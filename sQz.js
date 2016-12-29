@@ -1,11 +1,20 @@
-function check() {
-	var cls = this.getAttribute('class');
-	window.alert(cls);
+function check(x) {
+	try {
+		x.className = 'checked';
+		var a = x.name;
+		//window.alert(x);
+	} catch(err) {
+		window.alert(err.message);
+	}
+	// if(cls == null)
+		// window.alert('no name');
+	// else
+		// window.alert(cls);
 }
 function checked(a) {
 	for(var i = 0; i < a.length; ++i)
-		if(a[i].checked ||
-			a[i].getAttribute('class').indexOf('checked') != -1)
+		if(a[i].checked)// ||
+			// a[i].getAttribute('class').indexOf('checked') != -1)
 			return a[i];
 	return null;
 }

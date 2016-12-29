@@ -129,14 +129,15 @@ void Question::wrt(ofstream& stm, int idx) {
 void Question::wrtDIV(ofstream& stm, int idx) {
 	char* ix = new char[sizeof(int) * 8 + 1];
 	sprintf(ix, "%d", idx);
-	stm.write("<div class='stmt'>", sizeof("<div class='stmt'>") - 1);
+	stm.write("<div class='stmt'>", sizeof("<div class='stmt'>")-1);
 	stm.write(ix, strlen(ix));
 	stm.write(". ", sizeof(". ") - 1);
 	HTMLspecialChars(stmt);
 	stm.write(stmt, strlen(stmt));
-	const char ediv[] = "</div>\n";
-	stm.write(ediv, sizeof(ediv) - 1);
-	const char *hdr = "<div name='", *mid = "' onclick=check() class='choice ";
+	stm.write("</div>", sizeof("</div>")-1);
+	const char br[] = "<br>\n";
+	stm.write(br, sizeof(br) - 1);
+	const char *hdr = "<label onclick='check(this)'><input type='radio' name='", *mid = "' value='";
 	int len = strlen(hdr) + strlen(ix) + strlen(mid) + 1;
 	char* header = new char[len];
 	len = strlen(hdr);
@@ -173,7 +174,8 @@ void Question::wrtDIV(ofstream& stm, int idx) {
 			HTMLspecialChars(s);
 			stm.write(s, strlen(s));
 		}
-		stm.write(ediv, sizeof(ediv) - 1);
+		stm.write("</label>", sizeof("</label>")-1);
+		stm.write(br, sizeof(br) - 1);
 	}
 	delete(header);
 }

@@ -1,6 +1,9 @@
 body {font-family:consolas,sans-serif;}
+input[type=radio]{display:none;}
 .stmt {background-color:#003c78;font-family:"Open Sans",sans-serif;display:inline-block;color:white;padding:1em;}
 .qid {font-size:1.3em;background-color:#a51c30;padding:.8em;display:inline-block;color:white;}
 .choice{padding:.2em;}
-.selected{border-color:#c48203;border-width:medium;border-style:solid;display:inline-block;}
+label:hover{background-color:/*#5ba0d0;*/#cee6f3;}
+/*.checked{border-color:#c48203;border-width:medium;border-style:solid;}*/
+.checked{background-color:#5ba0d0;}
 .hlight{background-color:green;}
