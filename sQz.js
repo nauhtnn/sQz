@@ -1,32 +1,35 @@
 function check(x) {
-	try {
-		x.className = 'checked';
-		var a = x.name;
-		//window.alert(x);
-	} catch(err) {
-		window.alert(err.message);
-	}
-	// if(cls == null)
-		// window.alert('no name');
-	// else
-		// window.alert(cls);
-}
-function checked(a) {
+	var e = x.getAttribute('name');
+	var a = document.getElementsByName(e);
 	for(var i = 0; i < a.length; ++i)
-		if(a[i].checked)// ||
-			// a[i].getAttribute('class').indexOf('checked') != -1)
-			return a[i];
-	return null;
+		a[i].className = 'choice';
+	x.className += ' hlight';
 }
+// function checked(a) {
+	// for(var i = 0; i < a.length; ++i)
+		// if(a[i].checked)
+			// return a[i];
+	// return null;
+// }
 function score() {
 	try{
 		var mark = 0;
-		var n = document.getElementById('n').value;
-		while(n) {
-			var x = checked(document.getElementsByName(n));
-			if(x != null && x.value == 0)
-				mark++;
-			--n;
+		var n = 6;
+		var a = document.getElementsByName(n);
+		while(0 < a.length) {
+			var t = 0, c = 0;
+			for(var i = 0; i < a.length; ++i)
+				if(0 < a[i].value) {
+					++t;
+					if(a[i].checked)
+						++c;
+					else
+						break;
+				}
+			if(t == c)
+				++mark;
+			++n;
+			a = document.getElementsByName(n);
 		}
 		window.alert('Số câu đúng = ' + mark);
 	}catch(err){
@@ -34,25 +37,30 @@ function score() {
 	}
 }
 function toggle() {
-	var x = document.getElementById('toggle');
-	if(x != null)
-		if(x.value == 'Show answer')
-			showAnswer();
-		else
-			hideAnswer();
+	// var x = document.getElementById('toggle');
+	// if(x != null)
+		// if(x.value == 'Show answer')
+			// showAnswer();
+		// else
+			// hideAnswer();
+		showAnswer();
 }
 function showAnswer() {
 	try {
-		var n = document.getElementById('n').value;
-		while(n) {
-			var x = document.getElementsByName(n);
-			if(x != null)
-				for(var i = 0; i < x.length; ++i)
-					if(x[i].value == 0)
-						x[i].className = 'hlight';
+		var n = -1;
+		var a = document.getElementsByName(n);
+		while(0 < a.length) {
+			var b = document.getElementsByName(-n);
+			for(var i = 0; i < a.length; ++i)
+				if(0 < a[i].value) {
+					b[i].className += ' hlight';
+					// if(a[i].checked)
+					// else
+				}
 			--n;
+			a = document.getElementsByName(n);
 		}
-		document.getElementById('toggle').value = 'Hide answer';
+		// document.getElementById('toggle').value = 'Hide answer';
 	}catch(err){
 		window.alert(err.message);
 	}
