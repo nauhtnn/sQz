@@ -3,6 +3,12 @@
 typedef list<char*> chList;
 typedef chList::iterator chIt;
 
+#define SAFE_DEL(p) if(p){delete(p);p=NULL}
+#define SAFE_DEL_AR(p) if(p){delete[]p;p=NULL;}
+#define SAFE_DEL_AR_AR(p, n)\
+if(p){for(int pi=0;pi<n;++pi)delete[]p[pi];delete[]p;p=NULL;}
+#define D_FUNC(x) cout<<x<<'\n';
+
 void readFile(const char* fname, char*& buf, size_t& len);
 bool in(char c, const char* a, size_t n);
 void cleanWhSp(char*& buf, size_t& len);

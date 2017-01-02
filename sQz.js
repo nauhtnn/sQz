@@ -14,12 +14,12 @@ function check(x) {
 function score() {
 	try{
 		var mark = 0;
-		var n = 6;
+		var n = -1;
 		var a = document.getElementsByName(n);
 		while(0 < a.length) {
 			var t = 0, c = 0;
 			for(var i = 0; i < a.length; ++i)
-				if(0 < a[i].value) {
+				if('#' < a[i].value) {
 					++t;
 					if(a[i].checked)
 						++c;
@@ -28,7 +28,7 @@ function score() {
 				}
 			if(t == c)
 				++mark;
-			++n;
+			--n;
 			a = document.getElementsByName(n);
 		}
 		window.alert('Số câu đúng = ' + mark);
@@ -52,7 +52,7 @@ function showAnswer() {
 		while(0 < a.length) {
 			var b = document.getElementsByName(-n);
 			for(var i = 0; i < a.length; ++i)
-				if(0 < a[i].value) {
+				if('#' < a[i].value) {
 					b[i].className += ' hlight';
 					// if(a[i].checked)
 					// else

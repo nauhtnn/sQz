@@ -33,16 +33,18 @@ void Page::writeFooter(ofstream& stm) {
 	stm.write(c, sizeof(c)-1);
 }
 void Page::writeFormHeader(ofstream& stm, size_t nQuest) {
-	const char* c = "<form><input type='hidden' id='n' value='";
-	stm.write(c, strlen(c));
-	char* s = new char[(sizeof(int)*8+1)];
-	sprintf(s, "%d", nQuest);
-	stm.write(s, strlen(s));
-	delete(s);
-	c = "'>\n";
-	stm.write(c, strlen(c));
+	// const char* c = "<form><input type='hidden' id='n' value='";
+	// stm.write(c, strlen(c));
+	// char* s = new char[(sizeof(int)*8+1)];
+	// sprintf(s, "%d", nQuest);
+	// stm.write(s, strlen(s));
+	// delete(s);
+	// c = "'>\n";
+	// stm.write(c, strlen(c));
+	stm.write("<form>\n", sizeof("<form>\n") - 1);
 }
 void Page::writeFormFooter(ofstream& stm) {
-	const char c[] = "<input type='button' onclick='score()' value='Chấm điểm'></form>\n";
+	const char c[] = "<input type='button' onclick='score()' value='Score'>"\
+		"<input type='button' onclick='toggle()' value='Show answer'></form>\n";
 	stm.write(c, sizeof(c)-1);
 }

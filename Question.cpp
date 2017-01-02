@@ -8,6 +8,9 @@ using namespace std;
 #include "utils.h"
 #include "Question.h"
 #include "Page.h"
+#define WRARR(x) os.write(x,sizeof(x)-1);
+#define WRPTR(x) os.write(x,strlen(x));
+#define WRPTRN(x,n) os.write(x,n);
 
 Question::Question() {
 	stmt = NULL;
@@ -70,21 +73,21 @@ void Question::print() {
 	for(int i = 0; i < nChoices; ++i)
 		cout << '_' << choices[i] << "_\n";
 }
-void Question::write(ofstream& stm, int idx, bool bDIV) {
+void Question::write(ofstream& os, int idx, bool bDIV) {
 	if(bDIV)
-		wrtDIV(stm, idx);
+		wrtDIV(os, idx);
 	else
-		wrt(stm, idx);
+		wrt(os, idx);
 }
-void Question::wrt(ofstream& stm, int idx) {
+void Question::wrt(ofstream& os, int idx) {
 	char* ix = new char[sizeof(int) * 8 + 1];
 	sprintf(ix, "%d", idx);
-	stm.write(ix, strlen(ix));
-	stm.write(". ", sizeof(". ") - 1);
+	WRPTR(ix)
+	WRARR(". ")
 	HTMLspecialChars(stmt);
-	stm.write(stmt, strlen(stmt));
+	WRARR(stmt);
 	const char br[] = "<br>\n";
-	stm.write(br, sizeof(br) - 1);
+	WRARR(br)
 	const char *hdr = "<input type='radio' name='", *mid = "' value='";
 	int len = strlen(hdr) + strlen(ix) + strlen(mid) + 1;
 	char* header = new char[len];
@@ -108,47 +111,59 @@ void Question::wrt(ofstream& stm, int idx) {
 			while(pos--)
 				++qi;
 		}
-		stm.write(header, strlen(header));
+		WRPTR(header)
 		char* s = *qi;
 		vChoices.erase(qi);
 		if(s[0] == '\\') {
-			stm.write("0'>", sizeof("0'>") - 1);
+			WRARR("0'>")
 			HTMLspecialChars(s);
-			stm.write(s + 1, strlen(s) - 1); //+1 to skip '\'
+			os.write(s + 1, strlen(s) - 1); //+1 to skip '\'
 		} else {
-			stm.write(&j, sizeof(char));
+			os.write(&j, sizeof(char));
 			++j;
-			stm.write("'>", sizeof("'>") - 1);
+			WRARR("'>")
 			HTMLspecialChars(s);
-			stm.write(s, strlen(s));
+			WRPTR(s)
 		}
-		stm.write(br, sizeof(br) - 1);
+		WRARR(br)
 	}
 	delete(header);
 }
-void Question::wrtDIV(ofstream& stm, int idx) {
+void Question::wrtDIV(ofstream& os, int idx) {
 	char* ix = new char[sizeof(int) * 8 + 1];
 	sprintf(ix, "%d", idx);
-	stm.write("<div class='stmt'>", sizeof("<div class='stmt'>")-1);
-	stm.write(ix, strlen(ix));
-	stm.write(". ", sizeof(". ") - 1);
+	WRARR("<div class='qid'>")
+	WRPTR(ix)
+	WRARR("</div><div class='q'><div class='stmt'>");
 	HTMLspecialChars(stmt);
-	stm.write(stmt, strlen(stmt));
-	stm.write("</div>", sizeof("</div>")-1);
-	const char br[] = "<br>\n";
-	stm.write(br, sizeof(br) - 1);
-	const char *hdr = "<label onclick='check(this)'><input type='radio' name='", *mid = "' value='";
-	int len = strlen(hdr) + strlen(ix) + strlen(mid) + 1;
-	char* header = new char[len];
-	len = strlen(hdr);
-	memcpy(header, hdr, len);
-	memcpy(header + len, ix, strlen(ix));
-	len += strlen(ix);
-	delete(ix);
-	memcpy(header + len, mid, strlen(mid));
-	len += strlen(mid);
-	header[len] = '\0';
-	char j = '1';
+	WRPTR(stmt)
+	WRARR("</div>\n");
+	const char *hdr = "<label><div onmouseup='check(this)' name='", *mid = "' class='choice'><span class='cid'>(";
+	size_t lh = strlen(hdr) + strlen(ix) + strlen(mid) + 1; //+1 for '\0'
+	char* header = new char[lh];
+// <div class='qid'>1</div><div class='q'><div class='stmt'>Trong soạn thảo Word, muốn chuyển đổi giữa hai chế đó gõ: chế đó gõ chèn và chế độ gõ thay thế, ta nhấn phím nào trên bàn phím</div>
+// <label><div onmouseup='check(this)' name='2' class='choice'><span class='cid'>(A)</span><input type='radio' name='-2' value='1'>Tab</div></label>
+// </div>
+	lh = strlen(hdr);
+	memcpy(header, hdr, lh);
+	memcpy(header + lh, ix, strlen(ix));
+	lh += strlen(ix);
+	memcpy(header + lh, mid, strlen(mid));
+	lh += strlen(mid);
+	header[lh] = '\0';
+	hdr = ")</span><input type='radio' name='-";
+	mid = "' value='";
+	size_t lm = strlen(hdr) + strlen(ix) + strlen(mid) + 1; //+1 for '\0'
+	char* middle = new char[lm];
+	lm = strlen(hdr);
+	memcpy(middle, hdr, lm);
+	memcpy(middle + lm, ix, strlen(ix));
+	lm += strlen(ix);
+	memcpy(middle + lm, mid, strlen(mid));
+	lm += strlen(mid);
+	middle[lm] = '\0';
+	mid = "</div></label>\n";
+	char j = 'A';
 	chList vChoices;
 	for(int i = 0; i < nChoices; ++i)
 		vChoices.push_back(choices[i]);
@@ -160,22 +175,28 @@ void Question::wrtDIV(ofstream& stm, int idx) {
 			while(pos--)
 				++qi;
 		}
-		stm.write(header, strlen(header));
+		// os.write(header, lh);
+		WRPTRN(header, lh)
+		WRPTRN(&j, sizeof(char))
+		WRPTRN(middle, lm)
 		char* s = *qi;
 		vChoices.erase(qi);
 		if(s[0] == '\\') {
-			stm.write("0'>", sizeof("0'>") - 1);
+			char r = j - 'A' + '0';
+			os.write(&r, sizeof(char));
+			WRARR("'>")
 			HTMLspecialChars(s);
-			stm.write(s + 1, strlen(s) - 1); //+1 to skip '\'
+			os.write(s + 1, strlen(s) - 1); //+1 to skip '\'
 		} else {
-			stm.write(&j, sizeof(char));
-			++j;
-			stm.write("'>", sizeof("'>") - 1);
+			WRARR("#'>")
 			HTMLspecialChars(s);
-			stm.write(s, strlen(s));
+			WRPTR(s)
 		}
-		stm.write("</label>", sizeof("</label>")-1);
-		stm.write(br, sizeof(br) - 1);
+		WRARR("</div></label>\n")
+		++j;
 	}
-	delete(header);
+	WRARR("</div>")
+	SAFE_DEL_AR(ix)
+	SAFE_DEL_AR(header)
+	SAFE_DEL_AR(middle)
 }

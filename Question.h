@@ -4,11 +4,6 @@
 using namespace std;
 #include "Settings.h"
 
-#define SAFE_DEL_AR(p) if(p){delete[]p;p=NULL;}
-#define SAFE_DEL_AR_AR(p, n)\
-if(p){for(int pi=0;pi<n;++pi)delete[]p[pi];delete[]p;p=NULL;}
-#define D_FUNC(x) cout << x << '\n';
-
 class Question {
 public:
 	char* stmt; //statement
