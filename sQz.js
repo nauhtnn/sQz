@@ -1,16 +1,57 @@
+function setChoice() {
+	var tbl = document.getElementById('ans');
+	for(var i = 0; i < tbl.rows.length; ++i) {
+		var r = tbl.rows[i];
+		for(var j = 0; j < r.cells.length; ++j) {
+			r.cells[j].className = i + '_' + j;
+			r.cells[j].onmouseup = checkA;
+		}
+	}
+}
+function checkA(e) {
+	var targ;
+	if (!e) var e = window.event;
+	if (e.target) targ = e.target;
+	else if (e.srcElement) targ = e.srcElement;
+	if (targ.nodeType == 3) // defeat Safari bug
+		targ = targ.parentNode;
+	var m = targ.className, i = m.indexOf('_');
+	var r = m.substring(0, i), c = m.substring(i+1) - 1;
+	var tbl = document.getElementById('ans');
+	var row = tbl.rows[r];
+	for(var i = 1; i < row.cells.length; ++i)
+		row.cells[i].innerHTML = '';
+	targ.innerHTML = 'X';
+	var l = document.getElementsByName(r);
+	var d = document.getElementsByName(-r);
+	if(c < l.length) {
+		for(var i = 0; i < l.length; ++i) {
+			l[i].className = 'choice';
+			d[i].checked = false;
+		}
+		l[c].className += ' hlight';
+		d[c].checked = true;
+	}
+}
 function check(x) {
 	var e = x.getAttribute('name');
 	var a = document.getElementsByName(e);
-	for(var i = 0; i < a.length; ++i)
+	var col = 0;
+	for(var i = 0; i < a.length; ++i) {
 		a[i].className = 'choice';
+		if(a[i] == x)
+			col = i;
+	}
 	x.className += ' hlight';
+	++col; //+1 for 1st col is qid
+	//not e-1, 1st row is th
+	a = document.getElementById('ans').rows[e].cells;
+	for(var i = 1; i < a.length; ++i)
+		a[i].innerHTML = '';
+	a[col].innerHTML = 'X';
+	for(var i = 1; i < a.length; ++i)
+		s += a[i].innerHTML;
 }
-// function checked(a) {
-	// for(var i = 0; i < a.length; ++i)
-		// if(a[i].checked)
-			// return a[i];
-	// return null;
-// }
 function score() {
 	try{
 		var mark = 0;

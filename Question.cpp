@@ -8,9 +8,9 @@ using namespace std;
 #include "utils.h"
 #include "Question.h"
 #include "Page.h"
-#define WRARR(x) os.write(x,sizeof(x)-1);
-#define WRPTR(x) os.write(x,strlen(x));
-#define WRPTRN(x,n) os.write(x,n);
+#define MAX_COLUMN 2
+
+int Question::s_column = MAX_COLUMN;
 
 Question::Question() {
 	stmt = NULL;
@@ -74,10 +74,15 @@ void Question::print() {
 		cout << '_' << choices[i] << "_\n";
 }
 void Question::write(ofstream& os, int idx, bool bDIV) {
+	if(s_column == MAX_COLUMN) {
+		WRARR("<div class='k3'></div>") //invisible inline-block
+		s_column = 0;
+	}
 	if(bDIV)
 		wrtDIV(os, idx);
 	else
 		wrt(os, idx);
+	++s_column;
 }
 void Question::wrt(ofstream& os, int idx) {
 	char* ix = new char[sizeof(int) * 8 + 1];
@@ -85,7 +90,7 @@ void Question::wrt(ofstream& os, int idx) {
 	WRPTR(ix)
 	WRARR(". ")
 	HTMLspecialChars(stmt);
-	WRARR(stmt);
+	WRPTR(stmt)
 	const char br[] = "<br>\n";
 	WRARR(br)
 	const char *hdr = "<input type='radio' name='", *mid = "' value='";
@@ -134,10 +139,10 @@ void Question::wrtDIV(ofstream& os, int idx) {
 	sprintf(ix, "%d", idx);
 	WRARR("<div class='qid'>")
 	WRPTR(ix)
-	WRARR("</div><div class='q'><div class='stmt'>");
+	WRARR("</div><div class='q'><div class='stmt'>")
 	HTMLspecialChars(stmt);
 	WRPTR(stmt)
-	WRARR("</div>\n");
+	WRARR("</div>\n")
 	const char *hdr = "<label><div onmouseup='check(this)' name='", *mid = "' class='choice'><span class='cid'>(";
 	size_t lh = strlen(hdr) + strlen(ix) + strlen(mid) + 1; //+1 for '\0'
 	char* header = new char[lh];

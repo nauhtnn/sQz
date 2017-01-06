@@ -10,6 +10,7 @@ public:
 	size_t nChoices;
 	char** choices;
 	bool bChoiceSort;
+	static int s_column;
 	Question();
 	~Question();
 	void read(list<char*>::iterator& i, list<char*>::iterator e,
