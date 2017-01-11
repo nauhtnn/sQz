@@ -1,0 +1,150 @@
+Trong Powerpoint cho biết phím tắt để chạy phiên trình chiếu?
+\Phím F5
+Phím F9
+Phím F3
+Phím F7
+Câu nào sau đây sai? Khi nhập dữ liệu vào bảng tính Excel thì:
+\Dữ liệu kiểu số sẽ mặc nhiên căn thẳng lề trái
+Dữ liệu kiểu kí tự sẽ mặc nhiên căn thẳng lề trái
+Dữ liệu kiểu thời gian sẽ mặc nhiên căn thẳng lề phải
+Dữ liệu kiểu ngày tháng sẽ mặc nhiên căn thẳng lề phải
+Trong Powerpoint có những dạng hiển thị nào sau đây?
+Normal
+\Tất cả đáp án trên đều đúng
+Slide Sorter
+Notes page
+Font chữ nào sau đây thuộc bảng mã TCVN3 (ABC)?
+Vni-times
+Tahoma
+Vni-Brush
+\.VnTime
+Để đóng nhanh một cửa sổ trong Windows ta dùng tổ hợp phím nào sau đây?
+\ALT - F4
+ALT - F3
+ALT - F2
+ALT - F1
+Trong bảng tính Excel, để định dạng chữ đậm cho dữ liệu, ta dùng tổ hợp phím:
+Ctrl + C
+Ctrl + A
+Ctrl + D
+\Ctrl + B
+Trong bảng tính Excel, hàm nào sau đây cho phép tính tổng các giá trị kiểu số thoả một điều kiện cho trước:
+\SUMIF
+COUTIF
+COUNT
+SUM
+Trang Web Youtube là gì?
+Mạng xã hội
+Thư điện tử
+Đọc tin tức
+\Trang Web chia sẻ video trực tuyến
+Trong Powerpoint, khi đang thực hiện trình chiếu muốn thoát phiên trình chiếu phải làm sao?
+Click chuột phải -> Exit
+Click chuột phải -> Return
+Click chuột phải -> Quit
+\Click chuột phải -> End Show
+Trong soạn thảo Word, phím tắt nào sau đây để định dạng chữ in nghiêng:
+CTRL + L
+CTRL + R
+\CTRL + I
+CTRL + B
+Phần mềm nào sau đây sử dụng mã nguồn mở?
+Microsoft Office
+Photoshop
+Windows Media
+\Linux
+Thiết bị nào sau đây sử dụng cho máy tính?
+Chuột
+Bàn phím
+Máy in
+\Tất cả đáp án trên đều đúng
+Cho biết trang Web nào cho phép tạo thư điện tử?
+yahoo.com.vn
+\Tất cả các đáp án trên đều đúng
+yahoo.com
+gmail.com
+Trong bảng tính Exel, giá trị trả về của công thức =LEN("TRUNG TAM TIN HOC") là:
+15
+18
+\17
+16
+Để tạo hiệu ứng cho các đối tượng trên slide trong Powerpoint ta sử dụng chức năng?
+Transitions
+\Animations
+Slide Show
+Design
+Công dụng của thư điện tử (Email) là gì?
+Gửi dữ liệu qua mạng
+Gửi thư quảng cáo qua mạng
+Gửi thư điện tử
+\Tất cả đáp án trên đều đúng
+Trong soạn thảo Word, khi làm việc với văn bản muốn in đậm nội dung văn bản đang chọn khối bạn bấm tổ phím:
+Ctrl - C
+\Ctrl - B
+Ctrl - D
+Ctrl - A
+Cho biết cú pháp tìm nội dung ở trang Web zing.vn trên Google?
+<Nội Dung> Zing.vn
+Website:zing.vn <Nội dung>
+\Site:zing.vn <Nội dung>
+Zing.vn <Nội dung>
+Cho biết phần mềm nào dùng để duyệt Web?
+Internet Explorer
+Mozilla FireFox
+Google Chrome
+\Tất cả các đáp án trên đều đúng
+Trong soạn thảo Word, muốn tạo chữ rơi cho văn bản bạn thực hiện:
+Home -> Dropcap
+\Insert -> Dropcap
+View -> Dropcap
+Page Layout -> Dropcap
+Để máy tính có thể làm việc hệ điều hành được cài đặt ở đâu?
+ROM
+RAM
+\Ổ đĩa cứng
+Tất cả đều sai
+Các kiểu dữ liệu thông dụng của Excel là:
+\Kiểu chuỗi, kiểu số, kiểu ngày tháng, kiểu công thức
+Kiểu chuỗi, kiểu văn bản, kiểu ngày tháng
+Kiểu công thức, kiểu hàm, kiểu số, kiểu ngày tháng
+Kiểu số, kiểu logic, kiểu ngày tháng
+Bộ xử lý trung tâm của máy tính là?
+ROM
+\CPU
+RAM
+Router
+Cho biết phím tắt để lưu trang Web về máy tính?
+Ctrl - O
+\Ctrl - S
+Ctrl - B
+Ctrl - A
+Ý nghĩa Recycle Bin trong Windows?
+Phần mềm duyệt Web
+Nơi chứa các tập tin, thư mục quan trọng
+\Nơi chứa các tập tin, thư mục đã xóa
+Phần mềm chơi game
+Trong Windows Explorer, muốn sửa đổi tên của một thư mục, tập tin ta nhấp phải chuột trên thư mục, tập tin đó và chọn:
+\Rename
+Properties
+Search
+Create shortcut
+Trong soạn thảo Word, khi làm việc với văn bản muốn phục hồi lại thao tác vừa thực hiện bạn bấm tổ hợp phím:
+\Ctrl - Z
+Ctrl - X
+Ctrl - A
+Ctrl - B
+Trong Windows Explorer muốn tạo thư mục mới ta thực hiện?
+Tool -> New -> Folder
+View -> New -> Folder
+\File -> New -> Folder
+Edit -> New -> Folder
+Trong Powerpoint để vẽ một biểu đồ, chọn?
+Design -> Chart
+\Insert -> Illustration -> Chart
+Animation -> Chart
+Home -> Chart
+Trong soạn thảo Word, để định dạng đường khung cho một đoạn văn bản bạn chọn:
+Picture
+Clip Art
+Word Art
+\Tất cả đáp án trên đều sai

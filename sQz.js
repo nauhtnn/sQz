@@ -7,15 +7,19 @@ function setCell() {
 			r.cells[j].onmouseup = checkCell;
 		}
 	}
-	countdown();
+	// countdown();
 }
-function checkCell(e) {
+function caller(e) {
 	var targ;
 	if (!e) var e = window.event;
 	if (e.target) targ = e.target;
 	else if (e.srcElement) targ = e.srcElement;
 	if (targ.nodeType == 3) // defeat Safari bug
 		targ = targ.parentNode;
+	return targ;
+}
+function checkCell(e) {
+	var targ = caller(e);
 	var m = targ.className, i = m.indexOf('_');
 	var r = m.substring(0, i), c = m.substring(i+1) - 1;
 	var tbl = document.getElementById('ans');
@@ -54,7 +58,12 @@ function checkCell(e) {
 	// for(var i = 1; i < a.length; ++i)
 		// s += a[i].innerHTML;
 // }
-function score() {
+var bAnswer = false;
+function score(e) {
+	try{
+	var targ = caller(e);
+	if(targ.value != 'Submit')
+		return;
 	var mark = 0;
 	var n = -1;
 	var a = document.getElementsByName(n);
@@ -73,18 +82,26 @@ function score() {
 		--n;
 		a = document.getElementsByName(n);
 	}
+	targ.value = mark + '/' + (-n - 1);
+	bAnswer = true;
 	window.alert('Số câu đúng = ' + mark);
+	}catch(err) {
+		window.alert(err.message);
+	}
 }
-function toggle() {
+function showAnswer() {
 	// var x = document.getElementById('toggle');
 	// if(x != null)
 		// if(x.value == 'Show answer')
 			// showAnswer();
 		// else
 			// hideAnswer();
-		showAnswer();
+	if(bAnswer)
+		showAnswer1();
+	else
+		window.alert('Nộp bài trước khi xem đáp án');
 }
-function showAnswer() {
+function showAnswer1() {
 	try {
 		var n = -1;
 		var a = document.getElementsByName(n);
@@ -104,22 +121,22 @@ function showAnswer() {
 		window.alert(err.message);
 	}
 }
-function hideAnswer() {
-	var n = document.getElementById('n').value;
-	while(n) {
-		var x = document.getElementsByName(n);
-		if(x != null)
-			for(var i = 0; i < x.length; ++i)
-				x[i].className = '';
-		--n;
-	}
-	document.getElementById('toggle').value = 'Show answer';
-}
-function countdown() {
-	var s = Date.parse(new Date());
-	var tr = setInterval(function(){
-		var d = Date.parse(new Date()) - s;
-		var c = document.getElementById('clock');
-		c.innerHTML = d + ' s';
-	}, 5000);
-}
+// function hideAnswer() {
+	// var n = document.getElementById('n').value;
+	// while(n) {
+		// var x = document.getElementsByName(n);
+		// if(x != null)
+			// for(var i = 0; i < x.length; ++i)
+				// x[i].className = '';
+		// --n;
+	// }
+	// document.getElementById('toggle').value = 'Show answer';
+// }
+// function countdown() {
+	// var s = Date.parse(new Date());
+	// var tr = setInterval(function(){
+		// var d = Date.parse(new Date()) - s;
+		// var c = document.getElementById('clock');
+		// c.innerHTML = d + ' s';
+	// }, 5000);
+// }
