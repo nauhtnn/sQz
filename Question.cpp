@@ -8,9 +8,6 @@ using namespace std;
 #include "utils.h"
 #include "Question.h"
 #include "Page.h"
-#define MAX_COLUMN 2
-
-int Question::s_column = MAX_COLUMN;
 
 Question::Question() {
 	stmt = NULL;
@@ -74,15 +71,10 @@ void Question::print() {
 		cout << '_' << choices[i] << "_\n";
 }
 void Question::write(ofstream& os, int idx, bool bDIV) {
-	if(s_column == MAX_COLUMN) {
-		WRARR("<div class='k3'></div>") //invisible inline-block
-		s_column = 0;
-	}
 	if(bDIV)
 		wrtDIV(os, idx);
 	else
 		wrt(os, idx);
-	++s_column;
 }
 void Question::wrt(ofstream& os, int idx) {
 	char* ix = new char[sizeof(int) * 8 + 1];
@@ -137,18 +129,18 @@ void Question::wrt(ofstream& os, int idx) {
 void Question::wrtDIV(ofstream& os, int idx) {
 	char* ix = new char[sizeof(int) * 8 + 1];
 	sprintf(ix, "%d", idx);
-	WRARR("<div class='qid'>")
+	WRARR("<div class='cl'><div class='qid'>")
 	WRPTR(ix)
 	WRARR("</div><div class='q'><div class='stmt'>")
 	HTMLspecialChars(stmt);
 	WRPTR(stmt)
 	WRARR("</div>\n")
-	const char *hdr = "<label><div onmouseup='check(this)' name='", *mid = "' class='choice'><span class='cid'>(";
+	const char *hdr = "<div name='", *mid = "'class='c'><span class='cid'>(";
 	size_t lh = strlen(hdr) + strlen(ix) + strlen(mid) + 1; //+1 for '\0'
 	char* header = new char[lh];
-// <div class='qid'>1</div><div class='q'><div class='stmt'>Trong soạn thảo Word, muốn chuyển đổi giữa hai chế đó gõ: chế đó gõ chèn và chế độ gõ thay thế, ta nhấn phím nào trên bàn phím</div>
-// <label><div onmouseup='check(this)' name='2' class='choice'><span class='cid'>(A)</span><input type='radio' name='-2' value='1'>Tab</div></label>
-// </div>
+// <div class='cl1'></div><div class='cl'>
+// <div class='qid'>9999</div><div class='q'><div class='stmt'>Trong soạn thảo Word</div>
+// <div  name='1' class='c'><span class='cid ck'>(A)</span><input type='radio' name='-1' value='#'>Forward</div>
 	lh = strlen(hdr);
 	memcpy(header, hdr, lh);
 	memcpy(header + lh, ix, strlen(ix));
@@ -167,7 +159,6 @@ void Question::wrtDIV(ofstream& os, int idx) {
 	memcpy(middle + lm, mid, strlen(mid));
 	lm += strlen(mid);
 	middle[lm] = '\0';
-	mid = "</div></label>\n";
 	char j = 'A';
 	chList vChoices;
 	for(int i = 0; i < nChoices; ++i)
@@ -180,7 +171,6 @@ void Question::wrtDIV(ofstream& os, int idx) {
 			while(pos--)
 				++qi;
 		}
-		// os.write(header, lh);
 		WRPTRN(header, lh)
 		WRPTRN(&j, sizeof(char))
 		WRPTRN(middle, lm)
@@ -191,16 +181,17 @@ void Question::wrtDIV(ofstream& os, int idx) {
 			os.write(&r, sizeof(char));
 			WRARR("'>")
 			HTMLspecialChars(s);
-			os.write(s + 1, strlen(s) - 1); //+1 to skip '\'
+			//os.write(s + 1, strlen(s) - 1); //+1 to skip '\'
+			WRPTR(s + 1)
 		} else {
 			WRARR("#'>")
 			HTMLspecialChars(s);
 			WRPTR(s)
 		}
-		WRARR("</div></label>\n")
+		WRARR("</div>\n")
 		++j;
 	}
-	WRARR("</div>")
+	WRARR("</div></div>")
 	SAFE_DEL_AR(ix)
 	SAFE_DEL_AR(header)
 	SAFE_DEL_AR(middle)

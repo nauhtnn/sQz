@@ -3,6 +3,8 @@
 typedef list<char*> chList;
 typedef chList::iterator chIt;
 
+#define BUF_SIZE (1024)
+
 #define SAFE_DEL(p) if(p){delete(p);p=NULL}
 #define SAFE_DEL_AR(p) if(p){delete[]p;p=NULL;}
 #define SAFE_DEL_AR_AR(p, n)\

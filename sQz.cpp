@@ -10,6 +10,8 @@ using namespace std;
 #include "Question.h"
 #include "utils.h"
 
+#define MAX_COLUMN 2
+
 int main(int argc, const char* argv[]) {
 	string fname = (1 < argc) ? argv[1] : "qz.txt";
 	char* buf = NULL;
@@ -44,19 +46,23 @@ int main(int argc, const char* argv[]) {
 	size_t pos = fname.find_last_of('.');
 	fname = fname.substr(0, pos);
 	fname += ".html";
-	ofstream writer(fname.c_str(), ofstream::out);
-	if(!writer) {
+	ofstream os(fname.c_str(), ofstream::out);
+	if(!os) {
 		cout << "Cannot write file " << fname << "\n";
 		return -1;
 	} else
 		cout << "Write file " << fname << "\n";
-	pg.writeHeader(writer);
-	pg.writeFormHeader(writer, vQuest.size());
+	pg.writeHeader(os);
+	pg.writeFormHeader(os, vQuest.size());
 	list<Question*>::iterator qi = vQuest.begin();
 	len = vQuest.size();
 	srand(time(NULL));
-	int j = 0;
+	int j = 0, column = MAX_COLUMN;
 	while(!vQuest.empty()) {
+		if(column == MAX_COLUMN) {
+			WRARR("<div class='cl1'></div>")
+			column = 0;
+		}
 		qi = vQuest.begin();
 		if(pg.mSt->bQuestSort) {
 			pos = rand() % vQuest.size();
@@ -65,12 +71,13 @@ int main(int argc, const char* argv[]) {
 		}
 		q = *qi;
 		vQuest.erase(qi);
-		q->write(writer, ++j);
+		q->write(os, ++j);
 		delete(q);
+		++column;
 	}
-	pg.writeFormFooter(writer);
-	pg.writeFooter(writer);
-	writer.close();
+	pg.writeFormFooter(os);
+	pg.writeFooter(os);
+	os.close();
 	SAFE_DEL_AR(buf);
 	return 0;
 }

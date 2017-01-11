@@ -1,14 +1,14 @@
-function setChoice() {
+function setCell() {
 	var tbl = document.getElementById('ans');
-	for(var i = 0; i < tbl.rows.length; ++i) {
+	for(var i = 1; i < tbl.rows.length; ++i) { //1, not 0
 		var r = tbl.rows[i];
-		for(var j = 0; j < r.cells.length; ++j) {
+		for(var j = 1; j < r.cells.length; ++j) { //1, not 0
 			r.cells[j].className = i + '_' + j;
-			r.cells[j].onmouseup = checkA;
+			r.cells[j].onmouseup = checkCell;
 		}
 	}
 }
-function checkA(e) {
+function checkCell(e) {
 	var targ;
 	if (!e) var e = window.event;
 	if (e.target) targ = e.target;
@@ -19,63 +19,60 @@ function checkA(e) {
 	var r = m.substring(0, i), c = m.substring(i+1) - 1;
 	var tbl = document.getElementById('ans');
 	var row = tbl.rows[r];
-	for(var i = 1; i < row.cells.length; ++i)
-		row.cells[i].innerHTML = '';
-	targ.innerHTML = 'X';
 	var l = document.getElementsByName(r);
-	var d = document.getElementsByName(-r);
 	if(c < l.length) {
+		targ.innerHTML = 'X';
+		l[c].getElementsByTagName('input')[0].checked = true;
+		var cid = l[c].getElementsByTagName('span')[0];
+		if(cid.className.indexOf('ck') < 0)
+			cid.className += ' ck';
 		for(var i = 0; i < l.length; ++i) {
-			l[i].className = 'choice';
-			d[i].checked = false;
+			if(!l[i].getElementsByTagName('input')[0].checked) {
+				l[i].getElementsByTagName('span')[0].className = 'cid';
+				row.cells[i + 1].innerHTML = '';
+			}
 		}
-		l[c].className += ' hlight';
-		d[c].checked = true;
 	}
 }
-function check(x) {
-	var e = x.getAttribute('name');
-	var a = document.getElementsByName(e);
-	var col = 0;
-	for(var i = 0; i < a.length; ++i) {
-		a[i].className = 'choice';
-		if(a[i] == x)
-			col = i;
-	}
-	x.className += ' hlight';
-	++col; //+1 for 1st col is qid
-	//not e-1, 1st row is th
-	a = document.getElementById('ans').rows[e].cells;
-	for(var i = 1; i < a.length; ++i)
-		a[i].innerHTML = '';
-	a[col].innerHTML = 'X';
-	for(var i = 1; i < a.length; ++i)
-		s += a[i].innerHTML;
-}
+// function check(x) {
+	// var e = x.getAttribute('name');
+	// var a = document.getElementsByName(e);
+	// var col = 0;
+	// for(var i = 0; i < a.length; ++i) {
+		// a[i].className = 'choice';
+		// if(a[i] == x)
+			// col = i;
+	// }
+	// x.className += ' hlight';
+	// ++col; //+1 for 1st col is qid
+	// //not e-1, 1st row is th
+	// a = document.getElementById('ans').rows[e].cells;
+	// for(var i = 1; i < a.length; ++i)
+		// a[i].innerHTML = '';
+	// a[col].innerHTML = 'X';
+	// for(var i = 1; i < a.length; ++i)
+		// s += a[i].innerHTML;
+// }
 function score() {
-	try{
-		var mark = 0;
-		var n = -1;
-		var a = document.getElementsByName(n);
-		while(0 < a.length) {
-			var t = 0, c = 0;
-			for(var i = 0; i < a.length; ++i)
-				if('#' < a[i].value) {
-					++t;
-					if(a[i].checked)
-						++c;
-					else
-						break;
-				}
-			if(t == c)
-				++mark;
-			--n;
-			a = document.getElementsByName(n);
-		}
-		window.alert('Số câu đúng = ' + mark);
-	}catch(err){
-		window.alert(err.message);
+	var mark = 0;
+	var n = -1;
+	var a = document.getElementsByName(n);
+	while(0 < a.length) {
+		var t = 0, c = 0;
+		for(var i = 0; i < a.length; ++i)
+			if('#' < a[i].value) {
+				++t;
+				if(a[i].checked)
+					++c;
+				else
+					break;
+			}
+		if(t == c)
+			++mark;
+		--n;
+		a = document.getElementsByName(n);
 	}
+	window.alert('Số câu đúng = ' + mark);
 }
 function toggle() {
 	// var x = document.getElementById('toggle');
@@ -94,7 +91,7 @@ function showAnswer() {
 			var b = document.getElementsByName(-n);
 			for(var i = 0; i < a.length; ++i)
 				if('#' < a[i].value) {
-					b[i].className += ' hlight';
+					b[i].className += ' ch';
 					// if(a[i].checked)
 					// else
 				}
