@@ -7,6 +7,7 @@ function setCell() {
 			r.cells[j].onmouseup = checkCell;
 		}
 	}
+	countdown();
 }
 function checkCell(e) {
 	var targ;
@@ -113,4 +114,12 @@ function hideAnswer() {
 		--n;
 	}
 	document.getElementById('toggle').value = 'Show answer';
+}
+function countdown() {
+	var s = Date.parse(new Date());
+	var tr = setInterval(function(){
+		var d = Date.parse(new Date()) - s;
+		var c = document.getElementById('clock');
+		c.innerHTML = d + ' s';
+	}, 5000);
 }

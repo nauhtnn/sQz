@@ -1,0 +1,80 @@
+/*berkeley*/
+body {font-family:"Merriweather Light","Times New Roman",serif;
+	background-color:#cfd7de;
+	font-size:1.2em;
+	font-style:normal;
+	}
+.qid {display:inline-block;
+	color:#fff;
+	float:left;
+	background-color:#003262;
+	width:10%;
+	padding:.3em 0;
+	vertical-align:top;
+	text-align:center;
+	margin-top:8px;
+	}
+.q{
+	display:inline-block;
+	background-color:#eee;
+	width:90%;
+	vertical-align:top;
+	margin-top:8px;
+	}
+.stmt {
+	padding:.5em;
+	border-top:4px solid #003262;
+	border-bottom:4px solid #c4820e;
+	}
+.cid{
+	color:#003262;
+	padding:.4em;
+	text-align:center;
+}
+.ck{background:#003262;color:#fff;border-radius:50%;}
+.c{padding:.4em 0;}
+.ch{background-color:#3b7ea1;color:#fff;}
+input[type=radio]{display:none;}
+#lp{
+	width:25%;
+	position:fixed;
+	left:0;
+	height:100%;
+	background:#ffb;
+}
+.tit2{
+	font-size:1.2em;
+	text-align:center;
+	padding:.3em;
+}
+#sht{
+	height:80%;
+	overflow:auto;
+	background:#ffd;
+	margin-bottom:4px;
+	font-size:.9em;
+}
+table {
+	width:100%;
+	border-collapse:collapse;
+	font-family:"Courier New", serif;
+}
+td,th {
+	border:1px solid #000;
+	text-align:center;
+}
+th.o, td.o {
+	border:none;
+}
+th.i {width:2.5em;}
+.cl1 {display:inline-block;width:26%;}
+.cl{display:inline-block;width:36%;}
+.btn{font-size:1.1em;padding:.4em 0;color:#fff;border:none;width:50%;
+	/*background:#003d7c;*/
+	background:#003262;
+	font-family:/*"Merriweather Light",*/"Times New Roman",serif;}
+.btn1{border-right:1px solid #fff;}
+.btn:hover{
+	color:#c4820e;
+	cursor:pointer;
+}
