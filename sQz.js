@@ -26,11 +26,14 @@ function checkCell(e) {
 	var row = tbl.rows[r];
 	var l = document.getElementsByName(r);
 	if(c < l.length) {
-		targ.innerHTML = 'X';
-		l[c].getElementsByTagName('input')[0].checked = true;
-		var cid = l[c].getElementsByTagName('span')[0];
-		if(cid.className.indexOf('ck') < 0)
-			cid.className += ' ck';
+		if(targ.innerHTML == '') {
+			targ.innerHTML = 'X';
+			l[c].getElementsByTagName('input')[0].checked = true;
+			var cid = l[c].getElementsByTagName('span')[0];
+			if(cid.className.indexOf('ck') < 0)
+				cid.className += ' ck';
+		} else
+			l[c].getElementsByTagName('input')[0].checked = false;
 		for(var i = 0; i < l.length; ++i) {
 			if(!l[i].getElementsByTagName('input')[0].checked) {
 				l[i].getElementsByTagName('span')[0].className = 'cid';

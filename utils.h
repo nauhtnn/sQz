@@ -18,6 +18,8 @@ if(p){for(int pi=0;pi<n;++pi)delete[]p[pi];delete[]p;p=NULL;}
 
 void readFile(const char* fname, char*& buf, size_t& len);
 bool in(char c, const char* a, size_t n);
+void cleanFront(char*& buf);
+void cleanEnd(char*& buf);
 void cleanWhSp(char*& buf, size_t& len);
 void splitStr(char* buf, size_t len, char c, list<char*>& v);
 void HTMLspecialChars(std::string& data);

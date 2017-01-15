@@ -86,6 +86,7 @@ th.o, td.o {
 th.i {width:2.5em;}
 .cl1 {display:inline-block;width:26%;}
 .cl{display:inline-block;width:36%;}
+.cl2{display:inline-block;width:70%;}
 .btn{font-size:1.1em;padding:.4em 0;color:#fff;border:none;width:50%;
 	/*background:#003d7c;*/
 	background:#a51c30;

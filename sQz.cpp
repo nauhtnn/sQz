@@ -13,7 +13,7 @@ using namespace std;
 #define MAX_COLUMN 2
 
 int main(int argc, const char* argv[]) {
-	cout << "sQz version 0.0.1\n";
+	cout << "sQz version 0.0.2\n";
 	// string fname = (1 < argc) ? argv[1] : "qz.txt";
 	char* fname = new char[BUF_SIZE], fi = 0;
 	sprintf(fname, "qz%i.txt", ++fi);
@@ -32,12 +32,6 @@ int main(int argc, const char* argv[]) {
 		pg.mSt = &st;
 		chIt i = vToken.begin(), e = vToken.end();
 		while(i != e && st.read(i));
-		// cout << pg.nChoices << '_' << pg.bQuestSort << '_' << pg.bChoiceSort;
-		// list<char*>::iterator i = vToken.begin(), e = vToken.end();
-		// while(i != e) {
-			// cout << *i << '\n';
-			// ++i;
-		// }
 		
 		list<Question*> vQuest;
 		Question* q = new Question;
@@ -52,7 +46,6 @@ int main(int argc, const char* argv[]) {
 		// fname += ".html";
 		size_t pos = 0;
 		sprintf(fname, "qz%i.html", fi);
-		// ofstream os(fname.c_str(), ofstream::out);
 		ofstream os(fname, ofstream::out);
 		if(!os) {
 			cout << "Cannot write file " << fname << "\n";

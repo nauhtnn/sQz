@@ -2,6 +2,7 @@
 #include <fstream>
 #include <cstring>
 #include <list>
+#define WHSP {' ', '\t', '\n', '\r'}
 using namespace std;
 void readFile(const char* fname, char*& buf, size_t& len) {
 	ifstream is(fname, ifstream::binary);
@@ -32,21 +33,43 @@ bool in(char c, const char* a, size_t n) {
 	return false;
 }
 
+void cleanFront(char*& buf) {
+	size_t len = strlen(buf);
+	const char whSp[] = WHSP;
+	char* i = buf, *e = buf + len;
+	while(i < e && in(*i, whSp, sizeof(whSp)))
+		++i;
+	if(i != buf) //ok as long as *e = '\0'
+		buf = i;
+}
+
+void cleanEnd(char*& buf) {
+	size_t len = strlen(buf);
+	const char whSp[] = WHSP;
+	char* i = buf + len - 1, *b = buf;
+	while(b <= i && in(*i, whSp, sizeof(whSp)))
+		--i;
+	if(i < b)
+		b = '\0';
+	else if(i != buf + len - 1)
+		*(i + 1) = '\0';
+}
+
 //WARNING: the following function may cause leak memory
 void cleanWhSp(char*& buf, size_t& len) {
-	const char whSp[] = {' ', '\t', 13, '\n'};//include 13
+	const char whSp[] = WHSP;
 	char* s = new char[len], *j = s;
 	char* i = buf, *e = buf + len;
 	while(i < e && in(*i, whSp, sizeof(whSp)))
-		++i;//truncate front
+		++i;//clean front
 	while(i < e) {
 		do *j++ = *i++;
 		while(i < e && !in(*i, whSp, sizeof(whSp)));
 		if(i < e) {
 			char* h = i;
-			do ++i;//truncate middle
+			do ++i;//clean middle
 			while(i < e && in(*i, whSp, sizeof(whSp)));
-			if(i < e) {//truncate end
+			if(i < e) {//clean end
 				bool nl = false;
 				while(h < i && !nl)
 					if(*h++ == '\n')
