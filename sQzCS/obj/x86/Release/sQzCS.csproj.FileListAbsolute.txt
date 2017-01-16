@@ -1,0 +1,6 @@
+C:\cygwin64\home\thuan\sQz\sQzCS\bin\x86\Release\sQzCS.exe.config
+C:\cygwin64\home\thuan\sQz\sQzCS\bin\x86\Release\sQzCS.exe
+C:\cygwin64\home\thuan\sQz\sQzCS\bin\x86\Release\sQzCS.pdb
+C:\cygwin64\home\thuan\sQz\sQzCS\obj\x86\Release\sQzCS.csprojResolveAssemblyReference.cache
+C:\cygwin64\home\thuan\sQz\sQzCS\obj\x86\Release\sQzCS.exe
+C:\cygwin64\home\thuan\sQz\sQzCS\obj\x86\Release\sQzCS.pdb
