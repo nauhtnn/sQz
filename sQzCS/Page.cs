@@ -39,7 +39,7 @@ namespace sQzCS
         }
         public void WriteFormHeader(System.IO.StreamWriter os, int nQuest)
         {
-            os.Write("<form><div id='lp'><div class='tit2'>Answer sheet</div><div id='sht'>" +
+            os.Write("<form><div id='lp'><div class='tit2'>Answer Sheet</div><div id='sht'>" +
                 "<table id='ans'><tr><th class='o i'></th><th>A</th><th>B</th><th>C</th>" +
                 "<th>D</th></tr>");
             //if 0 < nQuest
@@ -50,7 +50,7 @@ namespace sQzCS
                 buf = buf + s + (++i) + e;
             buf += "</table></div><input type='button'class='btn btn1'" +
                 "onclick='score()'value='Submit'><input type='button'" +
-                "class='btn'onclick='showAnswer()'value='Correct Ans'>" +
+                "class='btn'onclick='showAnswer()'value='Ans Keys'>" +
                 "</div><div class='bp'></div>";
             os.Write(buf);
         }

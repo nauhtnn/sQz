@@ -6,24 +6,46 @@ using System.Text;
 
 namespace sQzCS
 {
+
+    enum QuestType
+    {
+        Single = 1,
+        Multiple = 2,
+        Insertion = 4,
+        Selection = 8,
+        Matching = 16
+    }
+
+    enum ContentType
+    {
+        Raw = 1,
+        Image = 2,
+        Audio = 4,
+        Video = 8
+    }
+
     class Question
     {
-        string stmt; //statement
+        string mStmt; //statement
         int nChoices;
-        string[] choices;
+        string[] vChoices;
+        bool[] vKeys;
         bool bChoiceSort;
+        QuestType qType;
+        ContentType cType;
 
         public Question() {
 	        nChoices = 0;
 	        bChoiceSort = true;
+            qType = QuestType.Single;
+            cType = ContentType.Raw;
         }
 
         public void read(string[] v, ref int i, Settings deftSt)
         {
-            int e = v.Length, ss = 0;
-            stmt = v[i];
+            int e = v.Length, s = 0;
             System.Text.RegularExpressions.Match m =
-                    System.Text.RegularExpressions.Regex.Match(v[i], "\\\\[0-9]+");
+                    System.Text.RegularExpressions.Regex.Match(v[i], "\\\\[0-9]+ ");
             if (m.Success)
             {
                 int nc = int.Parse(v[i].Substring(m.Index + 1, m.Length - 1));
@@ -31,66 +53,92 @@ namespace sQzCS
                     nChoices = nc;
                 else
                     nChoices = deftSt.nChoices;
-                ss = m.Index + m.Length + 1;
+                s = m.Index + m.Length;
             }
             else
                 nChoices = deftSt.nChoices;
-            m = System.Text.RegularExpressions.Regex.Match(v[i], "\\\\[cC]");
+            m = System.Text.RegularExpressions.Regex.Match(v[i], "\\\\[cC] ");
             if (m.Success)
             {
                 bChoiceSort = false;
-                ss = m.Index + m.Length + 1;
+                s = m.Index + m.Length;
             }
-            if (0 < ss)
-                stmt = v[i].Substring(ss);
-            ++i;
-            choices = new string[nChoices];
-            int ci = 0;
-            for (; ci < nChoices && i != e; ++ci)
-                choices[ci] = v[i++];
+            mStmt = Utils.HTML(v[i++].Substring(s), ref cType);
+            vChoices = new string[nChoices];
+            vKeys = new bool[nChoices];
+            for (int ki = 0; ki < nChoices; ++ki)
+                vKeys[ki] = false;
+            int ci = 0, keyC = 0;
+            for (; ci < nChoices && i != e; ++ci) {
+                vChoices[ci] = Utils.HTML(v[i++], ref cType);
+                if (vChoices[ci][0] == '\\')
+                {
+                    vKeys[ci] = true;
+                    ++keyC;
+                    vChoices[ci] = vChoices[ci].Substring(1);
+                }
+            }
             if (ci < nChoices)
             {
                 for (int cj = ci; cj < nChoices; ++cj)
-                    choices[cj] = null;
+                    vChoices[cj] = null;
                 nChoices = ci;
             }
+            if (1 < keyC && qType == QuestType.Single)
+                qType = QuestType.Multiple;
         }
-        //void Question::print()
-        //{
-        //    cout << "Stmt_" << stmt << '_' << nChoices << " choices\n";
-        //    for (int i = 0; i < nChoices; ++i)
-        //        cout << '_' << choices[i] << "_\n";
-        //}
-        public void write(System.IO.StreamWriter os, int idx)
+        public void write(System.IO.StreamWriter os, int idx, ref int col)
         {
-            //char* ix = new char[sizeof(int) * 8 + 1];
-            //sprintf(ix, "%d", idx);
-            os.Write("<div class='cl'><div class='qid'>" + idx +
+            if (cType == ContentType.Image)
+            {
+                if (col == 1)
+                    os.Write("<div class='cl'></div><div class='cl1'></div>");
+                col = Program.MAX_COLUMN;
+            }
+            else
+                ++col;
+            if (cType == ContentType.Image)
+                os.Write("<div class='cl2'");
+            else
+                os.Write("<div class='cl'");
+            os.Write("><div class='qid'>" + idx +
                 "</div><div class='q'><div class='stmt'>");
-            stmt = Utils.HTMLspecialChars(stmt);
-            os.Write(stmt + "</div>\n");
-            string header = "<div name='" + idx + "'class='c'><span class='cid'>(",
-                middle = ")</span><input type='radio' name='-" + idx + "' value='";
+            if (qType == QuestType.Multiple)
+                os.Write("<i>(Câu hỏi nhiều lựa chọn)</i><br>");
+            os.Write(mStmt);
+            os.Write("</div>\n");
+            if (qType == QuestType.Single ||
+                qType == QuestType.Multiple)
+                wrtChoices(os, idx);
+        }
+        void wrtChoices(System.IO.StreamWriter os, int idx)
+        {
+            string header = "<div name='" + idx + "'class='c'><span class='cid'>(", middle;
+            if (qType == QuestType.Single)
+                middle = ")</span><input type='radio'";
+            else //Multiple
+                middle = ")</span><input type='checkbox'";
+            middle = middle + " name='-" + idx + "' value='";
             char j = 'A';
-            List<string> vChoices = new List<string>(choices);
+            List<string> choices = new List<string>(vChoices);
+            List<bool> keys = new List<bool>(vKeys);
             Random r = new Random();
-            while (0 < vChoices.Count)
+            while (0 < choices.Count)
             {
                 int i = 0;
-                if (bChoiceSort && 1 < vChoices.Count)
-                    i = r.Next(vChoices.Count - 1);
+                if (bChoiceSort && 1 < choices.Count)
+                    i = r.Next(choices.Count);
                 os.Write(header + j + middle);
-                string s = vChoices[i];
-                vChoices.RemoveAt(i);
-                if (s[0] == '\\')
+                if (keys[i])
                 {
                     char k = (char)(j - 'A' + '0');
-                    os.Write(k + "'>" +
-                        Utils.HTMLspecialChars(s).Substring(1));
+                    os.Write(k + "'>");
                 }
                 else
-                    os.Write("#'>" + Utils.HTMLspecialChars(s));
-                os.WriteLine("</div>");
+                    os.Write("#'>");
+                os.WriteLine(choices[i] + "</div>");
+                choices.RemoveAt(i);
+                keys.RemoveAt(i);
                 ++j;
             }
             os.Write("</div></div>");

@@ -26,11 +26,11 @@ namespace sQzCS
             System.Console.WriteLine("sQz version 0.0.2");
             int fi = 1;
             string fn = "qz" + fi + ".txt";
-            string buf = Utils.readFile(fn);
+            string buf = Utils.ReadFile(fn);
             while (buf != null)
             {
-                buf = Utils.cleanWhSp(buf);
-                string[] vToken = buf.Split('\n');
+                //buf = Utils.cleanWhSp(buf);
+                string[] vToken = Utils.Split(buf, '\n');
                 Page pg = new Page();
                 Settings st = pg.mSt;
 
@@ -67,16 +67,15 @@ namespace sQzCS
                     i = 0;
                     if (pg.mSt.bQuestSort)
                         i = r.Next(vQuest.Count - 1);
-                    vQuest[i].write(sw, ++j);
+                    vQuest[i].write(sw, ++j, ref column);
                     vQuest.RemoveAt(i);
-                    ++column;
                 }
                 pg.WriteFormFooter(sw);
                 pg.WriteFooter(sw);
                 sw.Close();
 
                 fn = "qz" + (++fi) + ".txt";
-                buf = Utils.readFile(fn);
+                buf = Utils.ReadFile(fn);
             }
         }
     }
