@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
+//using System.Linq;
 //using System.Threading.Tasks;
 
 namespace sQzCS
@@ -24,68 +23,227 @@ namespace sQzCS
         Video = 8
     }
 
+    enum TokenType {
+        Requirement = 0,
+        Stmt = 1,
+        Ans = 2,
+        Both = 3
+    }
+
     class Question
     {
         string mStmt; //statement
-        int nChoices;
-        string[] vChoices;
+        int nAns;
+        string[] vAns;
         bool[] vKeys;
         bool bChoiceSort;
         QuestType qType;
         ContentType cType;
+        static string[] svToken;
+        static int siToken;
+        static Settings sSett;
+        static string[] qPattern = { "[a-zA-Z]+[0-9]+", "[0-9]+\\." };
+        int qSubs;
+        static string[] aPattern = { "\\([a-zA-Z]\\)", "[a-zA-Z]\\." };
+        List<int> aSubs;
 
         public Question() {
-	        nChoices = 0;
-	        bChoiceSort = true;
+            nAns = 0;
+            vAns = null;
+            bChoiceSort = true;
             qType = QuestType.Single;
             cType = ContentType.Raw;
+            qSubs = -1;
+            aSubs = new List<int>();
         }
 
-        public void read(string[] v, ref int i, Settings deftSt)
+        TokenType classify(string s) {
+            if (s.StartsWith("!"))
+                return TokenType.Requirement;
+            int x = s.IndexOf(' '), y = s.IndexOf('\t');
+            if (-1 < x && -1 < y)
+                x = System.Math.Min(x, y);
+            else
+                x = System.Math.Max(x, y);
+            if (-1 == x)
+                return TokenType.Ans;
+            else
+                s = s.Substring(0, x);//first word
+            for (int i = 0; i < qPattern.Length; ++i)
+            {
+                System.Text.RegularExpressions.Match m =
+                    System.Text.RegularExpressions.Regex.Match(s, qPattern[i]);
+                if (m.Success)
+                {
+                    qSubs = x;
+                    return TokenType.Stmt;
+                }
+            }
+            for (int i = 0; i < aPattern.Length; ++i)
+            {
+                System.Text.RegularExpressions.Match m =
+                    System.Text.RegularExpressions.Regex.Match(s, aPattern[i]);
+                if (m.Success)
+                {
+                    aSubs.Add(System.Math.Min(x, m.Index + m.Length));
+                    return TokenType.Ans;
+                }
+            }
+            return TokenType.Both;
+        }
+
+        void readStmt()
         {
-            int e = v.Length, s = 0;
+            if (svToken.Length <= siToken)
+                return;
+            TokenType t = classify(svToken[siToken]);
+            if (t == TokenType.Stmt || t == TokenType.Both)
+            {
+                if (-1 < qSubs)
+                    mStmt = Utils.CleanFront(svToken[siToken++], qSubs);
+                else
+                    mStmt = svToken[siToken++];
+            }
+
+            //else: error
+            //TODO: detect qType
+        }
+
+        void searchAns()
+        {
+            List<int> v = new List<int>(3 * vAns.Length);
+            for(int k = 0; k < nAns; ++k)
+                for (int i = 0; i < aPattern.Length; ++i)
+                {
+                    System.Text.RegularExpressions.MatchCollection m =
+                        System.Text.RegularExpressions.Regex.Matches(vAns[k], aPattern[i]);
+                    for (int j = 0; j < m.Count; ++j)
+                    {
+                        v.Add(m[j].Index);
+                        v.Add(k);
+                        v.Add(m[j].Index + m[j].Length);
+                    }
+                }
+            if (v.Count / 3 == vAns.Length - aSubs.Count)
+            {
+                List<string> vA = new List<string>(vAns.Length);
+                bool add0 = true;
+                while (0 < v.Count)
+                {
+                    if (add0)
+                    {
+                        vA.Add(vAns[v[1]].Substring(0, v[0]));
+                        add0 = false;
+                    }
+                    if (4 < v.Count && v[1] == v[4]) //middle of line
+                        vA.Add(Utils.CleanFrontBack(vAns[v[1]], v[2], v[3] - 1));
+                    else //end of line
+                    {
+                        vA.Add(Utils.CleanFront(vAns[v[1]], v[2]));
+                        add0 = true;
+                    }
+                    v.RemoveRange(0, 3);
+                }
+                vAns = vA.ToArray();
+                nAns = vAns.Length;
+            }
+        }
+
+        void readAns()
+        {
+            if (svToken.Length <= siToken)
+                return;
+            vAns = new string[nAns];
+            vKeys = new bool[nAns];
+            int np = aSubs.Count;
+            TokenType t = classify(svToken[siToken]);
+            int n = 0;
+            while (n < nAns && (t == TokenType.Ans || t == TokenType.Both)) {
+                if (np < aSubs.Count) {
+                    vAns[n++] =  Utils.CleanFront(svToken[siToken++], aSubs[np]);
+                    np = aSubs.Count;
+                }
+                else
+                    vAns[n++] = svToken[siToken++];
+                if (svToken.Length <= siToken)
+                    break;
+                t = classify(svToken[siToken]);
+            }
+            if (n < nAns)
+            {
+                nAns = n;
+                searchAns();
+            }
+        }
+
+        public static void StartRead(string[] v, Settings s) {
+            svToken = v;
+            siToken = 0;
+            sSett = s;
+        }
+
+        public bool Read()
+        {
+            if (svToken.Length <= siToken)
+                return false;
+            int s = 0;
             System.Text.RegularExpressions.Match m =
-                    System.Text.RegularExpressions.Regex.Match(v[i], "\\\\[0-9]+ ");
+                    System.Text.RegularExpressions.Regex.Match(svToken[siToken], "\\\\[0-9]+ ");
             if (m.Success)
             {
-                int nc = int.Parse(v[i].Substring(m.Index + 1, m.Length - 1));
+                int nc = int.Parse(svToken[siToken].Substring(m.Index + 1, m.Length - 1));
                 if (1 < nc)
-                    nChoices = nc;
+                    nAns = nc;
                 else
-                    nChoices = deftSt.nChoices;
+                    nAns = sSett.nAns;
                 s = m.Index + m.Length;
             }
             else
-                nChoices = deftSt.nChoices;
-            m = System.Text.RegularExpressions.Regex.Match(v[i], "\\\\[cC] ");
-            if (m.Success)
+                nAns = sSett.nAns;
+            int x = svToken[siToken].IndexOf("\\c");
+            if (-1 < x)
             {
                 bChoiceSort = false;
-                s = m.Index + m.Length;
+                x += 2;
+                s = System.Math.Max(s, x);
             }
-            mStmt = Utils.HTML(v[i++].Substring(s), ref cType);
-            vChoices = new string[nChoices];
-            vKeys = new bool[nChoices];
-            for (int ki = 0; ki < nChoices; ++ki)
+            x = svToken[siToken].IndexOf("\\C");
+            if (-1 < x)
+            {
+                bChoiceSort = false;
+                x += 2;
+                s = System.Math.Max(s, x);
+            }
+            svToken[siToken] = svToken[siToken].Substring(s);
+            readStmt();
+            if (svToken.Length <= siToken)
+                return false;
+            if (qType == QuestType.Single || qType == QuestType.Multiple)
+                readAns();
+            mStmt = Utils.HTML(mStmt, ref cType);
+            vKeys = new bool[nAns];
+            for (int ki = 0; ki < nAns; ++ki)
                 vKeys[ki] = false;
             int ci = 0, keyC = 0;
-            for (; ci < nChoices && i != e; ++ci) {
-                vChoices[ci] = Utils.HTML(v[i++], ref cType);
-                if (vChoices[ci][0] == '\\')
+            for (; ci < nAns; ++ci)
+            {
+                vAns[ci] = Utils.HTML(vAns[ci], ref cType);
+                if (vAns[ci][0] == '\\')
                 {
                     vKeys[ci] = true;
                     ++keyC;
-                    vChoices[ci] = vChoices[ci].Substring(1);
+                    vAns[ci] = vAns[ci].Substring(1);
                 }
             }
-            if (ci < nChoices)
+            if (ci < nAns)
             {
-                for (int cj = ci; cj < nChoices; ++cj)
-                    vChoices[cj] = null;
-                nChoices = ci;
+                for (int cj = ci; cj < nAns; ++cj)
+                    vAns[cj] = null;
+                nAns = ci;
             }
             if (1 < keyC && qType == QuestType.Single)
                 qType = QuestType.Multiple;
+            return true;
         }
         public void write(System.IO.StreamWriter os, int idx, ref int col)
         {
@@ -120,7 +278,7 @@ namespace sQzCS
                 middle = ")</span><input type='checkbox'";
             middle = middle + " name='-" + idx + "' value='";
             char j = 'A';
-            List<string> choices = new List<string>(vChoices);
+            List<string> choices = new List<string>(vAns);
             List<bool> keys = new List<bool>(vKeys);
             Random r = new Random();
             while (0 < choices.Count)

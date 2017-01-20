@@ -104,17 +104,26 @@ namespace sQzCS
             }
             buf = s;
         }
-        static void cleanFtBk(ref string buf, int s, int e)
+        public static string CleanFront(string buf, int s)
+        {
+            int i = s, e = buf.Length;
+            while (i < e && sWhSp.Contains(buf[i]))
+                ++i;
+            if (i == e)
+                return null;
+            return buf.Substring(i);
+        }
+        public static string CleanFrontBack(string buf, int s, int e)
         {
             int i = s;
             while (i < e && sWhSp.Contains(buf[i]))
                 ++i;
             if (i == e)
-                return;
+                return null;
             int j = e;
             while (i < j && sWhSp.Contains(buf[j]))
                 --j;
-            buf = buf.Substring(i, j - i + 1);
+            return buf.Substring(i, j - i + 1);
         }
         //public static void DetectContent(ref string buf)
         //{
@@ -150,7 +159,7 @@ namespace sQzCS
         {
             //suppose buf is already cleaned by Split / CleanSpace
             if (buf[0] == '{' && buf[buf.Length - 1] == '}')
-                cleanFtBk(ref buf, 1, buf.Length - 2);
+                buf = CleanFrontBack(buf, 1, buf.Length - 2);
 
             if (buf.Contains('&') || buf.Contains('\"') ||
                 buf.Contains('\'') || !buf.Contains('<') ||

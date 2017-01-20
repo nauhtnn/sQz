@@ -30,19 +30,17 @@ namespace sQzCS
             while (buf != null)
             {
                 //buf = Utils.cleanWhSp(buf);
-                string[] vToken = Utils.Split(buf, '\n');
                 Page pg = new Page();
-                Settings st = pg.mSt;
 
+                Question.StartRead(Utils.Split(buf, '\n'), pg.mSt);
                 List<Question> vQuest = new List<Question>();
                 Question q = new Question();
-                int i = 0, e = vToken.Length;
-                while (i < e)
+                while (q.Read())
                 {
-                    q.read(vToken, ref i, st);
                     vQuest.Add(q);
                     q = new Question();
                 }
+                q = null;
                 fn = "qz" + fi + ".html";
                 System.IO.StreamWriter sw = new System.IO.StreamWriter(fn);
                 if (sw == null)
@@ -52,7 +50,7 @@ namespace sQzCS
                 }
                 else
                     System.Console.WriteLine("Write file " + fn);
-                e = vQuest.Count;
+                int e = vQuest.Count;
                 pg.WriteHeader(sw);
                 pg.WriteFormHeader(sw, e);
                 int j = 0, column = MAX_COLUMN;
@@ -64,7 +62,7 @@ namespace sQzCS
                         sw.Write("<div class='cl1'></div>");
                         column = 0;
                     }
-                    i = 0;
+                    int i = 0;
                     if (pg.mSt.bQuestSort)
                         i = r.Next(vQuest.Count - 1);
                     vQuest[i].write(sw, ++j, ref column);

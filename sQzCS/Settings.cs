@@ -8,17 +8,17 @@ namespace sQzCS
 {
     class Settings
     {
-        public static UInt16 MAX_N_QUESTS = 999;
-        public static UInt16 DEFT_N_CHOICES = 4;
-        public UInt16 nQuest;
-        public UInt16 nChoices;
+        public static int MAX_N_QUESTS = 999;
+        public static int DEFT_N_ANS = 4;
+        public int nQuest;
+        public int nAns;
         public bool bChoiceSort;
         public bool bQuestSort;
         public bool bDIV;
 
         public Settings() {
             nQuest = MAX_N_QUESTS;
-            nChoices = DEFT_N_CHOICES;
+            nAns = DEFT_N_ANS;
             bQuestSort = true;
             bChoiceSort = true;
             bDIV = true;
