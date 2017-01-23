@@ -1,6 +1,0 @@
-C:\cygwin64\home\thuan\sQz\sQzCS\bin\x64\Debug\sQzCS.exe.config
-C:\cygwin64\home\thuan\sQz\sQzCS\bin\x64\Debug\sQzCS.exe
-C:\cygwin64\home\thuan\sQz\sQzCS\bin\x64\Debug\sQzCS.pdb
-C:\cygwin64\home\thuan\sQz\sQzCS\obj\x64\Debug\sQzCS.exe
-C:\cygwin64\home\thuan\sQz\sQzCS\obj\x64\Debug\sQzCS.pdb
-C:\cygwin64\home\thuan\sQz\sQzCS\obj\x64\Debug\sQzCS.csprojResolveAssemblyReference.cache
