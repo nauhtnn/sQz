@@ -1,0 +1,7 @@
+C:\cygwin64\home\thuan\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+C:\cygwin64\home\thuan\sQz\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe.config
+C:\cygwin64\home\thuan\sQz\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe
+C:\cygwin64\home\thuan\sQz\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.pdb
+C:\cygwin64\home\thuan\sQz\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.csprojResolveAssemblyReference.cache
+C:\cygwin64\home\thuan\sQz\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.exe
+C:\cygwin64\home\thuan\sQz\ConsoleApplication1\ConsoleApplication1\obj\Debug\ConsoleApplication1.pdb
