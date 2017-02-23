@@ -15,33 +15,34 @@ using System.Windows.Shapes;
 
 namespace WpfApplication1
 {
+	//from left to right
 	enum BrushId {
 		BG = 0,
-		QID_BG,
-		QID_CL,
+		LeftPanel_BG,
+		Sheet_BG,
+		Button_Hover,
 		Q_BG,
-		ST_BT,
-		C_HL,
-		LP_BG,
-		SH_BG,
-		BT_HV,
-		COUNT
+		QID_BG,
+		QID_Color,
+		Ans_TopLine,
+		Ans_Highlight,
+		Count
 	}
 	
-	enum ThknsId {
+	enum ThicknessId {
 		LT = 0,
 		MT,
 		RT,
 		LB,
 		MB,
 		RB,
-		COUNT
+		Count
 	}
 	
 	enum ThemeId {
-		HARVARD = 0,
-		BERKELEY,
-		COUNT
+		Harvard = 0,
+		Berkeley,
+		Count
 	}
 	
 	/// <summary>
@@ -50,6 +51,12 @@ namespace WpfApplication1
 	public partial class MainWindow : Window
 	{
 		double em = 16 * 1.2;
+		int AppWidth = 0;
+		int LeftPanelWidth = 0;
+		int QuestionWidth = 0;
+        Grid grdAnswerSheet;
+        Label[][] AnswerSheet;
+		
 		public MainWindow()
 		{
 			InitializeComponent();
@@ -64,11 +71,12 @@ namespace WpfApplication1
 		SolidColorBrush[][] vTheme;
 		Thickness[] vThickness;
         FontFamily[] vFontFml;
+		int nQuest = 20;
 		
 		void InitBrush() {
-			vTheme = new SolidColorBrush[(int)ThemeId.COUNT][];
-            //HARVARD theme
-            SolidColorBrush[] br = new SolidColorBrush[(int)BrushId.COUNT];
+			vTheme = new SolidColorBrush[(int)ThemeId.Count][];
+            //Harvard theme
+            SolidColorBrush[] br = new SolidColorBrush[(int)BrushId.Count];
 			Color c = new Color();
 			c.A = 0xff;
 			c.R = 0xc3;
@@ -80,42 +88,45 @@ namespace WpfApplication1
 			c.B = 0x30;
 			br[(int)BrushId.QID_BG] = new SolidColorBrush(c);
 			c.R = c.G = c.B = 0xff;
-			br[(int)BrushId.QID_CL] = new SolidColorBrush(c);
+			br[(int)BrushId.QID_Color] = new SolidColorBrush(c);
 			c.R = c.G = c.B = 0xee;
 			br[(int)BrushId.Q_BG] = new SolidColorBrush(c);
 			c.R = 0xd8;
 			c.G = 0x70;
 			c.B = 0xb8;
-			br[(int)BrushId.ST_BT] = new SolidColorBrush(c);
+			br[(int)BrushId.Ans_TopLine] = new SolidColorBrush(c);
 			c.R = 0x58;
 			c.G = 0xa9;
 			c.B = 0xb4;
-			br[(int)BrushId.C_HL] = new SolidColorBrush(c);
+			br[(int)BrushId.Ans_Highlight] = new SolidColorBrush(c);
 			c.R = c.G = 0xff;
 			c.B = 0xbb;
-			br[(int)BrushId.LP_BG] = new SolidColorBrush(c);
+			br[(int)BrushId.LeftPanel_BG] = new SolidColorBrush(c);
 			c.B = 0xdd;
-			br[(int)BrushId.SH_BG] = new SolidColorBrush(c);
+			br[(int)BrushId.Sheet_BG] = new SolidColorBrush(c);
 			c.R = 0xf1;
 			c.G = 0x5a;
 			c.B = 0x23;
-			br[(int)BrushId.BT_HV] = new SolidColorBrush(c);
-			vTheme[(int)ThemeId.HARVARD] = br;
-			vBrush = vTheme[(int)ThemeId.HARVARD];
+			br[(int)BrushId.Button_Hover] = new SolidColorBrush(c);
+			vTheme[(int)ThemeId.Harvard] = br;
+			vBrush = vTheme[(int)ThemeId.Harvard];
 		}
 		
 		void InitThickness() {
-			vThickness = new Thickness[(int)ThknsId.COUNT];
-			vThickness[(int)ThknsId.LT] = new Thickness(0, 0, 0, 0);
-			vThickness[(int)ThknsId.MT] = new Thickness(1, 1, 0, 0);
-			vThickness[(int)ThknsId.RT] = new Thickness(1, 1, 1, 0);
-			vThickness[(int)ThknsId.LB] = new Thickness(1, 1, 0, 1);
-			vThickness[(int)ThknsId.MB] = new Thickness(1, 1, 0, 1);
-			vThickness[(int)ThknsId.RB] = new Thickness(1, 1, 1, 1);
+			vThickness = new Thickness[(int)ThicknessId.Count];
+			vThickness[(int)ThicknessId.LT] = new Thickness(0, 0, 0, 0);
+			vThickness[(int)ThicknessId.MT] = new Thickness(1, 1, 0, 0);
+			vThickness[(int)ThicknessId.RT] = new Thickness(1, 1, 1, 0);
+			vThickness[(int)ThicknessId.LB] = new Thickness(1, 1, 0, 1);
+			vThickness[(int)ThicknessId.MB] = new Thickness(1, 1, 0, 1);
+			vThickness[(int)ThicknessId.RB] = new Thickness(1, 1, 1, 1);
         }
 
         void InitLayout(object sender, RoutedEventArgs e)
         {
+			AppWidth = (int)gMain.RenderSize.Width;
+			gMain.ColumnDefinitions.Add(new ColumnDefinition());
+			gMain.ColumnDefinitions.Add(new ColumnDefinition());
             InitLeftPanel();
             InitQuestPanel();
         }
@@ -123,12 +134,9 @@ namespace WpfApplication1
 		void InitLeftPanel()
 		{
 			//left panel
-			Size sz = gMain.RenderSize;
 			StackPanel lp = new StackPanel();
 			lp.HorizontalAlignment = HorizontalAlignment.Left;
-			//lp.Width = sz.Width / 5;
-			lp.Background = vBrush[(int)BrushId.LP_BG];
-			gMain.Children.Add(lp);
+			lp.Background = vBrush[(int)BrushId.LeftPanel_BG];
 			//title
 			Label l = new Label();
 			l.Content = "Answer Sheet";
@@ -138,134 +146,222 @@ namespace WpfApplication1
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             lp.Children.Add(l);
 			//answer sheet
-			Grid ansSh = new Grid();
-			ansSh.Background = vBrush[(int)BrushId.SH_BG];
+			grdAnswerSheet = new Grid();
+			grdAnswerSheet.Background = vBrush[(int)BrushId.Sheet_BG];
 			int nAns = 4;
             ++nAns;
             int i = 0;
             for (i = 0; i < nAns; ++i)
-                ansSh.ColumnDefinitions.Add(new ColumnDefinition());
+                grdAnswerSheet.ColumnDefinitions.Add(new ColumnDefinition());
             for (i = 0; i < nAns; ++i)
-                ansSh.ColumnDefinitions[i].Width = new GridLength(2 * em);
+                grdAnswerSheet.ColumnDefinitions[i].Width = new GridLength(2 * em);
             --nAns;
+            AnswerSheet = new Label[nQuest][];
             //top line
-            ansSh.RowDefinitions.Add(new RowDefinition());
+            grdAnswerSheet.RowDefinitions.Add(new RowDefinition());
             l = new Label();
             Grid.SetRow(l, 0);
             Grid.SetColumn(l, 0);
-            ansSh.Children.Add(l);
+            grdAnswerSheet.Children.Add(l);
             SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
 			for (i = 1; i < nAns; ++i)
 			{
 				l = new Label();
 				l.BorderBrush = brBK;
-				l.BorderThickness = vThickness[(int)ThknsId.MT];
+				l.BorderThickness = vThickness[(int)ThicknessId.MT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 l.Content = (char)('@' + i);
-                l.Width = 2 * em;
+                //l.Width = 2 * em;
                 l.FontFamily = vFontFml[1];
                 l.FontWeight = FontWeights.Bold;
                 Grid.SetRow(l, 0);
 				Grid.SetColumn(l, i);
-				ansSh.Children.Add(l);
-			}
+				grdAnswerSheet.Children.Add(l);
+
+            }
 			l = new Label();
             l.BorderBrush = brBK;
-			l.BorderThickness = vThickness[(int)ThknsId.RT];
+			l.BorderThickness = vThickness[(int)ThicknessId.RT];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.Content = (char)('@' + i);
             l.FontFamily = vFontFml[1];
             l.FontWeight = FontWeights.Bold;
             Grid.SetRow(l, 0);
 			Grid.SetColumn(l, i);
-			ansSh.Children.Add(l);
+			grdAnswerSheet.Children.Add(l);
 			//next lines
-			int nQuest = 20;
             int j = 0;
             for (j = 1, i = 0; j < nQuest; ++j)
             {
-                ansSh.RowDefinitions.Add(new RowDefinition());
+                grdAnswerSheet.RowDefinitions.Add(new RowDefinition());
+                AnswerSheet[j - 1] = new Label[nAns];
                 l = new Label();
                 l.BorderBrush = brBK;
-                l.BorderThickness = vThickness[(int)ThknsId.MT];
+                l.BorderThickness = vThickness[(int)ThicknessId.MT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 l.Content = j;
                 l.FontFamily = vFontFml[1];
                 l.FontWeight = FontWeights.Bold;
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, 0);
-                ansSh.Children.Add(l);
+                grdAnswerSheet.Children.Add(l);
                 for (i = 1; i < nAns; ++i)
                 {
                     l = new Label();
                     l.BorderBrush = brBK;
-                    l.BorderThickness = vThickness[(int)ThknsId.MT];
+                    l.BorderThickness = vThickness[(int)ThicknessId.MT];
                     l.HorizontalContentAlignment = HorizontalAlignment.Center;
                     Grid.SetRow(l, j);
                     Grid.SetColumn(l, i);
-                    ansSh.Children.Add(l);
+                    grdAnswerSheet.Children.Add(l);
+                    AnswerSheet[j - 1][i - 1] = l;
                 }
                 l = new Label();
                 l.BorderBrush = brBK;
-                l.BorderThickness = vThickness[(int)ThknsId.RT];
+                l.BorderThickness = vThickness[(int)ThicknessId.RT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, i);
-                ansSh.Children.Add(l);
+                grdAnswerSheet.Children.Add(l);
+                AnswerSheet[j - 1][nAns - 1] = l;
             }
             //bottom lines
-            ansSh.RowDefinitions.Add(new RowDefinition());
+            grdAnswerSheet.RowDefinitions.Add(new RowDefinition());
+            AnswerSheet[j - 1] = new Label[nAns];
             l = new Label();
             l.BorderBrush = brBK;
-            l.BorderThickness = vThickness[(int)ThknsId.LB];
+            l.BorderThickness = vThickness[(int)ThicknessId.LB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.Content = j;
             l.FontFamily = vFontFml[1];
             l.FontWeight = FontWeights.Bold;
             Grid.SetRow(l, j);
             Grid.SetColumn(l, 0);
-            ansSh.Children.Add(l);
+            grdAnswerSheet.Children.Add(l);
             for (i = 1; i < nAns; ++i)
             {
                 l = new Label();
                 l.BorderBrush = brBK;
-                l.BorderThickness = vThickness[(int)ThknsId.MB];
+                l.BorderThickness = vThickness[(int)ThicknessId.MB];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, i);
-                ansSh.Children.Add(l);
+                grdAnswerSheet.Children.Add(l);
+                AnswerSheet[j - 1][i - 1] = l;
             }
             l = new Label();
             l.BorderBrush = brBK;
-            l.BorderThickness = vThickness[(int)ThknsId.RB];
+            l.BorderThickness = vThickness[(int)ThicknessId.RB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             Grid.SetRow(l, j);
             Grid.SetColumn(l, i);
-            ansSh.Children.Add(l);
+            grdAnswerSheet.Children.Add(l);
+            AnswerSheet[j - 1][nAns - 1] = l;
 
             for (j = 0; j <= nQuest; ++j)
-                ansSh.RowDefinitions[j].Height = new GridLength(1.2 * em);
+                grdAnswerSheet.RowDefinitions[j].Height = new GridLength(1.2 * em);
 
             ScrollViewer scrlvwr = new ScrollViewer();
             scrlvwr.Height = gMain.RenderSize.Height * 2 / 3;
             scrlvwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            scrlvwr.Content = ansSh;
+            scrlvwr.Content = grdAnswerSheet;
             lp.Children.Add(scrlvwr);
+			
+			Grid.SetColumn(lp, 0);
+			gMain.ColumnDefinitions[0].Width = GridLength.Auto;
+			gMain.Children.Add(lp);
+			LeftPanelWidth = (int)lp.ActualWidth;
+			QuestionWidth = (AppWidth - LeftPanelWidth) / 2;
 		}
 
         void InitQuestPanel()
         {
-            StackPanel q = new StackPanel();
-            Label l = new Label();
+            Grid qs = new Grid();
+			qs.Background = vBrush[(int)BrushId.Q_BG];
+			qs.ColumnDefinitions.Add(new ColumnDefinition());
+			qs.ColumnDefinitions.Add(new ColumnDefinition());
+			int nc = nQuest / 2;
+			for(int i = 0; i < nc; ++i)
+			{
+				qs.RowDefinitions.Add(new RowDefinition());
+				StackPanel q = CreateQuestion(2*i + 1);
+				Grid.SetRow(q, i);
+				Grid.SetColumn(q, 0);
+				qs.Children.Add(q);
+				q = CreateQuestion(2*i + 2);
+				Grid.SetRow(q, i);
+				Grid.SetColumn(q, 1);
+				qs.Children.Add(q);
+			}
+            qs.Background = vBrush[(int)BrushId.BG];
+			ScrollViewer scrlvwr = new ScrollViewer();
+            //scrlvwr.Height = gMain.RenderSize.Height * 2 / 3;
+            scrlvwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            scrlvwr.Content = qs;
+			Grid.SetColumn(scrlvwr, 1);
+			gMain.Children.Add(scrlvwr);
+        }
+		
+		StackPanel CreateQuestion(int idx)
+		{
+			StackPanel q = new StackPanel();
+			q.Orientation = System.Windows.Controls.Orientation.Horizontal;
+            q.Margin = new Thickness(8, 0, 0, 8);
+			Label l = new Label();
             l.HorizontalAlignment = HorizontalAlignment.Left;
+			l.VerticalAlignment = VerticalAlignment.Top;
             l.FontSize = em;
             l.FontFamily = vFontFml[0];
-            l.Content = 1;
+            l.Content = idx;
             l.Background = vBrush[(int)BrushId.QID_BG];
-            l.Foreground = vBrush[(int)BrushId.QID_CL];
+            l.Foreground = vBrush[(int)BrushId.QID_Color];
             l.Width = 2 * em;
+			l.Height = 1.5f * em;
+			l.HorizontalContentAlignment = HorizontalAlignment.Center;
+			l.VerticalContentAlignment = VerticalAlignment.Center;
+			l.Padding = new Thickness(0);
             q.Children.Add(l);
-            gMain.Children.Add(q);
+            StackPanel con = new StackPanel();
+			Label stmt = new Label();
+			stmt.FontSize = em;
+			stmt.Content = "abcd\nabcd\nabcd";
+			stmt.Width = QuestionWidth - (int)l.ActualWidth;
+			stmt.BorderBrush = vBrush[(int)BrushId.QID_BG];
+			stmt.BorderThickness = new Thickness(0, 4, 0, 0);
+            stmt.Background = vBrush[(int)BrushId.Q_BG];
+            con.Children.Add(stmt);
+            ListBox answers = new ListBox();
+            answers.Name = "_" + idx;
+            for (int i = 0; i < 4; ++i)
+            {
+                ListBoxItem ans = new ListBoxItem();
+                ans.FontSize = em;
+                ans.Content = "list box item";
+                ans.Name = "_" + i;
+                ans.MouseLeftButtonUp += Ans_MouseLeftButtonUp;
+                answers.Items.Add(ans);
+            }
+            answers.BorderBrush = vBrush[(int)BrushId.Ans_TopLine];
+            answers.BorderThickness = new Thickness(0, 4, 0, 0);
+            con.Children.Add(answers);
+            q.Children.Add(con);
+            q.Background = vBrush[(int)BrushId.BG];
+            return q;
+		}
+
+        private void Ans_MouseLeftButtonUp(object sender, MouseButtonEventArgs e)
+        {
+            ListBoxItem ans = (ListBoxItem)sender;
+            ListBox answers = (ListBox)ans.Parent;
+            int qid = Convert.ToInt32(answers.Name.Substring(1));
+            for (int i = 0; i < answers.Items.Count; ++i)
+            {
+                ListBoxItem it = (ListBoxItem)answers.Items[i];
+                if(it.IsSelected)
+                    AnswerSheet[qid - 1][i].Content = 'X';
+                else
+                    AnswerSheet[qid - 1][i].Content = string.Empty;
+            }
         }
-	}
+    }
 }
