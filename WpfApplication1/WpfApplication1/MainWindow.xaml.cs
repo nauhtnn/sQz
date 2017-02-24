@@ -51,9 +51,13 @@ namespace WpfApplication1
         Grid grdAnswerSheet;
         Label[][] AnswerSheet;
 		
+		Label dmsg = new Label();
+		List<Question> vQuest;
+		
 		public MainWindow()
 		{
 			InitializeComponent();
+			vQuest = new List<Question>();
             InitBrush();
             InitThickness();
             vFontFml = new FontFamily[2];
@@ -64,24 +68,62 @@ namespace WpfApplication1
         void InitQuestion()
         {
             string fn = "qz1.txt";
+			if(!System.IO.File.Exists(fn))
+			{
+				dmsg.Content += "input file doesn't exist";
+				return;
+			}
             string buf = Utils.ReadFile(fn);
+			if(buf != null)
+				dmsg.Content += "buf size = " + buf.Length + '\n';
+			else
+				return;
             sQzCS.Page pg = new sQzCS.Page();
             Question.StartRead(Utils.Split(buf, '\n'), pg.mSt);
-            List<Question> vQuest = new List<Question>();
             Question q = new Question();
             while (q.Read())
             {
                 vQuest.Add(q);
                 q = new Question();
             }
-            q = null;
+			q = null;
+			// fn = "qz1.html";
+			// System.IO.StreamWriter sw = new System.IO.StreamWriter(fn);
+			// if (sw == null)
+			// {
+				// dmsg.Content += "Cannot write file " + fn;
+				// return;
+			// }
+			// else
+				// dmsg.Content += "Write file " + fn + '\n';
+			// int e = vQuest.Count;
+			// pg.WriteHeader(sw);
+			// pg.WriteFormHeader(sw, e);
+			// int MAX_COLUMN = 2;
+			// int j = 0, column = MAX_COLUMN;
+			// Random r = new Random();
+			// while (0 < vQuest.Count)
+			// {
+				// if (column == MAX_COLUMN)
+				// {
+					// sw.Write("<div class='cl1'></div>");
+					// column = 0;
+				// }
+				// int i = 0;
+				// if (pg.mSt.bQuestSort)
+					// i = r.Next(vQuest.Count - 1);
+				// vQuest[i].write(sw, ++j, ref column);
+				// vQuest.RemoveAt(i);
+			// }
+			// pg.WriteFormFooter(sw);
+			// pg.WriteFooter(sw);
+			// sw.Close();
         }
 		
 		SolidColorBrush[] vBrush;
 		SolidColorBrush[][] vTheme;
 		Thickness[] vThickness;
         FontFamily[] vFontFml;
-		int nQuest = 20;
 		
 		void InitBrush() {
 			vTheme = new SolidColorBrush[(int)ThemeId.Count][];
@@ -140,6 +182,10 @@ namespace WpfApplication1
             InitQuestion();
             InitLeftPanel();
             InitQuestPanel();
+			dmsg.Background = vBrush[(int)BrushId.LeftPanel_BG];
+			dmsg.Width = (int)gMain.RenderSize.Width / 2;
+			dmsg.Height = (int)gMain.RenderSize.Height / 4;
+			// gMain.Children.Add(dmsg);
         }
 
 		void InitLeftPanel()
@@ -159,7 +205,7 @@ namespace WpfApplication1
 			//answer sheet
 			grdAnswerSheet = new Grid();
 			grdAnswerSheet.Background = vBrush[(int)BrushId.Sheet_BG];
-			int nAns = 4;
+			int nAns = 4;//hardcode
             ++nAns;
             int i = 0;
             for (i = 0; i < nAns; ++i)
@@ -167,7 +213,7 @@ namespace WpfApplication1
             for (i = 0; i < nAns; ++i)
                 grdAnswerSheet.ColumnDefinitions[i].Width = new GridLength(2 * em);
             --nAns;
-            AnswerSheet = new Label[nQuest][];
+            AnswerSheet = new Label[vQuest.Count + 10][];
             //top line
             grdAnswerSheet.RowDefinitions.Add(new RowDefinition());
             l = new Label();
@@ -202,7 +248,7 @@ namespace WpfApplication1
 			grdAnswerSheet.Children.Add(l);
 			//next lines
             int j = 0;
-            for (j = 1, i = 0; j < nQuest; ++j)
+            for (j = 1, i = 0; j < vQuest.Count; ++j)
             {
                 grdAnswerSheet.RowDefinitions.Add(new RowDefinition());
                 AnswerSheet[j - 1] = new Label[nAns];
@@ -269,7 +315,7 @@ namespace WpfApplication1
             grdAnswerSheet.Children.Add(l);
             AnswerSheet[j - 1][nAns - 1] = l;
 
-            for (j = 0; j <= nQuest; ++j)
+            for (j = 0; j <= vQuest.Count; ++j)
                 grdAnswerSheet.RowDefinitions[j].Height = new GridLength(1.2 * em);
 
             ScrollViewer scrlvwr = new ScrollViewer();
@@ -291,7 +337,7 @@ namespace WpfApplication1
 			qs.Background = vBrush[(int)BrushId.Q_BG];
 			qs.ColumnDefinitions.Add(new ColumnDefinition());
 			qs.ColumnDefinitions.Add(new ColumnDefinition());
-			int nc = nQuest / 2;
+			int nc = vQuest.Count / 2;
 			for(int i = 0; i < nc; ++i)
 			{
 				qs.RowDefinitions.Add(new RowDefinition());
@@ -333,21 +379,24 @@ namespace WpfApplication1
 			l.Padding = new Thickness(0);
             q.Children.Add(l);
             StackPanel con = new StackPanel();
-			Label stmt = new Label();
+			TextBlock stmt = new TextBlock();
 			stmt.FontSize = em;
-			stmt.Content = "abcd\nabcd\nabcd";
-			stmt.Width = QuestionWidth - (int)l.ActualWidth;
-			stmt.BorderBrush = vBrush[(int)BrushId.QID_BG];
-			stmt.BorderThickness = new Thickness(0, 4, 0, 0);
+			Question quest = vQuest[idx - 1];
+			stmt.Text = quest.mStmt;
+			stmt.TextWrapping = TextWrapping.Wrap;
+			// dmsg.Content += "_" + idx + stmt.Text + vQuest.Count + "\n";
+			//stmt.Width = QuestionWidth - (int)l.ActualWidth;
+			// stmt.BorderBrush = vBrush[(int)BrushId.QID_BG];
+			// stmt.BorderThickness = new Thickness(0, 4, 0, 0);
             stmt.Background = vBrush[(int)BrushId.Q_BG];
             con.Children.Add(stmt);
             ListBox answers = new ListBox();
             answers.Name = "_" + idx;
-            for (int i = 0; i < 4; ++i)
+            for (int i = 0; i < quest.vAns.Length; ++i)
             {
                 ListBoxItem ans = new ListBoxItem();
                 ans.FontSize = em;
-                ans.Content = "list box item";
+                ans.Content = quest.vAns[i];
                 ans.Name = "_" + i;
                 ans.MouseLeftButtonUp += Ans_MouseLeftButtonUp;
                 answers.Items.Add(ans);

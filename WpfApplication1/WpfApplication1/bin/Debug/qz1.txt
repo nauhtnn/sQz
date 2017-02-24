@@ -1,24 +1,187 @@
-41.  What is the problem with her assistant? 
-(A) He resigned (B) He’s abroad. (C) He’s on vacation. (D) He’s sick.
-42. What does the woman imply about her   assistant? 
-(A) He is helpless. (B) He needs to be retrained. (C) He’s an efficient employee. (D) He used to be a hard-worker.
-43. What are they planning to do? 
-(A) Allocate work to other employees. (B) Fire the old assistant. (C) Hire a second assistant. (D) Hire a temporary assistant. 
-44.  How many days will she be away from   work?
- (A) 1 day (B) 2 days (C) 3 days (D) 4 days
-45. When is the conference?
- (A) Wednesday and Thursday (B) Thursday and Friday (C) Saturday and Sunday (D) Sunday and Monday
-46. What can be inferred about the woman? 
-(A) She likes sightseeing. (B) She’s been very busy lately. (C) She’s set up her own company. (D) She was unemployed. .
-47.  What does the woman want to do?
- (A) Buy new office furniture. (B) Change desks with the man. (C) Get a bigger office. (D) Have her office renovated.
-48. What does the man imply about the   company? 
-(A) It is diversifying. (B) It is downsizing. (C) It is expanding. (D) It is relocating.
-49. What does the woman ask the man to do?
- (A) Lodge a formal complaint to the    director. (B) Look for desks in the warehouse. (C) Order new office equipment. (D) Write a memo asking for bigger desks.
-50. What does the man inform the woman   about? 
-(A) A potential merger. (B) Arbitrary’s intention to buy ME. (C) Arbitrary’s turning down a bid (D) About the terms of a merger.
-51. How much had the company offered to   pay? 
-(A) $10 billion (B) $80.1 million (C) $8.1 billion (D) $81 million
-52. What can be inferred about Arbritrary’s   medical division? 
-(A) It is very modern. (B) It is very profitable. (C) It makes takeover bids. (D) It will soon close down.
+Thao tác chọn File -> Close dùng để
+Thoát khỏi Powerpoint
+Mở một tập tin nào đó
+\Đóng tập tin hiện tại
+Lưu tập tin hiện tại
+
+Người và máy tính giao tiếp với nhau thông qua
+Bàn phím
+\Hệ điều hành
+Đĩa cứng
+Chuột
+
+Tại sao bạn lại cần lưu tập tin sang một thiết bị lưu trữ?
+Để lưu thông tin từ RAM sang thiết bị lưu trữ
+Để lưu giữ lại dữ liệu đó
+Để tránh mất dữ liệu nếu như máy tính bị tắt
+\Tất cả các lý do trên
+
+Trong thư này, "Fwd: Re: Metting" là cái gì?
+Địa chỉ người gủi
+\Dòng chủ đề
+File đính kèm
+Địa chỉ người nhận
+
+Phần mềm nào có thể soạn thảo văn bản với nội dung và định dạng như sau+
+{images/075.png}
+WordPad
+Microsoft Word
+Notepad
+Tất cả đều sai
+
+Bạn đã cài đặt một bộ xử lý mới có tốc độ xử lý cao hơn vào máy của bạn. Điều này có thể có kết quả gì?
+Đĩa cứng máy tính sẽ lưu trữ dữ liệu nhiều hơn
+ROM (Read Only Memory) sẽ có dung lượng lớn hơn
+RAM (Random Access Memory) sẽ có dung lượng lớn hơn
+\Máy tính của bạn sẽ chạy nhanh hơn
+
+Để khởi động lại máy tính, phát biểu nào dưới đây là sai
+Nhấn tổ hợp phím Ctrl - Alt - Del, chọn mục Restart
+\Bấm nút Power trên hộp máy
+Bấm nút Reset trên hộp máy
+Từ cửa sổ màn hình nền nhấn nút Start - Shutdown, sau đó chọn mục Restart
+
+Phần mềm nào có thể soạn thảo văn bản với nội dung và định dạng như sau:+
+{images/078.png}
+\WordPad & Microsoft Word
+Notepad, WordPad và Microsoft Word
+Notepad & WordPad
+Notepad & Microsoft Word
+
+Trong bảng tính Excel, hàm VLOOKUP, nếu không tìm thấy giá trị cần tìm thì hàm sẽ trả về giá trị:
+\#NA
+Null
+FALSE
+TRUE
+
+Chọn câu thích hợp đề phân biệt giữa phần mềm ứng dụng và phần mềm hệ điều hành
+Phần mềm hệ điều hành cần nhiều bộ nhớ hơn phần mềm ứng dụng để chạy
+\Phần mềm ứng dụng cần phần mềm hệ điều hành để chạy
+Phần mềm hệ điều hành cần phần mềm ứng dụng để chạy
+Phần mềm ứng dụng cần nhiều không gian trong đĩa cứng hơn phần mềm hệ điều hành để chạy
+
+Khi muốn tìm kiếm thông tin trên mạng Internet, chúng ta cần
+Tìm trong các sách danh bạ Internet
+Tùy vào nội dung tìm kiếm mà kết nối đến các websites cụ thể.
+\Tìm kiếm trên các websites tìm kiếm chuyên dụng
+Tìm kiếm ở bất kỳ một websites nào
+
+Phần mềm nào có thể soạn thảo văn bản với nội dung và định dạng như sau:+
+{images/0712.png}
+Notepad
+WordPad
+\Microsoft Word
+\Tất cả đều sai
+
+Phát biểu nào không đúng trong các phát biểu sau?
+Trong hệ điều hành Windows, tệp có thể chứa tệp.
+Trong hệ điều hành Windows, thư mục có thể chứa các tệp và thư mục con khác.
+Trong hệ điều hành Windows, thư mục có thể chứa các thư mục con khác.
+Trong hệ điều hành Windows, thư mục có thể chứa các tệp khác.
+
+Trong các máy vi tính bộ nhớ ngoài thường bao gồm
+Đĩa cứng (HDD)
+\CD-ROM, HDD, FDD
+Đĩa mềm (Floppy Disk), CPU (Central Processing Unit)
+Đĩa cứng (HDD) , CPU (Central Processing Unit)
+
+Tại một Slide hiện hành ta bấm phím delete (trên bản phím) lệnh này sẽ:
+Thêm Slide
+\Xóa Slide hiện hành
+Không thục hiện
+Thêm Slide hiện hành
+
+Trong hộp thoại Run nhập lệnh nào để sử dụng chương trình Microsoft Excel?
+Msconfig
+Cmd
+Regedit
+\Excel
+
+Giáo dục và Đào tạo qua Internet thường được gọi là
+Phát thanh qua web (podcasting)
+Kết nối mạng xã hội
+Giáo dục tại gia đình
+\Học trực tuyến (e-leaming)
+
+Trong bảng tính Excel, giá trị tại ô C4 "PN01". Công thức tại ô D4: =IF(Left(C4,2)="PN","Nhập","Xuất"). Kết quả nhận được tại ô D4:
+#NAME?
+#VALUE!
+\Nhập
+Xuất
+
+Để đếm số SV xếp loại Đạt và Không Đạt như hình minh họa, ta sử dụng hàm COUNTIF tại ô F14, sau đó sao chép công thức sang ô F15. Biểu diễn hàm COUNTIF nào dưới đây đáp ứng được yêu cầu trên+
+{images/0719.png}
+COUNTIF(G2:G10,E14)
+COUNTIF(G2:G10,"Đạt")
+COUNTIF($G$2:$G$10,"Không Đạt")
+\COUNTIF($G$2:$G$10,E14)
+
+Trong soạn thảo Word, để soạn thảo và định dạng văn bản như mẫu, bạn sử dụng+
+{images/0720.png}
+Chèn hình và WordArt
+Chia cột
+Bullets and Numbering
+\Cả 3 lựa chọn trên
+
+Ta có bảng tính sau+
+{images/0721.png}+
+Công thức tại ô C2 sẽ là
+=IF(B2<>"Đã nghỉ",Year(Now())-Year("Ngày vào làm"),"")
+=IF("Nghỉ việc"<>"Đã nghỉ",Year(Now())-Year(A2))
+\=IF(B2<>"Đã nghỉ",Year(Now())-Year(A2),"")
+=Year(Date())-Year("Ngày vào làm")
+
+Trong PowerPoint muốn chèn 1 shape ta chọn lệnh nào?
+File / Print Preview
+\Insert / Shape
+File / Print
+Các câu trên đều sai
+
+Trong soạn thảo Word, để soạn thảo và định dạng văn bản như mẫu bạn sử dụng+
+{images/0723.png}
+Bullets and Numbering
+Định dạng Font, Tab và WordArt
+Textbox
+Cả 3 lựa chọn trên
+
+Để tạo hiệu ứng cho các đối tượng trong Slide, thực hiện:
+Slide Show -> Custom Animation, sau đó chọn kiểu hiệu ứng mong muốn
+Slide Show -> Slide Transition, sau đó chọn kiểu hiệu ứng mong muốn
+Slide Show -> Custom Shows, sau đó chọn kiểu hiệu ứng mong muốn
+\Tất cả các phương án trên đều sai
+
+Trong bảng tính Excel, bạn đã nhập số 15 vào ô C6. Bạn nhấn vào nút nào để ô C6 có giá trị là $15
+Vào thực đơn Format - Cells - Number - Scientific
+Vào thực đơn Format - Cells - Alignment - Accounting
+\Chọn ô C6 rồi nhấn chuột vào nút $ trên thanh công cụ
+Cả ba cách trên đều đúng
+
+Muốn mở một tập tin đã tồn tại trên đĩa, sau khi khởi động PowerPoint ta nhấn tổ hợp phím
+Ctrl + S
+Ctrl + N
+\Ctrl + O
+Ctrl + C
+
+Trong "www.goccay.vn", "vn" trên địa chỉ trang web có nghĩa là:
+\Ký hiệu tên nước Việt Nam
+Một ký hiệu nào đó
+Cả 2 đều sai
+Cả 2 đều đúng
+
+Những lợi ích lớn nhất của việc truy cập thư điện tử từ l trang web (như Hotmail) so với một phần mềm email như Thunderbird hoặc Outlook là gì
+\Chiếm ít không gian đĩa cứng trên máy tính hơn
+Có thể mở email từ nhiều địa điểm hơn
+Cho phép bạn lưu thư dễ dàng hơn
+\Cho phép bạn mở nhiều loại tài liệu đính kèm email hơn
+
+Bạn sẽ làm gì để di chuyển cửa sổ
+Kích vào nút Restore Down
+\Kích và kéo thanh tiêu đề để di chuyển tới vị trí mới
+Kích và kéo biểu tượng Control để di chuyển tới vị trí mới
+Kích vào bất kì chỗ nào trong cửa sổ để di chuyển tới vị trí mới
+
+Máy vi tính là hệ thống thiết bị điện tử được lắp ráp bởi các linh kiện điện tử và mạch vi xử lý. Nhìn bề ngoài máy tính bao gồm các bộ phận nào sau đây:
+Màn hình, Case (CPU, Mainboard, HDD)
+Bàn phím, Chuột, Máy in
+\Màn hình, Case (CPU, Mainboard, HDD) và Bàn phím, Chuột
+Tất cả đều sai

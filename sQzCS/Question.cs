@@ -32,9 +32,9 @@ namespace sQzCS
 
     public class Question
     {
-        string mStmt; //statement
+        public string mStmt; //statement
         int nAns;
-        string[] vAns;
+        public string[] vAns;
         bool[] vKeys;
         bool bChoiceSort;
         QuestType qType;
