@@ -6,7 +6,7 @@ using System.Text;
 
 namespace sQzCS
 {
-    class Settings
+    public class Settings
     {
         public static int MAX_N_QUESTS = 999;
         public static int DEFT_N_ANS = 4;

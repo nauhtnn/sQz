@@ -1,22 +1,16 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 //using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Navigation;
-using System.Windows.Shapes;
+using sQzCS;
+using System.Collections.Generic;
 
 namespace WpfApplication1
 {
-	//from left to right
-	enum BrushId {
+    //from left to right
+    enum BrushId {
 		BG = 0,
 		LeftPanel_BG,
 		Sheet_BG,
@@ -65,6 +59,22 @@ namespace WpfApplication1
             vFontFml = new FontFamily[2];
             vFontFml[0] = new FontFamily("Arial");
             vFontFml[1] = new FontFamily("Arial");
+        }
+
+        void InitQuestion()
+        {
+            string fn = "qz1.txt";
+            string buf = Utils.ReadFile(fn);
+            sQzCS.Page pg = new sQzCS.Page();
+            Question.StartRead(Utils.Split(buf, '\n'), pg.mSt);
+            List<Question> vQuest = new List<Question>();
+            Question q = new Question();
+            while (q.Read())
+            {
+                vQuest.Add(q);
+                q = new Question();
+            }
+            q = null;
         }
 		
 		SolidColorBrush[] vBrush;
@@ -127,6 +137,7 @@ namespace WpfApplication1
 			AppWidth = (int)gMain.RenderSize.Width;
 			gMain.ColumnDefinitions.Add(new ColumnDefinition());
 			gMain.ColumnDefinitions.Add(new ColumnDefinition());
+            InitQuestion();
             InitLeftPanel();
             InitQuestPanel();
         }

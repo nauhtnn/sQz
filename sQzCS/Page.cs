@@ -6,7 +6,7 @@ using System.Text;
 
 namespace sQzCS
 {
-    class Page
+    public class Page
     {
         public Settings mSt;
     

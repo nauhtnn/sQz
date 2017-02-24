@@ -6,7 +6,7 @@ using System.Collections.Generic;
 namespace sQzCS
 {
 
-    enum QuestType
+    public enum QuestType
     {
         Single = 1,
         Multiple = 2,
@@ -15,7 +15,7 @@ namespace sQzCS
         Matching = 16
     }
 
-    enum ContentType
+    public enum ContentType
     {
         Raw = 1,
         Image = 2,
@@ -23,14 +23,14 @@ namespace sQzCS
         Video = 8
     }
 
-    enum TokenType {
+    public enum TokenType {
         Requirement = 0,
         Stmt = 1,
         Ans = 2,
         Both = 3
     }
 
-    class Question
+    public class Question
     {
         string mStmt; //statement
         int nAns;
@@ -42,7 +42,8 @@ namespace sQzCS
         static string[] svToken;
         static int siToken;
         static Settings sSett;
-        static string[] qPattern = { "[a-zA-Z]+[0-9]+", "[0-9]+\\." };
+        //static string[] qPattern = { "[a-zA-Z]+[0-9]+", "[0-9]+\\." };
+		static string[] qPattern = { "[0-9]+\\." };
         int qSubs;
         static string[] aPattern = { "\\([a-zA-Z]\\)", "[a-zA-Z]\\." };
         List<int> aSubs;
@@ -73,7 +74,7 @@ namespace sQzCS
             {
                 System.Text.RegularExpressions.Match m =
                     System.Text.RegularExpressions.Regex.Match(s, qPattern[i]);
-                if (m.Success)
+                if (m.Success && m.Index == 0 && m.Length == s.Length)
                 {
                     qSubs = x;
                     return TokenType.Stmt;
@@ -83,7 +84,7 @@ namespace sQzCS
             {
                 System.Text.RegularExpressions.Match m =
                     System.Text.RegularExpressions.Regex.Match(s, aPattern[i]);
-                if (m.Success)
+                if (m.Success && m.Index == 0 && m.Length == s.Length)
                 {
                     aSubs.Add(System.Math.Min(x, m.Index + m.Length));
                     return TokenType.Ans;

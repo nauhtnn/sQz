@@ -6,7 +6,7 @@ using System.Text;
 
 namespace sQzCS
 {
-    class Utils
+    public class Utils
     {
         public static char[] sWhSp = { ' ', '\t', '\n', '\r' };
         public static string ReadFile(string fname)
