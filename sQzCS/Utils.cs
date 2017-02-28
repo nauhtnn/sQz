@@ -9,16 +9,17 @@ namespace sQzCS
     public class Utils
     {
         public static char[] sWhSp = { ' ', '\t', '\n', '\r' };
-        public static string ReadFile(string fname)
+        public static string ReadFile(string fileName)
         {
             try
             {
-                string buf = System.IO.File.ReadAllText(fname);
-                return buf;
+                if (!System.IO.File.Exists(fileName))
+                    return null;
+                return System.IO.File.ReadAllText(fileName);
             }
             catch (System.Exception)
             {
-                System.Console.WriteLine("Cannot read file '{0}'", fname);
+                System.Console.WriteLine("Cannot read file '{0}'", fileName);
                 return null;
             }
         }

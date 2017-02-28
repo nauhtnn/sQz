@@ -12,7 +12,8 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-using System.Timers;
+using System.Threading;
+using System.Net.Sockets;
 
 namespace WpfApplication1
 {
@@ -21,6 +22,9 @@ namespace WpfApplication1
     /// </summary>
     public partial class Authentication : Page
     {
+        Client0 mClient;
+        byte[] mBuffer;
+        int mSz;
         public Authentication()
         {
             InitializeComponent();
@@ -29,35 +33,56 @@ namespace WpfApplication1
 
             FirewallHandler fwHndl = new FirewallHandler();
             fwHndl.OpenFirewall();
+            mClient = Client0.GetInstance();
+            mSz = 1024 * 1024;
+            mBuffer = new byte[mSz];
         }
 
         private void SignIn(object sender, RoutedEventArgs e)
         {
-            //NavigationService.Navigate(new TakeExam());
-            //NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));//must have Urikind
-            //txMessage.Text += "\n" + txtUsername.Text + "\n" + txtPassword + "\n";
-            ClientInstance.Connect("127.0.0.1", "hello world");
+            mClient.BeginWrite(txtUsername.Text + "\n" + txtPassword.Text, SignInCallback);
         }
 
+        private void ConnectCallback(IAsyncResult ar)
+        {
+            TcpClient c = (TcpClient)ar.AsyncState;
+            //exception: c.EndConnect(ar);
+            Dispatcher.Invoke(() => { txMessage.Text += "connected"; });
+        }
+
+        private void SignInCallback(IAsyncResult ar)
+        {
+            NetworkStream s = (NetworkStream)ar.AsyncState;
+            s.EndWrite(ar);
+            mClient.BeginRead(QuestReadCallback, mBuffer, mSz);
+        }
+
+        private void QuestReadCallback(IAsyncResult ar)
+        {
+            NetworkStream s = (NetworkStream)ar.AsyncState;
+            s.EndRead(ar);
+            //NavigationService.Navigate(new TakeExam());
+            Dispatcher.Invoke(() =>
+            {
+                NavigationService.LoadCompleted += TakeExam.NavigationService_LoadCompleted;
+                NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative), mBuffer);//must have Urikind
+            });
+            //txMessage.Text += "\n" + txtUsername.Text + "\n" + txtPassword + "\n";
+        }
+
+        Thread th;
         private void btnStartSer_Click(object sender, RoutedEventArgs e)
         {
-            Timer aTimer = new Timer(2000);
-            // Hook up the Elapsed event for the timer. 
-            aTimer.Elapsed += OnTimedEvent;
-            aTimer.AutoReset = false;
-            aTimer.Enabled = true;
-
-            ServerInstance.Start();
-        }
-
-        private void OnTimedEvent(object sender, ElapsedEventArgs e)
-        {
-            SignIn(null, null);
+            th = new Thread(new ThreadStart(()=> { ServerInstance.Start(); }));
+            th.Start();
         }
 
         private void btnStopSer_Click(object sender, RoutedEventArgs e)
         {
-            ServerInstance.Stop();
+            //ServerInstance.Stop();
+            //th.Abort();
+            //th = null;
+            mClient.BeginConnect(ConnectCallback);
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)

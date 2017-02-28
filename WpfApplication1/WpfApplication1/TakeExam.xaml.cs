@@ -36,61 +36,6 @@ namespace WpfApplication1
             ShowsNavigationUI = false;
         }
 
-        void InitQuestion()
-        {
-            string fn = "qz1.txt";
-            if (!System.IO.File.Exists(fn))
-            {
-                dmsg.Content += "input file doesn't exist";
-                return;
-            }
-            string buf = Utils.ReadFile(fn);
-            if (buf != null)
-                dmsg.Content += "buf size = " + buf.Length + '\n';
-            else
-                return;
-            sQzCS.Page pg = new sQzCS.Page();
-            Question.StartRead(Utils.Split(buf, '\n'), pg.mSt);
-            Question q = new Question();
-            while (q.Read())
-            {
-                vQuest.Add(q);
-                q = new Question();
-            }
-            q = null;
-            // fn = "qz1.html";
-            // System.IO.StreamWriter sw = new System.IO.StreamWriter(fn);
-            // if (sw == null)
-            // {
-            // dmsg.Content += "Cannot write file " + fn;
-            // return;
-            // }
-            // else
-            // dmsg.Content += "Write file " + fn + '\n';
-            // int e = vQuest.Count;
-            // pg.WriteHeader(sw);
-            // pg.WriteFormHeader(sw, e);
-            // int MAX_COLUMN = 2;
-            // int j = 0, column = MAX_COLUMN;
-            // Random r = new Random();
-            // while (0 < vQuest.Count)
-            // {
-            // if (column == MAX_COLUMN)
-            // {
-            // sw.Write("<div class='cl1'></div>");
-            // column = 0;
-            // }
-            // int i = 0;
-            // if (pg.mSt.bQuestSort)
-            // i = r.Next(vQuest.Count - 1);
-            // vQuest[i].write(sw, ++j, ref column);
-            // vQuest.RemoveAt(i);
-            // }
-            // pg.WriteFormFooter(sw);
-            // pg.WriteFooter(sw);
-            // sw.Close();
-        }
-
         SolidColorBrush[] vBrush;
         SolidColorBrush[][] vTheme;
         Thickness[] vThickness;
@@ -157,7 +102,7 @@ namespace WpfApplication1
             vWidth[4] = (vWidth[0] - vWidth[2]) / 2 - SystemParameters.ScrollWidth - 2 * vWidth[3] - vWidth[1];
             gMain.ColumnDefinitions.Add(new ColumnDefinition());
             gMain.ColumnDefinitions.Add(new ColumnDefinition());
-            InitQuestion();
+            vQuest = Question.svQuest;
             InitLeftPanel();
             InitQuestPanel();
             dmsg.Background = vBrush[(int)BrushId.LeftPanel_BG];
@@ -412,22 +357,11 @@ namespace WpfApplication1
             }
         }
 
-        //protected void OnNavigatedFrom(NavigationEventArgs e)
-        //{
-        //    int a = 0;
-        //    ++a;
-        //}
-
-        //protected void OnNavigatingFrom(NavigatingCancelEventArgs e)
-        //{
-        //    int a = 0;
-        //    ++a;
-        //}
-
-        //protected void OnNavigatedTo(NavigationEventArgs e)
-        //{
-        //    int a = 0;
-        //    ++a;
-        //}
+        public static void NavigationService_LoadCompleted(object sender, NavigationEventArgs e)
+        {
+            string quest = System.Text.Encoding.UTF8.GetString((byte[])e.ExtraData);
+            Question.ParseString(quest);
+            //NavigationService.LoadCompleted -= NavigationService_LoadCompleted;
+        }
     }
 }

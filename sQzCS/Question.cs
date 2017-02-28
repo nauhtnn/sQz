@@ -32,6 +32,7 @@ namespace sQzCS
 
     public class Question
     {
+        public static List<Question> svQuest;
         public string mStmt; //statement
         int nAns;
         public string[] vAns;
@@ -181,6 +182,8 @@ namespace sQzCS
             svToken = v;
             siToken = 0;
             sSett = s;
+            if(svQuest == null)
+                svQuest = new List<Question>();
         }
 
         public bool Read()
@@ -301,6 +304,28 @@ namespace sQzCS
                 ++j;
             }
             os.Write("</div></div>");
+        }
+
+        public static void ParseString()
+        {
+            ParseString(Utils.ReadFile("qz1.txt"));
+        }
+
+        public static void ParseString(string buf)
+        {
+            if (buf == null)
+                return;
+            //else
+            //"buf size = " + buf.Length + '\n';
+            sQzCS.Page pg = new sQzCS.Page();
+            StartRead(Utils.Split(buf, '\n'), pg.mSt);
+            Question q = new Question();
+            while (q.Read())
+            {
+                svQuest.Add(q);
+                q = new Question();
+            }
+            q = null;
         }
     }
 }

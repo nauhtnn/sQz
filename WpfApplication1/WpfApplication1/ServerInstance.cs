@@ -23,7 +23,7 @@ namespace WpfApplication1
                 // TcpListener server = new TcpListener(port);
                 server = new TcpListener(localAddr, port);
 
-                // Start listening for client requests.
+                // Start listening for mClient requests.
                 server.Start();
 
                 // Buffer for reading data
@@ -37,35 +37,38 @@ namespace WpfApplication1
 
                     // Perform a blocking call to accept requests.
                     // You could also user server.AcceptSocket() here.
-                    TcpClient client = server.AcceptTcpClient();
+                    TcpClient mClient = server.AcceptTcpClient();
                     Console.WriteLine("Connected!");
 
                     data = null;
 
                     // Get a stream object for reading and writing
-                    NetworkStream stream = client.GetStream();
+                    NetworkStream stream = mClient.GetStream();
 
                     int i;
 
-                    // Loop to receive all the data sent by the client.
+                    string queStr = sQzCS.Utils.ReadFile("qz1.txt");
+
+                    // Loop to receive all the data sent by the mClient.
                     while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
                     {
                         // Translate data bytes to a ASCII string.
                         data = System.Text.Encoding.ASCII.GetString(bytes, 0, i);
                         Console.WriteLine("Received: {0}", data);
 
-                        // Process the data sent by the client.
+                        // Process the data sent by the mClient.
                         data = data.ToUpper();
 
-                        byte[] msg = System.Text.Encoding.ASCII.GetBytes("hi, there");// data);
+                        //byte[] msg = System.Text.Encoding.ASCII.GetBytes("hi, there");// data);
+                        byte[] msg = System.Text.Encoding.UTF8.GetBytes(queStr.ToArray());
 
                         // Send back a response.
                         stream.Write(msg, 0, msg.Length);
-                        Console.WriteLine("Sent: {0}", data);
+                        Console.WriteLine("Sent: {0}", queStr.Substring((int)(queStr.Length*0.9f)));
                     }
 
                     // Shutdown and end connection
-                    client.Close();
+                    mClient.Close();
                 }
             }
             catch (SocketException e)
