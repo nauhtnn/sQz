@@ -16,8 +16,8 @@ namespace WpfApplication1
         {    
             try
             {
-                // Set the TcpListener on port 13000.
-                Int32 port = 13001;
+                // Set the TcpListener on port 23821.
+                Int32 port = 23821;
                 IPAddress localAddr = IPAddress.Parse("127.0.0.1");
 
                 // TcpListener server = new TcpListener(port);

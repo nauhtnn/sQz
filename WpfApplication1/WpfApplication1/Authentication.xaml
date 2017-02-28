@@ -8,8 +8,8 @@
       d:DesignHeight="300" d:DesignWidth="300"
       Title="Authentication">
 
-    <Grid>
-        <TextBox x:Name="txtUsername" HorizontalAlignment="Left" Height="17" Margin="134,63,0,0" TextWrapping="Wrap" Text="type username" VerticalAlignment="Top" Width="102"/>
+    <Grid Loaded="Grid_Loaded">
+        <TextBox x:Name="txtUsername" HorizontalAlignment="Left" Height="17" Margin="134,63,0,0" TextWrapping="Wrap" Text="type username" VerticalAlignment="Top" Width="102" GotFocus="txtUsername_GotFocus"/>
         <TextBox x:Name="txtPassword" HorizontalAlignment="Left" Height="16" Margin="134,88,0,0" TextWrapping="Wrap" Text="type password" VerticalAlignment="Top" Width="102"/>
         <Button x:Name="btnSignIn" Content="Sign In" HorizontalAlignment="Left" Height="19" Margin="134,118,0,0" VerticalAlignment="Top" Width="102" Click="SignIn"/>
         <TextBox x:Name="txMessage" HorizontalAlignment="Left" Height="136" Margin="42,146,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="238"/>

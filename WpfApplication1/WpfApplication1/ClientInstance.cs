@@ -3,10 +3,9 @@ using System.Net.Sockets;
 
 public class ClientInstance
 {
-    static string ServerAddr = null;
+    static string ServerAddr = "127.0.0.1";
 	public ClientInstance()
 	{
-        ServerAddr = "127.0.0.1";
     }
 
     public static void Connect(String server, String message)
@@ -17,7 +16,7 @@ public class ClientInstance
             // Note, for this client to work you need to have a TcpServer 
             // connected to the same address as specified by the server, port
             // combination.
-            Int32 port = 13000;
+            Int32 port = 23821;
             server = ServerAddr;
             TcpClient client = new TcpClient(server, port);
 

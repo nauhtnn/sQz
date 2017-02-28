@@ -6,6 +6,7 @@ using System.Windows.Input;
 using System.Windows.Media;
 using sQzCS;
 using System.Collections.Generic;
+using System.Windows.Navigation;
 
 namespace WpfApplication1
 {
@@ -31,6 +32,8 @@ namespace WpfApplication1
             vFontFml = new FontFamily[2];
             vFontFml[0] = new FontFamily("Arial");
             vFontFml[1] = new FontFamily("Arial");
+
+            ShowsNavigationUI = false;
         }
 
         void InitQuestion()
@@ -408,5 +411,23 @@ namespace WpfApplication1
                     AnswerSheet[qid - 1][i].Content = string.Empty;
             }
         }
+
+        //protected void OnNavigatedFrom(NavigationEventArgs e)
+        //{
+        //    int a = 0;
+        //    ++a;
+        //}
+
+        //protected void OnNavigatingFrom(NavigatingCancelEventArgs e)
+        //{
+        //    int a = 0;
+        //    ++a;
+        //}
+
+        //protected void OnNavigatedTo(NavigationEventArgs e)
+        //{
+        //    int a = 0;
+        //    ++a;
+        //}
     }
 }
