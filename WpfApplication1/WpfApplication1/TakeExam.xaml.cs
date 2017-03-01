@@ -15,7 +15,7 @@ namespace WpfApplication1
     /// </summary>
     public partial class TakeExam : System.Windows.Controls.Page
     {
-        double em = 16 * 1.2;
+        public static double em = 16 * 1.2;
         Grid grdAnswerSheet;
         Label[][] AnswerSheet;
         double[] vWidth;
@@ -36,12 +36,12 @@ namespace WpfApplication1
             ShowsNavigationUI = false;
         }
 
-        SolidColorBrush[] vBrush;
-        SolidColorBrush[][] vTheme;
+        public static SolidColorBrush[] vBrush;
+        public static SolidColorBrush[][] vTheme;
         Thickness[] vThickness;
         FontFamily[] vFontFml;
 
-        void InitBrush()
+        public static void InitBrush()
         {
             vTheme = new SolidColorBrush[(int)ThemeId.Count][];
             //Harvard theme
