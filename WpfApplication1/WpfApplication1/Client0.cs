@@ -8,7 +8,6 @@ public class Client0
 {
     string mServerAddr;
     Int32 mPort;
-    int State;
     TcpClient mClient = null;
     static Client0 sClient = null;
 

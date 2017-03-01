@@ -91,7 +91,7 @@ namespace WpfApplication1
             }
             catch (Exception ex)
             {
-                string msg = ex.Message;
+                string byteMsg = ex.Message;
             }
             finally
             {
@@ -128,7 +128,7 @@ namespace WpfApplication1
             }
             catch (Exception ex)
             {
-                string msg = ex.Message;
+                string byteMsg = ex.Message;
             }
             finally
             {

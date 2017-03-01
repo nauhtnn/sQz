@@ -15,5 +15,6 @@
         <TextBox x:Name="txMessage" HorizontalAlignment="Left" Height="136" Margin="42,146,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="238"/>
         <Button x:Name="btnStartSer" Content="Start Server" HorizontalAlignment="Left" Height="16" Margin="26,88,0,0" VerticalAlignment="Top" Width="62" Click="btnStartSer_Click"/>
         <Button x:Name="btnStopSer" Content="Stop Server" HorizontalAlignment="Left" Height="18" Margin="26,109,0,0" VerticalAlignment="Top" Width="62" Click="btnStopSer_Click"/>
+        <TextBlock x:Name="txtDate" HorizontalAlignment="Left" Height="25" Margin="97,20,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="183"/>
     </Grid>
 </Page>

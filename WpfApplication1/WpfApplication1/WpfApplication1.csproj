@@ -61,7 +61,7 @@
     <Compile Include="SignIn.xaml.cs">
       <DependentUpon>SignIn.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ServerInstance.cs" />
+    <Compile Include="Server0.cs" />
     <Compile Include="sQz.xaml.cs">
       <DependentUpon>sQz.xaml</DependentUpon>
     </Compile>

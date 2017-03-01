@@ -23,8 +23,10 @@ namespace WpfApplication1
     public partial class Authentication : Page
     {
         Client0 mClient;
-        byte[] mBuffer;
         int mSz;
+        byte[] mBuffer;
+        RequestCode mState;
+
         public Authentication()
         {
             InitializeComponent();
@@ -33,21 +35,70 @@ namespace WpfApplication1
 
             FirewallHandler fwHndl = new FirewallHandler();
             fwHndl.OpenFirewall();
-            mClient = Client0.GetInstance();
             mSz = 1024 * 1024;
-            mBuffer = new byte[mSz];
+            mState = RequestCode.None;
+            mClient = Client0.GetInstance();
+            //Connect(null, null);
+        }
+
+        private void Connect(Object source, System.Timers.ElapsedEventArgs e)
+        {
+            mClient.BeginConnect(CB);
+        }
+
+        private void CB(IAsyncResult ar)
+        {
+            if(ar == null)
+            {
+                Connect(null, null);
+                return;
+            }
+            if (mState == RequestCode.None)
+            {
+                TcpClient c = (TcpClient)ar.AsyncState;
+                //exception: c.EndConnect(ar);
+                if (!c.Connected)
+                {
+                    Dispatcher.Invoke(() => { txMessage.Text += "connected"; });
+                    //else: wait and connect again
+                    System.Timers.Timer aTimer = new System.Timers.Timer(2000);
+                    // Hook up the Elapsed event for the timer. 
+                    aTimer.Elapsed += Connect;
+                    aTimer.AutoReset = false;
+                    aTimer.Enabled = true;
+                    return;
+                }
+                NetworkStream s = c.GetStream();
+                char[] msg = new char[1];
+                msg[0] = (char)RequestCode.Dating;
+                mBuffer = Encoding.UTF8.GetBytes(msg);
+                mState = RequestCode.Dating;
+                s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
+                return;
+            }
+            if (mState == RequestCode.Dating)
+            {
+                NetworkStream s = (NetworkStream)ar.AsyncState;
+                mBuffer = new byte[mSz];
+                mState = RequestCode.Dated;
+                s.BeginRead(mBuffer, 0, mSz, CB, s);
+            }
+            if (mState == RequestCode.Dated)
+            {
+                NetworkStream s = (NetworkStream)ar.AsyncState;
+                int nullIdx = Array.IndexOf(mBuffer, 0);
+                nullIdx = nullIdx >= 0 ? nullIdx : mBuffer.Length;
+                string date = ASCIIEncoding.ASCII.GetString(mBuffer, 0, nullIdx);
+                date = date.Substring(0, date.IndexOf('\0'));
+                Dispatcher.Invoke(() => { txtDate.Text = date; });
+                mState = RequestCode.Dated;
+                //s.BeginRead(mBuffer, 0, mSz, CB, s);
+            }
         }
 
         private void SignIn(object sender, RoutedEventArgs e)
         {
             mClient.BeginWrite(txtUsername.Text + "\n" + txtPassword.Text, SignInCallback);
-        }
-
-        private void ConnectCallback(IAsyncResult ar)
-        {
-            TcpClient c = (TcpClient)ar.AsyncState;
-            //exception: c.EndConnect(ar);
-            Dispatcher.Invoke(() => { txMessage.Text += "connected"; });
         }
 
         private void SignInCallback(IAsyncResult ar)
@@ -64,7 +115,6 @@ namespace WpfApplication1
             //NavigationService.Navigate(new TakeExam());
             Dispatcher.Invoke(() =>
             {
-                NavigationService.LoadCompleted += TakeExam.NavigationService_LoadCompleted;
                 NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative), mBuffer);//must have Urikind
             });
             //txMessage.Text += "\n" + txtUsername.Text + "\n" + txtPassword + "\n";
@@ -73,7 +123,7 @@ namespace WpfApplication1
         Thread th;
         private void btnStartSer_Click(object sender, RoutedEventArgs e)
         {
-            th = new Thread(new ThreadStart(()=> { ServerInstance.Start(); }));
+            th = new Thread(new ThreadStart(()=> { Server0 t = new Server0(); t.Start(); }));
             th.Start();
         }
 
@@ -82,7 +132,8 @@ namespace WpfApplication1
             //ServerInstance.Stop();
             //th.Abort();
             //th = null;
-            mClient.BeginConnect(ConnectCallback);
+            //mClient.BeginConnect(ConnectCallback);
+            Connect(null, null);
         }
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
