@@ -58,8 +58,8 @@
     <Compile Include="Authentication.xaml.cs">
       <DependentUpon>Authentication.xaml</DependentUpon>
     </Compile>
-    <Compile Include="ExamList.xaml.cs">
-      <DependentUpon>ExamList.xaml</DependentUpon>
+    <Compile Include="Operation.xaml.cs">
+      <DependentUpon>Operation.xaml</DependentUpon>
     </Compile>
     <Compile Include="FirewallHandler.cs" />
     <Compile Include="Server1.cs" />
@@ -74,7 +74,7 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
-    <Page Include="ExamList.xaml">
+    <Page Include="Operation.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

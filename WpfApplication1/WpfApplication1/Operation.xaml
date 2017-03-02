@@ -1,0 +1,33 @@
+﻿<Page x:Class="WpfApplication1.Operation"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:WpfApplication1"
+      mc:Ignorable="d" 
+      d:DesignHeight="360" d:DesignWidth="640"
+      Title="ExamList">
+
+    <StackPanel x:Name="spMain" Loaded="spMain_Loaded">
+        <StackPanel x:Name="spUp" Height="180" Orientation="Horizontal">
+            <StackPanel x:Name="spLeft">
+                <TextBlock x:Name="txtStatus" Text="Status" HorizontalAlignment="Center"></TextBlock>
+                <TextBlock x:Name="lblStatus" Width="213" VerticalAlignment="Stretch"></TextBlock>
+            </StackPanel>
+            <StackPanel x:Name="spCenter" Height="180">
+                <TextBlock x:Name="txtDate" Text="Dates" HorizontalAlignment="Center"></TextBlock>
+                <ListBox x:Name="lbxDate" HorizontalAlignment="Center" VerticalAlignment="Center"></ListBox>
+            </StackPanel>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="Number of exam"></TextBlock>
+                    <TextBox Width="50"></TextBox>
+                </StackPanel>
+                <Button Width="50" Content="Create Q Sheet"></Button>
+            </StackPanel>
+        </StackPanel>
+        <ScrollViewer x:Name="svwrDown" Height="180" VerticalScrollBarVisibility="Auto">
+            <StackPanel x:Name="spDown"></StackPanel>
+        </ScrollViewer>
+    </StackPanel>
+</Page>
