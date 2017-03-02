@@ -13,12 +13,16 @@ public class Client0
 
 	public Client0()
 	{
-        mServerAddr = "127.0.0.1";
+        string filePath = "ServerAddr.txt";
+        if (System.IO.File.Exists(filePath))
+            mServerAddr = System.IO.File.ReadAllText(filePath);
+        else
+            mServerAddr = "127.0.0.1";
         mPort = 23821;
         mClient = new TcpClient(AddressFamily.InterNetwork);
     }
 
-    public static Client0 GetInstance()
+    public static Client0 Instance()
     {
         if (sClient == null)
             sClient = new Client0();
@@ -48,7 +52,7 @@ public class Client0
             new AsyncCallback(callback), stream);
     }
 
-    public void BeginRead(DgCallback callback, byte[] buf, int sz)
+    public void BeginRead(byte[] buf, int sz, DgCallback callback)
     {
         if (!mClient.Connected)
             return;
@@ -70,22 +74,4 @@ public class Client0
     //    NetworkStream s = (NetworkStream)ar.AsyncState;
     //    s.EndWrite(ar);
     //}
-
-    public void Connect()
-    {
-        try
-        {
-        }
-        catch (ArgumentNullException e)
-        {
-            Console.WriteLine("ArgumentNullException: {0}", e);
-        }
-        catch (SocketException e)
-        {
-            Console.WriteLine("SocketException: {0}", e);
-        }
-
-        Console.WriteLine("\n Press Enter to continue...");
-        Console.Read();
-    }
 }

@@ -33,11 +33,11 @@ namespace WpfApplication1
 
             ShowsNavigationUI = false;
 
-            FirewallHandler fwHndl = new FirewallHandler();
+            FirewallHandler fwHndl = new FirewallHandler(3);
             fwHndl.OpenFirewall();
             mSz = 1024 * 1024;
             mState = RequestCode.None;
-            mClient = Client0.GetInstance();
+            mClient = Client0.Instance();
             //Connect(null, null);
         }
 
@@ -105,7 +105,7 @@ namespace WpfApplication1
         {
             NetworkStream s = (NetworkStream)ar.AsyncState;
             s.EndWrite(ar);
-            mClient.BeginRead(QuestReadCallback, mBuffer, mSz);
+            mClient.BeginRead(mBuffer, mSz, QuestReadCallback);
         }
 
         private void QuestReadCallback(IAsyncResult ar)
@@ -123,8 +123,8 @@ namespace WpfApplication1
         Thread th;
         private void btnStartSer_Click(object sender, RoutedEventArgs e)
         {
-            th = new Thread(new ThreadStart(()=> { Server0 t = new Server0(); t.Start(); }));
-            th.Start();
+            //th = new Thread(new ThreadStart(()=> { Server0 t = new Server0(); t.Start(); }));
+            //th.Start();
         }
 
         private void btnStopSer_Click(object sender, RoutedEventArgs e)

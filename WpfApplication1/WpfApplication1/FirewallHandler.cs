@@ -11,27 +11,59 @@ namespace WpfApplication1
 {
     class FirewallHandler
     {
-        private int[] portsSocket = { 23821 };
-        private string[] portsName = { "sQzPort"};
+        private int portSrvr0 = 23820;
+        private int portSrvr1 = 23821;
+        private string portNameSrvr0 = "sQz Server 0";
+        private string portNameSrvr1 = "sQz Server 1";
+        private int[] portsSocket;
+        private string[] portsName;
         private INetFwProfile fwProfile = null;
 
-        protected internal void OpenFirewall()
+        public FirewallHandler(int srvrType)
+        {
+            if(srvrType == 1)
+            {
+                portsSocket = new int[2];
+                portsSocket[0] = portSrvr0;
+                portsSocket[1] = portSrvr1;
+                portsName = new string[2];
+                portsName[0] = portNameSrvr0;
+                portsName[1] = portNameSrvr1;
+            }
+            else if(srvrType == 0)
+            {
+                portsSocket = new int[1];
+                portsSocket[0] = portSrvr0;
+                portsName = new string[1];
+                portsName[0] = portNameSrvr0;
+            }
+            else
+            {
+                portsSocket = new int[1];
+                portsSocket[0] = portSrvr1;
+                portsName = new string[1];
+                portsName[0] = portNameSrvr1;
+            }
+        }
+
+        protected internal string OpenFirewall()
         {
             INetFwAuthorizedApplications authApps = null;
             INetFwAuthorizedApplication authApp = null;
             INetFwOpenPorts openPorts = null;
             INetFwOpenPort openPort = null;
+            string retMsg = null;
             try
             {
                 //string productName = Application.Current.MainWindow.GetType().Assembly.GetName().Name;
-                string productName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name;
+                string productName = System.Reflection.Assembly.GetExecutingAssembly().GetName().Name + "Server";
                 string exePath = System.Reflection.Assembly.GetExecutingAssembly().Location;
-                if (isAppFound(productName + " Server") == false)
+                if (isAppFound(productName) == false)
                 {
                     SetProfile();
                     authApps = fwProfile.AuthorizedApplications;
                     authApp = GetInstance("INetAuthApp") as INetFwAuthorizedApplication;
-                    authApp.Name = productName + " Server";
+                    authApp.Name = productName;
                     authApp.ProcessImageFileName = exePath;
                     authApps.Add(authApp);
                 }
@@ -46,10 +78,27 @@ namespace WpfApplication1
                     openPort.Name = portsName[0];
                     openPorts.Add(openPort);
                 }
+
+                if (portsSocket.Length == 2 && isPortFound(portsSocket[1]) == false)
+                {
+                    SetProfile();
+                    openPorts = fwProfile.GloballyOpenPorts;
+                    openPort = GetInstance("INetOpenPort") as INetFwOpenPort;
+                    openPort.Port = portsSocket[1];
+                    openPort.Protocol = NET_FW_IP_PROTOCOL_.NET_FW_IP_PROTOCOL_TCP;
+                    openPort.Name = portsName[1];
+                    openPorts.Add(openPort);
+                }
+                retMsg = "Open firewall successfully, app name = " + productName
+                    + ", port1 name = " + portsName[0] + ", port1 = " + portsSocket[0];
+                if(portsSocket.Length == 2)
+                    retMsg += "port2 name = " + portsName[1] + ", port2 = " + portsSocket[1];
+                retMsg += ".\n";
             }
             catch (Exception ex)
             {
-                MessageBox.Show(ex.Message);
+                //MessageBox.Show(ex.Message);
+                retMsg = "Fw Error with the message = " + ex.Message;
             }
             finally
             {
@@ -58,6 +107,7 @@ namespace WpfApplication1
                 if (openPorts != null) openPorts = null;
                 if (openPort != null) openPort = null;
             }
+            return retMsg;
         }
 
         protected internal void CloseFirewall()
