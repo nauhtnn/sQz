@@ -33,10 +33,21 @@ namespace WpfApplication1
     {
         TcpListener mServer;
         DgResponseMsg dgResponse;
+        bool mStart;
+        bool mRunning;
+        bool mClosing;
 
         public Server0(DgResponseMsg dg)
         {
+            // Set the TcpListener on port 23820.
+            Int32 port = 23820;
+            IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+
+            //mServer = new TcpListener(IPAddress.Any, port);
+            mServer = new TcpListener(localAddr, port);
+
             dgResponse = dg;
+            mStart = mRunning = mClosing = false;
         }
 
         public void Start(ref bool bToUpdateMsg, ref string msg)
@@ -45,16 +56,12 @@ namespace WpfApplication1
             {
                 bToUpdateMsg = false;
                 msg = String.Empty;
-                // Set the TcpListener on port 23820.
-                Int32 port = 23820;
-                IPAddress localAddr = IPAddress.Parse("127.0.0.1");
-
-                // TcpListener mServer = new TcpListener(port);
-                //mServer = new TcpListener(IPAddress.Any, port);
-                mServer = new TcpListener(localAddr, port);
 
                 // Start listening for mClient requests.
                 mServer.Start();
+
+                mStart = true;
+                mClosing = false;
 
                 msg += "\n Server has started";
                 bToUpdateMsg = true;
@@ -62,56 +69,74 @@ namespace WpfApplication1
 
                 // Buffer for reading data
                 Byte[] bytes = new Byte[256];
-                String data = null;
 
                 // Enter the listening loop.
-                while (true)
+                while (!mClosing)
                 {
-                    Console.Write("Waiting for a connection... ");
+                    //Console.Write("Waiting for a connection... ");
 
                     // Perform a blocking call to accept requests.
                     // You could also user mServer.AcceptSocket() here.
-                    TcpClient mClient = mServer.AcceptTcpClient();
-
-                    data = null;
-
-                    // Get a stream object for reading and writing
-                    NetworkStream stream = mClient.GetStream();
-
-                    int i;
-
-                    // Loop to receive all the data sent by the mClient.
-                    while ((i = stream.Read(bytes, 0, bytes.Length)) != 0)
+                    if (mServer.Pending())
                     {
-                        Console.WriteLine("Received: {0}", data);
-                        string recvMsg = System.Text.Encoding.UTF8.GetString(bytes);
-                        byte[] byteMsg = null;
-                        char code = recvMsg[0];
-                        switch(code)
+                        TcpClient mClient = mServer.AcceptTcpClient();
+
+                        mRunning = true;
+
+                        // Get a stream object for reading and writing
+                        NetworkStream stream = mClient.GetStream();
+
+                        // Check to see if this NetworkStream is readable.
+                        if (stream.CanRead)
                         {
-                            case (char)RequestCode.DateStudentRetriving:
-                                msg = dgResponse(code);
-                                break;
-                            case (char)RequestCode.QuestAnsKeyRetrieving:
-                                msg = dgResponse(code);
-                                break;
-                            case (char)RequestCode.MarkSubmitting:
-                                break;
-                            default:
-                                msg = "unknown";
-                                break;
+                            byte[] myReadBuffer = new byte[1024];
+                            StringBuilder recvMsg = new StringBuilder();
+                            int nByte = 0;
+
+                            // Incoming message may be larger than the buffer size.
+                            do
+                            {
+                                nByte = stream.Read(myReadBuffer, 0, myReadBuffer.Length);
+
+                                recvMsg.AppendFormat("{0}", Encoding.UTF8.GetString(myReadBuffer, 0, nByte));
+
+                            }
+                            while (!mClosing && stream.DataAvailable);
+                            if (!mClosing)
+                            {
+                                byte[] byteMsg = null;
+                                char code = recvMsg[0];
+                                switch (code)
+                                {
+                                    case (char)RequestCode.DateStudentRetriving:
+                                        msg = dgResponse(code);
+                                        break;
+                                    case (char)RequestCode.QuestAnsKeyRetrieving:
+                                        msg = dgResponse(code);
+                                        break;
+                                    case (char)RequestCode.MarkSubmitting:
+                                        break;
+                                    default:
+                                        msg = "unknown";
+                                        break;
+                                }
+                                int sz = Encoding.UTF8.GetByteCount(msg);
+                                byteMsg = new byte[sz];
+                                byteMsg = Encoding.UTF8.GetBytes(msg);
+
+                                // Send back a response.
+                                stream.Write(byteMsg, 0, byteMsg.Length);
+                            }
                         }
-                        int sz = Encoding.UTF8.GetByteCount(msg);
-                        byteMsg = new byte[sz];
-                        byteMsg = Encoding.UTF8.GetBytes(msg);
+                        else
+                        {
+                            Console.WriteLine("Sorry.  You cannot read from this NetworkStream.");
+                        }
 
-                        // Send back a response.
-                        stream.Write(byteMsg, 0, byteMsg.Length);
-                        Console.WriteLine("Sent back: {0}", code);
+                        // Shutdown and end connection
+                        mClient.Close();
+                        mRunning = false;
                     }
-
-                    // Shutdown and end connection
-                    mClient.Close();
                 }
             }
             catch (SocketException e)
@@ -122,8 +147,10 @@ namespace WpfApplication1
             }
             finally
             {
+                mRunning = false;
                 // Stop listening for new clients.
                 mServer.Stop();
+                mStart = false;
             }
 
 
@@ -133,7 +160,8 @@ namespace WpfApplication1
 
         public void Stop()
         {
-            if (mServer != null)
+            mClosing = true;
+            if (mStart && !mRunning)
                 mServer.Stop();
         }
 
