@@ -26,6 +26,8 @@ namespace WpfApplication1
         int mSz;
         byte[] mBuffer;
         RequestCode mState;
+        bool bSrvrMsg;
+        string mSrvrMsg;
 
         public Authentication()
         {
@@ -39,6 +41,8 @@ namespace WpfApplication1
             mState = RequestCode.None;
             mClient = Client0.Instance();
             //Connect(null, null);
+            mSrvrMsg = String.Empty;
+            bSrvrMsg = false;
         }
 
         private void Connect(Object source, System.Timers.ElapsedEventArgs e)
@@ -123,8 +127,13 @@ namespace WpfApplication1
         Thread th;
         private void btnStartSer_Click(object sender, RoutedEventArgs e)
         {
-            //th = new Thread(new ThreadStart(()=> { Server0 t = new Server0(); t.Start(); }));
-            //th.Start();
+            th = new Thread(new ThreadStart(()=> { Server0 t = new Server0(ResponseMsg); t.Start(ref bSrvrMsg, ref mSrvrMsg); }));
+            th.Start();
+        }
+
+        public string ResponseMsg(char code)
+        {
+            return "for debug only";
         }
 
         private void btnStopSer_Click(object sender, RoutedEventArgs e)

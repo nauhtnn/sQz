@@ -14,5 +14,6 @@
             <StackPanel x:Name="spStudent"></StackPanel>
         </ScrollViewer>
         <Button x:Name="btnConnect" Content="Connect" Click="btnConnect_Click"  Width="80"></Button>
+        <Button x:Name="btnDisconnect" Content="Disconnect" Click="btnDisconnect_Click"  Width="80"></Button>
     </StackPanel>
 </Page>

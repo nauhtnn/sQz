@@ -32,11 +32,13 @@ namespace WpfApplication1
 
             ShowsNavigationUI = false;
 
-            FirewallHandler fwHndl = new FirewallHandler(1);
-            fwHndl.OpenFirewall();
+            //FirewallHandler fwHndl = new FirewallHandler(0);
+            //fwHndl.OpenFirewall();
             mSz = 1024 * 1024;
             mState = RequestCode.None;
             mClient = Client0.Instance();
+
+            TakeExam.InitBrush();
         }
 
         private void ScaleScreen(double r)
@@ -91,19 +93,19 @@ namespace WpfApplication1
                 s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                 return;
             }
-            if (mState == RequestCode.DateStudentRetriving)
+            else if (mState == RequestCode.DateStudentRetriving)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
                 mBuffer = new byte[mSz];
                 mState = RequestCode.DateStudentRetrieved;
                 s.BeginRead(mBuffer, 0, mSz, CB, s);
             }
-            if (mState == RequestCode.DateStudentRetrieved)
+            else if (mState == RequestCode.DateStudentRetrieved)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
                 int nullIdx = Array.IndexOf(mBuffer, 0);
                 nullIdx = nullIdx >= 0 ? nullIdx : mBuffer.Length;
-                string dat = ASCIIEncoding.ASCII.GetString(mBuffer, 0, nullIdx);
+                string dat = UTF8Encoding.UTF8.GetString(mBuffer, 0, nullIdx);
                 dat = dat.Substring(0, dat.IndexOf('\0'));
                 Dispatcher.Invoke(() => {
                     int idx1 = dat.IndexOf('\n');
@@ -113,6 +115,7 @@ namespace WpfApplication1
                     {
                         string t = dat.Substring(idx1, idx2 - idx1);
                         TextBlock x = new TextBlock();
+                        x.FontSize = TakeExam.em;
                         x.Text = t;
                         spStudent.Children.Add(x);
                         idx1 = ++idx2;
@@ -122,6 +125,11 @@ namespace WpfApplication1
                 mState = RequestCode.Dated;
                 //s.BeginRead(mBuffer, 0, mSz, CB, s);
             }
+        }
+
+        private void btnDisconnect_Click(object sender, RoutedEventArgs e)
+        {
+            mClient.Close();
         }
     }
 }

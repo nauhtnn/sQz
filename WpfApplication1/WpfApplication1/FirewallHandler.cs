@@ -21,7 +21,14 @@ namespace WpfApplication1
 
         public FirewallHandler(int srvrType)
         {
-            if(srvrType == 1)
+            if (srvrType == 0)
+            {
+                portsSocket = new int[1];
+                portsSocket[0] = portSrvr0;
+                portsName = new string[1];
+                portsName[0] = portNameSrvr0;
+            }
+            else if (srvrType == 1)
             {
                 portsSocket = new int[2];
                 portsSocket[0] = portSrvr0;
@@ -29,13 +36,6 @@ namespace WpfApplication1
                 portsName = new string[2];
                 portsName[0] = portNameSrvr0;
                 portsName[1] = portNameSrvr1;
-            }
-            else if(srvrType == 0)
-            {
-                portsSocket = new int[1];
-                portsSocket[0] = portSrvr0;
-                portsName = new string[1];
-                portsName[0] = portNameSrvr0;
             }
             else
             {

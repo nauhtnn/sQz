@@ -23,6 +23,7 @@ namespace WpfApplication1
     {
         List<string> vDate;
         List<string> vStudent;
+        string mSelectedDate;
         Server0 mServer;
         bool bSrvrMsg;
         string mSrvrMsg;
@@ -33,6 +34,7 @@ namespace WpfApplication1
             ShowsNavigationUI = false;
             vDate = new List<string>();
             vStudent = new List<string>();
+            mSelectedDate = String.Empty;
             mServer = new Server0(ResponseMsg);
             bSrvrMsg = false;
             mSrvrMsg = String.Empty;
@@ -41,6 +43,12 @@ namespace WpfApplication1
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
             TakeExam.InitBrush();
             LoadDates();
+
+            System.Timers.Timer aTimer = new System.Timers.Timer(2000);
+            // Hook up the Elapsed event for the timer. 
+            aTimer.Elapsed += UpdateSrvrMsg;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
         }
 
         public string ResponseMsg(char code)
@@ -49,7 +57,7 @@ namespace WpfApplication1
             switch (code)
             {
                 case (char)RequestCode.DateStudentRetriving:
-                    msg = (string)((ListBoxItem)lbxDate.SelectedItem).Content + "\n";
+                    msg = mSelectedDate + "\n";
                     foreach(string s in vStudent)
                         msg += s + "\n";
                     break;
@@ -68,7 +76,8 @@ namespace WpfApplication1
         private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListBox l = (ListBox)sender;
-            LoadStudents((string)((ListBoxItem)l.SelectedItem).Content);
+            mSelectedDate = (string)((ListBoxItem)l.SelectedItem).Content;
+            LoadStudents(mSelectedDate);
         }
 
         private void LoadDates()
@@ -197,24 +206,32 @@ namespace WpfApplication1
         {
 
             Thread th = new Thread(() => { StartSrvr(ref bSrvrMsg, ref mSrvrMsg); });
-                //ThreadStart((ref ) => { mServer = new Server0(); t.Start(); }));
             th.Start();
         }
 
         private void StartSrvr(ref bool bUpdate, ref string msg)
         {
-            System.Timers.Timer aTimer = new System.Timers.Timer(2000);
-            // Hook up the Elapsed event for the timer. 
-            aTimer.Elapsed += UpdateSrvrMsg;
-            aTimer.AutoReset = true;
-            aTimer.Enabled = true;
             mServer.Start(ref bUpdate, ref msg);
         }
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
             if (bSrvrMsg)
-                Dispatcher.Invoke(() => { lblStatus.Text += mSrvrMsg; bSrvrMsg = false; });
+                Dispatcher.Invoke(() => {
+                    lblStatus.Text += mSrvrMsg; bSrvrMsg = false; mSrvrMsg = String.Empty; });
+        }
+
+        private void StopSvrv_Click(object sender, RoutedEventArgs e)
+        {
+            mServer.Stop();
+        }
+
+        private void op1_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
+            });
         }
     }
 }

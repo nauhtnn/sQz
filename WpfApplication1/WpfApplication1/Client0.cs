@@ -18,7 +18,11 @@ public class Client0
             mServerAddr = System.IO.File.ReadAllText(filePath);
         else
             mServerAddr = "127.0.0.1";
-        mPort = 23821;
+        filePath = "ServerPort.txt";
+        if (System.IO.File.Exists(filePath))
+            mPort = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
+        else
+            mPort = 23821;
         mClient = new TcpClient(AddressFamily.InterNetwork);
     }
 
@@ -31,7 +35,8 @@ public class Client0
 
     public void BeginConnect(DgCallback callback)
     {
-        mClient.BeginConnect(mServerAddr, mPort, new AsyncCallback(callback), mClient);
+        if(!mClient.Connected)
+            mClient.BeginConnect(mServerAddr, mPort, new AsyncCallback(callback), mClient);
     }
 
     //private void ConnectCallback(IAsyncResult ar)

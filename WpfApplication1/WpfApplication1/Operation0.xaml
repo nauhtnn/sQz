@@ -24,7 +24,9 @@
                     <TextBox Width="50"></TextBox>
                 </StackPanel>
                 <Button Width="50" Content="Create Q Sheet"></Button>
-                <Button x:Name="StartSvrt" Width="50" Content="Start server" Click="StartSvrt_Click"></Button>
+                <Button x:Name="StartSvrv" Width="50" Content="Start server" Click="StartSvrt_Click"></Button>
+                <Button x:Name="StopSvrv" Width="50" Content="Stop srvr" Click="StopSvrv_Click"></Button>
+                <Button x:Name="op1" Width="100" Content="operation1" Click="op1_Click"></Button>
             </StackPanel>
         </StackPanel>
         <ScrollViewer x:Name="svwrDown" Height="180" VerticalScrollBarVisibility="Auto">

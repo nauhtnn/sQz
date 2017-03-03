@@ -47,10 +47,11 @@ namespace WpfApplication1
                 msg = String.Empty;
                 // Set the TcpListener on port 23820.
                 Int32 port = 23820;
-                //IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+                IPAddress localAddr = IPAddress.Parse("127.0.0.1");
 
                 // TcpListener mServer = new TcpListener(port);
-                mServer = new TcpListener(IPAddress.Any, port);
+                //mServer = new TcpListener(IPAddress.Any, port);
+                mServer = new TcpListener(localAddr, port);
 
                 // Start listening for mClient requests.
                 mServer.Start();
