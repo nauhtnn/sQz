@@ -9,11 +9,19 @@
       Title="Operation1">
 
     <StackPanel x:Name="spMain" Loaded="spMain_Loaded">
-        <TextBlock x:Name="txtDate" Text="Connecting..."></TextBlock>
-        <ScrollViewer x:Name="svwrStudent" Height="300" VerticalScrollBarVisibility="Auto">
-            <StackPanel x:Name="spStudent"></StackPanel>
-        </ScrollViewer>
-        <Button x:Name="btnConnect" Content="Connect Srvr" Click="btnConnect_Click"  Width="80"></Button>
-        <Button x:Name="btnDisconnect" Content="Disconnect Srvr" Click="btnDisconnect_Click"  Width="80"></Button>
+        <TextBlock x:Name="txtDate" Text="Connecting..." HorizontalAlignment="Center"></TextBlock>
+        <StackPanel Orientation="Horizontal">
+            <TextBlock x:Name="lblStatus" Width="213" Height="300" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
+            <ScrollViewer x:Name="svwrStudent" Height="300" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="spStudent"></StackPanel>
+            </ScrollViewer>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="btnConnect" Content="Connect Srvr" Click="btnConnect_Click"  Width="80"></Button>
+            <Button x:Name="btnDisconnect" Content="Disconnect Srvr" Click="btnDisconnect_Click"  Width="80"></Button>
+            <Button x:Name="btnStartSrvr" Content="Start srvr" Click="StartSrvr_Click" Width="80"></Button>
+            <Button x:Name="btnStopSrvr" Content="Stop srvr" Click="StopSrvr_Click" Width="80"></Button>
+            <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Width="80"></Button>
+        </StackPanel>
     </StackPanel>
 </Page>

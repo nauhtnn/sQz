@@ -13,17 +13,27 @@ public class Client0
 
 	public Client0()
 	{
-        string filePath = "ServerAddr0.txt";
+        string filePath = "ServerAddr.txt";
         if (System.IO.File.Exists(filePath))
             mServerAddr = System.IO.File.ReadAllText(filePath);
         else
             mServerAddr = "127.0.0.1";
-        filePath = "ServerPort0.txt";
+        filePath = "ServerPort.txt";
         if (System.IO.File.Exists(filePath))
             mPort = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
         else
             mPort = 23821;
         mClient = new TcpClient(AddressFamily.InterNetwork);
+    }
+
+    public void SetSrvrAddr(string addr)
+    {
+        mServerAddr = addr;
+    }
+
+    public void SetSrvrPort(Int32 port)
+    {
+        mPort = port;
     }
 
     public static Client0 Instance()
@@ -35,48 +45,35 @@ public class Client0
 
     public void BeginConnect(DgCallback callback)
     {
+        if (mClient == null)
+            mClient = new TcpClient(AddressFamily.InterNetwork);
         if(!mClient.Connected)
             mClient.BeginConnect(mServerAddr, mPort, new AsyncCallback(callback), mClient);
     }
 
-    //private void ConnectCallback(IAsyncResult ar)
-    //{
-    //    TcpClient c = (TcpClient)ar.AsyncState;
-    //    c.EndConnect(ar);
-    //}
-
     public void BeginWrite(string data, DgCallback callback)
     {
-        if (!mClient.Connected)
+        if (mClient == null || !mClient.Connected)
             return;
 
         NetworkStream stream = mClient.GetStream();
-
-        // Send the message to the connected TcpServer. 
         stream.BeginWrite(System.Text.Encoding.UTF8.GetBytes(data), 0, System.Text.Encoding.UTF8.GetByteCount(data),
             new AsyncCallback(callback), stream);
     }
 
     public void BeginRead(byte[] buf, int sz, DgCallback callback)
     {
-        if (!mClient.Connected)
+        if (mClient == null || !mClient.Connected)
             return;
         NetworkStream stream = mClient.GetStream();
-
-        // Send the message to the connected TcpServer. 
         stream.BeginRead(buf, 0, sz, new AsyncCallback(callback), stream);
     }
 
     public void Close()
     {
-        if (!mClient.Connected)
+        if (mClient == null)
             return;
         mClient.Close();
+        mClient = null;
     }
-
-    //private void SendData_Callback(IAsyncResult ar)
-    //{
-    //    NetworkStream s = (NetworkStream)ar.AsyncState;
-    //    s.EndWrite(ar);
-    //}
 }

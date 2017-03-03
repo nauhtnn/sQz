@@ -10,14 +10,17 @@ namespace WpfApplication1
 {
     enum RequestCode
     {
-        None = '@',
+        PrepDateStudent = '@',
         DateStudentRetriving = 'A',
         DateStudentRetrieved,
+        PrepQuestAnsKey,
         QuestAnsKeyRetrieving,
         QuestAnsKeyRetrieved,
+        PrepMark,
         MarkSubmitting,
         MarkSubmitted,
-        Dating = 'a',
+        PrepDate = 'a',
+        Dating,
         Dated,
         Authenticating,
         Authenticated,

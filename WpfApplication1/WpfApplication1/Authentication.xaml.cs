@@ -38,7 +38,7 @@ namespace WpfApplication1
             FirewallHandler fwHndl = new FirewallHandler(3);
             fwHndl.OpenFirewall();
             mSz = 1024 * 1024;
-            mState = RequestCode.None;
+            mState = RequestCode.PrepDate;
             mClient = Client0.Instance();
             //Connect(null, null);
             mSrvrMsg = String.Empty;
@@ -57,7 +57,7 @@ namespace WpfApplication1
                 Connect(null, null);
                 return;
             }
-            if (mState == RequestCode.None)
+            if (mState == RequestCode.PrepDateStudent)
             {
                 TcpClient c = (TcpClient)ar.AsyncState;
                 //exception: c.EndConnect(ar);

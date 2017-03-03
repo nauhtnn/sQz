@@ -8,7 +8,7 @@ using System.Net;
 
 namespace WpfApplication1
 {
-    class Server1
+    public class Server1
     {
         TcpListener mServer;
         DgResponseMsg dgResponse;

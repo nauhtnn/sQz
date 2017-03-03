@@ -24,8 +24,8 @@
                     <TextBox Width="50"></TextBox>
                 </StackPanel>
                 <Button Width="50" Content="Create Q Sheet"></Button>
-                <Button x:Name="StartSvrv" Width="50" Content="Start server" Click="StartSvrt_Click"></Button>
-                <Button x:Name="StopSvrv" Width="50" Content="Stop srvr" Click="StopSvrv_Click"></Button>
+                <Button x:Name="btnStartSrvr" Width="50" Content="Start server" Click="StartSrvr_Click"></Button>
+                <Button x:Name="btnStopSrvr" Width="50" Content="Stop srvr" Click="StopSrvr_Click"></Button>
                 <Button x:Name="op1" Width="100" Content="close" Click="op1_Click"></Button>
             </StackPanel>
         </StackPanel>

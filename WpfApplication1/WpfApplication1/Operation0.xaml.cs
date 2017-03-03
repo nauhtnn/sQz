@@ -69,7 +69,10 @@ namespace WpfApplication1
                         msg += s + "\n";
                     break;
                 case (char)RequestCode.QuestAnsKeyRetrieving:
-                    //msg = ;
+                    if (System.IO.File.Exists("qz1.txt"))
+                        msg = sQzCS.Utils.ReadFile("qz1.txt");
+                    else
+                        msg = String.Empty;
                     break;
                 case (char)RequestCode.MarkSubmitting:
                     break;
@@ -210,7 +213,7 @@ namespace WpfApplication1
             lblStatus.Text = msg;
         }
 
-        private void StartSvrt_Click(object sender, RoutedEventArgs e)
+        private void StartSrvr_Click(object sender, RoutedEventArgs e)
         {
 
             Thread th = new Thread(() => { mServer.Start(ref bSrvrMsg, ref mSrvrMsg); /*StartSrvr(ref bSrvrMsg, ref mSrvrMsg); */});
@@ -229,19 +232,19 @@ namespace WpfApplication1
                     lblStatus.Text += mSrvrMsg; bSrvrMsg = false; mSrvrMsg = String.Empty; });
         }
 
-        private void StopSvrv_Click(object sender, RoutedEventArgs e)
+        private void StopSrvr_Click(object sender, RoutedEventArgs e)
         {
             mServer.Stop(ref bSrvrMsg, ref mSrvrMsg);
         }
 
         private void op1_Click(object sender, RoutedEventArgs e)
         {
-            //Dispatcher.Invoke(() =>
-            //{
-            //    NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
-            //});
-            Window w = (Window)Parent;
-            w.Close();
+            Dispatcher.Invoke(() =>
+            {
+                NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
+            });
+            //Window w = (Window)Parent;
+            //w.Close();
         }
     }
 }

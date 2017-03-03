@@ -65,7 +65,7 @@
     <Compile Include="Operation1.xaml.cs">
       <DependentUpon>Operation1.xaml</DependentUpon>
     </Compile>
-    <None Include="Server1.cs" />
+    <Compile Include="Server1.cs" />
     <Compile Include="Server0.cs" />
     <Compile Include="sQz.xaml.cs">
       <DependentUpon>sQz.xaml</DependentUpon>
