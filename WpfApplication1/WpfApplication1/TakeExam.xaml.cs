@@ -20,6 +20,8 @@ namespace WpfApplication1
         Label[][] AnswerSheet;
         double[] vWidth;
 
+        static bool bBrushReady = false;
+
         Label dmsg = new Label();
         List<Question> vQuest;
 
@@ -43,6 +45,9 @@ namespace WpfApplication1
 
         public static void InitBrush()
         {
+            if (bBrushReady)
+                return;
+            bBrushReady = true;
             vTheme = new SolidColorBrush[(int)ThemeId.Count][];
             //Harvard theme
             SolidColorBrush[] br = new SolidColorBrush[(int)BrushId.Count];

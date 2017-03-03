@@ -51,6 +51,13 @@ namespace WpfApplication1
             aTimer.Enabled = true;
         }
 
+        private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            bool dummy1 = false;
+            string dummy2 = null;
+            mServer.Stop(ref dummy1, ref dummy2);
+        }
+
         public string ResponseMsg(char code)
         {
             string msg = null;
@@ -190,6 +197,7 @@ namespace WpfApplication1
             Window w = (Window)Parent;
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
+            w.Closing += W_Closing;
 
             PrepDatesGUI();
 
@@ -205,7 +213,7 @@ namespace WpfApplication1
         private void StartSvrt_Click(object sender, RoutedEventArgs e)
         {
 
-            Thread th = new Thread(() => { StartSrvr(ref bSrvrMsg, ref mSrvrMsg); });
+            Thread th = new Thread(() => { mServer.Start(ref bSrvrMsg, ref mSrvrMsg); /*StartSrvr(ref bSrvrMsg, ref mSrvrMsg); */});
             th.Start();
         }
 
@@ -223,15 +231,17 @@ namespace WpfApplication1
 
         private void StopSvrv_Click(object sender, RoutedEventArgs e)
         {
-            mServer.Stop();
+            mServer.Stop(ref bSrvrMsg, ref mSrvrMsg);
         }
 
         private void op1_Click(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
-            {
-                NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
-            });
+            //Dispatcher.Invoke(() =>
+            //{
+            //    NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
+            //});
+            Window w = (Window)Parent;
+            w.Close();
         }
     }
 }

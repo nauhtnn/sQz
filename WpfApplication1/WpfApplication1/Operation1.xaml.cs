@@ -25,6 +25,7 @@ namespace WpfApplication1
         int mSz;
         byte[] mBuffer;
         RequestCode mState;
+        string mDate;
 
         public Operation1()
         {
@@ -38,13 +39,39 @@ namespace WpfApplication1
             mState = RequestCode.None;
             mClient = Client0.Instance();
 
+            mDate = String.Empty;
+
             TakeExam.InitBrush();
+        }
+
+        public string ResponseMsg(char code)
+        {
+            string msg = null;
+            switch (code)
+            {
+                case (char)RequestCode.Dating:
+                    msg = mDate;
+                    break;
+                case (char)RequestCode.Authenticating:
+                    //msg = ;
+                    break;
+                case (char)RequestCode.ExamRetrieving:
+                    break;
+                case (char)RequestCode.Submiting:
+                    break;
+                default:
+                    msg = "unknown";
+                    break;
+            }
+            return msg;
         }
 
         private void ScaleScreen(double r)
         {
             svwrStudent.Height = svwrStudent.Height * r;
             svwrStudent.Background = new SolidColorBrush(Colors.AliceBlue);
+
+            txtDate.FontSize = TakeExam.em;
         }
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
@@ -109,7 +136,8 @@ namespace WpfApplication1
                 dat = dat.Substring(0, dat.IndexOf('\0'));
                 Dispatcher.Invoke(() => {
                     int idx1 = dat.IndexOf('\n');
-                    string date = dat.Substring(0, idx1++);
+                    mDate = dat.Substring(0, idx1++);
+                    txtDate.Text = mDate;
                     int idx2 = dat.IndexOf('\n', idx1);
                     while (idx2 != -1) //not check ends with '\n' here
                     {

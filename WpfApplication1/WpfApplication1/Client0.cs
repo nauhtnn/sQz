@@ -13,12 +13,12 @@ public class Client0
 
 	public Client0()
 	{
-        string filePath = "ServerAddr.txt";
+        string filePath = "ServerAddr0.txt";
         if (System.IO.File.Exists(filePath))
             mServerAddr = System.IO.File.ReadAllText(filePath);
         else
             mServerAddr = "127.0.0.1";
-        filePath = "ServerPort.txt";
+        filePath = "ServerPort0.txt";
         if (System.IO.File.Exists(filePath))
             mPort = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
         else

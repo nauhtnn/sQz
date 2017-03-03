@@ -28,7 +28,6 @@ namespace WpfApplication1
         private void SignIn(object sender, RoutedEventArgs e)
         {
             txMessage.Text += "_" + txtUsername.Text + "_" + txtPassword + "\n";
-            ClientInstance.Connect("127.0.0.1", "hello world");
         }
 
         private void btnStartSer_Click(object sender, RoutedEventArgs e)
@@ -39,7 +38,7 @@ namespace WpfApplication1
 
         private void btnStopSer_Click(object sender, RoutedEventArgs e)
         {
-            ServerInstance.Stop();
+            Server0.Stop();
         }
     }
 }

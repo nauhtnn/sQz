@@ -13,7 +13,7 @@
         <ScrollViewer x:Name="svwrStudent" Height="300" VerticalScrollBarVisibility="Auto">
             <StackPanel x:Name="spStudent"></StackPanel>
         </ScrollViewer>
-        <Button x:Name="btnConnect" Content="Connect" Click="btnConnect_Click"  Width="80"></Button>
-        <Button x:Name="btnDisconnect" Content="Disconnect" Click="btnDisconnect_Click"  Width="80"></Button>
+        <Button x:Name="btnConnect" Content="Connect Srvr" Click="btnConnect_Click"  Width="80"></Button>
+        <Button x:Name="btnDisconnect" Content="Disconnect Srvr" Click="btnDisconnect_Click"  Width="80"></Button>
     </StackPanel>
 </Page>

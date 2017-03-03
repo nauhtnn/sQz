@@ -39,12 +39,12 @@ namespace WpfApplication1
 
         public Server0(DgResponseMsg dg)
         {
-            // Set the TcpListener on port 23820.
-            Int32 port = 23820;
-            IPAddress localAddr = IPAddress.Parse("127.0.0.1");
-
-            //mServer = new TcpListener(IPAddress.Any, port);
-            mServer = new TcpListener(localAddr, port);
+            string filePath = "ServerPort0.txt";
+            int port = 23820;
+            if (System.IO.File.Exists(filePath))
+                port = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
+            //IPAddress localAddr = IPAddress.Parse("127.0.0.1");
+            mServer = new TcpListener(IPAddress.Any, port);
 
             dgResponse = dg;
             mStart = mRunning = mClosing = false;
@@ -134,7 +134,8 @@ namespace WpfApplication1
                         }
 
                         // Shutdown and end connection
-                        mClient.Close();
+                        if(mClient.Connected)
+                            mClient.Close();
                         mRunning = false;
                     }
                 }
@@ -144,32 +145,31 @@ namespace WpfApplication1
                 msg += "\nSocketException: " + e.Message;
                 bToUpdateMsg = true;
                 Console.Write("\nSocketException: {0}", e.Message);
+                mClosing = true;
             }
             finally
             {
                 mRunning = false;
-                // Stop listening for new clients.
-                mServer.Stop();
                 mStart = false;
+                if (mClosing)
+                    mServer.Stop();
             }
-
-
-            Console.WriteLine("\nHit enter to continue...");
-            Console.Read();
         }
 
-        public void Stop()
+        public void Stop(ref bool bToUpdateMsg, ref string msg)
         {
             mClosing = true;
             if (mStart && !mRunning)
                 mServer.Stop();
+            bToUpdateMsg = true;
+            msg = "Server is closing.\n";
         }
 
-        private bool Authenticate(string id, string birthdate)
-        {
-            if (id.Equals("A10") && birthdate.Equals("01/01/1990"))
-                return true;
-            return false;
-        }
+        //private bool Authenticate(string id, string birthdate)
+        //{
+        //    if (id.Equals("A10") && birthdate.Equals("01/01/1990"))
+        //        return true;
+        //    return false;
+        //}
     }
 }
