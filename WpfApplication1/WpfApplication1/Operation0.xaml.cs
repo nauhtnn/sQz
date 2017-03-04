@@ -22,18 +22,21 @@ namespace WpfApplication1
     public partial class Operation0 : Page
     {
         List<string> vDate;
+        List<short> vDateId;
         List<string> vStudent;
         string mSelectedDate;
         Server0 mServer;
         bool bSrvrMsg;
         string mSrvrMsg;
         byte[] vQuestAnsKey;
+        //byte[] vDateStud;
 
         public Operation0()
         {
             InitializeComponent();
             ShowsNavigationUI = false;
             vDate = new List<string>();
+            vDateId = new List<short>();
             vStudent = new List<string>();
             mSelectedDate = String.Empty;
             mServer = new Server0(ResponseMsg);
@@ -61,26 +64,29 @@ namespace WpfApplication1
             mServer.Stop(ref dummy1, ref dummy2);
         }
 
-        public string ResponseMsg(char code)
+        public byte[] ResponseMsg(char code)
         {
-            string msg = null;
+            byte[] msg = null;
             switch (code)
             {
-                case (char)RequestCode.DateStudentRetriving:
-                    msg = mSelectedDate + "\n";
-                    foreach(string s in vStudent)
-                        msg += s + "\n";
+                case (char)NetSttCode.DateStudentRetriving:
+                    byte[] b = Encoding.UTF32.GetBytes(mSelectedDate);
+                    byte[] c = Student.ToByteArr();
+                    int sz = b.Length + c.Length;
+                    msg = new byte[sz];
+                    Buffer.BlockCopy(b, 0, msg, 0, b.Length);
+                    Buffer.BlockCopy(c, 0, msg, b.Length, c.Length);
                     break;
-                case (char)RequestCode.QuestAnsKeyRetrieving:
+                case (char)NetSttCode.QuestAnsKeyRetrieving:
                     if (vQuestAnsKey == null)
-                        msg = "unknown";
+                        msg = BitConverter.GetBytes((char)NetSttCode.Unknown);
                     else
-                        msg = "known";//todo: msg = byte[] = vQuestAnsKey;
+                        msg = vQuestAnsKey;
                     break;
-                case (char)RequestCode.MarkSubmitting:
+                case (char)NetSttCode.MarkSubmitting:
                     break;
                 default:
-                    msg = "unknown";
+                    msg = BitConverter.GetBytes((char)NetSttCode.Unknown);
                     break;
             }
             return msg;
@@ -89,8 +95,7 @@ namespace WpfApplication1
         private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListBox l = (ListBox)sender;
-            mSelectedDate = (string)((ListBoxItem)l.SelectedItem).Content;
-            LoadStudents(mSelectedDate);
+            LoadStudents(vDateId[l.SelectedIndex]);
         }
 
         private void LoadDates()
@@ -103,7 +108,11 @@ namespace WpfApplication1
             if (dates == null)
                 return;
             foreach (string d in dates)
-                vDate.Add(d);
+            {
+                string[] s = d.Split('\t');
+                vDateId.Add(Convert.ToInt16(s[0]));
+                vDate.Add(s[1]);
+            }
             vDate.Sort();
         }
 
@@ -137,21 +146,21 @@ namespace WpfApplication1
             });
         }
 
-        private void LoadStudents(string date)
+        private void LoadStudents(short dateId)
         {
-            string filePath = "Students.txt";
-            string[] students = null;
-            vStudent.Clear();
-            if (System.IO.File.Exists(filePath))
-                students = System.IO.File.ReadAllLines(filePath);
-            if (students == null)
-                return;
-            foreach (string s in students)
-            {
-                if(date.Equals(s.Substring(0, 10)))
-                    vStudent.Add(s.Substring(10));
-            }
-            vStudent.Sort();
+            Student.ReadTxt(dateId);
+            //string[] students = null;
+            //vStudent.Clear();
+            //if (System.IO.File.Exists(filePath))
+            //    students = System.IO.File.ReadAllLines(filePath);
+            //if (students == null)
+            //    return;
+            //foreach (string s in students)
+            //{
+            //    if(date.Equals(s.Substring(0, 10)))
+            //        vStudent.Add(s.Substring(10));
+            //}
+            //vStudent.Sort();
             PrepStudentsGUI();
         }
 
@@ -218,8 +227,7 @@ namespace WpfApplication1
 
         private void StartSrvr_Click(object sender, RoutedEventArgs e)
         {
-
-            Thread th = new Thread(() => { mServer.Start(ref bSrvrMsg, ref mSrvrMsg); /*StartSrvr(ref bSrvrMsg, ref mSrvrMsg); */});
+            Thread th = new Thread(() => {mServer.Start(ref bSrvrMsg, ref mSrvrMsg);});
             th.Start();
         }
 
@@ -242,15 +250,15 @@ namespace WpfApplication1
 
         private void op1_Click(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
-            {
-                NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
-            });
+            //Dispatcher.Invoke(() =>
+            //{
+            //    NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
+            //});
 
             //Window w = (Window)Parent;
             //w.Close();
 
-            //sQzCS.Question.ParseString();
+            //sQzCS.Question.ReadTxt();
             //vQuestAnsKey = sQzCS.Question.ToByteArr();
             //sQzCS.Question.Clear();
         }

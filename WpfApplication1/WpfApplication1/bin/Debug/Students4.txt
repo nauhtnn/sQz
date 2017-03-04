@@ -1,0 +1,8 @@
+A1	Ngô Văn A	1	1990/01/01	Long An
+A2	Ngô Văn B	1	1990/01/01	Long An
+A3	Ngô Văn C	1	1990/01/02	Tiền Giang
+A4	Ngô Thị A	1	1990/01/03	Long An
+A5	Ngô Văn D	1	1990/01/04	TP. Hồ Chí Minh
+B1	Ngô Thị B	2	1990/01/05	Vĩnh Long
+B2	Ngô Văn E	2	1990/01/06	Tiền Giang
+B3	Ngô Thị C	2	1990/01/07	Long An

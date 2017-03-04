@@ -87,15 +87,15 @@ namespace WpfApplication1
                                 char code = recvMsg[0];
                                 switch (code)
                                 {
-                                    case (char)RequestCode.Dating:
-                                        msg = dgResponse(code);
+                                    case (char)NetSttCode.Dating:
+                                        //msg = dgResponse(code);
                                         break;
-                                    case (char)RequestCode.Authenticating:
-                                        msg = dgResponse(code);
+                                    case (char)NetSttCode.Authenticating:
+                                        //msg = dgResponse(code);
                                         break;
-                                    case (char)RequestCode.ExamRetrieving:
+                                    case (char)NetSttCode.ExamRetrieving:
                                         break;
-                                    case (char)RequestCode.Submiting:
+                                    case (char)NetSttCode.Submiting:
                                         break;
                                     default:
                                         msg = "unknown";

@@ -38,6 +38,8 @@
     <WarningLevel>4</WarningLevel>
     <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
+  <PropertyGroup />
+  <PropertyGroup />
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Data" />
@@ -70,6 +72,7 @@
     <Compile Include="sQz.xaml.cs">
       <DependentUpon>sQz.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Student.cs" />
     <Compile Include="TakeExam.xaml.cs">
       <DependentUpon>TakeExam.xaml</DependentUpon>
     </Compile>

@@ -25,7 +25,7 @@ namespace WpfApplication1
         Client0 mClient;
         int mSz;
         byte[] mBuffer;
-        RequestCode mState;
+        NetSttCode mState;
         bool bSrvrMsg;
         string mSrvrMsg;
 
@@ -38,7 +38,7 @@ namespace WpfApplication1
             FirewallHandler fwHndl = new FirewallHandler(3);
             fwHndl.OpenFirewall();
             mSz = 1024 * 1024;
-            mState = RequestCode.PrepDate;
+            mState = NetSttCode.PrepDate;
             mClient = Client0.Instance();
             //Connect(null, null);
             mSrvrMsg = String.Empty;
@@ -57,7 +57,7 @@ namespace WpfApplication1
                 Connect(null, null);
                 return;
             }
-            if (mState == RequestCode.PrepDateStudent)
+            if (mState == NetSttCode.PrepDateStudent)
             {
                 TcpClient c = (TcpClient)ar.AsyncState;
                 //exception: c.EndConnect(ar);
@@ -74,20 +74,20 @@ namespace WpfApplication1
                 }
                 NetworkStream s = c.GetStream();
                 char[] msg = new char[1];
-                msg[0] = (char)RequestCode.Dating;
+                msg[0] = (char)NetSttCode.Dating;
                 mBuffer = Encoding.UTF8.GetBytes(msg);
-                mState = RequestCode.Dating;
+                mState = NetSttCode.Dating;
                 s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                 return;
             }
-            if (mState == RequestCode.Dating)
+            if (mState == NetSttCode.Dating)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
                 mBuffer = new byte[mSz];
-                mState = RequestCode.Dated;
+                mState = NetSttCode.Dated;
                 s.BeginRead(mBuffer, 0, mSz, CB, s);
             }
-            if (mState == RequestCode.Dated)
+            if (mState == NetSttCode.Dated)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
                 int nullIdx = Array.IndexOf(mBuffer, 0);
@@ -95,7 +95,7 @@ namespace WpfApplication1
                 string date = ASCIIEncoding.ASCII.GetString(mBuffer, 0, nullIdx);
                 date = date.Substring(0, date.IndexOf('\0'));
                 Dispatcher.Invoke(() => { txtDate.Text = date; });
-                mState = RequestCode.Dated;
+                mState = NetSttCode.Dated;
                 //s.BeginRead(mBuffer, 0, mSz, CB, s);
             }
         }
@@ -127,8 +127,8 @@ namespace WpfApplication1
         Thread th;
         private void btnStartSer_Click(object sender, RoutedEventArgs e)
         {
-            th = new Thread(new ThreadStart(()=> { Server0 t = new Server0(ResponseMsg); t.Start(ref bSrvrMsg, ref mSrvrMsg); }));
-            th.Start();
+            //th = new Thread(new ThreadStart(() => { Server0 t = new Server0(ResponseMsg); t.start(ref bsrvrmsg, ref msrvrmsg); }));
+            //th.start();
         }
 
         public string ResponseMsg(char code)

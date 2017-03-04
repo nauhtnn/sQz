@@ -32,7 +32,7 @@ namespace sQzCS
 
     public class Question
     {
-        public static List<Question> svQuest;
+        public static List<Question> svQuest = new List<Question>();
         public string mStmt; //statement
         int nAns;
         public string[] vAns;
@@ -306,12 +306,12 @@ namespace sQzCS
             os.Write("</div></div>");
         }
 
-        public static void ParseString()
+        public static void ReadTxt()
         {
-            ParseString(Utils.ReadFile("qz1.txt"));
+            ReadTxt(Utils.ReadFile("qz1.txt"));
         }
 
-        public static void ParseString(string buf)
+        public static void ReadTxt(string buf)
         {
             if (buf == null)
                 return;
@@ -330,6 +330,8 @@ namespace sQzCS
 
         public static byte[] ToByteArr()
         {
+            if (svQuest.Count == 0)
+                return null;
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((Int32)svQuest.Count));
             for(int i = 0; i < svQuest.Count; ++i)
@@ -345,9 +347,9 @@ namespace sQzCS
                 for (int j = 0; j < svQuest[i].nAns; ++j)
                 {
                     //each ans
-                    byte[] bt = System.Text.Encoding.UTF32.GetBytes(svQuest[i].vAns[j]);
-                    l.Add(BitConverter.GetBytes((Int32)bt.Length));
-                    l.Add(bt);
+                    b = System.Text.Encoding.UTF32.GetBytes(svQuest[i].vAns[j]);
+                    l.Add(BitConverter.GetBytes((Int32)b.Length));
+                    l.Add(b);
                 }
                 //keys
                 for (int j = 0; j < svQuest[i].nAns; ++j)
@@ -367,43 +369,45 @@ namespace sQzCS
             return g;
         }
 
-        public static void ReadByteArr(byte[] arr)
+        public static void ReadByteArr(byte[] buf)
         {
             svQuest.Clear();
+            if (buf == null)
+                return;
             int offs = 0;
-            int nQuest = BitConverter.ToInt32(arr, offs);
+            int nQuest = BitConverter.ToInt32(buf, offs);
             offs += 4;
             for (int i = 0; i < nQuest; ++i)
             {
                 Question q = new Question();
                 //qType
-                q.qType = (QuestType)BitConverter.ToInt32(arr, offs);
+                q.qType = (QuestType)BitConverter.ToInt32(buf, offs);
                 offs += 4;
                 //stmt
-                int sz = BitConverter.ToInt32(arr, offs);
+                int sz = BitConverter.ToInt32(buf, offs);
                 offs += 4;
                 byte[] ar = new byte[sz];
-                Buffer.BlockCopy(arr, offs, ar, 0, sz);
+                Buffer.BlockCopy(buf, offs, ar, 0, sz);
                 offs += sz;
                 q.mStmt = System.Text.Encoding.UTF32.GetString(ar);
                 //ans
-                q.nAns = BitConverter.ToInt32(arr, offs);
+                q.nAns = BitConverter.ToInt32(buf, offs);
                 offs += 4;
                 q.vAns = new string[q.nAns];
                 for (int j = 0; j < q.nAns; ++j)
                 {
                     //each ans
-                    sz = BitConverter.ToInt32(arr, offs);
+                    sz = BitConverter.ToInt32(buf, offs);
                     offs += 4;
                     ar = new byte[sz];
-                    Buffer.BlockCopy(arr, offs, ar, 0, sz);
+                    Buffer.BlockCopy(buf, offs, ar, 0, sz);
                     offs += sz;
                     q.vAns[j] = System.Text.Encoding.UTF32.GetString(ar);
                 }
                 //keys
                 q.vKeys = new bool[q.nAns];
                 for (int j = 0; j < q.nAns; ++j)
-                    q.vKeys[j] = BitConverter.ToBoolean(arr, offs++);
+                    q.vKeys[j] = BitConverter.ToBoolean(buf, offs++);
                 svQuest.Add(q);
             }
         }

@@ -25,9 +25,9 @@ namespace WpfApplication1
         Client0 mClient;
         int mSz;
         byte[] mBuffer;
-        RequestCode mState;
+        NetSttCode mState;
         string mDate;
-        string zQuest;
+        byte[] zQuest;
         bool mSrvrConn;
         Server1 mServer;
         bool bSrvrMsg;
@@ -42,7 +42,7 @@ namespace WpfApplication1
             //FirewallHandler fwHndl = new FirewallHandler(0);
             //fwHndl.OpenFirewall();
             mSz = 1024 * 1024;
-            mState = RequestCode.PrepDateStudent;
+            mState = NetSttCode.PrepDateStudent;
             mClient = Client0.Instance();
             mClient.SetSrvrPort(23820);
             mServer = new Server1(ResponseMsg);
@@ -61,23 +61,23 @@ namespace WpfApplication1
             aTimer.Enabled = true;
         }
 
-        public string ResponseMsg(char code)
+        public byte[] ResponseMsg(char code)
         {
-            string msg = null;
+            byte[] msg = null;
             switch (code)
             {
-                case (char)RequestCode.Dating:
-                    msg = mDate;
+                case (char)NetSttCode.Dating:
+                    msg = System.Text.Encoding.UTF32.GetBytes(mDate);
                     break;
-                case (char)RequestCode.Authenticating:
+                case (char)NetSttCode.Authenticating:
                     msg = zQuest;
                     break;
-                case (char)RequestCode.ExamRetrieving:
+                case (char)NetSttCode.ExamRetrieving:
                     break;
-                case (char)RequestCode.Submiting:
+                case (char)NetSttCode.Submiting:
                     break;
                 default:
-                    msg = "unknown";
+                    msg = BitConverter.GetBytes((char)NetSttCode.Unknown);
                     break;
             }
             return msg;
@@ -123,7 +123,7 @@ namespace WpfApplication1
                 //btnConnect_Click(null, null);
                 return;
             }
-            if (mState == RequestCode.PrepDateStudent)
+            if (mState == NetSttCode.PrepDateStudent)
             {
                 TcpClient c = (TcpClient)ar.AsyncState;
                 //exception: c.EndConnect(ar);
@@ -139,21 +139,21 @@ namespace WpfApplication1
                 }
                 NetworkStream s = c.GetStream();
                 char[] msg = new char[1];
-                msg[0] = (char)RequestCode.DateStudentRetriving;
+                msg[0] = (char)NetSttCode.DateStudentRetriving;
                 mBuffer = Encoding.UTF8.GetBytes(msg);
-                mState = RequestCode.DateStudentRetriving;
+                mState = NetSttCode.DateStudentRetriving;
                 s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                 return;
             }
-            if (mState == RequestCode.DateStudentRetriving)
+            if (mState == NetSttCode.DateStudentRetriving)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
                 mBuffer = new byte[mSz];
-                mState = RequestCode.DateStudentRetrieved;
+                mState = NetSttCode.DateStudentRetrieved;
                 s.BeginRead(mBuffer, 0, mSz, CB, s);
                 return;
             }
-            if (mState == RequestCode.DateStudentRetrieved)
+            if (mState == NetSttCode.DateStudentRetrieved)
             {
                 int nullIdx = Array.IndexOf(mBuffer, 0);
                 nullIdx = nullIdx >= 0 ? nullIdx : mBuffer.Length;
@@ -176,49 +176,40 @@ namespace WpfApplication1
                     }
                 });
                 char[] msg = new char[1];
-                msg[0] = (char)RequestCode.QuestAnsKeyRetrieving;
+                msg[0] = (char)NetSttCode.QuestAnsKeyRetrieving;
                 mBuffer = Encoding.UTF8.GetBytes(msg);
-                mState = RequestCode.PrepQuestAnsKey;
+                mState = NetSttCode.PrepQuestAnsKey;
                 //reconnect
                 btnDisconnect_Click(null, null);
                 btnConnect_Click(null, null);
                 return;
             }
-            if (mState == RequestCode.PrepQuestAnsKey)
+            if (mState == NetSttCode.PrepQuestAnsKey)
             {
                 TcpClient c = (TcpClient)ar.AsyncState;
                 if (c.Connected)
                 {
                     NetworkStream s = (NetworkStream)c.GetStream();
                     char[] msg = new char[1];
-                    msg[0] = (char)RequestCode.QuestAnsKeyRetrieving;
+                    msg[0] = (char)NetSttCode.QuestAnsKeyRetrieving;
                     mBuffer = Encoding.UTF8.GetBytes(msg);
-                    mState = RequestCode.QuestAnsKeyRetrieving;
+                    mState = NetSttCode.QuestAnsKeyRetrieving;
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                 }
                 return;
             }
-            if (mState == RequestCode.QuestAnsKeyRetrieving)
+            if (mState == NetSttCode.QuestAnsKeyRetrieving)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
                 mBuffer = new byte[mSz];
-                mState = RequestCode.QuestAnsKeyRetrieved;
+                mState = NetSttCode.QuestAnsKeyRetrieved;
                 s.BeginRead(mBuffer, 0, mSz, CB, s);
                 return;
             }
-            if (mState == RequestCode.QuestAnsKeyRetrieved)
+            if (mState == NetSttCode.QuestAnsKeyRetrieved)
             {
-                int nullIdx = Array.IndexOf(mBuffer, 0);
-                nullIdx = nullIdx >= 0 ? nullIdx : mBuffer.Length;
-                zQuest = UTF8Encoding.UTF8.GetString(mBuffer, 0, nullIdx);
-                zQuest = zQuest.Substring(0, zQuest.IndexOf('\0'));
-                Dispatcher.Invoke(() => {
-                    TextBlock t = new TextBlock();
-                    t.Text = "QuestAnsKey recv len = " + zQuest.Length + " last = " +
-                        zQuest.Substring((int)(zQuest.Length * 0.9));
-                    spStudent.Children.Add(t);
-                });
-                mState = RequestCode.PrepMark;
+                zQuest = mBuffer;
+                mState = NetSttCode.PrepMark;
             }
         }
 

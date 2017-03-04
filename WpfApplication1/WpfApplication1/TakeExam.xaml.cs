@@ -365,7 +365,7 @@ namespace WpfApplication1
         public static void NavigationService_LoadCompleted(object sender, NavigationEventArgs e)
         {
             string quest = System.Text.Encoding.UTF8.GetString((byte[])e.ExtraData);
-            Question.ParseString(quest);
+            Question.ReadTxt(quest);
             //NavigationService.LoadCompleted -= NavigationService_LoadCompleted;
         }
     }
