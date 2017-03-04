@@ -105,7 +105,7 @@ namespace WpfApplication1
 
                             }
                             while (!mClosing && stream.DataAvailable);
-                            if (!mClosing)
+                            if (!mClosing && 0 < recvMsg.Length)
                             {
                                 byte[] byteMsg = null;
                                 char code = recvMsg[0];

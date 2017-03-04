@@ -327,5 +327,91 @@ namespace sQzCS
             }
             q = null;
         }
+
+        public static byte[] ToByteArr()
+        {
+            List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes((Int32)svQuest.Count));
+            for(int i = 0; i < svQuest.Count; ++i)
+            {
+                //qType
+                l.Add(BitConverter.GetBytes((Int32)svQuest[i].qType));
+                //stmt
+                byte[] b = System.Text.Encoding.UTF32.GetBytes(svQuest[i].mStmt);
+                l.Add(BitConverter.GetBytes((Int32)b.Length));
+                l.Add(b);
+                //ans
+                l.Add(BitConverter.GetBytes((Int32)svQuest[i].nAns));
+                for (int j = 0; j < svQuest[i].nAns; ++j)
+                {
+                    //each ans
+                    byte[] bt = System.Text.Encoding.UTF32.GetBytes(svQuest[i].vAns[j]);
+                    l.Add(BitConverter.GetBytes((Int32)bt.Length));
+                    l.Add(bt);
+                }
+                //keys
+                for (int j = 0; j < svQuest[i].nAns; ++j)
+                    l.Add(BitConverter.GetBytes(svQuest[i].vKeys[j]));
+            }
+            //join
+            int sz = 0;
+            for (int i = 0; i < l.Count; ++i)
+                sz += l[i].Length;
+            byte[] g = new byte[sz];
+            int offs = 0;
+            for(int i = 0; i < l.Count; ++i)
+            {
+                Buffer.BlockCopy(l[i], 0, g, offs, l[i].Length);
+                offs += l[i].Length;
+            }
+            return g;
+        }
+
+        public static void ReadByteArr(byte[] arr)
+        {
+            svQuest.Clear();
+            int offs = 0;
+            int nQuest = BitConverter.ToInt32(arr, offs);
+            offs += 4;
+            for (int i = 0; i < nQuest; ++i)
+            {
+                Question q = new Question();
+                //qType
+                q.qType = (QuestType)BitConverter.ToInt32(arr, offs);
+                offs += 4;
+                //stmt
+                int sz = BitConverter.ToInt32(arr, offs);
+                offs += 4;
+                byte[] ar = new byte[sz];
+                Buffer.BlockCopy(arr, offs, ar, 0, sz);
+                offs += sz;
+                q.mStmt = System.Text.Encoding.UTF32.GetString(ar);
+                //ans
+                q.nAns = BitConverter.ToInt32(arr, offs);
+                offs += 4;
+                q.vAns = new string[q.nAns];
+                for (int j = 0; j < q.nAns; ++j)
+                {
+                    //each ans
+                    sz = BitConverter.ToInt32(arr, offs);
+                    offs += 4;
+                    ar = new byte[sz];
+                    Buffer.BlockCopy(arr, offs, ar, 0, sz);
+                    offs += sz;
+                    q.vAns[j] = System.Text.Encoding.UTF32.GetString(ar);
+                }
+                //keys
+                q.vKeys = new bool[q.nAns];
+                for (int j = 0; j < q.nAns; ++j)
+                    q.vKeys[j] = BitConverter.ToBoolean(arr, offs++);
+                svQuest.Add(q);
+            }
+        }
+
+        public static void Clear()
+        {
+            svQuest.Clear();
+            siToken = 0;//safe to be 0
+        }
     }
 }

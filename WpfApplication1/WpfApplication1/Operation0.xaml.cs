@@ -27,6 +27,7 @@ namespace WpfApplication1
         Server0 mServer;
         bool bSrvrMsg;
         string mSrvrMsg;
+        byte[] vQuestAnsKey;
 
         public Operation0()
         {
@@ -43,6 +44,8 @@ namespace WpfApplication1
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
             TakeExam.InitBrush();
             LoadDates();
+
+            vQuestAnsKey = null;
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -69,10 +72,10 @@ namespace WpfApplication1
                         msg += s + "\n";
                     break;
                 case (char)RequestCode.QuestAnsKeyRetrieving:
-                    if (System.IO.File.Exists("qz1.txt"))
-                        msg = sQzCS.Utils.ReadFile("qz1.txt");
+                    if (vQuestAnsKey == null)
+                        msg = "unknown";
                     else
-                        msg = String.Empty;
+                        msg = "known";//todo: msg = byte[] = vQuestAnsKey;
                     break;
                 case (char)RequestCode.MarkSubmitting:
                     break;
@@ -243,8 +246,13 @@ namespace WpfApplication1
             {
                 NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
             });
+
             //Window w = (Window)Parent;
             //w.Close();
+
+            //sQzCS.Question.ParseString();
+            //vQuestAnsKey = sQzCS.Question.ToByteArr();
+            //sQzCS.Question.Clear();
         }
     }
 }
