@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace WpfApplication1
 {
@@ -13,9 +14,16 @@ namespace WpfApplication1
     }
     public class Student
     {
-        static List<Student> svStudent = new List<Student>();
+        /*
+        CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2) UNSIGNED,
+         `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf32`,
+         `birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf32`,
+         PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`))
+         */
+        public static List<Student> svStudent = new List<Student>();
+        const int nAttb = 5;//hardcode, not include dateIdx
         ExamLvl mLvl;
-        Int16 mId;
+        UInt16 mId;
         string mName;
         string mBirthdate;
         string mBirthplace;
@@ -23,6 +31,17 @@ namespace WpfApplication1
         public static void ReadTxt(Int16 dateId)
         {
             ReadTxt(sQzCS.Utils.ReadFile("Students" + dateId + ".txt"));
+        }
+        public override string ToString()
+        {
+            StringBuilder s = new StringBuilder();
+            if (mLvl == ExamLvl.Basis)
+                s.Append('A');
+            else
+                s.Append('B');
+            s.AppendFormat("{0}, {1}, {2}, ", mId, mName, mBirthdate);
+            s.Append(mBirthplace);
+            return s.ToString();
         }
         public static void ReadTxt(string buf)
         {
@@ -40,13 +59,60 @@ namespace WpfApplication1
                         stud.mLvl = ExamLvl.Basis;
                     else
                         stud.mLvl = ExamLvl.Advance;
-                    stud.mId = Convert.ToInt16(s[0].Substring(1));
+                    stud.mId = Convert.ToUInt16(s[0].Substring(1));
                     stud.mName = s[1];
                     stud.mBirthdate = s[2];
                     stud.mBirthplace = s[3];
                 }
                 svStudent.Add(stud);
             }
+        }
+        public static void DBSelect(UInt32 dateIdx)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+            string qry = DBConnect.mkQrySelect("examinees", null, nAttb, "dateIdx", "" + dateIdx, null);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            svStudent.Clear();
+            while (reader.Read())
+            {
+                Student s = new Student();
+                s.mLvl = (ExamLvl)(reader.GetUInt16(1));//hardcode
+                s.mId = reader.GetUInt16(2);
+                s.mName = reader.GetString(3);
+                s.mBirthdate = reader.GetString(4);
+                s.mBirthplace = reader.GetString(5);
+                svStudent.Add(s);
+            }
+            reader.Close();
+            DBConnect.Close(ref conn);
+        }
+
+        public static void DBInsert(UInt32 dateIdx)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+            string[] attbs = new string[6];//hardcode
+            attbs[0] = "dateIdx";
+            attbs[1] = "level";
+            attbs[2] = "idx";
+            attbs[3] = "name";
+            attbs[4] = "birthdate";
+            attbs[5] = "birthplace";
+            foreach (Student s in svStudent)
+            {
+                string[] vals = new string[6];
+                vals[0] = "" + dateIdx;
+                vals[1] = "" + (UInt32)s.mLvl;
+                vals[2] = "" + s.mId;
+                vals[3] = "'" + s.mName + "'";
+                vals[4] = "'" + s.mBirthdate + "'";
+                vals[5] = "'" + s.mBirthplace + "'";
+                DBConnect.Ins(conn, "examinees", attbs, vals);
+            }
+            DBConnect.Close(ref conn);
         }
         public static byte[] ToByteArr()
         {
@@ -97,7 +163,7 @@ namespace WpfApplication1
                 Student s = new Student();
                 s.mLvl = (ExamLvl)BitConverter.ToInt16(buf, offs);
                 offs += 2;
-                s.mId = BitConverter.ToInt16(buf, offs);
+                s.mId = BitConverter.ToUInt16(buf, offs);
                 offs += 2;
                 int sz = BitConverter.ToInt32(buf, offs);
                 offs += 4;

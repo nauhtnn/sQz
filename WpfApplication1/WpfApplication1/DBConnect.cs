@@ -116,9 +116,9 @@ namespace WpfApplication1
             for (int i = 0; i < lastIdx; ++i)
                 query += vAttb[i] + ",";
             query += vAttb[lastIdx] + ")VALUES(";
-            for (int i = 0; i < vVal.Length; ++i)
-                query += "'" + vVal[i] + "',";
-            query += "'" + vVal[lastIdx] + "')";
+            for (int i = 0; i < lastIdx; ++i)
+                query += vVal[i] + ",";
+            query += vVal[lastIdx] + ")";
             
             //create command and assign the query and connection from the constructor
             MySqlCommand cmd = new MySqlCommand(query, conn);

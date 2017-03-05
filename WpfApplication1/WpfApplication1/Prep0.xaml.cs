@@ -26,7 +26,7 @@ namespace WpfApplication1
             InitializeComponent();
         }
 
-        private void btnInsert_Click(object sender, RoutedEventArgs e)
+        private void btnInsDate_Click(object sender, RoutedEventArgs e)
         {
             if (Date.ChkFmt(tbxDate.Text))
             {
@@ -53,7 +53,6 @@ namespace WpfApplication1
                         dark = !dark;
                         if (dark)
                             i.Background = new SolidColorBrush(c);
-                        i.FontSize = TakeExam.em;
                         lbxDate.Items.Add(i);
                     }
                 });
@@ -62,22 +61,80 @@ namespace WpfApplication1
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
         {
+            double rt = spMain.RenderSize.Width / 640; //d:DesignWidth
+            //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
+
+            ScaleTransform st = new ScaleTransform(rt, rt);
+            spMain.RenderTransform = st;
             LoadDate();
         }
 
-        //private void btnBrowse_Click(object sender, RoutedEventArgs e)
-        //{
-        //    OpenFileDialog dlg = new OpenFileDialog();
+        private void LoadStudents()
+        {
+            //if(dateId != -1)
+            //    Student.ReadTxt(dateId);
+            //if(Student.svStudent.Count == 0)
 
-        //    // Set filter for file extension and default file extension 
-        //    dlg.DefaultExt = ".txt";
-        //    dlg.Filter = "Text documents (.txt)|*.txt";
-        //    bool? result = dlg.ShowDialog();
+            //string[] students = null;
+            //vStudent.Clear();
+            //if (System.IO.File.Exists(filePath))
+            //    students = System.IO.File.ReadAllLines(filePath);
+            //if (students == null)
+            //    return;
+            //foreach (string s in students)
+            //{
+            //    if(date.Equals(s.Substring(0, 10)))
+            //        vStudent.Add(s.Substring(10));
+            //}
+            //vStudent.Sort();
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            Dispatcher.Invoke(() => {
+                lbxStudent.Items.Clear();
+                foreach (Student s in Student.svStudent)
+                {
+                    ListBoxItem i = new ListBoxItem();
+                    i.Content = s.ToString();
+                    dark = !dark;
+                    if (dark)
+                        i.Background = new SolidColorBrush(c);
+                    lbxStudent.Items.Add(i);
+                }
+            });
+        }
 
-        //    // Get the selected file name and display in a TextBox
-        //    string filePath = null;
-        //    if (result == true)
-        //        tbxFileName.Text = filePath = dlg.FileName;
-        //}
+        private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            // set filter for file extension and default file extension 
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "text documents (.txt)|*.txt";
+            bool? result = dlg.ShowDialog();
+
+            // get the selected file name and display in a textbox
+            string filePath = null;
+            if (result == true)
+                tbxFilePath.Text = filePath = dlg.FileName;
+            Student.ReadTxt(sQzCS.Utils.ReadFile(filePath));
+            LoadStudents();
+        }
+
+        private void btnInsNee_Click(object sender, RoutedEventArgs e)
+        {
+            if(Date.mDBIdx != UInt32.MaxValue)
+                Student.DBInsert(Date.mDBIdx);
+        }
+
+        private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ListBox l = (ListBox)sender;
+            ListBoxItem i = (ListBoxItem)l.SelectedItem;
+            Date.DBIdx((string)i.Content);
+            Student.DBSelect(Date.mDBIdx);
+            LoadStudents();
+        }
     }
 }

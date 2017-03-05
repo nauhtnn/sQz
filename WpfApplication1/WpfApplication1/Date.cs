@@ -12,12 +12,13 @@ namespace WpfApplication1
     {
         /*
          *format yyyy/mm/dd for sorting easily
-        CREATE TABLE IF NOT EXISTS `dates` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-         `date` CHAR(10) CHARACTER SET `ascii`)
+         CREATE TABLE IF NOT EXISTS `dates` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `date` CHAR(10) CHARACTER SET `ascii`)
          */
-        public static List<int> svIdx = new List<int>();
+        public static List<UInt32> svIdx = new List<UInt32>();
         public static List<string> svDate = new List<string>();
         const int nAttb = 2;//hardcode
+        public static UInt32 mDBIdx = UInt32.MaxValue;
 
         public static bool ChkFmt(string s)
         {
@@ -37,7 +38,11 @@ namespace WpfApplication1
                 return false;
             return true;
         }
-
+        public static void DBIdx(string date)
+        {
+            int i = svDate.IndexOf(date);
+            mDBIdx = svIdx[i];
+        }
         public static void DBInsert(string date)
         {
             date = "'" + date + "'";
@@ -59,7 +64,7 @@ namespace WpfApplication1
             svDate.Clear();
             while (reader.Read())
             {
-                svIdx.Add(reader.GetInt32(0));//hardcode
+                svIdx.Add(reader.GetUInt32(0));//hardcode
                 svDate.Add(reader.GetString(1));
             }
             reader.Close();

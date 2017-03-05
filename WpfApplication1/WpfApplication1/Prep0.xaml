@@ -12,10 +12,20 @@
         <StackPanel Orientation="Horizontal">
             <TextBlock Text="Date"></TextBlock>
             <TextBox x:Name="tbxDate" Height="32" Width="393" />
-            <Button x:Name="btnInsert"  Content="Insert" Height="32" Width="88" Click="btnInsert_Click"/>
+            <Button x:Name="btnInsDate"  Content="Insert Date" Height="32" Width="88" Click="btnInsDate_Click"/>
         </StackPanel>
-        <ScrollViewer Width="160" Height="200" VerticalScrollBarVisibility="Auto">
-            <ListBox x:Name="lbxDate" Width="160"></ListBox>
-        </ScrollViewer>
+        <StackPanel Orientation="Horizontal">
+            <ScrollViewer Width="120" Height="200" VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="lbxDate" Width="120" SelectionChanged="lbxDate_SelectionChanged"></ListBox>
+            </ScrollViewer>
+            <ScrollViewer Width="360" Height="200" VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="lbxStudent" Width="360"></ListBox>
+            </ScrollViewer>
+            <StackPanel HorizontalAlignment="Stretch">
+                <TextBox x:Name="tbxFilePath" Width="100"></TextBox>
+                <Button x:Name="btnBrowse" Content="Browse" Height="32" Click="btnBrowse_Click"></Button>
+                <Button x:Name="btnInsNee" Content="Insert Examinee" Height="32" Click="btnInsNee_Click"></Button>
+            </StackPanel>
+        </StackPanel>
     </StackPanel>
 </Page>
