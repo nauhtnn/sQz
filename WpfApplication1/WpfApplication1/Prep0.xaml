@@ -8,10 +8,14 @@
       d:DesignHeight="360" d:DesignWidth="640"
       Title="Prep0">
 
-    <StackPanel>
-        <TextBox x:Name="tbxFileName" Height="32" Width="393" />
-
-        <Button x:Name="btnBrowse"  Content="Browse" Height="32" Width="88" Click="btnBrowse_Click"/>
-
+    <StackPanel x:Name="spMain" Loaded="spMain_Loaded">
+        <StackPanel Orientation="Horizontal">
+            <TextBlock Text="Date"></TextBlock>
+            <TextBox x:Name="tbxDate" Height="32" Width="393" />
+            <Button x:Name="btnInsert"  Content="Insert" Height="32" Width="88" Click="btnInsert_Click"/>
+        </StackPanel>
+        <ScrollViewer Width="160" Height="200" VerticalScrollBarVisibility="Auto">
+            <ListBox x:Name="lbxDate" Width="160"></ListBox>
+        </ScrollViewer>
     </StackPanel>
 </Page>

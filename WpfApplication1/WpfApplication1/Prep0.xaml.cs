@@ -26,23 +26,58 @@ namespace WpfApplication1
             InitializeComponent();
         }
 
-        private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        private void btnInsert_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
-            
-            // Set filter for file extension and default file extension 
-            dlg.DefaultExt = ".txt";
-            dlg.Filter = "Text documents (.txt)|*.txt";
-            bool? result = dlg.ShowDialog();
-
-            // Get the selected file name and display in a TextBox 
-            if (result == true)
+            if (Date.ChkFmt(tbxDate.Text))
             {
-                // Open document 
-                string filename = dlg.FileName;
-                tbxFileName.Text = filename;
+                Date.DBInsert(tbxDate.Text);
+                LoadDate();
             }
-
         }
+
+        private void LoadDate()
+        {
+            Date.DBSelect();
+            if(0 < Date.svDate.Count)
+            {
+                bool dark = true;
+                Color c = new Color();
+                c.A = 0xff;
+                c.B = c.G = c.R = 0xf0;
+                Dispatcher.Invoke(() => {
+                    lbxDate.Items.Clear();
+                    foreach (string s in Date.svDate)
+                    {
+                        ListBoxItem i = new ListBoxItem();
+                        i.Content = s;
+                        dark = !dark;
+                        if (dark)
+                            i.Background = new SolidColorBrush(c);
+                        i.FontSize = TakeExam.em;
+                        lbxDate.Items.Add(i);
+                    }
+                });
+            }
+        }
+
+        private void spMain_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoadDate();
+        }
+
+        //private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        //{
+        //    OpenFileDialog dlg = new OpenFileDialog();
+
+        //    // Set filter for file extension and default file extension 
+        //    dlg.DefaultExt = ".txt";
+        //    dlg.Filter = "Text documents (.txt)|*.txt";
+        //    bool? result = dlg.ShowDialog();
+
+        //    // Get the selected file name and display in a TextBox
+        //    string filePath = null;
+        //    if (result == true)
+        //        tbxFileName.Text = filePath = dlg.FileName;
+        //}
     }
 }

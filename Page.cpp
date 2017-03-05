@@ -31,7 +31,7 @@ void Page::writeFooter(ofstream& os) {
 	WRARR("</body></html>")
 }
 void Page::writeFormHeader(ofstream& os, size_t nQuest) {
-	WRARR("<form><div id='lp'><div class='tit2'>Phiếu trả lời</div><div id='sht'>"\
+	WRARR("<form><div id='lp'><div class='tit2'>Answer sheet</div><div id='sht'>"\
 		"<table id='ans'><tr><th class='o i'></th><th>A</th><th>B</th><th>C</th>"\
 		"<th>D</th></tr>")
 	//if 0 < nQuest
@@ -46,7 +46,7 @@ void Page::writeFormHeader(ofstream& os, size_t nQuest) {
 	}
 	len += sprintf(it, "</table></div><input type='button'class='btn btn1'"\
 			"onclick='score()'value='Submit'><input type='button'"\
-			"class='btn'onclick='showAnswer()'value='Answer'>"\
+			"class='btn'onclick='showAnswer()'value='Correct Ans'>"\
 			"</div><div class='bp'></div>");
 	os.write(buf, len);
 	delete[] buf;

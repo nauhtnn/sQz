@@ -10,27 +10,27 @@ namespace WpfApplication1
     class DBConnect
     {
         public MySqlConnection connection;
-        public string server;
-        public string database;
-        public string uid;
-        public string password;
-        bool bConnected;
+        static string server;
+        static string database;
+        static string uid;
+        static string password;
+        static bool bConnected;
 
         //Constructor
         public DBConnect()
         {
-            Initialize();
+            //Initialize();
         }
 
         //Initialize values
-        public void Initialize()
+        public static MySqlConnection Init()
         {
             string connStr = null;
             string s = sQzCS.Utils.ReadFile("Database.txt");
             if (s == null)
             {
                 server = "localhost";
-                database = "connectcsharptomysql";
+                database = "sQz";
                 uid = "root";
                 password = "1234";
             }
@@ -44,19 +44,23 @@ namespace WpfApplication1
             }
             connStr = "SERVER=" + server + ";" + "DATABASE=" +
             database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
-            connection = new MySqlConnection(connStr);
-            bConnected = false;
+            //bConnected = false;
+            MySqlConnection conn = new MySqlConnection(connStr);
+            if (Open(ref conn))
+                return conn;
+            else
+                return null;
         }
 
         //open connection to database
-        public bool OpenConnection()
+        public static bool Open(ref MySqlConnection conn)
         {
-            if (bConnected)
-                return true;
+            //if (bConnected)
+            //    return true;
             try
             {
-                connection.Open();
-                bConnected = true;
+                conn.Open();
+                //bConnected = true;
                 return true;
             }
             catch (MySqlException ex)
@@ -81,14 +85,14 @@ namespace WpfApplication1
         }
 
         //Close connection
-        public bool CloseConnection()
+        public static bool Close(ref MySqlConnection conn)
         {
             try
             {
-                if (bConnected)
+                //if (bConnected)
                 {
-                    connection.Close();
-                    bConnected = false;
+                    conn.Close();
+                    //bConnected = false;
                 }
                 return true;
             }
@@ -100,11 +104,11 @@ namespace WpfApplication1
         }
 
         //Insert statement
-        public void Insert(string tb, string[] vAttb, string[] vValue)
+        public static void Ins(MySqlConnection conn, string tb, string[] vAttb, string[] vVal)
         {
-            if (vAttb == null || vValue == null)
+            if (vAttb == null || vVal == null)
                 return;
-            if (vAttb.Length != vValue.Length)
+            if (vAttb.Length != vVal.Length)
                 return;
             int lastIdx = vAttb.Length - 1;
             //string query = "INSERT INTO tableinfo (name, age) VALUES('John Smith', '33')";
@@ -112,83 +116,158 @@ namespace WpfApplication1
             for (int i = 0; i < lastIdx; ++i)
                 query += vAttb[i] + ",";
             query += vAttb[lastIdx] + ")VALUES(";
-            for (int i = 0; i < vValue.Length; ++i)
-                query += "'" + vValue[i] + "',";
-            query += "'" + vValue[lastIdx] + "')";
+            for (int i = 0; i < vVal.Length; ++i)
+                query += "'" + vVal[i] + "',";
+            query += "'" + vVal[lastIdx] + "')";
+            
+            //create command and assign the query and connection from the constructor
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+
+            //Execute command
+            cmd.ExecuteNonQuery();
+        }
+
+        public static void Ins(MySqlConnection conn, string tb, string attb, string val)
+        {
+            if (attb == null || val == null)
+                return;
+            string query = "INSERT INTO " + tb + "(" + attb + ")VALUES(" + val + ")";
 
             //open connection
-            if (this.OpenConnection() == true)
-            {
-                //create command and assign the query and connection from the constructor
-                MySqlCommand cmd = new MySqlCommand(query, connection);
+            //if (this.OpenConnection() == true)
+            //{
+            //create command and assign the query and connection from the constructor
+            MySqlCommand cmd = new MySqlCommand(query, conn);
 
-                //Execute command
-                cmd.ExecuteNonQuery();
-            }
+            //Execute command
+            cmd.ExecuteNonQuery();
+            //}
         }
 
         //Update statement
         public void Update()
         {
             throw new NotImplementedException();
-            string query = "UPDATE tableinfo SET name='Joe', age='22' WHERE name='John Smith'";
+            //string query = "UPDATE tableinfo SET name='Joe', age='22' WHERE name='John Smith'";
 
             //Open connection
-            if (this.OpenConnection() == true)
-            {
-                //create mysql command
-                MySqlCommand cmd = new MySqlCommand();
-                //Assign the query using CommandText
-                cmd.CommandText = query;
-                //Assign the connection using Connection
-                cmd.Connection = connection;
+            //if (this.OpenConnection() == true)
+            //{
+            //    //create mysql command
+            //    MySqlCommand cmd = new MySqlCommand();
+            //    //Assign the query using CommandText
+            //    cmd.CommandText = query;
+            //    //Assign the connection using Connection
+            //    cmd.Connection = connection;
 
-                //Execute query
-                cmd.ExecuteNonQuery();
-            }
+            //    //Execute query
+            //    cmd.ExecuteNonQuery();
+            //}
         }
 
         //Delete statement
         public void Delete()
         {
             throw new NotImplementedException();
-            string query = "DELETE FROM tableinfo WHERE name='John Smith'";
+            //string query = "DELETE FROM tableinfo WHERE name='John Smith'";
 
-            if (this.OpenConnection() == true)
-            {
-                MySqlCommand cmd = new MySqlCommand(query, connection);
-                cmd.ExecuteNonQuery();
-            }
+            //if (this.OpenConnection() == true)
+            //{
+            //    MySqlCommand cmd = new MySqlCommand(query, connection);
+            //    cmd.ExecuteNonQuery();
+            //}
         }
 
         //Select statement
-        public List<byte[]>[] Select(string tb, string[] vAttb, string[] vCdAttb,
+        //public List<byte[]>[] Select(string tb, string[] vAttb, string[] vCdAttb,
+        public static string mkQrySelect(string tb, string[] vAttb, string[] vCdAttb,
             string[] vCdAttbVal, string[] vGpAttb)
         {
-            if (vCdAttb != null && vCdAttbVal != null &&
-                vCdAttb.Length != vCdAttbVal.Length)
-                return null;
+            return null;
+            //if (vCdAttb != null && vCdAttbVal != null &&
+            //    vCdAttb.Length != vCdAttbVal.Length)
+            //    return null;
+            //string query = "SELECT";
+            //int lastIdx = 0;
+            //if (vAttb == null)
+            //    query += " * ";
+            //else
+            //{
+            //    lastIdx = vAttb.Length - 1;
+            //    for (int i = 0; i < lastIdx; ++i)
+            //        query += vAttb[i] + ",";
+            //    query += vAttb[lastIdx] + " ";
+            //}
+            //query += " FROM " + tb;
+            //if(vCdAttb != null && vCdAttbVal != null)
+            //{
+            //    query += " WHERE ";
+            //    lastIdx = vCdAttb.Length - 1;
+            //    for (int i = 0; i < lastIdx; ++i)
+            //        query += vCdAttb[i] + "=" + vCdAttbVal[i] + ",";
+            //    query += vCdAttb + "=" + vCdAttbVal;
+            //}
+            //if(vGpAttb != null)
+            //{
+            //    query += " GROUP BY ";
+            //    lastIdx = vGpAttb.Length - 1;
+            //    for (int i = 0; i < lastIdx; ++i)
+            //        query += vGpAttb[i] + ",";
+            //    query += vGpAttb[lastIdx];
+            //}
+
+            ////Create a list to store the result
+            //List<byte[]>[] vRs = new List<byte[]>[vAttb.Length];
+            //for (int i = 0; i < vAttb.Length; ++i)
+            //    vRs[i] = new List<byte[]>();
+
+            ////Open connection
+            //if (this.OpenConnection() == true)
+            //{
+            //    //Create Command
+            //    MySqlCommand cmd = new MySqlCommand(query, connection);
+            //    //Create a data reader and Execute the command
+            //    MySqlDataReader datRdr = cmd.ExecuteReader();
+
+            //    //Read the data and store them in the list
+            //    while (datRdr.Read())
+            //    {
+            //        for (int i = 0; i < vAttb.Length; ++i)
+            //            vRs[i].Add((byte[])datRdr.GetValue(i));
+            //    }
+
+            //    //close Data Reader
+            //    datRdr.Close();
+
+            //    //return list to be displayed
+            //    return vRs;
+            //}
+            //else
+            //{
+            //    return null;
+            //}
+        }
+
+        //public List<byte[]>[] Select(string tb, string[] vAttb, int nAttb, string cdAttb,
+        public static string mkQrySelect(string tb, string[] vAttb, int nAttb, string cdAttb,
+            string cdAttbVal, string[] vGpAttb)
+        {
             string query = "SELECT";
             int lastIdx = 0;
             if (vAttb == null)
                 query += " * ";
             else
             {
+                nAttb = vAttb.Length;//overwrite
                 lastIdx = vAttb.Length - 1;
                 for (int i = 0; i < lastIdx; ++i)
                     query += vAttb[i] + ",";
                 query += vAttb[lastIdx] + " ";
             }
             query += " FROM " + tb;
-            if(vCdAttb != null && vCdAttbVal != null)
-            {
-                query += " WHERE ";
-                lastIdx = vCdAttb.Length - 1;
-                for (int i = 0; i < lastIdx; ++i)
-                    query += vCdAttb[i] + "=" + vCdAttbVal[i] + ",";
-                query += vCdAttb + "=" + vCdAttbVal;
-            }
-            if(vGpAttb != null)
+            if (cdAttb != null && cdAttbVal != null)
+                query += " WHERE " + cdAttb + "=" + cdAttbVal;
+            if (vGpAttb != null)
             {
                 query += " GROUP BY ";
                 lastIdx = vGpAttb.Length - 1;
@@ -197,60 +276,66 @@ namespace WpfApplication1
                 query += vGpAttb[lastIdx];
             }
 
-            //Create a list to store the result
-            List<byte[]>[] vRs = new List<byte[]>[vAttb.Length];
-            for (int i = 0; i < vAttb.Length; ++i)
-                vRs[i] = new List<byte[]>();
+            return query;
+        }
 
-            //Open connection
-            if (this.OpenConnection() == true)
-            {
+        public static MySqlDataReader exeQrySelect(MySqlConnection conn, string query) {
+            ////Create a list to store the result
+            //List<byte[]>[] vRs = new List<byte[]>[nAttb];
+            //for (int i = 0; i < nAttb; ++i)
+            //    vRs[i] = new List<byte[]>();
+
+            ////Open connection
+            //if (this.OpenConnection() == true)
+            //{
                 //Create Command
-                MySqlCommand cmd = new MySqlCommand(query, connection);
+                MySqlCommand cmd = new MySqlCommand(query, conn);
                 //Create a data reader and Execute the command
-                MySqlDataReader datRdr = cmd.ExecuteReader();
+                return cmd.ExecuteReader();
 
                 //Read the data and store them in the list
-                while (datRdr.Read())
-                {
-                    for (int i = 0; i < vAttb.Length; ++i)
-                        vRs[i].Add((byte[])datRdr.GetValue(i));
-                }
+            //    while (datRdr.Read())
+            //    {
+            //        for (int i = 0; i < nAttb; ++i)
+            //            vRs[i].Add((byte[])datRdr.GetValue(i));
+            //    }
 
-                //close Data Reader
-                datRdr.Close();
+            //    //close Data Reader
+            //    datRdr.Close();
 
-                //return list to be displayed
-                return vRs;
-            }
-            else
-            {
-                return null;
-            }
+            //    //return list to be displayed
+            //    if (vRs[0].Count == 0)
+            //        return null;
+            //    return vRs;
+            //}
+            //else
+            //{
+            //    return null;
+            //}
         }
 
         //Count statement
         public int Count()
         {
             throw new NotImplementedException();
-            string query = "SELECT Count(*) FROM tableinfo";
-            int Count = -1;
+            //string query = "SELECT Count(*) FROM tableinfo";
+            //int Count = -1;
 
-            //Open Connection
-            if (this.OpenConnection() == true)
-            {
-                //Create Mysql Command
-                MySqlCommand cmd = new MySqlCommand(query, connection);
+            ////Open Connection
+            //if (this.OpenConnection() == true)
+            //{
+            //    //Create Mysql Command
+            //    MySqlCommand cmd = new MySqlCommand(query, connection);
 
-                //ExecuteScalar will return one value
-                Count = int.Parse(cmd.ExecuteScalar() + "");
+            //    //ExecuteScalar will return one value
+            //    Count = int.Parse(cmd.ExecuteScalar() + "");
 
-                return Count;
-            }
-            else
-            {
-                return Count;
-            }
+            //    return Count;
+            //}
+            //else
+            //{
+            //    return Count;
+            //}
         }
     }
 }

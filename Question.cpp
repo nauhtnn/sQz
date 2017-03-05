@@ -13,6 +13,7 @@ Question::Question() {
 	stmt = NULL;
 	nChoices = 0;
 	choices = NULL;
+	keys = NULL;
 	bChoiceSort = true;
 	qType = QuestType::Single;
 	cType = ContentType::Raw;

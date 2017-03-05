@@ -3,29 +3,67 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace WpfApplication1
 {
+
     class Date
     {
-        static List<byte[]> svDate = new List<byte[]>();
-        public static void ReadTxt()
+        /*
+         *format yyyy/mm/dd for sorting easily
+        CREATE TABLE IF NOT EXISTS `dates` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+         `date` CHAR(10) CHARACTER SET `ascii`)
+         */
+        public static List<int> svIdx = new List<int>();
+        public static List<string> svDate = new List<string>();
+        const int nAttb = 2;//hardcode
+
+        public static bool ChkFmt(string s)
         {
-            ReadTxt(sQzCS.Utils.ReadFile("Dates.txt"));
+            if (s == null)
+                return false;
+            if (s.Length != 10)
+                return false;
+            int n = 0;
+            int offs = 0;
+            if (!int.TryParse(s.Substring(offs, 4), out n))
+                return false;
+            offs += 5;
+            if (!int.TryParse(s.Substring(offs, 2), out n))
+                return false;
+            offs += 3;
+            if (!int.TryParse(s.Substring(offs, 2), out n))
+                return false;
+            return true;
         }
-        public static void ReadTxt(string buf)
+
+        public static void DBInsert(string date)
         {
-            if (buf == null)
+            date = "'" + date + "'";
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
                 return;
-            string[] s = buf.Split('\n');
-            svDate.Clear();
-            for (int i = 0; i < s.Length; ++i)
-                svDate.Add(Encoding.UTF32.GetBytes(s[i]));
+            DBConnect.Ins(conn, "dates", "date", date);
+            DBConnect.Close(ref conn);
         }
-        public static void DBInsert()
+
+        public static void DBSelect()
         {
-            DBConnect conn = new DBConnect();
-            conn.OpenConnection();
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+            string qry = DBConnect.mkQrySelect("dates", null, nAttb, null, null, null);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            svIdx.Clear();
+            svDate.Clear();
+            while (reader.Read())
+            {
+                svIdx.Add(reader.GetInt32(0));//hardcode
+                svDate.Add(reader.GetString(1));
+            }
+            reader.Close();
+            DBConnect.Close(ref conn);
         }
     }
 }
