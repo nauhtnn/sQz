@@ -178,7 +178,6 @@ namespace WpfApplication1
                 mBuffer = BitConverter.GetBytes((Int32)mState);
                 //reconnect
                 btnDisconnect_Click(null, null);
-                //mClient = new Client0();
                 btnConnect_Click(null, null);
                 return;
             }

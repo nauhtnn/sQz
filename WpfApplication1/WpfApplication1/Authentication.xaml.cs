@@ -57,13 +57,11 @@ namespace WpfApplication1
                 Connect(null, null);
                 return;
             }
-            if (mState == NetSttCode.PrepDateStudent)
+            if (mState == NetSttCode.PrepDate)
             {
                 TcpClient c = (TcpClient)ar.AsyncState;
-                //exception: c.EndConnect(ar);
                 if (!c.Connected)
                 {
-                    Dispatcher.Invoke(() => { txMessage.Text += "connected"; });
                     //else: wait and connect again
                     System.Timers.Timer aTimer = new System.Timers.Timer(2000);
                     // Hook up the Elapsed event for the timer. 
@@ -73,36 +71,133 @@ namespace WpfApplication1
                     return;
                 }
                 NetworkStream s = c.GetStream();
-                char[] msg = new char[1];
-                msg[0] = (char)NetSttCode.Dating;
-                mBuffer = Encoding.UTF8.GetBytes(msg);
+                //char[] msg = new char[1];
+                //msg[0] = (char)NetSttCode.Dating;
+                //mBuffer = Encoding.UTF8.GetBytes(msg);
                 mState = NetSttCode.Dating;
+                mBuffer = BitConverter.GetBytes((Int32)mState);
                 s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                 return;
             }
             if (mState == NetSttCode.Dating)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
+                s.EndWrite(ar);
                 mBuffer = new byte[mSz];
                 mState = NetSttCode.Dated;
                 s.BeginRead(mBuffer, 0, mSz, CB, s);
+                return;
             }
             if (mState == NetSttCode.Dated)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
-                int nullIdx = Array.IndexOf(mBuffer, 0);
-                nullIdx = nullIdx >= 0 ? nullIdx : mBuffer.Length;
-                string date = ASCIIEncoding.ASCII.GetString(mBuffer, 0, nullIdx);
-                date = date.Substring(0, date.IndexOf('\0'));
-                Dispatcher.Invoke(() => { txtDate.Text = date; });
+                int r = s.EndRead(ar);
+                int offs = 0;
+                Date.ReadByteArr(mBuffer, ref offs);
+                Dispatcher.Invoke(() => {
+                    if(Date.sbArr != null)
+                    txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
+                });
                 mState = NetSttCode.Dated;
-                //s.BeginRead(mBuffer, 0, mSz, CB, s);
+                mClient.Close();//close conn
+                return;
+            }
+            if (mState == NetSttCode.PrepAuth)
+            {
+                TcpClient c = (TcpClient)ar.AsyncState;
+                if (!c.Connected)
+                {
+                    //else: wait and connect again
+                    System.Timers.Timer aTimer = new System.Timers.Timer(2000);
+                    // Hook up the Elapsed event for the timer. 
+                    aTimer.Elapsed += Connect;
+                    aTimer.AutoReset = false;
+                    aTimer.Enabled = true;
+                    return;
+                }
+                NetworkStream s = c.GetStream();
+                mState = NetSttCode.Authenticating;
+                mBuffer = BitConverter.GetBytes((Int32)mState);
+                s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
+                return;
+            }
+            if (mState == NetSttCode.Authenticating)
+            {
+                NetworkStream s = (NetworkStream)ar.AsyncState;
+                s.EndWrite(ar);
+                mBuffer = new byte[mSz];
+                mState = NetSttCode.Authenticated;
+                s.BeginRead(mBuffer, 0, mSz, CB, s);
+                return;
+            }
+            if (mState == NetSttCode.Authenticated)
+            {
+                NetworkStream s = (NetworkStream)ar.AsyncState;
+                int r = s.EndRead(ar);
+                bool auth = false;
+                if(mBuffer.Length == 4)
+                    auth = BitConverter.ToInt32(mBuffer, 0 ) == 1;
+                if (auth)
+                {
+                    mState = NetSttCode.PrepExamRet;
+                    mClient.Close();//close conn
+                    mClient.BeginConnect(CB);
+                }
+                else
+                {
+                    mState = NetSttCode.Dated;
+                    Dispatcher.Invoke(() => { txtMessage.Text += "fail to auth, retry"; });
+                    mClient.Close();//close conn
+                }
+                return;
+            }
+            if (mState == NetSttCode.PrepExamRet)
+            {
+                TcpClient c = (TcpClient)ar.AsyncState;
+                if (!c.Connected)
+                {
+                    //else: wait and connect again
+                    System.Timers.Timer aTimer = new System.Timers.Timer(2000);
+                    // Hook up the Elapsed event for the timer. 
+                    aTimer.Elapsed += Connect;
+                    aTimer.AutoReset = false;
+                    aTimer.Enabled = true;
+                    return;
+                }
+                NetworkStream s = c.GetStream();
+                mState = NetSttCode.ExamRetrieving;
+                mBuffer = BitConverter.GetBytes((Int32)mState);
+                s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
+                return;
+            }
+            if (mState == NetSttCode.ExamRetrieving)
+            {
+                NetworkStream s = (NetworkStream)ar.AsyncState;
+                s.EndWrite(ar);
+                mBuffer = new byte[mSz];
+                mState = NetSttCode.ExamRetrieved;
+                s.BeginRead(mBuffer, 0, mSz, CB, s);
+                return;
+            }
+            if (mState == NetSttCode.ExamRetrieved)
+            {
+                NetworkStream s = (NetworkStream)ar.AsyncState;
+                int r = s.EndRead(ar);
+                r = 0;
+                Question.ReadByteArr(mBuffer, ref r);
+                mClient.Close();
+                NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
+                return;
             }
         }
 
         private void SignIn(object sender, RoutedEventArgs e)
         {
-            mClient.BeginWrite(txtUsername.Text + "\n" + txtPassword.Text, SignInCallback);
+            if (mState == NetSttCode.Dated)
+            {
+                mState = NetSttCode.PrepAuth;
+                mClient.BeginConnect(CB);
+            }
         }
 
         private void SignInCallback(IAsyncResult ar)
@@ -124,40 +219,21 @@ namespace WpfApplication1
             //txMessage.Text += "\n" + txtUsername.Text + "\n" + txtPassword + "\n";
         }
 
-        Thread th;
-        private void btnStartSer_Click(object sender, RoutedEventArgs e)
-        {
-            //th = new Thread(new ThreadStart(() => { Server0 t = new Server0(ResponseMsg); t.start(ref bsrvrmsg, ref msrvrmsg); }));
-            //th.start();
-        }
-
-        public string ResponseMsg(char code)
-        {
-            return "for debug only";
-        }
-
-        private void btnStopSer_Click(object sender, RoutedEventArgs e)
-        {
-            //ServerInstance.Stop();
-            //th.Abort();
-            //th = null;
-            //mClient.BeginConnect(ConnectCallback);
-            Connect(null, null);
-        }
-
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
             Window w = (Window)Parent;
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
+
+            Connect(null, null);
         }
 
         private void txtUsername_GotFocus(object sender, RoutedEventArgs e)
         {
-            txtUsername.Text = String.Empty;
-            if (txtUsername.Text == "type username" ||
-                !System.Text.RegularExpressions.Regex.Match(txtUsername.Text, "[a-zA-Z0-9]").Success)
-                txtUsername.Text = String.Empty;
+            tbxNeeId.Text = String.Empty;
+            if (tbxNeeId.Text == "type Id" ||
+                !System.Text.RegularExpressions.Regex.Match(tbxNeeId.Text, "[a-zA-Z0-9]").Success)
+                tbxNeeId.Text = String.Empty;
         }
 
         //protected virtual void OnNavigatedFrom(NavigationEventArgs e)
