@@ -146,45 +146,28 @@ namespace WpfApplication1
             if (mState == NetSttCode.DateStudentRetriving)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
-                //s.EndWrite(ar);//important, bookmark
+                s.EndWrite(ar);
                 mBuffer = new byte[mSz];
                 mState = NetSttCode.DateStudentRetrieved;
+                //s.BeginRead(mBuffer, 0, mSz, CB, s);
                 s.BeginRead(mBuffer, 0, mSz, CB, s);
                 return;
             }
             if (mState == NetSttCode.DateStudentRetrieved)
             {
-                //int nullIdx = Array.IndexOf(mBuffer, 0);
-                //nullIdx = nullIdx >= 0 ? nullIdx : mBuffer.Length;
-                //string dat = UTF8Encoding.UTF8.GetString(mBuffer, 0, nullIdx);
-                //dat = dat.Substring(0, dat.IndexOf('\0'));
-                //Dispatcher.Invoke(() => {
-                //    int idx1 = dat.IndexOf('\n');
-                //    mDate = dat.Substring(0, idx1++);
-                //    txtDate.Text = mDate;
-                //    int idx2 = dat.IndexOf('\n', idx1);
-                //    while (idx2 != -1) //not check ends with '\n' here
-                //    {
-                //        string t = dat.Substring(idx1, idx2 - idx1);
-                //        TextBlock x = new TextBlock();
-                //        x.FontSize = TakeExam.em;
-                //        x.Text = t;
-                //        spStudent.Children.Add(x);
-                //        idx1 = ++idx2;
-                //        idx2 = dat.IndexOf('\n', idx2);
-                //    }
-                //});
+                NetworkStream s = (NetworkStream)ar.AsyncState;
+                int r = s.EndRead(ar);
                 int offs = 0;
                 Date.ReadByteArr(mBuffer, ref offs);
                 Student.ReadByteArr(mBuffer, ref offs);
                 Dispatcher.Invoke(() => {
                     if(Date.sbArr != null)
                         txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
-                    foreach(Student s in Student.svStudent)
+                    foreach(Student st in Student.svStudent)
                     {
                         TextBlock x = new TextBlock();
                         x.FontSize = TakeExam.em;
-                        x.Text = s.ToString();
+                        x.Text = st.ToString();
                         spStudent.Children.Add(x);
                     }
                 });
@@ -216,7 +199,7 @@ namespace WpfApplication1
             if (mState == NetSttCode.QuestAnsKeyRetrieving)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
-                //s.EndWrite(ar);//bookmark
+                s.EndWrite(ar);//bookmark
                 mBuffer = new byte[mSz];
                 mState = NetSttCode.QuestAnsKeyRetrieved;
                 s.BeginRead(mBuffer, 0, mSz, CB, s);
@@ -224,13 +207,17 @@ namespace WpfApplication1
             }
             if (mState == NetSttCode.QuestAnsKeyRetrieved)
             {
-                zQuest = mBuffer;
+                NetworkStream s = (NetworkStream)ar.AsyncState;
+                int r = s.EndRead(ar);
+                int offs = 0;
+                Question.ReadByteArr(mBuffer, ref offs);
                 mState = NetSttCode.PrepMark;
             }
         }
 
-        string ReadAllNetStream(NetworkStream stream)//toto: List<byte[]>
+        private string ReadAllNetStream(IAsyncResult ar)
         {
+            NetworkStream stream = (NetworkStream)ar.AsyncState;
             if (stream.CanRead)
             {
                 byte[] buf = new byte[1024];

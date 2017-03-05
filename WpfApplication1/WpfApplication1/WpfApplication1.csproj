@@ -73,8 +73,10 @@
     <Compile Include="Prep0.xaml.cs">
       <DependentUpon>Prep0.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Question.cs" />
     <Compile Include="Server1.cs" />
     <Compile Include="Server0.cs" />
+    <Compile Include="Settings.cs" />
     <Compile Include="sQz.xaml.cs">
       <DependentUpon>sQz.xaml</DependentUpon>
     </Compile>
@@ -82,6 +84,7 @@
     <Compile Include="TakeExam.xaml.cs">
       <DependentUpon>TakeExam.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Utils.cs" />
     <Page Include="Authentication.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -146,12 +149,6 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\sQzCS\sQzCS.csproj">
-      <Project>{32ecfebe-4fa8-44dc-adb1-1f5e629f9957}</Project>
-      <Name>sQzCS</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <WCFMetadata Include="Service References\" />

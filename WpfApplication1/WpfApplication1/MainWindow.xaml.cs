@@ -4,7 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
-using sQzCS;
+//using sQzCS;
 using System.Collections.Generic;
 
 namespace WpfApplication1
@@ -76,8 +76,9 @@ namespace WpfApplication1
 				dmsg.Content += "buf size = " + buf.Length + '\n';
 			else
 				return;
-            sQzCS.Page pg = new sQzCS.Page();
-            Question.StartRead(Utils.Split(buf, '\n'), pg.mSt);
+            //sQzCS.Page pg = new sQzCS.Page();
+            //Question.StartRead(Utils.Split(buf, '\n'), pg.mSt);
+            Question.StartRead(Utils.Split(buf, '\n'), null);
             Question q = new Question();
             while (q.Read())
             {

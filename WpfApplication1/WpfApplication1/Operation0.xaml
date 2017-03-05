@@ -23,7 +23,7 @@
                     <TextBlock Text="Number of exam"></TextBlock>
                     <TextBox Width="50"></TextBox>
                 </StackPanel>
-                <Button Width="50" Content="Create Q Sheet"></Button>
+                <Button Width="50" x:Name="btnQSheet" Content="Create QSheet" Click="btnQSheet_Click"></Button>
                 <Button x:Name="btnStartSrvr" Width="50" Content="Start server" Click="StartSrvr_Click"></Button>
                 <Button x:Name="btnStopSrvr" Width="50" Content="Stop srvr" Click="StopSrvr_Click"></Button>
                 <Button x:Name="op1" Width="100" Content="close" Click="op1_Click"></Button>

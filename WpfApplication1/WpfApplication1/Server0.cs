@@ -130,10 +130,25 @@ namespace WpfApplication1
                                 switch (code)
                                 {
                                     case (char)NetSttCode.DateStudentRetriving:
-                                        msg = dgResponse(code);
+                                        //msg = dgResponse(code);
+                                        int sz = 0;
+                                        if (Date.sbArr != null)
+                                            sz += Date.sbArr.Length;
+                                        if (Student.sbArr != null)
+                                            sz += Student.sbArr.Length;
+                                        msg = new byte[sz];
+                                        sz = 0;
+                                        if (Date.sbArr != null)
+                                        {
+                                            sz = Date.sbArr.Length;
+                                            Buffer.BlockCopy(Date.sbArr, 0, msg, 0, sz);
+                                        }
+                                        if (Student.sbArr != null)
+                                            Buffer.BlockCopy(Student.sbArr, 0, msg, sz, Student.sbArr.Length);
                                         break;
                                     case (char)NetSttCode.QuestAnsKeyRetrieving:
-                                        msg = dgResponse(code);
+                                        //msg = dgResponse(code);
+                                        msg = Question.sbArr;
                                         break;
                                     case (char)NetSttCode.MarkSubmitting:
                                         break;

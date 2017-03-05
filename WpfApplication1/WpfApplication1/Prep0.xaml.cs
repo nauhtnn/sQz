@@ -101,8 +101,8 @@ namespace WpfApplication1
             // get the selected file name and display in a textbox
             string filePath = null;
             if (result == true)
-                tbxFilePath.Text = filePath = dlg.FileName;
-            Student.ReadTxt(sQzCS.Utils.ReadFile(filePath));
+                tbxNeePath.Text = filePath = dlg.FileName;
+            Student.ReadTxt(Utils.ReadFile(filePath));
             LoadStudents();
         }
 
@@ -119,6 +119,54 @@ namespace WpfApplication1
             Date.Select((string)i.Content);
             Student.DBSelect(Date.sDBIdx);
             LoadStudents();
+        }
+
+        private void btnQBrowse_Click(object sender, RoutedEventArgs e)
+        {
+            OpenFileDialog dlg = new OpenFileDialog();
+
+            // set filter for file extension and default file extension 
+            dlg.DefaultExt = ".txt";
+            dlg.Filter = "text documents (.txt)|*.txt";
+            bool? result = dlg.ShowDialog();
+
+            // get the selected file name and display in a textbox
+            string filePath = null;
+            if (result == true)
+                tbxQPath.Text = filePath = dlg.FileName;
+            Question.ReadTxt(Utils.ReadFile(filePath));
+            LoadQuest();
+        }
+
+        private void LoadQuest() //same as Operation0.xaml
+        {
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            Dispatcher.Invoke(() => {
+                lbxStudent.Items.Clear();
+                foreach (Question q in Question.svQuest)
+                {
+                    TextBlock i = new TextBlock();
+                    i.Text = q.ToString();
+                    dark = !dark;
+                    if (dark)
+                        i.Background = new SolidColorBrush(c);
+                    gQuest.Children.Add(i);
+                }
+            });
+        }
+
+        private void btnInsQuest_Click(object sender, RoutedEventArgs e)
+        {
+            Question.DBInsert();
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            Question.DBSelect();
+            LoadQuest();
         }
     }
 }

@@ -15,10 +15,10 @@ namespace WpfApplication1
     public class Student
     {
         /*
-        CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2) UNSIGNED,
-         `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf32`,
-         `birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf32`,
-         PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`))
+         CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2) UNSIGNED,
+          `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf32`,
+          `birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf32`,
+          PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`))
          */
         public static List<Student> svStudent = new List<Student>();
         public static byte[] sbArr = null;
@@ -31,7 +31,7 @@ namespace WpfApplication1
         public Student() { }
         public static void ReadTxt(Int16 dateId)
         {
-            ReadTxt(sQzCS.Utils.ReadFile("Students" + dateId + ".txt"));
+            ReadTxt(Utils.ReadFile("Students" + dateId + ".txt"));
         }
         public override string ToString()
         {
@@ -144,14 +144,13 @@ namespace WpfApplication1
             int sz = 0;
             foreach (byte[] i in l)
                 sz += i.Length;
-            b = new byte[sz];
+            sbArr = new byte[sz];
             int offs = 0;
             for (int i = 0; i < l.Count; ++i)
             {
-                Buffer.BlockCopy(l[i], 0, b, offs, l[i].Length);
+                Buffer.BlockCopy(l[i], 0, sbArr, offs, l[i].Length);
                 offs += l[i].Length;
             }
-            sbArr = b;
         }
         public static void ReadByteArr(byte[] buf, ref int offs)
         {

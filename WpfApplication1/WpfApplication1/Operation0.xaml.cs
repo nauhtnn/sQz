@@ -305,5 +305,10 @@ namespace WpfApplication1
             //Window w = (Window)Parent;
             //w.Close();
         }
+
+        private void btnQSheet_Click(object sender, RoutedEventArgs e)
+        {
+            Question.DBSelect();
+        }
     }
 }

@@ -26,7 +26,7 @@ namespace WpfApplication1
         public static MySqlConnection Init()
         {
             string connStr = null;
-            string s = sQzCS.Utils.ReadFile("Database.txt");
+            string s = Utils.ReadFile("Database.txt");
             if (s == null)
             {
                 server = "localhost";
