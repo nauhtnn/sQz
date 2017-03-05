@@ -35,8 +35,6 @@ namespace WpfApplication1
 
             ShowsNavigationUI = false;
 
-            FirewallHandler fwHndl = new FirewallHandler(3);
-            fwHndl.OpenFirewall();
             mSz = 1024 * 1024;
             mState = NetSttCode.PrepDate;
             mClient = Client0.Instance();
@@ -225,6 +223,9 @@ namespace WpfApplication1
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
 
+            FirewallHandler fwHndl = new FirewallHandler(3);
+            txtMessage.Text += fwHndl.OpenFirewall();
+
             Connect(null, null);
         }
 
@@ -236,22 +237,9 @@ namespace WpfApplication1
                 tbxNeeId.Text = String.Empty;
         }
 
-        //protected virtual void OnNavigatedFrom(NavigationEventArgs e)
-        //{
-        //    int a = 0;
-        //    ++a;
-        //}
-
-        //protected void OnNavigatingFrom(NavigatingCancelEventArgs e)
-        //{
-        //    int a = 0;
-        //    ++a;
-        //}
-
-        //protected void OnNavigatedTo(NavigationEventArgs e)
-        //{
-        //    int a = 0;
-        //    ++a;
-        //}
+        private void btnReconn_Click(object sender, RoutedEventArgs e)
+        {
+            Connect(null, null);
+        }
     }
 }

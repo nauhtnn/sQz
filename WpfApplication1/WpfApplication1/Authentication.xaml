@@ -5,7 +5,7 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:WpfApplication1"
       mc:Ignorable="d" 
-      d:DesignHeight="300" d:DesignWidth="300"
+      d:DesignHeight="360" d:DesignWidth="640"
       Title="Authentication">
 
     <Grid Loaded="Grid_Loaded">
@@ -14,5 +14,6 @@
         <Button x:Name="btnSignIn" Content="Sign In" HorizontalAlignment="Left" Height="19" Margin="134,118,0,0" VerticalAlignment="Top" Width="102" Click="SignIn"/>
         <TextBox x:Name="txtMessage" HorizontalAlignment="Left" Height="136" Margin="42,146,0,0" TextWrapping="Wrap" Text="TextBox" VerticalAlignment="Top" Width="238"/>
         <TextBlock x:Name="txtDate" HorizontalAlignment="Left" Height="25" Margin="97,20,0,0" TextWrapping="Wrap" Text="TextBlock" VerticalAlignment="Top" Width="183"/>
+        <Button x:Name="btnReconn" Content="Reconnect" HorizontalAlignment="Left" Height="34" Margin="422,156,0,0" VerticalAlignment="Top" Width="81" Click="btnReconn_Click"/>
     </Grid>
 </Page>
