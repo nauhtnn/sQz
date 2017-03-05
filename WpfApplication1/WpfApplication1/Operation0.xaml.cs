@@ -21,10 +21,6 @@ namespace WpfApplication1
     /// </summary>
     public partial class Operation0 : Page
     {
-        List<string> vDate;
-        List<short> vDateId;
-        List<string> vStudent;
-        string mSelectedDate;
         Server0 mServer;
         bool bSrvrMsg;
         string mSrvrMsg;
@@ -35,10 +31,6 @@ namespace WpfApplication1
         {
             InitializeComponent();
             ShowsNavigationUI = false;
-            vDate = new List<string>();
-            vDateId = new List<short>();
-            vStudent = new List<string>();
-            mSelectedDate = String.Empty;
             mServer = new Server0(ResponseMsg);
             bSrvrMsg = false;
             mSrvrMsg = String.Empty;
@@ -49,12 +41,6 @@ namespace WpfApplication1
             LoadDates();
 
             vQuestAnsKey = null;
-
-            System.Timers.Timer aTimer = new System.Timers.Timer(2000);
-            // Hook up the Elapsed event for the timer. 
-            aTimer.Elapsed += UpdateSrvrMsg;
-            aTimer.AutoReset = true;
-            aTimer.Enabled = true;
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -70,12 +56,20 @@ namespace WpfApplication1
             switch (code)
             {
                 case (char)NetSttCode.DateStudentRetriving:
-                    byte[] b = Encoding.UTF32.GetBytes(mSelectedDate);
-                    byte[] c = Student.ToByteArr();
-                    int sz = b.Length + c.Length;
+                    int sz = 0;
+                    if (Date.sbArr != null)
+                        sz += Date.sbArr.Length;
+                    if (Student.sbArr != null)
+                        sz += Student.sbArr.Length;
                     msg = new byte[sz];
-                    Buffer.BlockCopy(b, 0, msg, 0, b.Length);
-                    Buffer.BlockCopy(c, 0, msg, b.Length, c.Length);
+                    sz = 0;
+                    if (Date.sbArr != null)
+                    {
+                        sz = Date.sbArr.Length;
+                        Buffer.BlockCopy(Date.sbArr, 0, msg, 0, sz);
+                    }
+                    if(Student.sbArr != null)
+                        Buffer.BlockCopy(Student.sbArr, 0, msg, sz, Student.sbArr.Length);
                     break;
                 case (char)NetSttCode.QuestAnsKeyRetrieving:
                     if (vQuestAnsKey == null)
@@ -95,60 +89,87 @@ namespace WpfApplication1
         private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListBox l = (ListBox)sender;
-            LoadStudents(vDateId[l.SelectedIndex]);
+            ListBoxItem i = (ListBoxItem)l.SelectedItem;
+            Date.Select((string)i.Content);
+            Student.DBSelect(Date.sDBIdx);
+            LoadStudents();
         }
+
+        //private void LoadDates()
+        //{
+        //    string filePath = "Dates.txt";
+        //    string[] dates = null;
+        //    vDate.Clear();
+        //    if (System.IO.File.Exists(filePath))
+        //        dates = System.IO.File.ReadAllLines(filePath);
+        //    if (dates == null)
+        //        return;
+        //    foreach (string d in dates)
+        //    {
+        //        string[] s = d.Split('\t');
+        //        vDateId.Add(Convert.ToInt16(s[0]));
+        //        vDate.Add(s[1]);
+        //    }
+        //    vDate.Sort();
+        //}
 
         private void LoadDates()
         {
-            string filePath = "Dates.txt";
-            string[] dates = null;
-            vDate.Clear();
-            if (System.IO.File.Exists(filePath))
-                dates = System.IO.File.ReadAllLines(filePath);
-            if (dates == null)
-                return;
-            foreach (string d in dates)
+            Date.DBSelect();
+            if (0 < Date.svDate.Count)
             {
-                string[] s = d.Split('\t');
-                vDateId.Add(Convert.ToInt16(s[0]));
-                vDate.Add(s[1]);
-            }
-            vDate.Sort();
-        }
-
-        private void PrepDatesGUI()
-        {
-            if (vDate.Count == 0)
-            {
-                Dispatcher.Invoke(() =>
-                {
+                bool dark = true;
+                Color c = new Color();
+                c.A = 0xff;
+                c.B = c.G = c.R = 0xf0;
+                Dispatcher.Invoke(() => {
                     lbxDate.Items.Clear();
+                    foreach (string s in Date.svDate)
+                    {
+                        ListBoxItem i = new ListBoxItem();
+                        i.Content = s;
+                        dark = !dark;
+                        if (dark)
+                            i.Background = new SolidColorBrush(c);
+                        lbxDate.Items.Add(i);
+                    }
                 });
-                return;
             }
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            Dispatcher.Invoke(() =>
-            {
-                lbxDate.Items.Clear();
-                for (int i = 0; i < vDate.Count; ++i)
-                {
-                    ListBoxItem t = new ListBoxItem();
-                    t.Content = vDate[i];
-                    dark = !dark;
-                    if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    t.FontSize = TakeExam.em;
-                    lbxDate.Items.Add(t);
-                }
-            });
         }
 
-        private void LoadStudents(short dateId)
-        {
-            Student.ReadTxt(dateId);
+        //private void PrepDatesGUI()
+        //{
+        //    if (vDate.Count == 0)
+        //    {
+        //        Dispatcher.Invoke(() =>
+        //        {
+        //            lbxDate.Items.Clear();
+        //        });
+        //        return;
+        //    }
+        //    bool dark = true;
+        //    Color c = new Color();
+        //    c.A = 0xff;
+        //    c.B = c.G = c.R = 0xf0;
+        //    Dispatcher.Invoke(() =>
+        //    {
+        //        lbxDate.Items.Clear();
+        //        for (int i = 0; i < vDate.Count; ++i)
+        //        {
+        //            ListBoxItem t = new ListBoxItem();
+        //            t.Content = vDate[i];
+        //            dark = !dark;
+        //            if (dark)
+        //                t.Background = new SolidColorBrush(c);
+        //            t.FontSize = TakeExam.em;
+        //            lbxDate.Items.Add(t);
+        //        }
+        //    });
+        //}
+
+        //private void LoadStudents(short dateId)
+        //{
+        //    Student.ReadTxt(dateId);
             //string[] students = null;
             //vStudent.Clear();
             //if (System.IO.File.Exists(filePath))
@@ -161,35 +182,55 @@ namespace WpfApplication1
             //        vStudent.Add(s.Substring(10));
             //}
             //vStudent.Sort();
-            PrepStudentsGUI();
-        }
+        //    PrepStudentsGUI();
+        //}
 
-        private void PrepStudentsGUI()
+        private void LoadStudents() //same as Prep0.xaml
         {
-            if (vStudent.Count == 0)
-            {
-                Dispatcher.Invoke(() => { spDown.Children.Clear(); });
-                return;
-            }
-            Dispatcher.Invoke(() =>
-            {
-                spDown.Children.Clear();
-                bool dark = true;
-                Color c = new Color();
-                c.A = 0xff;
-                c.B = c.G = c.R = 0xf0;
-                for (int i = 0; i < vStudent.Count; ++i)
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            Dispatcher.Invoke(() => {
+                lbxStudent.Items.Clear();
+                foreach (Student s in Student.svStudent)
                 {
-                    Label t = new Label();
-                    t.Content = vStudent[i];
+                    ListBoxItem i = new ListBoxItem();
+                    i.Content = s.ToString();
                     dark = !dark;
                     if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    t.FontSize = TakeExam.em;
-                    spDown.Children.Add(t);
+                        i.Background = new SolidColorBrush(c);
+                    lbxStudent.Items.Add(i);
                 }
             });
         }
+
+        //private void PrepStudentsGUI()
+        //{
+        //    if (vStudent.Count == 0)
+        //    {
+        //        Dispatcher.Invoke(() => { spDown.Children.Clear(); });
+        //        return;
+        //    }
+        //    Dispatcher.Invoke(() =>
+        //    {
+        //        spDown.Children.Clear();
+        //        bool dark = true;
+        //        Color c = new Color();
+        //        c.A = 0xff;
+        //        c.B = c.G = c.R = 0xf0;
+        //        for (int i = 0; i < vStudent.Count; ++i)
+        //        {
+        //            Label t = new Label();
+        //            t.Content = vStudent[i];
+        //            dark = !dark;
+        //            if (dark)
+        //                t.Background = new SolidColorBrush(c);
+        //            t.FontSize = TakeExam.em;
+        //            spDown.Children.Add(t);
+        //        }
+        //    });
+        //}
 
         private void ScaleScreen(double r)
         {
@@ -203,7 +244,6 @@ namespace WpfApplication1
             spLeft.Background = new SolidColorBrush(Colors.AntiqueWhite);
             spCenter.Height = spCenter.Height * r;
             spCenter.Background = new SolidColorBrush(Colors.Aqua);
-            svwrDown.Height = svwrDown.Height * r;
         }
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
@@ -214,7 +254,8 @@ namespace WpfApplication1
             w.WindowState = WindowState.Maximized;
             w.Closing += W_Closing;
 
-            PrepDatesGUI();
+            //PrepDatesGUI();
+            LoadDates();
 
             double scaleW = spMain.RenderSize.Width / 640; //d:DesignWidth
             //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
@@ -223,6 +264,12 @@ namespace WpfApplication1
             FirewallHandler fwHndl = new FirewallHandler(0);
             string msg = fwHndl.OpenFirewall();
             lblStatus.Text = msg;
+
+            System.Timers.Timer aTimer = new System.Timers.Timer(2000);
+            // Hook up the Elapsed event for the timer. 
+            aTimer.Elapsed += UpdateSrvrMsg;
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
         }
 
         private void StartSrvr_Click(object sender, RoutedEventArgs e)
@@ -250,17 +297,13 @@ namespace WpfApplication1
 
         private void op1_Click(object sender, RoutedEventArgs e)
         {
-            //Dispatcher.Invoke(() =>
-            //{
-            //    NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
-            //});
+            Dispatcher.Invoke(() =>
+            {
+                NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative));
+            });
 
             //Window w = (Window)Parent;
             //w.Close();
-
-            //sQzCS.Question.ReadTxt();
-            //vQuestAnsKey = sQzCS.Question.ToByteArr();
-            //sQzCS.Question.Clear();
         }
     }
 }

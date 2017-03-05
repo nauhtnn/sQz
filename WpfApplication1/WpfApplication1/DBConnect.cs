@@ -9,12 +9,12 @@ namespace WpfApplication1
 {
     class DBConnect
     {
-        public MySqlConnection connection;
+        //public MySqlConnection connection;
         static string server;
         static string database;
         static string uid;
         static string password;
-        static bool bConnected;
+        //static bool bConnected;
 
         //Constructor
         public DBConnect()
@@ -180,10 +180,10 @@ namespace WpfApplication1
 
         //Select statement
         //public List<byte[]>[] Select(string tb, string[] vAttb, string[] vCdAttb,
-        public static string mkQrySelect(string tb, string[] vAttb, string[] vCdAttb,
-            string[] vCdAttbVal, string[] vGpAttb)
-        {
-            return null;
+        //public static string mkQrySelect(string tb, string[] vAttb, string[] vCdAttb,
+        //    string[] vCdAttbVal, string[] vGpAttb)
+        //{
+        //    return null;
             //if (vCdAttb != null && vCdAttbVal != null &&
             //    vCdAttb.Length != vCdAttbVal.Length)
             //    return null;
@@ -246,10 +246,9 @@ namespace WpfApplication1
             //{
             //    return null;
             //}
-        }
+        //}
 
-        //public List<byte[]>[] Select(string tb, string[] vAttb, int nAttb, string cdAttb,
-        public static string mkQrySelect(string tb, string[] vAttb, int nAttb, string cdAttb,
+        public static string mkQrySelect(string tb, string[] vAttb, string cdAttb,
             string cdAttbVal, string[] vGpAttb)
         {
             string query = "SELECT";
@@ -258,7 +257,6 @@ namespace WpfApplication1
                 query += " * ";
             else
             {
-                nAttb = vAttb.Length;//overwrite
                 lastIdx = vAttb.Length - 1;
                 for (int i = 0; i < lastIdx; ++i)
                     query += vAttb[i] + ",";

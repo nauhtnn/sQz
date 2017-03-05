@@ -21,7 +21,8 @@ namespace WpfApplication1
          PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`))
          */
         public static List<Student> svStudent = new List<Student>();
-        const int nAttb = 5;//hardcode, not include dateIdx
+        public static byte[] sbArr = null;
+        //not include dateIdx
         ExamLvl mLvl;
         UInt16 mId;
         string mName;
@@ -66,13 +67,14 @@ namespace WpfApplication1
                 }
                 svStudent.Add(stud);
             }
+            ToByteArr();
         }
         public static void DBSelect(UInt32 dateIdx)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string qry = DBConnect.mkQrySelect("examinees", null, nAttb, "dateIdx", "" + dateIdx, null);
+            string qry = DBConnect.mkQrySelect("examinees", null, "dateIdx", "" + dateIdx, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             svStudent.Clear();
             while (reader.Read())
@@ -87,6 +89,7 @@ namespace WpfApplication1
             }
             reader.Close();
             DBConnect.Close(ref conn);
+            ToByteArr();
         }
 
         public static void DBInsert(UInt32 dateIdx)
@@ -114,10 +117,10 @@ namespace WpfApplication1
             }
             DBConnect.Close(ref conn);
         }
-        public static byte[] ToByteArr()
+        public static void ToByteArr()
         {
             if (svStudent.Count == 0)
-                return null;
+                return;
             List<byte[]> l = new List<byte[]>();
             byte[] b = BitConverter.GetBytes(svStudent.Count);
             l.Add(b);
@@ -148,24 +151,25 @@ namespace WpfApplication1
                 Buffer.BlockCopy(l[i], 0, b, offs, l[i].Length);
                 offs += l[i].Length;
             }
-            return b;
+            sbArr = b;
         }
-        public static void ReadByteArr(byte[] buf)
+        public static void ReadByteArr(byte[] buf, ref int offs)
         {
             svStudent.Clear();
             if (buf == null)
                 return;
-            int offs = 0;
+            int offs0 = offs;
+            int sz = 0;
             int nStu = BitConverter.ToInt32(buf, offs);
             offs += 4;
             for(int i = 0; i < nStu; ++i)
             {
                 Student s = new Student();
-                s.mLvl = (ExamLvl)BitConverter.ToInt16(buf, offs);
+                s.mLvl = (ExamLvl)BitConverter.ToUInt16(buf, offs);
                 offs += 2;
                 s.mId = BitConverter.ToUInt16(buf, offs);
                 offs += 2;
-                int sz = BitConverter.ToInt32(buf, offs);
+                sz = BitConverter.ToInt32(buf, offs);
                 offs += 4;
                 byte[] b = new byte[sz];
                 Buffer.BlockCopy(buf, offs, b, 0, sz);
@@ -185,6 +189,9 @@ namespace WpfApplication1
                 svStudent.Add(s);
                 offs += sz;
             }
+            sz = offs - offs0;
+            sbArr = new byte[sz];
+            Buffer.BlockCopy(buf, offs0, sbArr, 0, sz);
         }
     }
 }

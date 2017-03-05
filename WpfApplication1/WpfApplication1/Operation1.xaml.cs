@@ -26,7 +26,6 @@ namespace WpfApplication1
         int mSz;
         byte[] mBuffer;
         NetSttCode mState;
-        string mDate;
         byte[] zQuest;
         bool mSrvrConn;
         Server1 mServer;
@@ -48,8 +47,6 @@ namespace WpfApplication1
             mServer = new Server1(ResponseMsg);
             bSrvrMsg = false;
             mSrvrMsg = String.Empty;
-
-            mDate = String.Empty;
             mSrvrConn = true;
 
             TakeExam.InitBrush();
@@ -67,7 +64,7 @@ namespace WpfApplication1
             switch (code)
             {
                 case (char)NetSttCode.Dating:
-                    msg = System.Text.Encoding.UTF32.GetBytes(mDate);
+                    msg = Date.sbArr;//check null
                     break;
                 case (char)NetSttCode.Authenticating:
                     msg = zQuest;
@@ -138,16 +135,18 @@ namespace WpfApplication1
                     return;
                 }
                 NetworkStream s = c.GetStream();
-                char[] msg = new char[1];
-                msg[0] = (char)NetSttCode.DateStudentRetriving;
-                mBuffer = Encoding.UTF8.GetBytes(msg);
+                //char[] msg = new char[1];
+                //msg[0] = (char)NetSttCode.DateStudentRetriving;
+                //mBuffer = Encoding.UTF8.GetBytes(msg);
                 mState = NetSttCode.DateStudentRetriving;
+                mBuffer = BitConverter.GetBytes((Int32)mState);
                 s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                 return;
             }
             if (mState == NetSttCode.DateStudentRetriving)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
+                //s.EndWrite(ar);//important, bookmark
                 mBuffer = new byte[mSz];
                 mState = NetSttCode.DateStudentRetrieved;
                 s.BeginRead(mBuffer, 0, mSz, CB, s);
@@ -155,32 +154,48 @@ namespace WpfApplication1
             }
             if (mState == NetSttCode.DateStudentRetrieved)
             {
-                int nullIdx = Array.IndexOf(mBuffer, 0);
-                nullIdx = nullIdx >= 0 ? nullIdx : mBuffer.Length;
-                string dat = UTF8Encoding.UTF8.GetString(mBuffer, 0, nullIdx);
-                dat = dat.Substring(0, dat.IndexOf('\0'));
+                //int nullIdx = Array.IndexOf(mBuffer, 0);
+                //nullIdx = nullIdx >= 0 ? nullIdx : mBuffer.Length;
+                //string dat = UTF8Encoding.UTF8.GetString(mBuffer, 0, nullIdx);
+                //dat = dat.Substring(0, dat.IndexOf('\0'));
+                //Dispatcher.Invoke(() => {
+                //    int idx1 = dat.IndexOf('\n');
+                //    mDate = dat.Substring(0, idx1++);
+                //    txtDate.Text = mDate;
+                //    int idx2 = dat.IndexOf('\n', idx1);
+                //    while (idx2 != -1) //not check ends with '\n' here
+                //    {
+                //        string t = dat.Substring(idx1, idx2 - idx1);
+                //        TextBlock x = new TextBlock();
+                //        x.FontSize = TakeExam.em;
+                //        x.Text = t;
+                //        spStudent.Children.Add(x);
+                //        idx1 = ++idx2;
+                //        idx2 = dat.IndexOf('\n', idx2);
+                //    }
+                //});
+                int offs = 0;
+                Date.ReadByteArr(mBuffer, ref offs);
+                Student.ReadByteArr(mBuffer, ref offs);
                 Dispatcher.Invoke(() => {
-                    int idx1 = dat.IndexOf('\n');
-                    mDate = dat.Substring(0, idx1++);
-                    txtDate.Text = mDate;
-                    int idx2 = dat.IndexOf('\n', idx1);
-                    while (idx2 != -1) //not check ends with '\n' here
+                    if(Date.sbArr != null)
+                        txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
+                    foreach(Student s in Student.svStudent)
                     {
-                        string t = dat.Substring(idx1, idx2 - idx1);
                         TextBlock x = new TextBlock();
                         x.FontSize = TakeExam.em;
-                        x.Text = t;
+                        x.Text = s.ToString();
                         spStudent.Children.Add(x);
-                        idx1 = ++idx2;
-                        idx2 = dat.IndexOf('\n', idx2);
                     }
                 });
-                char[] msg = new char[1];
-                msg[0] = (char)NetSttCode.QuestAnsKeyRetrieving;
-                mBuffer = Encoding.UTF8.GetBytes(msg);
+                //char[] msg = new char[1];
+                //msg[0] = (char)NetSttCode.QuestAnsKeyRetrieving;
+                //mBuffer = Encoding.UTF8.GetBytes(msg);
                 mState = NetSttCode.PrepQuestAnsKey;
+                mBuffer = BitConverter.GetBytes((Int32)mState);
                 //reconnect
                 btnDisconnect_Click(null, null);
+                //mClient = new Client0();
                 btnConnect_Click(null, null);
                 return;
             }
@@ -190,9 +205,9 @@ namespace WpfApplication1
                 if (c.Connected)
                 {
                     NetworkStream s = (NetworkStream)c.GetStream();
-                    char[] msg = new char[1];
-                    msg[0] = (char)NetSttCode.QuestAnsKeyRetrieving;
-                    mBuffer = Encoding.UTF8.GetBytes(msg);
+                    //char[] msg = new char[1];
+                    //msg[0] = (char)NetSttCode.QuestAnsKeyRetrieving;
+                    //mBuffer = Encoding.UTF8.GetBytes(msg);
                     mState = NetSttCode.QuestAnsKeyRetrieving;
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                 }
@@ -201,6 +216,7 @@ namespace WpfApplication1
             if (mState == NetSttCode.QuestAnsKeyRetrieving)
             {
                 NetworkStream s = (NetworkStream)ar.AsyncState;
+                //s.EndWrite(ar);//bookmark
                 mBuffer = new byte[mSz];
                 mState = NetSttCode.QuestAnsKeyRetrieved;
                 s.BeginRead(mBuffer, 0, mSz, CB, s);
@@ -213,7 +229,7 @@ namespace WpfApplication1
             }
         }
 
-        string ReadAllNetStream(NetworkStream stream)
+        string ReadAllNetStream(NetworkStream stream)//toto: List<byte[]>
         {
             if (stream.CanRead)
             {
@@ -225,9 +241,7 @@ namespace WpfApplication1
                 do
                 {
                     nByte = stream.Read(buf, 0, buf.Length);
-
                     recvMsg.AppendFormat("{0}", Encoding.UTF8.GetString(buf, 0, nByte));
-
                 }
                 while (mSrvrConn && stream.DataAvailable);
                 return recvMsg.ToString();

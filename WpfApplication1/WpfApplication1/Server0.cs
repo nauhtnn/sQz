@@ -101,14 +101,14 @@ namespace WpfApplication1
                             {
                                 totByte += nByte = stream.Read(buf, 0, buf.Length);
                                 //recvMsg.AppendFormat("{0}", Encoding.UTF8.GetString(buf, 0, nByte));
-                                if (nByte < buf.Length)
-                                {
-                                    byte[] x = new byte[nByte];
+                                //if (nByte < buf.Length)
+                                //{
+                                    byte[] x = new byte[nByte];//use new buf
                                     Buffer.BlockCopy(buf, 0, x, 0, nByte);
                                     vRecvMsg.Add(x);
-                                }
-                                else
-                                    vRecvMsg.Add(buf);
+                                //}
+                                //else
+                                //    vRecvMsg.Add(buf);
                             }
                             while (!mClosing && stream.DataAvailable);
                             if(0 < vRecvMsg.Count)
@@ -124,7 +124,9 @@ namespace WpfApplication1
                             if (!mClosing && recvMsg != null)
                             {
                                 byte[] msg = null;
-                                char code = BitConverter.ToChar(recvMsg, 0);
+                                //char code = BitConverter.ToChar(recvMsg, 0);
+                                Int32 c = BitConverter.ToInt32(recvMsg, 0);
+                                char code = (char)c;
                                 switch (code)
                                 {
                                     case (char)NetSttCode.DateStudentRetriving:
@@ -151,6 +153,7 @@ namespace WpfApplication1
                         // Shutdown and end connection
                         if(mClient.Connected)
                             mClient.Close();
+                        //mClient = null;//bookmark
                         mRunning = false;
                     }
                 }

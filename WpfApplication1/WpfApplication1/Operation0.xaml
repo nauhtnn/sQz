@@ -29,8 +29,8 @@
                 <Button x:Name="op1" Width="100" Content="close" Click="op1_Click"></Button>
             </StackPanel>
         </StackPanel>
-        <ScrollViewer x:Name="svwrDown" Height="180" VerticalScrollBarVisibility="Auto">
-            <StackPanel x:Name="spDown"></StackPanel>
+        <ScrollViewer Width="360" Height="200" VerticalScrollBarVisibility="Auto">
+            <ListBox x:Name="lbxStudent" Width="360"></ListBox>
         </ScrollViewer>
     </StackPanel>
 </Page>

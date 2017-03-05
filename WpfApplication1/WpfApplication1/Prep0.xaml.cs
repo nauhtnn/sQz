@@ -69,24 +69,8 @@ namespace WpfApplication1
             LoadDate();
         }
 
-        private void LoadStudents()
+        private void LoadStudents() //same as Operation0.xaml
         {
-            //if(dateId != -1)
-            //    Student.ReadTxt(dateId);
-            //if(Student.svStudent.Count == 0)
-
-            //string[] students = null;
-            //vStudent.Clear();
-            //if (System.IO.File.Exists(filePath))
-            //    students = System.IO.File.ReadAllLines(filePath);
-            //if (students == null)
-            //    return;
-            //foreach (string s in students)
-            //{
-            //    if(date.Equals(s.Substring(0, 10)))
-            //        vStudent.Add(s.Substring(10));
-            //}
-            //vStudent.Sort();
             bool dark = true;
             Color c = new Color();
             c.A = 0xff;
@@ -124,16 +108,16 @@ namespace WpfApplication1
 
         private void btnInsNee_Click(object sender, RoutedEventArgs e)
         {
-            if(Date.mDBIdx != UInt32.MaxValue)
-                Student.DBInsert(Date.mDBIdx);
+            if(Date.sDBIdx != UInt32.MaxValue)
+                Student.DBInsert(Date.sDBIdx);
         }
 
         private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListBox l = (ListBox)sender;
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
-            Date.DBIdx((string)i.Content);
-            Student.DBSelect(Date.mDBIdx);
+            Date.Select((string)i.Content);
+            Student.DBSelect(Date.sDBIdx);
             LoadStudents();
         }
     }
