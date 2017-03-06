@@ -108,7 +108,7 @@ namespace WpfApplication1
                                         msg = Date.sbArr;
                                         break;
                                     case (char)NetSttCode.Authenticating:
-                                        
+                                        msg = BitConverter.GetBytes((Int32)1);
                                         break;
                                     case (char)NetSttCode.ExamRetrieving:
                                         msg = Question.sbArr;

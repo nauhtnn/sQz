@@ -28,7 +28,8 @@ namespace WpfApplication1
         byte[] mBuffer;
         NetSttCode mState;
         byte[] zQuest;
-        bool mSrvrConn;
+        bool bBusy;//crash fixed: only call if not busy
+        bool bToDispose;//crash fixed: flag to dispose
         Server1 mServer;
         bool bSrvrMsg;
         string mSrvrMsg;
@@ -48,7 +49,8 @@ namespace WpfApplication1
             mServer = new Server1(ResponseMsg);
             bSrvrMsg = false;
             mSrvrMsg = String.Empty;
-            mSrvrConn = true;
+            bBusy = false;
+            bToDispose = false;
 
             Theme.InitBrush();
 
@@ -110,136 +112,117 @@ namespace WpfApplication1
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            mSrvrConn = true;
+            if (bBusy)
+                return;
+            bBusy = true;
             mClient.BeginConnect(CB);
         }
 
         private void CB(IAsyncResult ar)
         {
-            if (ar == null)
+            NetworkStream s = null;
+            TcpClient c = null;
+            int r = 0, offs = 0;
+            switch (mState)
             {
-                //btnConnect_Click(null, null);
-                return;
-            }
-            if (mState == NetSttCode.PrepDateStudent)
-            {
-                TcpClient c = (TcpClient)ar.AsyncState;
-                //exception: c.EndConnect(ar);
-                if (!c.Connected)
-                {
-                    //else: wait and connect again
-                    //System.Timers.Timer aTimer = new System.Timers.Timer(2000);
-                    //// Hook up the Elapsed event for the timer. 
-                    //aTimer.Elapsed += Connect;
-                    //aTimer.AutoReset = false;
-                    //aTimer.Enabled = true;
-                    return;
-                }
-                NetworkStream s = c.GetStream();
-                //char[] msg = new char[1];
-                //msg[0] = (char)NetSttCode.DateStudentRetriving;
-                //mBuffer = Encoding.UTF8.GetBytes(msg);
-                mState = NetSttCode.DateStudentRetriving;
-                mBuffer = BitConverter.GetBytes((Int32)mState);
-                s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
-                return;
-            }
-            if (mState == NetSttCode.DateStudentRetriving)
-            {
-                NetworkStream s = (NetworkStream)ar.AsyncState;
-                s.EndWrite(ar);
-                mBuffer = new byte[mSz];
-                mState = NetSttCode.DateStudentRetrieved;
-                //s.BeginRead(mBuffer, 0, mSz, CB, s);
-                s.BeginRead(mBuffer, 0, mSz, CB, s);
-                return;
-            }
-            if (mState == NetSttCode.DateStudentRetrieved)
-            {
-                NetworkStream s = (NetworkStream)ar.AsyncState;
-                int r = s.EndRead(ar);
-                int offs = 0;
-                Date.ReadByteArr(mBuffer, ref offs);
-                Student.ReadByteArr(mBuffer, ref offs);
-                Dispatcher.Invoke(() => {
-                    if(Date.sbArr != null)
-                        txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
-                    foreach(Student st in Student.svStudent)
-                    {
-                        TextBlock x = new TextBlock();
-                        x.FontSize = Theme.em;
-                        x.Text = st.ToString();
-                        spStudent.Children.Add(x);
-                    }
-                });
-                //char[] msg = new char[1];
-                //msg[0] = (char)NetSttCode.QuestAnsKeyRetrieving;
-                //mBuffer = Encoding.UTF8.GetBytes(msg);
-                mState = NetSttCode.PrepQuestAnsKey;
-                mBuffer = BitConverter.GetBytes((Int32)mState);
-                //reconnect
-                btnDisconnect_Click(null, null);
-                btnConnect_Click(null, null);
-                return;
-            }
-            if (mState == NetSttCode.PrepQuestAnsKey)
-            {
-                TcpClient c = (TcpClient)ar.AsyncState;
-                if (c.Connected)
-                {
-                    NetworkStream s = (NetworkStream)c.GetStream();
-                    //char[] msg = new char[1];
-                    //msg[0] = (char)NetSttCode.QuestAnsKeyRetrieving;
-                    //mBuffer = Encoding.UTF8.GetBytes(msg);
-                    mState = NetSttCode.QuestAnsKeyRetrieving;
+                case NetSttCode.PrepDateStudent:
+                    c = (TcpClient)ar.AsyncState;
+                    if (!c.Connected)
+                        break;
+                    s = c.GetStream();
+                    mState = NetSttCode.DateStudentRetriving;
+                    mBuffer = BitConverter.GetBytes((Int32)mState);
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
-                }
-                return;
+                    break;
+                case NetSttCode.DateStudentRetriving:
+                    s = (NetworkStream)ar.AsyncState;
+                    s.EndWrite(ar);
+                    mBuffer = new byte[mSz];
+                    mState = NetSttCode.DateStudentRetrieved;
+                    s.BeginRead(mBuffer, 0, mSz, CB, s);
+                    break;
+                case NetSttCode.DateStudentRetrieved:
+                    s = (NetworkStream)ar.AsyncState;
+                    r = s.EndRead(ar);
+                    offs = 0;
+                    Date.ReadByteArr(mBuffer, ref offs);
+                    Student.ReadByteArr(mBuffer, ref offs);
+                    Dispatcher.Invoke(() => {
+                        if(Date.sbArr != null)
+                            txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
+                        foreach(Student st in Student.svStudent)
+                        {
+                            TextBlock x = new TextBlock();
+                            x.FontSize = Theme.em;
+                            x.Text = st.ToString();
+                            spStudent.Children.Add(x);
+                        }
+                    });
+                    mState = NetSttCode.PrepQuestAnsKey;
+                    mBuffer = BitConverter.GetBytes((Int32)mState);
+                    //reconnect
+                    btnDisconnect_Click(null, null);
+                    btnConnect_Click(null, null);
+                    break;
+                case NetSttCode.PrepQuestAnsKey:
+                    c = (TcpClient)ar.AsyncState;
+                    if (c.Connected)
+                    {
+                        s = (NetworkStream)c.GetStream();
+                        mState = NetSttCode.QuestAnsKeyRetrieving;
+                        s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
+                    }
+                    break;
+                case NetSttCode.QuestAnsKeyRetrieving:
+                    s = (NetworkStream)ar.AsyncState;
+                    s.EndWrite(ar);
+                    mBuffer = new byte[mSz];
+                    mState = NetSttCode.QuestAnsKeyRetrieved;
+                    s.BeginRead(mBuffer, 0, mSz, CB, s);
+                    break;
+                case NetSttCode.QuestAnsKeyRetrieved:
+                    s = (NetworkStream)ar.AsyncState;
+                    r = s.EndRead(ar);
+                    offs = 0;
+                    Question.ReadByteArr(mBuffer, ref offs);
+                    mState = NetSttCode.PrepMark;
+                    break;
             }
-            if (mState == NetSttCode.QuestAnsKeyRetrieving)
+            bBusy = false;
+            if (bToDispose)
             {
-                NetworkStream s = (NetworkStream)ar.AsyncState;
-                s.EndWrite(ar);//bookmark
-                mBuffer = new byte[mSz];
-                mState = NetSttCode.QuestAnsKeyRetrieved;
-                s.BeginRead(mBuffer, 0, mSz, CB, s);
-                return;
-            }
-            if (mState == NetSttCode.QuestAnsKeyRetrieved)
-            {
-                NetworkStream s = (NetworkStream)ar.AsyncState;
-                int r = s.EndRead(ar);
-                int offs = 0;
-                Question.ReadByteArr(mBuffer, ref offs);
-                mState = NetSttCode.PrepMark;
+                mClient.Close();
+                bToDispose = false;
             }
         }
 
-        private string ReadAllNetStream(IAsyncResult ar)
-        {
-            NetworkStream stream = (NetworkStream)ar.AsyncState;
-            if (stream.CanRead)
-            {
-                byte[] buf = new byte[1024];
-                StringBuilder recvMsg = new StringBuilder();
-                int nByte = 0;
+        //private string ReadAllNetStream(IAsyncResult ar)
+        //{
+        //    NetworkStream stream = (NetworkStream)ar.AsyncState;
+        //    if (stream.CanRead)
+        //    {
+        //        byte[] buf = new byte[1024];
+        //        StringBuilder recvMsg = new StringBuilder();
+        //        int nByte = 0;
 
-                // Incoming message may be larger than the buffer size.
-                do
-                {
-                    nByte = stream.Read(buf, 0, buf.Length);
-                    recvMsg.AppendFormat("{0}", Encoding.UTF8.GetString(buf, 0, nByte));
-                }
-                while (mSrvrConn && stream.DataAvailable);
-                return recvMsg.ToString();
-            }
-            return String.Empty;
-        }
+        //        // Incoming message may be larger than the buffer size.
+        //        do
+        //        {
+        //            nByte = stream.Read(buf, 0, buf.Length);
+        //            recvMsg.AppendFormat("{0}", Encoding.UTF8.GetString(buf, 0, nByte));
+        //        }
+        //        while (mSrvrConn && stream.DataAvailable);
+        //        return recvMsg.ToString();
+        //    }
+        //    return String.Empty;
+        //}
 
         private void btnDisconnect_Click(object sender, RoutedEventArgs e)
         {
-            mSrvrConn = false;
-            mClient.Close();
+            if (!bBusy)
+                mClient.Close();
+            else
+                bToDispose = true;
         }
 
         private void StartSrvr_Click(object sender, RoutedEventArgs e)

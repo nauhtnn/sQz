@@ -97,7 +97,7 @@ namespace WpfApplication1
                                     offs += vRecvMsg[i].Length;
                                 }
                             }
-                            if (!mClosing && recvMsg != null)
+                            if (!mClosing && recvMsg != null && 0 < recvMsg.Length)
                             {
                                 byte[] msg = null;
                                 //char code = BitConverter.ToChar(recvMsg, 0);
