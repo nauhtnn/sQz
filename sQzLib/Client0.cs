@@ -70,6 +70,8 @@ namespace sQzLib
             return sClient;
         }
 
+        public static void CloseInstance() { sClient = null; }
+
         public void BeginConnect(DgCallback callback)
         {
             if (mClient == null)

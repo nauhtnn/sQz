@@ -245,5 +245,11 @@ namespace sQzServer0
             UICbMsg dummy = new UICbMsg();
             mServer.Stop(ref dummy);
         }
+
+        private void btnCli_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(() => {
+                NavigationService.Navigate(new Uri("Authentication.xaml", UriKind.Relative)); });
+        }
     }
 }

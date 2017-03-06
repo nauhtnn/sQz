@@ -85,7 +85,7 @@ namespace sQzServer0
                                 cbMsg += "\nEx: " + e.Message;
                                 Stop(ref cbMsg);
                             }
-                            if (bRW)
+                            if (bRW && 0 < nByte)
                             {
                                 byte[] x = new byte[nByte];//use new buf
                                 Buffer.BlockCopy(buf, 0, x, 0, nByte);
@@ -155,12 +155,13 @@ namespace sQzServer0
             bListening = false;
             bRW = false;
         }
-
-        //private bool Authenticate(string id, string birthdate)
-        //{
-        //    if (id.Equals("A10") && birthdate.Equals("01/01/1990"))
-        //        return true;
-        //    return false;
-        //}
     }
 }
+
+//private bool Authenticate(string id, string birthdate)
+//{
+//    if (id.Equals("A10") && birthdate.Equals("01/01/1990"))
+//        return true;
+//    return false;
+//}
+

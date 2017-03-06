@@ -16,7 +16,7 @@ using System.Threading;
 using System.Net.Sockets;
 using sQzLib;
 
-namespace WpfApplication1
+namespace sQzServer0
 {
     /// <summary>
     /// Interaction logic for Authentication.xaml
@@ -38,6 +38,7 @@ namespace WpfApplication1
 
             mSz = 1024 * 1024;
             mState = NetSttCode.PrepDate;
+            Client0.CloseInstance();
             mClient = Client0.Instance();
             //Connect(null, null);
             nBusy = 0;
@@ -86,7 +87,7 @@ namespace WpfApplication1
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
                     });
-                    //mState = NetSttCode.PrepAuth;
+                    mState = NetSttCode.PrepAuth;
                     mClient.Close();//close conn
                     break;
                 case NetSttCode.PrepAuth:

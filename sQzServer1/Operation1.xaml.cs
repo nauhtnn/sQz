@@ -148,10 +148,11 @@ namespace sQzServer1
                     break;
                 case NetSttCode.DateStudentRetrieved:
                     s = (NetworkStream)ar.AsyncState;
-                        r = s.EndRead(ar);
+                    r = s.EndRead(ar);
                     offs = 0;
-                    Date.ReadByteArr(mBuffer, ref offs);
-                    Student.ReadByteArr(mBuffer, ref offs);
+                    Date.ReadByteArr(mBuffer, ref offs, r);
+                    r -= offs;
+                    Student.ReadByteArr(mBuffer, ref offs, r);
                     Dispatcher.Invoke(() => {
                         if(Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);

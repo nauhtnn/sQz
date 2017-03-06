@@ -76,7 +76,7 @@ namespace sQzServer0
                                 cbMsg += "\nEx: " + e.Message;
                                 Stop(ref cbMsg);
                             }
-                            if (bRW)
+                            if (bRW && 0 < nByte)
                             {
                                 byte[] x = new byte[nByte];//use new buf
                                 Buffer.BlockCopy(buf, 0, x, 0, nByte);
