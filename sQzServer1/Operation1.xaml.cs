@@ -28,8 +28,9 @@ namespace WpfApplication1
         byte[] mBuffer;
         NetSttCode mState;
         byte[] zQuest;
-        bool bBusy;//crash fixed: only call if not busy
+        int nBusy;//crash fixed: only call if not busy
         bool bToDispose;//crash fixed: flag to dispose
+        bool bReconn;//reconnect after callback
         Server1 mServer;
         bool bSrvrMsg;
         string mSrvrMsg;
@@ -49,8 +50,9 @@ namespace WpfApplication1
             mServer = new Server1(ResponseMsg);
             bSrvrMsg = false;
             mSrvrMsg = String.Empty;
-            bBusy = false;
+            nBusy = 0;
             bToDispose = false;
+            bReconn = false;
 
             Theme.InitBrush();
 
@@ -112,9 +114,9 @@ namespace WpfApplication1
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
-            if (bBusy)
+            if (0 < nBusy)
                 return;
-            bBusy = true;
+            ++nBusy;
             mClient.BeginConnect(CB);
         }
 
@@ -127,18 +129,21 @@ namespace WpfApplication1
             {
                 case NetSttCode.PrepDateStudent:
                     c = (TcpClient)ar.AsyncState;
-                    if (!c.Connected)
-                        break;
-                    s = c.GetStream();
-                    mState = NetSttCode.DateStudentRetriving;
-                    mBuffer = BitConverter.GetBytes((Int32)mState);
-                    s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
+                    if (c.Connected)
+                    {
+                        s = c.GetStream();
+                        mState = NetSttCode.DateStudentRetriving;
+                        mBuffer = BitConverter.GetBytes((Int32)mState);
+                        ++nBusy;
+                        s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
+                    }
                     break;
                 case NetSttCode.DateStudentRetriving:
                     s = (NetworkStream)ar.AsyncState;
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
                     mState = NetSttCode.DateStudentRetrieved;
+                    ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
                 case NetSttCode.DateStudentRetrieved:
@@ -158,26 +163,27 @@ namespace WpfApplication1
                             spStudent.Children.Add(x);
                         }
                     });
-                    mState = NetSttCode.PrepQuestAnsKey;
-                    mBuffer = BitConverter.GetBytes((Int32)mState);
-                    //reconnect
-                    btnDisconnect_Click(null, null);
-                    btnConnect_Click(null, null);
-                    break;
-                case NetSttCode.PrepQuestAnsKey:
-                    c = (TcpClient)ar.AsyncState;
-                    if (c.Connected)
-                    {
-                        s = (NetworkStream)c.GetStream();
+                //    mState = NetSttCode.PrepQuestAnsKey;
+                //    mBuffer = BitConverter.GetBytes((Int32)mState);
+                //    //reconnect
+                //    bReconn = true;
+                //    break;
+                //case NetSttCode.PrepQuestAnsKey:
+                //    c = (TcpClient)ar.AsyncState;
+                //    if (c.Connected)
+                //    {
+                //        s = (NetworkStream)c.GetStream();
                         mState = NetSttCode.QuestAnsKeyRetrieving;
+                        ++nBusy;
                         s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
-                    }
+                    //}
                     break;
                 case NetSttCode.QuestAnsKeyRetrieving:
                     s = (NetworkStream)ar.AsyncState;
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
                     mState = NetSttCode.QuestAnsKeyRetrieved;
+                    ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
                 case NetSttCode.QuestAnsKeyRetrieved:
@@ -188,11 +194,16 @@ namespace WpfApplication1
                     mState = NetSttCode.PrepMark;
                     break;
             }
-            bBusy = false;
-            if (bToDispose)
+            --nBusy;
+            if (bToDispose && nBusy == 0)
             {
                 mClient.Close();
                 bToDispose = false;
+            }
+            else if (bReconn && nBusy == 0)
+            {
+                ++nBusy;
+                mClient.BeginConnect(CB);
             }
         }
 
@@ -219,7 +230,7 @@ namespace WpfApplication1
 
         private void btnDisconnect_Click(object sender, RoutedEventArgs e)
         {
-            if (!bBusy)
+            if (nBusy == 0)
                 mClient.Close();
             else
                 bToDispose = true;

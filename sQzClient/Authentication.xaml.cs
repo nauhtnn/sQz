@@ -29,8 +29,9 @@ namespace WpfApplication1
         NetSttCode mState;
         bool bSrvrMsg;
         string mSrvrMsg;
-        bool bBusy;//crash fixed: only call if not busy
+        int nBusy;//crash fixed: only call if not busy
         bool bToDispose;//crash fixed: flag to dispose
+        bool bReconn;//reconnect after callback
         public Authentication()
         {
             InitializeComponent();
@@ -43,15 +44,16 @@ namespace WpfApplication1
             //Connect(null, null);
             mSrvrMsg = String.Empty;
             bSrvrMsg = false;
-            bBusy = false;
+            nBusy = 0;
             bToDispose = false;
+            bReconn = false;
         }
 
         private void Connect(Object source, System.Timers.ElapsedEventArgs e)
         {
-            if (bBusy)
+            if (0 < nBusy)
                 return;
-            bBusy = true;
+            ++nBusy;
             mClient.BeginConnect(CB);
         }
 
@@ -68,6 +70,7 @@ namespace WpfApplication1
                     s = c.GetStream();
                     mState = NetSttCode.Dating;
                     mBuffer = BitConverter.GetBytes((Int32)mState);
+                    ++nBusy;
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                     break;
                 case NetSttCode.Dating:
@@ -75,6 +78,7 @@ namespace WpfApplication1
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
                     mState = NetSttCode.Dated;
+                    ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
                 case NetSttCode.Dated:
@@ -86,24 +90,17 @@ namespace WpfApplication1
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
                     });
-                    mState = NetSttCode.Dated;
-                    mClient.Close();//close conn
-                    break;
-                case NetSttCode.PrepAuth:
-                    c = (TcpClient)ar.AsyncState;
-                    if (!c.Connected)
-                    {
-                        //else: wait and connect again
-                        System.Timers.Timer aTimer = new System.Timers.Timer(2000);
-                        // Hook up the Elapsed event for the timer. 
-                        aTimer.Elapsed += Connect;
-                        aTimer.AutoReset = false;
-                        aTimer.Enabled = true;
-                        return;
-                    }
-                    s = c.GetStream();
+                    //mState = NetSttCode.PrepAuth;
+                    //mClient.Close();//close conn
+                    //break;
+                    //case NetSttCode.PrepAuth:
+                    //    c = (TcpClient)ar.AsyncState;
+                    //    if (!c.Connected)
+                    //        break;
+                    //    s = c.GetStream();
                     mState = NetSttCode.Authenticating;
                     mBuffer = BitConverter.GetBytes((Int32)mState);
+                    ++nBusy;
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                     break;
                 case NetSttCode.Authenticating:
@@ -111,6 +108,7 @@ namespace WpfApplication1
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
                     mState = NetSttCode.Authenticated;
+                    ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
                 case NetSttCode.Authenticated:
@@ -121,24 +119,25 @@ namespace WpfApplication1
                         auth = BitConverter.ToInt32(mBuffer, 0) == 1;
                     if (auth)
                     {
-                        mState = NetSttCode.PrepExamRet;
-                        mClient.Close();//close conn
-                        mClient.BeginConnect(CB);
+                        //mState = NetSttCode.PrepExamRet;
+                        //bReconn = true;
                     }
                     else
                     {
                         mState = NetSttCode.Dated;
                         Dispatcher.Invoke(() => { txtMessage.Text += "fail to auth, retry"; });
-                        mClient.Close();//close conn
-                    }
-                    break;
-                case NetSttCode.PrepExamRet:
-                    c = (TcpClient)ar.AsyncState;
-                    if (!c.Connected)
+                        bToDispose = true;
                         break;
-                    s = c.GetStream();
+                    }
+                //    break;
+                //case NetSttCode.PrepExamRet:
+                //    c = (TcpClient)ar.AsyncState;
+                //    if (!c.Connected)
+                //        break;
+                //    s = c.GetStream();
                     mState = NetSttCode.ExamRetrieving;
                     mBuffer = BitConverter.GetBytes((Int32)mState);
+                    ++nBusy;
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                     break;
                 case NetSttCode.ExamRetrieving:
@@ -146,6 +145,7 @@ namespace WpfApplication1
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
                     mState = NetSttCode.ExamRetrieved;
+                    ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
                 case NetSttCode.ExamRetrieved:
@@ -158,11 +158,16 @@ namespace WpfApplication1
                     break;
             }
 
-            bBusy = false;
-            if (bToDispose)
+            --nBusy;
+            if (bToDispose && nBusy == 0)
             {
                 mClient.Close();
                 bToDispose = false;
+            }
+            else if (bReconn && nBusy == 0)
+            {
+                ++nBusy;
+                mClient.BeginConnect(CB);
             }
         }
 
@@ -170,29 +175,32 @@ namespace WpfApplication1
         {
             if (mState == NetSttCode.Dated)
             {
-                mState = NetSttCode.PrepAuth;
+                //mState = NetSttCode.PrepAuth;
+                mState = NetSttCode.Dated;
+                ++nBusy;
                 mClient.BeginConnect(CB);
             }
         }
 
-        private void SignInCallback(IAsyncResult ar)
-        {
-            NetworkStream s = (NetworkStream)ar.AsyncState;
-            s.EndWrite(ar);
-            mClient.BeginRead(mBuffer, mSz, QuestReadCallback);
-        }
+        //private void SignInCallback(IAsyncResult ar)
+        //{
+        //    NetworkStream s = (NetworkStream)ar.AsyncState;
+        //    s.EndWrite(ar);
+        //    //fair -- ++
+        //    mClient.BeginRead(mBuffer, mSz, QuestReadCallback);
+        //}
 
-        private void QuestReadCallback(IAsyncResult ar)
-        {
-            NetworkStream s = (NetworkStream)ar.AsyncState;
-            s.EndRead(ar);
-            //NavigationService.Navigate(new TakeExam());
-            Dispatcher.Invoke(() =>
-            {
-                NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative), mBuffer);//must have Urikind
-            });
-            //txMessage.Text += "\n" + txtUsername.Text + "\n" + txtPassword + "\n";
-        }
+        //private void QuestReadCallback(IAsyncResult ar)
+        //{
+        //    NetworkStream s = (NetworkStream)ar.AsyncState;
+        //    s.EndRead(ar);
+        //    //NavigationService.Navigate(new TakeExam());
+        //    Dispatcher.Invoke(() =>
+        //    {
+        //        NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative), mBuffer);//must have Urikind
+        //    });
+        //    //txMessage.Text += "\n" + txtUsername.Text + "\n" + txtPassword + "\n";
+        //}
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
@@ -216,9 +224,9 @@ namespace WpfApplication1
 
         private void btnReconn_Click(object sender, RoutedEventArgs e)
         {
-            if (bBusy)
+            if (0 < nBusy)
                 return;
-            bBusy = false;
+            ++nBusy;
             Connect(null, null);
         }
     }

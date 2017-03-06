@@ -14,7 +14,7 @@ namespace WpfApplication1
         TcpListener mServer;
         DgResponseMsg dgResponse;
         bool mStart;
-        bool mRunning;
+        bool bRunning;
         bool mClosing;
 
         public Server0(DgResponseMsg dg)
@@ -27,7 +27,8 @@ namespace WpfApplication1
             mServer = new TcpListener(IPAddress.Any, port);
 
             dgResponse = dg;
-            mStart = mRunning = mClosing = false;
+            mStart = mClosing = false;
+            bRunning = true;
         }
 
         public void Start(ref bool bToUpdateMsg, ref string cbMsg)
@@ -48,7 +49,7 @@ namespace WpfApplication1
                 //Console.Write("\n Server has started");
 
                 // Enter the listening loop.
-                while (!mClosing)
+                while (bRunning)
                 {
                     //Console.Write("Waiting for a connection... ");
 
@@ -58,38 +59,39 @@ namespace WpfApplication1
                     {
                         TcpClient mClient = mServer.AcceptTcpClient();
 
-                        mRunning = true;
+                        bRunning = true;
 
                         // Get a stream object for reading and writing
                         NetworkStream stream = mClient.GetStream();
 
                         // Check to see if this NetworkStream is readable.
-                        if (stream.CanRead)
+                        while (bRunning)
                         {
                             byte[] buf = new byte[1024];
-                            //StringBuilder recvMsg = new StringBuilder();
                             List<byte[]> vRecvMsg = new List<byte[]>();
                             byte[] recvMsg = null;
-                            int nByte = 0, totByte = 0;
+                            int nByte = 0, nnByte = 0;
 
-                            // Incoming message may be larger than the buffer size.
+                            //Incoming message may be larger than the buffer size.
                             do
                             {
-                                totByte += nByte = stream.Read(buf, 0, buf.Length);
-                                //recvMsg.AppendFormat("{0}", Encoding.UTF8.GetString(buf, 0, nByte));
-                                //if (nByte < buf.Length)
-                                //{
-                                    byte[] x = new byte[nByte];//use new buf
-                                    Buffer.BlockCopy(buf, 0, x, 0, nByte);
-                                    vRecvMsg.Add(x);
-                                //}
-                                //else
-                                //    vRecvMsg.Add(buf);
+                                try
+                                {
+                                    nnByte += nByte = stream.Read(buf, 0, buf.Length);
+                                } catch(System.IO.IOException e)
+                                {
+                                    //stand firmly when client crash
+                                    Console.WriteLine(e.Message);
+                                    bRunning = false;
+                                }
+                                byte[] x = new byte[nByte];//use new buf
+                                Buffer.BlockCopy(buf, 0, x, 0, nByte);
+                                vRecvMsg.Add(x);
                             }
-                            while (!mClosing && stream.DataAvailable);
-                            if(0 < vRecvMsg.Count)
+                            while (bRunning && stream.DataAvailable);
+                            if (0 < vRecvMsg.Count)
                             {
-                                recvMsg = new byte[totByte];
+                                recvMsg = new byte[nnByte];
                                 int offs = 0;
                                 for (int i = 0; i < vRecvMsg.Count; ++i)
                                 {
@@ -97,16 +99,13 @@ namespace WpfApplication1
                                     offs += vRecvMsg[i].Length;
                                 }
                             }
-                            if (!mClosing && recvMsg != null && 0 < recvMsg.Length)
+                            if (bRunning && recvMsg != null && 0 < recvMsg.Length)
                             {
                                 byte[] msg = null;
-                                //char code = BitConverter.ToChar(recvMsg, 0);
-                                Int32 c = BitConverter.ToInt32(recvMsg, 0);
-                                char code = (char)c;
-                                switch (code)
+                                NetSttCode c = (NetSttCode)BitConverter.ToInt32(recvMsg, 0);
+                                switch (c)
                                 {
-                                    case (char)NetSttCode.DateStudentRetriving:
-                                        //msg = dgResponse(code);
+                                    case NetSttCode.DateStudentRetriving:
                                         int sz = 0;
                                         if (Date.sbArr != null)
                                             sz += Date.sbArr.Length;
@@ -122,30 +121,32 @@ namespace WpfApplication1
                                         if (Student.sbArr != null)
                                             Buffer.BlockCopy(Student.sbArr, 0, msg, sz, Student.sbArr.Length);
                                         break;
-                                    case (char)NetSttCode.QuestAnsKeyRetrieving:
-                                        //msg = dgResponse(code);
+                                    case NetSttCode.QuestAnsKeyRetrieving:
                                         msg = Question.sbArr;
                                         break;
-                                    case (char)NetSttCode.MarkSubmitting:
+                                    case NetSttCode.MarkSubmitting:
+                                        msg = BitConverter.GetBytes((Int32)NetSttCode.Unknown);
+                                        break;
+                                    case NetSttCode.ToShutdown:
+                                        bRunning = false;
                                         break;
                                     default:
-                                        msg = BitConverter.GetBytes((char)NetSttCode.Unknown);
+                                        msg = BitConverter.GetBytes((Int32)NetSttCode.Unknown);
                                         break;
                                 }
-                                // Send back a response.
-                                stream.Write(msg, 0, msg.Length);
+                                if (bRunning && msg != null && 0 < msg.Length)
+                                    stream.Write(msg, 0, msg.Length);
                             }
                         }
-                        else
-                        {
-                            Console.WriteLine("Sorry.  You cannot read from this NetworkStream.");
-                        }
-
                         // Shutdown and end connection
-                        if(mClient.Connected)
+                        try
+                        {
+                            //stand firmly when client crash
                             mClient.Close();
-                        //mClient = null;//bookmark
-                        mRunning = false;
+                        } catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                        }
                     }
                 }
             }
@@ -158,7 +159,7 @@ namespace WpfApplication1
             }
             finally
             {
-                mRunning = false;
+                bRunning = false;
                 mStart = false;
                 if (mClosing)
                     mServer.Stop();
@@ -168,8 +169,8 @@ namespace WpfApplication1
         public void Stop(ref bool bToUpdateMsg, ref string msg)
         {
             mClosing = true;
-            if (mStart && !mRunning)
-                mServer.Stop();
+            if (mStart && !bRunning)
+                mServer.Stop();//TODO: send msg to all client before stop
             bToUpdateMsg = true;
             msg = "Server is closing.\n";
         }

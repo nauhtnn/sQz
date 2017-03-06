@@ -8,7 +8,7 @@ namespace sQzLib
         PrepDateStudent = '@',
         DateStudentRetriving = 'A',
         DateStudentRetrieved,
-        PrepQuestAnsKey,
+        //PrepQuestAnsKey,
         QuestAnsKeyRetrieving,
         QuestAnsKeyRetrieved,
         PrepMark,
@@ -17,14 +17,15 @@ namespace sQzLib
         PrepDate = 'a',
         Dating,
         Dated,
-        PrepAuth,
+        //PrepAuth,
         Authenticating,
         Authenticated,
-        PrepExamRet,
+        //PrepExamRet,
         ExamRetrieving,
         ExamRetrieved,
         Submiting,
         Submitted,
+        ToShutdown,
         Unknown
     }
 
