@@ -37,7 +37,7 @@ namespace sQzServer0
                 mServer = new TcpListener(IPAddress.Any, mPort);
                 mServer.Start();
             } catch(SocketException e) {
-                cbMsg += e.Message;
+                cbMsg += "\nEx: " + e.Message;
                 Stop(ref cbMsg);
             }
 
@@ -46,7 +46,7 @@ namespace sQzServer0
                 bool p = false;
                 try { p = mServer.Pending(); }
                 catch(SocketException e) {
-                    p = false; cbMsg += e.Message; Stop(ref cbMsg);
+                    p = false; cbMsg += "\nEx: " + e.Message; Stop(ref cbMsg);
                 }
                 if (p)
                 {
@@ -58,7 +58,7 @@ namespace sQzServer0
                         cli = mServer.AcceptTcpClient();
                         stream = cli.GetStream();
                     } catch(SocketException e) {
-                        cbMsg += e.Message; Stop(ref cbMsg);
+                        cbMsg += "\nEx: " + e.Message; Stop(ref cbMsg);
                     }
 
                     while (bRW)
@@ -73,7 +73,7 @@ namespace sQzServer0
                             try {
                                 nnByte += nByte = stream.Read(buf, 0, buf.Length);
                             } catch(System.IO.IOException e) { //client crash
-                                cbMsg += e.Message;
+                                cbMsg += "\nEx: " + e.Message;
                                 Stop(ref cbMsg);
                             }
                             if (bRW)
@@ -121,7 +121,7 @@ namespace sQzServer0
                                 case NetSttCode.MarkSubmitting:
                                     msg = BitConverter.GetBytes((Int32)NetSttCode.Unknown);
                                     break;
-                                case NetSttCode.ToShutdown:
+                                case NetSttCode.ToClose:
                                     bRW = false;
                                     break;
                                 default:
@@ -132,21 +132,21 @@ namespace sQzServer0
                                 try {
                                     stream.Write(msg, 0, msg.Length);
                                 } catch(SocketException e) {
-                                    cbMsg += e.Message;
+                                    cbMsg += "\nEx: " + e.Message;
                                     Stop(ref cbMsg);
                                 }
                         }
                     }
                     bRW = false;
                     try { cli.Close(); }
-                    catch (SocketException e) { cbMsg += e.Message; Stop(ref cbMsg); }
+                    catch (SocketException e) { cbMsg += "\nEx: " + e.Message; Stop(ref cbMsg); }
                 }
             }
             Stop(ref cbMsg);
-            cbMsg += "\nServer stopped.";
             try { mServer.Stop(); }
-            catch (SocketException e) { Console.WriteLine(e.Message); }
+            catch (SocketException e) { cbMsg += "\nEx: " + e.Message; }
             mServer = null;
+            cbMsg += "\nServer stopped.";
         }
 
         public void Stop(ref UICbMsg cbMsg)
@@ -156,12 +156,5 @@ namespace sQzServer0
             bListening = false;
             bRW = false;
         }
-
-        //private bool Authenticate(string id, string birthdate)
-        //{
-        //    if (id.Equals("A10") && birthdate.Equals("01/01/1990"))
-        //        return true;
-        //    return false;
-        //}
     }
 }
