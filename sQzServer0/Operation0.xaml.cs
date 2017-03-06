@@ -15,7 +15,7 @@ using System.Windows.Shapes;
 using System.Threading;
 using sQzLib;
 
-namespace WpfApplication1
+namespace sQzServer0
 {
     /// <summary>
     /// Interaction logic for Operation.xaml
@@ -23,8 +23,7 @@ namespace WpfApplication1
     public partial class Operation0 : Page
     {
         Server0 mServer;
-        bool bSrvrMsg;
-        string mSrvrMsg;
+        UICbMsg mMsgCb;
         byte[] vQuestAnsKey;
         //byte[] vDateStud;
 
@@ -33,8 +32,7 @@ namespace WpfApplication1
             InitializeComponent();
             ShowsNavigationUI = false;
             mServer = new Server0();
-            bSrvrMsg = false;
-            mSrvrMsg = String.Empty;
+            mMsgCb = new UICbMsg();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -46,9 +44,8 @@ namespace WpfApplication1
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            bool dummy1 = false;
-            string dummy2 = null;
-            mServer.Stop(ref dummy1, ref dummy2);
+            UICbMsg dummy = new UICbMsg();
+            mServer.Stop(ref dummy);
         }
 
         public byte[] ResponseMsg(char code)
@@ -275,25 +272,25 @@ namespace WpfApplication1
 
         private void StartSrvr_Click(object sender, RoutedEventArgs e)
         {
-            Thread th = new Thread(() => {mServer.Start(ref bSrvrMsg, ref mSrvrMsg);});
+            Thread th = new Thread(() => {mServer.Start(ref mMsgCb);});
             th.Start();
         }
 
-        private void StartSrvr(ref bool bUpdate, ref string msg)
+        private void StartSrvr(ref UICbMsg cb)
         {
-            mServer.Start(ref bUpdate, ref msg);
+            mServer.Start(ref cb);
         }
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
-            if (bSrvrMsg)
+            if (mMsgCb.ToUp())
                 Dispatcher.Invoke(() => {
-                    lblStatus.Text += mSrvrMsg; bSrvrMsg = false; mSrvrMsg = String.Empty; });
+                    lblStatus.Text += mMsgCb.txt; });
         }
 
         private void StopSrvr_Click(object sender, RoutedEventArgs e)
         {
-            mServer.Stop(ref bSrvrMsg, ref mSrvrMsg);
+            mServer.Stop(ref mMsgCb);
         }
 
         private void btnQSheet_Click(object sender, RoutedEventArgs e)

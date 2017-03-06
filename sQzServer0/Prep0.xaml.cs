@@ -15,7 +15,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using sQzLib;
 
-namespace WpfApplication1
+namespace sQzServer0
 {
     /// <summary>
     /// Interaction logic for Prep0.xaml

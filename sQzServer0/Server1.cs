@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Net;
 using sQzLib;
 
-namespace sQzServer1
+namespace sQzServer0
 {
     class Server1
     {
@@ -24,7 +24,7 @@ namespace sQzServer1
                 port = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
             //IPAddress localAddr = IPAddress.Parse("127.0.0.1");
             mServer = new TcpListener(IPAddress.Any, port);
-            
+
             mStart = mClosing = false;
             bRunning = true;
         }

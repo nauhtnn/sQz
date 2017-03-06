@@ -39,7 +39,34 @@ namespace sQzLib
         Count
     }
 
-    public delegate byte[] DgResponseMsg(char code);
+    public class UICbMsg
+    {
+        private StringBuilder sb;
+        private bool bUp;
+        public UICbMsg() { sb = new StringBuilder(); bUp = false; }
+        public string txt
+        {
+            get {
+                if (bUp)
+                {
+                    string x = sb.ToString(); sb.Clear(); bUp = false; return x;
+                }
+                return string.Empty;
+            }
+            //set { sb.Append(value); bUp = true; }
+        }
+        public bool ToUp() { return bUp; }
+        public static UICbMsg operator +(UICbMsg a, string s)
+        {
+            a.sb.Append(s);
+            a.bUp = true;
+            return a;
+        }
+        public override string ToString()
+        {
+            return sb.ToString();
+        }
+    }
 
     public class Utils
     {

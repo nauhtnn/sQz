@@ -27,8 +27,6 @@ namespace WpfApplication1
         int mSz;
         byte[] mBuffer;
         NetSttCode mState;
-        bool bSrvrMsg;
-        string mSrvrMsg;
         int nBusy;//crash fixed: only call if not busy
         bool bToDispose;//crash fixed: flag to dispose
         bool bReconn;//reconnect after callback
@@ -42,8 +40,6 @@ namespace WpfApplication1
             mState = NetSttCode.PrepDate;
             mClient = Client0.Instance();
             //Connect(null, null);
-            mSrvrMsg = String.Empty;
-            bSrvrMsg = false;
             nBusy = 0;
             bToDispose = false;
             bReconn = false;
@@ -226,7 +222,7 @@ namespace WpfApplication1
             if (0 < nBusy)
                 return;
             ++nBusy;
-            Connect(null, null);
+            mClient.BeginConnect(CB);
         }
     }
 }

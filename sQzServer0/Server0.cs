@@ -7,7 +7,7 @@ using System.Net.Sockets;
 using System.Net;
 using sQzLib;
 
-namespace WpfApplication1
+namespace sQzServer0
 {
     class Server0
     {
@@ -25,31 +25,42 @@ namespace WpfApplication1
             bRW = bListening = false;
         }
 
-        public void Start(ref bool bMsging, ref string cbMsg)
+        //public void Start(ref bool bMsging, ref string cbMsg.txt)
+        public void Start(ref UICbMsg cbMsg)
         {
             if (mServer != null)
                 return;
             bListening = true;
+            cbMsg += "\nServer started.";
             try
             {
                 mServer = new TcpListener(IPAddress.Any, mPort);
                 mServer.Start();
             } catch(SocketException e) {
                 cbMsg += e.Message;
-                bMsging = true;
-                bListening = false;
+                Stop(ref cbMsg);
             }
-
-            cbMsg += "\n Server has started";
-            bMsging = true;
 
             while (bListening)
             {
-                if (mServer.Pending())
+                bool p = false;
+                try { p = mServer.Pending(); }
+                catch(SocketException e) {
+                    p = false; cbMsg += e.Message; Stop(ref cbMsg);
+                }
+                if (p)
                 {
                     bRW = true;
-                    TcpClient mClient = mServer.AcceptTcpClient();
-                    NetworkStream stream = mClient.GetStream();
+                    TcpClient cli = null;
+                    NetworkStream stream = null;
+                    try
+                    {
+                        cli = mServer.AcceptTcpClient();
+                        stream = cli.GetStream();
+                    } catch(SocketException e) {
+                        cbMsg += e.Message; Stop(ref cbMsg);
+                    }
+
                     while (bRW)
                     {
                         byte[] buf = new byte[1024];
@@ -58,17 +69,12 @@ namespace WpfApplication1
                         int nByte = 0, nnByte = 0;
 
                         //Incoming message may be larger than the buffer size.
-                        do
-                        {
-                            try
-                            {
+                        do {
+                            try {
                                 nnByte += nByte = stream.Read(buf, 0, buf.Length);
-                            } catch(System.IO.IOException e)
-                            {
-                                //stand firmly when client crash
+                            } catch(System.IO.IOException e) { //client crash
                                 cbMsg += e.Message;
-                                bMsging = true;
-                                bRW = false;
+                                Stop(ref cbMsg);
                             }
                             if (bRW)
                             {
@@ -76,8 +82,7 @@ namespace WpfApplication1
                                 Buffer.BlockCopy(buf, 0, x, 0, nByte);
                                 vRecvMsg.Add(x);
                             }
-                        }
-                        while (bRW && stream.DataAvailable);
+                        } while (bRW && stream.DataAvailable);
                         if (0 < vRecvMsg.Count)
                         {
                             recvMsg = new byte[nnByte];
@@ -124,28 +129,32 @@ namespace WpfApplication1
                                     break;
                             }
                             if (bRW && msg != null && 0 < msg.Length)
-                                stream.Write(msg, 0, msg.Length);
+                                try {
+                                    stream.Write(msg, 0, msg.Length);
+                                } catch(SocketException e) {
+                                    cbMsg += e.Message;
+                                    Stop(ref cbMsg);
+                                }
                         }
                     }
                     bRW = false;
-                    try { mClient.Close(); }
-                    catch (SocketException e) { Console.WriteLine(e.Message); }
+                    try { cli.Close(); }
+                    catch (SocketException e) { cbMsg += e.Message; Stop(ref cbMsg); }
                 }
             }
-            cbMsg += "Server stopped";
-            bMsging = true;
-            bListening = false;
+            Stop(ref cbMsg);
+            cbMsg += "\nServer stopped.";
             try { mServer.Stop(); }
             catch (SocketException e) { Console.WriteLine(e.Message); }
             mServer = null;
         }
 
-        public void Stop(ref bool bMsging, ref string msg)
+        public void Stop(ref UICbMsg cbMsg)
         {
+            if (bListening)
+                cbMsg += "\nServer is stopping.";
             bListening = false;
             bRW = false;
-            bMsging = true;
-            msg = "Server is stopping";
         }
 
         //private bool Authenticate(string id, string birthdate)
