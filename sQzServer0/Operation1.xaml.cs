@@ -32,8 +32,7 @@ namespace sQzServer0
         bool bToDispose;//crash fixed: flag to dispose
         bool bReconn;//reconnect after callback
         Server1 mServer;
-        bool bSrvrMsg;
-        string mSrvrMsg;
+        UICbMsg mCbMsg;
 
         public Operation1()
         {
@@ -48,8 +47,7 @@ namespace sQzServer0
             mClient = Client0.Instance();
             mClient.SetSrvrPort(23820);
             mServer = new Server1();
-            bSrvrMsg = false;
-            mSrvrMsg = String.Empty;
+            mCbMsg = new UICbMsg();
             nBusy = 0;
             bToDispose = false;
             bReconn = false;
@@ -148,10 +146,11 @@ namespace sQzServer0
                     break;
                 case NetSttCode.DateStudentRetrieved:
                     s = (NetworkStream)ar.AsyncState;
-                        r = s.EndRead(ar);
+                    r = s.EndRead(ar);
                     offs = 0;
-                    Date.ReadByteArr(mBuffer, ref offs);
-                    Student.ReadByteArr(mBuffer, ref offs);
+                    Date.ReadByteArr(mBuffer, ref offs, r);
+                    r -= offs;
+                    Student.ReadByteArr(mBuffer, ref offs, r);
                     Dispatcher.Invoke(() => {
                         if(Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
@@ -173,9 +172,10 @@ namespace sQzServer0
                 //    if (c.Connected)
                 //    {
                 //        s = (NetworkStream)c.GetStream();
-                        mState = NetSttCode.QuestAnsKeyRetrieving;
-                        ++nBusy;
-                        s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
+                    mState = NetSttCode.QuestAnsKeyRetrieving;
+                    mBuffer = BitConverter.GetBytes((Int32)mState);
+                    ++nBusy;
+                    s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                     //}
                     break;
                 case NetSttCode.QuestAnsKeyRetrieving:
@@ -190,7 +190,7 @@ namespace sQzServer0
                     s = (NetworkStream)ar.AsyncState;
                     r = s.EndRead(ar);
                     offs = 0;
-                    Question.ReadByteArr(mBuffer, ref offs);
+                    Question.ReadByteArr(mBuffer, ref offs, r);
                     mState = NetSttCode.PrepMark;
                     break;
             }
@@ -207,27 +207,6 @@ namespace sQzServer0
             }
         }
 
-        //private string ReadAllNetStream(IAsyncResult ar)
-        //{
-        //    NetworkStream stream = (NetworkStream)ar.AsyncState;
-        //    if (stream.CanRead)
-        //    {
-        //        byte[] buf = new byte[1024];
-        //        StringBuilder recvMsg = new StringBuilder();
-        //        int nByte = 0;
-
-        //        // Incoming message may be larger than the buffer size.
-        //        do
-        //        {
-        //            nByte = stream.Read(buf, 0, buf.Length);
-        //            recvMsg.AppendFormat("{0}", Encoding.UTF8.GetString(buf, 0, nByte));
-        //        }
-        //        while (mSrvrConn && stream.DataAvailable);
-        //        return recvMsg.ToString();
-        //    }
-        //    return String.Empty;
-        //}
-
         private void btnDisconnect_Click(object sender, RoutedEventArgs e)
         {
             if (nBusy == 0)
@@ -239,26 +218,20 @@ namespace sQzServer0
         private void StartSrvr_Click(object sender, RoutedEventArgs e)
         {
 
-            Thread th = new Thread(() => { mServer.Start(ref bSrvrMsg, ref mSrvrMsg); /*StartSrvr(ref bSrvrMsg, ref mSrvrMsg); */});
+            Thread th = new Thread(() => { mServer.Start(ref mCbMsg); });
             th.Start();
-        }
-
-        private void StartSrvr(ref bool bUpdate, ref string msg)
-        {
-            mServer.Start(ref bUpdate, ref msg);
         }
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
-            if (bSrvrMsg)
+            if (mCbMsg.ToUp())
                 Dispatcher.Invoke(() => {
-                    lblStatus.Text += mSrvrMsg; bSrvrMsg = false; mSrvrMsg = String.Empty;
-                });
+                    lblStatus.Text += mCbMsg.txt; });
         }
 
         private void StopSrvr_Click(object sender, RoutedEventArgs e)
         {
-            mServer.Stop(ref bSrvrMsg, ref mSrvrMsg);
+            mServer.Stop(ref mCbMsg);
         }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
@@ -269,9 +242,8 @@ namespace sQzServer0
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            bool dummy1 = false;
-            string dummy2 = null;
-            mServer.Stop(ref dummy1, ref dummy2);
+            UICbMsg dummy = new UICbMsg();
+            mServer.Stop(ref dummy);
         }
     }
 }

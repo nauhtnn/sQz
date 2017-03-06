@@ -23,7 +23,7 @@ namespace sQzServer0
     public partial class Operation0 : Page
     {
         Server0 mServer;
-        UICbMsg mMsgCb;
+        UICbMsg mCbMsg;
         byte[] vQuestAnsKey;
         //byte[] vDateStud;
 
@@ -32,7 +32,7 @@ namespace sQzServer0
             InitializeComponent();
             ShowsNavigationUI = false;
             mServer = new Server0();
-            mMsgCb = new UICbMsg();
+            mCbMsg = new UICbMsg();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -272,25 +272,20 @@ namespace sQzServer0
 
         private void StartSrvr_Click(object sender, RoutedEventArgs e)
         {
-            Thread th = new Thread(() => {mServer.Start(ref mMsgCb);});
+            Thread th = new Thread(() => {mServer.Start(ref mCbMsg);});
             th.Start();
-        }
-
-        private void StartSrvr(ref UICbMsg cb)
-        {
-            mServer.Start(ref cb);
         }
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
-            if (mMsgCb.ToUp())
+            if (mCbMsg.ToUp())
                 Dispatcher.Invoke(() => {
-                    lblStatus.Text += mMsgCb.txt; });
+                    lblStatus.Text += mCbMsg.txt; });
         }
 
         private void StopSrvr_Click(object sender, RoutedEventArgs e)
         {
-            mServer.Stop(ref mMsgCb);
+            mServer.Stop(ref mCbMsg);
         }
 
         private void btnQSheet_Click(object sender, RoutedEventArgs e)

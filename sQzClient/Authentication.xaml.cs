@@ -81,7 +81,7 @@ namespace WpfApplication1
                     s = (NetworkStream)ar.AsyncState;
                     r = s.EndRead(ar);
                     int offs = 0;
-                    Date.ReadByteArr(mBuffer, ref offs);
+                    Date.ReadByteArr(mBuffer, ref offs, r);
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
@@ -147,8 +147,8 @@ namespace WpfApplication1
                 case NetSttCode.ExamRetrieved:
                     s = (NetworkStream)ar.AsyncState;
                     r = s.EndRead(ar);
-                    r = 0;
-                    Question.ReadByteArr(mBuffer, ref r);
+                    offs = 0;
+                    Question.ReadByteArr(mBuffer, ref offs, r);
                     mClient.Close();
                     NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
                     break;
