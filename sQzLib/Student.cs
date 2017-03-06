@@ -152,45 +152,80 @@ namespace sQzLib
                 offs += l[i].Length;
             }
         }
-        public static void ReadByteArr(byte[] buf, ref int offs)
+        public static void ReadByteArr(byte[] buf, ref int offs, int l)
         {
             svStudent.Clear();
             if (buf == null)
                 return;
             int offs0 = offs;
             int sz = 0;
+            if (l < 4)
+                return;
             int nStu = BitConverter.ToInt32(buf, offs);
+            l -= 4;
             offs += 4;
             for(int i = 0; i < nStu; ++i)
             {
                 Student s = new Student();
+                if (l < 2)
+                    break;
                 s.mLvl = (ExamLvl)BitConverter.ToUInt16(buf, offs);
+                l -= 2;
                 offs += 2;
+                if (l < 2)
+                    break;
                 s.mId = BitConverter.ToUInt16(buf, offs);
+                l -= 2;
                 offs += 2;
+                if (l < 4)
+                    break;
                 sz = BitConverter.ToInt32(buf, offs);
+                l -= 4;
                 offs += 4;
+                if (l < sz)
+                    break;
                 byte[] b = new byte[sz];
                 Buffer.BlockCopy(buf, offs, b, 0, sz);
                 s.mName = Encoding.UTF32.GetString(b);
+                l -= sz;
                 offs += sz;
+                if (l < 4)
+                    break;
                 sz = BitConverter.ToInt32(buf, offs);
+                l -= 4;
                 offs += 4;
+                if (l < sz)
+                    break;
                 b = new byte[sz];
                 Buffer.BlockCopy(buf, offs, b, 0, sz);
                 s.mBirthdate = Encoding.UTF32.GetString(b);
+                l -= sz;
                 offs += sz;
+                if (l < 4)
+                    break;
                 sz = BitConverter.ToInt32(buf, offs);
+                l -= 4;
                 offs += 4;
+                if (l < sz)
+                    break;
                 b = new byte[sz];
                 Buffer.BlockCopy(buf, offs, b, 0, sz);
                 s.mBirthplace = Encoding.UTF32.GetString(b);
                 svStudent.Add(s);
+                l -= sz;
                 offs += sz;
             }
-            sz = offs - offs0;
-            sbArr = new byte[sz];
-            Buffer.BlockCopy(buf, offs0, sbArr, 0, sz);
+            if (!Array.Equals(buf, sbArr))
+            {
+                sz = offs - offs0;
+                if (sz == buf.Length)
+                    sbArr = (byte[])buf.Clone();
+                else
+                {
+                    sbArr = new byte[sz];
+                    Buffer.BlockCopy(buf, 0, sbArr, 0, sz);
+                }
+            }
         }
     }
 }

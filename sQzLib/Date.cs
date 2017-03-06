@@ -38,6 +38,12 @@ namespace sQzLib
                 return false;
             return true;
         }
+        //public static string ymd()
+        //{
+        //    if (sbArr == null)
+        //        return null;
+
+        //}
         public static void Select(string date)
         {
             int i = svDate.IndexOf(date);
@@ -71,10 +77,12 @@ namespace sQzLib
             reader.Close();
             DBConnect.Close(ref conn);
         }
-        public static void ReadByteArr(byte[] buf, ref int offs)
+        public static void ReadByteArr(byte[] buf, ref int offs, int l)
         {
             if(snDate == 0)
                 snDate = Encoding.UTF32.GetByteCount("2017/01/01");//learn from example
+            if (l < snDate)
+                return;
             sbArr = new byte[snDate];
             Buffer.BlockCopy(buf, offs, sbArr, 0, snDate);
             offs += snDate;
