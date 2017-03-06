@@ -17,7 +17,7 @@ namespace sQzLib
         PrepDate = 'a',
         Dating,
         Dated,
-        //PrepAuth,
+        PrepAuth,
         Authenticating,
         Authenticated,
         //PrepExamRet,

@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 //using System.Linq;
 //using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace sQzCS
 {
@@ -32,6 +33,10 @@ namespace sQzCS
 
     public class Question
     {
+        /*
+         CREATE TABLE IF NOT EXISTS `questions` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`)
+         */
         public static List<Question> svQuest = new List<Question>();
         public string mStmt; //statement
         int nAns;
@@ -328,6 +333,14 @@ namespace sQzCS
             q = null;
         }
 
+        public override string ToString()
+        {
+            string s = mStmt + '\n';
+            for (int i = 0; i < nAns; ++i)
+                s += vAns[i] + '\n';
+            return s;
+        }
+
         public static byte[] ToByteArr()
         {
             if (svQuest.Count == 0)
@@ -416,6 +429,32 @@ namespace sQzCS
         {
             svQuest.Clear();
             siToken = 0;//safe to be 0
+        }
+
+        public static void DBInsert()
+        {
+            //MySqlConnection conn = DBConnect.Init();
+            //if (conn == null)
+            //    return;
+            //string[] attbs = new string[6];//hardcode
+            //attbs[0] = "dateIdx";
+            //attbs[1] = "level";
+            //attbs[2] = "idx";
+            //attbs[3] = "name";
+            //attbs[4] = "birthdate";
+            //attbs[5] = "birthplace";
+            //foreach (Student s in svStudent)
+            //{
+            //    string[] vals = new string[6];
+            //    vals[0] = "" + dateIdx;
+            //    vals[1] = "" + (UInt32)s.mLvl;
+            //    vals[2] = "" + s.mId;
+            //    vals[3] = "'" + s.mName + "'";
+            //    vals[4] = "'" + s.mBirthdate + "'";
+            //    vals[5] = "'" + s.mBirthplace + "'";
+            //    DBConnect.Ins(conn, "examinees", attbs, vals);
+            //}
+            //DBConnect.Close(ref conn);
         }
     }
 }

@@ -425,9 +425,6 @@ namespace sQzLib
                     q.vKeys[j] = BitConverter.ToBoolean(buf, offs++);
                 svQuest.Add(q);
             }
-            sz = offs - offs0;
-            sbArr = new byte[sz];
-            Buffer.BlockCopy(buf, offs0, sbArr, 0, sz);
         }
 
         public static void Clear()

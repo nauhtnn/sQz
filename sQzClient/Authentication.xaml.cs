@@ -90,14 +90,14 @@ namespace WpfApplication1
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
                     });
-                    //mState = NetSttCode.PrepAuth;
-                    //mClient.Close();//close conn
-                    //break;
-                    //case NetSttCode.PrepAuth:
-                    //    c = (TcpClient)ar.AsyncState;
-                    //    if (!c.Connected)
-                    //        break;
-                    //    s = c.GetStream();
+                    mState = NetSttCode.PrepAuth;
+                    mClient.Close();//close conn
+                    break;
+                case NetSttCode.PrepAuth:
+                    c = (TcpClient)ar.AsyncState;
+                    if (!c.Connected)
+                        break;
+                    s = c.GetStream();
                     mState = NetSttCode.Authenticating;
                     mBuffer = BitConverter.GetBytes((Int32)mState);
                     ++nBusy;
@@ -175,8 +175,7 @@ namespace WpfApplication1
         {
             if (mState == NetSttCode.Dated)
             {
-                //mState = NetSttCode.PrepAuth;
-                mState = NetSttCode.Dated;
+                mState = NetSttCode.PrepAuth;
                 ++nBusy;
                 mClient.BeginConnect(CB);
             }
