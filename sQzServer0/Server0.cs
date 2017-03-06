@@ -11,168 +11,141 @@ namespace WpfApplication1
 {
     class Server0
     {
-        TcpListener mServer;
-        DgResponseMsg dgResponse;
-        bool mStart;
-        bool bRunning;
-        bool mClosing;
+        TcpListener mServer = null;
+        bool bRW;//will cause trouble in multithreading
+        bool bListening;//raise flag to stop
+        int mPort;
 
-        public Server0(DgResponseMsg dg)
+        public Server0()
         {
             string filePath = "ServerPort0.txt";
-            int port = 23820;
+            mPort = 23820;
             if (System.IO.File.Exists(filePath))
-                port = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
-            //IPAddress localAddr = IPAddress.Parse("127.0.0.1");
-            mServer = new TcpListener(IPAddress.Any, port);
-
-            dgResponse = dg;
-            mStart = mClosing = false;
-            bRunning = true;
+                mPort = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
+            bRW = bListening = false;
         }
 
-        public void Start(ref bool bToUpdateMsg, ref string cbMsg)
-        {    
+        public void Start(ref bool bMsging, ref string cbMsg)
+        {
+            if (mServer != null)
+                return;
+            bListening = true;
             try
             {
-                bToUpdateMsg = false;
-                cbMsg = String.Empty;
-
-                // Start listening for mClient requests.
+                mServer = new TcpListener(IPAddress.Any, mPort);
                 mServer.Start();
+            } catch(SocketException e) {
+                cbMsg += e.Message;
+                bMsging = true;
+                bListening = false;
+            }
 
-                mStart = true;
-                mClosing = false;
+            cbMsg += "\n Server has started";
+            bMsging = true;
 
-                cbMsg += "\n Server has started";
-                bToUpdateMsg = true;
-                //Console.Write("\n Server has started");
-
-                // Enter the listening loop.
-                while (bRunning)
+            while (bListening)
+            {
+                if (mServer.Pending())
                 {
-                    //Console.Write("Waiting for a connection... ");
-
-                    // Perform a blocking call to accept requests.
-                    // You could also user mServer.AcceptSocket() here.
-                    if (mServer.Pending())
+                    bRW = true;
+                    TcpClient mClient = mServer.AcceptTcpClient();
+                    NetworkStream stream = mClient.GetStream();
+                    while (bRW)
                     {
-                        TcpClient mClient = mServer.AcceptTcpClient();
+                        byte[] buf = new byte[1024];
+                        List<byte[]> vRecvMsg = new List<byte[]>();
+                        byte[] recvMsg = null;
+                        int nByte = 0, nnByte = 0;
 
-                        bRunning = true;
-
-                        // Get a stream object for reading and writing
-                        NetworkStream stream = mClient.GetStream();
-
-                        // Check to see if this NetworkStream is readable.
-                        while (bRunning)
+                        //Incoming message may be larger than the buffer size.
+                        do
                         {
-                            byte[] buf = new byte[1024];
-                            List<byte[]> vRecvMsg = new List<byte[]>();
-                            byte[] recvMsg = null;
-                            int nByte = 0, nnByte = 0;
-
-                            //Incoming message may be larger than the buffer size.
-                            do
+                            try
                             {
-                                try
-                                {
-                                    nnByte += nByte = stream.Read(buf, 0, buf.Length);
-                                } catch(System.IO.IOException e)
-                                {
-                                    //stand firmly when client crash
-                                    Console.WriteLine(e.Message);
-                                    bRunning = false;
-                                }
+                                nnByte += nByte = stream.Read(buf, 0, buf.Length);
+                            } catch(System.IO.IOException e)
+                            {
+                                //stand firmly when client crash
+                                cbMsg += e.Message;
+                                bMsging = true;
+                                bRW = false;
+                            }
+                            if (bRW)
+                            {
                                 byte[] x = new byte[nByte];//use new buf
                                 Buffer.BlockCopy(buf, 0, x, 0, nByte);
                                 vRecvMsg.Add(x);
                             }
-                            while (bRunning && stream.DataAvailable);
-                            if (0 < vRecvMsg.Count)
+                        }
+                        while (bRW && stream.DataAvailable);
+                        if (0 < vRecvMsg.Count)
+                        {
+                            recvMsg = new byte[nnByte];
+                            int offs = 0;
+                            for (int i = 0; i < vRecvMsg.Count; ++i)
                             {
-                                recvMsg = new byte[nnByte];
-                                int offs = 0;
-                                for (int i = 0; i < vRecvMsg.Count; ++i)
-                                {
-                                    Buffer.BlockCopy(vRecvMsg[i], 0, recvMsg, offs, vRecvMsg[i].Length);
-                                    offs += vRecvMsg[i].Length;
-                                }
-                            }
-                            if (bRunning && recvMsg != null && 0 < recvMsg.Length)
-                            {
-                                byte[] msg = null;
-                                NetSttCode c = (NetSttCode)BitConverter.ToInt32(recvMsg, 0);
-                                switch (c)
-                                {
-                                    case NetSttCode.DateStudentRetriving:
-                                        int sz = 0;
-                                        if (Date.sbArr != null)
-                                            sz += Date.sbArr.Length;
-                                        if (Student.sbArr != null)
-                                            sz += Student.sbArr.Length;
-                                        msg = new byte[sz];
-                                        sz = 0;
-                                        if (Date.sbArr != null)
-                                        {
-                                            sz = Date.sbArr.Length;
-                                            Buffer.BlockCopy(Date.sbArr, 0, msg, 0, sz);
-                                        }
-                                        if (Student.sbArr != null)
-                                            Buffer.BlockCopy(Student.sbArr, 0, msg, sz, Student.sbArr.Length);
-                                        break;
-                                    case NetSttCode.QuestAnsKeyRetrieving:
-                                        msg = Question.sbArr;
-                                        break;
-                                    case NetSttCode.MarkSubmitting:
-                                        msg = BitConverter.GetBytes((Int32)NetSttCode.Unknown);
-                                        break;
-                                    case NetSttCode.ToShutdown:
-                                        bRunning = false;
-                                        break;
-                                    default:
-                                        msg = BitConverter.GetBytes((Int32)NetSttCode.Unknown);
-                                        break;
-                                }
-                                if (bRunning && msg != null && 0 < msg.Length)
-                                    stream.Write(msg, 0, msg.Length);
+                                Buffer.BlockCopy(vRecvMsg[i], 0, recvMsg, offs, vRecvMsg[i].Length);
+                                offs += vRecvMsg[i].Length;
                             }
                         }
-                        // Shutdown and end connection
-                        try
+                        if (bRW && recvMsg != null && 0 < recvMsg.Length)
                         {
-                            //stand firmly when client crash
-                            mClient.Close();
-                        } catch (Exception e)
-                        {
-                            Console.WriteLine(e.Message);
+                            byte[] msg = null;
+                            NetSttCode c = (NetSttCode)BitConverter.ToInt32(recvMsg, 0);
+                            switch (c)
+                            {
+                                case NetSttCode.DateStudentRetriving:
+                                    int sz = 0;
+                                    if (Date.sbArr != null)
+                                        sz += Date.sbArr.Length;
+                                    if (Student.sbArr != null)
+                                        sz += Student.sbArr.Length;
+                                    msg = new byte[sz];
+                                    sz = 0;
+                                    if (Date.sbArr != null)
+                                    {
+                                        sz = Date.sbArr.Length;
+                                        Buffer.BlockCopy(Date.sbArr, 0, msg, 0, sz);
+                                    }
+                                    if (Student.sbArr != null)
+                                        Buffer.BlockCopy(Student.sbArr, 0, msg, sz, Student.sbArr.Length);
+                                    break;
+                                case NetSttCode.QuestAnsKeyRetrieving:
+                                    msg = Question.sbArr;
+                                    break;
+                                case NetSttCode.MarkSubmitting:
+                                    msg = BitConverter.GetBytes((Int32)NetSttCode.Unknown);
+                                    break;
+                                case NetSttCode.ToShutdown:
+                                    bRW = false;
+                                    break;
+                                default:
+                                    msg = BitConverter.GetBytes((Int32)NetSttCode.Unknown);
+                                    break;
+                            }
+                            if (bRW && msg != null && 0 < msg.Length)
+                                stream.Write(msg, 0, msg.Length);
                         }
                     }
+                    bRW = false;
+                    try { mClient.Close(); }
+                    catch (SocketException e) { Console.WriteLine(e.Message); }
                 }
             }
-            catch (SocketException e)
-            {
-                cbMsg += "\nSocketException: " + e.Message;
-                bToUpdateMsg = true;
-                Console.Write("\nSocketException: {0}", e.Message);
-                mClosing = true;
-            }
-            finally
-            {
-                bRunning = false;
-                mStart = false;
-                if (mClosing)
-                    mServer.Stop();
-            }
+            cbMsg += "Server stopped";
+            bMsging = true;
+            bListening = false;
+            try { mServer.Stop(); }
+            catch (SocketException e) { Console.WriteLine(e.Message); }
+            mServer = null;
         }
 
-        public void Stop(ref bool bToUpdateMsg, ref string msg)
+        public void Stop(ref bool bMsging, ref string msg)
         {
-            mClosing = true;
-            if (mStart && !bRunning)
-                mServer.Stop();//TODO: send msg to all client before stop
-            bToUpdateMsg = true;
-            msg = "Server is closing.\n";
+            bListening = false;
+            bRW = false;
+            bMsging = true;
+            msg = "Server is stopping";
         }
 
         //private bool Authenticate(string id, string birthdate)

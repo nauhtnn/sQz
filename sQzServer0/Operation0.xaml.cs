@@ -32,7 +32,7 @@ namespace WpfApplication1
         {
             InitializeComponent();
             ShowsNavigationUI = false;
-            mServer = new Server0(ResponseMsg);
+            mServer = new Server0();
             bSrvrMsg = false;
             mSrvrMsg = String.Empty;
 
@@ -313,6 +313,11 @@ namespace WpfApplication1
         {
             Window w = (Window)Parent;
             w.Close();
+        }
+
+        private void btnDebOp1_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(() => { NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative)); });
         }
     }
 }

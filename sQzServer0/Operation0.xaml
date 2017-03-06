@@ -28,6 +28,7 @@
                 <Button x:Name="btnStopSrvr" Width="50" Content="Stop srvr" Click="StopSrvr_Click"></Button>
                 <Button x:Name="btnPrep" Width="52" Content="Prepare" Click="btnPrep_Click"></Button>
                 <Button x:Name="btnClose" Content="Close" Height="26" Width="51" Click="btnClose_Click"/>
+                <Button x:Name="btnDebOp1" Content="op1" Height="26" Width="51" Click="btnDebOp1_Click"></Button>
             </StackPanel>
         </StackPanel>
         <ScrollViewer Width="360" Height="200" VerticalScrollBarVisibility="Auto">
