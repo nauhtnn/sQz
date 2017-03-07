@@ -45,7 +45,6 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Client0.cs" />
     <Compile Include="Client2.cs" />
     <Compile Include="Date.cs" />
     <Compile Include="DBConnect.cs" />

@@ -22,6 +22,7 @@
             <Button x:Name="btnStartSrvr" Content="Start srvr" Click="StartSrvr_Click" Width="80"></Button>
             <Button x:Name="btnStopSrvr" Content="Stop srvr" Click="StopSrvr_Click" Width="80"></Button>
             <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Width="80"></Button>
+            <Button x:Name="btnCli" Content="dev cli" Click="btnCli_Click" Width="80"></Button>
         </StackPanel>
     </StackPanel>
 </Page>
