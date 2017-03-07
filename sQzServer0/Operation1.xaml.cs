@@ -24,10 +24,10 @@ namespace sQzServer0
     public partial class Operation1 : Page
     {
         Client0 mClient;
+        Client2 mClient2;
         int mSz;
         byte[] mBuffer;
-        NetSttCode mState;
-        byte[] zQuest;
+        NetCode mState;
         int nBusy;//crash fixed: only call if not busy
         bool bToDispose;//crash fixed: flag to dispose
         bool bReconn;//reconnect after callback
@@ -37,15 +37,14 @@ namespace sQzServer0
         public Operation1()
         {
             InitializeComponent();
-
             ShowsNavigationUI = false;
 
-            //FirewallHandler fwHndl = new FirewallHandler(0);
-            //fwHndl.OpenFirewall();
             mSz = 1024 * 1024;
-            mState = NetSttCode.PrepDateStudent;
-            mClient = Client0.Instance();
-            mClient.SetSrvrPort(23820);
+            mState = NetCode.PrepDateStudent;
+            //mClient = Client0.Instance();
+            //mClient.SetSrvrPort(23820);
+            mClient2 = new Client2(NetBufHndl, BufPrep);
+            mClient2.SrvrPort = 23820;
             mServer = new Server1();
             mCbMsg = new UICbMsg();
             nBusy = 0;
@@ -66,18 +65,18 @@ namespace sQzServer0
             byte[] msg = null;
             switch (code)
             {
-                case (char)NetSttCode.Dating:
+                case (char)NetCode.Dating:
                     msg = Date.sbArr;//check null
                     break;
-                case (char)NetSttCode.Authenticating:
-                    msg = zQuest;
+                case (char)NetCode.Authenticating:
+                    msg = null;
                     break;
-                case (char)NetSttCode.ExamRetrieving:
+                case (char)NetCode.ExamRetrieving:
                     break;
-                case (char)NetSttCode.Submiting:
+                case (char)NetCode.Submiting:
                     break;
                 default:
-                    msg = BitConverter.GetBytes((char)NetSttCode.Unknown);
+                    msg = BitConverter.GetBytes((char)NetCode.Unknown);
                     break;
             }
             return msg;
@@ -115,7 +114,9 @@ namespace sQzServer0
             if (0 < nBusy)
                 return;
             ++nBusy;
-            mClient.BeginConnect(CB);
+            //mClient.BeginConnect(CB);
+            Thread th = new Thread(() => { mClient2.ConnectWR(ref mCbMsg); });
+            th.Start();
         }
 
         private void CB(IAsyncResult ar)
@@ -125,26 +126,26 @@ namespace sQzServer0
             int r = 0, offs = 0;
             switch (mState)
             {
-                case NetSttCode.PrepDateStudent:
+                case NetCode.PrepDateStudent:
                     c = (TcpClient)ar.AsyncState;
                     if (c.Connected)
                     {
                         s = c.GetStream();
-                        mState = NetSttCode.DateStudentRetriving;
+                        mState = NetCode.DateStudentRetriving;
                         mBuffer = BitConverter.GetBytes((Int32)mState);
                         ++nBusy;
                         s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                     }
                     break;
-                case NetSttCode.DateStudentRetriving:
+                case NetCode.DateStudentRetriving:
                     s = (NetworkStream)ar.AsyncState;
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
-                    mState = NetSttCode.DateStudentRetrieved;
+                    mState = NetCode.DateStudentRetrieved;
                     ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
-                case NetSttCode.DateStudentRetrieved:
+                case NetCode.DateStudentRetrieved:
                     s = (NetworkStream)ar.AsyncState;
                     r = s.EndRead(ar);
                     offs = 0;
@@ -162,36 +163,36 @@ namespace sQzServer0
                             spStudent.Children.Add(x);
                         }
                     });
-                //    mState = NetSttCode.PrepQuestAnsKey;
+                //    mState = NetCode.PrepQuestAnsKey;
                 //    mBuffer = BitConverter.GetBytes((Int32)mState);
                 //    //reconnect
                 //    bReconn = true;
                 //    break;
-                //case NetSttCode.PrepQuestAnsKey:
+                //case NetCode.PrepQuestAnsKey:
                 //    c = (TcpClient)ar.AsyncState;
                 //    if (c.Connected)
                 //    {
                 //        s = (NetworkStream)c.GetStream();
-                    mState = NetSttCode.QuestAnsKeyRetrieving;
+                    mState = NetCode.QuestAnsKeyRetrieving;
                     mBuffer = BitConverter.GetBytes((Int32)mState);
                     ++nBusy;
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                     //}
                     break;
-                case NetSttCode.QuestAnsKeyRetrieving:
+                case NetCode.QuestAnsKeyRetrieving:
                     s = (NetworkStream)ar.AsyncState;
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
-                    mState = NetSttCode.QuestAnsKeyRetrieved;
+                    mState = NetCode.QuestAnsKeyRetrieved;
                     ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
-                case NetSttCode.QuestAnsKeyRetrieved:
+                case NetCode.QuestAnsKeyRetrieved:
                     s = (NetworkStream)ar.AsyncState;
                     r = s.EndRead(ar);
                     offs = 0;
                     Question.ReadByteArr(mBuffer, ref offs, r);
-                    mState = NetSttCode.PrepMark;
+                    mState = NetCode.PrepMark;
                     break;
             }
             --nBusy;
@@ -250,6 +251,55 @@ namespace sQzServer0
         {
             Dispatcher.Invoke(() => {
                 NavigationService.Navigate(new Uri("Authentication.xaml", UriKind.Relative)); });
+        }
+
+
+        public bool NetBufHndl(byte[] buf, int offs)
+        {
+            switch (mState)
+            {
+                case NetCode.DateStudentRetrieved:
+                    int r = buf.Length;
+                    Date.ReadByteArr(buf, ref offs, r);
+                    r -= offs;
+                    Student.ReadByteArr(buf, ref offs, r);
+                    Dispatcher.Invoke(() => {
+                        if (Date.sbArr != null)
+                            txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
+                        foreach (Student st in Student.svStudent)
+                        {
+                            TextBlock x = new TextBlock();
+                            x.FontSize = Theme.em;
+                            x.Text = st.ToString();
+                            spStudent.Children.Add(x);
+                        }
+                    });
+                    mState = NetCode.QuestAnsKeyRetrieving;
+                    break;
+                case NetCode.QuestAnsKeyRetrieved:
+                    offs = 0;
+                    Question.ReadByteArr(buf, ref offs, buf.Length);
+                    mState = NetCode.PrepMark;
+                    return false;
+            }
+            return true;
+        }
+
+        public bool BufPrep(ref byte[] outBuf)
+        {
+            switch (mState)
+            {
+                case NetCode.PrepDateStudent:
+                    mState = NetCode.DateStudentRetriving;
+                    outBuf = BitConverter.GetBytes((Int32)mState);
+                    mState = NetCode.DateStudentRetrieved;
+                    break;
+                case NetCode.QuestAnsKeyRetrieving:
+                    outBuf = BitConverter.GetBytes((Int32)mState);
+                    mState = NetCode.QuestAnsKeyRetrieved;
+                    break;
+            }
+            return true;
         }
     }
 }

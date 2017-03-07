@@ -8,7 +8,7 @@ using System.Collections.Generic;
 using System.Windows.Navigation;
 using sQzLib;
 
-namespace WpfApplication1
+namespace sQzClient
 {
     /// <summary>
     /// Interaction logic for MainWindow.xaml

@@ -5,27 +5,29 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Net.Sockets;
 using System.Net;
-using sQzLib;
 
-namespace sQzServer0
+namespace sQzLib
 {
-    class Server0
+    public delegate bool DgNetCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg);
+
+    public class Server2
     {
         TcpListener mServer = null;
         bool bRW;//will cause trouble in multithreading
         bool bListening;//raise flag to stop
         int mPort;
+        DgNetCodeHndl dgHndl;
 
-        public Server0()
+        public Server2(DgNetCodeHndl dg)
         {
-            string filePath = "ServerPort0.txt";
+            string filePath = "ServerPort2.txt";
             mPort = 23820;
             if (System.IO.File.Exists(filePath))
                 mPort = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
             bRW = bListening = false;
+            dgHndl = dg;
         }
 
-        //public void Start(ref bool bMsging, ref string cbMsg.txt)
         public void Start(ref UICbMsg cbMsg)
         {
             if (mServer != null)
@@ -36,7 +38,9 @@ namespace sQzServer0
             {
                 mServer = new TcpListener(IPAddress.Any, mPort);
                 mServer.Start();
-            } catch(SocketException e) {
+            }
+            catch (SocketException e)
+            {
                 cbMsg += "\nEx: " + e.Message;
                 Stop(ref cbMsg);
             }
@@ -45,7 +49,8 @@ namespace sQzServer0
             {
                 bool p = false;
                 try { p = mServer.Pending(); }
-                catch(SocketException e) {
+                catch (SocketException e)
+                {
                     p = false; cbMsg += "\nEx: " + e.Message; Stop(ref cbMsg);
                 }
                 if (p)
@@ -53,12 +58,19 @@ namespace sQzServer0
                     bRW = true;
                     TcpClient cli = null;
                     NetworkStream stream = null;
-                    try
+                    try { cli = mServer.AcceptTcpClient(); }
+                    catch (SocketException e)
                     {
-                        cli = mServer.AcceptTcpClient();
-                        stream = cli.GetStream();
-                    } catch(SocketException e) {
-                        cbMsg += "\nEx: " + e.Message; Stop(ref cbMsg);
+                        cbMsg += "\nEx: " + e.Message;
+                        Stop(ref cbMsg);
+                    }
+
+                    try { stream = cli.GetStream(); }
+                    catch (SocketException e)
+                    {
+                        cbMsg += "\nEx: " + e.Message;
+                        //Stop(ref cbMsg);
+                        bRW = false;
                     }
 
                     while (bRW)
@@ -69,12 +81,17 @@ namespace sQzServer0
                         int nByte = 0, nnByte = 0;
 
                         //Incoming message may be larger than the buffer size.
-                        do {
-                            try {
+                        do
+                        {
+                            try
+                            {
                                 nnByte += nByte = stream.Read(buf, 0, buf.Length);
-                            } catch(System.IO.IOException e) { //client crash
+                            }
+                            catch (System.IO.IOException e)
+                            { //client crash
                                 cbMsg += "\nEx: " + e.Message;
-                                Stop(ref cbMsg);
+                                //Stop(ref cbMsg);
+                                bRW = false;
                             }
                             if (bRW && 0 < nByte)
                             {
@@ -93,53 +110,29 @@ namespace sQzServer0
                                 offs += vRecvMsg[i].Length;
                             }
                         }
-                        if (bRW && recvMsg != null && 0 < recvMsg.Length)
+                        if (bRW && recvMsg != null && 4 <= recvMsg.Length)
                         {
                             byte[] msg = null;
                             NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
-                            switch (c)
-                            {
-                                case NetCode.DateStudentRetriving:
-                                    int sz = 0;
-                                    if (Date.sbArr != null)
-                                        sz += Date.sbArr.Length;
-                                    if (Student.sbArr != null)
-                                        sz += Student.sbArr.Length;
-                                    msg = new byte[sz];
-                                    sz = 0;
-                                    if (Date.sbArr != null)
-                                    {
-                                        sz = Date.sbArr.Length;
-                                        Buffer.BlockCopy(Date.sbArr, 0, msg, 0, sz);
-                                    }
-                                    if (Student.sbArr != null)
-                                        Buffer.BlockCopy(Student.sbArr, 0, msg, sz, Student.sbArr.Length);
-                                    break;
-                                case NetCode.QuestAnsKeyRetrieving:
-                                    msg = Question.sbArr;
-                                    break;
-                                case NetCode.MarkSubmitting:
-                                    msg = BitConverter.GetBytes((Int32)NetCode.Unknown);
-                                    break;
-                                case NetCode.ToClose:
-                                    bRW = false;
-                                    break;
-                                default:
-                                    msg = BitConverter.GetBytes((Int32)NetCode.Unknown);
-                                    break;
-                            }
+                            bRW = dgHndl(c, recvMsg, 4, ref msg);
                             if (bRW && msg != null && 0 < msg.Length)
-                                try {
+                                try
+                                {
                                     stream.Write(msg, 0, msg.Length);
-                                } catch(SocketException e) {
+                                }
+                                catch (SocketException e)
+                                {
                                     cbMsg += "\nEx: " + e.Message;
-                                    Stop(ref cbMsg);
+                                    //Stop(ref cbMsg);
+                                    bRW = false;
                                 }
                         }
                     }
-                    bRW = false;
                     try { cli.Close(); }
-                    catch (SocketException e) { cbMsg += "\nEx: " + e.Message; Stop(ref cbMsg); }
+                    catch (SocketException e) {
+                        cbMsg += "\nEx: " + e.Message;
+                    }
+                    cbMsg += "\nA client stopped.";
                 }
             }
             Stop(ref cbMsg);

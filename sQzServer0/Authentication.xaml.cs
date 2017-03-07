@@ -26,7 +26,7 @@ namespace sQzServer0
         Client0 mClient;
         int mSz;
         byte[] mBuffer;
-        NetSttCode mState;
+        NetCode mState;
         int nBusy;//crash fixed: only call if not busy
         bool bToDispose;//crash fixed: flag to dispose
         bool bReconn;//reconnect after callback
@@ -37,7 +37,7 @@ namespace sQzServer0
             ShowsNavigationUI = false;
 
             mSz = 1024 * 1024;
-            mState = NetSttCode.PrepDate;
+            mState = NetCode.PrepDate;
             Client0.CloseInstance();
             mClient = Client0.Instance();
             //Connect(null, null);
@@ -60,25 +60,25 @@ namespace sQzServer0
             TcpClient c = null;
             int r = 0;
             switch (mState) {
-                case NetSttCode.PrepDate:
+                case NetCode.PrepDate:
                     c = (TcpClient)ar.AsyncState;
                     if (!c.Connected)
                         break;
                     s = c.GetStream();
-                    mState = NetSttCode.Dating;
+                    mState = NetCode.Dating;
                     mBuffer = BitConverter.GetBytes((Int32)mState);
                     ++nBusy;
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                     break;
-                case NetSttCode.Dating:
+                case NetCode.Dating:
                     s = (NetworkStream)ar.AsyncState;
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
-                    mState = NetSttCode.Dated;
+                    mState = NetCode.Dated;
                     ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
-                case NetSttCode.Dated:
+                case NetCode.Dated:
                     s = (NetworkStream)ar.AsyncState;
                     r = s.EndRead(ar);
                     int offs = 0;
@@ -87,28 +87,28 @@ namespace sQzServer0
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
                     });
-                    mState = NetSttCode.PrepAuth;
+                    mState = NetCode.PrepAuth;
                     mClient.Close();//close conn
                     break;
-                case NetSttCode.PrepAuth:
+                case NetCode.PrepAuth:
                     c = (TcpClient)ar.AsyncState;
                     if (!c.Connected)
                         break;
                     s = c.GetStream();
-                    mState = NetSttCode.Authenticating;
+                    mState = NetCode.Authenticating;
                     mBuffer = BitConverter.GetBytes((Int32)mState);
                     ++nBusy;
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                     break;
-                case NetSttCode.Authenticating:
+                case NetCode.Authenticating:
                     s = (NetworkStream)ar.AsyncState;
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
-                    mState = NetSttCode.Authenticated;
+                    mState = NetCode.Authenticated;
                     ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
-                case NetSttCode.Authenticated:
+                case NetCode.Authenticated:
                     s = (NetworkStream)ar.AsyncState;
                     r = s.EndRead(ar);
                     bool auth = false;
@@ -116,36 +116,36 @@ namespace sQzServer0
                         auth = BitConverter.ToInt32(mBuffer, 0) == 1;
                     if (auth)
                     {
-                        //mState = NetSttCode.PrepExamRet;
+                        //mState = NetCode.PrepExamRet;
                         //bReconn = true;
                     }
                     else
                     {
-                        mState = NetSttCode.Dated;
+                        mState = NetCode.Dated;
                         Dispatcher.Invoke(() => { txtMessage.Text += "fail to auth, retry"; });
                         bToDispose = true;
                         break;
                     }
                 //    break;
-                //case NetSttCode.PrepExamRet:
+                //case NetCode.PrepExamRet:
                 //    c = (TcpClient)ar.AsyncState;
                 //    if (!c.Connected)
                 //        break;
                 //    s = c.GetStream();
-                    mState = NetSttCode.ExamRetrieving;
+                    mState = NetCode.ExamRetrieving;
                     mBuffer = BitConverter.GetBytes((Int32)mState);
                     ++nBusy;
                     s.BeginWrite(mBuffer, 0, mBuffer.Length, CB, s);
                     break;
-                case NetSttCode.ExamRetrieving:
+                case NetCode.ExamRetrieving:
                     s = (NetworkStream)ar.AsyncState;
                     s.EndWrite(ar);
                     mBuffer = new byte[mSz];
-                    mState = NetSttCode.ExamRetrieved;
+                    mState = NetCode.ExamRetrieved;
                     ++nBusy;
                     s.BeginRead(mBuffer, 0, mSz, CB, s);
                     break;
-                case NetSttCode.ExamRetrieved:
+                case NetCode.ExamRetrieved:
                     s = (NetworkStream)ar.AsyncState;
                     r = s.EndRead(ar);
                     offs = 0;
@@ -170,7 +170,7 @@ namespace sQzServer0
 
         private void SignIn(object sender, RoutedEventArgs e)
         {
-            if (mState == NetSttCode.Dated)
+            if (mState == NetCode.Dated)
             {
                 ++nBusy;
                 mClient.BeginConnect(CB);

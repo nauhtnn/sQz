@@ -22,16 +22,15 @@ namespace sQzServer0
     /// </summary>
     public partial class Operation0 : Page
     {
-        Server0 mServer;
+        Server2 mServer;
         UICbMsg mCbMsg;
         byte[] vQuestAnsKey;
-        //byte[] vDateStud;
 
         public Operation0()
         {
             InitializeComponent();
             ShowsNavigationUI = false;
-            mServer = new Server0();
+            mServer = new Server2(NetCodeHndl);
             mCbMsg = new UICbMsg();
 
             lbxDate.SelectionMode = SelectionMode.Single;
@@ -46,42 +45,6 @@ namespace sQzServer0
         {
             UICbMsg dummy = new UICbMsg();
             mServer.Stop(ref dummy);
-        }
-
-        public byte[] ResponseMsg(char code)
-        {
-            byte[] msg = null;
-            switch (code)
-            {
-                case (char)NetSttCode.DateStudentRetriving:
-                    int sz = 0;
-                    if (Date.sbArr != null)
-                        sz += Date.sbArr.Length;
-                    if (Student.sbArr != null)
-                        sz += Student.sbArr.Length;
-                    msg = new byte[sz];
-                    sz = 0;
-                    if (Date.sbArr != null)
-                    {
-                        sz = Date.sbArr.Length;
-                        Buffer.BlockCopy(Date.sbArr, 0, msg, 0, sz);
-                    }
-                    if(Student.sbArr != null)
-                        Buffer.BlockCopy(Student.sbArr, 0, msg, sz, Student.sbArr.Length);
-                    break;
-                case (char)NetSttCode.QuestAnsKeyRetrieving:
-                    if (vQuestAnsKey == null)
-                        msg = BitConverter.GetBytes((char)NetSttCode.Unknown);
-                    else
-                        msg = vQuestAnsKey;
-                    break;
-                case (char)NetSttCode.MarkSubmitting:
-                    break;
-                default:
-                    msg = BitConverter.GetBytes((char)NetSttCode.Unknown);
-                    break;
-            }
-            return msg;
         }
 
         private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -310,6 +273,41 @@ namespace sQzServer0
         private void btnDebOp1_Click(object sender, RoutedEventArgs e)
         {
             Dispatcher.Invoke(() => { NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative)); });
+        }
+
+        public bool NetCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg)
+        {
+            switch (c)
+            {
+                case NetCode.DateStudentRetriving:
+                    int sz = 0;
+                    if (Date.sbArr != null)
+                        sz += Date.sbArr.Length;
+                    if (Student.sbArr != null)
+                        sz += Student.sbArr.Length;
+                    outMsg = new byte[sz];
+                    sz = 0;
+                    if (Date.sbArr != null)
+                    {
+                        sz = Date.sbArr.Length;
+                        Buffer.BlockCopy(Date.sbArr, 0, outMsg, 0, sz);
+                    }
+                    if (Student.sbArr != null)
+                        Buffer.BlockCopy(Student.sbArr, 0, outMsg, sz, Student.sbArr.Length);
+                    break;
+                case NetCode.QuestAnsKeyRetrieving:
+                    outMsg = Question.sbArr;
+                    break;
+                case NetCode.MarkSubmitting:
+                    outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
+                    break;
+                case NetCode.ToClose:
+                    return false;
+                default:
+                    outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
+                    break;
+            }
+            return true;
         }
     }
 }

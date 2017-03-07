@@ -105,23 +105,23 @@ namespace sQzServer0
                         if (bRW && recvMsg != null && 0 < recvMsg.Length)
                         {
                             byte[] msg = null;
-                            NetSttCode c = (NetSttCode)BitConverter.ToInt32(recvMsg, 0);
+                            NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
                             switch (c)
                             {
-                                case NetSttCode.Dating:
+                                case NetCode.Dating:
                                     msg = Date.sbArr;
                                     break;
-                                case NetSttCode.Authenticating:
+                                case NetCode.Authenticating:
                                     msg = BitConverter.GetBytes((Int32)1);
                                     break;
-                                case NetSttCode.ExamRetrieving:
+                                case NetCode.ExamRetrieving:
                                     msg = Question.sbArr;
                                     break;
-                                case NetSttCode.Submiting:
-                                    msg = BitConverter.GetBytes((Int32)NetSttCode.Unknown);
+                                case NetCode.Submiting:
+                                    msg = BitConverter.GetBytes((Int32)NetCode.Unknown);
                                     break;
                                 default:
-                                    msg = BitConverter.GetBytes((Int32)NetSttCode.Unknown);
+                                    msg = BitConverter.GetBytes((Int32)NetCode.Unknown);
                                     break;
                             }
                             if (bRW && msg != null && 0 < msg.Length)

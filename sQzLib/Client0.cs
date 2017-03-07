@@ -3,31 +3,31 @@ using System.Net.Sockets;
 
 namespace sQzLib
 {
-    public enum NetSttCode
-    {
-        PrepDateStudent = '@',
-        DateStudentRetriving = 'A',
-        DateStudentRetrieved,
-        //PrepQuestAnsKey,
-        QuestAnsKeyRetrieving,
-        QuestAnsKeyRetrieved,
-        PrepMark,
-        MarkSubmitting,
-        MarkSubmitted,
-        PrepDate = 'a',
-        Dating,
-        Dated,
-        PrepAuth,
-        Authenticating,
-        Authenticated,
-        //PrepExamRet,
-        ExamRetrieving,
-        ExamRetrieved,
-        Submiting,
-        Submitted,
-        ToClose,
-        Unknown
-    }
+    //public enum NetSttCode
+    //{
+    //    PrepDateStudent = '@',
+    //    DateStudentRetriving = 'A',
+    //    DateStudentRetrieved,
+    //    //PrepQuestAnsKey,
+    //    QuestAnsKeyRetrieving,
+    //    QuestAnsKeyRetrieved,
+    //    PrepMark,
+    //    MarkSubmitting,
+    //    MarkSubmitted,
+    //    PrepDate = 'a',
+    //    Dating,
+    //    Dated,
+    //    PrepAuth,
+    //    Authenticating,
+    //    Authenticated,
+    //    //PrepExamRet,
+    //    ExamRetrieving,
+    //    ExamRetrieved,
+    //    Submiting,
+    //    Submitted,
+    //    ToClose,
+    //    Unknown
+    //}
 
     public delegate void DgCallback(IAsyncResult ar);
 
