@@ -30,19 +30,20 @@ namespace sQzLib
         Unknown
     }
 
-    public delegate bool DgNetBufHndl(byte[] buf, int offs);
-    public delegate bool DgBufPrep(ref byte[] outBuf);
+    public delegate bool DgCliBufHndl(byte[] buf, int offs);
+    public delegate bool DgCliBufPrep(ref byte[] outBuf);
 
     public class Client2
     {
         string mSrvrAddr;
         int mSrvrPort;
         TcpClient mClient = null;
-        DgNetBufHndl dgBufHndl;
-        DgBufPrep dgBufPrep;
+        DgCliBufHndl dgBufHndl;
+        DgCliBufPrep dgBufPrep;
         bool bRW;
+        bool bSrvrRW;
 
-        public Client2(DgNetBufHndl hndl, DgBufPrep prep)
+        public Client2(DgCliBufHndl hndl, DgCliBufPrep prep)
         {
             string filePath = "ServerAddr.txt";
             if (System.IO.File.Exists(filePath))
@@ -56,7 +57,7 @@ namespace sQzLib
                 mSrvrPort = 23821;
             dgBufHndl = hndl;
             dgBufPrep = prep;
-            bRW = false;
+            bSrvrRW = bRW = false;
         }
 
         public string SrvrAddr { set { mSrvrAddr = value; } }
@@ -66,10 +67,10 @@ namespace sQzLib
         public bool ConnectWR(ref UICbMsg cbMsg)
         {
             if (mClient != null)
-                return true;
+                return false;
             bool ok = true;
             mClient = new TcpClient(AddressFamily.InterNetwork);
-            bRW = true;
+            bSrvrRW = bRW = true;
             try {
                 mClient.Connect(mSrvrAddr, mSrvrPort);
             } catch (SocketException e) {
@@ -90,8 +91,11 @@ namespace sQzLib
                 byte[] msg = null;
                 bRW = dgBufPrep(ref msg);
 
-                if (!bRW)
+                if (!bRW || msg == null || msg.Length < sizeof(int))
+                {
+                    bRW = false;
                     break;
+                }
 
                 try { stream.Write(msg, 0, msg.Length); }
                 catch(System.IO.IOException e)
@@ -100,7 +104,7 @@ namespace sQzLib
                     ok = false;
                 }
 
-                if (!ok)
+                if (!ok || !bRW)
                     break;
 
                 //read message from server
@@ -138,17 +142,35 @@ namespace sQzLib
                         offs += vRecvMsg[i].Length;
                     }
                 }
-                if (ok && recvMsg != null && 4 <= recvMsg.Length)
-                    bRW = dgBufHndl(recvMsg, 0);
+
+                if (ok && recvMsg != null && sizeof(int) <= recvMsg.Length)
+                {
+                    NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
+                    if (c == NetCode.ToClose)
+                    {
+                        bSrvrRW = bRW = false;
+                    }
+                    else
+                        bRW = dgBufHndl(recvMsg, 0);
+                }
             }
+            if (ok && bSrvrRW)
+                try { stream.Write(BitConverter.GetBytes((int)NetCode.ToClose), 0, sizeof(int)); }
+                catch (System.IO.IOException e)
+                {
+                    cbMsg += e.Message;
+                    ok = false;
+                }
+            bRW = false;
             try { mClient.Close(); }
             catch (SocketException e)
             {
                 cbMsg += "\nEx: " + e.Message;
+                ok = false;
             }
             cbMsg += "\nA client stopped.";
             mClient = null;
-            return !ok;
+            return ok;
         }
     }
 }

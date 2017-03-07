@@ -57,7 +57,6 @@
     </ApplicationDefinition>
     <Compile Include="Authentication.xaml.cs" />
     <Compile Include="Operation1.xaml.cs" />
-    <Compile Include="Server0.cs" />
     <Compile Include="Server1.cs" />
     <Compile Include="TakeExam.xaml.cs" />
     <Page Include="Authentication.xaml">

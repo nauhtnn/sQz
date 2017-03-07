@@ -23,14 +23,10 @@ namespace sQzClient
     /// </summary>
     public partial class Authentication : Page
     {
-        Client0 mClient;
         Client2 mClient2;
         int mSz;
         byte[] mBuffer;
         NetCode mState;
-        int nBusy;//crash fixed: only call if not busy
-        bool bToDispose;//crash fixed: flag to dispose
-        bool bReconn;//reconnect after callback
         UICbMsg mCbMsg;
         public Authentication()
         {
@@ -39,14 +35,9 @@ namespace sQzClient
             ShowsNavigationUI = false;
 
             mSz = 1024 * 1024;
-            //mState = NetCode.PrepDate;
-            mState = NetCode.PrepAuth;
-            mClient = Client0.Instance();
-            mClient2 = new Client2(NetBufHndl, BufPrep);
-            //Connect(null, null);
-            nBusy = 0;
-            bToDispose = false;
-            bReconn = false;
+            mState = NetCode.PrepDate;
+            //mState = NetCode.PrepAuth;
+            mClient2 = new Client2(CliBufHndl, CliBufPrep);
             mCbMsg = new UICbMsg();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
@@ -58,160 +49,16 @@ namespace sQzClient
 
         private void Connect(Object source, System.Timers.ElapsedEventArgs e)
         {
-            //if (0 < nBusy)
-            //    return;
-            //++nBusy;
-            //mClient.BeginConnect(Cb);
             Thread th = new Thread(() => { mClient2.ConnectWR(ref mCbMsg); });
             th.Start();
-        }
-
-        private void Cb(IAsyncResult ar)
-        {
-            NetworkStream s = null;
-            TcpClient c = null;
-            int r = 0;
-            switch (mState) {
-                case NetCode.PrepDate:
-                    c = (TcpClient)ar.AsyncState;
-                    if (!c.Connected)
-                        break;
-                    s = c.GetStream();
-                    mState = NetCode.Dating;
-                    mBuffer = BitConverter.GetBytes((Int32)mState);
-                    ++nBusy;
-                    s.BeginWrite(mBuffer, 0, mBuffer.Length, Cb, s);
-                    break;
-                case NetCode.Dating:
-                    s = (NetworkStream)ar.AsyncState;
-                    s.EndWrite(ar);
-                    mBuffer = new byte[mSz];
-                    mState = NetCode.Dated;
-                    ++nBusy;
-                    s.BeginRead(mBuffer, 0, mSz, Cb, s);
-                    break;
-                case NetCode.Dated:
-                    s = (NetworkStream)ar.AsyncState;
-                    r = s.EndRead(ar);
-                    int offs = 0;
-                    Date.ReadByteArr(mBuffer, ref offs, r);
-                    Dispatcher.Invoke(() => {
-                        if (Date.sbArr != null)
-                            txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
-                    });
-                    //mState = NetCode.PrepAuth;
-                    mClient.Close();//close conn
-                    break;
-                case NetCode.PrepAuth:
-                    c = (TcpClient)ar.AsyncState;
-                    if (!c.Connected)
-                        break;
-                    s = c.GetStream();
-                    mState = NetCode.Authenticating;
-                    mBuffer = BitConverter.GetBytes((Int32)mState);
-                    ++nBusy;
-                    s.BeginWrite(mBuffer, 0, mBuffer.Length, Cb, s);
-                    break;
-                case NetCode.Authenticating:
-                    s = (NetworkStream)ar.AsyncState;
-                    s.EndWrite(ar);
-                    mBuffer = new byte[mSz];
-                    mState = NetCode.Authenticated;
-                    ++nBusy;
-                    s.BeginRead(mBuffer, 0, mSz, Cb, s);
-                    break;
-                case NetCode.Authenticated:
-                    s = (NetworkStream)ar.AsyncState;
-                    r = s.EndRead(ar);
-                    bool auth = false;
-                    if (mBuffer.Length == 4)
-                        auth = BitConverter.ToInt32(mBuffer, 0) == 1;
-                    if (auth)
-                    {
-                        //mState = NetCode.PrepExamRet;
-                        //bReconn = true;
-                    }
-                    else
-                    {
-                        mState = NetCode.Dated;
-                        Dispatcher.Invoke(() => { lblStatus.Text += "fail to auth, retry"; });
-                        bToDispose = true;
-                        break;
-                    }
-                //    break;
-                //case NetCode.PrepExamRet:
-                //    c = (TcpClient)ar.AsyncState;
-                //    if (!c.Connected)
-                //        break;
-                //    s = c.GetStream();
-                    mState = NetCode.ExamRetrieving;
-                    mBuffer = BitConverter.GetBytes((Int32)mState);
-                    ++nBusy;
-                    s.BeginWrite(mBuffer, 0, mBuffer.Length, Cb, s);
-                    break;
-                case NetCode.ExamRetrieving:
-                    s = (NetworkStream)ar.AsyncState;
-                    s.EndWrite(ar);
-                    mBuffer = new byte[mSz];
-                    mState = NetCode.ExamRetrieved;
-                    ++nBusy;
-                    s.BeginRead(mBuffer, 0, mSz, Cb, s);
-                    break;
-                case NetCode.ExamRetrieved:
-                    s = (NetworkStream)ar.AsyncState;
-                    r = s.EndRead(ar);
-                    offs = 0;
-                    Question.ReadByteArr(mBuffer, ref offs, r);
-                    mClient.Close();
-                    NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
-                    break;
-            }
-
-            --nBusy;
-            if (bToDispose && nBusy == 0)
-            {
-                mClient.Close();
-                bToDispose = false;
-            }
-            else if (bReconn && nBusy == 0)
-            {
-                ++nBusy;
-                mClient.BeginConnect(Cb);
-            }
         }
 
         private void SignIn(object sender, RoutedEventArgs e)
         {
-            //if (mState == NetCode.Dated)
-            //{
-            //    mState = NetCode.PrepAuth;
-            //    ++nBusy;
-            //    mClient.BeginConnect(Cb);
-            //}
             mState = NetCode.PrepAuth;
             Thread th = new Thread(() => { mClient2.ConnectWR(ref mCbMsg); });
             th.Start();
         }
-
-        //private void SignInCallback(IAsyncResult ar)
-        //{
-        //    NetworkStream s = (NetworkStream)ar.AsyncState;
-        //    s.EndWrite(ar);
-        //    //fair -- ++
-        //    mClient.BeginRead(mBuffer, mSz, QuestReadCallback);
-        //}
-
-        //private void QuestReadCallback(IAsyncResult ar)
-        //{
-        //    NetworkStream s = (NetworkStream)ar.AsyncState;
-        //    s.EndRead(ar);
-        //    //NavigationService.Navigate(new TakeExam());
-        //    Dispatcher.Invoke(() =>
-        //    {
-        //        NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative), mBuffer);//must have Urikind
-        //    });
-        //    //txMessage.Text += "\n" + txtUsername.Text + "\n" + txtPassword + "\n";
-        //}
 
         private void Grid_Loaded(object sender, RoutedEventArgs e)
         {
@@ -235,13 +82,9 @@ namespace sQzClient
 
         private void btnReconn_Click(object sender, RoutedEventArgs e)
         {
-            if (0 < nBusy)
-                return;
-            ++nBusy;
-            mClient.BeginConnect(Cb);
         }
 
-        public bool NetBufHndl(byte[] buf, int offs)
+        public bool CliBufHndl(byte[] buf, int offs)
         {
             switch (mState)
             {
@@ -277,7 +120,7 @@ namespace sQzClient
             return true;
         }
 
-        public bool BufPrep(ref byte[] outBuf)
+        public bool CliBufPrep(ref byte[] outBuf)
         {
             switch (mState)
             {

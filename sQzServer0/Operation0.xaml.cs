@@ -51,6 +51,8 @@ namespace sQzServer0
         {
             ListBox l = (ListBox)sender;
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
+            if (i == null)
+                return;
             Date.Select((string)i.Content);
             Student.DBSelect(Date.sDBIdx);
             LoadStudents();
