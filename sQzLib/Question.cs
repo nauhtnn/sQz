@@ -52,7 +52,10 @@ namespace sQzLib
         int qSubs;
         static string[] aPattern = { "\\([a-zA-Z]\\)", "[a-zA-Z]\\." };
         List<int> aSubs;
+        public static byte[] sbArrwKey = null;
+        static bool sRdywKey = false;
         public static byte[] sbArr = null;
+        static bool sRdy = false;
 
         public Question() {
             nAns = 0;
@@ -332,7 +335,8 @@ namespace sQzLib
                 q = new Question();
             }
             q = null;
-            ToByteArr();
+            sRdy = sRdywKey = false;
+            ToByteArr(true);
         }
 
         public override string ToString()
@@ -343,48 +347,83 @@ namespace sQzLib
             return s;
         }
 
-        public static void ToByteArr()
+        public static void ToByteArr(bool woKey)
         {
+            woKey = false;
             if (svQuest.Count == 0)
                 return;
             List<byte[]> l = new List<byte[]>();
+            List<bool> lk = new List<bool>();
             l.Add(BitConverter.GetBytes((Int32)svQuest.Count));
-            for(int i = 0; i < svQuest.Count; ++i)
+            if(woKey)
+                lk.Add(false);
+            for(int i = 0; i < svQuest.Count; ++i)//todo: foreach
             {
                 //qType
                 l.Add(BitConverter.GetBytes((Int32)svQuest[i].qType));
+                if (woKey)
+                    lk.Add(false);
                 //stmt
                 byte[] b = System.Text.Encoding.UTF32.GetBytes(svQuest[i].mStmt);
                 l.Add(BitConverter.GetBytes((Int32)b.Length));
                 l.Add(b);
+                if (woKey)
+                {
+                    lk.Add(false);
+                    lk.Add(false);
+                }
                 //ans
                 l.Add(BitConverter.GetBytes((Int32)svQuest[i].nAns));
+                if (woKey)
+                    lk.Add(false);
                 for (int j = 0; j < svQuest[i].nAns; ++j)
                 {
                     //each ans
                     b = System.Text.Encoding.UTF32.GetBytes(svQuest[i].vAns[j]);
                     l.Add(BitConverter.GetBytes((Int32)b.Length));
                     l.Add(b);
+                    if (woKey)
+                    {
+                        lk.Add(false);
+                        lk.Add(false);
+                    }
                 }
                 //keys
                 for (int j = 0; j < svQuest[i].nAns; ++j)
+                {
                     l.Add(BitConverter.GetBytes(svQuest[i].vKeys[j]));
+                    if(woKey)
+                        lk.Add(true);
+                }
             }
             //join
             int sz = 0;
-            for (int i = 0; i < l.Count; ++i)
-                sz += l[i].Length;
-            sbArr = new byte[sz];
-            int offs = 0;
-            for(int i = 0; i < l.Count; ++i)
+            int szk = 0;
+            for (int i = 0; i < l.Count; ++i)//foreach
             {
-                Buffer.BlockCopy(l[i], 0, sbArr, offs, l[i].Length);
+                sz += l[i].Length;
+                if (woKey && lk[i])
+                    szk += l[i].Length;
+            }
+            sbArrwKey = new byte[sz];
+            if (woKey)
+                sbArr = new byte[sz - szk];
+            int offs = 0;
+            for(int i = 0; i < l.Count; ++i)//foreach
+            {
+                Buffer.BlockCopy(l[i], 0, sbArrwKey, offs, l[i].Length);
+                if(woKey && !lk[i])
+                    Buffer.BlockCopy(l[i], 0, sbArr, offs, l[i].Length);
                 offs += l[i].Length;
             }
+            sRdywKey = true;
+            if (woKey)
+                sRdy = true;
         }
 
-        public static void ReadByteArr(byte[] buf, ref int offs, int l)
+        public static void ReadByteArr(byte[] buf, ref int offs, int l, bool wKey)
         {
+            wKey = true;
             svQuest.Clear();
             if (buf == null)
                 return;
@@ -441,15 +480,31 @@ namespace sQzLib
                     q.vAns[j] = System.Text.Encoding.UTF32.GetString(ar);
                 }
                 //keys
-                if (l < q.nAns)
-                    break;
-                q.vKeys = new bool[q.nAns];
-                for (int j = 0; j < q.nAns; ++j)
-                    q.vKeys[j] = BitConverter.ToBoolean(buf, offs++);
-                l -= q.nAns;
+                if (wKey)
+                {
+                    if (l < q.nAns)
+                        break;
+                    q.vKeys = new bool[q.nAns];
+                    for (int j = 0; j < q.nAns; ++j)
+                        q.vKeys[j] = BitConverter.ToBoolean(buf, offs++);
+                    l -= q.nAns;
+                }
                 svQuest.Add(q);
             }
-            if(!Array.Equals(buf, sbArr))
+            if(wKey && !Array.Equals(buf, sbArrwKey))
+            {
+                sz = offs - offs0;
+                if (sz == buf.Length)
+                    sbArrwKey = (byte[])buf.Clone();
+                else
+                {
+                    sbArrwKey = new byte[sz];
+                    Buffer.BlockCopy(buf, 0, sbArrwKey, 0, sz);
+                }
+                sRdy = false;
+                sRdywKey = true;
+            }
+            if(!wKey && !Array.Equals(buf, sbArr))
             {
                 sz = offs - offs0;
                 if (sz == buf.Length)
@@ -457,8 +512,10 @@ namespace sQzLib
                 else
                 {
                     sbArr = new byte[sz];
-                    Buffer.BlockCopy(buf, 0, sbArr, 0, sz);
+                    Buffer.BlockCopy(buf, 0, sbArrwKey, 0, sz);
                 }
+                sRdy = true;
+                sRdywKey = false;
             }
         }
 
@@ -466,6 +523,9 @@ namespace sQzLib
         {
             svQuest.Clear();
             siToken = 0;//safe to be 0
+            sbArr = null;
+            sbArrwKey = null;
+            sRdy = sRdywKey = false;
         }
         public static void DBInsert()
         {
@@ -516,7 +576,7 @@ namespace sQzLib
             }
             reader.Close();
             DBConnect.Close(ref conn);
-            ToByteArr();
+            ToByteArr(true);
         }
     }
 }

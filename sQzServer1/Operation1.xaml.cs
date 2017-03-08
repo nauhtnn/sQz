@@ -156,7 +156,8 @@ namespace sQzServer1
                     outMsg = BitConverter.GetBytes((Int32)1);
                     break;
                 case NetCode.ExamRetrieving:
-                    outMsg = Question.sbArr;
+                    outMsg = Question.sbArrwKey;
+                    //outMsg = Question.sbArr;
                     break;
                 case NetCode.Submiting:
                     outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
@@ -191,7 +192,8 @@ namespace sQzServer1
                     break;
                 case NetCode.QuestAnsKeyRetrieved:
                     offs = 0;
-                    Question.ReadByteArr(buf, ref offs, buf.Length);
+                    Question.ReadByteArr(buf, ref offs, buf.Length, true);
+                    Question.ToByteArr(true);
                     mState = NetCode.PrepMark;
                     return false;
             }

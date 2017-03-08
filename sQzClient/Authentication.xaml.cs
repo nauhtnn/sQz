@@ -110,7 +110,7 @@ namespace sQzClient
                     break;
                 case NetCode.ExamRetrieved:
                     offs = 0;
-                    Question.ReadByteArr(buf, ref offs, buf.Length);
+                    Question.ReadByteArr(buf, ref offs, buf.Length, false);
                     Dispatcher.Invoke(() =>
                     {
                         NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
