@@ -298,7 +298,8 @@ namespace sQzServer0
                         Buffer.BlockCopy(Student.sbArr, 0, outMsg, sz, Student.sbArr.Length);
                     break;
                 case NetCode.QuestAnsKeyRetrieving:
-                    outMsg = Question.sbArr;
+                    //outMsg = Question.sbArr;
+                    outMsg = Question.sbArrwKey;
                     break;
                 case NetCode.MarkSubmitting:
                     outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
