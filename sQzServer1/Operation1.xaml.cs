@@ -163,8 +163,16 @@ namespace sQzServer1
                     break;
                 case NetCode.Submiting:
                     int mark = 0;
-                    List<byte[]> l = new List<byte[]>();
-                    for(int i = 0, j = 0, m = dat.Length, k = 0,
+                    offs = 0;
+                    if (dat.Length < sizeof(int)) {
+                        outMsg = BitConverter.GetBytes((int)101);
+                        break;
+                    }
+                    int len = BitConverter.ToInt32(dat, offs);
+                    offs += 4;
+                    len = (len > dat.Length) ? dat.Length : len;
+                    //List<byte[]> l = new List<byte[]>();
+                    for(int i = 0, j = offs, m = len, k = 0,
                         n = Question.svQuest.Count; i < n && j < m; ++i)
                     {
                         for (k = 0; k < Question.svQuest[i].vKeys.Length && j < m; ++k, ++j)
