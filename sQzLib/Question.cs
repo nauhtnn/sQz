@@ -40,7 +40,7 @@ namespace sQzLib
         public string mStmt; //statement
         int nAns;
         public string[] vAns;
-        bool[] vKeys;
+        public bool[] vKeys;
         bool bChoiceSort;
         QuestType qType;
         ContentType cType;
@@ -463,22 +463,31 @@ namespace sQzLib
                 l -= 4;
                 offs += 4;
                 q.vAns = new string[q.nAns];
+                bool brk = false;
                 for (int j = 0; j < q.nAns; ++j)
                 {
                     //each ans
                     if (l < 4)
+                    {
+                        brk = true;
                         break;
+                    }
                     sz = BitConverter.ToInt32(buf, offs);
                     l -= 4;
                     offs += 4;
                     if (l < sz)
+                    {
+                        brk = true;
                         break;
+                    }
                     ar = new byte[sz];
                     Buffer.BlockCopy(buf, offs, ar, 0, sz);
                     l -= sz;
                     offs += sz;
                     q.vAns[j] = System.Text.Encoding.UTF32.GetString(ar);
                 }
+                if (brk)
+                    break;
                 //keys
                 if (wKey)
                 {

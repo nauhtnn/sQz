@@ -11,9 +11,14 @@
     <StackPanel x:Name="spMain" Loaded="spMain_Loaded">
         <TextBlock x:Name="txtDate" Text="Connecting..." HorizontalAlignment="Center"></TextBlock>
         <StackPanel Orientation="Horizontal">
-            <TextBlock x:Name="lblStatus" Width="213" Height="300" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
-            <ScrollViewer x:Name="svwrStudent" Height="300" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="svwrStt" Width="213" Height="300" VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="lblStatus" Width="200" Height="300" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
+            </ScrollViewer>
+            <ScrollViewer x:Name="svwrStudent" Width="213" Height="300" VerticalScrollBarVisibility="Auto">
                 <StackPanel x:Name="spStudent"></StackPanel>
+            </ScrollViewer>
+            <ScrollViewer Width="213" Height="300" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="gQuest"></StackPanel>
             </ScrollViewer>
         </StackPanel>
         <StackPanel Orientation="Horizontal">

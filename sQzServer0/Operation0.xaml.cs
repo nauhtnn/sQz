@@ -156,10 +156,11 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
                 lbxStudent.Items.Clear();
+                int x = 0;
                 foreach (Student s in Student.svStudent)
                 {
                     ListBoxItem i = new ListBoxItem();
-                    i.Content = s.ToString();
+                    i.Content = ++x + ") " + s.ToString();
                     dark = !dark;
                     if (dark)
                         i.Background = new SolidColorBrush(c);
@@ -195,23 +196,23 @@ namespace sQzServer0
         //    });
         //}
 
-        private void ScaleScreen(double r)
-        {
-            spUp.Height = spUp.Height * r;
-            spUp.Background = new SolidColorBrush(Colors.AliceBlue);
-            //spLeft.Width = spLeft.Width * r;
-            lblStatus.Height = spLeft.Height * r;
-            txtStatus.FontSize = Theme.em;
-            lblStatus.Width = lblStatus.Width * r;
-            //lblStatus.FontSize = TakeExam.em;
-            spLeft.Background = new SolidColorBrush(Colors.AntiqueWhite);
-            spCenter.Height = spCenter.Height * r;
-            spCenter.Background = new SolidColorBrush(Colors.Aqua);
-        }
+        //private void ScaleScreen(double r)
+        //{
+        //    spUp.Height = spUp.Height * r;
+        //    spUp.Background = new SolidColorBrush(Colors.AliceBlue);
+        //    //spLeft.Width = spLeft.Width * r;
+        //    lblStatus.Height = spLeft.Height * r;
+        //    txtStatus.FontSize = Theme.em;
+        //    lblStatus.Width = lblStatus.Width * r;
+        //    //lblStatus.FontSize = TakeExam.em;
+        //    spLeft.Background = new SolidColorBrush(Colors.AntiqueWhite);
+        //    spCenter.Height = spCenter.Height * r;
+        //    spCenter.Background = new SolidColorBrush(Colors.Aqua);
+        //}
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
         {
-            spMain.Background = Theme.vBrush[(int)BrushId.BG];
+            spMain.Background = Theme.vBrush[(int)BrushId.Ans_Highlight];
             Window w = (Window)Parent;
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
@@ -220,9 +221,11 @@ namespace sQzServer0
             //PrepDatesGUI();
             LoadDates();
 
-            double scaleW = spMain.RenderSize.Width / 640; //d:DesignWidth
+            double rt = spMain.RenderSize.Width / 640; //d:DesignWidth
             //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
-            ScaleScreen(scaleW);
+            //ScaleScreen(scaleW);
+            ScaleTransform st = new ScaleTransform(rt, rt);
+            spMain.RenderTransform = st;
 
             FirewallHandler fwHndl = new FirewallHandler(0);
             string msg = fwHndl.OpenFirewall();
@@ -256,6 +259,29 @@ namespace sQzServer0
         private void btnQSheet_Click(object sender, RoutedEventArgs e)
         {
             Question.DBSelect();
+            LoadQuest();
+        }
+
+        private void LoadQuest() //same as Operation0.xaml
+        {
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            Dispatcher.Invoke(() => {
+                int x = 0;
+                foreach (Question q in Question.svQuest)
+                {
+                    TextBlock i = new TextBlock();
+                    i.Text = ++x + ") " + q.ToString();
+                    dark = !dark;
+                    if (dark)
+                        i.Background = new SolidColorBrush(c);
+                    else
+                        i.Background = Theme.vBrush[(int)BrushId.LeftPanel_BG];
+                    gQuest.Children.Add(i);
+                }
+            });
         }
 
         private void btnPrep_Click(object sender, RoutedEventArgs e)
@@ -270,11 +296,6 @@ namespace sQzServer0
         {
             Window w = (Window)Parent;
             w.Close();
-        }
-
-        private void btnDebOp1_Click(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.Invoke(() => { NavigationService.Navigate(new Uri("Operation1.xaml", UriKind.Relative)); });
         }
 
         public bool NetCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg)

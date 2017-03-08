@@ -26,6 +26,7 @@ namespace sQzLib
         ExamRetrieved,
         Submiting,
         Submitted,
+        Resubmit,
         ToClose,
         Unknown
     }

@@ -89,9 +89,11 @@ namespace sQzServer1
             w.WindowState = WindowState.Maximized;
             w.Closing += W_Closing;
 
-            double scaleW = spMain.RenderSize.Width / 640; //d:DesignWidth
+            double rt = spMain.RenderSize.Width / 640; //d:DesignWidth
             //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
-            ScaleScreen(scaleW);
+            //ScaleScreen(scaleW);
+            ScaleTransform st = new ScaleTransform(rt, rt);
+            spMain.RenderTransform = st;
 
             FirewallHandler fwHndl = new FirewallHandler(1);
             string msg = fwHndl.OpenFirewall();
@@ -160,7 +162,34 @@ namespace sQzServer1
                     //outMsg = Question.sbArr;
                     break;
                 case NetCode.Submiting:
-                    outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
+                    int mark = 0;
+                    List<byte[]> l = new List<byte[]>();
+                    for(int i = 0, j = 0, m = dat.Length, k = 0,
+                        n = Question.svQuest.Count; i < n && j < m; ++i)
+                    {
+                        for (k = 0; k < Question.svQuest[i].vKeys.Length && j < m; ++k, ++j)
+                            if (dat[j] != Convert.ToByte(Question.svQuest[i].vKeys[k]))
+                                break;
+                        if (k == Question.svQuest[i].vKeys.Length)
+                            ++mark;
+                    }
+                    outMsg = BitConverter.GetBytes(mark);
+                    //if (dat.Length == Question.sbArr.Length)
+                    //{
+                    //    for (int i = 0; i < dat.Length;)
+                    //    {
+                    //        int j = i + 4;
+                    //        for (; i < j; ++i)
+                    //            if (dat[i] != Question.sbArr[i])
+                    //                break;
+                    //        if (i == j)
+                    //            ++mark;
+                    //        i = j;
+                    //    }
+                    //    outMsg = BitConverter.GetBytes((Int32)mark);
+                    //}
+                    //else
+                    //    outMsg = BitConverter.GetBytes((Int32)NetCode.Resubmit);
                     break;
                 default:
                     return false;
@@ -180,11 +209,12 @@ namespace sQzServer1
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
+                        int i = 0;
                         foreach (Student st in Student.svStudent)
                         {
                             TextBlock x = new TextBlock();
-                            x.FontSize = Theme.em;
-                            x.Text = st.ToString();
+                            //x.FontSize = Theme.em;
+                            x.Text = ++i + ") " + st.ToString();
                             spStudent.Children.Add(x);
                         }
                     });
@@ -194,6 +224,7 @@ namespace sQzServer1
                     offs = 0;
                     Question.ReadByteArr(buf, ref offs, buf.Length, true);
                     Question.ToByteArr(true);
+                    LoadQuest();
                     mState = NetCode.PrepMark;
                     return false;
             }
@@ -215,6 +246,28 @@ namespace sQzServer1
                     break;
             }
             return true;
+        }
+
+        private void LoadQuest() //same as Operation0.xaml
+        {
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            Dispatcher.Invoke(() => {
+                int x = 0;
+                foreach (Question q in Question.svQuest)
+                {
+                    TextBlock i = new TextBlock();
+                    i.Text = ++x + ") " + q.ToString();
+                    dark = !dark;
+                    if (dark)
+                        i.Background = new SolidColorBrush(c);
+                    else
+                        i.Background = Theme.vBrush[(int)BrushId.Button_Hover];
+                    gQuest.Children.Add(i);
+                }
+            });
         }
     }
 }

@@ -12,7 +12,9 @@
         <StackPanel x:Name="spUp" Height="180" Orientation="Horizontal">
             <StackPanel x:Name="spLeft">
                 <TextBlock x:Name="txtStatus" Text="Status" HorizontalAlignment="Center"></TextBlock>
-                <TextBlock x:Name="lblStatus" Width="213" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
+                <ScrollViewer x:Name="svwrStt" Height="160" Width="213" VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="lblStatus" Width="200" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
+                </ScrollViewer>
             </StackPanel>
             <StackPanel x:Name="spCenter" Height="180">
                 <TextBlock x:Name="txtDate" Text="Dates" HorizontalAlignment="Center"></TextBlock>
@@ -28,11 +30,16 @@
                 <Button x:Name="btnStopSrvr" Width="50" Content="Stop srvr" Click="StopSrvr_Click"></Button>
                 <Button x:Name="btnPrep" Width="52" Content="Prepare" Click="btnPrep_Click"></Button>
                 <Button x:Name="btnClose" Content="Close" Height="26" Width="51" Click="btnClose_Click"/>
-                <Button x:Name="btnDebOp1" Content="op1" Height="26" Width="51" Click="btnDebOp1_Click"></Button>
             </StackPanel>
         </StackPanel>
-        <ScrollViewer Width="360" Height="200" VerticalScrollBarVisibility="Auto">
-            <ListBox x:Name="lbxStudent" Width="360"></ListBox>
-        </ScrollViewer>
+        <StackPanel Orientation="Horizontal">
+            <ScrollViewer Width="320" Height="180" VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="lbxStudent" Width="360"></ListBox>
+            </ScrollViewer>
+            <ScrollViewer Width="320" Height="180" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="gQuest">
+                </StackPanel>
+            </ScrollViewer>
+        </StackPanel>
     </StackPanel>
 </Page>

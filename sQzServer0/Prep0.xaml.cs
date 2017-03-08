@@ -146,11 +146,11 @@ namespace sQzServer0
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
-                lbxStudent.Items.Clear();
+                int x = 0;
                 foreach (Question q in Question.svQuest)
                 {
                     TextBlock i = new TextBlock();
-                    i.Text = q.ToString();
+                    i.Text = ++x + ") " + q.ToString();
                     dark = !dark;
                     if (dark)
                         i.Background = new SolidColorBrush(c);

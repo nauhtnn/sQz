@@ -23,7 +23,7 @@ namespace sQzClient
     /// </summary>
     public partial class Authentication : Page
     {
-        Client2 mClient2;
+        Client2 mClient;
         int mSz;
         byte[] mBuffer;
         NetCode mState;
@@ -36,8 +36,7 @@ namespace sQzClient
 
             mSz = 1024 * 1024;
             mState = NetCode.PrepDate;
-            //mState = NetCode.PrepAuth;
-            mClient2 = new Client2(CliBufHndl, CliBufPrep);
+            mClient = new Client2(CliBufHndl, CliBufPrep);
             mCbMsg = new UICbMsg();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
@@ -49,14 +48,14 @@ namespace sQzClient
 
         private void Connect(Object source, System.Timers.ElapsedEventArgs e)
         {
-            Thread th = new Thread(() => { mClient2.ConnectWR(ref mCbMsg); });
+            Thread th = new Thread(() => { mClient.ConnectWR(ref mCbMsg); });
             th.Start();
         }
 
         private void SignIn(object sender, RoutedEventArgs e)
         {
             mState = NetCode.PrepAuth;
-            Thread th = new Thread(() => { mClient2.ConnectWR(ref mCbMsg); });
+            Thread th = new Thread(() => { mClient.ConnectWR(ref mCbMsg); });
             th.Start();
         }
 
@@ -65,6 +64,10 @@ namespace sQzClient
             Window w = (Window)Parent;
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
+
+            double rt = w.RenderSize.Width / 640; //design size
+            ScaleTransform st = new ScaleTransform(rt, rt);
+            gMain.RenderTransform = st;
 
             FirewallHandler fwHndl = new FirewallHandler(3);
             lblStatus.Text += fwHndl.OpenFirewall();
