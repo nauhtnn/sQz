@@ -64,6 +64,7 @@ namespace sQzClient
             Window w = (Window)Parent;
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
+            w.ResizeMode = ResizeMode.NoResize;
 
             double rt = w.RenderSize.Width / 640; //design size
             ScaleTransform st = new ScaleTransform(rt, rt);

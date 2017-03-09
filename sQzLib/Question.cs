@@ -1,8 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
-//using System.Linq;
-//using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+
+/*
+CREATE TABLE IF NOT EXISTS `quest1` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest2` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest2` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest3` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest4` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest5` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest6` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest7` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest8` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest9` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest10` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest11` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+CREATE TABLE IF NOT EXISTS `quest12` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+*/
 
 namespace sQzLib
 {
@@ -37,34 +64,6 @@ namespace sQzLib
 
     public class Question
     {
-        /*
-         CREATE TABLE IF NOT EXISTS `quest1` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest2` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest2` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest3` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest4` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest5` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest6` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest7` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest8` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest9` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest10` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest11` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         CREATE TABLE IF NOT EXISTS `quest12` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-         */
         public static List<Question> svQuest = new List<Question>();
         public string mStmt; //statement
         int nAns;
@@ -602,7 +601,10 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string qry = DBConnect.mkQrySelect("quest" + sIU.ToString(), null, null, null, null);
+            string iu = sIU.ToString().Substring(2);//hardcode
+            if (iu[0] == '0')
+                iu = iu.Substring(1);
+            string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             svQuest.Clear();
             while (reader.Read())

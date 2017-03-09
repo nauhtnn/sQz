@@ -5,42 +5,44 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:sQzServer0"
       mc:Ignorable="d" 
-      d:DesignHeight="360" d:DesignWidth="640"
+      d:DesignHeight="720" d:DesignWidth="1280"
       Title="Prep0">
 
     <StackPanel x:Name="spMain" Loaded="spMain_Loaded">
-        <StackPanel Orientation="Horizontal">
-            <TextBlock Text="Date"></TextBlock>
-            <TextBox x:Name="tbxDate" Height="32" Width="393" />
-            <Button x:Name="btnInsDate"  Content="Insert Date" Height="32" Width="88" Click="btnInsDate_Click"/>
+        <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
+            <TextBox x:Name="tbxDate" Height="60" Width="160" />
+            <Button x:Name="btnInsDate"  Content="Insert Date" Height="60" Width="100" Click="btnInsDate_Click"/>
+            <Button x:Name="btnNeeBrowse" Content="Browse Examinee" Height="60" Width="160" Click="btnBrowse_Click" HorizontalAlignment="Right"/>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <ScrollViewer Width="120" Height="100" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="lbxDate" Width="120" SelectionChanged="lbxDate_SelectionChanged"></ListBox>
+        <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
+            <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="lbxDate" Width="200" SelectionChanged="lbxDate_SelectionChanged"></ListBox>
             </ScrollViewer>
-            <ScrollViewer Width="360" Height="100" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="lbxStudent" Width="360"></ListBox>
+            <ScrollViewer Width="600" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
+                <ListBox x:Name="lbxStudent" Width="600"></ListBox>
             </ScrollViewer>
-            <StackPanel HorizontalAlignment="Stretch">
-                <TextBox x:Name="tbxNeePath" Width="100"></TextBox>
-                <Button x:Name="btnNeeBrowse" Content="Browse Examinee" Height="32" Click="btnBrowse_Click"></Button>
-                <Button x:Name="btnInsNee" Content="Insert Examinee" Height="32" Click="btnInsNee_Click"></Button>
-            </StackPanel>
+            <Button x:Name="btnInsNee" Content="&lt;&lt;" Height="30" Width="60" Click="btnInsNee_Click" Margin="5,0,0,5"/>
+            <ScrollViewer Width="380" Height="100" VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="lbxNewStu" Width="380"></ListBox>
+            </ScrollViewer>
         </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <ScrollViewer Width="120" Height="100" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="lbxQCatgry" Width="120" SelectionChanged="lbxDate_SelectionChanged"></ListBox>
+        <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
+            <ScrollViewer Width="140" Height="400" VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="lbxQCatgry" Width="140" SelectionChanged="lbxQCatgry_SelectionChanged"></ListBox>
             </ScrollViewer>
-            <ScrollViewer Width="360" Height="100" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Width="480" Height="400" VerticalScrollBarVisibility="Auto">
                 <StackPanel x:Name="gQuest">
                 </StackPanel>
             </ScrollViewer>
             <StackPanel HorizontalAlignment="Stretch">
-                <TextBox x:Name="tbxQPath" Width="100"></TextBox>
-                <Button x:Name="btnQBrowse" Content="Browse Question" Height="32" Click="btnQBrowse_Click"></Button>
-                <Button x:Name="btnInsQuest" Content="Insert Question" Height="32" Click="btnInsQuest_Click"></Button>
-                <Button Content="load q" Height="32" Click="Button_Click"></Button>
+                <Button x:Name="btnQBrowse" Content="Browse Question" Height="60" Width="160" Click="btnQBrowse_Click"></Button>
+                <Button x:Name="btn2Left" Content="&lt;&lt;" Height="30" Width="60" Click="btn2Left_Click"></Button>
+                <Button x:Name="btnInsQuest" Content="Insert to DB;" Height="30" Width="60" Click="btnInsQuest_Click"></Button>
             </StackPanel>
+            <ScrollViewer Width="480" Height="400" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="gwQuest">
+                </StackPanel>
+            </ScrollViewer>
         </StackPanel>
     </StackPanel>
 </Page>

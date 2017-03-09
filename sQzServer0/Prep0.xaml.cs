@@ -24,6 +24,7 @@ namespace sQzServer0
     {
         public Prep0()
         {
+            Application.Current.MainWindow.FontSize = 16;
             InitializeComponent();
         }
 
@@ -62,12 +63,36 @@ namespace sQzServer0
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
         {
-            double rt = spMain.RenderSize.Width / 640; //d:DesignWidth
-            //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
-
+            double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
             ScaleTransform st = new ScaleTransform(rt, rt);
             spMain.RenderTransform = st;
+            InitLbxQCatgry();
             LoadDate();
+        }
+
+        void InitLbxQCatgry()
+        {
+            //names corresponding to IUxx
+            string[] qCatName = { "Concept of ICT", "Computer", "Word", "Spreadsheet", "Presentation",
+                "Internet", "Adv Word", "Adv Spreadsheet", "Database Mgmt", "Img processing",
+                "Project Mgmt", "Img Editting"};
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            Brush b = new SolidColorBrush(c);
+            Dispatcher.Invoke(() => {
+                lbxQCatgry.Items.Clear();
+                foreach (string i in qCatName)
+                {
+                    ListBoxItem it = new ListBoxItem();
+                    it.Content = i;
+                    dark = !dark;
+                    if (dark)
+                        it.Background = b;
+                    lbxQCatgry.Items.Add(i);
+                }
+            });
         }
 
         private void LoadStudents() //same as Operation0.xaml
@@ -102,7 +127,7 @@ namespace sQzServer0
             // get the selected file name and display in a textbox
             string filePath = null;
             if (result == true)
-                tbxNeePath.Text = filePath = dlg.FileName;
+                filePath = dlg.FileName;
             Student.ReadTxt(Utils.ReadFile(filePath));
             LoadStudents();
         }
@@ -134,12 +159,12 @@ namespace sQzServer0
             // get the selected file name and display in a textbox
             string filePath = null;
             if (result == true)
-                tbxQPath.Text = filePath = dlg.FileName;
+                filePath = dlg.FileName;
             Question.ReadTxt(Utils.ReadFile(filePath));
-            LoadQuest();
+            LoadQuest(false);
         }
 
-        private void LoadQuest() //same as Operation0.xaml
+        private void LoadQuest(bool db) //same as Operation0.xaml
         {
             bool dark = true;
             Color c = new Color();
@@ -147,6 +172,8 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
                 int x = 0;
+                StackPanel sp = db ? gQuest : gwQuest;
+                sp.Children.Clear();
                 foreach (Question q in Question.svQuest)
                 {
                     TextBlock i = new TextBlock();
@@ -154,20 +181,39 @@ namespace sQzServer0
                     dark = !dark;
                     if (dark)
                         i.Background = new SolidColorBrush(c);
-                    gQuest.Children.Add(i);
+                    sp.Children.Add(i);
                 }
             });
         }
 
-        private void btnInsQuest_Click(object sender, RoutedEventArgs e)
+        private void btn2Left_Click(object sender, RoutedEventArgs e)
         {
-            Question.DBInsert();
+            gQuest.Children.Clear();
+            foreach (UIElement i in gwQuest.Children)
+            {
+                TextBlock t = new TextBlock();
+                t.Text = ((TextBlock)i).Text;
+                gQuest.Children.Add(t);
+            }
+            gwQuest.Children.Clear();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private void btnInsQuest_Click(object sender, RoutedEventArgs e)
         {
             Question.DBSelect();
-            LoadQuest();
+            LoadQuest(true);
+        }
+
+        private void lbxQCatgry_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ListBox l = (ListBox)sender;
+            if (Enum.IsDefined(typeof(IUxx), l.SelectedIndex + 1))
+            {
+                Question.svQuest.Clear();
+                Question.sIU = (IUxx)l.SelectedIndex + 1;
+                Question.DBSelect();
+                LoadQuest(true);
+            }
         }
     }
 }

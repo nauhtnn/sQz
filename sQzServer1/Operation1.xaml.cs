@@ -87,6 +87,7 @@ namespace sQzServer1
             Window w = (Window)Parent;
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
+            w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
 
             double rt = spMain.RenderSize.Width / 640; //d:DesignWidth
