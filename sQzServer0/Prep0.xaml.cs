@@ -24,7 +24,7 @@ namespace sQzServer0
     {
         public Prep0()
         {
-            Application.Current.MainWindow.FontSize = 16;
+            ShowsNavigationUI = false;
             InitializeComponent();
         }
 
@@ -63,6 +63,7 @@ namespace sQzServer0
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
         {
+            Application.Current.MainWindow.FontSize = 16;
             double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
             ScaleTransform st = new ScaleTransform(rt, rt);
             spMain.RenderTransform = st;
@@ -200,7 +201,7 @@ namespace sQzServer0
 
         private void btnInsQuest_Click(object sender, RoutedEventArgs e)
         {
-            Question.DBSelect();
+            Question.DBInsert();
             LoadQuest(true);
         }
 

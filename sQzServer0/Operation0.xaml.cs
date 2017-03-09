@@ -212,6 +212,8 @@ namespace sQzServer0
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
         {
+            Application.Current.MainWindow.FontSize = 16;
+
             spMain.Background = Theme.vBrush[(int)BrushId.Ans_Highlight];
             Window w = (Window)Parent;
             w.WindowStyle = WindowStyle.None;
@@ -222,7 +224,7 @@ namespace sQzServer0
             //PrepDatesGUI();
             LoadDates();
 
-            double rt = spMain.RenderSize.Width / 640; //d:DesignWidth
+            double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
             //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
             //ScaleScreen(scaleW);
             ScaleTransform st = new ScaleTransform(rt, rt);
@@ -259,6 +261,7 @@ namespace sQzServer0
 
         private void btnQSheet_Click(object sender, RoutedEventArgs e)
         {
+            Question.sIU = IUxx.IU01;
             Question.DBSelect();
             LoadQuest();
         }

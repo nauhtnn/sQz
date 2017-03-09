@@ -64,8 +64,8 @@ namespace sQzLib
                     stud.mName = s[1];
                     stud.mBirthdate = s[2];
                     stud.mBirthplace = s[3];
+                    svStudent.Add(stud);
                 }
-                svStudent.Add(stud);
             }
             ToByteArr();
         }

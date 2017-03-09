@@ -7,8 +7,6 @@ CREATE TABLE IF NOT EXISTS `quest1` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMAR
 `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest2` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `quest2` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest3` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest4` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -590,7 +588,10 @@ namespace sQzLib
                     else
                         vals[1] += '0';
                 vals[1] += "'";
-                DBConnect.Ins(conn, "quest" + sIU.ToString(), attbs, vals);
+                string iu = sIU.ToString().Substring(2);//hardcode
+                if (iu[0] == '0')
+                    iu = iu.Substring(1);
+                DBConnect.Ins(conn, "quest" + iu, attbs, vals);
             }
             DBConnect.Close(ref conn);
         }
