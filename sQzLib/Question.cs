@@ -30,15 +30,46 @@ namespace sQzLib
         Both = 3
     }
 
+    public enum IUxx
+    {
+        IU00 = 0, IU01, IU02, IU03, IU04, IU05, IU06, IU07, IU08, IU09, IU10, IU11, IU12
+    }
+
     public class Question
     {
         /*
-         CREATE TABLE IF NOT EXISTS `questions` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`)
+         CREATE TABLE IF NOT EXISTS `quest1` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest2` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest2` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest3` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest4` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest5` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest6` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest7` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest8` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest9` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest10` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest11` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+         CREATE TABLE IF NOT EXISTS `quest12` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+          `body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
          */
         public static List<Question> svQuest = new List<Question>();
         public string mStmt; //statement
         int nAns;
+        public static IUxx sIU = IUxx.IU00;
+        public IUxx mIU;
         public string[] vAns;
         public bool[] vKeys;
         bool bChoiceSort;
@@ -60,6 +91,7 @@ namespace sQzLib
         public Question() {
             nAns = 0;
             vAns = null;
+            mIU = sIU;
             bChoiceSort = true;
             qType = QuestType.Single;
             cType = ContentType.Raw;
@@ -255,6 +287,7 @@ namespace sQzLib
             }
             if (1 < keyC && qType == QuestType.Single)
                 qType = QuestType.Multiple;
+            mIU = sIU;
             return true;
         }
         public void write(System.IO.StreamWriter os, int idx, ref int col)
@@ -538,6 +571,8 @@ namespace sQzLib
         }
         public static void DBInsert()
         {
+            if (sIU == IUxx.IU00)
+                return;
             MySqlConnection conn = DBConnect.Init();
             string[] attbs = new string[2];//hardcode
             attbs[0] = "body";
@@ -556,16 +591,18 @@ namespace sQzLib
                     else
                         vals[1] += '0';
                 vals[1] += "'";
-                DBConnect.Ins(conn, "questions", attbs, vals);
+                DBConnect.Ins(conn, "quest" + sIU.ToString(), attbs, vals);
             }
             DBConnect.Close(ref conn);
         }
         public static void DBSelect()
         {
+            if (sIU == IUxx.IU00)
+                return;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string qry = DBConnect.mkQrySelect("questions", null, null, null, null);
+            string qry = DBConnect.mkQrySelect("quest" + sIU.ToString(), null, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             svQuest.Clear();
             while (reader.Read())
@@ -581,6 +618,7 @@ namespace sQzLib
                 q.vKeys = new bool[4];
                 for (int i = 0; i < 4; ++i)
                     q.vKeys[i] = (x[i] == '1');
+                q.mIU = sIU;
                 svQuest.Add(q);
             }
             reader.Close();
