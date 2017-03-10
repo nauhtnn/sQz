@@ -325,7 +325,8 @@ namespace sQzServer0
                 case NetCode.QuestAnsKeyRetrieving:
                     //outMsg = Question.sbArr;
                     outMsg = Question.sbArrwKey;
-                    break;
+                    return false;
+                    //break;
                 case NetCode.MarkSubmitting:
                     outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
                     break;
