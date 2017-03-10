@@ -23,8 +23,8 @@ namespace sQzLib
         public static List<Student> svStudent = new List<Student>();
         public static byte[] sbArr = null;
         //not include dateIdx
-        ExamLvl mLvl;
-        UInt16 mId;
+        public ExamLvl mLvl;
+        public ushort mId;
         string mName;
         string mBirthdate;
         string mBirthplace;
@@ -69,7 +69,7 @@ namespace sQzLib
             }
             ToByteArr();
         }
-        public static void DBSelect(UInt32 dateIdx)
+        public static void DBSelect(uint dateIdx)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -92,7 +92,7 @@ namespace sQzLib
             ToByteArr();
         }
 
-        public static void DBInsert(UInt32 dateIdx)
+        public static void DBInsert(uint dateIdx)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -108,7 +108,7 @@ namespace sQzLib
             {
                 string[] vals = new string[6];
                 vals[0] = "" + dateIdx;
-                vals[1] = "" + (UInt32)s.mLvl;
+                vals[1] = "" + (uint)s.mLvl;
                 vals[2] = "" + s.mId;
                 vals[3] = "'" + s.mName + "'";
                 vals[4] = "'" + s.mBirthdate + "'";

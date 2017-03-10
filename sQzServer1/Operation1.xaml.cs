@@ -27,6 +27,7 @@ namespace sQzServer1
         NetCode mState;
         Server2 mServer;
         UICbMsg mCbMsg;
+        Dictionary<string, TextBlock> vMark;
 
         public Operation1()
         {
@@ -35,10 +36,11 @@ namespace sQzServer1
 
             mState = NetCode.PrepDateStudent;
             mClient2 = new Client2(CliBufHndl, CliBufPrep);
-            //mClient2.SrvrPort = 23820;
             mServer = new Server2(SrvrCodeHndl);
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
+
+            vMark = new Dictionary<string, TextBlock>();
 
             Theme.InitBrush();
 
@@ -180,6 +182,11 @@ namespace sQzServer1
                         if (k == Question.svQuest[i].vKeys.Length)
                             ++mark;
                     }
+                    Dispatcher.Invoke(() => {
+                        TextBlock t = null;
+                        if (vMark.TryGetValue("" + 1 + "" + 1, out t))
+                            t.Text = mark.ToString();
+                    });
                     outMsg = BitConverter.GetBytes(mark);
                     //if (dat.Length == Question.sbArr.Length)
                     //{
@@ -232,7 +239,8 @@ namespace sQzServer1
                             Grid.SetColumn(t, 1);
                             gStudent.Children.Add(t);
                             t = new TextBlock();
-                            t.Text = "10";
+                            t.Text = "doing";
+                            vMark.Add("" + (int)st.mLvl + "" + st.mId, t);
                             Grid.SetRow(t, rid++);
                             Grid.SetColumn(t, 2);
                             gStudent.Children.Add(t);
