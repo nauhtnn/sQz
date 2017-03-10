@@ -85,6 +85,8 @@ namespace sQzLib
                     ok = false;
                 }
 
+            byte[] buf = new byte[1024 * 1024];
+
             while (ok && bRW)
             {
                 //write message to server
@@ -98,10 +100,9 @@ namespace sQzLib
                     break;
                 }
 
-                int sz = 4 + msg.Length;
-                msg2 = new byte[sz];
-                Buffer.BlockCopy(BitConverter.GetBytes(sz), 0, msg2, 0, 4);//to optmz
-                Buffer.BlockCopy(msg, 0, msg2, 4, 4);
+                msg2 = new byte[4 + msg.Length];
+                Buffer.BlockCopy(BitConverter.GetBytes(msg.Length), 0, msg2, 0, 4);//to optmz
+                Buffer.BlockCopy(msg, 0, msg2, 4, msg.Length);
 
                 try { stream.Write(msg2, 0, msg2.Length); }
                 catch(System.IO.IOException e)
@@ -114,8 +115,6 @@ namespace sQzLib
                     break;
 
                 //read message from server
-                //byte[] buf = new byte[1024*1024];
-                byte[] buf = new byte[1024];
                 List<byte[]> vRecvMsg = new List<byte[]>();
                 byte[] recvMsg = null;
                 int nByte = 0, nnByte = 0, nExpByte = 0;
@@ -136,6 +135,7 @@ namespace sQzLib
                 {
                     nExpByte = BitConverter.ToInt32(buf, 0);
                     nByte -= 4;
+                    nnByte -= 4;
                     byte[] x = new byte[nByte];//use new buf
                     Buffer.BlockCopy(buf, 4, x, 0, nByte);
                     vRecvMsg.Add(x);

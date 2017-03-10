@@ -77,9 +77,10 @@ namespace sQzLib
                         bRW = false;
                     }
 
+                    byte[] buf = new byte[1024 * 1024];
+
                     while (bRW)
                     {
-                        byte[] buf = new byte[1024];
                         List<byte[]> vRecvMsg = new List<byte[]>();
                         byte[] recvMsg = null;
                         int nByte = 0, nnByte = 0, nExpByte = 0;
@@ -102,6 +103,7 @@ namespace sQzLib
                         {
                             nExpByte = BitConverter.ToInt32(buf, 0);
                             nByte -= 4;
+                            nnByte -= 4;
                             byte[] x = new byte[nByte];//use new buf
                             Buffer.BlockCopy(buf, 4, x, 0, nByte);
                             vRecvMsg.Add(x);
@@ -152,10 +154,9 @@ namespace sQzLib
                                 bRW = false;//case 1/2 to send NetCode.ToClose
                             else
                             {
-                                int sz = 4 + msg.Length;
-                                msg2 = new byte[sz];
-                                Buffer.BlockCopy(BitConverter.GetBytes(sz), 0, msg2, 0, 4);//todo
-                                Buffer.BlockCopy(msg, 0, msg2, 4, 4);
+                                msg2 = new byte[4 + msg.Length];
+                                Buffer.BlockCopy(BitConverter.GetBytes(msg.Length), 0, msg2, 0, 4);//todo
+                                Buffer.BlockCopy(msg, 0, msg2, 4, msg.Length);
                             }
                             if (bRW)
                                 try
