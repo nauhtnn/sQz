@@ -5,20 +5,31 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:sQzServer1"
       mc:Ignorable="d" 
-      d:DesignHeight="360" d:DesignWidth="640"
+      d:DesignHeight="720" d:DesignWidth="1280"
       Title="Operation1">
 
     <StackPanel x:Name="spMain" Loaded="spMain_Loaded">
         <TextBlock x:Name="txtDate" Text="Connecting..." HorizontalAlignment="Center"></TextBlock>
-        <StackPanel Orientation="Horizontal">
-            <ScrollViewer x:Name="svwrStt" Width="213" Height="300" VerticalScrollBarVisibility="Auto">
-                <TextBlock x:Name="lblStatus" Width="200" Height="300" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
+        <StackPanel Orientation="Horizontal" Margin="10">
+            <ScrollViewer x:Name="svwrStt" Width="300" Height="600" VerticalScrollBarVisibility="Auto">
+                <TextBlock x:Name="lblStatus" Width="300" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
             </ScrollViewer>
-            <ScrollViewer x:Name="svwrStudent" Width="213" Height="300" VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="spStudent"></StackPanel>
-            </ScrollViewer>
-            <ScrollViewer Width="213" Height="300" VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="gQuest"></StackPanel>
+            <StackPanel>
+                <ScrollViewer x:Name="svwrStudent" Width="600" Height="300" VerticalScrollBarVisibility="Auto">
+                    <!--<StackPanel x:Name="spStudent"></StackPanel>-->
+                    <TextBlock x:Name="txtStudent" Width="600" TextWrapping="Wrap" />
+                </ScrollViewer>
+                <ScrollViewer Width="600" Height="300" VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="gQuest"></StackPanel>
+                </ScrollViewer>
+            </StackPanel>
+            <ScrollViewer Width="300" Height="600" VerticalScrollBarVisibility="Auto">
+                <Grid x:Name="gStudent">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="100"/>
+                    </Grid.ColumnDefinitions>
+                </Grid>
             </ScrollViewer>
         </StackPanel>
         <StackPanel Orientation="Horizontal">

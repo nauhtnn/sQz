@@ -90,7 +90,7 @@ namespace sQzServer1
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
 
-            double rt = spMain.RenderSize.Width / 640; //d:DesignWidth
+            double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
             //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
             //ScaleScreen(scaleW);
             ScaleTransform st = new ScaleTransform(rt, rt);
@@ -218,14 +218,26 @@ namespace sQzServer1
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
-                        int i = 0;
+                        //int i = 0;
+                        StringBuilder sb = new StringBuilder();
+                        int rid = 0;
                         foreach (Student st in Student.svStudent)
                         {
-                            TextBlock x = new TextBlock();
-                            //x.FontSize = Theme.em;
-                            x.Text = ++i + ") " + st.ToString();
-                            spStudent.Children.Add(x);
+                            //TextBlock x = new TextBlock();
+                            ////x.FontSize = Theme.em;
+                            //x.Text = ++i + ") " + st.ToString();
+                            //spStudent.Children.Add(x);
+                            RowDefinition rd = new RowDefinition();
+                            rd.Height = new GridLength(20);
+                            gStudent.RowDefinitions.Add(rd);
+                            TextBlock t = new TextBlock();
+                            t.Text = st.ToString();
+                            Grid.SetRow(t, rid++);
+                            gStudent.Children.Add(t);
+                            sb.Append(st.ToString());
                         }
+                        if (0 < sb.Length)
+                            txtStudent.Text = sb.ToString();
                     });
                     mState = NetCode.QuestAnsKeyRetrieving;
                     break;
@@ -273,7 +285,7 @@ namespace sQzServer1
                     if (dark)
                         i.Background = new SolidColorBrush(c);
                     else
-                        i.Background = Theme.vBrush[(int)BrushId.Button_Hover];
+                        i.Background = Theme.vBrush[(int)BrushId.LeftPanel_BG];
                     gQuest.Children.Add(i);
                 }
             });
