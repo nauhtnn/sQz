@@ -42,7 +42,6 @@ namespace sQzLib
         DgCliBufHndl dgBufHndl;
         DgCliBufPrep dgBufPrep;
         bool bRW;
-        bool bSrvrRW;
 
         public Client2(DgCliBufHndl hndl, DgCliBufPrep prep)
         {
@@ -58,7 +57,7 @@ namespace sQzLib
                 mSrvrPort = 23821;
             dgBufHndl = hndl;
             dgBufPrep = prep;
-            bSrvrRW = bRW = false;
+            bRW = false;
         }
 
         public string SrvrAddr { set { mSrvrAddr = value; } }
@@ -71,7 +70,7 @@ namespace sQzLib
                 return false;
             bool ok = true;
             mClient = new TcpClient(AddressFamily.InterNetwork);
-            bSrvrRW = bRW = true;
+            bRW = true;
             try {
                 mClient.Connect(mSrvrAddr, mSrvrPort);
             } catch (SocketException e) {
@@ -90,6 +89,7 @@ namespace sQzLib
             {
                 //write message to server
                 byte[] msg = null;
+                byte[] msg2 = null;//todo
                 bRW = dgBufPrep(ref msg);
 
                 if (!bRW || msg == null || msg.Length < sizeof(int))
@@ -98,7 +98,12 @@ namespace sQzLib
                     break;
                 }
 
-                try { stream.Write(msg, 0, msg.Length); }
+                int sz = 4 + msg.Length;
+                msg2 = new byte[sz];
+                Buffer.BlockCopy(BitConverter.GetBytes(sz), 0, msg2, 0, 4);//to optmz
+                Buffer.BlockCopy(msg, 0, msg2, 4, 4);
+
+                try { stream.Write(msg2, 0, msg2.Length); }
                 catch(System.IO.IOException e)
                 {
                     cbMsg += e.Message;
@@ -109,13 +114,35 @@ namespace sQzLib
                     break;
 
                 //read message from server
-                byte[] buf = new byte[1024*1024];
+                //byte[] buf = new byte[1024*1024];
+                byte[] buf = new byte[1024];
                 List<byte[]> vRecvMsg = new List<byte[]>();
                 byte[] recvMsg = null;
-                int nByte = 0, nnByte = 0;
+                int nByte = 0, nnByte = 0, nExpByte = 0;
 
                 //Incoming message may be larger than the buffer size.
-                do
+                //Do not rely on stream.DataAvailable, because the response
+                //  may be split into multiple TCP packets, and a packet
+                //  has not yet been delivered at the moment checking DataAvailable
+                try
+                {
+                    nnByte += nByte = stream.Read(buf, 0, buf.Length);
+                } catch (System.IO.IOException e) {
+                    cbMsg += "\nEx: " + e.Message;
+                    nnByte = nByte = 0;
+                    ok = false;
+                }
+                if (4 < nByte)
+                {
+                    nExpByte = BitConverter.ToInt32(buf, 0);
+                    nByte -= 4;
+                    byte[] x = new byte[nByte];//use new buf
+                    Buffer.BlockCopy(buf, 4, x, 0, nByte);
+                    vRecvMsg.Add(x);
+                }
+                else
+                    break;//todo
+                while (ok && nnByte < nExpByte)
                 {
                     try
                     {
@@ -132,7 +159,7 @@ namespace sQzLib
                         Buffer.BlockCopy(buf, 0, x, 0, nByte);
                         vRecvMsg.Add(x);
                     }
-                } while (ok && stream.DataAvailable);
+                }
                 if (0 < vRecvMsg.Count)
                 {
                     recvMsg = new byte[nnByte];
@@ -148,20 +175,11 @@ namespace sQzLib
                 {
                     NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
                     if (c == NetCode.ToClose)
-                    {
-                        bSrvrRW = bRW = false;
-                    }
+                        bRW = false;
                     else
                         bRW = dgBufHndl(recvMsg, 0);
                 }
             }
-            if (ok && bSrvrRW)
-                try { stream.Write(BitConverter.GetBytes((int)NetCode.ToClose), 0, sizeof(int)); }
-                catch (System.IO.IOException e)
-                {
-                    cbMsg += e.Message;
-                    ok = false;
-                }
             bRW = false;
             try { mClient.Close(); }
             catch (SocketException e)

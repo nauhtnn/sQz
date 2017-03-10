@@ -14,7 +14,6 @@ namespace sQzLib
     {
         TcpListener mServer = null;
         bool bRW;//will cause trouble in multithreading, so it's thread-depending
-        bool bClntRW;
         bool bListening;//raise flag to stop
         int mPort;
         DgSrvrCodeHndl dgHndl;
@@ -25,7 +24,7 @@ namespace sQzLib
             mPort = 23820;
             if (System.IO.File.Exists(filePath))
                 mPort = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
-            bClntRW = bRW = bListening = false;
+            bRW = bListening = false;
             dgHndl = dg;
         }
 
@@ -61,7 +60,7 @@ namespace sQzLib
                 }
                 if (p)
                 {
-                    bClntRW = bRW = true;
+                    bRW = true;
                     TcpClient cli = null;
                     NetworkStream stream = null;
                     try { cli = mServer.AcceptTcpClient(); }
@@ -75,7 +74,7 @@ namespace sQzLib
                     catch (SocketException e)
                     {
                         cbMsg += "\nEx: " + e.Message;
-                        bClntRW = bRW = false;
+                        bRW = false;
                     }
 
                     while (bRW)
@@ -83,19 +82,42 @@ namespace sQzLib
                         byte[] buf = new byte[1024];
                         List<byte[]> vRecvMsg = new List<byte[]>();
                         byte[] recvMsg = null;
-                        int nByte = 0, nnByte = 0;
+                        int nByte = 0, nnByte = 0, nExpByte = 0;
 
                         //Incoming message may be larger than the buffer size.
-                        do
+                        //Do not rely on stream.DataAvailable, because the response
+                        //  may be split into multiple TCP packets, and a packet
+                        //  has not yet been delivered at the moment checking DataAvailable
+                        try
+                        {
+                            nnByte += nByte = stream.Read(buf, 0, buf.Length);
+                        }
+                        catch (System.IO.IOException e)
+                        {
+                            cbMsg += "\nEx: " + e.Message;
+                            nnByte = nByte = 0;
+                            bRW = false;
+                        }
+                        if (4 < nByte)
+                        {
+                            nExpByte = BitConverter.ToInt32(buf, 0);
+                            nByte -= 4;
+                            byte[] x = new byte[nByte];//use new buf
+                            Buffer.BlockCopy(buf, 4, x, 0, nByte);
+                            vRecvMsg.Add(x);
+                        }
+                        else
+                            break;//todo
+                        while (bRW && nnByte < nExpByte)
                         {
                             try
                             {
                                 nnByte += nByte = stream.Read(buf, 0, buf.Length);
                             }
                             catch (System.IO.IOException e)
-                            { //client crash
+                            {
                                 cbMsg += "\nEx: " + e.Message;
-                                bClntRW = bRW = false;
+                                bRW = false;
                             }
                             if (bRW && 0 < nByte)
                             {
@@ -103,7 +125,7 @@ namespace sQzLib
                                 Buffer.BlockCopy(buf, 0, x, 0, nByte);
                                 vRecvMsg.Add(x);
                             }
-                        } while (bRW && stream.DataAvailable);
+                        }
                         if (0 < vRecvMsg.Count)
                         {
                             recvMsg = new byte[nnByte];
@@ -118,41 +140,43 @@ namespace sQzLib
                         {
                             byte[] msg = null;
                             NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
-                            if (c == NetCode.ToClose)
-                            {
-                                bClntRW = bRW = false;
-                            }
-                            else
-                                bRW = dgHndl(c, recvMsg, 4, ref msg);
+                            //if (c == NetCode.ToClose)
+                            //{
+                            //    bClntRW = bRW = false;
+                            //}
+                            //else
+                            //bRW = dgHndl(c, recvMsg, 4, ref msg);
+                            bool nextRW = dgHndl(c, recvMsg, 4, ref msg);
+                            byte[] msg2 = null;
                             if (msg == null || msg.Length < 4)
                                 bRW = false;//case 1/2 to send NetCode.ToClose
+                            else
+                            {
+                                int sz = 4 + msg.Length;
+                                msg2 = new byte[sz];
+                                Buffer.BlockCopy(BitConverter.GetBytes(sz), 0, msg2, 0, 4);//todo
+                                Buffer.BlockCopy(msg, 0, msg2, 4, 4);
+                            }
                             if (bRW)
                                 try
                                 {
-                                    stream.Write(msg, 0, msg.Length);
+                                    stream.Write(msg2, 0, msg2.Length);
                                 }
                                 catch (SocketException e)
                                 {
                                     cbMsg += "\nEx: " + e.Message;
-                                    bClntRW = bRW = false;
+                                    bRW = false;
                                 }
+                            if (!nextRW)
+                                break;
                         }
                         else
                             bRW = false;//case 1/2 to send NetCode.ToClose
                     }
-                    bool toClose = true;
-                    if(bClntRW)
-                        try { stream.Write(BitConverter.GetBytes((int)NetCode.ToClose), 0, sizeof(int)); }
-                        catch (System.IO.IOException e)
-                        {
-                            cbMsg += e.Message;
-                            toClose = false;
-                        }
-                    if(toClose)
-                        try { cli.Close(); }
-                        catch (SocketException e) {
-                            cbMsg += "\nEx: " + e.Message;
-                        }
+                    try { cli.Close(); }
+                    catch (SocketException e) {
+                        cbMsg += "\nEx: " + e.Message;
+                    }
                     cbMsg += "\nA client stopped.";
                 }
             }
@@ -167,7 +191,7 @@ namespace sQzLib
         {
             if (bListening)
                 cbMsg += "\nServer is stopping.";
-            bClntRW = bRW = bListening = false;
+            bRW = bListening = false;
         }
     }
 }
