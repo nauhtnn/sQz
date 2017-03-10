@@ -18,7 +18,7 @@ namespace sQzLib
          CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2) UNSIGNED,
           `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf32`,
           `birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf32`,
-          PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`))
+          PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`));
          */
         public static List<Student> svStudent = new List<Student>();
         public static byte[] sbArr = null;

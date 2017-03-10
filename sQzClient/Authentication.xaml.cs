@@ -148,7 +148,7 @@ namespace sQzClient
                 //    mState = NetCode.ExamRetrieving;
                 case NetCode.ExamRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);
-                    mState = NetCode.ExamRetrieved;
+                    //mState = NetCode.ExamRetrieved;
                     break;
             }
             return true;
