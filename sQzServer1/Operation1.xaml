@@ -14,22 +14,17 @@
             <ScrollViewer x:Name="svwrStt" Width="300" Height="600" VerticalScrollBarVisibility="Auto">
                 <TextBlock x:Name="lblStatus" Width="300" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
             </ScrollViewer>
-            <StackPanel>
-                <ScrollViewer x:Name="svwrStudent" Width="600" Height="300" VerticalScrollBarVisibility="Auto">
-                    <!--<StackPanel x:Name="spStudent"></StackPanel>-->
-                    <TextBlock x:Name="txtStudent" Width="600" TextWrapping="Wrap" />
-                </ScrollViewer>
-                <ScrollViewer Width="600" Height="300" VerticalScrollBarVisibility="Auto">
-                    <StackPanel x:Name="gQuest"></StackPanel>
-                </ScrollViewer>
-            </StackPanel>
-            <ScrollViewer Width="300" Height="600" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Width="500" Height="600" VerticalScrollBarVisibility="Auto">
                 <Grid x:Name="gStudent">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="200"/>
+                        <ColumnDefinition Width="300"/>
                         <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="50"/>
                     </Grid.ColumnDefinitions>
                 </Grid>
+            </ScrollViewer>
+            <ScrollViewer Width="400" Height="600" VerticalScrollBarVisibility="Auto">
+                <StackPanel x:Name="gQuest"></StackPanel>
             </ScrollViewer>
         </StackPanel>
         <StackPanel Orientation="Horizontal">

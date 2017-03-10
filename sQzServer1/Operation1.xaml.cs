@@ -75,8 +75,6 @@ namespace sQzServer1
         {
             lblStatus.Height = lblStatus.Height * r;
             lblStatus.Width = lblStatus.Width * r;
-            svwrStudent.Height = svwrStudent.Height * r;
-            svwrStudent.Background = new SolidColorBrush(Colors.AliceBlue);
 
             txtDate.FontSize = Theme.em;
         }
@@ -218,26 +216,27 @@ namespace sQzServer1
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
-                        //int i = 0;
-                        StringBuilder sb = new StringBuilder();
                         int rid = 0;
                         foreach (Student st in Student.svStudent)
                         {
-                            //TextBlock x = new TextBlock();
-                            ////x.FontSize = Theme.em;
-                            //x.Text = ++i + ") " + st.ToString();
-                            //spStudent.Children.Add(x);
                             RowDefinition rd = new RowDefinition();
                             rd.Height = new GridLength(20);
                             gStudent.RowDefinitions.Add(rd);
                             TextBlock t = new TextBlock();
                             t.Text = st.ToString();
-                            Grid.SetRow(t, rid++);
+                            Grid.SetRow(t, rid);
                             gStudent.Children.Add(t);
-                            sb.Append(st.ToString());
+                            t = new TextBlock();
+                            t.Text = "waiting";
+                            Grid.SetRow(t, rid);
+                            Grid.SetColumn(t, 1);
+                            gStudent.Children.Add(t);
+                            t = new TextBlock();
+                            t.Text = "10";
+                            Grid.SetRow(t, rid++);
+                            Grid.SetColumn(t, 2);
+                            gStudent.Children.Add(t);
                         }
-                        if (0 < sb.Length)
-                            txtStudent.Text = sb.ToString();
                     });
                     mState = NetCode.QuestAnsKeyRetrieving;
                     break;
