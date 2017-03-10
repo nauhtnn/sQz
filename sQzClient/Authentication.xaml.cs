@@ -35,7 +35,8 @@ namespace sQzClient
             ShowsNavigationUI = false;
 
             mSz = 1024 * 1024;
-            mState = NetCode.PrepDate;
+            //mState = NetCode.PrepDate;
+            mState = NetCode.Dating;
             mClient = new Client2(CliBufHndl, CliBufPrep);
             mCbMsg = new UICbMsg();
 
@@ -54,7 +55,7 @@ namespace sQzClient
 
         private void SignIn(object sender, RoutedEventArgs e)
         {
-            mState = NetCode.PrepAuth;
+            //mState = NetCode.PrepAuth;
             Thread th = new Thread(() => { mClient.ConnectWR(ref mCbMsg); });
             th.Start();
         }
@@ -92,13 +93,15 @@ namespace sQzClient
         {
             switch (mState)
             {
-                case NetCode.Dated:
+                //case NetCode.Dated:
+                case NetCode.Dating:
                     Date.ReadByteArr(buf, ref offs, buf.Length);
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
                     });
-                    mState = NetCode.PrepAuth;
+                    //mState = NetCode.PrepAuth;
+                    mState = NetCode.Authenticating;
                     return false;
                 case NetCode.Authenticating:
                     bool auth = false;
@@ -106,13 +109,15 @@ namespace sQzClient
                         auth = BitConverter.ToInt32(buf, 0) == 1;
                     if(!auth)
                     {
-                        mState = NetCode.Dated;
+                        //mState = NetCode.Dated;
                         Dispatcher.Invoke(() => { lblStatus.Text += "fail to auth, retry"; });
                         return false;
                     }
-                    mState = NetCode.Authenticated;
+                    //mState = NetCode.Authenticated;
+                    mState = NetCode.ExamRetrieving;
                     break;
-                case NetCode.ExamRetrieved:
+                //case NetCode.ExamRetrieved:
+                case NetCode.ExamRetrieving:
                     offs = 0;
                     Question.ReadByteArr(buf, ref offs, buf.Length, false);
                     Dispatcher.Invoke(() =>
@@ -128,17 +133,20 @@ namespace sQzClient
         {
             switch (mState)
             {
-                case NetCode.PrepDate:
-                    mState = NetCode.Dating;
+                //case NetCode.PrepDate:
+                //    mState = NetCode.Dating;
+                case NetCode.Dating:
                     outBuf = BitConverter.GetBytes((int)mState);
-                    mState = NetCode.Dated;
+                    //mState = NetCode.Dated;
                     break;
-                case NetCode.PrepAuth:
-                    mState = NetCode.Authenticating;
+                //case NetCode.PrepAuth:
+                //    mState = NetCode.Authenticating;
+                case NetCode.Authenticating:
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
-                case NetCode.Authenticated:
-                    mState = NetCode.ExamRetrieving;
+                //case NetCode.Authenticated:
+                //    mState = NetCode.ExamRetrieving;
+                case NetCode.ExamRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);
                     mState = NetCode.ExamRetrieved;
                     break;

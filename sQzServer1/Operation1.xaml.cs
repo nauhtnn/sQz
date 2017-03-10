@@ -35,7 +35,7 @@ namespace sQzServer1
 
             mState = NetCode.PrepDateStudent;
             mClient2 = new Client2(CliBufHndl, CliBufPrep);
-            mClient2.SrvrPort = 23820;
+            //mClient2.SrvrPort = 23820;
             mServer = new Server2(SrvrCodeHndl);
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
