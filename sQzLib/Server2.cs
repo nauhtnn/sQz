@@ -50,6 +50,7 @@ namespace sQzLib
 
             while (bListening)
             {
+                System.Threading.Thread.Sleep(8);//do not overhead CPU
                 bool p = false;
                 try { p = mServer.Pending(); }
                 catch (SocketException e)
