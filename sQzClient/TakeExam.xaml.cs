@@ -38,7 +38,7 @@ namespace sQzClient
             vFontFml = new FontFamily[2];
             vFontFml[0] = new FontFamily("Arial");
             vFontFml[1] = new FontFamily("Arial");
-            mState = NetCode.PrepDate;
+            mState = NetCode.Dating;
             mClient = new Client2(CliBufHndl, CliBufPrep);
             mCbMsg = new UICbMsg();
 
@@ -113,22 +113,22 @@ namespace sQzClient
         void InitLayout(object sender, RoutedEventArgs e)
         {
             vWidth = new double[5];
-            vWidth[0] = 640;// gMain.RenderSize.Width;
+            vWidth[0] = 640;// spMain.RenderSize.Width;
             vWidth[1] = 20;// 2 * em;
             vWidth[2] = 5 * vWidth[1];
             vWidth[3] = 5;// 8;
             vWidth[4] = (vWidth[0] - vWidth[2]) / 2 - SystemParameters.ScrollWidth - 2 * vWidth[3] - vWidth[1];
-            //gMain.ColumnDefinitions.Add(new ColumnDefinition());
-            //gMain.ColumnDefinitions.Add(new ColumnDefinition());
+            //spMain.ColumnDefinitions.Add(new ColumnDefinition());
+            //spMain.ColumnDefinitions.Add(new ColumnDefinition());
             InitLeftPanel();
             InitQuestPanel();
             dmsg.Background = vBrush[(int)BrushId.LeftPanel_BG];
-            dmsg.Width = (int)gMain.RenderSize.Width / 2;
-            dmsg.Height = (int)gMain.RenderSize.Height / 4;
-            // gMain.Children.Add(dmsg);
+            dmsg.Width = (int)spMain.RenderSize.Width / 2;
+            dmsg.Height = (int)spMain.RenderSize.Height / 4;
+            // spMain.Children.Add(dmsg);
 
-            double rt = gMain.RenderSize.Width / 640; //d:DesignWidth
-            double scaleH = gMain.RenderSize.Height / 360; //d:DesignHeight
+            double rt = spMain.RenderSize.Width / 640; //d:DesignWidth
+            double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
             ScaleTransform st = new ScaleTransform(rt, rt);
             //svwrQSh.Width = svwrQSh.Width * rt;
             //svwrQSh.Height = svwrQSh.Height * rt;
@@ -136,7 +136,7 @@ namespace sQzClient
             //g.RenderTransform = st;
             //svwrQSh.RenderTransform = st;
             //spLp.RenderTransform = st;
-            gMain.RenderTransform = st;
+            spMain.RenderTransform = st;
         }
 
         void InitLeftPanel()

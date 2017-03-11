@@ -6,28 +6,28 @@ namespace sQzLib
 {
     public enum NetCode
     {
-        PrepDateStudent = '@',
-        DateStudentRetriving = 'A',
-        DateStudentRetrieved,
+        //PrepDateStudent = 0,
+        DateStudentRetriving = 0,
+        //DateStudentRetrieved,
         //PrepQuestAnsKey,
         QuestAnsKeyRetrieving,
-        QuestAnsKeyRetrieved,
+        //QuestAnsKeyRetrieved,
         PrepMark,
         MarkSubmitting,
         MarkSubmitted,
-        PrepDate = 'a',
+        //PrepDate = 'a',
         Dating,
-        Dated,
-        PrepAuth,
+        //Dated,
+        //PrepAuth,
         Authenticating,
-        Authenticated,
+        //Authenticated,
         //PrepExamRet,
         ExamRetrieving,
-        ExamRetrieved,
+        //ExamRetrieved,
         Submiting,
         Submitted,
         Resubmit,
-        ToClose,
+        //ToClose,
         Unknown
     }
 
@@ -173,10 +173,10 @@ namespace sQzLib
 
                 if (ok && recvMsg != null && sizeof(int) <= recvMsg.Length)
                 {
-                    NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
-                    if (c == NetCode.ToClose)
-                        bRW = false;
-                    else
+                    //NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
+                    //if (c == NetCode.ToClose)
+                    //    bRW = false;
+                    //else
                         bRW = dgBufHndl(recvMsg, 0);
                 }
             }

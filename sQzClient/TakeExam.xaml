@@ -8,7 +8,7 @@
       d:DesignHeight="360" d:DesignWidth="640"
       Title="TakeExam">
 
-    <Grid x:Name="gMain" Loaded="InitLayout">
+    <Grid x:Name="spMain" Loaded="InitLayout">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="128"/>
             <ColumnDefinition Width="512"/>

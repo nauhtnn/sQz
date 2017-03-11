@@ -26,7 +26,7 @@ namespace sQzLib
         public ExamLvl mLvl;
         public ushort mId;
         string mName;
-        string mBirthdate;
+        public string mBirthdate;
         string mBirthplace;
         public Student() { }
         public static void ReadTxt(Int16 dateId)

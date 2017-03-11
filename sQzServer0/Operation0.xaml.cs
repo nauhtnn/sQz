@@ -330,8 +330,8 @@ namespace sQzServer0
                 case NetCode.MarkSubmitting:
                     outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
                     break;
-                case NetCode.ToClose:
-                    return false;
+                //case NetCode.ToClose:
+                //    return false;
                 default:
                     outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
                     break;

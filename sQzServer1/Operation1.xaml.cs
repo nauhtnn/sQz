@@ -34,7 +34,7 @@ namespace sQzServer1
             InitializeComponent();
             ShowsNavigationUI = false;
 
-            mState = NetCode.PrepDateStudent;
+            mState = NetCode.DateStudentRetriving;
             mClient2 = new Client2(CliBufHndl, CliBufPrep);
             mServer = new Server2(SrvrCodeHndl);
             mServer.SrvrPort = 23821;
@@ -156,7 +156,31 @@ namespace sQzServer1
                     outMsg = Date.sbArr;
                     break;
                 case NetCode.Authenticating:
-                    outMsg = BitConverter.GetBytes((Int32)1);
+                    int l = dat.Length - offs;
+                    if (l < 4)
+                        break;
+                    ExamLvl lv = (ExamLvl)BitConverter.ToInt32(dat, offs);
+                    l -= 4;
+                    offs += 4;
+                    if (l < 2)
+                        break;
+                    short id = BitConverter.ToInt16(dat, offs);
+                    l -= 2;
+                    offs += 2;
+                    if (l < 10)
+                        break;
+                    string date = Encoding.UTF32.GetString(dat, offs, dat.Length - offs);
+                    outMsg = null;
+                    foreach (Student st in Student.svStudent)
+                    {
+                        if (st.mId == id && st.mLvl == lv && st.mBirthdate == date)
+                        {
+                            outMsg = BitConverter.GetBytes(1);
+                            break;
+                        }
+                    }
+                    if(outMsg == null)
+                        outMsg = BitConverter.GetBytes(0);
                     break;
                 case NetCode.ExamRetrieving:
                     outMsg = Question.sbArrwKey;
@@ -215,7 +239,7 @@ namespace sQzServer1
         {
             switch (mState)
             {
-                case NetCode.DateStudentRetrieved:
+                case NetCode.DateStudentRetriving:
                     int r = buf.Length;
                     Date.ReadByteArr(buf, ref offs, r);
                     r -= offs;
@@ -248,7 +272,7 @@ namespace sQzServer1
                     });
                     mState = NetCode.QuestAnsKeyRetrieving;
                     break;
-                case NetCode.QuestAnsKeyRetrieved:
+                case NetCode.QuestAnsKeyRetrieving:
                     offs = 0;
                     Question.ReadByteArr(buf, ref offs, buf.Length, true);
                     Question.ToByteArr(true);
@@ -263,14 +287,11 @@ namespace sQzServer1
         {
             switch (mState)
             {
-                case NetCode.PrepDateStudent:
-                    mState = NetCode.DateStudentRetriving;
+                case NetCode.DateStudentRetriving:
                     outBuf = BitConverter.GetBytes((Int32)mState);
-                    mState = NetCode.DateStudentRetrieved;
                     break;
                 case NetCode.QuestAnsKeyRetrieving:
                     outBuf = BitConverter.GetBytes((Int32)mState);
-                    mState = NetCode.QuestAnsKeyRetrieved;
                     break;
             }
             return true;
