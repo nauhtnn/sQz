@@ -84,7 +84,7 @@ namespace sQzServer1
         private void spMain_Loaded(object sender, RoutedEventArgs e)
         {
             spMain.Background = Theme.vBrush[(int)BrushId.BG];
-            Window w = (Window)Parent;
+            Window w = Window.GetWindow(this);
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
             w.ResizeMode = ResizeMode.NoResize;
@@ -132,8 +132,9 @@ namespace sQzServer1
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
-            Window w = (Window)Parent;
-            w.Close();
+            Window w = Window.GetWindow(this);
+            if(w != null)
+                w.Close();
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
