@@ -42,6 +42,8 @@ namespace sQzClient
             mClient = new Client2(CliBufHndl, CliBufPrep);
             mCbMsg = new UICbMsg();
 
+            txtWelcome.Text = Examinee.sAuthNee.ToString();
+
             ShowsNavigationUI = false;
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
@@ -110,10 +112,10 @@ namespace sQzClient
             vThickness[(int)ThicknessId.RB] = new Thickness(1, 1, 1, 1);
         }
 
-        void InitLayout(object sender, RoutedEventArgs e)
+        private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             vWidth = new double[5];
-            vWidth[0] = 640;// spMain.RenderSize.Width;
+            vWidth[0] = 1280;// spMain.RenderSize.Width;
             vWidth[1] = 20;// 2 * em;
             vWidth[2] = 5 * vWidth[1];
             vWidth[3] = 5;// 8;

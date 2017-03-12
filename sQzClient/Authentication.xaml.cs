@@ -103,16 +103,15 @@ namespace sQzClient
                     mState = NetCode.Authenticating;
                     break;
                 case NetCode.Authenticating:
-                    bool auth = false;
-                    if (buf.Length == 4)
-                        auth = BitConverter.ToInt32(buf, 0) == 1;
-                    if (!auth)
-                        Dispatcher.Invoke(() => { lblStatus.Text += "fail to auth, retry"; });
-                    else
+                    bool rs = Examinee.CliReadAuthByteArr(buf, offs, out Examinee.sAuthNee);
+                    if(rs)
                     {
                         mState = NetCode.ExamRetrieving;
                         return true;//continue
                     }
+                    Dispatcher.Invoke(()=> {
+                        txtAuth.Text = "The examinee is not found. Pls try again";
+                    });
                     break;
                 case NetCode.ExamRetrieving:
                     offs = 0;
@@ -134,17 +133,7 @@ namespace sQzClient
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.Authenticating:
-                    byte[] a = Encoding.UTF32.GetBytes(mBirdate);
-                    outBuf = new byte[10 + a.Length];
-                    Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
-                    if(mNeeId[0] == 'A')
-                        Buffer.BlockCopy(BitConverter.GetBytes((int)ExamLvl.Basis), 0, outBuf, 4, 4);
-                    else
-                        Buffer.BlockCopy(BitConverter.GetBytes((int)ExamLvl.Advance), 0, outBuf, 4, 4);
-                    int id;
-                    if (int.TryParse(mNeeId.Substring(1), out id))
-                        Buffer.BlockCopy(BitConverter.GetBytes(id), 0, outBuf, 8, 4);
-                    Buffer.BlockCopy(a, 0, outBuf, 10, a.Length);
+                    Examinee.CliToAuthByteArr(out outBuf, (int)mState, mNeeId, mBirdate);
                     break;
                 case NetCode.ExamRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);

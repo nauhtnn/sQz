@@ -27,7 +27,8 @@ namespace sQzServer1
         NetCode mState;
         Server2 mServer;
         UICbMsg mCbMsg;
-        Dictionary<string, TextBlock> vMark;
+        Dictionary<int, TextBlock> vMark;
+        Dictionary<int, TextBlock> vComp;
 
         public Operation1()
         {
@@ -40,7 +41,8 @@ namespace sQzServer1
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
 
-            vMark = new Dictionary<string, TextBlock>();
+            vMark = new Dictionary<int, TextBlock>();
+            vComp = new Dictionary<int, TextBlock>();
 
             Theme.InitBrush();
 
@@ -155,30 +157,22 @@ namespace sQzServer1
                     outMsg = Date.sbArr;
                     break;
                 case NetCode.Authenticating:
-                    int l = dat.Length - offs;
-                    if (l < 4)
-                        break;
-                    ExamLvl lv = (ExamLvl)BitConverter.ToInt32(dat, offs);
-                    l -= 4;
-                    offs += 4;
-                    if (l < 2)
-                        break;
-                    short id = BitConverter.ToInt16(dat, offs);
-                    l -= 2;
-                    offs += 2;
-                    if (l < 10)
-                        break;
-                    string date = Encoding.UTF32.GetString(dat, offs, dat.Length - offs);
-                    outMsg = null;
-                    foreach (Examinee st in Examinee.svExaminee)
+                    string cname;
+                    ExamLvl lv;
+                    int rid = Examinee.SrvrReadAuthByteArr(dat, offs, out lv, out cname);
+                    if (-1 < rid)
                     {
-                        if (st.mId == id && st.mLvl == lv && st.mBirthdate == date)
+                        if (cname == null)
+                            cname = "computer";
+                        Dispatcher.Invoke(() =>
                         {
-                            outMsg = BitConverter.GetBytes(1);
-                            break;
-                        }
+                            TextBlock t = null;
+                            if (vComp.TryGetValue(((int)lv)*rid, out t))
+                                t.Text = cname;
+                        });
+                        Examinee.SrvrToAuthByteArr(rid, out outMsg);
                     }
-                    if(outMsg == null)
+                    else
                         outMsg = BitConverter.GetBytes(0);
                     break;
                 case NetCode.ExamRetrieving:
@@ -207,7 +201,7 @@ namespace sQzServer1
                     }
                     Dispatcher.Invoke(() => {
                         TextBlock t = null;
-                        if (vMark.TryGetValue("" + 1 + "" + 1, out t))
+                        if (vMark.TryGetValue(1, out t))//todo
                             t.Text = mark.ToString();
                     });
                     outMsg = BitConverter.GetBytes(mark);
@@ -258,12 +252,13 @@ namespace sQzServer1
                             gStudent.Children.Add(t);
                             t = new TextBlock();
                             t.Text = "waiting";
+                            vComp.Add((int)st.mLvl * st.mId, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 1);
                             gStudent.Children.Add(t);
                             t = new TextBlock();
                             t.Text = "doing";
-                            vMark.Add("" + (int)st.mLvl + "" + st.mId, t);
+                            vMark.Add((int)st.mLvl * st.mId, t);
                             Grid.SetRow(t, rid++);
                             Grid.SetColumn(t, 2);
                             gStudent.Children.Add(t);

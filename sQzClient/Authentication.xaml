@@ -37,6 +37,7 @@
             <Button x:Name="btnSignIn" Grid.Row="3" Content="Sign In" Height="30" Width="100" Click="btnSignIn_Click"/>
             <Button x:Name="btnReconn" Grid.Row="3" Grid.Column="1" Content="Reconnect" HorizontalAlignment="Left" Height="30" Width="100" Click="btnReconn_Click"/>
         </Grid>
+        <TextBlock x:Name="txtAuth" Width="400" Height="30"/>
         <ScrollViewer Width="600" Height="300" VerticalScrollBarVisibility="Auto">
             <TextBox x:Name="lblStatus" Height="300" TextWrapping="Wrap" Text="TextBox" Width="600"/>
         </ScrollViewer>

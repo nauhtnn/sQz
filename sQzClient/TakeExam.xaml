@@ -5,30 +5,33 @@
       xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
       xmlns:local="clr-namespace:sQzClient"
       mc:Ignorable="d" 
-      d:DesignHeight="360" d:DesignWidth="640"
+      d:DesignHeight="720" d:DesignWidth="1280"
       Title="TakeExam">
 
-    <Grid x:Name="spMain" Loaded="InitLayout">
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="128"/>
-            <ColumnDefinition Width="512"/>
-        </Grid.ColumnDefinitions>
-        <StackPanel Grid.Column="0" x:Name="spLp" HorizontalAlignment="Left" Height="360" Width="128" VerticalAlignment="Top">
-            <TextBlock Text="Answer Sheet" HorizontalAlignment="Center" FontFamily="Arial" FontWeight="Bold" FontSize="20"></TextBlock>
-            <ScrollViewer x:Name="svwrAnsSh" Height="240" Width="128" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <Grid x:Name="gAnsSh">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                </Grid>
+    <StackPanel x:Name="spMain" Loaded="Main_Loaded">
+        <TextBlock x:Name="txtWelcome" Height="30"/>
+        <Grid x:Name="gQSheet">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="540" Width="250">
+                <TextBlock Text="Ans Sheet" Height="20" HorizontalAlignment="Center" FontFamily="Arial" FontWeight="Bold" FontSize="20"/>
+                <ScrollViewer x:Name="svwrAnsSh" Height="520" Width="250" VerticalScrollBarVisibility="Auto">
+                    <Grid x:Name="gAnsSh">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ScrollViewer>
+                <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click" Height="20" Width="40"></Button>
+            </StackPanel>
+            <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1030" Height="540" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
             </ScrollViewer>
-            <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click" Height="20" Width="40"></Button>
-        </StackPanel>
-        <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="512" Height="360" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
-        </ScrollViewer>
-    </Grid>
+        </Grid>
+    </StackPanel>
 </Page>
