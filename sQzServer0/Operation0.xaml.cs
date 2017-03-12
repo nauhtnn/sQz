@@ -25,6 +25,7 @@ namespace sQzServer0
         Server2 mServer;
         UICbMsg mCbMsg;
         byte[] vQuestAnsKey;
+        Dictionary<int, TextBlock> vMark;
 
         public Operation0()
         {
@@ -32,6 +33,7 @@ namespace sQzServer0
             ShowsNavigationUI = false;
             mServer = new Server2(NetCodeHndl);
             mCbMsg = new UICbMsg();
+            vMark = new Dictionary<int, TextBlock>();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -58,24 +60,6 @@ namespace sQzServer0
             LoadStudents();
         }
 
-        //private void LoadDates()
-        //{
-        //    string filePath = "Dates.txt";
-        //    string[] dates = null;
-        //    vDate.Clear();
-        //    if (System.IO.File.Exists(filePath))
-        //        dates = System.IO.File.ReadAllLines(filePath);
-        //    if (dates == null)
-        //        return;
-        //    foreach (string d in dates)
-        //    {
-        //        string[] s = d.Split('\t');
-        //        vDateId.Add(Convert.ToInt16(s[0]));
-        //        vDate.Add(s[1]);
-        //    }
-        //    vDate.Sort();
-        //}
-
         private void LoadDates()
         {
             Date.DBSelect();
@@ -100,135 +84,85 @@ namespace sQzServer0
             }
         }
 
-        //private void PrepDatesGUI()
-        //{
-        //    if (vDate.Count == 0)
-        //    {
-        //        Dispatcher.Invoke(() =>
-        //        {
-        //            lbxDate.Items.Clear();
-        //        });
-        //        return;
-        //    }
-        //    bool dark = true;
-        //    Color c = new Color();
-        //    c.A = 0xff;
-        //    c.B = c.G = c.R = 0xf0;
-        //    Dispatcher.Invoke(() =>
-        //    {
-        //        lbxDate.Items.Clear();
-        //        for (int i = 0; i < vDate.Count; ++i)
-        //        {
-        //            ListBoxItem t = new ListBoxItem();
-        //            t.Content = vDate[i];
-        //            dark = !dark;
-        //            if (dark)
-        //                t.Background = new SolidColorBrush(c);
-        //            t.FontSize = TakeExam.em;
-        //            lbxDate.Items.Add(t);
-        //        }
-        //    });
-        //}
-
-        //private void LoadStudents(short dateId)
-        //{
-        //    Examinee.ReadTxt(dateId);
-            //string[] students = null;
-            //vStudent.Clear();
-            //if (System.IO.File.Exists(filePath))
-            //    students = System.IO.File.ReadAllLines(filePath);
-            //if (students == null)
-            //    return;
-            //foreach (string s in students)
-            //{
-            //    if(date.Equals(s.Substring(0, 10)))
-            //        vStudent.Add(s.Substring(10));
-            //}
-            //vStudent.Sort();
-        //    PrepStudentsGUI();
-        //}
-
         private void LoadStudents() //same as Prep0.xaml
         {
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
-                lbxStudent.Items.Clear();
-                int x = 0;
-                foreach (Examinee s in Examinee.svExaminee)
+                Color c = new Color();
+                c.A = 0xff;
+                c.B = c.G = c.R = 0xf0;
+                bool dark = false;
+                int rid = 1;
+                foreach (Examinee st in Examinee.svExaminee)
                 {
-                    ListBoxItem i = new ListBoxItem();
-                    i.Content = ++x + ") " + s.ToString();
-                    dark = !dark;
+                    RowDefinition rd = new RowDefinition();
+                    rd.Height = new GridLength(20);
+                    gNee.RowDefinitions.Add(rd);
+                    TextBlock t = new TextBlock();
+                    t.Text = st.ID;
                     if (dark)
-                        i.Background = new SolidColorBrush(c);
-                    lbxStudent.Items.Add(i);
+                        t.Background = new SolidColorBrush(c);
+                    Grid.SetRow(t, rid);
+                    gNee.Children.Add(t);
+                    t = new TextBlock();
+                    t.Text = st.mName;
+                    if (dark)
+                        t.Background = new SolidColorBrush(c);
+                    Grid.SetRow(t, rid);
+                    Grid.SetColumn(t, 1);
+                    gNee.Children.Add(t);
+                    t = new TextBlock();
+                    t.Text = st.mBirthdate;
+                    if (dark)
+                        t.Background = new SolidColorBrush(c);
+                    Grid.SetRow(t, rid);
+                    Grid.SetColumn(t, 2);
+                    gNee.Children.Add(t);
+                    t = new TextBlock();
+                    t.Text = st.mBirthplace;
+                    if (dark)
+                        t.Background = new SolidColorBrush(c);
+                    Grid.SetRow(t, rid);
+                    Grid.SetColumn(t, 3);
+                    gNee.Children.Add(t);
+                    t = new TextBlock();
+                    if (dark)
+                        t.Background = new SolidColorBrush(c);
+                    vMark.Add((int)st.mLvl * st.mId, t);
+                    Grid.SetRow(t, rid++);
+                    Grid.SetColumn(t, 4);
+                    gNee.Children.Add(t);
+                    dark = !dark;
                 }
             });
         }
 
-        //private void PrepStudentsGUI()
-        //{
-        //    if (vStudent.Count == 0)
-        //    {
-        //        Dispatcher.Invoke(() => { spDown.Children.Clear(); });
-        //        return;
-        //    }
-        //    Dispatcher.Invoke(() =>
-        //    {
-        //        spDown.Children.Clear();
-        //        bool dark = true;
-        //        Color c = new Color();
-        //        c.A = 0xff;
-        //        c.B = c.G = c.R = 0xf0;
-        //        for (int i = 0; i < vStudent.Count; ++i)
-        //        {
-        //            Label t = new Label();
-        //            t.Content = vStudent[i];
-        //            dark = !dark;
-        //            if (dark)
-        //                t.Background = new SolidColorBrush(c);
-        //            t.FontSize = TakeExam.em;
-        //            spDown.Children.Add(t);
-        //        }
-        //    });
-        //}
-
-        //private void ScaleScreen(double r)
-        //{
-        //    spUp.Height = spUp.Height * r;
-        //    spUp.Background = new SolidColorBrush(Colors.AliceBlue);
-        //    //spLeft.Width = spLeft.Width * r;
-        //    lblStatus.Height = spLeft.Height * r;
-        //    txtStatus.FontSize = Theme.em;
-        //    lblStatus.Width = lblStatus.Width * r;
-        //    //lblStatus.FontSize = TakeExam.em;
-        //    spLeft.Background = new SolidColorBrush(Colors.AntiqueWhite);
-        //    spCenter.Height = spCenter.Height * r;
-        //    spCenter.Background = new SolidColorBrush(Colors.Aqua);
-        //}
+        private void LoadMarks()
+        {
+            Dispatcher.Invoke(() => {
+                TextBlock t;
+                foreach (Examinee st in Examinee.svExaminee)
+                {
+                    if(vMark.TryGetValue((int)st.mLvl * st.mId, out t))
+                        t.Text = "" + st.mMark;
+                }
+            });
+        }
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
         {
-            Application.Current.MainWindow.FontSize = 16;
-
-            spMain.Background = Theme.vBrush[(int)BrushId.Ans_Highlight];
             Window w = Window.GetWindow(this);
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
+            w.FontSize = 13;
 
-            //PrepDatesGUI();
+            spMain.Background = Theme.vBrush[(int)BrushId.Ans_Highlight];
+
             LoadDates();
 
-            double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
-            //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
-            //ScaleScreen(scaleW);
-            ScaleTransform st = new ScaleTransform(rt, rt);
-            spMain.RenderTransform = st;
+            double rt = spMain.RenderSize.Width / 1280;
+            spMain.RenderTransform = new ScaleTransform(rt, rt);
 
             FirewallHandler fwHndl = new FirewallHandler(0);
             string msg = fwHndl.OpenFirewall();
@@ -326,11 +260,10 @@ namespace sQzServer0
                     outMsg = Question.sbArrwKey;
                     return false;
                     //break;
-                case NetCode.MarkSubmitting:
-                    outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
+                case NetCode.SrvrSubmitting:
+                    Examinee.ReadMarkArr(dat, ref offs);
+                    LoadMarks();
                     break;
-                //case NetCode.ToClose:
-                //    return false;
                 default:
                     outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
                     break;

@@ -85,18 +85,17 @@ namespace sQzServer1
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
         {
-            spMain.Background = Theme.vBrush[(int)BrushId.BG];
             Window w = Window.GetWindow(this);
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
+            w.FontSize = 13;
 
-            double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
-            //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
-            //ScaleScreen(scaleW);
-            ScaleTransform st = new ScaleTransform(rt, rt);
-            spMain.RenderTransform = st;
+            spMain.Background = Theme.vBrush[(int)BrushId.BG];
+
+            double rt = spMain.RenderSize.Width / 1280;
+            spMain.RenderTransform = new ScaleTransform(rt, rt);
 
             FirewallHandler fwHndl = new FirewallHandler(1);
             string msg = fwHndl.OpenFirewall();
@@ -108,10 +107,6 @@ namespace sQzServer1
             //todo: check th state to return
             Thread th = new Thread(() => { mClient2.ConnectWR(ref mCbMsg); });
             th.Start();
-        }
-
-        private void btnDisconnect_Click(object sender, RoutedEventArgs e)
-        {
         }
 
         private void StartSrvr_Click(object sender, RoutedEventArgs e)
@@ -143,12 +138,6 @@ namespace sQzServer1
             mServer.Stop(ref dummy);
         }
 
-        private void btnCli_Click(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.Invoke(() => {
-                NavigationService.Navigate(new Uri("Authentication.xaml", UriKind.Relative)); });
-        }
-
         public bool SrvrCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg)
         {
             switch (c)
@@ -159,7 +148,7 @@ namespace sQzServer1
                 case NetCode.Authenticating:
                     string cname;
                     ExamLvl lv;
-                    int rid = Examinee.SrvrReadAuthByteArr(dat, offs, out lv, out cname);
+                    int rid = Examinee.SrvrReadAuthArr(dat, offs, out lv, out cname);
                     if (-1 < rid)
                     {
                         if (cname == null)
@@ -170,7 +159,7 @@ namespace sQzServer1
                             if (vComp.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
                                 t.Text = cname;
                         });
-                        Examinee.SrvrToAuthByteArr(rid, out outMsg);
+                        Examinee.SrvrToAuthArr(rid, out outMsg);
                     }
                     else
                     {
@@ -192,7 +181,8 @@ namespace sQzServer1
                         outMsg = BitConverter.GetBytes(101);//todo
                         break;
                     }
-                    int mark = 0, j, k;
+                    ushort mark = 0;
+                    int j, k;
                     --offs;
                     foreach(Question q in Question.svQuest)
                     {
@@ -212,6 +202,8 @@ namespace sQzServer1
                         if (vMark.TryGetValue((int)lv * id, out t))//todo
                             t.Text = mark.ToString();
                     });
+                    Examinee.svLvId2Idx.TryGetValue((int)lv * id, out rid);
+                    Examinee.svExaminee[rid].mMark = mark;
                     outMsg = BitConverter.GetBytes(mark);
                     break;
                 default:
@@ -237,31 +229,31 @@ namespace sQzServer1
                         {
                             RowDefinition rd = new RowDefinition();
                             rd.Height = new GridLength(20);
-                            gStudent.RowDefinitions.Add(rd);
+                            gNee.RowDefinitions.Add(rd);
                             TextBlock t = new TextBlock();
                             t.Text = st.ID;
                             Grid.SetRow(t, rid);
-                            gStudent.Children.Add(t);
+                            gNee.Children.Add(t);
                             t = new TextBlock();
                             t.Text = st.mName;
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 1);
-                            gStudent.Children.Add(t);
+                            gNee.Children.Add(t);
                             t = new TextBlock();
                             t.Text = st.mBirthdate;
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 2);
-                            gStudent.Children.Add(t);
+                            gNee.Children.Add(t);
                             t = new TextBlock();
                             vComp.Add((int)st.mLvl * st.mId, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 3);
-                            gStudent.Children.Add(t);
+                            gNee.Children.Add(t);
                             t = new TextBlock();
                             vMark.Add((int)st.mLvl * st.mId, t);
                             Grid.SetRow(t, rid++);
                             Grid.SetColumn(t, 4);
-                            gStudent.Children.Add(t);
+                            gNee.Children.Add(t);
                         }
                     });
                     mState = NetCode.QuestAnsKeyRetrieving;
@@ -282,10 +274,13 @@ namespace sQzServer1
             switch (mState)
             {
                 case NetCode.DateStudentRetriving:
-                    outBuf = BitConverter.GetBytes((Int32)mState);
+                    outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.QuestAnsKeyRetrieving:
-                    outBuf = BitConverter.GetBytes((Int32)mState);
+                    outBuf = BitConverter.GetBytes((int)mState);
+                    break;
+                case NetCode.SrvrSubmitting:
+                    Examinee.ToMarkArr(BitConverter.GetBytes((int)mState), out outBuf);
                     break;
             }
             return true;
@@ -311,6 +306,14 @@ namespace sQzServer1
                     gQuest.Children.Add(i);
                 }
             });
+        }
+
+        private void btnSubmit_Click(object sender, RoutedEventArgs e)
+        {
+            //todo: check th state to return
+            mState = NetCode.SrvrSubmitting;
+            Thread th = new Thread(() => { mClient2.ConnectWR(ref mCbMsg); });
+            th.Start();
         }
     }
 }

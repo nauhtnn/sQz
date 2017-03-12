@@ -389,7 +389,7 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Submiting:
-                    int mark = BitConverter.ToInt32(buf, offs);
+                    ushort mark = BitConverter.ToUInt16(buf, offs);
                     btnSubmit.Content = mark;
                     return false;
             }

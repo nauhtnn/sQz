@@ -115,7 +115,7 @@ namespace sQzClient
                     mState = NetCode.Authenticating;
                     break;
                 case NetCode.Authenticating:
-                    bool rs = Examinee.CliReadAuthByteArr(buf, offs, out Examinee.sAuthNee);
+                    bool rs = Examinee.CliReadAuthArr(buf, offs, out Examinee.sAuthNee);
                     if(rs)
                     {
                         mState = NetCode.ExamRetrieving;
@@ -145,7 +145,7 @@ namespace sQzClient
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.Authenticating:
-                    Examinee.CliToAuthByteArr(out outBuf, (int)mState, mNeeId, mBirdate);
+                    Examinee.CliToAuthArr(out outBuf, (int)mState, mNeeId, mBirdate);
                     break;
                 case NetCode.ExamRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);

@@ -27,9 +27,13 @@ namespace sQzLib
         public ushort mId;
         public string mName;
         public string mBirthdate;
-        string mBirthplace;
+        public string mBirthplace;
+        public ushort mMark;
         public static Examinee sAuthNee = null;
-        public Examinee() { }
+        public static Dictionary<int, int> svLvId2Idx = new Dictionary<int, int>();
+        public Examinee() {
+            mMark = ushort.MaxValue;
+        }
         public string ID {
             get {
                 if (mLvl == ExamLvl.Basis)
@@ -104,6 +108,7 @@ namespace sQzLib
             }
             ToByteArr();
         }
+
         public static void DBSelect(uint dateIdx)
         {
             MySqlConnection conn = DBConnect.Init();
@@ -112,6 +117,8 @@ namespace sQzLib
             string qry = DBConnect.mkQrySelect("examinees", null, "dateIdx", "" + dateIdx, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             svExaminee.Clear();
+            svLvId2Idx.Clear();
+            int i = -1;
             while (reader.Read())
             {
                 Examinee s = new Examinee();
@@ -121,6 +128,7 @@ namespace sQzLib
                 s.mBirthdate = reader.GetString(4);
                 s.mBirthplace = reader.GetString(5);
                 svExaminee.Add(s);
+                svLvId2Idx.Add((int)s.mLvl * s.mId, ++i);
             }
             reader.Close();
             DBConnect.Close(ref conn);
@@ -152,6 +160,7 @@ namespace sQzLib
             }
             DBConnect.Close(ref conn);
         }
+
         public static void ToByteArr()
         {
             if (svExaminee.Count == 0)
@@ -190,6 +199,7 @@ namespace sQzLib
         public static void ReadByteArr(byte[] buf, ref int offs, int l)
         {
             svExaminee.Clear();
+            svLvId2Idx.Clear();
             if (buf == null)
                 return;
             int offs0 = offs;
@@ -247,6 +257,7 @@ namespace sQzLib
                 Buffer.BlockCopy(buf, offs, b, 0, sz);
                 s.mBirthplace = Encoding.UTF32.GetString(b);
                 svExaminee.Add(s);
+                svLvId2Idx.Add((int)s.mLvl * s.mId, i);
                 l -= sz;
                 offs += sz;
             }
@@ -262,7 +273,8 @@ namespace sQzLib
                 }
             }
         }
-        public static void CliToAuthByteArr(out byte[] buf, int state, string rid, string birdate)
+
+        public static void CliToAuthArr(out byte[] buf, int state, string rid, string birdate)
         {
             if (birdate == null || birdate.Length != 10)
             {
@@ -296,7 +308,7 @@ namespace sQzLib
                 Buffer.BlockCopy(b, 0, buf, 54, b.Length);
             }
         }
-        public static int SrvrReadAuthByteArr(byte[] buf, int offs, out ExamLvl lv, out string cname)
+        public static int SrvrReadAuthArr(byte[] buf, int offs, out ExamLvl lv, out string cname)
         {
             cname = null;
             lv = ExamLvl.Basis;
@@ -329,7 +341,7 @@ namespace sQzLib
             }
             return -1;
         }
-        public static void SrvrToAuthByteArr(int rid, out byte[] buf)
+        public static void SrvrToAuthArr(int rid, out byte[] buf)
         {
             buf = null;
             if (rid < 0 || svExaminee.Count < rid)
@@ -362,7 +374,7 @@ namespace sQzLib
             Buffer.BlockCopy(c, 0, buf, offs, c.Length);
             offs += c.Length;
         }
-        public static bool CliReadAuthByteArr(byte[] buf, int offs, out Examinee nee)
+        public static bool CliReadAuthArr(byte[] buf, int offs, out Examinee nee)
         {
             nee = null;
             int l = buf.Length - offs;
@@ -413,6 +425,77 @@ namespace sQzLib
                 return false;
             nee.mBirthplace = Encoding.UTF32.GetString(buf, offs, sz);
             return true;
+        }
+
+
+        public static void ToMarkArr(byte[] prefix, out byte[] buf)
+        {
+            if (svExaminee.Count == 0)
+            {
+                buf = null;
+                return;
+            }
+            List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(svExaminee.Count));
+            for (int i = 0; i < svExaminee.Count; ++i)
+            {
+                Examinee s = svExaminee[i];
+                l.Add(BitConverter.GetBytes((short)s.mLvl));
+                l.Add(BitConverter.GetBytes(s.mId));
+                l.Add(BitConverter.GetBytes(s.mMark));
+            }
+            int sz = 0;
+            if(prefix != null)
+                sz += prefix.Length;
+            foreach (byte[] i in l)
+                sz += i.Length;
+            buf = new byte[sz];
+            int offs = 0;
+            if(prefix != null)
+            {
+                Buffer.BlockCopy(prefix, 0, buf, offs, prefix.Length);
+                offs += prefix.Length;
+            }
+            for (int i = 0; i < l.Count; ++i)
+            {
+                Buffer.BlockCopy(l[i], 0, buf, offs, l[i].Length);
+                offs += l[i].Length;
+            }
+        }
+
+        public static void ReadMarkArr(byte[] buf, ref int offs)
+        {
+            if (buf == null || svLvId2Idx.Count < 1)
+                return;
+            int l = buf.Length - offs;
+            if (l < 4)
+                return;
+            int nNee = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            int idx;
+            for (int i = 0; i < nNee; ++i)
+            {
+                if (l < 2)
+                    return;
+                ExamLvl lv = (ExamLvl)BitConverter.ToInt16(buf, offs);
+                l -= 2;
+                offs += 2;
+                if (l < 2)
+                    return;
+                ushort id = BitConverter.ToUInt16(buf, offs);
+                l -= 2;
+                offs += 2;
+                if (l < 2)
+                    return;
+                ushort mark = BitConverter.ToUInt16(buf, offs);
+                l -= 2;
+                offs += 2;
+                if (svLvId2Idx.TryGetValue((int)lv * id, out idx))
+                    svExaminee[idx].mMark = mark;
+                else
+                    Console.Write(idx);
+            }
         }
     }
 }

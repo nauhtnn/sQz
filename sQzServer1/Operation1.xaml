@@ -15,7 +15,7 @@
                 <TextBlock x:Name="lblStatus" Width="300" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
             </ScrollViewer>
             <ScrollViewer Width="500" Height="600" VerticalScrollBarVisibility="Auto">
-                <Grid x:Name="gStudent">
+                <Grid x:Name="gNee">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="180"/>
@@ -38,12 +38,11 @@
             </ScrollViewer>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
-            <Button x:Name="btnConnect" Content="Connect Srvr" Click="btnConnect_Click"  Width="80"></Button>
-            <Button x:Name="btnDisconnect" Content="Disconnect Srvr" Click="btnDisconnect_Click"  Width="80"></Button>
-            <Button x:Name="btnStartSrvr" Content="Start srvr" Click="StartSrvr_Click" Width="80"></Button>
-            <Button x:Name="btnStopSrvr" Content="Stop srvr" Click="StopSrvr_Click" Width="80"></Button>
-            <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Width="80"></Button>
-            <Button x:Name="btnCli" Content="dev cli" Click="btnCli_Click" Width="80"></Button>
+            <Button x:Name="btnConnect" Content="Connect srvr" Click="btnConnect_Click"  Width="80"/>
+            <Button x:Name="btnStartSrvr" Content="Start srvr" Click="StartSrvr_Click" Width="80"/>
+            <Button x:Name="btnStopSrvr" Content="Stop srvr" Click="StopSrvr_Click" Width="80"/>
+            <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Width="80"/>
+            <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click"  Width="80"/>
         </StackPanel>
     </StackPanel>
 </Page>

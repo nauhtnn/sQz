@@ -24,8 +24,24 @@
             <ScrollViewer Width="200" Height="320" VerticalScrollBarVisibility="Auto">
                 <ListBox x:Name="lbxDate"  Width="200" HorizontalAlignment="Center" VerticalAlignment="Center"></ListBox>
             </ScrollViewer>
-            <ScrollViewer Width="400" Height="320" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="lbxStudent" Width="400"></ListBox>
+            <ScrollViewer Width="500" Height="320" VerticalScrollBarVisibility="Auto">
+                <Grid x:Name="gNee">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="60"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="ID" Background="AliceBlue" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="Birthplace" Background="Gold" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="4" Text="Mark" Background="Azure" TextAlignment="Center"/>
+                </Grid>
             </ScrollViewer>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10">
