@@ -25,11 +25,45 @@ namespace sQzLib
         //not include dateIdx
         public ExamLvl mLvl;
         public ushort mId;
-        string mName;
+        public string mName;
         public string mBirthdate;
         string mBirthplace;
         public static Examinee sAuthNee = null;
         public Examinee() { }
+        public string ID {
+            get {
+                if (mLvl == ExamLvl.Basis)
+                    return "A" + mId;
+                else
+                    return "B" + mId;
+            }
+        }
+        public static bool ToID(string s, ref ExamLvl lv, ref ushort id)
+        {
+            if(s == null || s.Length < 2)
+                return false;
+            if (s[0] == 'A')
+            {
+                if (ushort.TryParse(s.Substring(1), out id))
+                {
+                    lv = ExamLvl.Basis;
+                    return true;
+                }
+                else
+                    return false;
+            }
+            else if (s[0] == 'B')
+            {
+                if (ushort.TryParse(s.Substring(1), out id))
+                {
+                    lv = ExamLvl.Advance;
+                    return true;
+                }
+                else
+                    return false;
+            }
+            return false;
+        }
         public static void ReadTxt(short dateId)
         {
             ReadTxt(Utils.ReadFile("Examinees" + dateId + ".txt"));
@@ -230,23 +264,31 @@ namespace sQzLib
         }
         public static void CliToAuthByteArr(out byte[] buf, int state, string rid, string birdate)
         {
-            byte[] a = Encoding.UTF32.GetBytes(birdate);//check a.length == 40
+            if (birdate == null || birdate.Length != 10)
+            {
+                buf = null;
+                return;
+            }
+            byte[] a = Encoding.UTF32.GetBytes(birdate);
             byte[] b = null;
             try {
                b = Encoding.UTF32.GetBytes(Environment.MachineName);
             } catch(InvalidOperationException) { b = null; }
+            ExamLvl lv = ExamLvl.Basis;
+            ushort id = 0;
+            bool rs = ToID(rid, ref lv, ref id);
+            if (!rs)
+            {
+                buf = null;
+                return;
+            }
             if (b == null)
                 buf = new byte[50];
             else
                 buf = new byte[54 + b.Length];
             Buffer.BlockCopy(BitConverter.GetBytes(state), 0, buf, 0, 4);
-            if (rid[0] == 'A')
-                Buffer.BlockCopy(BitConverter.GetBytes((int)ExamLvl.Basis), 0, buf, 4, 4);
-            else
-                Buffer.BlockCopy(BitConverter.GetBytes((int)ExamLvl.Advance), 0, buf, 4, 4);
-            ushort id;
-            if (ushort.TryParse(rid.Substring(1), out id))
-                Buffer.BlockCopy(BitConverter.GetBytes(id), 0, buf, 8, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes((int)lv), 0, buf, 4, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes(id), 0, buf, 8, 2);
             Buffer.BlockCopy(a, 0, buf, 10, a.Length);
             if (b != null)
             {

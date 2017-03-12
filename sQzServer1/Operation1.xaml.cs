@@ -163,7 +163,7 @@ namespace sQzServer1
                     if (-1 < rid)
                     {
                         if (cname == null)
-                            cname = "computer";
+                            cname = "";
                         Dispatcher.Invoke(() =>
                         {
                             TextBlock t = null;
@@ -240,27 +240,35 @@ namespace sQzServer1
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
-                        int rid = 0;
+                        int rid = 1;
                         foreach (Examinee st in Examinee.svExaminee)
                         {
                             RowDefinition rd = new RowDefinition();
                             rd.Height = new GridLength(20);
                             gStudent.RowDefinitions.Add(rd);
                             TextBlock t = new TextBlock();
-                            t.Text = st.ToString();
+                            t.Text = st.ID;
                             Grid.SetRow(t, rid);
                             gStudent.Children.Add(t);
                             t = new TextBlock();
-                            t.Text = "waiting";
-                            vComp.Add((int)st.mLvl * st.mId, t);
+                            t.Text = st.mName;
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 1);
                             gStudent.Children.Add(t);
                             t = new TextBlock();
-                            t.Text = "doing";
+                            t.Text = st.mBirthdate;
+                            Grid.SetRow(t, rid);
+                            Grid.SetColumn(t, 2);
+                            gStudent.Children.Add(t);
+                            t = new TextBlock();
+                            vComp.Add((int)st.mLvl * st.mId, t);
+                            Grid.SetRow(t, rid);
+                            Grid.SetColumn(t, 3);
+                            gStudent.Children.Add(t);
+                            t = new TextBlock();
                             vMark.Add((int)st.mLvl * st.mId, t);
                             Grid.SetRow(t, rid++);
-                            Grid.SetColumn(t, 2);
+                            Grid.SetColumn(t, 4);
                             gStudent.Children.Add(t);
                         }
                     });

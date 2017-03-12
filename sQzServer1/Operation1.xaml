@@ -17,10 +17,20 @@
             <ScrollViewer Width="500" Height="600" VerticalScrollBarVisibility="Auto">
                 <Grid x:Name="gStudent">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="300"/>
-                        <ColumnDefinition Width="100"/>
-                        <ColumnDefinition Width="50"/>
+                        <ColumnDefinition Width="40"/>
+                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="60"/>
                     </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="30"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="ID" Background="AliceBlue" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="3" Text="Computer" Background="Gold" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="4" Text="Mark" Background="Azure" TextAlignment="Center"/>
                 </Grid>
             </ScrollViewer>
             <ScrollViewer Width="400" Height="600" VerticalScrollBarVisibility="Auto">
