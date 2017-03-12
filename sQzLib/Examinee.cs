@@ -244,9 +244,9 @@ namespace sQzLib
                 Buffer.BlockCopy(BitConverter.GetBytes((int)ExamLvl.Basis), 0, buf, 4, 4);
             else
                 Buffer.BlockCopy(BitConverter.GetBytes((int)ExamLvl.Advance), 0, buf, 4, 4);
-            int id;
-            if (int.TryParse(rid.Substring(1), out id))
-                Buffer.BlockCopy(BitConverter.GetBytes(id), 0, buf, 8, 4);
+            ushort id;
+            if (ushort.TryParse(rid.Substring(1), out id))
+                Buffer.BlockCopy(BitConverter.GetBytes(id), 0, buf, 8, 2);
             Buffer.BlockCopy(a, 0, buf, 10, a.Length);
             if (b != null)
             {
@@ -266,7 +266,7 @@ namespace sQzLib
             offs += 4;
             if (l < 2)
                 return -1;
-            short id = BitConverter.ToInt16(buf, offs);
+            ushort id = BitConverter.ToUInt16(buf, offs);
             l -= 2;
             offs += 2;
             if (l < 40)
@@ -274,16 +274,14 @@ namespace sQzLib
             string date = Encoding.UTF32.GetString(buf, offs, 40);//hardcode
             l -= 40;
             offs += 40;
-            int idx = 0;
             foreach (Examinee st in svExaminee)
             {
                 if (st.mId == id && st.mLvl == lv && st.mBirthdate == date)
                 {
                     if (0 < l)
                         cname = Encoding.UTF32.GetString(buf, offs, l);
-                    return idx;
+                    return id;
                 }
-                ++idx;
             }
             return -1;
         }
