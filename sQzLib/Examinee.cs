@@ -12,7 +12,7 @@ namespace sQzLib
         Basis = 0,
         Advance = 1
     }
-    public class Student
+    public class Examinee
     {
         /*
          CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2) UNSIGNED,
@@ -20,7 +20,7 @@ namespace sQzLib
           `birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf32`,
           PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`));
          */
-        public static List<Student> svStudent = new List<Student>();
+        public static List<Examinee> svExaminee = new List<Examinee>();
         public static byte[] sbArr = null;
         //not include dateIdx
         public ExamLvl mLvl;
@@ -28,10 +28,10 @@ namespace sQzLib
         string mName;
         public string mBirthdate;
         string mBirthplace;
-        public Student() { }
-        public static void ReadTxt(Int16 dateId)
+        public Examinee() { }
+        public static void ReadTxt(short dateId)
         {
-            ReadTxt(Utils.ReadFile("Students" + dateId + ".txt"));
+            ReadTxt(Utils.ReadFile("Examinees" + dateId + ".txt"));
         }
         public override string ToString()
         {
@@ -48,13 +48,13 @@ namespace sQzLib
         {
             if (buf == null)
                 return;
-            svStudent.Clear();
+            svExaminee.Clear();
             string[] students = buf.Split('\n');
-            foreach(string stu in students)
+            foreach (string stu in students)
             {
-                Student stud = new Student();
+                Examinee stud = new Examinee();
                 string[] s = stu.Split('\t');
-                if(s.Length == 4) //todo: hardcode, unsafe
+                if (s.Length == 4) //todo: hardcode, unsafe
                 {
                     if ((s[0])[0] == 'A')
                         stud.mLvl = ExamLvl.Basis;
@@ -64,7 +64,7 @@ namespace sQzLib
                     stud.mName = s[1];
                     stud.mBirthdate = s[2];
                     stud.mBirthplace = s[3];
-                    svStudent.Add(stud);
+                    svExaminee.Add(stud);
                 }
             }
             ToByteArr();
@@ -76,16 +76,16 @@ namespace sQzLib
                 return;
             string qry = DBConnect.mkQrySelect("examinees", null, "dateIdx", "" + dateIdx, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            svStudent.Clear();
+            svExaminee.Clear();
             while (reader.Read())
             {
-                Student s = new Student();
+                Examinee s = new Examinee();
                 s.mLvl = (ExamLvl)(reader.GetUInt16(1));//hardcode
                 s.mId = reader.GetUInt16(2);
                 s.mName = reader.GetString(3);
                 s.mBirthdate = reader.GetString(4);
                 s.mBirthplace = reader.GetString(5);
-                svStudent.Add(s);
+                svExaminee.Add(s);
             }
             reader.Close();
             DBConnect.Close(ref conn);
@@ -104,7 +104,7 @@ namespace sQzLib
             attbs[3] = "name";
             attbs[4] = "birthdate";
             attbs[5] = "birthplace";
-            foreach (Student s in svStudent)
+            foreach (Examinee s in svExaminee)
             {
                 string[] vals = new string[6];
                 vals[0] = "" + dateIdx;
@@ -119,14 +119,14 @@ namespace sQzLib
         }
         public static void ToByteArr()
         {
-            if (svStudent.Count == 0)
+            if (svExaminee.Count == 0)
                 return;
             List<byte[]> l = new List<byte[]>();
-            byte[] b = BitConverter.GetBytes(svStudent.Count);
+            byte[] b = BitConverter.GetBytes(svExaminee.Count);
             l.Add(b);
-            for(int i = 0; i < svStudent.Count; ++i)
+            for (int i = 0; i < svExaminee.Count; ++i)
             {
-                Student s = svStudent[i];
+                Examinee s = svExaminee[i];
                 b = BitConverter.GetBytes((Int16)s.mLvl);
                 l.Add(b);
                 b = BitConverter.GetBytes(s.mId);
@@ -154,19 +154,19 @@ namespace sQzLib
         }
         public static void ReadByteArr(byte[] buf, ref int offs, int l)
         {
-            svStudent.Clear();
+            svExaminee.Clear();
             if (buf == null)
                 return;
             int offs0 = offs;
             int sz = 0;
             if (l < 4)
                 return;
-            int nStu = BitConverter.ToInt32(buf, offs);
+            int nNee = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            for(int i = 0; i < nStu; ++i)
+            for (int i = 0; i < nNee; ++i)
             {
-                Student s = new Student();
+                Examinee s = new Examinee();
                 if (l < 2)
                     break;
                 s.mLvl = (ExamLvl)BitConverter.ToUInt16(buf, offs);
@@ -211,7 +211,7 @@ namespace sQzLib
                 b = new byte[sz];
                 Buffer.BlockCopy(buf, offs, b, 0, sz);
                 s.mBirthplace = Encoding.UTF32.GetString(b);
-                svStudent.Add(s);
+                svExaminee.Add(s);
                 l -= sz;
                 offs += sz;
             }

@@ -54,7 +54,7 @@ namespace sQzServer0
             if (i == null)
                 return;
             Date.Select((string)i.Content);
-            Student.DBSelect(Date.sDBIdx);
+            Examinee.DBSelect(Date.sDBIdx);
             LoadStudents();
         }
 
@@ -132,7 +132,7 @@ namespace sQzServer0
 
         //private void LoadStudents(short dateId)
         //{
-        //    Student.ReadTxt(dateId);
+        //    Examinee.ReadTxt(dateId);
             //string[] students = null;
             //vStudent.Clear();
             //if (System.IO.File.Exists(filePath))
@@ -157,7 +157,7 @@ namespace sQzServer0
             Dispatcher.Invoke(() => {
                 lbxStudent.Items.Clear();
                 int x = 0;
-                foreach (Student s in Student.svStudent)
+                foreach (Examinee s in Examinee.svExaminee)
                 {
                     ListBoxItem i = new ListBoxItem();
                     i.Content = ++x + ") " + s.ToString();
@@ -309,8 +309,8 @@ namespace sQzServer0
                     int sz = 0;
                     if (Date.sbArr != null)
                         sz += Date.sbArr.Length;
-                    if (Student.sbArr != null)
-                        sz += Student.sbArr.Length;
+                    if (Examinee.sbArr != null)
+                        sz += Examinee.sbArr.Length;
                     outMsg = new byte[sz];
                     sz = 0;
                     if (Date.sbArr != null)
@@ -318,8 +318,8 @@ namespace sQzServer0
                         sz = Date.sbArr.Length;
                         Buffer.BlockCopy(Date.sbArr, 0, outMsg, 0, sz);
                     }
-                    if (Student.sbArr != null)
-                        Buffer.BlockCopy(Student.sbArr, 0, outMsg, sz, Student.sbArr.Length);
+                    if (Examinee.sbArr != null)
+                        Buffer.BlockCopy(Examinee.sbArr, 0, outMsg, sz, Examinee.sbArr.Length);
                     break;
                 case NetCode.QuestAnsKeyRetrieving:
                     //outMsg = Question.sbArr;

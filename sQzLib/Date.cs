@@ -14,11 +14,11 @@ namespace sQzLib
          CREATE TABLE IF NOT EXISTS `dates` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
           `date` CHAR(10) CHARACTER SET `ascii`);
          */
-        public static List<UInt32> svIdx = new List<UInt32>();
+        public static List<uint> svIdx = new List<uint>();
         public static List<string> svDate = new List<string>();
         public static byte[] sbArr = null;
         private static int snDate = 0;//redundant but convenient
-        public static UInt32 sDBIdx = UInt32.MaxValue;
+        public static uint sDBIdx = uint.MaxValue;
 
         public static bool ChkFmt(string s)
         {
@@ -28,22 +28,16 @@ namespace sQzLib
                 return false;
             int n = 0;
             int offs = 0;
-            if (!int.TryParse(s.Substring(offs, 4), out n))
-                return false;
-            offs += 5;
             if (!int.TryParse(s.Substring(offs, 2), out n))
                 return false;
             offs += 3;
             if (!int.TryParse(s.Substring(offs, 2), out n))
                 return false;
+            offs += 3;
+            if (!int.TryParse(s.Substring(offs, 4), out n))
+                return false;
             return true;
         }
-        //public static string ymd()
-        //{
-        //    if (sbArr == null)
-        //        return null;
-
-        //}
         public static void Select(string date)
         {
             int i = svDate.IndexOf(date);

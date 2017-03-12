@@ -96,7 +96,7 @@ namespace sQzServer0
             });
         }
 
-        private void LoadStudents() //same as Operation0.xaml
+        private void LoadExaminees() //same as Operation0.xaml
         {
             bool dark = true;
             Color c = new Color();
@@ -104,7 +104,7 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
                 lbxStudent.Items.Clear();
-                foreach (Student s in Student.svStudent)
+                foreach (Examinee s in Examinee.svExaminee)
                 {
                     ListBoxItem i = new ListBoxItem();
                     i.Content = s.ToString();
@@ -129,14 +129,14 @@ namespace sQzServer0
             string filePath = null;
             if (result == true)
                 filePath = dlg.FileName;
-            Student.ReadTxt(Utils.ReadFile(filePath));
-            LoadStudents();
+            Examinee.ReadTxt(Utils.ReadFile(filePath));
+            LoadExaminees();
         }
 
         private void btnInsNee_Click(object sender, RoutedEventArgs e)
         {
-            if(Date.sDBIdx != UInt32.MaxValue)
-                Student.DBInsert(Date.sDBIdx);
+            if(Date.sDBIdx != uint.MaxValue)
+                Examinee.DBInsert(Date.sDBIdx);
         }
 
         private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -144,8 +144,8 @@ namespace sQzServer0
             ListBox l = (ListBox)sender;
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
             Date.Select((string)i.Content);
-            Student.DBSelect(Date.sDBIdx);
-            LoadStudents();
+            Examinee.DBSelect(Date.sDBIdx);
+            LoadExaminees();
         }
 
         private void btnQBrowse_Click(object sender, RoutedEventArgs e)

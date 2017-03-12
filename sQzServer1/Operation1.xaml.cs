@@ -170,7 +170,7 @@ namespace sQzServer1
                         break;
                     string date = Encoding.UTF32.GetString(dat, offs, dat.Length - offs);
                     outMsg = null;
-                    foreach (Student st in Student.svStudent)
+                    foreach (Examinee st in Examinee.svExaminee)
                     {
                         if (st.mId == id && st.mLvl == lv && st.mBirthdate == date)
                         {
@@ -242,12 +242,12 @@ namespace sQzServer1
                     int r = buf.Length;
                     Date.ReadByteArr(buf, ref offs, r);
                     r -= offs;
-                    Student.ReadByteArr(buf, ref offs, r);
+                    Examinee.ReadByteArr(buf, ref offs, r);
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
                         int rid = 0;
-                        foreach (Student st in Student.svStudent)
+                        foreach (Examinee st in Examinee.svExaminee)
                         {
                             RowDefinition rd = new RowDefinition();
                             rd.Height = new GridLength(20);

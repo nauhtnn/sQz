@@ -291,7 +291,7 @@ namespace sQzLib
             //Create a data reader and Execute the command
             MySqlDataReader d = null;
             try { d = cmd.ExecuteReader(); }
-            catch(MySqlException e) { d = null; }
+            catch(MySqlException) { d = null; }
             return d;
 
                 //Read the data and store them in the list
