@@ -192,19 +192,20 @@ namespace sQzServer1
                         outMsg = BitConverter.GetBytes(101);//todo
                         break;
                     }
-                    int mark = 0;
-                    offs = 0;
-                    int i = -1;
+                    int mark = 0, j, k;
+                    --offs;
                     foreach(Question q in Question.svQuest)
                     {
-                        int j = 0;
+                        j = 0;
+                        k = offs;
                         foreach (bool b in q.vKeys)
-                            if (dat[++i] != Convert.ToByte(b))
+                            if (dat[++k] != Convert.ToByte(b))
                                 break;
                             else
                                 ++j;
                         if (j == q.vKeys.Length)
                             ++mark;
+                        offs += q.vKeys.Length;
                     }
                     Dispatcher.Invoke(() => {
                         TextBlock t = null;
