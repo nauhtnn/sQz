@@ -9,7 +9,8 @@
       Title="Authentication">
 
     <StackPanel x:Name="spMain" Loaded="Main_Loaded">
-        <TextBlock x:Name="txtWelcome" Text="Welcome" Margin="20" Height="30" Width="100" TextAlignment="Center"/>
+        <TextBlock x:Name="txtWelcome" Text="Welcome" Margin="20,30,20,5" Height="30" Width="100" TextAlignment="Center"/>
+        <TextBlock x:Name="txtDate" Text="Date" Margin="20,5,20,20" Height="30" Width="100" TextAlignment="Center"/>
         <Grid HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="400"/>
@@ -39,5 +40,6 @@
         <ScrollViewer Width="600" Height="300" VerticalScrollBarVisibility="Auto">
             <TextBox x:Name="lblStatus" Height="300" TextWrapping="Wrap" Text="TextBox" Width="600"/>
         </ScrollViewer>
+        <Button x:Name="btnClose" Content="Close" Height="30" Width="100" Click="btnClose_Click"/>
     </StackPanel>
 </Page>

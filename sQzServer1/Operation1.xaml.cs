@@ -132,9 +132,7 @@ namespace sQzServer1
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
-            Window w = Window.GetWindow(this);
-            if(w != null)
-                w.Close();
+            Window.GetWindow(this).Close();
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)

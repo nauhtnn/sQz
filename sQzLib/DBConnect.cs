@@ -288,8 +288,11 @@ namespace sQzLib
             //{
                 //Create Command
                 MySqlCommand cmd = new MySqlCommand(query, conn);
-                //Create a data reader and Execute the command
-                return cmd.ExecuteReader();
+            //Create a data reader and Execute the command
+            MySqlDataReader d = null;
+            try { d = cmd.ExecuteReader(); }
+            catch(MySqlException e) { d = null; }
+            return d;
 
                 //Read the data and store them in the list
             //    while (datRdr.Read())

@@ -298,9 +298,7 @@ namespace sQzServer0
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
-            Window w = Window.GetWindow(this);
-            if(w != null)
-                w.Close();
+            Window.GetWindow(this).Close();
         }
 
         public bool NetCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg)

@@ -63,12 +63,18 @@ namespace sQzClient
             th.Start();
         }
 
+        private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            mClient.Close();
+        }
+
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
-            Window w = (Window)Parent;
+            Window w = Window.GetWindow(this);
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
             w.ResizeMode = ResizeMode.NoResize;
+            w.Closing += W_Closing;
 
             double rt = w.RenderSize.Width / 1280; //design size
             ScaleTransform st = new ScaleTransform(rt, rt);
@@ -155,11 +161,6 @@ namespace sQzClient
                 });
         }
 
-        private void spMain_Loaded(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         private void tbx_DMYKeyUp(object sender, KeyEventArgs e)
         {
             TextBox t = (TextBox)sender;
@@ -202,6 +203,11 @@ namespace sQzClient
                     btnSignIn.IsEnabled = true;
             }
             mBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
+        }
+
+        private void btnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Window.GetWindow(this).Close();
         }
     }
 }

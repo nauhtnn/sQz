@@ -181,15 +181,17 @@ namespace sQzLib
                 }
             }
             bRW = false;
-            try { mClient.Close(); }
-            catch (SocketException e)
-            {
-                cbMsg += "\nEx: " + e.Message;
-                ok = false;
-            }
+            mClient.Close();
             cbMsg += "\nA client stopped.";
             mClient = null;
             return ok;
+        }
+
+        public void Close()
+        {
+            //todo
+            //if (mClient != null && mClient.Connected)
+            //    mClient.Close();
         }
     }
 }
