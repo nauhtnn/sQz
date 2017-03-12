@@ -91,7 +91,9 @@ namespace sQzServer0
                 c.A = 0xff;
                 c.B = c.G = c.R = 0xf0;
                 bool dark = false;
-                int rid = 1;
+                int rid = 0;
+                vMark.Clear();
+                gNee.Children.Clear();
                 foreach (Examinee st in Examinee.svExaminee)
                 {
                     RowDefinition rd = new RowDefinition();
