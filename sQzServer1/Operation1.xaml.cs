@@ -167,60 +167,51 @@ namespace sQzServer1
                         Dispatcher.Invoke(() =>
                         {
                             TextBlock t = null;
-                            if (vComp.TryGetValue(((int)lv)*rid, out t))
+                            if (vComp.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
                                 t.Text = cname;
                         });
                         Examinee.SrvrToAuthByteArr(rid, out outMsg);
                     }
                     else
-                        outMsg = BitConverter.GetBytes(0);
+                    {
+                        outMsg = BitConverter.GetBytes(false);
+                        return false;//close
+                    }
                     break;
                 case NetCode.ExamRetrieving:
                     outMsg = Question.sbArrwKey;
                     //outMsg = Question.sbArr;
                     break;
                 case NetCode.Submiting:
-                    int mark = 0;
-                    offs = 0;
-                    if (dat.Length < sizeof(int)) {
-                        outMsg = BitConverter.GetBytes((int)101);
+                    lv = (ExamLvl)BitConverter.ToInt32(dat, offs);
+                    offs += 4;
+                    int id = BitConverter.ToUInt16(dat, offs);
+                    offs += 2;
+                    if (dat.Length - offs != Question.svQuest.Count * 4)//hardcode
+                    {
+                        outMsg = BitConverter.GetBytes(101);//todo
                         break;
                     }
-                    int len = BitConverter.ToInt32(dat, offs);
-                    offs += 4;
-                    len = (len > dat.Length) ? dat.Length : len;
-                    //List<byte[]> l = new List<byte[]>();
-                    for(int i = 0, j = offs, m = len, k = 0,
-                        n = Question.svQuest.Count; i < n && j < m; ++i)
+                    int mark = 0;
+                    offs = 0;
+                    int i = -1;
+                    foreach(Question q in Question.svQuest)
                     {
-                        for (k = 0; k < Question.svQuest[i].vKeys.Length && j < m; ++k, ++j)
-                            if (dat[j] != Convert.ToByte(Question.svQuest[i].vKeys[k]))
+                        int j = 0;
+                        foreach (bool b in q.vKeys)
+                            if (dat[++i] != Convert.ToByte(b))
                                 break;
-                        if (k == Question.svQuest[i].vKeys.Length)
+                            else
+                                ++j;
+                        if (j == q.vKeys.Length)
                             ++mark;
                     }
                     Dispatcher.Invoke(() => {
                         TextBlock t = null;
-                        if (vMark.TryGetValue(1, out t))//todo
+                        if (vMark.TryGetValue((int)lv * id, out t))//todo
                             t.Text = mark.ToString();
                     });
                     outMsg = BitConverter.GetBytes(mark);
-                    //if (dat.Length == Question.sbArr.Length)
-                    //{
-                    //    for (int i = 0; i < dat.Length;)
-                    //    {
-                    //        int j = i + 4;
-                    //        for (; i < j; ++i)
-                    //            if (dat[i] != Question.sbArr[i])
-                    //                break;
-                    //        if (i == j)
-                    //            ++mark;
-                    //        i = j;
-                    //    }
-                    //    outMsg = BitConverter.GetBytes((Int32)mark);
-                    //}
-                    //else
-                    //    outMsg = BitConverter.GetBytes((Int32)NetCode.Resubmit);
                     break;
                 default:
                     return false;

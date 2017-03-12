@@ -138,7 +138,7 @@ namespace sQzLib
                                 offs += vRecvMsg[i].Length;
                             }
                         }
-                        if (bRW && recvMsg != null && 4 <= recvMsg.Length)
+                        if (bRW && recvMsg != null && 3 < recvMsg.Length)
                         {
                             byte[] msg = null;
                             NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
@@ -150,7 +150,7 @@ namespace sQzLib
                             //bRW = dgHndl(c, recvMsg, 4, ref msg);
                             bool nextRW = dgHndl(c, recvMsg, 4, ref msg);
                             byte[] msg2 = null;
-                            if (msg == null || msg.Length < 4)
+                            if (msg == null || msg.Length < 1)
                                 bRW = false;//case 1/2 to send NetCode.ToClose
                             else
                             {

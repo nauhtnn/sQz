@@ -28,10 +28,10 @@
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ScrollViewer>
-                <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click" Height="20" Width="40"></Button>
             </StackPanel>
             <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1030" Height="540" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
             </ScrollViewer>
         </Grid>
+        <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click" Height="30" Width="60"></Button>
     </StackPanel>
 </Page>

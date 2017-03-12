@@ -59,6 +59,18 @@ namespace sQzClient
         {
             mNeeId = tbxNeeId.Text;
             mBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
+            if (mBirdate.Length != 10)
+            {
+                txtAuth.Text = "Date format is invalid!";
+                return;
+            }
+            ExamLvl lv = ExamLvl.Basis;
+            ushort id = ushort.MaxValue;
+            if(!Examinee.ToID(mNeeId, ref lv, ref id))
+            {
+                txtAuth.Text = "Examinee's identity is invalid!";
+                return;
+            }
             Thread th = new Thread(() => { mClient.ConnectWR(ref mCbMsg); });
             th.Start();
         }

@@ -171,7 +171,7 @@ namespace sQzLib
                     }
                 }
 
-                if (ok && recvMsg != null && sizeof(int) <= recvMsg.Length)
+                if (ok && recvMsg != null && 0 < recvMsg.Length)
                 {
                     //NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
                     //if (c == NetCode.ToClose)

@@ -129,8 +129,8 @@ namespace sQzClient
             dmsg.Height = (int)spMain.RenderSize.Height / 4;
             // spMain.Children.Add(dmsg);
 
-            double rt = spMain.RenderSize.Width / 640; //d:DesignWidth
-            double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
+            double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
+            //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
             ScaleTransform st = new ScaleTransform(rt, rt);
             //svwrQSh.Width = svwrQSh.Width * rt;
             //svwrQSh.Height = svwrQSh.Height * rt;
@@ -401,11 +401,19 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Submiting:
-                    byte[] x = BitConverter.GetBytes((int)mState);
-                    int sz = x.Length + mbAns.Length;
+                    int sz = 10 + mbAns.Length;
+                    int offs = 0;
                     outBuf = new byte[sz];
-                    Buffer.BlockCopy(x, 0, outBuf, 0, x.Length);
-                    Buffer.BlockCopy(mbAns, 0, outBuf, x.Length, mbAns.Length);
+                    Buffer.BlockCopy(BitConverter.GetBytes((int)mState),
+                        0, outBuf, offs, 4);
+                    offs += 4;
+                    Buffer.BlockCopy(BitConverter.GetBytes((int)Examinee.sAuthNee.mLvl),
+                        0, outBuf, offs, 4);
+                    offs += 4;
+                    Buffer.BlockCopy(BitConverter.GetBytes(Examinee.sAuthNee.mId),
+                        0, outBuf, offs, 2);
+                    offs += 2;
+                    Buffer.BlockCopy(mbAns, 0, outBuf, offs, mbAns.Length);
                     break;
                 case NetCode.Resubmit:
                     break;

@@ -316,14 +316,16 @@ namespace sQzLib
             string date = Encoding.UTF32.GetString(buf, offs, 40);//hardcode
             l -= 40;
             offs += 40;
+            int rid = 0;
             foreach (Examinee st in svExaminee)
             {
                 if (st.mId == id && st.mLvl == lv && st.mBirthdate == date)
                 {
-                    if (0 < l)
-                        cname = Encoding.UTF32.GetString(buf, offs, l);
-                    return id;
+                    if (4 < l)
+                        cname = Encoding.UTF32.GetString(buf, offs + 4, l - 4);
+                    return rid;
                 }
+                ++rid;
             }
             return -1;
         }
@@ -339,7 +341,7 @@ namespace sQzLib
             byte[] a = Encoding.UTF32.GetBytes(s.mName);
             byte[] b = Encoding.UTF32.GetBytes(s.mBirthdate);
             byte[] c = Encoding.UTF32.GetBytes(s.mBirthplace);
-            buf = new byte[1 + 2 + 4 + 4 + a.Length + 4 + b.Length + 4 + c.Length];
+            buf = new byte[1 + 4 + 2 + 4 + a.Length + 4 + b.Length + 4 + c.Length];
             int offs = 0;
             Buffer.BlockCopy(BitConverter.GetBytes(true), 0, buf, offs, 1);
             offs += 1;
