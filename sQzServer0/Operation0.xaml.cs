@@ -150,7 +150,7 @@ namespace sQzServer0
             });
         }
 
-        private void spMain_Loaded(object sender, RoutedEventArgs e)
+        private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Window w = Window.GetWindow(this);
             w.WindowStyle = WindowStyle.None;
@@ -162,6 +162,7 @@ namespace sQzServer0
             spMain.Background = Theme.vBrush[(int)BrushId.Ans_Highlight];
 
             LoadDates();
+            InitQPanel();
 
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
@@ -197,9 +198,29 @@ namespace sQzServer0
 
         private void btnQSheet_Click(object sender, RoutedEventArgs e)
         {
-            Question.sIU = IUxx.IU01;
-            Question.DBSelect();
-            LoadQuest();
+            //Question.sIU = IUxx.IU01;
+            //Question.DBSelect();
+            //LoadQuest();
+            int v;
+            List<Question> l = new List<Question>();
+            for (int i = 1; i < 16; ++i)
+            {
+                TextBox t = (TextBox)FindName("tbxIU" + i);
+                if (t != null && 0 < t.Text.Length)
+                {
+                    if (int.TryParse(t.Text, out v))
+                    {
+                        IUxx iu = (IUxx)i;
+                        Question.DBSelect(iu, v, ref l);
+                    }
+                }
+            }
+            if(0 < l.Count)
+            {
+                Question.svQuest = l;
+                Question.ToByteArr(true);
+                LoadQuest();
+            }
         }
 
         private void LoadQuest() //same as Operation0.xaml
@@ -210,6 +231,7 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
                 int x = 0;
+                gQuest.Children.Clear();
                 foreach (Question q in Question.svQuest)
                 {
                     TextBlock i = new TextBlock();
@@ -271,6 +293,47 @@ namespace sQzServer0
                     break;
             }
             return true;
+        }
+
+        public void InitQPanel()
+        {
+            for(int i = 1; i < 16; ++i)
+            {
+                TextBox t = (TextBox)FindName("tbxIU" + i);
+                if(t != null)
+                {
+                    t.Text = "0";
+                    t.MaxLength = 2;
+                    t.KeyDown += txtIU_KeyDown;
+                    t.TextChanged += tbxIU_TextChanged;
+                }
+            }
+            txtNq.Text = "0";
+        }
+
+        private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            int n = 0, v;
+            for (int i = 1; i < 16; ++i)
+            {
+                TextBox t = (TextBox)FindName("tbxIU" + i);
+                if (t != null && 0 < t.Text.Length)
+                {
+                    if (int.TryParse(t.Text, out v))
+                        n += v;
+                    else
+                        t.Text = "0";
+                }
+            }
+            txtNq.Text = "" + n;
+        }
+
+        private void txtIU_KeyDown(object sender, KeyEventArgs e)
+        {
+            //TextBox t = sender as TextBox;
+            //short v;
+            //if(!short.TryParse(t.Text, out v))
+            //    e.Handled = true;
         }
     }
 }

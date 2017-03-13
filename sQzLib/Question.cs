@@ -57,7 +57,7 @@ namespace sQzLib
 
     public enum IUxx
     {
-        IU00 = 0, IU01, IU02, IU03, IU04, IU05, IU06, IU07, IU08, IU09, IU10, IU11, IU12
+        IU00 = 0, IU01, IU02, IU03, IU04, IU05, IU06, IU07, IU08, IU09, IU10, IU11, IU12, IU13, IU14, IU15
     }
 
     public class Question
@@ -627,6 +627,43 @@ namespace sQzLib
             reader.Close();
             DBConnect.Close(ref conn);
             ToByteArr(true);
+        }
+
+        public static void DBSelect(IUxx iu, int n, ref List<Question> l)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+            string siu = iu.ToString().Substring(2);//hardcode
+            if (siu[0] == '0')
+                siu = siu.Substring(1);
+            string qry = DBConnect.mkQrySelect("quest" + siu, null, null, null, null);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            if(reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return;
+            }
+            svQuest.Clear();
+            while (reader.Read() && 0 < n)
+            {
+                Question q = new Question();
+                string[] s = reader.GetString(1).Split('\n');//hardcode
+                q.mStmt = s[0];
+                q.nAns = 4;
+                q.vAns = new string[4];
+                for (int i = 0; i < 4; ++i)
+                    q.vAns[i] = s[i + 1];
+                string x = reader.GetString(2);
+                q.vKeys = new bool[4];
+                for (int i = 0; i < 4; ++i)
+                    q.vKeys[i] = (x[i] == '1');
+                q.mIU = sIU;
+                l.Add(q);
+                --n;
+            }
+            reader.Close();
+            DBConnect.Close(ref conn);
         }
     }
 }
