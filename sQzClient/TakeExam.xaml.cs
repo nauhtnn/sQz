@@ -114,6 +114,7 @@ namespace sQzClient
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
+            Theme.InitBrush();
             vWidth = new double[5];
             vWidth[0] = 1280;// spMain.RenderSize.Width;
             vWidth[1] = 20;// 2 * em;
@@ -360,12 +361,9 @@ namespace sQzClient
             for (int i = 0; i < quest.vAns.Length; ++i)
             {
                 ListBoxItem ans = new ListBoxItem();
-                TextBlock ansTxt = new TextBlock();
-                ansTxt.FontSize = em;
-                ansTxt.Text = quest.vAns[i];
-                ansTxt.TextWrapping = TextWrapping.Wrap;
-                ansTxt.Width = 470;// SystemParameters.ScrollWidth;//minus is a trick
-                ans.Content = ansTxt;
+                char aa = (char)('A' + i);
+                AnsItem ai = new AnsItem(quest.vAns[i], "" + aa);
+                ans.Content = ai;
                 ans.Name = "_" + i;
                 answers.Items.Add(ans);
             }
@@ -391,11 +389,15 @@ namespace sQzClient
                 {
                     vlblAnsSh[qid - 1][i].Content = 'X';
                     vbAns[qid - 1][i] = true;
+                    AnsItem ai = (AnsItem)li.Content;
+                    ai.Selected();
                 }
                 else
                 {
                     vlblAnsSh[qid - 1][i].Content = string.Empty;
                     vbAns[qid - 1][i] = false;
+                    AnsItem ai = (AnsItem)li.Content;
+                    ai.Unselected();
                 }
             }
         }
@@ -489,6 +491,58 @@ namespace sQzClient
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             mClient.Close();
+        }
+    }
+
+    public class AnsItem : StackPanel
+    {
+        public static CornerRadius sCr = new CornerRadius();
+        //public static Thickness sTh = new Thickness(4);
+        Border mB;
+        static bool sI = false;
+        public void SInit()
+        {
+            if(!sI)
+                sCr.BottomLeft = sCr.BottomRight = sCr.TopLeft = sCr.TopRight = 50;
+        }
+        
+        public AnsItem(string t, string i)
+        {
+            SInit();
+            Orientation = Orientation.Horizontal;
+            mB = new Border();
+            mB.Width = mB.Height = 30;
+            mB.CornerRadius = sCr;
+            //mB.BorderThickness = sTh;
+            mB.Background = Theme.vBrush[(int)BrushId.Q_BG];
+            TextBlock tb = new TextBlock();
+            tb.Text = i;
+            tb.Foreground = Theme.vBrush[(int)BrushId.QID_BG];
+            tb.VerticalAlignment = VerticalAlignment.Center;
+            tb.HorizontalAlignment = HorizontalAlignment.Center;
+            mB.Child = tb;
+            Children.Add(mB);
+            TextBlock ansTxt = new TextBlock();
+            //ansTxt.FontSize = 14;
+            ansTxt.Text = t;
+            ansTxt.TextWrapping = TextWrapping.Wrap;
+            ansTxt.Width = 470;// SystemParameters.sCrollWidth;//minus is a trick
+            ansTxt.VerticalAlignment = VerticalAlignment.Center;
+            Children.Add(ansTxt);
+        }
+
+        public void Selected()
+        {
+            mB.Background = Theme.vBrush[(int)BrushId.QID_BG];
+            TextBlock t = (TextBlock)mB.Child;
+            t.Foreground = Theme.vBrush[(int)BrushId.QID_Color];
+        }
+
+        public void Unselected()
+        {
+            mB.Background = Theme.vBrush[(int)BrushId.Q_BG];
+            TextBlock t = (TextBlock)mB.Child;
+            t.Foreground = Theme.vBrush[(int)BrushId.QID_BG];
         }
     }
 }
