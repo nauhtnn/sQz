@@ -8,16 +8,16 @@
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="TakeExam">
 
-    <StackPanel x:Name="spMain" Loaded="Main_Loaded">
+    <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10">
         <TextBlock x:Name="txtWelcome" Height="30"/>
         <Grid x:Name="gQSheet">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="250"/>
+                <ColumnDefinition Width="240"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="540" Width="250">
+            <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="540" Width="240">
                 <TextBlock Text="Ans Sheet" Height="20" HorizontalAlignment="Center" FontFamily="Arial" FontWeight="Bold" FontSize="20"/>
-                <ScrollViewer x:Name="svwrAnsSh" Height="520" Width="250" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="svwrAnsSh" Height="520" Width="240" VerticalScrollBarVisibility="Auto">
                     <Grid x:Name="gAnsSh">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -29,7 +29,13 @@
                     </Grid>
                 </ScrollViewer>
             </StackPanel>
-            <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1030" Height="540" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1040" Height="540" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
+                <Grid x:Name="gQuest" Width="1024">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="512"/>
+                        <ColumnDefinition Width="512"/>
+                    </Grid.ColumnDefinitions>
+                </Grid>
             </ScrollViewer>
         </Grid>
         <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click" Height="30" Width="60"></Button>

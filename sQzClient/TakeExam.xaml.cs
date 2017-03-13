@@ -15,7 +15,7 @@ namespace sQzClient
     /// </summary>
     public partial class TakeExam : System.Windows.Controls.Page
     {
-        public static double em = 8;//16 * 1.2;
+        public static double em = 14;
         Label[][] vlblAnsSh;
         bool[][] vbAns;
         double[] vWidth;
@@ -156,7 +156,7 @@ namespace sQzClient
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
-            l.Height = vWidth[1];
+            l.Height = 28;// vWidth[1];
             Grid.SetRow(l, 0);
             Grid.SetColumn(l, 0);
             gAnsSh.Children.Add(l);
@@ -196,10 +196,10 @@ namespace sQzClient
                 l.BorderBrush = brBK;
                 l.BorderThickness = vThickness[(int)ThicknessId.MT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                l.VerticalContentAlignment = VerticalAlignment.Top;
-                l.FontFamily = vFontFml[1];
+                //l.VerticalContentAlignment = VerticalAlignment.Top;
+                //l.FontFamily = vFontFml[1];
                 l.FontWeight = FontWeights.Bold;
-                l.Height = vWidth[1];
+                //l.Height = vWidth[1];
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, 0);
                 gAnsSh.Children.Add(l);
@@ -237,7 +237,7 @@ namespace sQzClient
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.FontFamily = vFontFml[1];
             l.FontWeight = FontWeights.Bold;
-            l.Height = vWidth[1];
+            //l.Height = vWidth[1];
             Grid.SetRow(l, j);
             Grid.SetColumn(l, 0);
             gAnsSh.Children.Add(l);
@@ -308,8 +308,8 @@ namespace sQzClient
             Label l = new Label();
             l.HorizontalAlignment = HorizontalAlignment.Left;
             l.VerticalAlignment = VerticalAlignment.Top;
-            l.FontSize = em;
-            l.FontFamily = vFontFml[0];
+            //l.FontSize = em;
+            //l.FontFamily = vFontFml[0];
             l.Content = idx;
             l.Background = vBrush[(int)BrushId.QID_BG];
             l.Foreground = vBrush[(int)BrushId.QID_Color];
@@ -326,7 +326,7 @@ namespace sQzClient
             stmt.Text = quest.mStmt;
             stmt.TextWrapping = TextWrapping.Wrap;
             // dmsg.Content += "_" + idx + stmt.Text + vQuest.Count + "\n";
-            stmt.Width = vWidth[4];
+            stmt.Width = 484;// vWidth[4];
             stmt.Background = vBrush[(int)BrushId.Q_BG];
             Label stmtCon = new Label();
             stmtCon.Content = stmt;
@@ -336,7 +336,7 @@ namespace sQzClient
             stmtCon.Margin = stmtCon.Padding = zero;
             con.Children.Add(stmtCon);
             ListBox answers = new ListBox();
-            answers.Width = vWidth[4];
+            answers.Width = 484;
             answers.Name = "_" + idx;
             answers.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             answers.SelectionChanged += Ans_SelectionChanged;
@@ -347,7 +347,7 @@ namespace sQzClient
                 ansTxt.FontSize = em;
                 ansTxt.Text = quest.vAns[i];
                 ansTxt.TextWrapping = TextWrapping.Wrap;
-                ansTxt.Width = vWidth[4] - SystemParameters.ScrollWidth;//minus is a trick
+                ansTxt.Width = 470;// SystemParameters.ScrollWidth;//minus is a trick
                 ans.Content = ansTxt;
                 ans.Name = "_" + i;
                 answers.Items.Add(ans);
