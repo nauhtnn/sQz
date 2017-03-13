@@ -20,6 +20,11 @@ namespace sQzClient
         bool[][] vbAns;
         double[] vWidth;
         byte[] mbAns;
+        DateTime kDtStart;
+        TimeSpan dtRemn;
+        TimeSpan kDtDuration;
+        List<ListBox> vLbx;
+        System.Timers.Timer mTimer;
 
         Client2 mClient;
         NetCode mState;
@@ -41,16 +46,11 @@ namespace sQzClient
             mState = NetCode.Dating;
             mClient = new Client2(CliBufHndl, CliBufPrep);
             mCbMsg = new UICbMsg();
+            vLbx = new List<ListBox>();
 
             txtWelcome.Text = Examinee.sAuthNee.ToString();
 
             ShowsNavigationUI = false;
-
-            System.Timers.Timer aTimer = new System.Timers.Timer(2000);
-            // Hook up the Elapsed event for the timer. 
-            aTimer.Elapsed += UpdateSrvrMsg;
-            aTimer.AutoReset = true;
-            aTimer.Enabled = true;
         }
 
         public static SolidColorBrush[] vBrush;
@@ -129,16 +129,33 @@ namespace sQzClient
             dmsg.Height = (int)spMain.RenderSize.Height / 4;
             // spMain.Children.Add(dmsg);
 
-            double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
-            //double scaleH = spMain.RenderSize.Height / 360; //d:DesignHeight
-            ScaleTransform st = new ScaleTransform(rt, rt);
-            //svwrQSh.Width = svwrQSh.Width * rt;
-            //svwrQSh.Height = svwrQSh.Height * rt;
-            //Grid g = (Grid)svwrQSh.Content;
-            //g.RenderTransform = st;
-            //svwrQSh.RenderTransform = st;
-            //spLp.RenderTransform = st;
-            spMain.RenderTransform = st;
+            double rt = spMain.RenderSize.Width / 1280;
+            spMain.RenderTransform = new ScaleTransform(rt, rt);
+
+            string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
+                ") has signed in successfully. Press ok and start answering.";
+            MessageBox.Show(msg);
+
+            mTimer = new System.Timers.Timer(1000);
+            mTimer.Elapsed += UpdateSrvrMsg;
+            mTimer.AutoReset = true;
+            mTimer.Enabled = true;
+            kDtStart = DateTime.Now;
+            string t = Utils.ReadFile("Duration.txt");
+            int m = -1, s = -1;
+            if (t != null)
+            {
+                string[] vt = t.Split('\t');
+                if (vt.Length == 2)
+                {
+                    int.TryParse(vt[0], out m);
+                    int.TryParse(vt[1], out s);
+                }
+                if(-1 < m && -1 < s)
+                    dtRemn = kDtDuration = new TimeSpan(0, m, s);
+            }
+            if(m < 0 || s < 0)
+                dtRemn = kDtDuration = new TimeSpan(0, 30, 2);
         }
 
         void InitLeftPanel()
@@ -354,7 +371,7 @@ namespace sQzClient
             }
             answers.BorderBrush = vBrush[(int)BrushId.Ans_TopLine];
             answers.BorderThickness = new Thickness(0, 4, 0, 0);
-            //answers.Margin = answers.Padding = zero;
+            vLbx.Add(answers);
             con.Children.Add(answers);
             q.Children.Add(con);
             q.Background = vBrush[(int)BrushId.BG];
@@ -392,6 +409,7 @@ namespace sQzClient
                     mbAns[k] = Convert.ToByte(vbAns[i][j]);
             mState = NetCode.Submiting;
             mClient.ConnectWR(ref mCbMsg);
+            DisableAll();
         }
 
         public bool CliBufHndl(byte[] buf, int offs)
@@ -400,7 +418,7 @@ namespace sQzClient
             {
                 case NetCode.Submiting:
                     ushort mark = BitConverter.ToUInt16(buf, offs);
-                    btnSubmit.Content = mark;
+                    txtRs.Text = "The number of correct answer: " + mark;
                     return false;
             }
             return true;
@@ -433,10 +451,44 @@ namespace sQzClient
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
-            if (mCbMsg.ToUp())
-                Dispatcher.Invoke(() => {
-                    Console.WriteLine("txtabc" + mCbMsg.txt);
-                });
+            Dispatcher.Invoke(() =>
+            {
+                if (0 < dtRemn.Ticks)
+                {
+                    dtRemn = kDtDuration - (DateTime.Now - kDtStart);
+                    txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
+                }
+                else
+                {
+                    txtRTime.Text = "0:0";
+                    btnSubmit_Click(null, null);
+                    System.Threading.Thread th = new System.Threading.Thread(() => {
+                        Dispatcher.Invoke(() => {
+                            MessageBox.Show("Time's up! Your answers have been submitted automatically.");
+                        });
+                    });
+                    th.Start();
+                }
+            });
+        }
+
+        private void DisableAll()
+        {
+            foreach(ListBox lbx in vLbx)
+                lbx.IsEnabled = false;
+            btnSubmit.IsEnabled = false;
+            mTimer.Stop();
+            btnClose.IsEnabled = true;
+        }
+
+        private void btnClose_Click(object sender, RoutedEventArgs e)
+        {
+            Window.GetWindow(this).Close();
+        }
+
+        private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            mClient.Close();
         }
     }
 }

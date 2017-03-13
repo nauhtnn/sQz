@@ -38,6 +38,10 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
-        <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click" Height="30" Width="60"></Button>
+        <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click" Height="30" Width="60"/>
+        <TextBlock Text="Time remaining:"/>
+        <TextBlock x:Name="txtRTime" Text="Time"/>
+        <TextBlock x:Name="txtRs"/>
+        <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Height="30" Width="60" IsEnabled="False"/>
     </StackPanel>
 </Page>
