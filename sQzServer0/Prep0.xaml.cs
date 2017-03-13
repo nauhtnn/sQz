@@ -96,14 +96,19 @@ namespace sQzServer0
             });
         }
 
-        private void LoadExaminees() //same as Operation0.xaml
+        private void LoadExaminees(bool fresh) //same as Operation0.xaml
         {
             bool dark = true;
             Color c = new Color();
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
-                lbxStudent.Items.Clear();
+                ListBox l = null;
+                if (fresh)
+                    l = lbxNewStu;
+                else
+                    l = lbxStudent;
+                l.Items.Clear();
                 foreach (Examinee s in Examinee.svExaminee)
                 {
                     ListBoxItem i = new ListBoxItem();
@@ -111,7 +116,7 @@ namespace sQzServer0
                     dark = !dark;
                     if (dark)
                         i.Background = new SolidColorBrush(c);
-                    lbxStudent.Items.Add(i);
+                    l.Items.Add(i);
                 }
             });
         }
@@ -130,22 +135,28 @@ namespace sQzServer0
             if (result == true)
                 filePath = dlg.FileName;
             Examinee.ReadTxt(Utils.ReadFile(filePath));
-            LoadExaminees();
+            LoadExaminees(true);
         }
 
         private void btnInsNee_Click(object sender, RoutedEventArgs e)
         {
-            if(Date.sDBIdx != uint.MaxValue)
+            if (Date.sDBIdx != uint.MaxValue)
+            {
+                lbxNewStu.Items.Clear();
                 Examinee.DBInsert(Date.sDBIdx);
+                LoadExaminees(false);
+            }
         }
 
         private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListBox l = (ListBox)sender;
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
+            if (i == null)
+                return;
             Date.Select((string)i.Content);
             Examinee.DBSelect(Date.sDBIdx);
-            LoadExaminees();
+            LoadExaminees(false);
         }
 
         private void btnQBrowse_Click(object sender, RoutedEventArgs e)

@@ -1,0 +1,6 @@
+A1	Trần Văn A	01/01/1990	Long An
+A2	Trần Văn B	01/01/1990	Long An
+A3	Trần Văn C	02/01/1990	Tiền Giang
+B1	Trần Thị B	05/01/1990	Vĩnh Long
+B2	Trần Văn E	06/01/1990	Tiền Giang
+B3	Trần Thị C	07/01/1990	Long An

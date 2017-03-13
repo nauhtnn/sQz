@@ -18,12 +18,12 @@
             <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto">
                 <ListBox x:Name="lbxDate" Width="200" SelectionChanged="lbxDate_SelectionChanged"></ListBox>
             </ScrollViewer>
-            <ScrollViewer Width="600" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
-                <ListBox x:Name="lbxStudent" Width="600"></ListBox>
+            <ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
+                <ListBox x:Name="lbxStudent" Width="420"></ListBox>
             </ScrollViewer>
             <Button x:Name="btnInsNee" Content="&lt;&lt;" Height="30" Width="60" Click="btnInsNee_Click" Margin="5,0,0,5"/>
-            <ScrollViewer Width="380" Height="100" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="lbxNewStu" Width="380"></ListBox>
+            <ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto">
+                <ListBox x:Name="lbxNewStu" Width="420"></ListBox>
             </ScrollViewer>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10,10,10,0">

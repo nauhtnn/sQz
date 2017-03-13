@@ -273,7 +273,17 @@ namespace sQzClient
             qs.Background = vBrush[(int)BrushId.Q_BG];
             qs.ColumnDefinitions.Add(new ColumnDefinition());
             qs.ColumnDefinitions.Add(new ColumnDefinition());
-            int nc = Question.svQuest.Count / 2;
+            int nc = (Question.svQuest.Count + 1) / 2;
+            for (int i = 0; i < nc; ++i)
+            {
+                qs.RowDefinitions.Add(new RowDefinition());
+                StackPanel q = CreateQuestion(2 * i + 1);
+                Grid.SetRow(q, i);
+                Grid.SetColumn(q, 0);
+                qs.Children.Add(q);
+            }
+            if (Question.svQuest.Count % 2 == 1)
+                --nc;
             for (int i = 0; i < nc; ++i)
             {
                 qs.RowDefinitions.Add(new RowDefinition());

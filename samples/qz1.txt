@@ -1,0 +1,245 @@
+Người và máy tính giao tiếp với nhau thông qua
+Bàn phím
+\Hệ điều hành
+Đĩa cứng
+Chuột
+
+Tại sao bạn lại cần lưu tập tin sang một thiết bị lưu trữ?
+Để lưu thông tin từ RAM sang thiết bị lưu trữ
+Để lưu giữ lại dữ liệu đó
+Để tránh mất dữ liệu nếu như máy tính bị tắt
+\Tất cả các lý do trên
+
+Bạn đã cài đặt một bộ xử lý mới có tốc độ xử lý cao hơn vào máy của bạn. Điều này có thể có kết quả gì?
+Đĩa cứng máy tính sẽ lưu trữ dữ liệu nhiều hơn
+ROM (Read Only Memory) sẽ có dung lượng lớn hơn
+RAM (Random Access Memory) sẽ có dung lượng lớn hơn
+\Máy tính của bạn sẽ chạy nhanh hơn
+
+Để khởi động lại máy tính, phát biểu nào dưới đây là sai
+Nhấn tổ hợp phím Ctrl - Alt - Del, chọn mục Restart
+\Bấm nút Power trên hộp máy
+Bấm nút Reset trên hộp máy
+Từ cửa sổ màn hình nền nhấn nút Start - Shutdown, sau đó chọn mục Restart
+
+Chọn câu thích hợp đề phân biệt giữa phần mềm ứng dụng và phần mềm hệ điều hành
+Phần mềm hệ điều hành cần nhiều bộ nhớ hơn phần mềm ứng dụng để chạy
+\Phần mềm ứng dụng cần phần mềm hệ điều hành để chạy
+Phần mềm hệ điều hành cần phần mềm ứng dụng để chạy
+Phần mềm ứng dụng cần nhiều không gian trong đĩa cứng hơn phần mềm hệ điều hành để chạy
+
+Khi muốn tìm kiếm thông tin trên mạng Internet, chúng ta cần
+Tìm trong các sách danh bạ Internet
+Tùy vào nội dung tìm kiếm mà kết nối đến các websites cụ thể.
+\Tìm kiếm trên các websites tìm kiếm chuyên dụng
+Tìm kiếm ở bất kỳ một websites nào
+
+Phát biểu nào không đúng trong các phát biểu sau?
+\Trong hệ điều hành Windows, tệp có thể chứa tệp.
+Trong hệ điều hành Windows, thư mục có thể chứa các tệp và thư mục con khác.
+Trong hệ điều hành Windows, thư mục có thể chứa các thư mục con khác.
+Trong hệ điều hành Windows, thư mục có thể chứa các tệp khác.
+
+Trong các máy vi tính bộ nhớ ngoài thường bao gồm
+Đĩa cứng (HDD)
+\CD-ROM, HDD, FDD
+Đĩa mềm (Floppy Disk), CPU (Central Processing Unit)
+Đĩa cứng (HDD) , CPU (Central Processing Unit)
+
+Giáo dục và Đào tạo qua Internet thường được gọi là
+Phát thanh qua web (podcasting)
+Kết nối mạng xã hội
+Giáo dục tại gia đình
+\Học trực tuyến (e-leaming)
+
+Muốn mở một tập tin đã tồn tại trên đĩa, sau khi khởi động PowerPoint ta nhấn tổ hợp phím
+Ctrl + S
+Ctrl + N
+\Ctrl + O
+Ctrl + C
+
+Trong "www.goccay.vn", "vn" trên địa chỉ trang web có nghĩa là:
+\Ký hiệu tên nước Việt Nam
+Một ký hiệu nào đó
+Cả 2 đều sai
+Cả 2 đều đúng
+
+Làm thế nào để di chuyển cửa sổ?
+Kích vào nút Restore Down
+\Kích và kéo thanh tiêu đề để di chuyển tới vị trí mới
+Kích và kéo biểu tượng Control để di chuyển tới vị trí mới
+Kích vào bất kì chỗ nào trong cửa sổ để di chuyển tới vị trí mới
+
+Máy vi tính là hệ thống thiết bị điện tử được lắp ráp bởi các linh kiện điện tử và mạch vi xử lý. Nhìn bề ngoài máy tính bao gồm các bộ phận nào sau đây:
+Màn hình, Case (CPU, Mainboard, HDD)
+Bàn phím, Chuột, Máy in
+\Màn hình, Case (CPU, Mainboard, HDD) và Bàn phím, Chuột
+Tất cả đều sai
+
+Một người có thể mang theo thiết bị nào sau đây có tính năng gọi điện, nhắn tin, chụp ảnh và duyệt Internet?
+Hộp phụ kiện cho máy tính xách tay (docking station)
+Máy tính để bàn
+Máy nghe nhạc (media player)
+\Điện thoại thông minh
+
+Thuật ngữ nào sau đây đại diện cho các chỉ thị để máy tính thực hiện các tác vụ?
+\Phần mềm
+Phần cứng
+Thanh cuộn
+Ổ đĩa flash
+
+Trong hệ điều hành Windows, thành phần nào sau đây chứa nút Bắt đầu (Start) của hệ điều hành?
+Bảng điều khiển (control panel)
+Thư mục
+Thùng rác
+\Thanh tác vụ
+
+Hệ điều hành Windows dùng cấu trúc nào sau đây để tổ chức ổ đĩa, thư mục và tập tin trên máy tính?
+Wi-max
+Không liền kề (non-adjacent)
+\Cây phân cấp (hierarchical)
+Trojan
+
+Lựa chọn nào sau đây có dung lượng lưu trữ lớn nhất?
+Một đĩa CD dung lượng 600 MB
+\Một ổ đĩa cứng dung lượng 2 TB
+Một ổ đĩa flash dung lượng 32 GB
+Một thư mục dung lượng 100 KB
+
+Lựa chọn nào sau đây mô tả đúng về World Wide Web?
+Hệ thống mạng trên phạm vi toàn cầu liên kết nhiều mạng máy tính
+Hệ thống mạng được thiết kế để bảo vệ khỏi sự tấn công từ bên ngoài
+\Tập hợp các tài liệu kết nối với nhau và được lưu trữ trên Internet
+Mạng intranet để kết nối các thành viên vào hệ thống mạng riêng của một tổ chức.
+
+Cách kết nối nào sau đây thường trực tiếp dùng cho thiết bị di động để truy cập Internet?
+Mạng intranet
+Dây cáp mạng
+Vệ tinh
+\Wi-fi
+
+Hành động nào sau đây có thể làm phần mềm độc hại xâm nhập vào máy tính?
+Dùng phần mềm diệt vi rút quét máy tính
+Đặt lịch sao lưu dữ liệu vào vùng lưu trữ từ xa
+Tìm kiếm tập tin trên ổ cứng máy tính
+\Tải phần mềm từ mạng Internet
+
+Thao tác nào sau đây trong máy tính có thể giúp tiết kiệm năng lượng?
+Dùng ghế ngồi có thiết kế tốt
+Không bao giờ tắt máy tính
+\Đặt chế độ ngủ của máy tính hợp lý
+Điều chỉnh ánh sáng phòng máy cho phù hợp
+
+Lựa chọn nào sau đây mô tả đúng về Internet?
+\Một tập hợp các mạng máy tính trên phạm vi toàn thế giới và cộng đồng có thể truy cập.
+Tập hợp các tài liệu kết nối với nhau và được lưu trữ trên Internet.
+Hệ thống mạng được thiết kế để bảo vệ khỏi sự tấn công từ bên ngoài.
+Mạng intranet để kết nối các thành viên vào hệ thống mạng riêng của một tổ chức.
+
+Vì sao https và biểu tượng khóa hiển thị trên một trang web?
+Vì trang web đó bị đóng.
+\Vì trang web đó có thể không an toàn.
+Vì trang web đó dùng để mua hàng trực tuyến.
+Vì trang web đó an toàn.
+
+Lựa chọn nào sau đây mô tả đúng về pop-up?
+Một thư mục chứa liên kết đến các trang web để người dùng dễ truy cập trở lại.
+\Một hình thức quảng cáo trực tuyến xuất hiện dưới dạng một cửa sổ trình duyệt nhỏ.
+Một tập tin văn bản chứa thông tin về người dùng và sở thích của người dùng.
+Việc xác minh kỹ thuật số (digital verification) một website.
+
+Người dùng thuộc nhóm nào sau đây nhiều khả năng vào website có trò chơi trực tuyến, hay diễn đàn thảo luận về nhạc pop, hơn các lựa chọn còn lại?
+\Tuổi vị thành niên.
+Người cao niên.
+Giáo viên.
+Nhà khoa học.
+
+Phương châm nào sau đây mà người kiểm soát dữ liệu (data controller) nên tuân theo?
+Chắc chắn rằng thông tin cá nhân không bao giờ được cập nhật.
+Lưu trữ thông tin cá nhân trong thời gian không hạn định.
+Để thông tin cá nhân luôn sẵn sàng cho đối tác thứ ba sử dụng.
+\Chỉ lưu trữ thông tin cá nhân cho mục đích rõ ràng, chuyên biệt, được pháp luật cho phép.
+
+Hội nghị web là một ví dụ của khái niệm nào sau đây?
+Bảo vệ dữ liệu.
+\Cộng đồng ảo (virtual community).
+Luật bản quyền.
+Duyệt web (web browsing).
+
+Lựa chọn nào sau đây mô tả đúng về thuật ngữ VoIP?
+\Một giao thức trong Internet để thực hiện cuộc gọi thông qua Internet.
+Một giao thức trong Internet để gửi nhận email.
+Một giao thức trong Internet để mua hàng ở một trang web.
+Một giao thức trong Internet để giới hạn thông tin người dùng trong một website.
+
+Lựa chọn nào sau đây có kích thước tối đa là nhỏ nhất so với các lựa chọn còn lại?
+Một chữ ký ở cuối email.
+Một đính kèm trong email.
+\Một địa chỉ email.
+Một email phản hồi.
+
+Lựa chọn nào sau đây là một ví dụ về biên tập cộng tác trên mạng trực tuyến trong thời gian thực?
+Nhiều người dùng chỉnh sửa cùng một bảng tính ở các thời điểm khác nhau.
+Nhiều người dùng chỉnh sửa cùng một bảng tính ở cùng thời điểm.
+\Nhiều người dùng chỉnh sửa hai hay nhiều bảng tính ở cùng thời điểm.
+Nhiều người dùng chỉnh sửa hai hay nhiều bảng tính ở các thời điểm khác nhau.
+
+Lựa chọn nào sau đây là một lợi ích của điện toán đám mây?
+Tăng cường các dịch vụ truy cập Internet tốc độ cao.
+Dùng được với máy tính xách tay và máy tính bảng.
+Tạo ra lượng dữ liệu ít hơn.
+\Tăng khả năng truy cập các tập tin và ứng dụng và làm tăng tính di động.
+
+Lựa chọn nào sau đây nhiều khả năng là nguyên nhân làm người dùng không truy cập được môi trường học ảo?
+VoIP
+\Tường lửa
+Tin nhắn tức thời (IM)
+Màn hình máy tính
+
+Lựa chọn nào sau đây là một ví dụ về lưu trữ trực tuyến?
+\Di chuyển tập tin vào OneDrive hoặc Google Drive.
+Dùng bách khoa toàn thư trực tuyến để học tập, nghiên cứu.
+Dùng thẻ tín dụng để thanh toán trực tuyến.
+Lưu trữ dữ liệu vào ổ đĩa USB.
+
+Lựa chọn nào sau đây mô tả đúng về mạng xã hội?
+Một hình thức phát thanh trên Internet.
+Một website được phát triển bởi cộng đồng người dùng, cho phép một người dùng bất kỳ thêm và biên tập nội dung của một số chủ đề.
+\Một website cho phép người dùng kết nối với bạn bè và gia đình để trò chuyện, bình luận, chia sẻ hình ảnh, video.
+Một nhật ký trực tuyến để người dùng cá nhân hoặc nhóm người dùng ghi lại cảm nghĩ, thông tin thường nhật.
+
+Lựa chọn nào sau đây mô tả về ưu điểm nổi bật của tính năng trò chuyện trong môi trường học trực tuyến?
+\Khuyến khích sinh viên thảo luận về bài học.
+Cung cấp các câu hỏi trắc nghiệm để hướng dẫn cho giáo viên và sinh viên.
+Lên lịch để nhắc nhở và chuẩn bị cho các cuộc họp.
+Cung cấp danh sách các địa chỉ email.
+
+Lựa chọn nào sau đây nhiều khả năng là mối nguy cơ an ninh của một điện thoại thông minh?
+Dùng số định danh cá nhân (personal indentifier number).
+Sao lưu dữ liệu trên điện thoại hàng tuần.
+Tắt kết nối không dây khi không dùng.
+\Luôn mở kết nối Bluetooth.
+
+Thuật ngữ nào sau đây nói về việc lưu trữ, truy xuất, xử lý và truyền dữ liệu?
+Internet và công nghệ truyền thông.
+Internet và công nghệ thông tin.
+\Công nghệ thông tin và truyền thông.
+Công nghệ thông tin và máy tính.
+
+Đơn vị nào sau đây dùng để đo tốc độ của CPU?
+\Gigahertz (GHz).
+Số bit mỗi giây (Bps).
+Gigabytes (GB).
+Megabytes (MB).
+
+Thuật ngữ nào sau đây nói về việc ghi video và đăng trên website để người dùng có thể tải và phát lại?
+\Podcast.
+Blog.
+VoIP.
+RSS feed.
+
+Lựa chọn nào sau đây mô tả đúng về hệ điều hành máy tính?
+Một phần mềm truy xuất thông tin từ cơ sở dữ liệu.
+Một phần cứng quét ảnh giấy và chuyển thành tập tin kỹ thuật số.
+\Một phần mềm kiểm soát việc cấp phát và sử dụng phần cứng.
+Một phần cứng chụp ảnh và gửi qua Internet.
