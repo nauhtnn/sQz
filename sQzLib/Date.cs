@@ -12,7 +12,7 @@ namespace sQzLib
         /*
          *format yyyy/mm/dd for sorting easily
          CREATE TABLE IF NOT EXISTS `dates` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `date` CHAR(10) CHARACTER SET `ascii`);
+          `date` DATE, `slot` TINYINT(1));
          */
         public static List<uint> svIdx = new List<uint>();
         public static List<string> svDate = new List<string>();
