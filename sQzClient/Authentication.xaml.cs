@@ -29,6 +29,7 @@ namespace sQzClient
         bool bReconn;
         string mNeeId;
         string mBirdate;
+        Txt mTxt;
         public Authentication()
         {
             InitializeComponent();
@@ -88,6 +89,8 @@ namespace sQzClient
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
 
+            LoadTxt();
+
             double rt = w.RenderSize.Width / 1280; //design size
             ScaleTransform st = new ScaleTransform(rt, rt);
             spMain.RenderTransform = st;
@@ -96,6 +99,18 @@ namespace sQzClient
             lblStatus.Text += fwHndl.OpenFirewall();
 
             Connect(null, null);
+        }
+
+        private void LoadTxt()
+        {
+            mTxt = new Txt();
+            mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
+            txtWelcome.Text = mTxt._[(int)TxI.WELCOME];
+            txtNeeId.Text = mTxt._[(int)TxI.NEEID];
+            txtBirdate.Text = mTxt._[(int)TxI.BIRDATE] + mTxt._[(int)TxI.BIRDATE_MSG];
+            btnSignIn.Content = mTxt._[(int)TxI.SIGNIN];
+            btnReconn.Content = mTxt._[(int)TxI.CONN];
+            btnClose.Content = mTxt._[(int)TxI.CLOSE];
         }
 
         private void btnReconn_Click(object sender, RoutedEventArgs e)

@@ -58,6 +58,8 @@
     <Compile Include="Theme.xaml.cs">
       <DependentUpon>Theme.xaml</DependentUpon>
     </Compile>
+    <Compile Include="TxI.cs" />
+    <Compile Include="Txt.cs" />
     <Compile Include="Utils.cs" />
   </ItemGroup>
   <ItemGroup>

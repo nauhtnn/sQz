@@ -9,8 +9,8 @@
       Title="Authentication">
 
     <StackPanel x:Name="spMain" Loaded="Main_Loaded">
-        <TextBlock x:Name="txtWelcome" Text="Welcome" Margin="20,30,20,5" Height="30" Width="100" TextAlignment="Center"/>
-        <TextBlock x:Name="txtDate" Text="Date" Margin="20,5,20,20" Height="30" Width="100" TextAlignment="Center"/>
+        <TextBlock x:Name="txtWelcome" Text="Welcome" Margin="20,30,20,5" Height="160" Width="1240" TextAlignment="Center"/>
+        <!--<TextBlock x:Name="txtDate" Text="Date" Margin="20,5,20,20" Height="30" Width="100" TextAlignment="Center"/>-->
         <Grid HorizontalAlignment="Center">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="400"/>
@@ -22,9 +22,9 @@
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="30"/>
             </Grid.RowDefinitions>
-            <TextBlock Text="Examinee Id" Height="30" Width="100" TextAlignment="Center"/>
+            <TextBlock x:Name="txtNeeId" Text="Examinee Id" Height="30" Width="100" TextAlignment="Center"/>
             <TextBox x:Name="tbxNeeId" Grid.Row="1" Height="30" Width="100" MaxLength="5" KeyUp="tbx_NeeIdKeyUp"/>
-            <TextBlock Text="Birthdate (dd/mm/yyyy)" Grid.Column="1" Height="30" Width="200" TextAlignment="Center"/>
+            <TextBlock x:Name="txtBirdate" Text="Birthdate (dd/mm/yyyy)" Grid.Column="1" Height="30" Width="200" TextAlignment="Center" Margin="102,0,98,0"/>
             <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
                 <TextBox x:Name="tbxD" Height="30" Width="30" MaxLength="2" KeyUp="tbx_DMYKeyUp"/>
                 <TextBlock Text="/" Width="10" TextAlignment="Center"/>
