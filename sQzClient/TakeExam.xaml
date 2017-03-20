@@ -42,6 +42,6 @@
         <TextBlock Text="Time remaining:"/>
         <TextBlock x:Name="txtRTime" Text="Time"/>
         <TextBlock x:Name="txtRs"/>
-        <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Height="30" Width="60" IsEnabled="False"/>
+        <Button x:Name="btnExit" Content="Close" Click="btnExit_Click" Height="30" Width="60" IsEnabled="False"/>
     </StackPanel>
 </Page>

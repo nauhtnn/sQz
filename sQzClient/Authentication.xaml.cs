@@ -110,7 +110,7 @@ namespace sQzClient
             txtBirdate.Text = mTxt._[(int)TxI.BIRDATE] + mTxt._[(int)TxI.BIRDATE_MSG];
             btnSignIn.Content = mTxt._[(int)TxI.SIGNIN];
             btnReconn.Content = mTxt._[(int)TxI.CONN];
-            btnClose.Content = mTxt._[(int)TxI.CLOSE];
+            btnExit.Content = mTxt._[(int)TxI.EXIT];
         }
 
         private void btnReconn_Click(object sender, RoutedEventArgs e)
@@ -221,7 +221,7 @@ namespace sQzClient
             mBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
+        private void btnExit_Click(object sender, RoutedEventArgs e)
         {
             Window.GetWindow(this).Close();
         }

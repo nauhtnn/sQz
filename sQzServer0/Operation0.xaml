@@ -26,11 +26,11 @@
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Text="ID" Background="AliceBlue" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="3" Text="Birthplace" Background="Gold" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="4" Text="Mark" Background="Azure" TextAlignment="Center"/>
+                        <TextBlock x:Name="txtId" Text="ID" Background="AliceBlue" TextAlignment="Center"/>
+                        <TextBlock x:Name="txtName" Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
+                        <TextBlock x:Name="txtBirdate" Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
+                        <TextBlock x:Name="txtBirpl" Grid.Column="3" Text="Birthplace" Background="Gold" TextAlignment="Center"/>
+                        <TextBlock x:Name="txtMark" Grid.Column="4" Text="Mark" Background="Azure" TextAlignment="Center"/>
                     </Grid>
                     <Grid x:Name="gNee">
                         <Grid.ColumnDefinitions>
@@ -47,7 +47,7 @@
                 <Button x:Name="btnStartSrvr" Width="100" Height="40" Content="Start server" Click="StartSrvr_Click"></Button>
                 <Button x:Name="btnStopSrvr" Width="100" Height="40" Content="Stop srvr" Click="StopSrvr_Click"></Button>
                 <Button x:Name="btnPrep" Width="100" Height="40" Content="Prepare" Click="btnPrep_Click"></Button>
-                <Button x:Name="btnClose" Content="Close" Height="40" Width="100" Click="btnClose_Click"/>
+                <Button x:Name="btnExit" Content="Close" Height="40" Width="100" Click="btnExit_Click"/>
             </StackPanel>
             <StackPanel x:Name="spLeft">
                 <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
@@ -74,11 +74,11 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="N of exam" Grid.Row="0" Grid.Column="0" Margin="5" Height="25"/>
+                <TextBlock x:Name="txtNe" Text="N of exam" Grid.Row="0" Grid.Column="0" Margin="5" Height="25"/>
                 <TextBox x:Name="tbxNe" Width="30" Grid.Row="0" Grid.Column="1" Margin="5"/>
-                <Button Grid.Row="0" x:Name="btnQSheet" Content="Create Q Sh" Grid.Column="2" Click="btnQSheet_Click"/>
-                <TextBlock Text="N of quest" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
-                <TextBlock x:Name="txtNq" Width="30" Grid.Row="1" Grid.Column="1" Margin="5"/>
+                <Button Grid.Row="0" x:Name="btnExGen" Content="Create Q Sh" Grid.Column="2" Click="btnExGen_Click"/>
+                <TextBlock x:Name="txtNq" Text="N of quest" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
+                <TextBlock x:Name="tbxNq" Width="30" Grid.Row="1" Grid.Column="1" Margin="5"/>
                 <TextBlock Text="module 2" Grid.Row="2" Grid.Column="0" Margin="5" />
                 <TextBox x:Name="tbxIU2" Width="30" Grid.Row="2" Grid.Column="1" Margin="5"/>
                 <TextBlock Text="module 4" Grid.Row="3" Grid.Column="0" Margin="5" />

@@ -480,10 +480,10 @@ namespace sQzClient
                 lbx.IsEnabled = false;
             btnSubmit.IsEnabled = false;
             mTimer.Stop();
-            btnClose.IsEnabled = true;
+            btnExit.IsEnabled = true;
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
+        private void btnExit_Click(object sender, RoutedEventArgs e)
         {
             Window.GetWindow(this).Close();
         }

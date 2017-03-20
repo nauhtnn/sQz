@@ -22,6 +22,8 @@ namespace sQzServer0
     /// </summary>
     public partial class Prep0 : Page
     {
+        private Txt mTxt;
+
         public Prep0()
         {
             ShowsNavigationUI = false;
@@ -61,12 +63,15 @@ namespace sQzServer0
             }
         }
 
-        private void spMain_Loaded(object sender, RoutedEventArgs e)
+        private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Application.Current.MainWindow.FontSize = 16;
             double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
             ScaleTransform st = new ScaleTransform(rt, rt);
             spMain.RenderTransform = st;
+
+            LoadTxt();
+
             InitLbxQCatgry();
             LoadDate();
         }
@@ -74,9 +79,12 @@ namespace sQzServer0
         void InitLbxQCatgry()
         {
             //names corresponding to IUxx
-            string[] qCatName = { "Concept of ICT", "Computer", "Word", "Spreadsheet", "Presentation",
-                "Internet", "Adv Word", "Adv Spreadsheet", "Database Mgmt", "Img processing",
-                "Project Mgmt", "Img Editting"};
+            //string[] qCatName = { "Concept of ICT", "Computer", "Word", "Spreadsheet", "Presentation",
+            //    "Internet", "Adv Word", "Adv Spreadsheet", "Database Mgmt", "Img processing",
+            //    "Project Mgmt", "Img Editting"};
+            List<string> qCatName = new List<string>();
+            for (int i = (int)TxI.IU01; i <= (int)TxI.IU15; ++i)
+                qCatName.Add(mTxt._[i]);
             bool dark = true;
             Color c = new Color();
             c.A = 0xff;
@@ -127,7 +135,7 @@ namespace sQzServer0
 
             // set filter for file extension and default file extension 
             dlg.DefaultExt = ".txt";
-            dlg.Filter = "text documents (.txt)|*.txt";
+            dlg.Filter = "text documents (*.txt)";
             bool? result = dlg.ShowDialog();
 
             // get the selected file name and display in a textbox
@@ -226,6 +234,15 @@ namespace sQzServer0
                 Question.DBSelect();
                 LoadQuest(true);
             }
+        }
+
+        private void LoadTxt()
+        {
+            mTxt = new Txt();
+            mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
+            btnInsDate.Content = mTxt._[(int)TxI.DATE_ADD];
+            btnNeeBrowse.Content = mTxt._[(int)TxI.NEE_ADD];
+            btnQBrowse.Content = mTxt._[(int)TxI.Q_ADD];
         }
     }
 }

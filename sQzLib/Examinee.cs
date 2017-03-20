@@ -119,18 +119,21 @@ namespace sQzLib
             svExaminee.Clear();
             svLvId2Idx.Clear();
             int i = -1;
-            while (reader.Read())
+            if (reader != null)
             {
-                Examinee s = new Examinee();
-                s.mLvl = (ExamLvl)(reader.GetInt16(1));//hardcode
-                s.mId = reader.GetUInt16(2);
-                s.mName = reader.GetString(3);
-                s.mBirthdate = reader.GetString(4);
-                s.mBirthplace = reader.GetString(5);
-                svExaminee.Add(s);
-                svLvId2Idx.Add((int)s.mLvl * s.mId, ++i);
+                while (reader.Read())
+                {
+                    Examinee s = new Examinee();
+                    s.mLvl = (ExamLvl)(reader.GetInt16(1));//hardcode
+                    s.mId = reader.GetUInt16(2);
+                    s.mName = reader.GetString(3);
+                    s.mBirthdate = reader.GetString(4);
+                    s.mBirthplace = reader.GetString(5);
+                    svExaminee.Add(s);
+                    svLvId2Idx.Add((int)s.mLvl * s.mId, ++i);
+                }
+                reader.Close();
             }
-            reader.Close();
             DBConnect.Close(ref conn);
             ToByteArr();
         }

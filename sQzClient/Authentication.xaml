@@ -41,6 +41,6 @@
         <ScrollViewer Width="600" Height="300" VerticalScrollBarVisibility="Auto">
             <TextBox x:Name="lblStatus" Height="300" TextWrapping="Wrap" Text="TextBox" Width="600"/>
         </ScrollViewer>
-        <Button x:Name="btnClose" Content="Close" Height="30" Width="100" Click="btnClose_Click"/>
+        <Button x:Name="btnExit" Content="Close" Height="30" Width="100" Click="btnExit_Click"/>
     </StackPanel>
 </Page>

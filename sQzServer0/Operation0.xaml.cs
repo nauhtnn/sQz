@@ -26,6 +26,7 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         byte[] vQuestAnsKey;
         Dictionary<int, TextBlock> vMark;
+        private Txt mTxt;
 
         public Operation0()
         {
@@ -161,6 +162,8 @@ namespace sQzServer0
 
             spMain.Background = Theme.vBrush[(int)BrushId.Ans_Highlight];
 
+            LoadTxt();
+
             LoadDates();
             InitQPanel();
 
@@ -196,7 +199,7 @@ namespace sQzServer0
             mServer.Stop(ref mCbMsg);
         }
 
-        private void btnQSheet_Click(object sender, RoutedEventArgs e)
+        private void btnExGen_Click(object sender, RoutedEventArgs e)
         {
             //Question.sIU = IUxx.IU01;
             //Question.DBSelect();
@@ -254,7 +257,7 @@ namespace sQzServer0
             });
         }
 
-        private void btnClose_Click(object sender, RoutedEventArgs e)
+        private void btnExit_Click(object sender, RoutedEventArgs e)
         {
             Window.GetWindow(this).Close();
         }
@@ -308,7 +311,7 @@ namespace sQzServer0
                     t.TextChanged += tbxIU_TextChanged;
                 }
             }
-            txtNq.Text = "0";
+            tbxNq.Text = "0";
         }
 
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
@@ -334,6 +337,25 @@ namespace sQzServer0
             //short v;
             //if(!short.TryParse(t.Text, out v))
             //    e.Handled = true;
+        }
+
+        private void LoadTxt()
+        {
+            mTxt = new Txt();
+            mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
+            btnExit.Content = mTxt._[(int)TxI.EXIT];
+            btnStartSrvr.Content = mTxt._[(int)TxI.STRT_SRVR];
+            btnStopSrvr.Content = mTxt._[(int)TxI.STOP_SRVR];
+            btnPrep.Content = mTxt._[(int)TxI.PREP];
+            btnExGen.Content = mTxt._[(int)TxI.EX_GEN];
+            btnExit.Content = mTxt._[(int)TxI.EXIT];
+            txtNe.Text = mTxt._[(int)TxI.EX_SH_N];
+            txtNq.Text = mTxt._[(int)TxI.Q_N];
+            txtBirdate.Text = mTxt._[(int)TxI.BIRDATE];
+            txtBirpl.Text = mTxt._[(int)TxI.BIRPL];
+            txtName.Text = mTxt._[(int)TxI.NEE_NAME];
+            txtId.Text = mTxt._[(int)TxI.NEEID_S];
+            txtMark.Text = mTxt._[(int)TxI.MARK];
         }
     }
 }

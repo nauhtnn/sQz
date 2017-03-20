@@ -608,23 +608,26 @@ namespace sQzLib
             string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             svQuest.Clear();
-            while (reader.Read())
+            if (reader != null)
             {
-                Question q = new Question();
-                string[] s = reader.GetString(1).Split('\n');//hardcode
-                q.mStmt = s[0];
-                q.nAns = 4;
-                q.vAns = new string[4];
-                for (int i = 0; i < 4; ++i)
-                    q.vAns[i] = s[i + 1];
-                string x = reader.GetString(2);
-                q.vKeys = new bool[4];
-                for (int i = 0; i < 4; ++i)
-                    q.vKeys[i] = (x[i] == '1');
-                q.mIU = sIU;
-                svQuest.Add(q);
+                while (reader.Read())
+                {
+                    Question q = new Question();
+                    string[] s = reader.GetString(1).Split('\n');//hardcode
+                    q.mStmt = s[0];
+                    q.nAns = 4;
+                    q.vAns = new string[4];
+                    for (int i = 0; i < 4; ++i)
+                        q.vAns[i] = s[i + 1];
+                    string x = reader.GetString(2);
+                    q.vKeys = new bool[4];
+                    for (int i = 0; i < 4; ++i)
+                        q.vKeys[i] = (x[i] == '1');
+                    q.mIU = sIU;
+                    svQuest.Add(q);
+                }
+                reader.Close();
             }
-            reader.Close();
             DBConnect.Close(ref conn);
             ToByteArr(true);
         }
@@ -639,30 +642,28 @@ namespace sQzLib
                 siu = siu.Substring(1);
             string qry = DBConnect.mkQrySelect("quest" + siu, null, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            if(reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return;
-            }
             svQuest.Clear();
-            while (reader.Read() && 0 < n)
+            if (reader != null)
             {
-                Question q = new Question();
-                string[] s = reader.GetString(1).Split('\n');//hardcode
-                q.mStmt = s[0];
-                q.nAns = 4;
-                q.vAns = new string[4];
-                for (int i = 0; i < 4; ++i)
-                    q.vAns[i] = s[i + 1];
-                string x = reader.GetString(2);
-                q.vKeys = new bool[4];
-                for (int i = 0; i < 4; ++i)
-                    q.vKeys[i] = (x[i] == '1');
-                q.mIU = sIU;
-                l.Add(q);
-                --n;
+                while (reader.Read() && 0 < n)
+                {
+                    Question q = new Question();
+                    string[] s = reader.GetString(1).Split('\n');//hardcode
+                    q.mStmt = s[0];
+                    q.nAns = 4;
+                    q.vAns = new string[4];
+                    for (int i = 0; i < 4; ++i)
+                        q.vAns[i] = s[i + 1];
+                    string x = reader.GetString(2);
+                    q.vKeys = new bool[4];
+                    for (int i = 0; i < 4; ++i)
+                        q.vKeys[i] = (x[i] == '1');
+                    q.mIU = sIU;
+                    l.Add(q);
+                    --n;
+                }
+                reader.Close();
             }
-            reader.Close();
             DBConnect.Close(ref conn);
         }
     }
