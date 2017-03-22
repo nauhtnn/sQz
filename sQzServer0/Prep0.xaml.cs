@@ -32,7 +32,7 @@ namespace sQzServer0
 
         private void btnInsDate_Click(object sender, RoutedEventArgs e)
         {
-            if (Date.ChkFmt(tbxDate.Text))
+            if (Date.Chk224(tbxDate.Text))
             {
                 Date.DBInsert(tbxDate.Text);
                 LoadDate();
@@ -135,7 +135,7 @@ namespace sQzServer0
 
             // set filter for file extension and default file extension 
             dlg.DefaultExt = ".txt";
-            dlg.Filter = "text documents (*.txt)";
+            dlg.Filter = "text documents (*.txt)|*.txt";
             bool? result = dlg.ShowDialog();
 
             // get the selected file name and display in a textbox

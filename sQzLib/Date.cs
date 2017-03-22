@@ -10,7 +10,6 @@ namespace sQzLib
     public class Date
     {
         /*
-         *format yyyy/mm/dd for sorting easily
          CREATE TABLE IF NOT EXISTS `dates` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
           `date` DATE, `slot` TINYINT(1));
          */
@@ -19,25 +18,56 @@ namespace sQzLib
         public static byte[] sbArr = null;
         private static int snDate = 0;//redundant but convenient
         public static uint sDBIdx = uint.MaxValue;
+		private static int sDD = 0, sMM = 0, sYYYY = 0;
 
-        public static bool ChkFmt(string s)
+        public static bool Chk224(string s)
         {
             if (s == null)
                 return false;
-            if (s.Length != 10)
+            if (s.Length < 10)
                 return false;
             int n = 0;
             int offs = 0;
-            if (!int.TryParse(s.Substring(offs, 2), out n))
+            if (!int.TryParse(s.Substring(offs, 2), out sDD))
                 return false;
             offs += 3;
-            if (!int.TryParse(s.Substring(offs, 2), out n))
+            if (!int.TryParse(s.Substring(offs, 2), out sMM))
                 return false;
             offs += 3;
-            if (!int.TryParse(s.Substring(offs, 4), out n))
+            if (!int.TryParse(s.Substring(offs, 4), out sYYYY))
                 return false;
             return true;
         }
+		private static bool Chk422(string s)
+        {
+            if (s == null)
+                return false;
+            if (s.Length < 10)
+                return false;
+            int n = 0;
+            int offs = 0;
+            if (!int.TryParse(s.Substring(offs, 4), out sYYYY))
+                return false;
+            offs += 5;
+            if (!int.TryParse(s.Substring(offs, 2), out sMM))
+                return false;
+            offs += 3;
+            if (!int.TryParse(s.Substring(offs, 2), out sDD))
+                return false;
+            return true;
+        }
+		public static string To422(string s) {
+			if(!Chk224(s))
+				return null;
+			else
+				return "" + sYYYY + '-' + sMM + '-' + sDD;
+		}
+		public static string To224(string s) {
+			if(!Chk422(s))
+				return null;
+			else
+				return "" + sDD + '/' + sMM + '/' + sYYYY;
+		}
         public static void Select(string date)
         {
             int i = svDate.IndexOf(date);
@@ -46,6 +76,9 @@ namespace sQzLib
         }
         public static void DBInsert(string date)
         {
+			date = To422(date);
+			if(date == null)
+				return;
             date = "'" + date + "'";
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -63,10 +96,15 @@ namespace sQzLib
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             svIdx.Clear();
             svDate.Clear();
+            string s = null;
             while (reader.Read())
             {
-                svIdx.Add(reader.GetUInt32(0));//hardcode
-                svDate.Add(reader.GetString(1));
+                s = reader.GetString(1);
+                if (s != null && 9 < s.Length)
+                {
+                    svIdx.Add(reader.GetUInt32(0));//hardcode
+                    svDate.Add(s.Substring(0, 10));//suppose ok
+                }
             }
             reader.Close();
             DBConnect.Close(ref conn);

@@ -43,7 +43,7 @@ namespace sQzLib
                 password = vs[0];
             }
             connStr = "SERVER=" + server + ";" + "DATABASE=" +
-            database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";";
+                database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";charset=utf32";
             //bConnected = false;
             MySqlConnection conn = new MySqlConnection(connStr);
             if (Open(ref conn))
