@@ -12,7 +12,7 @@
         <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
             <TextBox x:Name="tbxDate" Height="60" Width="160" />
             <Button x:Name="btnInsDate"  Content="Insert Date" Height="60" Width="100" Click="btnInsDate_Click"/>
-            <Button x:Name="btnNeeBrowse" Content="Browse Examinee" Height="60" Width="160" Click="btnBrowse_Click" HorizontalAlignment="Right"/>
+            <Button x:Name="btnNeeBrowse" Content="Browse Examinee" Height="60" Width="160" Click="btnNeeBrowse_Click" HorizontalAlignment="Right"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
             <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto">
@@ -36,8 +36,7 @@
             </ScrollViewer>
             <StackPanel HorizontalAlignment="Stretch">
                 <Button x:Name="btnQBrowse" Content="Browse Question" Height="60" Width="156" Click="btnQBrowse_Click"></Button>
-                <Button x:Name="btn2Left" Content="&lt;&lt;" Height="30" Width="60" Click="btn2Left_Click"></Button>
-                <Button x:Name="btnInsQuest" Content="Insert to DB;" Height="30" Width="60" Click="btnInsQuest_Click"></Button>
+                <Button x:Name="btnInsQuest" Content="&lt;&lt;" Height="30" Width="60" Click="btnInsQuest_Click"></Button>
             </StackPanel>
             <ScrollViewer Width="472" Height="410" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
                 <StackPanel x:Name="gwQuest">

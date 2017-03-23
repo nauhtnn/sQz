@@ -129,7 +129,7 @@ namespace sQzServer0
             });
         }
 
-        private void btnBrowse_Click(object sender, RoutedEventArgs e)
+        private void btnNeeBrowse_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
 
@@ -206,22 +206,15 @@ namespace sQzServer0
             });
         }
 
-        private void btn2Left_Click(object sender, RoutedEventArgs e)
-        {
-            gQuest.Children.Clear();
-            foreach (UIElement i in gwQuest.Children)
-            {
-                TextBlock t = new TextBlock();
-                t.Text = ((TextBlock)i).Text;
-                gQuest.Children.Add(t);
-            }
-            gwQuest.Children.Clear();
-        }
-
         private void btnInsQuest_Click(object sender, RoutedEventArgs e)
         {
-            Question.DBInsert();
-            LoadQuest(true);
+            if (0 < gwQuest.Children.Count)
+            {
+                gQuest.Children.Clear();
+                gwQuest.Children.Clear();
+                Question.DBInsert();
+                LoadQuest(true);
+            }
         }
 
         private void lbxQCatgry_SelectionChanged(object sender, SelectionChangedEventArgs e)
