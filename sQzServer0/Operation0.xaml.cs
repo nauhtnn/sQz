@@ -201,48 +201,61 @@ namespace sQzServer0
 
         private void btnExGen_Click(object sender, RoutedEventArgs e)
         {
-            int v;
-            List<Question> l = new List<Question>();
-            for (int i = 1; i < 16; ++i)
-            {
-                TextBox t = (TextBox)FindName("tbxIU" + i);
-                if (t != null && 0 < t.Text.Length)
-                {
-                    if (int.TryParse(t.Text, out v))
-                    {
-                        IUxx iu = (IUxx)i;
-                        Question.DBSelect(iu, v, ref l);
-                    }
-                }
-            }
-            if(0 < l.Count)
-            {
-                Question.svQuest = l;
-                Question.ToByteArr(true);
-                LoadQuest();
-            }
+			TextBox t = (TextBox)FindName("tbxNe");
+			int n = 1;
+			if(t != null && 0 < t.Text.Length)
+				int.TryParse(t.Text, out n);
+			Question.svvQuest = new List<Question>[n];
+			while(0 < n) {
+				int v;
+				List<Question> l = new List<Question>();
+				for (int i = 1; i < 16; ++i)
+				{
+					t = (TextBox)FindName("tbxIU" + i);
+					if (t != null && 0 < t.Text.Length)
+					{
+						if (int.TryParse(t.Text, out v))
+						{
+							IUxx iu = (IUxx)i;
+							Question.DBSelect(iu, v, ref l);
+						}
+					}
+				}
+				--n;
+				if(0 < l.Count)
+					Question.svvQuest[n] = l;
+			}
+            LoadQuest();
         }
 
-        private void LoadQuest() //same as Operation0.xaml
+        private void LoadQuest()
         {
             bool dark = true;
             Color c = new Color();
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
-                int x = 0;
-                gQuest.Children.Clear();
-                foreach (Question q in Question.svQuest)
-                {
-                    TextBlock i = new TextBlock();
-                    i.Text = ++x + ") " + q.ToString();
-                    dark = !dark;
-                    if (dark)
-                        i.Background = new SolidColorBrush(c);
-                    else
-                        i.Background = Theme.vBrush[(int)BrushId.LeftPanel_BG];
-                    gQuest.Children.Add(i);
-                }
+				tbcQuest.Items.Clear();
+				int e = 0;
+				foreach(List<Question> l in Question.svvQuest) {
+					TabItem ti = new TabItem();
+					ti.Header = ++e;
+					StackPanel sp = new StackPanel();
+                    int x = 0;
+                    foreach (Question q in Question.svQuest)
+					{
+						TextBlock i = new TextBlock();
+						i.Text = ++x + ") " + q.ToString();
+						dark = !dark;
+						if (dark)
+							i.Background = new SolidColorBrush(c);
+						else
+							i.Background = Theme.vBrush[(int)BrushId.LeftPanel_BG];
+						sp.Children.Add(i);
+					}
+					ti.Content = sp;
+					tbcQuest.Items.Add(ti);
+				}
             });
         }
 
@@ -325,7 +338,7 @@ namespace sQzServer0
                         t.Text = "0";
                 }
             }
-            txtNq.Text = "" + n;
+            tbxNq.Text = "" + n;
         }
 
         private void txtIU_KeyDown(object sender, KeyEventArgs e)

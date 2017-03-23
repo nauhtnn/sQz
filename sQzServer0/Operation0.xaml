@@ -74,8 +74,8 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="txtNe" Text="N of exam" Grid.Row="0" Grid.Column="0" Margin="5" Height="25"/>
-                <TextBox x:Name="tbxNe" Width="30" Grid.Row="0" Grid.Column="1" Margin="5"/>
+                <TextBlock x:Name="txtNe" Text="N of exam" Grid.Column="0" Margin="5" Height="25"/>
+                <TextBox x:Name="tbxNe" Width="30" Grid.Column="1" Margin="5"/>
                 <Button Grid.Row="0" x:Name="btnExGen" Content="Create Q Sh" Grid.Column="2" Click="btnExGen_Click"/>
                 <TextBlock x:Name="txtNq" Text="N of quest" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
                 <TextBlock x:Name="tbxNq" Width="30" Grid.Row="1" Grid.Column="1" Margin="5"/>
@@ -112,8 +112,8 @@
                 <TextBox x:Name="tbxIU15" Width="30" Grid.Row="8" Grid.Column="3" Margin="5"/>
             </Grid>
             <ScrollViewer Width="400" Height="320" VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="gQuest">
-                </StackPanel>
+				<TabControl x:Name="tbcQuest">
+				</TabControl>
             </ScrollViewer>
         </StackPanel>
     </StackPanel>

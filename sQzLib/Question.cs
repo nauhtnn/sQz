@@ -62,6 +62,7 @@ namespace sQzLib
 
     public class Question
     {
+		public static List<Question>[] svvQuest = null;
         public static List<Question> svQuest = new List<Question>();
         public string mStmt; //statement
         int nAns;
