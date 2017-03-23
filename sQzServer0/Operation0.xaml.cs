@@ -201,9 +201,6 @@ namespace sQzServer0
 
         private void btnExGen_Click(object sender, RoutedEventArgs e)
         {
-            //Question.sIU = IUxx.IU01;
-            //Question.DBSelect();
-            //LoadQuest();
             int v;
             List<Question> l = new List<Question>();
             for (int i = 1; i < 16; ++i)

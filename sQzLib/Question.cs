@@ -571,6 +571,8 @@ namespace sQzLib
             if (sIU == IUxx.IU00)
                 return;
             MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
             string[] attbs = new string[2];//hardcode
             attbs[0] = "body";
             attbs[1] = "ansKeys";
@@ -642,14 +644,13 @@ namespace sQzLib
                 siu = siu.Substring(1);
             string qry = DBConnect.mkQrySelect("quest" + siu, null, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            svQuest.Clear();
             if (reader != null)
             {
                 while (reader.Read() && 0 < n)
                 {
                     Question q = new Question();
                     string[] s = reader.GetString(1).Split('\n');//hardcode
-                    q.mStmt = s[0];
+                    q.mStmt = "(" + siu + ')' + s[0];
                     q.nAns = 4;
                     q.vAns = new string[4];
                     for (int i = 0; i < 4; ++i)

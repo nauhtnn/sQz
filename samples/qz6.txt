@@ -1,0 +1,101 @@
+﻿Lựa chọn nào sau đây mô tả đúng về Internet?
+\Một tập hợp các mạng máy tính trên phạm vi toàn thế giới và cộng đồng có thể truy cập.
+Tập hợp các tài liệu kết nối với nhau và được lưu trữ trên Internet.
+Hệ thống mạng được thiết kế để bảo vệ khỏi sự tấn công từ bên ngoài.
+Mạng intranet để kết nối các thành viên vào hệ thống mạng riêng của một tổ chức.
+
+Vì sao https và biểu tượng khóa hiển thị trên một trang web?
+Vì trang web đó bị đóng.
+\Vì trang web đó có thể không an toàn.
+Vì trang web đó dùng để mua hàng trực tuyến.
+Vì trang web đó an toàn.
+
+Lựa chọn nào sau đây mô tả đúng về pop-up?
+Một thư mục chứa liên kết đến các trang web để người dùng dễ truy cập trở lại.
+\Một hình thức quảng cáo trực tuyến xuất hiện dưới dạng một cửa sổ trình duyệt nhỏ.
+Một tập tin văn bản chứa thông tin về người dùng và sở thích của người dùng.
+Việc xác minh kỹ thuật số (digital verification) một website.
+
+Người dùng thuộc nhóm nào sau đây nhiều khả năng vào website có trò chơi trực tuyến, hay diễn đàn thảo luận về nhạc pop, hơn các lựa chọn còn lại?
+\Tuổi vị thành niên.
+Người cao niên.
+Giáo viên.
+Nhà khoa học.
+
+Phương châm nào sau đây mà người kiểm soát dữ liệu (data controller) nên tuân theo?
+Chắc chắn rằng thông tin cá nhân không bao giờ được cập nhật.
+Lưu trữ thông tin cá nhân trong thời gian không hạn định.
+Để thông tin cá nhân luôn sẵn sàng cho đối tác thứ ba sử dụng.
+\Chỉ lưu trữ thông tin cá nhân cho mục đích rõ ràng, chuyên biệt, được pháp luật cho phép.
+
+Hội nghị web là một ví dụ của khái niệm nào sau đây?
+Bảo vệ dữ liệu.
+\Cộng đồng ảo (virtual community).
+Luật bản quyền.
+Duyệt web (web browsing).
+
+Lựa chọn nào sau đây mô tả đúng về thuật ngữ VoIP?
+\Một giao thức trong Internet để thực hiện cuộc gọi thông qua Internet.
+Một giao thức trong Internet để gửi nhận email.
+Một giao thức trong Internet để mua hàng ở một trang web.
+Một giao thức trong Internet để giới hạn thông tin người dùng trong một website.
+
+Lựa chọn nào sau đây có giới hạn kích thước tối đa là nhỏ nhất so với các lựa chọn còn lại?
+\Một chữ ký ở cuối email.
+Một đính kèm trong email.
+Một địa chỉ email.
+Một email phản hồi.
+
+Lựa chọn nào sau đây là một ví dụ về biên tập cộng tác trên mạng trực tuyến trong thời gian thực?
+Nhiều người dùng chỉnh sửa cùng một bảng tính ở các thời điểm khác nhau.
+Nhiều người dùng chỉnh sửa cùng một bảng tính ở cùng thời điểm.
+\Nhiều người dùng chỉnh sửa hai hay nhiều bảng tính ở cùng thời điểm.
+Nhiều người dùng chỉnh sửa hai hay nhiều bảng tính ở các thời điểm khác nhau.
+
+Lựa chọn nào sau đây là một lợi ích của điện toán đám mây?
+Tăng cường các dịch vụ truy cập Internet tốc độ cao.
+Dùng được với máy tính xách tay và máy tính bảng.
+Tạo ra lượng dữ liệu ít hơn.
+\Tăng khả năng truy cập các tập tin và ứng dụng và làm tăng tính di động.
+
+Lựa chọn nào sau đây nhiều khả năng là nguyên nhân làm người dùng không truy cập được môi trường học ảo?
+VoIP
+\Tường lửa
+Tin nhắn tức thời (IM)
+Màn hình máy tính
+
+Lựa chọn nào sau đây là một ví dụ về lưu trữ trực tuyến?
+\Di chuyển tập tin vào OneDrive hoặc Google Drive.
+Dùng bách khoa toàn thư trực tuyến để học tập, nghiên cứu.
+Dùng thẻ tín dụng để thanh toán trực tuyến.
+Lưu trữ dữ liệu vào ổ đĩa USB.
+
+Lựa chọn nào sau đây mô tả đúng về mạng xã hội?
+Một hình thức phát thanh trên Internet.
+Một website được phát triển bởi cộng đồng người dùng, cho phép một người dùng bất kỳ thêm và biên tập nội dung của một số chủ đề.
+\Một website cho phép người dùng kết nối với bạn bè và gia đình để trò chuyện, bình luận, chia sẻ hình ảnh, video.
+Một nhật ký trực tuyến để người dùng cá nhân hoặc nhóm người dùng ghi lại cảm nghĩ, thông tin thường nhật.
+
+Lựa chọn nào sau đây mô tả về ưu điểm nổi bật của tính năng trò chuyện trong môi trường học trực tuyến?
+\Khuyến khích sinh viên thảo luận về bài học.
+Cung cấp các câu hỏi trắc nghiệm để hướng dẫn cho giáo viên và sinh viên.
+Lên lịch để nhắc nhở và chuẩn bị cho các cuộc họp.
+Cung cấp danh sách các địa chỉ email.
+
+Lựa chọn nào sau đây nhiều khả năng là mối nguy cơ an ninh của một điện thoại thông minh?
+Dùng số định danh cá nhân (personal indentifier number).
+Sao lưu dữ liệu trên điện thoại hàng tuần.
+Tắt kết nối không dây khi không dùng.
+\Luôn mở kết nối Bluetooth.
+
+Khi muốn tìm kiếm thông tin trên mạng Internet, chúng ta cần
+Tìm trong các sách danh bạ Internet
+Tùy vào nội dung tìm kiếm mà kết nối đến các websites cụ thể.
+\Tìm kiếm trên các websites tìm kiếm chuyên dụng
+Tìm kiếm ở bất kỳ một websites nào
+
+Trong "www.goccay.vn", "vn" trên địa chỉ trang web có nghĩa là:
+\Ký hiệu tên nước Việt Nam
+Một ký hiệu nào đó
+Cả 2 đều sai
+Cả 2 đều đúng
