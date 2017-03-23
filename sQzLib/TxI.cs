@@ -2,6 +2,7 @@ namespace sQzLib {
 	public enum TxI {
 		LALGITC,
 		WELCOME,
+		DATE,
 		NEEID,
 		NEEID_S,
 		NEEID_NOTI,

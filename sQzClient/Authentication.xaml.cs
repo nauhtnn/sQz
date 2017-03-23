@@ -62,14 +62,14 @@ namespace sQzClient
             mBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
             if (mBirdate.Length != 10)
             {
-                txtAuth.Text = "Date format is invalid!";
+                txtAuth.Text = mTxt._[(int)TxI.BIRDATE_NOTI];
                 return;
             }
             ExamLvl lv = ExamLvl.Basis;
             ushort id = ushort.MaxValue;
             if(!Examinee.ToID(mNeeId, ref lv, ref id))
             {
-                txtAuth.Text = "Examinee's identity is invalid!";
+                txtAuth.Text = mTxt._[(int)TxI.NEEID_NOTI];
                 return;
             }
             Thread th = new Thread(() => { mClient.ConnectWR(ref mCbMsg); });
@@ -88,12 +88,13 @@ namespace sQzClient
             w.WindowState = WindowState.Maximized;
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
+            w.FontSize = 14;
 
             LoadTxt();
 
             double rt = w.RenderSize.Width / 1280; //design size
             ScaleTransform st = new ScaleTransform(rt, rt);
-            spMain.RenderTransform = st;
+            //spMain.RenderTransform = st;
 
             FirewallHandler fwHndl = new FirewallHandler(3);
             lblStatus.Text += fwHndl.OpenFirewall();
@@ -105,7 +106,9 @@ namespace sQzClient
         {
             mTxt = new Txt();
             mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
+            txtLalgitc.Text = mTxt._[(int)TxI.LALGITC];
             txtWelcome.Text = mTxt._[(int)TxI.WELCOME];
+            txtDate.Text = mTxt._[(int)TxI.DATE] + DateTime.Today;
             txtNeeId.Text = mTxt._[(int)TxI.NEEID];
             txtBirdate.Text = mTxt._[(int)TxI.BIRDATE] + mTxt._[(int)TxI.BIRDATE_MSG];
             btnSignIn.Content = mTxt._[(int)TxI.SIGNIN];
@@ -137,7 +140,7 @@ namespace sQzClient
                         return true;//continue
                     }
                     Dispatcher.Invoke(()=> {
-                        txtAuth.Text = "The examinee is not found. Pls try again";
+                        txtAuth.Text = mTxt._[(int)TxI.SIGNIN_NOTI];
                     });
                     break;
                 case NetCode.ExamRetrieving:
@@ -184,7 +187,7 @@ namespace sQzClient
             {
                 if (!char.IsDigit(e.Key.ToString()[0]))
                 {
-                    txtDMYMsg.Text = "Digit only!";
+                    txtDMYMsg.Text = mTxt._[(int)TxI.BIRDATE_NOTI];
                     e.Handled = true;
                 }
             }
@@ -206,7 +209,7 @@ namespace sQzClient
             {
                 if (e.Key != Key.A && e.Key != Key.B)
                 {
-                    txtNeeIdMsg.Text = "Examinee Id must start with 'A' or 'B'!";
+                    txtNeeIdMsg.Text = mTxt._[(int)TxI.NEEID_NOTI];
                     e.Handled = true;
                 }
             }
