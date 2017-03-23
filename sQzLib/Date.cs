@@ -96,10 +96,11 @@ namespace sQzLib
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             svIdx.Clear();
             svDate.Clear();
-            string s = null;
+            string s;
             while (reader.Read())
             {
-                s = reader.GetString(1);
+                try { s = reader.GetDateTime(1).ToString("dd/MM/yyyy"); }
+                catch(FormatException) { s = null; }
                 if (s != null && 9 < s.Length)
                 {
                     svIdx.Add(reader.GetUInt32(0));//hardcode
