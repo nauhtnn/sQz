@@ -32,7 +32,7 @@ namespace sQzServer0
         {
             InitializeComponent();
             ShowsNavigationUI = false;
-            mServer = new Server2(NetCodeHndl);
+            mServer = new Server2(SrvrCodeHndl);
             mCbMsg = new UICbMsg();
             vMark = new Dictionary<int, TextBlock>();
 
@@ -181,7 +181,7 @@ namespace sQzServer0
             aTimer.Enabled = true;
         }
 
-        private void StartSrvr_Click(object sender, RoutedEventArgs e)
+        private void btnStartSrvr_Click(object sender, RoutedEventArgs e)
         {
             Thread th = new Thread(() => {mServer.Start(ref mCbMsg);});
             th.Start();
@@ -194,7 +194,7 @@ namespace sQzServer0
                     lblStatus.Text += mCbMsg.txt; });
         }
 
-        private void StopSrvr_Click(object sender, RoutedEventArgs e)
+        private void btnStopSrvr_Click(object sender, RoutedEventArgs e)
         {
             mServer.Stop(ref mCbMsg);
         }
@@ -203,8 +203,8 @@ namespace sQzServer0
         {
 			TextBox t = (TextBox)FindName("tbxNe");
 			int n = 1;
-			if(t != null && 0 < t.Text.Length)
-				int.TryParse(t.Text, out n);
+            if (t != null && 0 < t.Text.Length && !int.TryParse(t.Text, out n))
+                n = 1;
 			Question.svvQuest = new List<Question>[n];
 			while(0 < n) {
 				int v;
@@ -214,7 +214,7 @@ namespace sQzServer0
 					t = (TextBox)FindName("tbxIU" + i);
 					if (t != null && 0 < t.Text.Length)
 					{
-						if (int.TryParse(t.Text, out v))
+						if (int.TryParse(t.Text, out v) && 0 < v)
 						{
 							IUxx iu = (IUxx)i;
 							Question.DBSelect(iu, v, ref l);
@@ -225,6 +225,8 @@ namespace sQzServer0
 				if(0 < l.Count)
 					Question.svvQuest[n] = l;
 			}
+            if (0 < Question.svvQuest.Length)
+                Question.ToByteArr(false);
             LoadQuest();
         }
 
@@ -240,9 +242,11 @@ namespace sQzServer0
 				foreach(List<Question> l in Question.svvQuest) {
 					TabItem ti = new TabItem();
 					ti.Header = ++e;
+                    ScrollViewer svwr = new ScrollViewer();
+                    svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 					StackPanel sp = new StackPanel();
                     int x = 0;
-                    foreach (Question q in Question.svQuest)
+                    foreach (Question q in l)
 					{
 						TextBlock i = new TextBlock();
 						i.Text = ++x + ") " + q.ToString();
@@ -253,7 +257,8 @@ namespace sQzServer0
 							i.Background = Theme.vBrush[(int)BrushId.LeftPanel_BG];
 						sp.Children.Add(i);
 					}
-					ti.Content = sp;
+                    svwr.Content = sp;
+                    ti.Content = svwr;
 					tbcQuest.Items.Add(ti);
 				}
             });
@@ -272,7 +277,7 @@ namespace sQzServer0
             Window.GetWindow(this).Close();
         }
 
-        public bool NetCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg)
+        public bool SrvrCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg)
         {
             switch (c)
             {

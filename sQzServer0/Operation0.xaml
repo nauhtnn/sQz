@@ -44,10 +44,10 @@
                 </StackPanel>
             </ScrollViewer>
             <StackPanel>
-                <Button x:Name="btnStartSrvr" Width="100" Height="40" Content="Start server" Click="StartSrvr_Click"></Button>
-                <Button x:Name="btnStopSrvr" Width="100" Height="40" Content="Stop srvr" Click="StopSrvr_Click"></Button>
+                <Button x:Name="btnStartSrvr" Width="100" Height="40" Content="Start server" Click="btnStartSrvr_Click"></Button>
+                <Button x:Name="btnStopSrvr" Width="100" Height="40" Content="Stop srvr" Click="btnStopSrvr_Click"></Button>
                 <Button x:Name="btnPrep" Width="100" Height="40" Content="Prepare" Click="btnPrep_Click"></Button>
-                <Button x:Name="btnExit" Content="Close" Height="40" Width="100" Click="btnExit_Click"/>
+                <Button x:Name="btnExit" Content="Exit" Height="40" Width="100" Click="btnExit_Click"/>
             </StackPanel>
             <StackPanel x:Name="spLeft">
                 <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
@@ -111,10 +111,7 @@
                 <TextBlock Text="module 15" Grid.Row="8" Grid.Column="2" Margin="5" />
                 <TextBox x:Name="tbxIU15" Width="30" Grid.Row="8" Grid.Column="3" Margin="5"/>
             </Grid>
-            <ScrollViewer Width="400" Height="320" VerticalScrollBarVisibility="Auto">
-				<TabControl x:Name="tbcQuest">
-				</TabControl>
-            </ScrollViewer>
+            <TabControl x:Name="tbcQuest" Width="400" Height="320"/>
         </StackPanel>
     </StackPanel>
 </Page>

@@ -33,9 +33,7 @@
                     <TextBlock Grid.Column="4" Text="Mark" Background="Azure" TextAlignment="Center"/>
                 </Grid>
             </ScrollViewer>
-            <ScrollViewer Width="400" Height="600" VerticalScrollBarVisibility="Auto">
-                <StackPanel x:Name="gQuest"></StackPanel>
-            </ScrollViewer>
+            <TabControl x:Name="tbcQuest" Width="400" Height="320"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <Button x:Name="btnConnect" Content="Connect srvr" Click="btnConnect_Click"  Width="80"/>
