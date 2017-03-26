@@ -168,13 +168,13 @@ namespace sQzClient
             Label l = new Label();
             gAnsSh.Background = vBrush[(int)BrushId.Sheet_BG];
             int nAns = 4;//hardcode
-            int i = 0, n = Question.svQuest.Count;
+            int i = 0, n = Question.svQuest[0].Count;
             vlblAnsSh = new Label[n][];
             vbAns = new bool[n][];
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
-            l.Height = 28;// vWidth[1];
+            l.Height = 28;
             Grid.SetRow(l, 0);
             Grid.SetColumn(l, 0);
             gAnsSh.Children.Add(l);
@@ -197,14 +197,13 @@ namespace sQzClient
             l.BorderThickness = vThickness[(int)ThicknessId.RT];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.Content = (char)('@' + i);
-            //l.FontFamily = vFontFml[1];
             l.FontWeight = FontWeights.Bold;
             Grid.SetRow(l, 0);
             Grid.SetColumn(l, i);
             gAnsSh.Children.Add(l);
             //next lines
             int j = 0;
-            for (j = 1, i = 0; j < Question.svQuest.Count; ++j)
+            for (j = 1, i = 0; j < Question.svQuest[0].Count; ++j)
             {
                 gAnsSh.RowDefinitions.Add(new RowDefinition());
                 vlblAnsSh[j - 1] = new Label[nAns];
@@ -214,10 +213,7 @@ namespace sQzClient
                 l.BorderBrush = brBK;
                 l.BorderThickness = vThickness[(int)ThicknessId.MT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                //l.VerticalContentAlignment = VerticalAlignment.Top;
-                //l.FontFamily = vFontFml[1];
                 l.FontWeight = FontWeights.Bold;
-                //l.Height = vWidth[1];
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, 0);
                 gAnsSh.Children.Add(l);
@@ -281,7 +277,7 @@ namespace sQzClient
             vlblAnsSh[j - 1][nAns - 1] = l;
             vbAns[j - 1][nAns - 1] = false;
 
-            for (j = 0; j <= Question.svQuest.Count; ++j)
+            for (j = Question.svQuest[0].Count; -1 < j; --j)
                 gAnsSh.RowDefinitions[j].Height = new GridLength(26, GridUnitType.Pixel);
         }
 
@@ -291,26 +287,19 @@ namespace sQzClient
             qs.Background = vBrush[(int)BrushId.Q_BG];
             qs.ColumnDefinitions.Add(new ColumnDefinition());
             qs.ColumnDefinitions.Add(new ColumnDefinition());
-            int nc = (Question.svQuest.Count + 1) / 2;
-            for (int i = 0; i < nc; ++i)
+            int n = Question.svQuest[0].Count;
+            for (int i = 1, j = 0; i <= n; i += 2, ++j)
             {
                 qs.RowDefinitions.Add(new RowDefinition());
-                StackPanel q = CreateQuestion(2 * i + 1);
-                Grid.SetRow(q, i);
+                StackPanel q = CreateQuestion(i);
+                Grid.SetRow(q, j);
                 Grid.SetColumn(q, 0);
                 qs.Children.Add(q);
             }
-            if (Question.svQuest.Count % 2 == 1)
-                --nc;
-            for (int i = 0; i < nc; ++i)
+            for (int i = 2, j = 0; i <= n; i += 2, ++j)
             {
-                qs.RowDefinitions.Add(new RowDefinition());
-                StackPanel q = CreateQuestion(2 * i + 1);
-                Grid.SetRow(q, i);
-                Grid.SetColumn(q, 0);
-                qs.Children.Add(q);
-                q = CreateQuestion(2 * i + 2);
-                Grid.SetRow(q, i);
+                StackPanel q = CreateQuestion(i);
+                Grid.SetRow(q, j);
                 Grid.SetColumn(q, 1);
                 qs.Children.Add(q);
             }
@@ -340,7 +329,7 @@ namespace sQzClient
             StackPanel con = new StackPanel();
             TextBlock stmt = new TextBlock();
             stmt.FontSize = em;
-            Question quest = Question.svQuest[idx - 1];
+            Question quest = Question.svQuest[0][idx - 1];
             stmt.Text = quest.mStmt;
             stmt.TextWrapping = TextWrapping.Wrap;
             // dmsg.Content += "_" + idx + stmt.Text + vQuest.Count + "\n";
@@ -406,7 +395,7 @@ namespace sQzClient
         {
             int n = vbAns.Length * 4, i = 0, k = 0; //hardcode
             mbAns = new byte[n];
-            for (i = 0, k = 0, n = Question.svQuest.Count; i < n; ++i)
+            for (i = 0, k = 0, n = Question.svQuest[0].Count; i < n; ++i)
                 for (int j = 0; j < 4; ++j, ++k)//hardcode
                     mbAns[k] = Convert.ToByte(vbAns[i][j]);
             mState = NetCode.Submiting;

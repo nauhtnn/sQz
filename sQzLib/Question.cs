@@ -62,8 +62,7 @@ namespace sQzLib
 
     public class Question
     {
-		public static List<Question>[] svvQuest = null;
-        public static List<Question> svQuest = new List<Question>();
+		public static List<Question>[] svQuest = null;
         public string mStmt; //statement
         int nAns;
         public static IUxx sIU = IUxx.IU00;
@@ -219,9 +218,12 @@ namespace sQzLib
         public static void StartRead(string[] v, Settings s) {
             svToken = v;
             siToken = 0;
-            //sSett = s;
-            if(svQuest == null)
-                svQuest = new List<Question>();
+            if (svQuest == null)
+            {
+                svQuest = new List<Question>[1];
+                svQuest[0] = new List<Question>();
+            }
+            svQuest[0].Clear();
         }
 
         public bool Read()
@@ -358,11 +360,13 @@ namespace sQzLib
             //"buf size = " + buf.Length + '\n';
             //sQzCS.Page pg = new sQzCS.Page();
             //StartRead(Utils.Split(buf, '\n'), pg.mSt);
+            svQuest = new List<Question>[1];
+            svQuest[0] = new List<Question>();
             StartRead(Utils.Split(buf, '\n'), null);
             Question q = new Question();
             while (q.Read())
             {
-                svQuest.Add(q);
+                svQuest[0].Add(q);
                 q = new Question();
             }
             q = null;
@@ -381,14 +385,14 @@ namespace sQzLib
         public static void ToByteArr(bool woKey)
         {
             woKey = false;
-            if (svvQuest == null || svvQuest.Length == 0)
+            if (svQuest == null || svQuest.Length == 0)
                 return;
             List<byte[]> l = new List<byte[]>();
             List<bool> lk = new List<bool>();
-            l.Add(BitConverter.GetBytes(svvQuest.Length));
+            l.Add(BitConverter.GetBytes(svQuest.Length));
             if(woKey)
                 lk.Add(false);
-            foreach (List<Question> ls in svvQuest)
+            foreach (List<Question> ls in svQuest)
             {
                 l.Add(BitConverter.GetBytes(ls.Count));
                 foreach (Question q in ls)//todo: foreach
@@ -468,9 +472,9 @@ namespace sQzLib
             offs += 4;
             l -= 4;
             if (nExSh < 1)
-                svvQuest = null;
+                svQuest = null;
             else
-                svvQuest = new List<Question>[nExSh];
+                svQuest = new List<Question>[nExSh];
             int sz = 0;
             while (0 < nExSh)
             {
@@ -480,7 +484,7 @@ namespace sQzLib
                 offs += 4;
                 l -= 4;
                 --nExSh;
-                svvQuest[nExSh] = new List<Question>();
+                svQuest[nExSh] = new List<Question>();
                 while (0 < nQuest)
                 {
                     Question q = new Question();
@@ -546,7 +550,7 @@ namespace sQzLib
                         l -= q.nAns;
                     }
                     --nQuest;
-                    svvQuest[nExSh].Add(q);
+                    svQuest[nExSh].Add(q);
                 }
             }
             if(wKey && !Array.Equals(buf, sbArrwKey))
@@ -579,7 +583,8 @@ namespace sQzLib
 
         public static void Clear()
         {
-            svQuest.Clear();
+            foreach (List<Question> l in svQuest)
+                l.Clear();
             siToken = 0;//safe to be 0
             sbArr = null;
             sbArrwKey = null;
@@ -595,7 +600,7 @@ namespace sQzLib
             string[] attbs = new string[2];//hardcode
             attbs[0] = "body";
             attbs[1] = "ansKeys";
-            foreach (Question q in svQuest)
+            foreach (Question q in svQuest[0])
             {
                 string[] vals = new string[2];
                 vals[0] = "'" + q.mStmt.Replace("'", "\\'") + '\n';
@@ -628,8 +633,8 @@ namespace sQzLib
                 iu = iu.Substring(1);
             string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            svvQuest = new List<Question>[1];
-            svvQuest[0] = new List<Question>();
+            svQuest = new List<Question>[1];
+            svQuest[0] = new List<Question>();
             if (reader != null)
             {
                 while (reader.Read())
@@ -646,7 +651,7 @@ namespace sQzLib
                     for (int i = 0; i < 4; ++i)
                         q.vKeys[i] = (x[i] == '1');
                     q.mIU = sIU;
-                    svvQuest[0].Add(q);
+                    svQuest[0].Add(q);
                 }
                 reader.Close();
             }

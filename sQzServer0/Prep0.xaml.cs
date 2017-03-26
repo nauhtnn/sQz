@@ -194,7 +194,7 @@ namespace sQzServer0
                 int x = 0;
                 StackPanel sp = db ? gQuest : gwQuest;
                 sp.Children.Clear();
-                foreach (Question q in Question.svvQuest[0])
+                foreach (Question q in Question.svQuest[0])
                 {
                     TextBlock i = new TextBlock();
                     i.Text = ++x + ") " + q.ToString();
@@ -222,7 +222,8 @@ namespace sQzServer0
             ListBox l = (ListBox)sender;
             if (Enum.IsDefined(typeof(IUxx), l.SelectedIndex + 1))
             {
-                Question.svQuest.Clear();
+                if(Question.svQuest != null)
+                    Question.svQuest[0].Clear();
                 Question.sIU = (IUxx)l.SelectedIndex + 1;
                 Question.DBSelect();
                 LoadQuest(true);

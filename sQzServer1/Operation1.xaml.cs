@@ -176,7 +176,7 @@ namespace sQzServer1
                     offs += 4;
                     int id = BitConverter.ToUInt16(dat, offs);
                     offs += 2;
-                    if (dat.Length - offs != Question.svQuest.Count * 4)//hardcode
+                    if (dat.Length - offs != Question.svQuest[0].Count * 4)//hardcode
                     {
                         outMsg = BitConverter.GetBytes(101);//todo
                         break;
@@ -184,7 +184,7 @@ namespace sQzServer1
                     ushort mark = 0;
                     int j, k;
                     --offs;
-                    foreach(Question q in Question.svQuest)
+                    foreach(Question q in Question.svQuest[0])
                     {
                         j = 0;
                         k = offs;
@@ -295,7 +295,7 @@ namespace sQzServer1
             Dispatcher.Invoke(() => {
                 tbcQuest.Items.Clear();
                 int e = 0;
-                foreach (List<Question> l in Question.svvQuest)
+                foreach (List<Question> l in Question.svQuest)
                 {
                     TabItem ti = new TabItem();
                     ti.Header = ++e;

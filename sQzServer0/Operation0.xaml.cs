@@ -205,7 +205,7 @@ namespace sQzServer0
 			int n = 1;
             if (t != null && 0 < t.Text.Length && !int.TryParse(t.Text, out n))
                 n = 1;
-			Question.svvQuest = new List<Question>[n];
+			Question.svQuest = new List<Question>[n];
 			while(0 < n) {
 				int v;
 				List<Question> l = new List<Question>();
@@ -223,9 +223,9 @@ namespace sQzServer0
 				}
 				--n;
 				if(0 < l.Count)
-					Question.svvQuest[n] = l;
+					Question.svQuest[n] = l;
 			}
-            if (0 < Question.svvQuest.Length)
+            if (0 < Question.svQuest.Length)
                 Question.ToByteArr(false);
             LoadQuest();
         }
@@ -239,7 +239,7 @@ namespace sQzServer0
             Dispatcher.Invoke(() => {
 				tbcQuest.Items.Clear();
 				int e = 0;
-				foreach(List<Question> l in Question.svvQuest) {
+				foreach(List<Question> l in Question.svQuest) {
 					TabItem ti = new TabItem();
 					ti.Header = ++e;
                     ScrollViewer svwr = new ScrollViewer();
