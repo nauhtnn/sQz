@@ -39,7 +39,6 @@ namespace sQzServer0
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
             Theme.InitBrush();
-            LoadDates();
 
             vQuestAnsKey = null;
         }

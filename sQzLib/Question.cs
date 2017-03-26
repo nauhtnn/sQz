@@ -667,26 +667,63 @@ namespace sQzLib
             string siu = iu.ToString().Substring(2);//hardcode
             if (siu[0] == '0')
                 siu = siu.Substring(1);
+            //randomize
+            int nn = DBConnect.Count(conn, "quest" + siu);
+            if (nn < 1 || nn < n)
+                return;
+            int[] vSel = new int[n];
+            int i;
+            for (i = 0; i < n; ++i)
+                vSel[i] = -1;
+            Random r = new Random();
+            i = n;
+            while(0 < i)
+            {
+                int sel = r.Next() % nn;
+                int idx = Array.IndexOf(vSel, sel);
+                bool fw = sel % 2 == 0;
+                while(-1 < idx)
+                {
+                    if (fw)
+                        ++sel;
+                    else
+                        --sel;
+                    if(sel < 0 || sel == nn)
+                    {
+                        fw = sel < 0;
+                        continue;
+                    }
+                    idx = Array.IndexOf(vSel, sel);
+                }
+                --i;
+                vSel[i] = sel;
+            }
+            Array.Sort(vSel);
+            //
             string qry = DBConnect.mkQrySelect("quest" + siu, null, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            i = 0;
+            int ii = -1;
             if (reader != null)
             {
-                while (reader.Read() && 0 < n)
+                while (reader.Read() && i < n)
                 {
+                    if (++ii != vSel[i])
+                        continue;
+                    ++i;
                     Question q = new Question();
                     string[] s = reader.GetString(1).Split('\n');//hardcode
                     q.mStmt = "(" + siu + ')' + s[0];
                     q.nAns = 4;
                     q.vAns = new string[4];
-                    for (int i = 0; i < 4; ++i)
-                        q.vAns[i] = s[i + 1];
+                    for (int k = 0; k < 4; ++k)
+                        q.vAns[k] = s[k + 1];
                     string x = reader.GetString(2);
                     q.vKeys = new bool[4];
-                    for (int i = 0; i < 4; ++i)
-                        q.vKeys[i] = (x[i] == '1');
+                    for (int k = 0; k < 4; ++k)
+                        q.vKeys[k] = (x[k] == '1');
                     q.mIU = sIU;
                     l.Add(q);
-                    --n;
                 }
                 reader.Close();
             }

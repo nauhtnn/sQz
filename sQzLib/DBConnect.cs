@@ -43,7 +43,7 @@ namespace sQzLib
                 password = vs[0];
             }
             connStr = "SERVER=" + server + ";" + "DATABASE=" +
-                database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";charset=utf32";
+                database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password;//todo + ";charset=utf32";
             //bConnected = false;
             MySqlConnection conn = new MySqlConnection(connStr);
             if (Open(ref conn))
@@ -178,75 +178,21 @@ namespace sQzLib
             //}
         }
 
-        //Select statement
-        //public List<byte[]>[] Select(string tb, string[] vAttb, string[] vCdAttb,
-        //public static string mkQrySelect(string tb, string[] vAttb, string[] vCdAttb,
-        //    string[] vCdAttbVal, string[] vGpAttb)
-        //{
-        //    return null;
-            //if (vCdAttb != null && vCdAttbVal != null &&
-            //    vCdAttb.Length != vCdAttbVal.Length)
-            //    return null;
-            //string query = "SELECT";
-            //int lastIdx = 0;
-            //if (vAttb == null)
-            //    query += " * ";
-            //else
-            //{
-            //    lastIdx = vAttb.Length - 1;
-            //    for (int i = 0; i < lastIdx; ++i)
-            //        query += vAttb[i] + ",";
-            //    query += vAttb[lastIdx] + " ";
-            //}
-            //query += " FROM " + tb;
-            //if(vCdAttb != null && vCdAttbVal != null)
-            //{
-            //    query += " WHERE ";
-            //    lastIdx = vCdAttb.Length - 1;
-            //    for (int i = 0; i < lastIdx; ++i)
-            //        query += vCdAttb[i] + "=" + vCdAttbVal[i] + ",";
-            //    query += vCdAttb + "=" + vCdAttbVal;
-            //}
-            //if(vGpAttb != null)
-            //{
-            //    query += " GROUP BY ";
-            //    lastIdx = vGpAttb.Length - 1;
-            //    for (int i = 0; i < lastIdx; ++i)
-            //        query += vGpAttb[i] + ",";
-            //    query += vGpAttb[lastIdx];
-            //}
 
-            ////Create a list to store the result
-            //List<byte[]>[] vRs = new List<byte[]>[vAttb.Length];
-            //for (int i = 0; i < vAttb.Length; ++i)
-            //    vRs[i] = new List<byte[]>();
 
-            ////Open connection
-            //if (this.OpenConnection() == true)
-            //{
-            //    //Create Command
-            //    MySqlCommand cmd = new MySqlCommand(query, connection);
-            //    //Create a data reader and Execute the command
-            //    MySqlDataReader datRdr = cmd.ExecuteReader();
+        //Count statement
+        public static int Count(MySqlConnection conn, string tb)
+        {
+            string query = "SELECT COUNT(*) FROM " + tb;
+            int n;
 
-            //    //Read the data and store them in the list
-            //    while (datRdr.Read())
-            //    {
-            //        for (int i = 0; i < vAttb.Length; ++i)
-            //            vRs[i].Add((byte[])datRdr.GetValue(i));
-            //    }
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            //Create a data reader and Execute the command
+            try { if (!int.TryParse(cmd.ExecuteScalar() + "", out n)) n = 0; }
+            catch (MySqlException) { n = 0; }
 
-            //    //close Data Reader
-            //    datRdr.Close();
-
-            //    //return list to be displayed
-            //    return vRs;
-            //}
-            //else
-            //{
-            //    return null;
-            //}
-        //}
+            return n;
+        }
 
         public static string mkQrySelect(string tb, string[] vAttb, string cdAttb,
             string cdAttbVal, string[] vGpAttb)
@@ -278,65 +224,12 @@ namespace sQzLib
         }
 
         public static MySqlDataReader exeQrySelect(MySqlConnection conn, string query) {
-            ////Create a list to store the result
-            //List<byte[]>[] vRs = new List<byte[]>[nAttb];
-            //for (int i = 0; i < nAttb; ++i)
-            //    vRs[i] = new List<byte[]>();
-
-            ////Open connection
-            //if (this.OpenConnection() == true)
-            //{
-                //Create Command
-                MySqlCommand cmd = new MySqlCommand(query, conn);
+            MySqlCommand cmd = new MySqlCommand(query, conn);
             //Create a data reader and Execute the command
             MySqlDataReader d = null;
             try { d = cmd.ExecuteReader(); }
             catch(MySqlException) { d = null; }
             return d;
-
-                //Read the data and store them in the list
-            //    while (datRdr.Read())
-            //    {
-            //        for (int i = 0; i < nAttb; ++i)
-            //            vRs[i].Add((byte[])datRdr.GetValue(i));
-            //    }
-
-            //    //close Data Reader
-            //    datRdr.Close();
-
-            //    //return list to be displayed
-            //    if (vRs[0].Count == 0)
-            //        return null;
-            //    return vRs;
-            //}
-            //else
-            //{
-            //    return null;
-            //}
-        }
-
-        //Count statement
-        public int Count()
-        {
-            throw new NotImplementedException();
-            //string query = "SELECT Count(*) FROM tableinfo";
-            //int Count = -1;
-
-            ////Open Connection
-            //if (this.OpenConnection() == true)
-            //{
-            //    //Create Mysql Command
-            //    MySqlCommand cmd = new MySqlCommand(query, connection);
-
-            //    //ExecuteScalar will return one value
-            //    Count = int.Parse(cmd.ExecuteScalar() + "");
-
-            //    return Count;
-            //}
-            //else
-            //{
-            //    return Count;
-            //}
         }
     }
 }
