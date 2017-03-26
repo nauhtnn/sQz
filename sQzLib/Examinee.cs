@@ -31,8 +31,13 @@ namespace sQzLib
         public ushort mMark;
         public static Examinee sAuthNee = null;
         public static Dictionary<int, int> svLvId2Idx = new Dictionary<int, int>();
+
+        public string mComp = null;
+        public DateTime mDt;
+
         public Examinee() {
             mMark = ushort.MaxValue;
+            mDt = DateTime.Parse("2016/01/01");
         }
         public string ID {
             get {

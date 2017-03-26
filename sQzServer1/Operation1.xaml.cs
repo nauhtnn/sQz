@@ -163,7 +163,13 @@ namespace sQzServer1
                     }
                     else
                     {
-                        outMsg = BitConverter.GetBytes(false);
+                        string msg = "Examinee has signed in on the computer " + cname;
+                        byte[] b = Encoding.UTF32.GetBytes(msg);
+                        outMsg = new byte[5 + b.Length];
+                        Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
+                        Buffer.BlockCopy(BitConverter.GetBytes(b.Length), 0, outMsg, 1, 4);
+                        Buffer.BlockCopy(b, 0, outMsg, 5, b.Length);
+                        //outMsg = BitConverter.GetBytes(false);
                         return false;//close
                     }
                     break;
