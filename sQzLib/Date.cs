@@ -26,7 +26,6 @@ namespace sQzLib
                 return false;
             if (s.Length < 10)
                 return false;
-            int n = 0;
             int offs = 0;
             if (!int.TryParse(s.Substring(offs, 2), out sDD))
                 return false;
@@ -44,7 +43,6 @@ namespace sQzLib
                 return false;
             if (s.Length < 10)
                 return false;
-            int n = 0;
             int offs = 0;
             if (!int.TryParse(s.Substring(offs, 4), out sYYYY))
                 return false;

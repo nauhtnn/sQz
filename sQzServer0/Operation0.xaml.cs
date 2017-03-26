@@ -298,7 +298,7 @@ namespace sQzServer0
                     break;
                 case NetCode.QuestAnsKeyRetrieving:
                     //outMsg = Question.sbArr;
-                    outMsg = Question.sbArrwKey;
+                    outMsg = Question.Arr(true);
                     return false;
                     //break;
                 case NetCode.SrvrSubmitting:

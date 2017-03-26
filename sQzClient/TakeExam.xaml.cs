@@ -420,7 +420,7 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Submiting:
-                    int sz = 10 + mbAns.Length;
+                    int sz = 14 + mbAns.Length;
                     int offs = 0;
                     outBuf = new byte[sz];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState),
@@ -432,6 +432,9 @@ namespace sQzClient
                     Buffer.BlockCopy(BitConverter.GetBytes(Examinee.sAuthNee.mId),
                         0, outBuf, offs, 2);
                     offs += 2;
+                    Buffer.BlockCopy(BitConverter.GetBytes(Question.siArr),
+                        0, outBuf, offs, 4);
+                    offs += 4;
                     Buffer.BlockCopy(mbAns, 0, outBuf, offs, mbAns.Length);
                     break;
                 case NetCode.Resubmit:

@@ -80,10 +80,12 @@ namespace sQzLib
         int qSubs;
         static string[] aPattern = { "\\([a-zA-Z]\\)", "[a-zA-Z]\\." };
         List<int> aSubs;
-        public static byte[] sbArrwKey = null;
+        public static byte[][] sbArrwKey = null;
         static bool sRdywKey = false;
         public static byte[] sbArr = null;
         static bool sRdy = false;
+        static int sSeed = 1;
+        public static int siArr = -1;
 
         public Question() {
             nAns = 0;
@@ -389,11 +391,14 @@ namespace sQzLib
                 return;
             List<byte[]> l = new List<byte[]>();
             List<bool> lk = new List<bool>();
-            l.Add(BitConverter.GetBytes(svQuest.Length));
-            if(woKey)
-                lk.Add(false);
+            //l.Add(BitConverter.GetBytes(svQuest.Length));
+            //if(woKey)
+            //    lk.Add(false);
+            sbArrwKey = new byte[svQuest.Length][];
+            int i = -1;
             foreach (List<Question> ls in svQuest)
             {
+                l.Clear();
                 l.Add(BitConverter.GetBytes(ls.Count));
                 foreach (Question q in ls)//todo: foreach
                 {
@@ -434,26 +439,26 @@ namespace sQzLib
                             lk.Add(true);
                     }
                 }
-            }
-            //join
-            int sz = 0;
-            int szk = 0;
-            for (int i = 0; i < l.Count; ++i)//foreach
-            {
-                sz += l[i].Length;
-                if (woKey && lk[i])
-                    szk += l[i].Length;
-            }
-            sbArrwKey = new byte[sz];
-            if (woKey)
-                sbArr = new byte[sz - szk];
-            int offs = 0;
-            for(int i = 0; i < l.Count; ++i)//foreach
-            {
-                Buffer.BlockCopy(l[i], 0, sbArrwKey, offs, l[i].Length);
-                if(woKey && !lk[i])
-                    Buffer.BlockCopy(l[i], 0, sbArr, offs, l[i].Length);
-                offs += l[i].Length;
+                //join
+                int sz = 0;
+                int szk = 0;
+                for (int j = 0; j < l.Count; ++j)//foreach
+                {
+                    sz += l[j].Length;
+                    if (woKey && lk[j])
+                        szk += l[j].Length;
+                }
+                if (woKey)
+                    sbArr = new byte[sz - szk];
+                sbArrwKey[++i] = new byte[sz];
+                int offs = 0;
+                for (int j = 0; j < l.Count; ++j)//foreach
+                {
+                    Buffer.BlockCopy(l[j], 0, sbArrwKey[i], offs, l[j].Length);
+                    if (woKey && !lk[j])
+                        Buffer.BlockCopy(l[j], 0, sbArr, offs, l[j].Length);
+                    offs += l[j].Length;
+                }
             }
             sRdywKey = true;
             if (woKey)
@@ -475,16 +480,24 @@ namespace sQzLib
                 svQuest = null;
             else
                 svQuest = new List<Question>[nExSh];
-            int sz = 0;
-            while (0 < nExSh)
+            if (1 == nExSh)
+            {
+                if (l < 4)
+                    return;
+                siArr = BitConverter.ToInt32(buf, offs);
+                offs += 4;
+                l -= 4;
+            }
+            int sz = 0, i = -1;
+            sbArrwKey = new byte[nExSh][];
+            while (++i < nExSh)
             {
                 if (l < 4)
                     return;
                 int nQuest = BitConverter.ToInt32(buf, offs);
                 offs += 4;
                 l -= 4;
-                --nExSh;
-                svQuest[nExSh] = new List<Question>();
+                svQuest[i] = new List<Question>();
                 while (0 < nQuest)
                 {
                     Question q = new Question();
@@ -550,35 +563,66 @@ namespace sQzLib
                         l -= q.nAns;
                     }
                     --nQuest;
-                    svQuest[nExSh].Add(q);
+                    svQuest[i].Add(q);
                 }
-            }
-            if(wKey && !Array.Equals(buf, sbArrwKey))
-            {
-                sz = offs - offs0;
-                if (sz == buf.Length)
-                    sbArrwKey = (byte[])buf.Clone();
-                else
+                if (wKey && !Array.Equals(buf, sbArrwKey))
                 {
-                    sbArrwKey = new byte[sz];
-                    Buffer.BlockCopy(buf, 0, sbArrwKey, 0, sz);
+                    sz = offs - offs0;
+                    if (sz == buf.Length)
+                        sbArrwKey[i] = (byte[])buf.Clone();
+                    else
+                    {
+                        sbArrwKey[i] = new byte[sz];
+                        Buffer.BlockCopy(buf, offs0, sbArrwKey[i], 0, sz);
+                    }
+                    sRdy = false;
+                    sRdywKey = true;
                 }
-                sRdy = false;
-                sRdywKey = true;
             }
-            if(!wKey && !Array.Equals(buf, sbArr))
+            //if(!wKey && !Array.Equals(buf, sbArr))
+            //{
+            //    sz = offs - offs0;
+            //    if (sz == buf.Length)
+            //        sbArr = (byte[])buf.Clone();
+            //    else
+            //    {
+            //        sbArr = new byte[sz];
+            //        Buffer.BlockCopy(buf, 0, sbArrwKey, 0, sz);
+            //    }
+            //    sRdy = true;
+            //    sRdywKey = false;
+            //}
+        }
+
+        public static byte[] Arr(bool all)
+        {
+            byte[] ar;
+            if (all && 1 < sbArrwKey.Length)
             {
-                sz = offs - offs0;
-                if (sz == buf.Length)
-                    sbArr = (byte[])buf.Clone();
-                else
+                int sz = 4;
+                foreach (byte[] a in sbArrwKey)
+                    sz += a.Length;
+                ar = new byte[sz];
+                int offs = 0;
+                Buffer.BlockCopy(BitConverter.GetBytes(sbArrwKey.Length), 0, ar, offs, 4);
+                offs += 4;
+                foreach(byte[] a in sbArrwKey)
                 {
-                    sbArr = new byte[sz];
-                    Buffer.BlockCopy(buf, 0, sbArrwKey, 0, sz);
+                    Buffer.BlockCopy(a, 0, ar, offs, a.Length);
+                    offs += a.Length;
                 }
-                sRdy = true;
-                sRdywKey = false;
             }
+            else
+            {
+                ++siArr;
+                if (sbArrwKey.Length <= siArr)
+                    siArr = 0;
+                ar = new byte[sbArrwKey[siArr].Length + 8];
+                Buffer.BlockCopy(BitConverter.GetBytes(1), 0, ar, 0, 4);
+                Buffer.BlockCopy(BitConverter.GetBytes(siArr), 0, ar, 4, 4);
+                Buffer.BlockCopy(sbArrwKey[siArr], 0, ar, 8, sbArrwKey[siArr].Length);
+            }
+            return ar;
         }
 
         public static void Clear()
@@ -675,7 +719,10 @@ namespace sQzLib
             int i;
             for (i = 0; i < n; ++i)
                 vSel[i] = -1;
-            Random r = new Random();
+            ++sSeed;
+            if (sSeed == int.MaxValue)
+                sSeed = 1;
+            Random r = new Random(sSeed);
             i = n;
             while(0 < i)
             {

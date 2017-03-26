@@ -168,7 +168,7 @@ namespace sQzServer1
                     }
                     break;
                 case NetCode.ExamRetrieving:
-                    outMsg = Question.sbArrwKey;
+                    outMsg = Question.Arr(false);
                     //outMsg = Question.sbArr;
                     break;
                 case NetCode.Submiting:
@@ -176,6 +176,8 @@ namespace sQzServer1
                     offs += 4;
                     int id = BitConverter.ToUInt16(dat, offs);
                     offs += 2;
+                    int siArr = BitConverter.ToInt32(dat, offs);
+                    offs += 4;
                     if (dat.Length - offs != Question.svQuest[0].Count * 4)//hardcode
                     {
                         outMsg = BitConverter.GetBytes(101);//todo
@@ -184,7 +186,7 @@ namespace sQzServer1
                     ushort mark = 0;
                     int j, k;
                     --offs;
-                    foreach(Question q in Question.svQuest[0])
+                    foreach(Question q in Question.svQuest[siArr])
                     {
                         j = 0;
                         k = offs;
