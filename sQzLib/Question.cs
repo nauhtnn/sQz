@@ -381,7 +381,7 @@ namespace sQzLib
         public static void ToByteArr(bool woKey)
         {
             woKey = false;
-            if (svvQuest.Length == 0)
+            if (svvQuest == null || svvQuest.Length == 0)
                 return;
             List<byte[]> l = new List<byte[]>();
             List<bool> lk = new List<bool>();
@@ -628,7 +628,8 @@ namespace sQzLib
                 iu = iu.Substring(1);
             string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            svQuest.Clear();
+            svvQuest = new List<Question>[1];
+            svvQuest[0] = new List<Question>();
             if (reader != null)
             {
                 while (reader.Read())
@@ -645,7 +646,7 @@ namespace sQzLib
                     for (int i = 0; i < 4; ++i)
                         q.vKeys[i] = (x[i] == '1');
                     q.mIU = sIU;
-                    svQuest.Add(q);
+                    svvQuest[0].Add(q);
                 }
                 reader.Close();
             }

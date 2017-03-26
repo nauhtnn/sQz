@@ -194,7 +194,7 @@ namespace sQzServer0
                 int x = 0;
                 StackPanel sp = db ? gQuest : gwQuest;
                 sp.Children.Clear();
-                foreach (Question q in Question.svQuest)
+                foreach (Question q in Question.svvQuest[0])
                 {
                     TextBlock i = new TextBlock();
                     i.Text = ++x + ") " + q.ToString();
