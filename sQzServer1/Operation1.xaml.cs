@@ -153,23 +153,33 @@ namespace sQzServer1
                     {
                         if (cname == null)
                             cname = "";
-                        Dispatcher.Invoke(() =>
+                        Examinee ee = Examinee.svExaminee[rid];
+                        if (ee.mDt.Year < 2017)
                         {
-                            TextBlock t = null;
-                            if (vComp.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
-                                t.Text = cname;
-                        });
-                        Examinee.SrvrToAuthArr(rid, out outMsg);
+                            ee.mDt = DateTime.Now;
+                            ee.mComp = cname;
+                            Dispatcher.Invoke(() =>
+                            {
+                                TextBlock t = null;
+                                if (vComp.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
+                                    t.Text = cname;
+                            });
+                            Examinee.SrvrToAuthArr(rid, out outMsg);
+                        }
+                        else
+                        {
+                            string msg = "Examinee has signed in at " +
+                                ee.mDt + " on the computer " + ee.mComp + ".";
+                            byte[] b = Encoding.UTF32.GetBytes(msg);
+                            outMsg = new byte[5 + b.Length];
+                            Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
+                            Buffer.BlockCopy(BitConverter.GetBytes(b.Length), 0, outMsg, 1, 4);
+                            Buffer.BlockCopy(b, 0, outMsg, 5, b.Length);
+                        }
                     }
                     else
                     {
-                        string msg = "Examinee has signed in on the computer " + cname;
-                        byte[] b = Encoding.UTF32.GetBytes(msg);
-                        outMsg = new byte[5 + b.Length];
-                        Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
-                        Buffer.BlockCopy(BitConverter.GetBytes(b.Length), 0, outMsg, 1, 4);
-                        Buffer.BlockCopy(b, 0, outMsg, 5, b.Length);
-                        //outMsg = BitConverter.GetBytes(false);
+                        outMsg = BitConverter.GetBytes(false);
                         return false;//close
                     }
                     break;

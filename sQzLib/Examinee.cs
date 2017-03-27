@@ -361,7 +361,10 @@ namespace sQzLib
             byte[] a = Encoding.UTF32.GetBytes(s.mName);
             byte[] b = Encoding.UTF32.GetBytes(s.mBirthdate);
             byte[] c = Encoding.UTF32.GetBytes(s.mBirthplace);
-            buf = new byte[1 + 4 + 2 + 4 + a.Length + 4 + b.Length + 4 + c.Length];
+            byte[] d = Encoding.UTF32.GetBytes(s.mDt.ToString("yyyy/MM/dd"));
+            byte[] e = Encoding.UTF32.GetBytes(s.mComp);
+            buf = new byte[1 + 4 + 2 + 4 + a.Length + 4 + b.Length + 4 + c.Length +
+                4 + d.Length + 4 + e.Length];
             int offs = 0;
             Buffer.BlockCopy(BitConverter.GetBytes(true), 0, buf, offs, 1);
             offs += 1;
@@ -381,6 +384,14 @@ namespace sQzLib
             offs += 4;
             Buffer.BlockCopy(c, 0, buf, offs, c.Length);
             offs += c.Length;
+            Buffer.BlockCopy(BitConverter.GetBytes(d.Length), 0, buf, offs, 4);
+            offs += 4;
+            Buffer.BlockCopy(d, 0, buf, offs, d.Length);
+            offs += d.Length;
+            Buffer.BlockCopy(BitConverter.GetBytes(e.Length), 0, buf, offs, 4);
+            offs += 4;
+            Buffer.BlockCopy(e, 0, buf, offs, e.Length);
+            offs += e.Length;
         }
         public static bool CliReadAuthArr(byte[] buf, int offs, out Examinee nee)
         {
@@ -432,6 +443,28 @@ namespace sQzLib
             if (l < sz)
                 return false;
             nee.mBirthplace = Encoding.UTF32.GetString(buf, offs, sz);
+
+            l -= sz;
+            offs += sz;
+            if (l < 4)
+                return false;
+            sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (l < sz)
+                return false;
+            DateTime.TryParse(Encoding.UTF32.GetString(buf, offs, sz), out nee.mDt);
+
+            l -= sz;
+            offs += sz;
+            if (l < 4)
+                return false;
+            sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (l < sz)
+                return false;
+            nee.mComp = Encoding.UTF32.GetString(buf, offs, sz);
             return true;
         }
 

@@ -139,9 +139,16 @@ namespace sQzClient
                         mState = NetCode.ExamRetrieving;
                         return true;//continue
                     }
-                    Dispatcher.Invoke(()=> {
-                        txtAuth.Text = mTxt._[(int)TxI.SIGNIN_NOTI];
-                    });
+                    else
+                    {
+                        ++offs;//todo
+                        int sz = BitConverter.ToInt32(buf, offs);
+                        offs += 4;
+                        string txt = Encoding.UTF32.GetString(buf, offs, sz);
+                        Dispatcher.Invoke(() => {
+                            txtAuth.Text = txt;// mTxt._[(int)TxI.SIGNIN_NOTI];
+                        });
+                    }
                     break;
                 case NetCode.ExamRetrieving:
                     offs = 0;
