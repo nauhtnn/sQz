@@ -130,6 +130,7 @@ namespace sQzServer0
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     vMark.Add((int)st.mLvl * st.mId, t);
+                    t.Text = "" + st.mMark;
                     Grid.SetRow(t, rid++);
                     Grid.SetColumn(t, 4);
                     gNee.Children.Add(t);
@@ -303,6 +304,7 @@ namespace sQzServer0
                     //break;
                 case NetCode.SrvrSubmitting:
                     Examinee.ReadMarkArr(dat, ref offs);
+					Examinee.Update();
                     LoadMarks();
                     break;
                 default:

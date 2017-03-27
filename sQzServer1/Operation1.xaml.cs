@@ -154,9 +154,9 @@ namespace sQzServer1
                         if (cname == null)
                             cname = "";
                         Examinee ee = Examinee.svExaminee[rid];
-                        if (ee.mDt.Year < 2017)
+                        if (ee.mDt1.Year < 2017)
                         {
-                            ee.mDt = DateTime.Now;
+                            ee.mDt1 = DateTime.Now;
                             ee.mComp = cname;
                             Dispatcher.Invoke(() =>
                             {
@@ -169,7 +169,7 @@ namespace sQzServer1
                         else
                         {
                             string msg = "Examinee has signed in at " +
-                                ee.mDt + " on the computer " + ee.mComp + ".";
+                                ee.mDt1 + " on the computer " + ee.mComp + ".";
                             byte[] b = Encoding.UTF32.GetBytes(msg);
                             outMsg = new byte[5 + b.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);

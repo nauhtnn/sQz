@@ -145,24 +145,12 @@ namespace sQzLib
         }
 
         //Update statement
-        public void Update()
+        public static void Update(MySqlConnection conn, string qry)
         {
-            throw new NotImplementedException();
-            //string query = "UPDATE tableinfo SET name='Joe', age='22' WHERE name='John Smith'";
+			MySqlCommand cmd = new MySqlCommand(qry, conn);
 
-            //Open connection
-            //if (this.OpenConnection() == true)
-            //{
-            //    //create mysql command
-            //    MySqlCommand cmd = new MySqlCommand();
-            //    //Assign the query using CommandText
-            //    cmd.CommandText = query;
-            //    //Assign the connection using Connection
-            //    cmd.Connection = connection;
-
-            //    //Execute query
-            //    cmd.ExecuteNonQuery();
-            //}
+            //Execute command
+            cmd.ExecuteNonQuery();
         }
 
         //Delete statement

@@ -18,11 +18,12 @@ namespace sQzLib
          CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
           `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf32`,
           `birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf32`,
+		  `mark` SMALLINT(2) UNSIGNED DEFAULT 65535, `dt1` DATETIME, `dt2` DATETIME,
           PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`));
          */
         public static List<Examinee> svExaminee = new List<Examinee>();
         public static byte[] sbArr = null;
-        //not include dateIdx
+        public uint mDate;
         public ExamLvl mLvl;
         public ushort mId;
         public string mName;
@@ -33,11 +34,12 @@ namespace sQzLib
         public static Dictionary<int, int> svLvId2Idx = new Dictionary<int, int>();
 
         public string mComp = null;
-        public DateTime mDt;
+        public DateTime mDt1;
+		public DateTime mDt2;
 
         public Examinee() {
             mMark = ushort.MaxValue;
-            mDt = DateTime.Parse("2016/01/01");
+            mDt1 = mDt2 = DateTime.Parse("2016/01/01");
         }
         public string ID {
             get {
@@ -129,11 +131,13 @@ namespace sQzLib
                 while (reader.Read())
                 {
                     Examinee s = new Examinee();
+					s.mDate = dateIdx;
                     s.mLvl = (ExamLvl)(reader.GetInt16(1));//hardcode
                     s.mId = reader.GetUInt16(2);
                     s.mName = reader.GetString(3);
                     s.mBirthdate = reader.GetString(4);
                     s.mBirthplace = reader.GetString(5);
+					s.mMark = reader.GetUInt16(6);
                     svExaminee.Add(s);
                     svLvId2Idx.Add((int)s.mLvl * s.mId, ++i);
                 }
@@ -361,7 +365,7 @@ namespace sQzLib
             byte[] a = Encoding.UTF32.GetBytes(s.mName);
             byte[] b = Encoding.UTF32.GetBytes(s.mBirthdate);
             byte[] c = Encoding.UTF32.GetBytes(s.mBirthplace);
-            byte[] d = Encoding.UTF32.GetBytes(s.mDt.ToString("yyyy/MM/dd"));
+            byte[] d = Encoding.UTF32.GetBytes(s.mDt1.ToString("yyyy/MM/dd"));
             byte[] e = Encoding.UTF32.GetBytes(s.mComp);
             buf = new byte[1 + 4 + 2 + 4 + a.Length + 4 + b.Length + 4 + c.Length +
                 4 + d.Length + 4 + e.Length];
@@ -453,7 +457,7 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return false;
-            DateTime.TryParse(Encoding.UTF32.GetString(buf, offs, sz), out nee.mDt);
+            DateTime.TryParse(Encoding.UTF32.GetString(buf, offs, sz), out nee.mDt1);
 
             l -= sz;
             offs += sz;
@@ -532,11 +536,40 @@ namespace sQzLib
                 ushort mark = BitConverter.ToUInt16(buf, offs);
                 l -= 2;
                 offs += 2;
-                if (svLvId2Idx.TryGetValue((int)lv * id, out idx))
+                if (svLvId2Idx.TryGetValue((int)lv * id, out idx)) {
                     svExaminee[idx].mMark = mark;
+					//Update(idx);
+				}
                 else
                     Console.Write(idx);
             }
         }
+		
+		public static void Update(/*int vi*/) {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+			foreach(Examinee nee in svExaminee) {
+				StringBuilder qry = new StringBuilder("UPDATE `examinees` SET ");
+				// if(2016 < nee.mDt1.Year)
+				// {
+					// qry.Append("dt1='" + nee.mDt1 + "'");
+					// if(2016 < nee.mDt2.Year) {
+						// qry.Append(",dt2='" + nee.mMark + "'");
+						if(nee.mMark != short.MaxValue) {
+                            //qry.Append(",mark=" + nee.mMark);
+                            qry.Append("mark=" + nee.mMark);
+							qry.Append(" WHERE dateIdx=" + nee.mDate +
+								" AND level=" + (int)nee.mLvl + " AND idx=" + nee.mId);
+							DBConnect.Update(conn, qry.ToString());
+						}
+					// }
+					// qry.Append(" WHERE dateIdx='" + nee.mDate +
+						// ",level=" + nee.mLvl + ",idx=" + nee.mId +";");
+					// DBConnect.Update(conn, qry);
+				// }
+			}
+			DBConnect.Close(ref conn);
+		}
     }
 }
