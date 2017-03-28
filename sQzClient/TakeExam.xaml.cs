@@ -143,9 +143,6 @@ namespace sQzClient
 
             LoadTxt();
 
-            double rt = spMain.RenderSize.Width / 1280;
-            spMain.RenderTransform = new ScaleTransform(rt, rt);
-
             string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
                 ") has signed in successfully. Press ok and start answering.";
             MessageBox.Show(msg);
@@ -170,6 +167,9 @@ namespace sQzClient
             }
             if(m < 0 || s < 0)
                 dtRemn = kDtDuration = new TimeSpan(0, 30, 2);
+
+            double rt = spMain.RenderSize.Width / 1280;
+            spMain.RenderTransform = new ScaleTransform(rt, rt);
         }
 
         void InitLeftPanel()
@@ -187,7 +187,6 @@ namespace sQzClient
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
-            l.Height = 28;
             Grid.SetRow(l, 0);
             Grid.SetColumn(l, 0);
             gAnsSh.Children.Add(l);
@@ -263,7 +262,6 @@ namespace sQzClient
             l.BorderThickness = vThickness[(int)ThicknessId.LB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.FontWeight = FontWeights.Bold;
-            //l.Height = vWidth[1];
             Grid.SetRow(l, j);
             Grid.SetColumn(l, 0);
             gAnsSh.Children.Add(l);
@@ -289,8 +287,8 @@ namespace sQzClient
             vlblAnsSh[j - 1][nAns - 1] = l;
             vbAns[j - 1][nAns - 1] = false;
 
-            for (j = Question.svQuest[0].Count; -1 < j; --j)
-                gAnsSh.RowDefinitions[j].Height = new GridLength(26, GridUnitType.Pixel);
+            //for (j = Question.svQuest[0].Count; -1 < j; --j)
+            //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
         }
 
         void InitQuestPanel()

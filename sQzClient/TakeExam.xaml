@@ -16,7 +16,7 @@
             </Grid.ColumnDefinitions>
             <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="540" Width="240">
                 <TextBlock x:Name="txtAnsSh" Height="30" FontSize="20" HorizontalAlignment="Center"/>
-                <ScrollViewer x:Name="svwrAnsSh" Height="510" Width="240" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="svwrAnsSh" Height="510" Width="240" VerticalScrollBarVisibility="Auto" FontSize="14">
                     <Grid x:Name="gAnsSh">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -47,7 +47,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="48"/>
             </Grid.RowDefinitions>
-            <TextBlock x:Name="txtWelcome" Foreground="#00356b" FontSize="20"/>
+            <TextBlock x:Name="txtWelcome" Foreground="#00356b" FontSize="18"/>
             <Button x:Name="btnSubmit" Grid.Column="1" FontSize="20" Click="btnSubmit_Click" Background="#1c64e7" Foreground="White" BorderThickness="0"/>
             <TextBlock x:Name="txtRTime" Foreground="#00356b" Grid.Column="2" FontSize="28" TextAlignment="Center"/>
             <Button x:Name="btnExit" Grid.Column="3" Content="Close" Click="btnExit_Click" FontSize="20"/>
