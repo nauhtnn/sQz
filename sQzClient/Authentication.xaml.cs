@@ -108,7 +108,6 @@ namespace sQzClient
             mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
             txtLalgitc.Text = mTxt._[(int)TxI.LALGITC];
             txtWelcome.Text = mTxt._[(int)TxI.WELCOME];
-            txtDate.Text = mTxt._[(int)TxI.DATE] + DateTime.Today;
             txtNeeId.Text = mTxt._[(int)TxI.NEEID];
             txtBirdate.Text = mTxt._[(int)TxI.BIRDATE] + mTxt._[(int)TxI.BIRDATE_MSG];
             btnSignIn.Content = mTxt._[(int)TxI.SIGNIN];
@@ -128,7 +127,9 @@ namespace sQzClient
                     Date.ReadByteArr(buf, ref offs, buf.Length);
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
-                            txtWelcome.Text = Encoding.UTF32.GetString(Date.sbArr);
+                            txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
+                        else
+                            txtDate.Text = "No connection";
                     });
                     mState = NetCode.Authenticating;
                     break;
@@ -179,7 +180,7 @@ namespace sQzClient
             return true;
         }
 
-        private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
+        private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
             if (mCbMsg.ToUp())
                 Dispatcher.Invoke(() => {

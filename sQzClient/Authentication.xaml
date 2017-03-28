@@ -26,7 +26,7 @@
             </Grid.RowDefinitions>
             <TextBlock x:Name="txtNeeId" Text="Examinee Id" Height="30" Width="100" TextAlignment="Center"/>
             <TextBox x:Name="tbxNeeId" Grid.Row="1" Height="30" Width="100" MaxLength="5" KeyUp="tbx_NeeIdKeyUp"/>
-            <TextBlock x:Name="txtBirdate" Text="Birthdate (dd/mm/yyyy)" Grid.Column="1" Height="30" Width="200" TextAlignment="Center" Margin="102,0,98,0"/>
+            <TextBlock x:Name="txtBirdate" Grid.Column="1" Height="30" Width="200" TextAlignment="Center" Margin="102,0,98,0"/>
             <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
                 <TextBox x:Name="tbxD" Height="30" Width="30" MaxLength="2" KeyUp="tbx_DMYKeyUp"/>
                 <TextBlock Text="/" Width="10" TextAlignment="Center"/>

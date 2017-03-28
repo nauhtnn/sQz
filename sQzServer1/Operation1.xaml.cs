@@ -27,8 +27,11 @@ namespace sQzServer1
         NetCode mState;
         Server2 mServer;
         UICbMsg mCbMsg;
+        bool bRunning;
         Dictionary<int, TextBlock> vMark;
         Dictionary<int, TextBlock> vComp;
+        Dictionary<int, TextBlock> vTime1;
+        Dictionary<int, TextBlock> vTime2;
 
         public Operation1()
         {
@@ -40,9 +43,12 @@ namespace sQzServer1
             mServer = new Server2(SrvrCodeHndl);
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
+            bRunning = true;
 
             vMark = new Dictionary<int, TextBlock>();
             vComp = new Dictionary<int, TextBlock>();
+            vTime1 = new Dictionary<int, TextBlock>();
+            vTime2 = new Dictionary<int, TextBlock>();
 
             Theme.InitBrush();
 
@@ -117,7 +123,7 @@ namespace sQzServer1
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
-            if (mCbMsg.ToUp())
+            if (bRunning && mCbMsg.ToUp())
                 Dispatcher.Invoke(() => {
                     lblStatus.Text += mCbMsg.txt; });
         }
@@ -134,6 +140,7 @@ namespace sQzServer1
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            bRunning = false;
             UICbMsg dummy = new UICbMsg();
             mServer.Stop(ref dummy);
         }
@@ -154,22 +161,24 @@ namespace sQzServer1
                         if (cname == null)
                             cname = "";
                         Examinee ee = Examinee.svExaminee[rid];
-                        if (ee.mDt1.Year < 2017)
+                        if (ee.mTime1.Hour == 0)
                         {
-                            ee.mDt1 = DateTime.Now;
+                            ee.mTime1 = DateTime.Now;
                             ee.mComp = cname;
                             Dispatcher.Invoke(() =>
                             {
                                 TextBlock t = null;
                                 if (vComp.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
                                     t.Text = cname;
+                                if (vTime1.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
+                                    t.Text = ee.mTime1.ToString("HH:mm");
                             });
                             Examinee.SrvrToAuthArr(rid, out outMsg);
                         }
                         else
                         {
                             string msg = "Examinee has signed in at " +
-                                ee.mDt1 + " on the computer " + ee.mComp + ".";
+                                ee.mTime1 + " on the computer " + ee.mComp + ".";
                             byte[] b = Encoding.UTF32.GetBytes(msg);
                             outMsg = new byte[5 + b.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
@@ -215,13 +224,19 @@ namespace sQzServer1
                             ++mark;
                         offs += q.vKeys.Length;
                     }
-                    Dispatcher.Invoke(() => {
-                        TextBlock t = null;
-                        if (vMark.TryGetValue((int)lv * id, out t))//todo
-                            t.Text = mark.ToString();
-                    });
-                    Examinee.svLvId2Idx.TryGetValue((int)lv * id, out rid);
-                    Examinee.svExaminee[rid].mMark = mark;
+                    if (Examinee.svLvId2Idx.TryGetValue((int)lv * id, out rid))
+                    {
+                        Examinee.svExaminee[rid].mMark = mark;
+                        Examinee.svExaminee[rid].mTime2 = DateTime.Now;
+                        Dispatcher.Invoke(() =>
+                        {
+                            TextBlock t = null;
+                            if (vMark.TryGetValue((int)lv * id, out t))//todo
+                                t.Text = mark.ToString();
+                            if (vTime2.TryGetValue((int)lv * id, out t))//todo
+                                t.Text = Examinee.svExaminee[rid].mTime2.ToString("HH:mm");
+                        });
+                    }
                     outMsg = BitConverter.GetBytes(mark);
                     break;
                 default:
@@ -242,6 +257,10 @@ namespace sQzServer1
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
                             txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
+                        vComp.Clear();
+                        vMark.Clear();
+                        vTime1.Clear();
+                        vTime2.Clear();
                         int rid = 1;
                         foreach (Examinee st in Examinee.svExaminee)
                         {
@@ -268,9 +287,25 @@ namespace sQzServer1
                             Grid.SetColumn(t, 3);
                             gNee.Children.Add(t);
                             t = new TextBlock();
+                            if(st.mTime1.Hour != 0)
+                                t.Text = st.mTime1.ToString("HH:mm");
+                            vTime1.Add((int)st.mLvl * st.mId, t);
+                            Grid.SetRow(t, rid);
+                            Grid.SetColumn(t, 4);
+                            gNee.Children.Add(t);
+                            t = new TextBlock();
+                            if (st.mTime2.Hour != 0)
+                                t.Text = st.mTime2.ToString("HH:mm");
+                            vTime2.Add((int)st.mLvl * st.mId, t);
+                            Grid.SetRow(t, rid);
+                            Grid.SetColumn(t, 5);
+                            gNee.Children.Add(t);
+                            t = new TextBlock();
+                            if (st.mMark != ushort.MaxValue)
+                                t.Text = st.mMark.ToString();
                             vMark.Add((int)st.mLvl * st.mId, t);
                             Grid.SetRow(t, rid++);
-                            Grid.SetColumn(t, 4);
+                            Grid.SetColumn(t, 6);
                             gNee.Children.Add(t);
                         }
                     });

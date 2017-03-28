@@ -596,6 +596,8 @@ namespace sQzLib
 
         public static byte[] Arr(bool all)
         {
+            if (sbArrwKey == null)
+                return null;//todo
             byte[] ar;
             if (all && 1 < sbArrwKey.Length)
             {

@@ -14,13 +14,15 @@
             <ScrollViewer x:Name="svwrStt" Width="300" Height="600" VerticalScrollBarVisibility="Auto">
                 <TextBlock x:Name="lblStatus" Width="300" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
             </ScrollViewer>
-            <ScrollViewer Width="500" Height="600" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Width="700" Height="600" VerticalScrollBarVisibility="Auto">
                 <Grid x:Name="gNee">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="180"/>
                         <ColumnDefinition Width="80"/>
                         <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="100"/>
+                        <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="60"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
@@ -30,10 +32,12 @@
                     <TextBlock Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
                     <TextBlock Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
                     <TextBlock Grid.Column="3" Text="Computer" Background="Gold" TextAlignment="Center"/>
-                    <TextBlock Grid.Column="4" Text="Mark" Background="Azure" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="4" Text="dt 1" Background="Azure" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="5" Text="dt 2" Background="Azure" TextAlignment="Center"/>
+                    <TextBlock Grid.Column="6" Text="Mark" Background="Azure" TextAlignment="Center"/>
                 </Grid>
             </ScrollViewer>
-            <TabControl x:Name="tbcQuest" Width="400" Height="320"/>
+            <TabControl x:Name="tbcQuest" Width="260" Height="600"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <Button x:Name="btnConnect" Content="Connect srvr" Click="btnConnect_Click"  Width="80"/>

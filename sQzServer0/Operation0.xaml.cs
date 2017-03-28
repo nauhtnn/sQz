@@ -24,7 +24,7 @@ namespace sQzServer0
     {
         Server2 mServer;
         UICbMsg mCbMsg;
-        byte[] vQuestAnsKey;
+        bool bRunning;
         Dictionary<int, TextBlock> vMark;
         private Txt mTxt;
 
@@ -40,11 +40,12 @@ namespace sQzServer0
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
             Theme.InitBrush();
 
-            vQuestAnsKey = null;
+            bRunning = true;
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            bRunning = false;
             UICbMsg dummy = new UICbMsg();
             mServer.Stop(ref dummy);
         }
@@ -130,7 +131,8 @@ namespace sQzServer0
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     vMark.Add((int)st.mLvl * st.mId, t);
-                    t.Text = "" + st.mMark;
+                    if(st.mMark != ushort.MaxValue)
+                        t.Text = st.mMark.ToString();
                     Grid.SetRow(t, rid++);
                     Grid.SetColumn(t, 4);
                     gNee.Children.Add(t);
@@ -145,7 +147,7 @@ namespace sQzServer0
                 TextBlock t;
                 foreach (Examinee st in Examinee.svExaminee)
                 {
-                    if(vMark.TryGetValue((int)st.mLvl * st.mId, out t))
+                    if(st.mMark != ushort.MaxValue && vMark.TryGetValue((int)st.mLvl * st.mId, out t))
                         t.Text = "" + st.mMark;
                 }
             });
@@ -189,7 +191,7 @@ namespace sQzServer0
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
-            if (mCbMsg.ToUp())
+            if (bRunning && mCbMsg.ToUp())
                 Dispatcher.Invoke(() => {
                     lblStatus.Text += mCbMsg.txt; });
         }

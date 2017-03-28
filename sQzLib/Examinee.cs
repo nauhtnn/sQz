@@ -18,7 +18,7 @@ namespace sQzLib
          CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
           `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf32`,
           `birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf32`,
-		  `mark` SMALLINT(2) UNSIGNED DEFAULT 65535, `dt1` DATETIME, `dt2` DATETIME,
+		  `dt1` TIME, `dt2` TIME, `mark` SMALLINT(2) UNSIGNED, 
           PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`));
          */
         public static List<Examinee> svExaminee = new List<Examinee>();
@@ -34,12 +34,12 @@ namespace sQzLib
         public static Dictionary<int, int> svLvId2Idx = new Dictionary<int, int>();
 
         public string mComp = null;
-        public DateTime mDt1;
-		public DateTime mDt2;
+        public DateTime mTime1;
+		public DateTime mTime2;
 
         public Examinee() {
             mMark = ushort.MaxValue;
-            mDt1 = mDt2 = DateTime.Parse("2016/01/01");
+            mTime1 = mTime2 = DateTime.Parse("2016/01/01");
         }
         public string ID {
             get {
@@ -137,7 +137,12 @@ namespace sQzLib
                     s.mName = reader.GetString(3);
                     s.mBirthdate = reader.GetString(4);
                     s.mBirthplace = reader.GetString(5);
-					s.mMark = reader.GetUInt16(6);
+                    if (reader.IsDBNull(6) || !DateTime.TryParse(reader.GetString(6), out s.mTime1))
+                        s.mTime1 = DateTime.Parse("00:00");
+                    if (reader.IsDBNull(7) || !DateTime.TryParse(reader.GetString(7), out s.mTime2))
+                        s.mTime2 = DateTime.Parse("00:00");
+                    if (!reader.IsDBNull(8))
+                        s.mMark = reader.GetUInt16(8);
                     svExaminee.Add(s);
                     svLvId2Idx.Add((int)s.mLvl * s.mId, ++i);
                 }
@@ -196,6 +201,11 @@ namespace sQzLib
                 b = Encoding.UTF32.GetBytes(s.mBirthplace);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
+                l.Add(BitConverter.GetBytes(s.mTime1.Hour));
+                l.Add(BitConverter.GetBytes(s.mTime1.Minute));
+                l.Add(BitConverter.GetBytes(s.mTime2.Hour));
+                l.Add(BitConverter.GetBytes(s.mTime2.Minute));
+                l.Add(BitConverter.GetBytes(s.mMark));
             }
             int sz = 0;
             foreach (byte[] i in l)
@@ -241,9 +251,7 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     break;
-                byte[] b = new byte[sz];
-                Buffer.BlockCopy(buf, offs, b, 0, sz);
-                s.mName = Encoding.UTF32.GetString(b);
+                s.mName = Encoding.UTF32.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
                 if (l < 4)
@@ -253,9 +261,7 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     break;
-                b = new byte[sz];
-                Buffer.BlockCopy(buf, offs, b, 0, sz);
-                s.mBirthdate = Encoding.UTF32.GetString(b);
+                s.mBirthdate = Encoding.UTF32.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
                 if (l < 4)
@@ -265,15 +271,42 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     break;
-                b = new byte[sz];
-                Buffer.BlockCopy(buf, offs, b, 0, sz);
-                s.mBirthplace = Encoding.UTF32.GetString(b);
+                s.mBirthplace = Encoding.UTF32.GetString(buf, offs, sz);
+                l -= sz;
+                offs += sz;
+                if (l < 4)
+                    break;
+                int h = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
+                if (l < 4)
+                    break;
+                int m = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
+                if (!DateTime.TryParse(h.ToString("d2") + ':' + m.ToString("d2"), out s.mTime1))
+                    s.mTime1 = DateTime.Parse("00:00");
+                if (l < 4)
+                    break;
+                h = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
+                if (l < 4)
+                    break;
+                m = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
+                if (!DateTime.TryParse(h.ToString("d2") + ':' + m.ToString("d2"), out s.mTime2))
+                    s.mTime2 = DateTime.Parse("00:00");
+                if (l < 4)
+                    break;
+                s.mMark = BitConverter.ToUInt16(buf, offs);
+                l -= 2;
+                offs += 2;
                 svExaminee.Add(s);
                 svLvId2Idx.Add((int)s.mLvl * s.mId, i);
-                l -= sz;
-                offs += sz;
             }
-            if (!Array.Equals(buf, sbArr))
+            if (!buf.Equals(sbArr))
             {
                 sz = offs - offs0;
                 if (sz == buf.Length)
@@ -365,7 +398,7 @@ namespace sQzLib
             byte[] a = Encoding.UTF32.GetBytes(s.mName);
             byte[] b = Encoding.UTF32.GetBytes(s.mBirthdate);
             byte[] c = Encoding.UTF32.GetBytes(s.mBirthplace);
-            byte[] d = Encoding.UTF32.GetBytes(s.mDt1.ToString("yyyy/MM/dd"));
+            byte[] d = Encoding.UTF32.GetBytes(s.mTime1.ToString("HH:mm"));
             byte[] e = Encoding.UTF32.GetBytes(s.mComp);
             buf = new byte[1 + 4 + 2 + 4 + a.Length + 4 + b.Length + 4 + c.Length +
                 4 + d.Length + 4 + e.Length];
@@ -457,7 +490,7 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return false;
-            DateTime.TryParse(Encoding.UTF32.GetString(buf, offs, sz), out nee.mDt1);
+            DateTime.TryParse(Encoding.UTF32.GetString(buf, offs, sz), out nee.mTime1);
 
             l -= sz;
             offs += sz;
@@ -487,6 +520,10 @@ namespace sQzLib
                 Examinee s = svExaminee[i];
                 l.Add(BitConverter.GetBytes((short)s.mLvl));
                 l.Add(BitConverter.GetBytes(s.mId));
+                l.Add(BitConverter.GetBytes(s.mTime1.Hour));
+                l.Add(BitConverter.GetBytes(s.mTime1.Minute));
+                l.Add(BitConverter.GetBytes(s.mTime2.Hour));
+                l.Add(BitConverter.GetBytes(s.mTime2.Minute));
                 l.Add(BitConverter.GetBytes(s.mMark));
             }
             int sz = 0;
@@ -531,17 +568,41 @@ namespace sQzLib
                 ushort id = BitConverter.ToUInt16(buf, offs);
                 l -= 2;
                 offs += 2;
+                if (!svLvId2Idx.TryGetValue((int)lv * id, out idx))
+                    continue;
+                Examinee nee = svExaminee[idx];
+                if (l < 4)
+                    return;
+                int h = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
+                if (l < 4)
+                    return;
+                int m = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
+                string t = "" + h.ToString("d2") + ":" + m.ToString("d2");
+                if (!DateTime.TryParse(t, out nee.mTime1))
+                    nee.mTime1 = DateTime.Parse("00:00");
+                if (l < 4)
+                    return;
+                h = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
+                if (l < 4)
+                    return;
+                m = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
+                if (!DateTime.TryParse(h.ToString("d2") + ':' + m.ToString("d2"), out nee.mTime2))
+                    nee.mTime2 = DateTime.Parse("00:00");
                 if (l < 2)
                     return;
                 ushort mark = BitConverter.ToUInt16(buf, offs);
                 l -= 2;
                 offs += 2;
-                if (svLvId2Idx.TryGetValue((int)lv * id, out idx)) {
-                    svExaminee[idx].mMark = mark;
-					//Update(idx);
-				}
-                else
-                    Console.Write(idx);
+                nee.mMark = mark;
+                //Update(idx);
             }
         }
 		
@@ -551,24 +612,20 @@ namespace sQzLib
                 return;
 			foreach(Examinee nee in svExaminee) {
 				StringBuilder qry = new StringBuilder("UPDATE `examinees` SET ");
-				// if(2016 < nee.mDt1.Year)
-				// {
-					// qry.Append("dt1='" + nee.mDt1 + "'");
-					// if(2016 < nee.mDt2.Year) {
-						// qry.Append(",dt2='" + nee.mMark + "'");
-						if(nee.mMark != short.MaxValue) {
-                            //qry.Append(",mark=" + nee.mMark);
-                            qry.Append("mark=" + nee.mMark);
-							qry.Append(" WHERE dateIdx=" + nee.mDate +
-								" AND level=" + (int)nee.mLvl + " AND idx=" + nee.mId);
-							DBConnect.Update(conn, qry.ToString());
-						}
-					// }
-					// qry.Append(" WHERE dateIdx='" + nee.mDate +
-						// ",level=" + nee.mLvl + ",idx=" + nee.mId +";");
-					// DBConnect.Update(conn, qry);
-				// }
-			}
+                if (nee.mTime1.Hour != 0)
+                {
+                    qry.Append("dt1='" + nee.mTime1.ToString("HH:mm") + "'");
+                    if (nee.mTime2.Hour != 0)
+                    {
+                        qry.Append(",dt2='" + nee.mTime2.ToString("HH:mm") + "'");
+                        if (nee.mMark != short.MaxValue)
+                            qry.Append(",mark=" + nee.mMark);
+                    }
+                    qry.Append(" WHERE dateIdx=" + nee.mDate +
+                        " AND level=" + (int)nee.mLvl + " AND idx=" + nee.mId);
+                    DBConnect.Update(conn, qry.ToString());
+                }
+            }
 			DBConnect.Close(ref conn);
 		}
     }
