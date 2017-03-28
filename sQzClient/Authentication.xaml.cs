@@ -88,7 +88,7 @@ namespace sQzClient
             w.WindowState = WindowState.Maximized;
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
-            w.FontSize = 14;
+            w.FontSize = 20;
 
             LoadTxt();
 
