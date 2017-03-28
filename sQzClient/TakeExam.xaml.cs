@@ -25,6 +25,7 @@ namespace sQzClient
         TimeSpan kDtDuration;
         List<ListBox> vLbx;
         System.Timers.Timer mTimer;
+        Txt mTxt;
 
         Client2 mClient;
         NetCode mState;
@@ -40,9 +41,6 @@ namespace sQzClient
             InitializeComponent();
             InitBrush();
             InitThickness();
-            vFontFml = new FontFamily[2];
-            vFontFml[0] = new FontFamily("Arial");
-            vFontFml[1] = new FontFamily("Arial");
             mState = NetCode.Dating;
             mClient = new Client2(CliBufHndl, CliBufPrep);
             mCbMsg = new UICbMsg();
@@ -53,10 +51,18 @@ namespace sQzClient
             ShowsNavigationUI = false;
         }
 
+        private void LoadTxt()
+        {
+            mTxt = new Txt();
+            mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
+            txtAnsSh.Text = mTxt._[(int)TxI.ANS_SHEET];
+            btnSubmit.Content = mTxt._[(int)TxI.SUBMIT];
+            btnExit.Content = mTxt._[(int)TxI.EXIT];
+        }
+
         public static SolidColorBrush[] vBrush;
         public static SolidColorBrush[][] vTheme;
         Thickness[] vThickness;
-        FontFamily[] vFontFml;
 
         public static void InitBrush()
         {
@@ -114,6 +120,13 @@ namespace sQzClient
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
+            Window w = Window.GetWindow(this);
+            w.WindowStyle = WindowStyle.None;
+            w.WindowState = WindowState.Maximized;
+            w.ResizeMode = ResizeMode.NoResize;
+            w.Closing += W_Closing;
+            w.FontSize = 16;
+
             Theme.InitBrush();
             vWidth = new double[5];
             vWidth[0] = 1280;// spMain.RenderSize.Width;
@@ -121,14 +134,14 @@ namespace sQzClient
             vWidth[2] = 5 * vWidth[1];
             vWidth[3] = 5;// 8;
             vWidth[4] = (vWidth[0] - vWidth[2]) / 2 - SystemParameters.ScrollWidth - 2 * vWidth[3] - vWidth[1];
-            //spMain.ColumnDefinitions.Add(new ColumnDefinition());
-            //spMain.ColumnDefinitions.Add(new ColumnDefinition());
+            
             InitLeftPanel();
             InitQuestPanel();
             dmsg.Background = vBrush[(int)BrushId.LeftPanel_BG];
             dmsg.Width = (int)spMain.RenderSize.Width / 2;
             dmsg.Height = (int)spMain.RenderSize.Height / 4;
-            // spMain.Children.Add(dmsg);
+
+            LoadTxt();
 
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
@@ -249,7 +262,6 @@ namespace sQzClient
             l.BorderBrush = brBK;
             l.BorderThickness = vThickness[(int)ThicknessId.LB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
-            l.FontFamily = vFontFml[1];
             l.FontWeight = FontWeights.Bold;
             //l.Height = vWidth[1];
             Grid.SetRow(l, j);
@@ -315,8 +327,6 @@ namespace sQzClient
             Label l = new Label();
             l.HorizontalAlignment = HorizontalAlignment.Left;
             l.VerticalAlignment = VerticalAlignment.Top;
-            //l.FontSize = em;
-            //l.FontFamily = vFontFml[0];
             l.Content = idx;
             l.Background = vBrush[(int)BrushId.QID_BG];
             l.Foreground = vBrush[(int)BrushId.QID_Color];
@@ -328,7 +338,6 @@ namespace sQzClient
             q.Children.Add(l);
             StackPanel con = new StackPanel();
             TextBlock stmt = new TextBlock();
-            stmt.FontSize = em;
             Question quest = Question.svQuest[0][idx - 1];
             stmt.Text = quest.mStmt;
             stmt.TextWrapping = TextWrapping.Wrap;
@@ -515,7 +524,6 @@ namespace sQzClient
             mB.Child = tb;
             Children.Add(mB);
             TextBlock ansTxt = new TextBlock();
-            //ansTxt.FontSize = 14;
             ansTxt.Text = t;
             ansTxt.TextWrapping = TextWrapping.Wrap;
             ansTxt.Width = 470;// SystemParameters.sCrollWidth;//minus is a trick

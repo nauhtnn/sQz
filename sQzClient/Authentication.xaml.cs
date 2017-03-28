@@ -127,7 +127,7 @@ namespace sQzClient
                     Date.ReadByteArr(buf, ref offs, buf.Length);
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
-                            txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
+                            txtDate.Text = mTxt._[(int)TxI.DATE] + Encoding.UTF32.GetString(Date.sbArr);
                         else
                             txtDate.Text = "No connection";
                     });
