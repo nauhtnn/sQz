@@ -15,7 +15,6 @@ namespace sQzClient
     /// </summary>
     public partial class TakeExam : Page
     {
-        public static double em = 14;
         Label[][] vlblAnsSh;
         bool[][] vbAns;
         double[] vWidth;
@@ -30,8 +29,6 @@ namespace sQzClient
         NetCode mState;
 
         UICbMsg mCbMsg;
-
-        Label dmsg = new Label();
 
         public TakeExam()
         {
@@ -71,11 +68,23 @@ namespace sQzClient
             
             InitLeftPanel();
             InitQuestPanel();
-            dmsg.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-            dmsg.Width = (int)spMain.RenderSize.Width / 2;
-            dmsg.Height = (int)spMain.RenderSize.Height / 4;
 
             LoadTxt();
+
+            double rt = spMain.RenderSize.Width / 1280;
+            spMain.RenderTransform = new ScaleTransform(rt, rt);
+
+            string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
+                ")" + Txt.s._[(int)TxI.AUTH_MSG];
+            Dispatcher.Invoke(() => {
+                WPopup.wpCb = ShowQuestion;
+                WPopup.ShowDialog(msg);
+            });
+        }
+
+        void ShowQuestion()
+        {
+            Dispatcher.Invoke(()=> { svwrQSh.Visibility = Visibility.Visible; });
 
             mTimer = new System.Timers.Timer(1000);
             mTimer.Elapsed += UpdateSrvrMsg;
@@ -92,18 +101,12 @@ namespace sQzClient
                     int.TryParse(vt[0], out m);
                     int.TryParse(vt[1], out s);
                 }
-                if(-1 < m && -1 < s)
+                if (-1 < m && -1 < s)
                     dtRemn = kDtDuration = new TimeSpan(0, m, s);
             }
-            if(m < 0 || s < 0)
-                dtRemn = kDtDuration = new TimeSpan(0, 30, 2);
-
-            double rt = spMain.RenderSize.Width / 1280;
-            spMain.RenderTransform = new ScaleTransform(rt, rt);
-
-            string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
-                ")" + Txt.s._[(int)TxI.AUTH_MSG];
-            Dispatcher.Invoke(() => { WPopup.ShowDialog(msg); });
+            if (m < 0 || s < 0)
+                dtRemn = kDtDuration = new TimeSpan(0, 30, 0);
+            WPopup.wpCb = null;
         }
 
         void InitLeftPanel()
@@ -263,7 +266,7 @@ namespace sQzClient
             l.Background = Theme.s._[(int)BrushId.QID_BG];
             l.Foreground = Theme.s._[(int)BrushId.QID_Color];
             l.Width = vWidth[1];
-            l.Height = 1.5f * em;
+            l.Height = 1.5f * FontSize;
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.VerticalContentAlignment = VerticalAlignment.Center;
             l.Padding = new Thickness(0);
@@ -273,8 +276,7 @@ namespace sQzClient
             Question quest = Question.svQuest[0][idx - 1];
             stmt.Text = quest.mStmt;
             stmt.TextWrapping = TextWrapping.Wrap;
-            // dmsg.Content += "_" + idx + stmt.Text + vQuest.Count + "\n";
-            stmt.Width = 484;// vWidth[4];
+            stmt.Width = 484;
             stmt.Background = Theme.s._[(int)BrushId.Q_BG];
             Label stmtCon = new Label();
             stmtCon.Content = stmt;

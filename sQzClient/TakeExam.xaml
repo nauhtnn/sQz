@@ -28,7 +28,7 @@
                     </Grid>
                 </ScrollViewer>
             </StackPanel>
-            <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1020" Height="540" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top">
+            <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1020" Height="540" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
                 <Grid x:Name="gQuest" Width="1024">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="510"/>
@@ -39,9 +39,9 @@
         </Grid>
         <Grid Height="48" Background="#ffffbb">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="5*"/>
                 <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="4*"/>
+                <ColumnDefinition Width="3*"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>

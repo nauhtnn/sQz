@@ -115,11 +115,14 @@ namespace sQzLib
         }
     }
 
+    public delegate void WPopupCb();
+
     public class WPopup
     {
         Window w;
         TextBlock t;
-        public static WPopup _s;
+        WPopupCb _wpCb;
+        static WPopup _s;
         WPopup()
         {
             w = new Window();
@@ -137,6 +140,8 @@ namespace sQzLib
             c.B = 0xb4;
             t.Background = new SolidColorBrush(c);
             w.Content = t;
+
+            _wpCb = null;
         }
 
         static WPopup s
@@ -146,6 +151,11 @@ namespace sQzLib
                     _s = new WPopup();
                 return _s;
             }
+        }
+
+        public static WPopupCb wpCb
+        {
+            set { s._wpCb = value; }
         }
 
         public static void Config(Window p, double fsz)
@@ -173,6 +183,8 @@ namespace sQzLib
             Window w = sender as Window;
             w.Visibility = Visibility.Collapsed;
             e.Cancel = true;
+            if (_wpCb != null)
+                _wpCb();
         }
     }
 }
