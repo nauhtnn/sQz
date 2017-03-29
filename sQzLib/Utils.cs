@@ -6,39 +6,6 @@ using System.Text;
 
 namespace sQzLib
 {
-    //from left to right
-    public enum BrushId
-    {
-        BG = 0,
-        LeftPanel_BG,
-        Sheet_BG,
-        Button_Hover,
-        Q_BG,
-        QID_BG,
-        QID_Color,
-        Ans_TopLine,
-        Ans_Highlight,
-        Count
-    }
-
-    public enum ThicknessId
-    {
-        LT = 0,
-        MT,
-        RT,
-        LB,
-        MB,
-        RB,
-        Count
-    }
-
-    public enum ThemeId
-    {
-        Harvard = 0,
-        Berkeley,
-        Count
-    }
-
     public class UICbMsg
     {
         private StringBuilder sb;

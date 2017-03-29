@@ -23,7 +23,7 @@ namespace sQzServer1
     /// </summary>
     public partial class Operation1 : Page
     {
-        Client2 mClient2;
+        Client2 mClnt;
         NetCode mState;
         Server2 mServer;
         UICbMsg mCbMsg;
@@ -39,7 +39,7 @@ namespace sQzServer1
             ShowsNavigationUI = false;
 
             mState = NetCode.DateStudentRetriving;
-            mClient2 = new Client2(ClntBufHndl, ClntBufPrep);
+            mClnt = new Client2(ClntBufHndl, ClntBufPrep, true);
             mServer = new Server2(SrvrCodeHndl);
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
@@ -49,8 +49,6 @@ namespace sQzServer1
             vComp = new Dictionary<int, TextBlock>();
             vTime1 = new Dictionary<int, TextBlock>();
             vTime2 = new Dictionary<int, TextBlock>();
-
-            Theme.InitBrush();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -90,7 +88,7 @@ namespace sQzServer1
             w.Closing += W_Closing;
             w.FontSize = 13;
 
-            spMain.Background = Theme.vBrush[(int)BrushId.BG];
+            spMain.Background = Theme.s._[(int)BrushId.BG];
 
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
@@ -103,7 +101,7 @@ namespace sQzServer1
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
             //todo: check th state to return
-            Thread th = new Thread(() => { mClient2.ConnectWR(ref mCbMsg); });
+            Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
         }
 
@@ -169,8 +167,8 @@ namespace sQzServer1
                         }
                         else
                         {
-                            string msg = "Examinee has signed in at " +
-                                ee.mTime1 + " on the computer " + ee.mComp + ".";
+                            string msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
+                                ee.mTime1 + Txt.s._[(int)TxI.SIGNIN_AL_2] + ee.mComp + ".";
                             byte[] b = Encoding.UTF32.GetBytes(msg);
                             outMsg = new byte[5 + b.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
@@ -356,7 +354,7 @@ namespace sQzServer1
                         if (dark)
                             i.Background = new SolidColorBrush(c);
                         else
-                            i.Background = Theme.vBrush[(int)BrushId.LeftPanel_BG];
+                            i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
                         sp.Children.Add(i);
                     }
                     svwr.Content = sp;
@@ -370,7 +368,7 @@ namespace sQzServer1
         {
             //todo: check th state to return
             mState = NetCode.SrvrSubmitting;
-            Thread th = new Thread(() => { mClient2.ConnectWR(ref mCbMsg); });
+            Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
         }
     }

@@ -23,7 +23,7 @@ namespace sQzClient
     /// </summary>
     public partial class Authentication : Page
     {
-        Client2 mClient;
+        Client2 mClnt;
         NetCode mState;
         UICbMsg mCbMsg;
         bool bRunning;
@@ -37,7 +37,7 @@ namespace sQzClient
             ShowsNavigationUI = false;
 
             mState = NetCode.Dating;
-            mClient = new Client2(ClntBufHndl, ClntBufPrep);
+            mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
             bRunning = true;
 
@@ -52,7 +52,7 @@ namespace sQzClient
 
         private void Connect(Object source, System.Timers.ElapsedEventArgs e)
         {
-            Thread th = new Thread(() => { mClient.ConnectWR(ref mCbMsg); });
+            Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
         }
 
@@ -73,14 +73,14 @@ namespace sQzClient
                 WPopup.ShowDialog(Txt.s._[(int)TxI.NEEID_NOTI]);
                 return;
             }
-            Thread th = new Thread(() => { mClient.ConnectWR(ref mCbMsg); });
+            Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bRunning = false;
-            mClient.Close();
+            mClnt.Close();
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)

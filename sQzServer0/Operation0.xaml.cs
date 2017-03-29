@@ -37,7 +37,6 @@ namespace sQzServer0
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
-            Theme.InitBrush();
 
             bRunning = true;
         }
@@ -161,7 +160,7 @@ namespace sQzServer0
             w.Closing += W_Closing;
             w.FontSize = 13;
 
-            spMain.Background = Theme.vBrush[(int)BrushId.Ans_Highlight];
+            spMain.Background = Theme.s._[(int)BrushId.Ans_Highlight];
 
             LoadTxt();
 
@@ -255,7 +254,7 @@ namespace sQzServer0
 						if (dark)
 							i.Background = new SolidColorBrush(c);
 						else
-							i.Background = Theme.vBrush[(int)BrushId.LeftPanel_BG];
+							i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
 						sp.Children.Add(i);
 					}
                     svwr.Content = sp;

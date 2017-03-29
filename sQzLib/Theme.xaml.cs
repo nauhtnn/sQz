@@ -15,21 +15,59 @@ using System.Windows.Shapes;
 
 namespace sQzLib
 {
+    //from left to right
+    public enum BrushId
+    {
+        BG = 0,
+        LeftPanel_BG,
+        Sheet_BG,
+        Button_Hover,
+        Q_BG,
+        QID_BG,
+        QID_Color,
+        Ans_TopLine,
+        Ans_Highlight,
+        Count
+    }
+
+    public enum ThicknessId
+    {
+        LT = 0,
+        MT,
+        RT,
+        LB,
+        MB,
+        RB,
+        Count
+    }
+
+    public enum ThemeId
+    {
+        Harvard = 0,
+        Berkeley,
+        Count
+    }
     /// <summary>
     /// Interaction logic for Theme.xaml
     /// </summary>
     public partial class Theme : UserControl
     {
-        public static SolidColorBrush[] vBrush;
-        public static SolidColorBrush[][] vTheme;
-
-        static bool bBrushReady = false;
-
-        public static void InitBrush()
+        public SolidColorBrush[] _;
+        public Thickness[] l;
+        SolidColorBrush[][] vTheme;
+        static Theme _s;
+        public static Theme s
         {
-            if (bBrushReady)
-                return;
-            bBrushReady = true;
+            get {
+                if (_s == null)
+                    _s = new Theme();
+                return _s;
+            }
+        }
+
+        public Theme()
+        {
+            //InitializeComponent();
             vTheme = new SolidColorBrush[(int)ThemeId.Count][];
             //Harvard theme
             SolidColorBrush[] br = new SolidColorBrush[(int)BrushId.Count];
@@ -65,12 +103,15 @@ namespace sQzLib
             c.B = 0x23;
             br[(int)BrushId.Button_Hover] = new SolidColorBrush(c);
             vTheme[(int)ThemeId.Harvard] = br;
-            vBrush = vTheme[(int)ThemeId.Harvard];
-        }
-
-        public Theme()
-        {
-            InitializeComponent();
+            _ = vTheme[(int)ThemeId.Harvard];
+            
+            l = new Thickness[(int)ThicknessId.Count];
+            l[(int)ThicknessId.LT] = new Thickness(0, 0, 0, 0);
+            l[(int)ThicknessId.MT] = new Thickness(1, 1, 0, 0);
+            l[(int)ThicknessId.RT] = new Thickness(1, 1, 1, 0);
+            l[(int)ThicknessId.LB] = new Thickness(1, 1, 0, 1);
+            l[(int)ThicknessId.MB] = new Thickness(1, 1, 0, 1);
+            l[(int)ThicknessId.RB] = new Thickness(1, 1, 1, 1);
         }
     }
 
@@ -113,8 +154,8 @@ namespace sQzLib
             if (p != null)
             {
                 i.w.Owner = p;
-                s.w.Width = p.RenderSize.Width / 4;
-                s.w.Height = p.RenderSize.Height / 4;
+                s.w.Width = p.RenderSize.Width / 3;
+                s.w.Height = p.RenderSize.Height / 3;
                 s.w.ResizeMode = ResizeMode.NoResize;
             }
             if (0 < fsz)

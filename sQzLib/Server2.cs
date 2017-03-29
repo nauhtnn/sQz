@@ -35,7 +35,7 @@ namespace sQzLib
             if (mServer != null)
                 return;
             bListening = true;
-            cbMsg += "\nServer started.";
+            cbMsg += Txt.s._[(int)TxI.CONN_SRVR_ST];
             try
             {
                 mServer = new TcpListener(IPAddress.Any, mPort);

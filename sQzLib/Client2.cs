@@ -42,8 +42,9 @@ namespace sQzLib
         DgClntBufHndl dgBufHndl;
         DgClntBufPrep dgBufPrep;
         bool bRW;
+        bool bAllMsg;
 
-        public Client2(DgClntBufHndl hndl, DgClntBufPrep prep)
+        public Client2(DgClntBufHndl hndl, DgClntBufPrep prep, bool allMsg)
         {
             string filePath = "ServerAddr.txt";
             if (System.IO.File.Exists(filePath))
@@ -58,6 +59,7 @@ namespace sQzLib
             dgBufHndl = hndl;
             dgBufPrep = prep;
             bRW = false;
+            bAllMsg = allMsg;
         }
 
         public string SrvrAddr { set { mSrvrAddr = value; } }
@@ -194,7 +196,8 @@ namespace sQzLib
             }
             bRW = false;
             mClient.Close();
-            cbMsg += Txt.s._[(int)TxI.CONN_CLNT_CE];
+            if(bAllMsg)
+                cbMsg += Txt.s._[(int)TxI.CONN_CLNT_CE];
             mClient = null;
             return ok;
         }

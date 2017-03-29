@@ -13,7 +13,7 @@ namespace sQzClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class TakeExam : System.Windows.Controls.Page
+    public partial class TakeExam : Page
     {
         public static double em = 14;
         Label[][] vlblAnsSh;
@@ -26,22 +26,18 @@ namespace sQzClient
         List<ListBox> vLbx;
         System.Timers.Timer mTimer;
 
-        Client2 mClient;
+        Client2 mClnt;
         NetCode mState;
 
         UICbMsg mCbMsg;
-
-        static bool bBrushReady = false;
 
         Label dmsg = new Label();
 
         public TakeExam()
         {
             InitializeComponent();
-            InitBrush();
-            InitThickness();
             mState = NetCode.Dating;
-            mClient = new Client2(ClntBufHndl, ClntBufPrep);
+            mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
             vLbx = new List<ListBox>();
 
@@ -57,64 +53,6 @@ namespace sQzClient
             btnExit.Content = Txt.s._[(int)TxI.EXIT];
         }
 
-        public static SolidColorBrush[] vBrush;
-        public static SolidColorBrush[][] vTheme;
-        Thickness[] vThickness;
-
-        public static void InitBrush()
-        {
-            if (bBrushReady)
-                return;
-            bBrushReady = true;
-            vTheme = new SolidColorBrush[(int)ThemeId.Count][];
-            //Harvard theme
-            SolidColorBrush[] br = new SolidColorBrush[(int)BrushId.Count];
-            Color c = new Color();
-            c.A = 0xff;
-            c.R = 0xc3;
-            c.G = 0xd7;
-            c.B = 0xa4;
-            br[(int)BrushId.BG] = new SolidColorBrush(c);
-            c.R = 0xa5;
-            c.G = 0x1c;
-            c.B = 0x30;
-            br[(int)BrushId.QID_BG] = new SolidColorBrush(c);
-            c.R = c.G = c.B = 0xff;
-            br[(int)BrushId.QID_Color] = new SolidColorBrush(c);
-            c.R = c.G = c.B = 0xee;
-            br[(int)BrushId.Q_BG] = new SolidColorBrush(c);
-            c.R = 0xd8;
-            c.G = 0x70;
-            c.B = 0xb8;
-            br[(int)BrushId.Ans_TopLine] = new SolidColorBrush(c);
-            c.R = 0x58;
-            c.G = 0xa9;
-            c.B = 0xb4;
-            br[(int)BrushId.Ans_Highlight] = new SolidColorBrush(c);
-            c.R = c.G = 0xff;
-            c.B = 0xbb;
-            br[(int)BrushId.LeftPanel_BG] = new SolidColorBrush(c);
-            c.B = 0xdd;
-            br[(int)BrushId.Sheet_BG] = new SolidColorBrush(c);
-            c.R = 0xf1;
-            c.G = 0x5a;
-            c.B = 0x23;
-            br[(int)BrushId.Button_Hover] = new SolidColorBrush(c);
-            vTheme[(int)ThemeId.Harvard] = br;
-            vBrush = vTheme[(int)ThemeId.Harvard];
-        }
-
-        void InitThickness()
-        {
-            vThickness = new Thickness[(int)ThicknessId.Count];
-            vThickness[(int)ThicknessId.LT] = new Thickness(0, 0, 0, 0);
-            vThickness[(int)ThicknessId.MT] = new Thickness(1, 1, 0, 0);
-            vThickness[(int)ThicknessId.RT] = new Thickness(1, 1, 1, 0);
-            vThickness[(int)ThicknessId.LB] = new Thickness(1, 1, 0, 1);
-            vThickness[(int)ThicknessId.MB] = new Thickness(1, 1, 0, 1);
-            vThickness[(int)ThicknessId.RB] = new Thickness(1, 1, 1, 1);
-        }
-
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Window w = Window.GetWindow(this);
@@ -124,7 +62,6 @@ namespace sQzClient
             w.Closing += W_Closing;
             w.FontSize = 16;
 
-            Theme.InitBrush();
             vWidth = new double[5];
             vWidth[0] = 1280;// spMain.RenderSize.Width;
             vWidth[1] = 20;// 2 * em;
@@ -134,15 +71,11 @@ namespace sQzClient
             
             InitLeftPanel();
             InitQuestPanel();
-            dmsg.Background = vBrush[(int)BrushId.LeftPanel_BG];
+            dmsg.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
             dmsg.Width = (int)spMain.RenderSize.Width / 2;
             dmsg.Height = (int)spMain.RenderSize.Height / 4;
 
             LoadTxt();
-
-            string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
-                ")" + Txt.s._[(int)TxI.AUTH_MSG];
-            WPopup.ShowDialog(msg);
 
             mTimer = new System.Timers.Timer(1000);
             mTimer.Elapsed += UpdateSrvrMsg;
@@ -167,16 +100,20 @@ namespace sQzClient
 
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
+
+            string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
+                ")" + Txt.s._[(int)TxI.AUTH_MSG];
+            Dispatcher.Invoke(() => { WPopup.ShowDialog(msg); });
         }
 
         void InitLeftPanel()
         {
             //left panel
             spLp.HorizontalAlignment = HorizontalAlignment.Left;
-            spLp.Background = vBrush[(int)BrushId.LeftPanel_BG];
+            spLp.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
             //title
             Label l = new Label();
-            gAnsSh.Background = vBrush[(int)BrushId.Sheet_BG];
+            gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             int nAns = 4;//hardcode
             int i = 0, n = Question.svQuest[0].Count;
             vlblAnsSh = new Label[n][];
@@ -193,7 +130,7 @@ namespace sQzClient
                 l = new Label();
                 l.Content = (char)('@' + i);
                 l.BorderBrush = brBK;
-                l.BorderThickness = vThickness[(int)ThicknessId.MT];
+                l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 l.FontWeight = FontWeights.Bold;
                 Grid.SetRow(l, 0);
@@ -203,7 +140,7 @@ namespace sQzClient
             }
             l = new Label();
             l.BorderBrush = brBK;
-            l.BorderThickness = vThickness[(int)ThicknessId.RT];
+            l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.Content = (char)('@' + i);
             l.FontWeight = FontWeights.Bold;
@@ -220,7 +157,7 @@ namespace sQzClient
                 l = new Label();
                 l.Content = j;
                 l.BorderBrush = brBK;
-                l.BorderThickness = vThickness[(int)ThicknessId.MT];
+                l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 l.FontWeight = FontWeights.Bold;
                 Grid.SetRow(l, j);
@@ -230,7 +167,7 @@ namespace sQzClient
                 {
                     l = new Label();
                     l.BorderBrush = brBK;
-                    l.BorderThickness = vThickness[(int)ThicknessId.MT];
+                    l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
                     l.HorizontalContentAlignment = HorizontalAlignment.Center;
                     l.VerticalContentAlignment = VerticalAlignment.Top;
                     Grid.SetRow(l, j);
@@ -241,7 +178,7 @@ namespace sQzClient
                 }
                 l = new Label();
                 l.BorderBrush = brBK;
-                l.BorderThickness = vThickness[(int)ThicknessId.RT];
+                l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, i);
@@ -256,7 +193,7 @@ namespace sQzClient
             l = new Label();
             l.Content = j;
             l.BorderBrush = brBK;
-            l.BorderThickness = vThickness[(int)ThicknessId.LB];
+            l.BorderThickness = Theme.s.l[(int)ThicknessId.LB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.FontWeight = FontWeights.Bold;
             Grid.SetRow(l, j);
@@ -266,7 +203,7 @@ namespace sQzClient
             {
                 l = new Label();
                 l.BorderBrush = brBK;
-                l.BorderThickness = vThickness[(int)ThicknessId.MB];
+                l.BorderThickness = Theme.s.l[(int)ThicknessId.MB];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, i);
@@ -276,7 +213,7 @@ namespace sQzClient
             }
             l = new Label();
             l.BorderBrush = brBK;
-            l.BorderThickness = vThickness[(int)ThicknessId.RB];
+            l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             Grid.SetRow(l, j);
             Grid.SetColumn(l, i);
@@ -291,7 +228,7 @@ namespace sQzClient
         void InitQuestPanel()
         {
             Grid qs = new Grid();
-            qs.Background = vBrush[(int)BrushId.Q_BG];
+            qs.Background = Theme.s._[(int)BrushId.Q_BG];
             qs.ColumnDefinitions.Add(new ColumnDefinition());
             qs.ColumnDefinitions.Add(new ColumnDefinition());
             int n = Question.svQuest[0].Count;
@@ -310,7 +247,7 @@ namespace sQzClient
                 Grid.SetColumn(q, 1);
                 qs.Children.Add(q);
             }
-            qs.Background = vBrush[(int)BrushId.BG];
+            qs.Background = Theme.s._[(int)BrushId.BG];
             svwrQSh.Content = qs;
         }
 
@@ -323,8 +260,8 @@ namespace sQzClient
             l.HorizontalAlignment = HorizontalAlignment.Left;
             l.VerticalAlignment = VerticalAlignment.Top;
             l.Content = idx;
-            l.Background = vBrush[(int)BrushId.QID_BG];
-            l.Foreground = vBrush[(int)BrushId.QID_Color];
+            l.Background = Theme.s._[(int)BrushId.QID_BG];
+            l.Foreground = Theme.s._[(int)BrushId.QID_Color];
             l.Width = vWidth[1];
             l.Height = 1.5f * em;
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -338,10 +275,10 @@ namespace sQzClient
             stmt.TextWrapping = TextWrapping.Wrap;
             // dmsg.Content += "_" + idx + stmt.Text + vQuest.Count + "\n";
             stmt.Width = 484;// vWidth[4];
-            stmt.Background = vBrush[(int)BrushId.Q_BG];
+            stmt.Background = Theme.s._[(int)BrushId.Q_BG];
             Label stmtCon = new Label();
             stmtCon.Content = stmt;
-            stmtCon.BorderBrush = vBrush[(int)BrushId.QID_BG];
+            stmtCon.BorderBrush = Theme.s._[(int)BrushId.QID_BG];
             stmtCon.BorderThickness = new Thickness(0, 4, 0, 0);
             Thickness zero = new Thickness(0);
             stmtCon.Margin = stmtCon.Padding = zero;
@@ -360,12 +297,12 @@ namespace sQzClient
                 ans.Name = "_" + i;
                 answers.Items.Add(ans);
             }
-            answers.BorderBrush = vBrush[(int)BrushId.Ans_TopLine];
+            answers.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
             answers.BorderThickness = new Thickness(0, 4, 0, 0);
             vLbx.Add(answers);
             con.Children.Add(answers);
             q.Children.Add(con);
-            q.Background = vBrush[(int)BrushId.BG];
+            q.Background = Theme.s._[(int)BrushId.BG];
             return q;
         }
 
@@ -403,7 +340,7 @@ namespace sQzClient
                 for (int j = 0; j < 4; ++j, ++k)//hardcode
                     mbAns[k] = Convert.ToByte(vbAns[i][j]);
             mState = NetCode.Submiting;
-            mClient.ConnectWR(ref mCbMsg);
+            mClnt.ConnectWR(ref mCbMsg);
             DisableAll();
         }
 
@@ -413,7 +350,8 @@ namespace sQzClient
             {
                 case NetCode.Submiting:
                     ushort mark = BitConverter.ToUInt16(buf, offs);
-                    txtRs.Text = Txt.s._[(int)TxI.RESULT] + mark;
+                    //txtRs.Text = Txt.s._[(int)TxI.RESULT] + mark;
+                    WPopup.ShowDialog(Txt.s._[(int)TxI.RESULT] + mark);
                     return false;
             }
             return true;
@@ -486,7 +424,7 @@ namespace sQzClient
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            mClient.Close();
+            mClnt.Close();
         }
     }
 
@@ -510,10 +448,10 @@ namespace sQzClient
             mB.Width = mB.Height = 30;
             mB.CornerRadius = sCr;
             //mB.BorderThickness = sTh;
-            mB.Background = Theme.vBrush[(int)BrushId.Q_BG];
+            mB.Background = Theme.s._[(int)BrushId.Q_BG];
             TextBlock tb = new TextBlock();
             tb.Text = i;
-            tb.Foreground = Theme.vBrush[(int)BrushId.QID_BG];
+            tb.Foreground = Theme.s._[(int)BrushId.QID_BG];
             tb.VerticalAlignment = VerticalAlignment.Center;
             tb.HorizontalAlignment = HorizontalAlignment.Center;
             mB.Child = tb;
@@ -528,16 +466,16 @@ namespace sQzClient
 
         public void Selected()
         {
-            mB.Background = Theme.vBrush[(int)BrushId.QID_BG];
+            mB.Background = Theme.s._[(int)BrushId.QID_BG];
             TextBlock t = (TextBlock)mB.Child;
-            t.Foreground = Theme.vBrush[(int)BrushId.QID_Color];
+            t.Foreground = Theme.s._[(int)BrushId.QID_Color];
         }
 
         public void Unselected()
         {
-            mB.Background = Theme.vBrush[(int)BrushId.Q_BG];
+            mB.Background = Theme.s._[(int)BrushId.Q_BG];
             TextBlock t = (TextBlock)mB.Child;
-            t.Foreground = Theme.vBrush[(int)BrushId.QID_BG];
+            t.Foreground = Theme.s._[(int)BrushId.QID_BG];
         }
     }
 }
