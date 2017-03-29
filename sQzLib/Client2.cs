@@ -31,19 +31,19 @@ namespace sQzLib
         Unknown
     }
 
-    public delegate bool DgCliBufHndl(byte[] buf, int offs);
-    public delegate bool DgCliBufPrep(ref byte[] outBuf);
+    public delegate bool DgClntBufHndl(byte[] buf, int offs);
+    public delegate bool DgClntBufPrep(ref byte[] outBuf);
 
     public class Client2
     {
         string mSrvrAddr;
         int mSrvrPort;
         TcpClient mClient = null;
-        DgCliBufHndl dgBufHndl;
-        DgCliBufPrep dgBufPrep;
+        DgClntBufHndl dgBufHndl;
+        DgClntBufPrep dgBufPrep;
         bool bRW;
 
-        public Client2(DgCliBufHndl hndl, DgCliBufPrep prep)
+        public Client2(DgClntBufHndl hndl, DgClntBufPrep prep)
         {
             string filePath = "ServerAddr.txt";
             if (System.IO.File.Exists(filePath))
@@ -64,6 +64,16 @@ namespace sQzLib
 
         public int SrvrPort { set { mSrvrPort = value; } }
 
+        private bool ErrCode2Msg(int code, ref UICbMsg cbm)
+        {
+            if (code == 10061)
+            {
+                cbm += Txt.s._[(int)TxI.CONN_NOTI];
+                return false;
+            }
+            return true;
+        }
+
         public bool ConnectWR(ref UICbMsg cbMsg)
         {
             if (mClient != null)
@@ -74,14 +84,16 @@ namespace sQzLib
             try {
                 mClient.Connect(mSrvrAddr, mSrvrPort);
             } catch (SocketException e) {
-                cbMsg += e.Message;
+                if (ErrCode2Msg(e.ErrorCode, ref cbMsg))
+                    cbMsg += "\nEx: " + e.Message;
                 ok = false;
             }
             NetworkStream stream = null;
             if(ok)
                 try { stream = mClient.GetStream(); }
                 catch (SocketException e) {
-                    cbMsg += "\nEx: " + e.Message;
+                    if(ErrCode2Msg(e.ErrorCode, ref cbMsg))
+                        cbMsg += "\nEx: " + e.Message;
                     ok = false;
                 }
 
@@ -107,7 +119,7 @@ namespace sQzLib
                 try { stream.Write(msg2, 0, msg2.Length); }
                 catch(System.IO.IOException e)
                 {
-                    cbMsg += e.Message;
+                    cbMsg += "\nEx: " + e.Message;
                     ok = false;
                 }
 
@@ -182,7 +194,7 @@ namespace sQzLib
             }
             bRW = false;
             mClient.Close();
-            cbMsg += "\nA client stopped.";
+            cbMsg += Txt.s._[(int)TxI.CONN_CLNT_CE];
             mClient = null;
             return ok;
         }

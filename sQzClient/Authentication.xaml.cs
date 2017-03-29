@@ -26,20 +26,20 @@ namespace sQzClient
         Client2 mClient;
         NetCode mState;
         UICbMsg mCbMsg;
-        bool bReconn;
+        bool bRunning;
         string mNeeId;
         string mBirdate;
-        Txt mTxt;
+
         public Authentication()
         {
             InitializeComponent();
 
             ShowsNavigationUI = false;
 
-            bReconn = false;
             mState = NetCode.Dating;
-            mClient = new Client2(CliBufHndl, CliBufPrep);
+            mClient = new Client2(ClntBufHndl, ClntBufPrep);
             mCbMsg = new UICbMsg();
+            bRunning = true;
 
             mNeeId = mBirdate = string.Empty;
 
@@ -60,16 +60,17 @@ namespace sQzClient
         {
             mNeeId = tbxNeeId.Text;
             mBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
-            if (mBirdate.Length != 10)
+            DateTime dummy;
+            if (!DateTime.TryParse(mBirdate, out dummy))
             {
-                txtAuth.Text = mTxt._[(int)TxI.BIRDATE_NOTI];
+                WPopup.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOTI]);
                 return;
             }
             ExamLvl lv = ExamLvl.Basis;
             ushort id = ushort.MaxValue;
             if(!Examinee.ToID(mNeeId, ref lv, ref id))
             {
-                txtAuth.Text = mTxt._[(int)TxI.NEEID_NOTI];
+                WPopup.ShowDialog(Txt.s._[(int)TxI.NEEID_NOTI]);
                 return;
             }
             Thread th = new Thread(() => { mClient.ConnectWR(ref mCbMsg); });
@@ -78,6 +79,7 @@ namespace sQzClient
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            bRunning = false;
             mClient.Close();
         }
 
@@ -92,9 +94,10 @@ namespace sQzClient
 
             LoadTxt();
 
-            double rt = w.RenderSize.Width / 1280; //design size
-            ScaleTransform st = new ScaleTransform(rt, rt);
+            //double rt = w.RenderSize.Width / 1280; //design size
+            //ScaleTransform st = new ScaleTransform(rt, rt);
             //spMain.RenderTransform = st;
+            WPopup.Config(w, w.FontSize);
 
             FirewallHandler fwHndl = new FirewallHandler(3);
             lblStatus.Text += fwHndl.OpenFirewall();
@@ -104,22 +107,16 @@ namespace sQzClient
 
         private void LoadTxt()
         {
-            mTxt = new Txt();
-            mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
-            txtLalgitc.Text = mTxt._[(int)TxI.LALGITC];
-            txtWelcome.Text = mTxt._[(int)TxI.WELCOME];
-            txtNeeId.Text = mTxt._[(int)TxI.NEEID];
-            txtBirdate.Text = mTxt._[(int)TxI.BIRDATE] + mTxt._[(int)TxI.BIRDATE_MSG];
-            btnSignIn.Content = mTxt._[(int)TxI.SIGNIN];
-            btnReconn.Content = mTxt._[(int)TxI.CONN];
-            btnExit.Content = mTxt._[(int)TxI.EXIT];
+            Txt t = Txt.s;
+            txtLalgitc.Text = t._[(int)TxI.LALGITC];
+            txtWelcome.Text = t._[(int)TxI.WELCOME];
+            txtNeeId.Text = t._[(int)TxI.NEEID];
+            txtBirdate.Text = t._[(int)TxI.BIRDATE] + t._[(int)TxI.BIRDATE_MSG];
+            btnSignIn.Content = t._[(int)TxI.SIGNIN];
+            btnExit.Content = t._[(int)TxI.EXIT];
         }
 
-        private void btnReconn_Click(object sender, RoutedEventArgs e)
-        {
-        }
-
-        public bool CliBufHndl(byte[] buf, int offs)
+        public bool ClntBufHndl(byte[] buf, int offs)
         {
             switch (mState)
             {
@@ -127,7 +124,7 @@ namespace sQzClient
                     Date.ReadByteArr(buf, ref offs, buf.Length);
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
-                            txtDate.Text = mTxt._[(int)TxI.DATE] + Encoding.UTF32.GetString(Date.sbArr);
+                            txtDate.Text = Txt.s._[(int)TxI.DATE] + Encoding.UTF32.GetString(Date.sbArr);
                         else
                             txtDate.Text = "No connection";
                     });
@@ -147,7 +144,7 @@ namespace sQzClient
                         offs += 4;
                         string txt = Encoding.UTF32.GetString(buf, offs, sz);
                         Dispatcher.Invoke(() => {
-                            txtAuth.Text = txt;// mTxt._[(int)TxI.SIGNIN_NOTI];
+                            WPopup.ShowDialog(txt);
                         });
                     }
                     break;
@@ -163,7 +160,7 @@ namespace sQzClient
             return false;
         }
 
-        public bool CliBufPrep(ref byte[] outBuf)
+        public bool ClntBufPrep(ref byte[] outBuf)
         {
             switch (mState)
             {
@@ -182,54 +179,8 @@ namespace sQzClient
 
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
-            if (mCbMsg.ToUp())
-                Dispatcher.Invoke(() => {
-                    lblStatus.Text += mCbMsg.txt;
-                });
-        }
-
-        private void tbx_DMYKeyUp(object sender, KeyEventArgs e)
-        {
-            TextBox t = (TextBox)sender;
-            if (t.Text.Length == 0)
-            {
-                if (!char.IsDigit(e.Key.ToString()[0]))
-                {
-                    txtDMYMsg.Text = mTxt._[(int)TxI.BIRDATE_NOTI];
-                    e.Handled = true;
-                }
-            }
-            else
-            {
-                if (tbxNeeId.Text.Length == 0 || tbxD.Text.Length == 0 ||
-                    tbxM.Text.Length == 0 || tbxY.Text.Length == 0)
-                    btnSignIn.IsEnabled = false;
-                else
-                    btnSignIn.IsEnabled = true;
-            }
-            mNeeId = t.Text;
-        }
-
-        private void tbx_NeeIdKeyUp(object sender, KeyEventArgs e)
-        {
-            TextBox t = (TextBox)sender;
-            if (t.Text.Length == 0)
-            {
-                if (e.Key != Key.A && e.Key != Key.B)
-                {
-                    txtNeeIdMsg.Text = mTxt._[(int)TxI.NEEID_NOTI];
-                    e.Handled = true;
-                }
-            }
-            else
-            {
-                if (tbxD.Text.Length == 0 || tbxM.Text.Length == 0 ||
-                    tbxY.Text.Length == 0)
-                    btnSignIn.IsEnabled = false;
-                else
-                    btnSignIn.IsEnabled = true;
-            }
-            mBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
+            if (bRunning && mCbMsg.ToUp())
+                Dispatcher.Invoke(() => { WPopup.ShowDialog(mCbMsg.txt); });
         }
 
         private void btnExit_Click(object sender, RoutedEventArgs e)

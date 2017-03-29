@@ -22,8 +22,6 @@ namespace sQzServer0
     /// </summary>
     public partial class Prep0 : Page
     {
-        private Txt mTxt;
-
         public Prep0()
         {
             ShowsNavigationUI = false;
@@ -78,13 +76,9 @@ namespace sQzServer0
 
         void InitLbxQCatgry()
         {
-            //names corresponding to IUxx
-            //string[] qCatName = { "Concept of ICT", "Computer", "Word", "Spreadsheet", "Presentation",
-            //    "Internet", "Adv Word", "Adv Spreadsheet", "Database Mgmt", "Img processing",
-            //    "Project Mgmt", "Img Editting"};
             List<string> qCatName = new List<string>();
             for (int i = (int)TxI.IU01; i <= (int)TxI.IU15; ++i)
-                qCatName.Add(mTxt._[i]);
+                qCatName.Add(Txt.s._[i]);
             bool dark = true;
             Color c = new Color();
             c.A = 0xff;
@@ -232,11 +226,10 @@ namespace sQzServer0
 
         private void LoadTxt()
         {
-            mTxt = new Txt();
-            mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
-            btnInsDate.Content = mTxt._[(int)TxI.DATE_ADD];
-            btnNeeBrowse.Content = mTxt._[(int)TxI.NEE_ADD];
-            btnQBrowse.Content = mTxt._[(int)TxI.Q_ADD];
+            Txt t = Txt.s;
+            btnInsDate.Content = t._[(int)TxI.DATE_ADD];
+            btnNeeBrowse.Content = t._[(int)TxI.NEE_ADD];
+            btnQBrowse.Content = t._[(int)TxI.Q_ADD];
         }
     }
 }

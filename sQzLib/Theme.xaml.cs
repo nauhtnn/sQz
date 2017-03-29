@@ -22,9 +22,6 @@ namespace sQzLib
     {
         public static SolidColorBrush[] vBrush;
         public static SolidColorBrush[][] vTheme;
-        Thickness[] vThickness;
-        FontFamily[] vFontFml;
-        public static double em = 16 * 1.2;
 
         static bool bBrushReady = false;
 
@@ -74,6 +71,67 @@ namespace sQzLib
         public Theme()
         {
             InitializeComponent();
+        }
+    }
+
+    public class WPopup
+    {
+        Window w;
+        TextBlock t;
+        public static WPopup _s;
+        WPopup()
+        {
+            w = new Window();
+            w.Title = Txt.s._[(int)TxI.POPUP_TIT];
+            w.Closing += wPopup_Closing;
+            w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            t = new TextBlock();
+            
+            t.VerticalAlignment = VerticalAlignment.Center;
+            t.TextWrapping = TextWrapping.Wrap;
+            t.TextAlignment = TextAlignment.Center;
+            Color c = new Color();
+            c.R = 0x58;
+            c.G = 0xa9;
+            c.B = 0xb4;
+            t.Background = new SolidColorBrush(c);
+            w.Content = t;
+        }
+
+        static WPopup s
+        {
+            get {
+                if (_s == null)
+                    _s = new WPopup();
+                return _s;
+            }
+        }
+
+        public static void Config(Window p, double fsz)
+        {
+            WPopup i = s;
+            if (p != null)
+            {
+                i.w.Owner = p;
+                s.w.Width = p.RenderSize.Width / 4;
+                s.w.Height = p.RenderSize.Height / 4;
+                s.w.ResizeMode = ResizeMode.NoResize;
+            }
+            if (0 < fsz)
+                i.t.FontSize = fsz;
+        }
+
+        public static void ShowDialog(string msg)
+        {
+            s.t.Text = msg;
+            s.w.ShowDialog();
+        }
+
+        private void wPopup_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            Window w = sender as Window;
+            w.Visibility = Visibility.Collapsed;
+            e.Cancel = true;
         }
     }
 }

@@ -25,7 +25,6 @@ namespace sQzClient
         TimeSpan kDtDuration;
         List<ListBox> vLbx;
         System.Timers.Timer mTimer;
-        Txt mTxt;
 
         Client2 mClient;
         NetCode mState;
@@ -42,7 +41,7 @@ namespace sQzClient
             InitBrush();
             InitThickness();
             mState = NetCode.Dating;
-            mClient = new Client2(CliBufHndl, CliBufPrep);
+            mClient = new Client2(ClntBufHndl, ClntBufPrep);
             mCbMsg = new UICbMsg();
             vLbx = new List<ListBox>();
 
@@ -53,11 +52,9 @@ namespace sQzClient
 
         private void LoadTxt()
         {
-            mTxt = new Txt();
-            mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
-            txtAnsSh.Text = mTxt._[(int)TxI.ANS_SHEET];
-            btnSubmit.Content = mTxt._[(int)TxI.SUBMIT];
-            btnExit.Content = mTxt._[(int)TxI.EXIT];
+            txtAnsSh.Text = Txt.s._[(int)TxI.ANS_SHEET];
+            btnSubmit.Content = Txt.s._[(int)TxI.SUBMIT];
+            btnExit.Content = Txt.s._[(int)TxI.EXIT];
         }
 
         public static SolidColorBrush[] vBrush;
@@ -144,8 +141,8 @@ namespace sQzClient
             LoadTxt();
 
             string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
-                ") has signed in successfully. Press ok and start answering.";
-            MessageBox.Show(msg);
+                ")" + Txt.s._[(int)TxI.AUTH_MSG];
+            WPopup.ShowDialog(msg);
 
             mTimer = new System.Timers.Timer(1000);
             mTimer.Elapsed += UpdateSrvrMsg;
@@ -410,19 +407,19 @@ namespace sQzClient
             DisableAll();
         }
 
-        public bool CliBufHndl(byte[] buf, int offs)
+        public bool ClntBufHndl(byte[] buf, int offs)
         {
             switch (mState)
             {
                 case NetCode.Submiting:
                     ushort mark = BitConverter.ToUInt16(buf, offs);
-                    txtRs.Text = "The number of correct answer: " + mark;
+                    txtRs.Text = Txt.s._[(int)TxI.RESULT] + mark;
                     return false;
             }
             return true;
         }
 
-        public bool CliBufPrep(ref byte[] outBuf)
+        public bool ClntBufPrep(ref byte[] outBuf)
         {
             switch (mState)
             {
@@ -465,7 +462,7 @@ namespace sQzClient
                     btnSubmit_Click(null, null);
                     System.Threading.Thread th = new System.Threading.Thread(() => {
                         Dispatcher.Invoke(() => {
-                            MessageBox.Show("Time's up! Your answers have been submitted automatically.");
+                            WPopup.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
                         });
                     });
                     th.Start();

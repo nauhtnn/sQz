@@ -39,7 +39,7 @@ namespace sQzServer1
             ShowsNavigationUI = false;
 
             mState = NetCode.DateStudentRetriving;
-            mClient2 = new Client2(CliBufHndl, CliBufPrep);
+            mClient2 = new Client2(ClntBufHndl, ClntBufPrep);
             mServer = new Server2(SrvrCodeHndl);
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
@@ -79,14 +79,6 @@ namespace sQzServer1
                     break;
             }
             return msg;
-        }
-
-        private void ScaleScreen(double r)
-        {
-            lblStatus.Height = lblStatus.Height * r;
-            lblStatus.Width = lblStatus.Width * r;
-
-            txtDate.FontSize = Theme.em;
         }
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
@@ -245,7 +237,7 @@ namespace sQzServer1
             return true;
         }
 
-        public bool CliBufHndl(byte[] buf, int offs)
+        public bool ClntBufHndl(byte[] buf, int offs)
         {
             switch (mState)
             {
@@ -322,7 +314,7 @@ namespace sQzServer1
             return true;
         }
 
-        public bool CliBufPrep(ref byte[] outBuf)
+        public bool ClntBufPrep(ref byte[] outBuf)
         {
             switch (mState)
             {

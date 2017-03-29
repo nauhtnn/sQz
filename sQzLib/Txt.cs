@@ -8,12 +8,13 @@ namespace sQzLib
 {
     public class Txt
     {
-        public static string sRPath = "../../../";
         List<string> avEnum;
         List<string> avTxt;
         byte[] mBuf;
         int mSz;
         public string[] _;
+
+        static Txt _s = null;
 
         public Txt()
         {
@@ -23,6 +24,16 @@ namespace sQzLib
             _ = null;
             mSz = 0;
         }
+		
+		public static Txt s{
+			get{
+				if(_s == null) {
+					_s = new Txt();
+					_s.ReadByte("../../../samples/GUI-vi.bin");
+				}
+				return _s;
+			}
+		}
 
         public void Scan(string f)
         {

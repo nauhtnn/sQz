@@ -178,20 +178,20 @@ namespace sQzLib
                     catch (SocketException e) {
                         cbMsg += "\nEx: " + e.Message;
                     }
-                    cbMsg += "\nA client stopped.";
+                    cbMsg += Txt.s._[(int)TxI.CONN_CLNT_CE];
                 }
             }
             Stop(ref cbMsg);
             try { mServer.Stop(); }
             catch (SocketException e) { cbMsg += "\nEx: " + e.Message; }
             mServer = null;
-            cbMsg += "\nServer stopped.";
+            cbMsg += Txt.s._[(int)TxI.CONN_SRVR_CE];
         }
 
         public void Stop(ref UICbMsg cbMsg)
         {
             if (bListening)
-                cbMsg += "\nServer is stopping.";
+                cbMsg += Txt.s._[(int)TxI.CONN_SRVR_CG];
             bRW = bListening = false;
         }
     }

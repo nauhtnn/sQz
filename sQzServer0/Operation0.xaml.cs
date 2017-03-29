@@ -26,7 +26,6 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         Dictionary<int, TextBlock> vMark;
-        private Txt mTxt;
 
         public Operation0()
         {
@@ -359,21 +358,20 @@ namespace sQzServer0
 
         private void LoadTxt()
         {
-            mTxt = new Txt();
-            mTxt.ReadByte(Txt.sRPath + "samples/GUI-vi.bin");
-            btnExit.Content = mTxt._[(int)TxI.EXIT];
-            btnStartSrvr.Content = mTxt._[(int)TxI.STRT_SRVR];
-            btnStopSrvr.Content = mTxt._[(int)TxI.STOP_SRVR];
-            btnPrep.Content = mTxt._[(int)TxI.PREP];
-            btnExGen.Content = mTxt._[(int)TxI.EX_GEN];
-            btnExit.Content = mTxt._[(int)TxI.EXIT];
-            txtNe.Text = mTxt._[(int)TxI.EX_SH_N];
-            txtNq.Text = mTxt._[(int)TxI.Q_N];
-            txtBirdate.Text = mTxt._[(int)TxI.BIRDATE];
-            txtBirpl.Text = mTxt._[(int)TxI.BIRPL];
-            txtName.Text = mTxt._[(int)TxI.NEE_NAME];
-            txtId.Text = mTxt._[(int)TxI.NEEID_S];
-            txtMark.Text = mTxt._[(int)TxI.MARK];
+            Txt t = Txt.s;
+            btnExit.Content = t._[(int)TxI.EXIT];
+            btnStartSrvr.Content = t._[(int)TxI.STRT_SRVR];
+            btnStopSrvr.Content = t._[(int)TxI.STOP_SRVR];
+            btnPrep.Content = t._[(int)TxI.PREP];
+            btnExGen.Content = t._[(int)TxI.EX_GEN];
+            btnExit.Content = t._[(int)TxI.EXIT];
+            txtNe.Text = t._[(int)TxI.EX_SH_N];
+            txtNq.Text = t._[(int)TxI.Q_N];
+            txtBirdate.Text = t._[(int)TxI.BIRDATE];
+            txtBirpl.Text = t._[(int)TxI.BIRPL];
+            txtName.Text = t._[(int)TxI.NEE_NAME];
+            txtId.Text = t._[(int)TxI.NEEID_S];
+            txtMark.Text = t._[(int)TxI.MARK];
         }
     }
 }
