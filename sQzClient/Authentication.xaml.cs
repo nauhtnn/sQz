@@ -118,6 +118,7 @@ namespace sQzClient
 
         public bool ClntBufHndl(byte[] buf, int offs)
         {
+            int l;
             switch (mState)
             {
                 case NetCode.Dating:
@@ -131,7 +132,8 @@ namespace sQzClient
                     mState = NetCode.Authenticating;
                     break;
                 case NetCode.Authenticating:
-                    bool rs = Examinee.CliReadAuthArr(buf, offs, out Examinee.sAuthNee);
+                    bool rs = Examinee.CliReadAuthArr(buf, ref offs, out Examinee.sAuthNee);
+                    l = buf.Length - offs;
                     if(rs)
                     {
                         mState = NetCode.ExamRetrieving;
@@ -139,9 +141,11 @@ namespace sQzClient
                     }
                     else
                     {
-                        ++offs;//todo
+                        if (l < 4)
+                            break;
                         int sz = BitConverter.ToInt32(buf, offs);
                         offs += 4;
+                        l -= 4;
                         string txt = Encoding.UTF32.GetString(buf, offs, sz);
                         Dispatcher.Invoke(() => {
                             WPopup.ShowDialog(txt);

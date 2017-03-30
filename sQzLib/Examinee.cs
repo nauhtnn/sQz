@@ -430,7 +430,7 @@ namespace sQzLib
             Buffer.BlockCopy(e, 0, buf, offs, e.Length);
             offs += e.Length;
         }
-        public static bool CliReadAuthArr(byte[] buf, int offs, out Examinee nee)
+        public static bool CliReadAuthArr(byte[] buf, ref int offs, out Examinee nee)
         {
             nee = null;
             int l = buf.Length - offs;
