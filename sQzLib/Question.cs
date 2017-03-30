@@ -4,29 +4,29 @@ using MySql.Data.MySqlClient;
 
 /*
 CREATE TABLE IF NOT EXISTS `quest1` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest2` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest3` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest4` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest5` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest6` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest7` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest8` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest9` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest10` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest11` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 CREATE TABLE IF NOT EXISTS `quest12` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf32`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
+`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
 */
 
 namespace sQzLib
@@ -407,7 +407,7 @@ namespace sQzLib
                     if (woKey)
                         lk.Add(false);
                     //stmt
-                    byte[] b = System.Text.Encoding.UTF32.GetBytes(q.mStmt);
+                    byte[] b = System.Text.Encoding.UTF8.GetBytes(q.mStmt);
                     l.Add(BitConverter.GetBytes(b.Length));
                     l.Add(b);
                     if (woKey)
@@ -422,7 +422,7 @@ namespace sQzLib
                     for (int j = 0; j < q.nAns; ++j)
                     {
                         //each ans
-                        b = System.Text.Encoding.UTF32.GetBytes(q.vAns[j]);
+                        b = System.Text.Encoding.UTF8.GetBytes(q.vAns[j]);
                         l.Add(BitConverter.GetBytes(b.Length));
                         l.Add(b);
                         if (woKey)
@@ -465,12 +465,13 @@ namespace sQzLib
                 sRdy = true;
         }
 
-        public static void ReadByteArr(byte[] buf, ref int offs, int l, bool wKey)
+        public static void ReadByteArr(byte[] buf, ref int offs, bool wKey)
         {
             wKey = true;
             if (buf == null)
                 return;
             int offs0 = offs;
+            int l = buf.Length - offs;
             if (l < 4)
                 return;
             int nExSh = BitConverter.ToInt32(buf, offs);
@@ -519,7 +520,7 @@ namespace sQzLib
                     Buffer.BlockCopy(buf, offs, ar, 0, sz);
                     l -= sz;
                     offs += sz;
-                    q.mStmt = System.Text.Encoding.UTF32.GetString(ar);
+                    q.mStmt = System.Text.Encoding.UTF8.GetString(ar);
                     //ans
                     if (l < 4)
                         break;
@@ -548,7 +549,7 @@ namespace sQzLib
                         Buffer.BlockCopy(buf, offs, ar, 0, sz);
                         l -= sz;
                         offs += sz;
-                        q.vAns[j] = System.Text.Encoding.UTF32.GetString(ar);
+                        q.vAns[j] = System.Text.Encoding.UTF8.GetString(ar);
                     }
                     if (brk)
                         break;

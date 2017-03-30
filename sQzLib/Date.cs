@@ -5,18 +5,18 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
+/*
+CREATE TABLE IF NOT EXISTS `dates` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`date` DATE, `slot` TINYINT(1));
+*/
+
 namespace sQzLib
 {
     public class Date
     {
-        /*
-         CREATE TABLE IF NOT EXISTS `dates` (`idx` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-          `date` DATE, `slot` TINYINT(1));
-         */
         public static List<uint> svIdx = new List<uint>();
         public static List<string> svDate = new List<string>();
         public static byte[] sbArr = null;
-        private static int snDate = 0;//redundant but convenient
         public static uint sDBIdx = uint.MaxValue;
 		private static int sDD = 0, sMM = 0, sYYYY = 0;
 
@@ -70,7 +70,7 @@ namespace sQzLib
         {
             int i = svDate.IndexOf(date);
             sDBIdx = svIdx[i];
-            sbArr = Encoding.UTF32.GetBytes(date);
+            sbArr = Encoding.UTF8.GetBytes(date);
         }
         public static void DBInsert(string date)
         {
@@ -108,15 +108,15 @@ namespace sQzLib
             reader.Close();
             DBConnect.Close(ref conn);
         }
-        public static void ReadByteArr(byte[] buf, ref int offs, int l)
+        public static void ReadByteArr(byte[] buf, ref int offs)
         {
-            if(snDate == 0)
-                snDate = Encoding.UTF32.GetByteCount("2017/01/01");//learn from example
-            if (l < snDate)
+            int l = buf.Length - offs;
+            if (l < 10)
                 return;
-            sbArr = new byte[snDate];
-            Buffer.BlockCopy(buf, offs, sbArr, 0, snDate);
-            offs += snDate;
+            l = 10;
+            sbArr = new byte[l];
+            Buffer.BlockCopy(buf, offs, sbArr, 0, l);
+            offs += l;
         }
     }
 }

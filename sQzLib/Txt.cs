@@ -91,7 +91,7 @@ namespace sQzLib
             offs += 4;
             foreach (string s in avTxt)
             {
-                byte[] b = Encoding.UTF32.GetBytes(s);
+                byte[] b = Encoding.UTF8.GetBytes(s);
                 Buffer.BlockCopy(BitConverter.GetBytes(b.Length), 0, mBuf, offs, 4);
                 offs += 4;
                 Buffer.BlockCopy(b, 0, mBuf, offs, b.Length);
@@ -111,7 +111,7 @@ namespace sQzLib
             {
                 int l = BitConverter.ToInt32(mBuf, offs);
                 offs += 4;
-                _[i] = Encoding.UTF32.GetString(mBuf, offs, l);
+                _[i] = Encoding.UTF8.GetString(mBuf, offs, l);
                 offs += l;
             }
             //int j = -1;

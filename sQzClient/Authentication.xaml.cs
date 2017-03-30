@@ -122,17 +122,17 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Dating:
-                    Date.ReadByteArr(buf, ref offs, buf.Length);
+                    Date.ReadByteArr(buf, ref offs);
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
-                            txtDate.Text = Txt.s._[(int)TxI.DATE] + Encoding.UTF32.GetString(Date.sbArr);
+                            txtDate.Text = Txt.s._[(int)TxI.DATE] + Encoding.UTF8.GetString(Date.sbArr);
                         else
                             txtDate.Text = "No connection";
                     });
                     mState = NetCode.Authenticating;
                     break;
                 case NetCode.Authenticating:
-                    bool rs = Examinee.CliReadAuthArr(buf, ref offs, out Examinee.sAuthNee);
+                    bool rs = Examinee.ClntReadAuthArr(buf, ref offs, out Examinee.sAuthNee);
                     l = buf.Length - offs;
                     if(rs)
                     {
@@ -146,7 +146,7 @@ namespace sQzClient
                         int sz = BitConverter.ToInt32(buf, offs);
                         offs += 4;
                         l -= 4;
-                        string txt = Encoding.UTF32.GetString(buf, offs, sz);
+                        string txt = Encoding.UTF8.GetString(buf, offs, sz);
                         Dispatcher.Invoke(() => {
                             WPopup.ShowDialog(txt);
                         });
@@ -154,7 +154,7 @@ namespace sQzClient
                     break;
                 case NetCode.ExamRetrieving:
                     offs = 0;
-                    Question.ReadByteArr(buf, ref offs, buf.Length, false);
+                    Question.ReadByteArr(buf, ref offs, false);
                     Dispatcher.Invoke(() =>
                     {
                         NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
@@ -172,7 +172,7 @@ namespace sQzClient
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.Authenticating:
-                    Examinee.CliToAuthArr(out outBuf, (int)mState, mNeeId, mBirdate);
+                    Examinee.ClntToAuthArr(out outBuf, (int)mState, mNeeId, mBirdate);
                     break;
                 case NetCode.ExamRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);

@@ -5,6 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
+/*
+CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
+`idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
+`birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
+`dt1` TIME, `dt2` TIME, `mark` SMALLINT(2) UNSIGNED, 
+PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`));
+*/
+
 namespace sQzLib
 {
     public enum ExamLvl
@@ -14,13 +22,6 @@ namespace sQzLib
     }
     public class Examinee
     {
-        /*
-         CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
-          `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf32`,
-          `birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf32`,
-		  `dt1` TIME, `dt2` TIME, `mark` SMALLINT(2) UNSIGNED, 
-          PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`));
-         */
         public static List<Examinee> svExaminee = new List<Examinee>();
         public static byte[] sbArr = null;
         public uint mDate;
@@ -192,13 +193,13 @@ namespace sQzLib
                 l.Add(b);
                 b = BitConverter.GetBytes(s.mId);
                 l.Add(b);
-                b = Encoding.UTF32.GetBytes(s.mName);
+                b = Encoding.UTF8.GetBytes(s.mName);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
-                b = Encoding.UTF32.GetBytes(s.mBirthdate);
+                b = Encoding.UTF8.GetBytes(s.mBirthdate);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
-                b = Encoding.UTF32.GetBytes(s.mBirthplace);
+                b = Encoding.UTF8.GetBytes(s.mBirthplace);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
                 l.Add(BitConverter.GetBytes(s.mTime1.Hour));
@@ -218,7 +219,7 @@ namespace sQzLib
                 offs += l[i].Length;
             }
         }
-        public static void ReadByteArr(byte[] buf, ref int offs, int l)
+        public static void ReadByteArr(byte[] buf, ref int offs)
         {
             svExaminee.Clear();
             svLvId2Idx.Clear();
@@ -226,6 +227,7 @@ namespace sQzLib
                 return;
             int offs0 = offs;
             int sz = 0;
+            int l = buf.Length - offs;
             if (l < 4)
                 return;
             int nNee = BitConverter.ToInt32(buf, offs);
@@ -251,7 +253,7 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     break;
-                s.mName = Encoding.UTF32.GetString(buf, offs, sz);
+                s.mName = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
                 if (l < 4)
@@ -261,7 +263,7 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     break;
-                s.mBirthdate = Encoding.UTF32.GetString(buf, offs, sz);
+                s.mBirthdate = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
                 if (l < 4)
@@ -271,7 +273,7 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     break;
-                s.mBirthplace = Encoding.UTF32.GetString(buf, offs, sz);
+                s.mBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
                 if (l < 4)
@@ -319,17 +321,17 @@ namespace sQzLib
             }
         }
 
-        public static void CliToAuthArr(out byte[] buf, int state, string rid, string birdate)
+        public static void ClntToAuthArr(out byte[] buf, int state, string rid, string birdate)
         {
             if (birdate == null || birdate.Length != 10)
             {
                 buf = null;
                 return;
             }
-            byte[] a = Encoding.UTF32.GetBytes(birdate);
+            byte[] a = Encoding.UTF8.GetBytes(birdate);
             byte[] b = null;
             try {
-               b = Encoding.UTF32.GetBytes(Environment.MachineName);
+               b = Encoding.UTF8.GetBytes(Environment.MachineName);
             } catch(InvalidOperationException) { b = null; }
             ExamLvl lv = ExamLvl.Basis;
             ushort id = 0;
@@ -340,17 +342,25 @@ namespace sQzLib
                 return;
             }
             if (b == null)
-                buf = new byte[50];
+                buf = new byte[14 + a.Length];
             else
-                buf = new byte[54 + b.Length];
-            Buffer.BlockCopy(BitConverter.GetBytes(state), 0, buf, 0, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes((int)lv), 0, buf, 4, 4);
-            Buffer.BlockCopy(BitConverter.GetBytes(id), 0, buf, 8, 2);
-            Buffer.BlockCopy(a, 0, buf, 10, a.Length);
+                buf = new byte[14 + a.Length + 4 + b.Length];
+            int offs = 0;
+            Buffer.BlockCopy(BitConverter.GetBytes(state), 0, buf, offs, 4);
+            offs += 4;
+            Buffer.BlockCopy(BitConverter.GetBytes((int)lv), 0, buf, offs, 4);
+            offs += 4;
+            Buffer.BlockCopy(BitConverter.GetBytes(id), 0, buf, offs, 2);
+            offs += 2;
+            Buffer.BlockCopy(BitConverter.GetBytes(a.Length), 0, buf, offs, 4);
+            offs += 4;
+            Buffer.BlockCopy(a, 0, buf, offs, a.Length);
+            offs += a.Length;
             if (b != null)
             {
-                Buffer.BlockCopy(BitConverter.GetBytes(b.Length), 0, buf, 50, 4);
-                Buffer.BlockCopy(b, 0, buf, 54, b.Length);
+                Buffer.BlockCopy(BitConverter.GetBytes(b.Length), 0, buf, offs, 4);
+                offs += 4;
+                Buffer.BlockCopy(b, 0, buf, offs, b.Length);
             }
         }
         public static int SrvrReadAuthArr(byte[] buf, int offs, out ExamLvl lv, out string cname)
@@ -368,18 +378,23 @@ namespace sQzLib
             ushort id = BitConverter.ToUInt16(buf, offs);
             l -= 2;
             offs += 2;
-            if (l < 40)
+            if (l < 4)
                 return -1;
-            string date = Encoding.UTF32.GetString(buf, offs, 40);//hardcode
-            l -= 40;
-            offs += 40;
+            int sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (l < sz)
+                return -1;
+            string date = Encoding.UTF8.GetString(buf, offs, sz);
+            l -= sz;
+            offs += sz;
             int rid = 0;
             foreach (Examinee st in svExaminee)
             {
                 if (st.mId == id && st.mLvl == lv && st.mBirthdate == date)
                 {
                     if (4 < l)
-                        cname = Encoding.UTF32.GetString(buf, offs + 4, l - 4);
+                        cname = Encoding.UTF8.GetString(buf, offs + 4, l - 4);
                     return rid;
                 }
                 ++rid;
@@ -395,12 +410,12 @@ namespace sQzLib
                 return;
             }
             Examinee s = svExaminee[rid];
-            byte[] a = Encoding.UTF32.GetBytes(s.mName);
-            byte[] b = Encoding.UTF32.GetBytes(s.mBirthdate);
-            byte[] c = Encoding.UTF32.GetBytes(s.mBirthplace);
-            byte[] d = Encoding.UTF32.GetBytes(s.mTime1.ToString("HH:mm"));
-            byte[] e = Encoding.UTF32.GetBytes(s.mComp);
-            buf = new byte[1 + 4 + 2 + 4 + a.Length + 4 + b.Length + 4 + c.Length +
+            byte[] a = Encoding.UTF8.GetBytes(s.mName);
+            byte[] b = Encoding.UTF8.GetBytes(s.mBirthdate);
+            byte[] c = Encoding.UTF8.GetBytes(s.mBirthplace);
+            byte[] d = Encoding.UTF8.GetBytes(s.mTime1.ToString("HH:mm"));
+            byte[] e = Encoding.UTF8.GetBytes(s.mComp);
+            buf = new byte[11 + a.Length + 4 + b.Length + 4 + c.Length +
                 4 + d.Length + 4 + e.Length];
             int offs = 0;
             Buffer.BlockCopy(BitConverter.GetBytes(true), 0, buf, offs, 1);
@@ -430,7 +445,7 @@ namespace sQzLib
             Buffer.BlockCopy(e, 0, buf, offs, e.Length);
             offs += e.Length;
         }
-        public static bool CliReadAuthArr(byte[] buf, ref int offs, out Examinee nee)
+        public static bool ClntReadAuthArr(byte[] buf, ref int offs, out Examinee nee)
         {
             nee = null;
             int l = buf.Length - offs;
@@ -459,7 +474,7 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return false;
-            nee.mName = Encoding.UTF32.GetString(buf, offs, sz);
+            nee.mName = Encoding.UTF8.GetString(buf, offs, sz);
             l -= sz;
             offs += sz;
             if (l < 4)
@@ -469,7 +484,7 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return false;
-            nee.mBirthdate = Encoding.UTF32.GetString(buf, offs, sz);
+            nee.mBirthdate = Encoding.UTF8.GetString(buf, offs, sz);
             l -= sz;
             offs += sz;
             if (l < 4)
@@ -479,7 +494,7 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return false;
-            nee.mBirthplace = Encoding.UTF32.GetString(buf, offs, sz);
+            nee.mBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
 
             l -= sz;
             offs += sz;
@@ -490,7 +505,7 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return false;
-            DateTime.TryParse(Encoding.UTF32.GetString(buf, offs, sz), out nee.mTime1);
+            DateTime.TryParse(Encoding.UTF8.GetString(buf, offs, sz), out nee.mTime1);
 
             l -= sz;
             offs += sz;
@@ -501,7 +516,7 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return false;
-            nee.mComp = Encoding.UTF32.GetString(buf, offs, sz);
+            nee.mComp = Encoding.UTF8.GetString(buf, offs, sz);
             return true;
         }
 

@@ -169,7 +169,7 @@ namespace sQzServer1
                         {
                             string msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
                                 ee.mTime1 + Txt.s._[(int)TxI.SIGNIN_AL_2] + ee.mComp + ".";
-                            byte[] b = Encoding.UTF32.GetBytes(msg);
+                            byte[] b = Encoding.UTF8.GetBytes(msg);
                             outMsg = new byte[5 + b.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
                             Buffer.BlockCopy(BitConverter.GetBytes(b.Length), 0, outMsg, 1, 4);
@@ -240,13 +240,11 @@ namespace sQzServer1
             switch (mState)
             {
                 case NetCode.DateStudentRetriving:
-                    int r = buf.Length;
-                    Date.ReadByteArr(buf, ref offs, r);
-                    r -= offs;
-                    Examinee.ReadByteArr(buf, ref offs, r);
+                    Date.ReadByteArr(buf, ref offs);
+                    Examinee.ReadByteArr(buf, ref offs);
                     Dispatcher.Invoke(() => {
                         if (Date.sbArr != null)
-                            txtDate.Text = Encoding.UTF32.GetString(Date.sbArr);
+                            txtDate.Text = Encoding.UTF8.GetString(Date.sbArr);
                         vComp.Clear();
                         vMark.Clear();
                         vTime1.Clear();
@@ -303,7 +301,7 @@ namespace sQzServer1
                     break;
                 case NetCode.QuestAnsKeyRetrieving:
                     offs = 0;
-                    Question.ReadByteArr(buf, ref offs, buf.Length, true);
+                    Question.ReadByteArr(buf, ref offs, true);
                     Question.ToByteArr(true);
                     LoadQuest();
                     mState = NetCode.PrepMark;
