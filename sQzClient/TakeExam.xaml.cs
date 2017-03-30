@@ -17,7 +17,6 @@ namespace sQzClient
     {
         Label[][] vlblAnsSh;
         bool[][] vbAns;
-        double[] vWidth;
         byte[] mbAns;
         DateTime kDtStart;
         TimeSpan dtRemn;
@@ -29,6 +28,10 @@ namespace sQzClient
         NetCode mState;
 
         UICbMsg mCbMsg;
+
+        public static double qaWh;
+        double qiWh;
+        Thickness qMrg;
 
         public TakeExam()
         {
@@ -59,13 +62,11 @@ namespace sQzClient
             w.Closing += W_Closing;
             w.FontSize = 16;
 
-            vWidth = new double[5];
-            vWidth[0] = 1280;// spMain.RenderSize.Width;
-            vWidth[1] = 20;// 2 * em;
-            vWidth[2] = 5 * vWidth[1];
-            vWidth[3] = 5;// 8;
-            vWidth[4] = (vWidth[0] - vWidth[2]) / 2 - SystemParameters.ScrollWidth - 2 * vWidth[3] - vWidth[1];
-            
+            double mrg = FontSize / 2;
+            qiWh = 3 * mrg;
+            qMrg = new Thickness(mrg, mrg, 0, mrg);
+            qaWh = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
+
             InitLeftPanel();
             InitQuestPanel();
 
@@ -258,15 +259,15 @@ namespace sQzClient
         {
             StackPanel q = new StackPanel();
             q.Orientation = Orientation.Horizontal;
-            q.Margin = new Thickness(vWidth[3], vWidth[3], 0, vWidth[3]);
+            q.Margin = qMrg;
             Label l = new Label();
             l.HorizontalAlignment = HorizontalAlignment.Left;
             l.VerticalAlignment = VerticalAlignment.Top;
             l.Content = idx;
             l.Background = Theme.s._[(int)BrushId.QID_BG];
             l.Foreground = Theme.s._[(int)BrushId.QID_Color];
-            l.Width = vWidth[1];
-            l.Height = 1.5f * FontSize;
+            l.Width = qiWh;
+            l.Height = qiWh;
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.VerticalContentAlignment = VerticalAlignment.Center;
             l.Padding = new Thickness(0);
@@ -276,7 +277,7 @@ namespace sQzClient
             Question quest = Question.svQuest[0][idx - 1];
             stmt.Text = quest.mStmt;
             stmt.TextWrapping = TextWrapping.Wrap;
-            stmt.Width = 484;
+            stmt.Width = qaWh;
             stmt.Background = Theme.s._[(int)BrushId.Q_BG];
             Label stmtCon = new Label();
             stmtCon.Content = stmt;
@@ -286,9 +287,9 @@ namespace sQzClient
             stmtCon.Margin = stmtCon.Padding = zero;
             con.Children.Add(stmtCon);
             ListBox answers = new ListBox();
-            answers.Width = 484;
+            answers.Width = qaWh;
             answers.Name = "_" + idx;
-            answers.HorizontalContentAlignment = HorizontalAlignment.Stretch;
+            //answers.HorizontalContentAlignment = HorizontalAlignment.Stretch;
             answers.SelectionChanged += Ans_SelectionChanged;
             for (int i = 0; i < quest.vAns.Length; ++i)
             {
@@ -461,7 +462,7 @@ namespace sQzClient
             TextBlock ansTxt = new TextBlock();
             ansTxt.Text = t;
             ansTxt.TextWrapping = TextWrapping.Wrap;
-            ansTxt.Width = 470;// SystemParameters.sCrollWidth;//minus is a trick
+            ansTxt.Width = TakeExam.qaWh - mB.Width;//hardcode
             ansTxt.VerticalAlignment = VerticalAlignment.Center;
             Children.Add(ansTxt);
         }

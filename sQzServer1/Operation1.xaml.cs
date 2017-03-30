@@ -168,7 +168,7 @@ namespace sQzServer1
                         else
                         {
                             string msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
-                                ee.mTime1 + Txt.s._[(int)TxI.SIGNIN_AL_2] + ee.mComp + ".";
+                                ee.mTime1.ToString("HH:mm dd/MM/yyyy") + Txt.s._[(int)TxI.SIGNIN_AL_2] + ee.mComp + ".";
                             byte[] b = Encoding.UTF8.GetBytes(msg);
                             outMsg = new byte[5 + b.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
