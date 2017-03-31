@@ -80,6 +80,7 @@ namespace sQzClient
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bRunning = false;
+            WPopup.s.cncl = false;
             mClnt.Close();
         }
 
@@ -97,7 +98,7 @@ namespace sQzClient
             //double rt = w.RenderSize.Width / 1280; //design size
             //ScaleTransform st = new ScaleTransform(rt, rt);
             //spMain.RenderTransform = st;
-            WPopup.Config(w, w.FontSize);
+            WPopup.s.owner = w;
 
             FirewallHandler fwHndl = new FirewallHandler(3);
             lblStatus.Text += fwHndl.OpenFirewall();

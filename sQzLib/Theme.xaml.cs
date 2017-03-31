@@ -122,6 +122,7 @@ namespace sQzLib
         Window w;
         TextBlock t;
         WPopupCb _wpCb;
+        bool bCncl;
         static WPopup _s;
         WPopup()
         {
@@ -129,6 +130,7 @@ namespace sQzLib
             w.Title = Txt.s._[(int)TxI.POPUP_TIT];
             w.Closing += wPopup_Closing;
             w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            w.ResizeMode = ResizeMode.NoResize;
             t = new TextBlock();
             
             t.VerticalAlignment = VerticalAlignment.Center;
@@ -140,11 +142,12 @@ namespace sQzLib
             c.B = 0xb4;
             t.Background = new SolidColorBrush(c);
             w.Content = t;
+            bCncl = true;
 
             _wpCb = null;
         }
 
-        static WPopup s
+        public static WPopup s
         {
             get {
                 if (_s == null)
@@ -153,24 +156,26 @@ namespace sQzLib
             }
         }
 
-        public static WPopupCb wpCb
+        public WPopupCb wpCb
         {
-            set { s._wpCb = value; }
+            set { _wpCb = value; }
         }
 
-        public static void Config(Window p, double fsz)
+        public Window owner
         {
-            WPopup i = s;
-            if (p != null)
-            {
-                i.w.Owner = p;
-                s.w.Width = p.RenderSize.Width / 3;
-                s.w.Height = p.RenderSize.Height / 3;
-                s.w.ResizeMode = ResizeMode.NoResize;
+            set {
+                if (value != null)
+                {
+                    w.Owner = value;
+                    w.Width = w.RenderSize.Width / 3;
+                    w.Height = w.RenderSize.Height / 3;
+                    if (0 < value.FontSize)
+                        t.FontSize = value.FontSize;
+                }
             }
-            if (0 < fsz)
-                i.t.FontSize = fsz;
         }
+
+        public bool cncl { set { bCncl = value; } }
 
         public static void ShowDialog(string msg)
         {
@@ -182,9 +187,9 @@ namespace sQzLib
         {
             Window w = sender as Window;
             w.Visibility = Visibility.Collapsed;
-            e.Cancel = true;
-            if (_wpCb != null)
-                _wpCb();
+            if(bCncl)
+                e.Cancel = true;
+            _wpCb?.Invoke();
         }
     }
 }

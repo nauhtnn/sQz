@@ -21,13 +21,14 @@ namespace sQzClient
         DateTime kDtStart;
         TimeSpan dtRemn;
         TimeSpan kDtDuration;
-        List<ListBox> vLbx;
+        bool bRunning;
+        UICbMsg mCbMsg;
         System.Timers.Timer mTimer;
+
+        List<ListBox> vLbx;
 
         Client2 mClnt;
         NetCode mState;
-
-        UICbMsg mCbMsg;
 
         public static double qaWh;
         double qiWh;
@@ -39,6 +40,7 @@ namespace sQzClient
             mState = NetCode.Dating;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
+            bRunning = true;
             vLbx = new List<ListBox>();
 
             txtWelcome.Text = Examinee.sAuthNee.ToString();
@@ -72,13 +74,13 @@ namespace sQzClient
 
             LoadTxt();
 
-            double rt = spMain.RenderSize.Width / 1280;
-            spMain.RenderTransform = new ScaleTransform(rt, rt);
+            //double rt = spMain.RenderSize.Width / 1280;
+            //spMain.RenderTransform = new ScaleTransform(rt, rt);
 
             string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
                 ")" + Txt.s._[(int)TxI.AUTH_MSG];
             Dispatcher.Invoke(() => {
-                WPopup.wpCb = ShowQuestion;
+                WPopup.s.wpCb = ShowQuestion;
                 WPopup.ShowDialog(msg);
             });
         }
@@ -107,7 +109,7 @@ namespace sQzClient
             }
             if (m < 0 || s < 0)
                 dtRemn = kDtDuration = new TimeSpan(0, 30, 0);
-            WPopup.wpCb = null;
+            WPopup.s.wpCb = null;
         }
 
         void InitLeftPanel()
@@ -390,25 +392,26 @@ namespace sQzClient
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
-            {
-                if (0 < dtRemn.Ticks)
+            if (bRunning)
+                Dispatcher.Invoke(() =>
                 {
-                    dtRemn = kDtDuration - (DateTime.Now - kDtStart);
-                    txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
-                }
-                else
-                {
-                    txtRTime.Text = "0:0";
-                    btnSubmit_Click(null, null);
-                    System.Threading.Thread th = new System.Threading.Thread(() => {
-                        Dispatcher.Invoke(() => {
-                            WPopup.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
+                    if (0 < dtRemn.Ticks)
+                    {
+                        dtRemn = kDtDuration - (DateTime.Now - kDtStart);
+                        txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
+                    }
+                    else
+                    {
+                        txtRTime.Text = "0:0";
+                        btnSubmit_Click(null, null);
+                        System.Threading.Thread th = new System.Threading.Thread(() => {
+                            Dispatcher.Invoke(() => {
+                                WPopup.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
+                            });
                         });
-                    });
-                    th.Start();
-                }
-            });
+                        th.Start();
+                    }
+                });
         }
 
         private void DisableAll()
@@ -427,6 +430,8 @@ namespace sQzClient
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            bRunning = false;
+            WPopup.s.cncl = false;
             mClnt.Close();
         }
     }
