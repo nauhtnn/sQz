@@ -12,7 +12,7 @@
         <Grid x:Name="gQSheet">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="240"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="1020"/>
             </Grid.ColumnDefinitions>
             <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="540" Width="240">
                 <TextBlock x:Name="txtAnsSh" Height="30" FontSize="20" HorizontalAlignment="Center"/>
@@ -29,7 +29,7 @@
                 </ScrollViewer>
             </StackPanel>
             <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1020" Height="540" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
-                <Grid x:Name="gQuest" Width="1024">
+                <Grid x:Name="gQuest" Width="1020">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="510"/>
                         <ColumnDefinition Width="510"/>
@@ -37,19 +37,19 @@
                 </Grid>
             </ScrollViewer>
         </Grid>
-        <Grid Height="48" Background="#ffffbb">
+        <Grid Height="48">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="5*"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="3*"/>
-                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="630"/>
+                <ColumnDefinition Width="126"/>
+                <ColumnDefinition Width="378"/>
+                <ColumnDefinition Width="126"/>
             </Grid.ColumnDefinitions>
             <Grid.RowDefinitions>
                 <RowDefinition Height="48"/>
             </Grid.RowDefinitions>
-            <TextBlock x:Name="txtWelcome" Foreground="#00356b" FontSize="18"/>
+            <TextBlock x:Name="txtWelcome" Background="#ffffbb" Foreground="#00356b" FontSize="18"/>
             <Button x:Name="btnSubmit" Grid.Column="1" FontSize="20" Click="btnSubmit_Click" Background="#1c64e7" Foreground="White" BorderThickness="0"/>
-            <TextBlock x:Name="txtRTime" Foreground="#00356b" Grid.Column="2" FontSize="28" TextAlignment="Center"/>
+            <TextBlock x:Name="txtRTime" Background="#ffffbb" Foreground="#00356b" Grid.Column="2" FontSize="28" TextAlignment="Center"/>
             <Button x:Name="btnExit" Grid.Column="3" Content="Close" Click="btnExit_Click" FontSize="20"/>
         </Grid>
         <TextBlock x:Name="txtRs" Text="ABD"/>

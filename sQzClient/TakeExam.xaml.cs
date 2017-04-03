@@ -79,10 +79,10 @@ namespace sQzClient
 
             string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
                 ")" + Txt.s._[(int)TxI.AUTH_MSG];
-            Dispatcher.Invoke(() => {
+            //Dispatcher.Invoke(() => {
                 WPopup.s.wpCb = ShowQuestion;
-                WPopup.ShowDialog(msg);
-            });
+                WPopup.s.ShowDialog(msg);
+            //});
         }
 
         void ShowQuestion()
@@ -356,7 +356,7 @@ namespace sQzClient
                 case NetCode.Submiting:
                     ushort mark = BitConverter.ToUInt16(buf, offs);
                     //txtRs.Text = Txt.s._[(int)TxI.RESULT] + mark;
-                    WPopup.ShowDialog(Txt.s._[(int)TxI.RESULT] + mark);
+                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.RESULT] + mark);
                     return false;
             }
             return true;
@@ -406,7 +406,7 @@ namespace sQzClient
                         btnSubmit_Click(null, null);
                         System.Threading.Thread th = new System.Threading.Thread(() => {
                             Dispatcher.Invoke(() => {
-                                WPopup.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
+                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
                             });
                         });
                         th.Start();

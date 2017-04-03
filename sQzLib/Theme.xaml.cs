@@ -167,8 +167,10 @@ namespace sQzLib
                 if (value != null)
                 {
                     w.Owner = value;
-                    w.Width = w.RenderSize.Width / 3;
-                    w.Height = w.RenderSize.Height / 3;
+                    w.Width = ((0.1 < value.RenderSize.Width) ? value.RenderSize.Width :
+                        SystemParameters.PrimaryScreenWidth) / 3;
+                    w.Height = ((0.1 < value.RenderSize.Height) ? value.RenderSize.Height :
+                        SystemParameters.PrimaryScreenHeight) / 3;
                     if (0 < value.FontSize)
                         t.FontSize = value.FontSize;
                 }
@@ -177,19 +179,22 @@ namespace sQzLib
 
         public bool cncl { set { bCncl = value; } }
 
-        public static void ShowDialog(string msg)
+        public void ShowDialog(string msg)
         {
-            s.t.Text = msg;
-            s.w.ShowDialog();
+            t.Text = msg;
+            w.UpdateLayout();
+            w.ShowDialog();
         }
 
         private void wPopup_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Window w = sender as Window;
-            w.Visibility = Visibility.Collapsed;
-            if(bCncl)
+            Window s = sender as Window;
+            s.Visibility = Visibility.Collapsed;
+            if (bCncl)
+            {
                 e.Cancel = true;
-            _wpCb?.Invoke();
+                _wpCb?.Invoke();
+            }
         }
     }
 }

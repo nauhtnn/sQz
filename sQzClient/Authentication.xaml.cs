@@ -63,14 +63,14 @@ namespace sQzClient
             DateTime dummy;
             if (!DateTime.TryParse(mBirdate, out dummy))
             {
-                WPopup.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOTI]);
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOTI]);
                 return;
             }
             ExamLvl lv = ExamLvl.Basis;
             ushort id = ushort.MaxValue;
             if(!Examinee.ToID(mNeeId, ref lv, ref id))
             {
-                WPopup.ShowDialog(Txt.s._[(int)TxI.NEEID_NOTI]);
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOTI]);
                 return;
             }
             Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
@@ -149,7 +149,7 @@ namespace sQzClient
                         l -= 4;
                         string txt = Encoding.UTF8.GetString(buf, offs, sz);
                         Dispatcher.Invoke(() => {
-                            WPopup.ShowDialog(txt);
+                            WPopup.s.ShowDialog(txt);
                         });
                     }
                     break;
@@ -185,7 +185,7 @@ namespace sQzClient
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
             if (bRunning && mCbMsg.ToUp())
-                Dispatcher.Invoke(() => { WPopup.ShowDialog(mCbMsg.txt); });
+                Dispatcher.Invoke(() => { WPopup.s.ShowDialog(mCbMsg.txt); });
         }
 
         private void btnExit_Click(object sender, RoutedEventArgs e)

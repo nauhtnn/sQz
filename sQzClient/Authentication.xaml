@@ -8,11 +8,11 @@
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="Authentication">
 
-    <StackPanel x:Name="spMain" Loaded="Main_Loaded">
-        <TextBlock Width="1024" Height="16" Background="#c3d7a4" HorizontalAlignment="Center"/>
-        <TextBlock x:Name="txtLalgitc" Height="64" Foreground="#a51c30" TextAlignment="Center" VerticalAlignment="Center" FontSize="32" FontWeight="Bold"/>
-        <TextBlock x:Name="txtWelcome" Text="Welcome" Background="#f3f3ed" Foreground="#8c1515" Height="48" VerticalAlignment="Center" TextAlignment="Center" FontSize="24" />
-        <TextBlock x:Name="txtDate" Height="48" Background="#ffffdd" Foreground="#1c64e7" TextAlignment="Center" FontSize="24"/>
+    <StackPanel x:Name="spMain" Loaded="Main_Loaded" Background="#f3f3ee">
+        <TextBlock Height="16" Background="#f3f3ee"/>
+        <TextBlock x:Name="txtLalgitc" Height="64" Background="#a51c30" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" FontSize="32" FontWeight="Bold"/>
+        <TextBlock x:Name="txtWelcome" Text="Welcome" Background="White" Foreground="#8c1515" Height="48" VerticalAlignment="Center" TextAlignment="Center" FontSize="24" />
+        <TextBlock x:Name="txtDate" Height="48" Background="White" Foreground="#8c1515" TextAlignment="Center" FontSize="24"/>
         <Grid HorizontalAlignment="Center" Margin="0,30,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="400"/>
