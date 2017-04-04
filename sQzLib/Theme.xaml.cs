@@ -119,32 +119,75 @@ namespace sQzLib
 
     public class WPopup
     {
-        Window w;
-        TextBlock t;
+        Window mW;
+        TextBlock mT;
         WPopupCb _wpCb;
         bool bCncl;
         static WPopup _s;
+        Button mBtnOk;
+        bool bOk;
+        Button mBtnCncl;
+        Grid mG;
         WPopup()
         {
-            w = new Window();
-            w.Title = Txt.s._[(int)TxI.POPUP_TIT];
-            w.Closing += wPopup_Closing;
-            w.WindowStartupLocation = WindowStartupLocation.CenterScreen;
-            w.ResizeMode = ResizeMode.NoResize;
-            t = new TextBlock();
-            
-            t.VerticalAlignment = VerticalAlignment.Center;
-            t.TextWrapping = TextWrapping.Wrap;
-            t.TextAlignment = TextAlignment.Center;
+            mW = new Window();
+            mW.Title = Txt.s._[(int)TxI.POPUP_TIT];
+            mW.Closing += wPopup_Closing;
+            mW.WindowStartupLocation = WindowStartupLocation.CenterScreen;
+            mW.ResizeMode = ResizeMode.NoResize;
+
+            mG = new Grid();
+            RowDefinition rd = new RowDefinition();
+            mG.RowDefinitions.Add(rd);
+            rd = new RowDefinition();
+            mG.RowDefinitions.Add(rd);
+            ColumnDefinition cd = new ColumnDefinition();
+            mG.ColumnDefinitions.Add(cd);
+            cd = new ColumnDefinition();
+            mG.ColumnDefinitions.Add(cd);
+
+            mT = new TextBlock();
+            mT.VerticalAlignment = VerticalAlignment.Center;
+            mT.TextWrapping = TextWrapping.Wrap;
+            mT.TextAlignment = TextAlignment.Center;
             Color c = new Color();
             c.R = 0x58;
             c.G = 0xa9;
             c.B = 0xb4;
-            t.Background = new SolidColorBrush(c);
-            w.Content = t;
+            mT.Background = new SolidColorBrush(c);
+            Grid.SetColumnSpan(mT, 2);
+            mG.Children.Add(mT);
+
+            mBtnOk = new Button();
+            mBtnOk.Content = "OK";
+            mBtnOk.Click += BtnOk_Click;
+            Grid.SetRow(mBtnOk, 1);
+            mG.Children.Add(mBtnOk);
+
+            mBtnCncl = new Button();
+            mBtnCncl.Content = "Cancel";
+            mBtnCncl.Click += BtnCncl_Click;
+            Grid.SetRow(mBtnCncl, 1);
+            Grid.SetColumn(mBtnCncl, 1);
+            mG.Children.Add(mBtnCncl);
+
+            mW.Content = mG;
+
+            bOk = false;
             bCncl = true;
 
             _wpCb = null;
+        }
+
+        private void BtnCncl_Click(object sender, RoutedEventArgs e)
+        {
+            mW.Close();
+        }
+
+        private void BtnOk_Click(object sender, RoutedEventArgs e)
+        {
+            bOk = true;
+            mW.Close();
         }
 
         public static WPopup s
@@ -166,13 +209,13 @@ namespace sQzLib
             set {
                 if (value != null)
                 {
-                    w.Owner = value;
-                    w.Width = ((0.1 < value.RenderSize.Width) ? value.RenderSize.Width :
+                    mW.Owner = value;
+                    mW.Width = ((0.1 < value.RenderSize.Width) ? value.RenderSize.Width :
                         SystemParameters.PrimaryScreenWidth) / 3;
-                    w.Height = ((0.1 < value.RenderSize.Height) ? value.RenderSize.Height :
+                    mW.Height = ((0.1 < value.RenderSize.Height) ? value.RenderSize.Height :
                         SystemParameters.PrimaryScreenHeight) / 3;
                     if (0 < value.FontSize)
-                        t.FontSize = value.FontSize;
+                        mT.FontSize = value.FontSize;
                 }
             }
         }
@@ -181,9 +224,21 @@ namespace sQzLib
 
         public void ShowDialog(string msg)
         {
-            t.Text = msg;
-            w.UpdateLayout();
-            w.ShowDialog();
+            mT.Text = msg;
+            mBtnOk.Visibility = Visibility.Collapsed;
+            mBtnCncl.Visibility = Visibility.Collapsed;
+            bOk = true;
+            mW.ShowDialog();
+        }
+
+        public void ShowDialog(string msg, string ok, string cncl)
+        {
+            mT.Text = msg;
+            mBtnOk.Content = ok;
+            mBtnOk.Visibility = Visibility.Visible;
+            mBtnCncl.Content = cncl;
+            mBtnCncl.Visibility = Visibility.Visible;
+            mW.ShowDialog();
         }
 
         private void wPopup_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -191,9 +246,11 @@ namespace sQzLib
             Window s = sender as Window;
             s.Visibility = Visibility.Collapsed;
             if (bCncl)
-            {
                 e.Cancel = true;
+            if (bOk)
+            {
                 _wpCb?.Invoke();
+                bOk = false;
             }
         }
     }

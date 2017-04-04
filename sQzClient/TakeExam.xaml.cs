@@ -337,7 +337,7 @@ namespace sQzClient
             }
         }
 
-        private void btnSubmit_Click(object sender, RoutedEventArgs e)
+        public void Submit()
         {
             int n = vbAns.Length * 4, i = 0, k = 0; //hardcode
             mbAns = new byte[n];
@@ -347,6 +347,12 @@ namespace sQzClient
             mState = NetCode.Submiting;
             mClnt.ConnectWR(ref mCbMsg);
             DisableAll();
+        }
+
+        private void btnSubmit_Click(object sender, RoutedEventArgs e)
+        {
+            WPopup.s.wpCb = Submit;
+            WPopup.s.ShowDialog(Txt.s._[(int)TxI.SUBMIT_CAUT], "OK", "Cancel");
         }
 
         public bool ClntBufHndl(byte[] buf, int offs)
