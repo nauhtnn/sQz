@@ -352,7 +352,8 @@ namespace sQzClient
         private void btnSubmit_Click(object sender, RoutedEventArgs e)
         {
             WPopup.s.wpCb = Submit;
-            WPopup.s.ShowDialog(Txt.s._[(int)TxI.SUBMIT_CAUT], "OK", "Cancel");
+            WPopup.s.ShowDialog(Txt.s._[(int)TxI.SUBMIT_CAUT],
+                Txt.s._[(int)TxI.SUBMIT], Txt.s._[(int)TxI.BTN_CNCL], null);
         }
 
         public bool ClntBufHndl(byte[] buf, int offs)
@@ -429,9 +430,16 @@ namespace sQzClient
             btnExit.IsEnabled = true;
         }
 
-        private void btnExit_Click(object sender, RoutedEventArgs e)
+        void Exit()
         {
             Window.GetWindow(this).Close();
+        }
+
+        private void btnExit_Click(object sender, RoutedEventArgs e)
+        {
+            WPopup.s.wpCb = Exit;
+            WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT],
+                Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], "exit");
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)

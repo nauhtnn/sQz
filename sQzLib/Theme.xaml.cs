@@ -121,13 +121,17 @@ namespace sQzLib
     {
         Window mW;
         TextBlock mT;
+        TextBox mC;
         WPopupCb _wpCb;
-        bool bCncl;
         static WPopup _s;
         Button mBtnOk;
-        bool bOk;
         Button mBtnCncl;
         Grid mG;
+        bool bOk;
+        bool bShowing;
+        bool bCollapse;
+        bool bCnclEvnt;
+        string mCode;
         WPopup()
         {
             mW = new Window();
@@ -138,6 +142,8 @@ namespace sQzLib
 
             mG = new Grid();
             RowDefinition rd = new RowDefinition();
+            mG.RowDefinitions.Add(rd);
+            rd = new RowDefinition();
             mG.RowDefinitions.Add(rd);
             rd = new RowDefinition();
             mG.RowDefinitions.Add(rd);
@@ -158,23 +164,30 @@ namespace sQzLib
             Grid.SetColumnSpan(mT, 2);
             mG.Children.Add(mT);
 
+            mC = new TextBox();
+            mC.TextAlignment = TextAlignment.Center;
+            Grid.SetRow(mC, 1);
+            Grid.SetColumnSpan(mC, 2);
+            mG.Children.Add(mC);
+
             mBtnOk = new Button();
-            mBtnOk.Content = "OK";
             mBtnOk.Click += BtnOk_Click;
-            Grid.SetRow(mBtnOk, 1);
+            Grid.SetRow(mBtnOk, 2);
             mG.Children.Add(mBtnOk);
 
             mBtnCncl = new Button();
-            mBtnCncl.Content = "Cancel";
             mBtnCncl.Click += BtnCncl_Click;
-            Grid.SetRow(mBtnCncl, 1);
+            Grid.SetRow(mBtnCncl, 2);
             Grid.SetColumn(mBtnCncl, 1);
             mG.Children.Add(mBtnCncl);
 
             mW.Content = mG;
 
             bOk = false;
-            bCncl = true;
+            bShowing = false;
+            bCollapse = true;
+            bCnclEvnt = true;
+            mCode = null;
 
             _wpCb = null;
         }
@@ -186,8 +199,12 @@ namespace sQzLib
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            bOk = true;
-            mW.Close();
+            if (mCode == mC.Text)
+            {
+                mC.Text = null;
+                bOk = true;
+                mW.Close();
+            }
         }
 
         public static WPopup s
@@ -211,7 +228,7 @@ namespace sQzLib
                 {
                     mW.Owner = value;
                     mW.Width = ((0.1 < value.RenderSize.Width) ? value.RenderSize.Width :
-                        SystemParameters.PrimaryScreenWidth) / 3;
+                        SystemParameters.PrimaryScreenWidth) / 2;
                     mW.Height = ((0.1 < value.RenderSize.Height) ? value.RenderSize.Height :
                         SystemParameters.PrimaryScreenHeight) / 3;
                     if (0 < value.FontSize)
@@ -220,7 +237,7 @@ namespace sQzLib
             }
         }
 
-        public bool cncl { set { bCncl = value; } }
+        public bool cncl { set { bCnclEvnt = value; } }
 
         public void ShowDialog(string msg)
         {
@@ -228,30 +245,49 @@ namespace sQzLib
             mBtnOk.Visibility = Visibility.Collapsed;
             mBtnCncl.Visibility = Visibility.Collapsed;
             bOk = true;
+            if (bShowing)
+            {
+                bCollapse = false;
+                return;
+            }
+            bShowing = true;
             mW.ShowDialog();
         }
 
-        public void ShowDialog(string msg, string ok, string cncl)
+        public void ShowDialog(string msg, string ok, string cncl, string code)
         {
             mT.Text = msg;
             mBtnOk.Content = ok;
             mBtnOk.Visibility = Visibility.Visible;
             mBtnCncl.Content = cncl;
             mBtnCncl.Visibility = Visibility.Visible;
+            mCode = code;
+            if (bShowing)
+            {
+                bCollapse = false;
+                return;
+            }
+            bShowing = true;
             mW.ShowDialog();
         }
 
         private void wPopup_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            Window s = sender as Window;
-            s.Visibility = Visibility.Collapsed;
-            if (bCncl)
+            if (bCnclEvnt)
                 e.Cancel = true;
             if (bOk)
             {
                 _wpCb?.Invoke();
                 bOk = false;
             }
+            if (bCollapse)
+            {
+                Window s = sender as Window;
+                s.Visibility = Visibility.Collapsed;
+                bShowing = false;
+            }
+            else
+                bCollapse = true;
         }
     }
 }
