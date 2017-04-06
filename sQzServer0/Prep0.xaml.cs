@@ -22,6 +22,8 @@ namespace sQzServer0
     /// </summary>
     public partial class Prep0 : Page
     {
+        List<CheckBox> vChk;
+        List<uint> vQId;
         public Prep0()
         {
             ShowsNavigationUI = false;
@@ -132,7 +134,6 @@ namespace sQzServer0
             dlg.Filter = "text documents (*.txt)|*.txt";
             bool? result = dlg.ShowDialog();
 
-            // get the selected file name and display in a textbox
             string filePath = null;
             if (result == true)
                 filePath = dlg.FileName;
@@ -185,17 +186,30 @@ namespace sQzServer0
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
-                int x = 0;
-                StackPanel sp = db ? gQuest : gwQuest;
-                sp.Children.Clear();
+                int x = -1;
+                Grid g = db ? gQuest : gwQuest;
+                g.Children.Clear();
+				g.RowDefinitions.Clear();
+                vChk = new List<CheckBox>();
+                vQId = new List<uint>();
                 foreach (Question q in Question.svQuest[0])
                 {
                     TextBlock i = new TextBlock();
-                    i.Text = ++x + ") " + q.ToString();
+					Grid.SetRow(i, ++x);
+                    i.Text = x + ") " + q.ToString();
                     dark = !dark;
                     if (dark)
                         i.Background = new SolidColorBrush(c);
-                    sp.Children.Add(i);
+                    g.Children.Add(i);
+                    CheckBox chk = new CheckBox();
+                    chk.Name = "c" + x;
+					Grid.SetColumn(chk, 1);
+					Grid.SetRow(chk, x);
+					RowDefinition rd = new RowDefinition();
+					g.RowDefinitions.Add(rd);
+                    g.Children.Add(chk);
+                    vQId.Add(q.mId);
+                    vChk.Add(chk);
                 }
             });
         }
@@ -230,6 +244,31 @@ namespace sQzServer0
             btnInsDate.Content = t._[(int)TxI.DATE_ADD];
             btnNeeBrowse.Content = t._[(int)TxI.NEE_ADD];
             btnQBrowse.Content = t._[(int)TxI.Q_ADD];
+            btnDel.Content = t._[(int)TxI.DEL];
+            btnSelAll.Content = t._[(int)TxI.SEL_ALL];
+        }
+
+        private void btnSelAll_Click(object sender, RoutedEventArgs e)
+        {
+            foreach (CheckBox c in vChk)
+                c.IsChecked = true;
+        }
+
+        private void btnDel_Click(object sender, RoutedEventArgs e)
+        {
+            bool toUpdate = false;
+            foreach(CheckBox c in vChk)
+                if(c.IsChecked == true)
+                {
+                    uint qId;
+                    if (uint.TryParse(c.Name.Substring(1), out qId))
+                    {
+                        Question.DBDelete(vQId[(int)qId]);
+                        toUpdate = true;
+                    }
+                }
+            if (toUpdate)
+                LoadQuest(true);
         }
     }
 }

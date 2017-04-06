@@ -132,16 +132,8 @@ namespace sQzLib
             if (attb == null || val == null)
                 return;
             string query = "INSERT INTO " + tb + "(" + attb + ")VALUES(" + val + ")";
-
-            //open connection
-            //if (this.OpenConnection() == true)
-            //{
-            //create command and assign the query and connection from the constructor
             MySqlCommand cmd = new MySqlCommand(query, conn);
-
-            //Execute command
             cmd.ExecuteNonQuery();
-            //}
         }
 
         //Update statement
@@ -154,19 +146,12 @@ namespace sQzLib
         }
 
         //Delete statement
-        public void Delete()
+        public static void Delete(MySqlConnection conn, string tb, string cdAttb, string cdAttbVal)
         {
-            throw new NotImplementedException();
-            //string query = "DELETE FROM tableinfo WHERE name='John Smith'";
-
-            //if (this.OpenConnection() == true)
-            //{
-            //    MySqlCommand cmd = new MySqlCommand(query, connection);
-            //    cmd.ExecuteNonQuery();
-            //}
+            string query = "DELETE FROM " + tb + " WHERE " + cdAttb + " = " + cdAttbVal;
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            cmd.ExecuteNonQuery();
         }
-
-
 
         //Count statement
         public static int Count(MySqlConnection conn, string tb)
@@ -175,7 +160,6 @@ namespace sQzLib
             int n;
 
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            //Create a data reader and Execute the command
             try { if (!int.TryParse(cmd.ExecuteScalar() + "", out n)) n = 0; }
             catch (MySqlException) { n = 0; }
 
@@ -213,7 +197,6 @@ namespace sQzLib
 
         public static MySqlDataReader exeQrySelect(MySqlConnection conn, string query) {
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            //Create a data reader and Execute the command
             MySqlDataReader d = null;
             try { d = cmd.ExecuteReader(); }
             catch(MySqlException) { d = null; }

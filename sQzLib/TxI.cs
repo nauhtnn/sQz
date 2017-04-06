@@ -54,6 +54,8 @@ namespace sQzLib {
 		MODL_SEL,
 		Q_ADD,
 		DB,
+		SEL_ALL,
+		DEL,
 		IU01,
 		IU02,
 		IU03,

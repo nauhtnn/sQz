@@ -30,17 +30,35 @@
             <ScrollViewer Width="160" Height="410" VerticalScrollBarVisibility="Auto">
                 <ListBox x:Name="lbxQCatgry" Width="160" SelectionChanged="lbxQCatgry_SelectionChanged"></ListBox>
             </ScrollViewer>
-            <ScrollViewer Width="472" Height="410" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
-                <StackPanel x:Name="gQuest">
-                </StackPanel>
-            </ScrollViewer>
+            <StackPanel>
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="420"/>
+                        <ColumnDefinition Width="30"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Content="Sel All" x:Name="btnSelAll" Click="btnSelAll_Click" Width="60" Height="30" HorizontalAlignment="Right"/>
+                    <Button Content="Del" Grid.Column="1" x:Name="btnDel" Click="btnDel_Click"  Width="60" Height="30"/>
+                </Grid>
+                <ScrollViewer Width="472" Height="410" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
+				    <Grid x:Name="gQuest">
+					    <Grid.ColumnDefinitions>
+						    <ColumnDefinition Width="420"/>
+						    <ColumnDefinition Width="30"/>
+					    </Grid.ColumnDefinitions>
+				    </Grid>
+                </ScrollViewer>
+            </StackPanel>
             <StackPanel HorizontalAlignment="Stretch">
                 <Button x:Name="btnQBrowse" Content="Browse Question" Height="60" Width="156" Click="btnQBrowse_Click"></Button>
                 <Button x:Name="btnInsQuest" Content="&lt;&lt;" Height="30" Width="60" Click="btnInsQuest_Click"></Button>
             </StackPanel>
             <ScrollViewer Width="472" Height="410" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
-                <StackPanel x:Name="gwQuest">
-                </StackPanel>
+                <Grid x:Name="gwQuest">
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="420"/>
+						<ColumnDefinition Width="30"/>
+					</Grid.ColumnDefinitions>
+				</Grid>
             </ScrollViewer>
         </StackPanel>
     </StackPanel>

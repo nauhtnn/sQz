@@ -63,6 +63,7 @@ namespace sQzLib
     public class Question
     {
 		public static List<Question>[] svQuest = null;
+        public uint mId;
         public string mStmt; //statement
         int nAns;
         public static IUxx sIU = IUxx.IU00;
@@ -668,6 +669,13 @@ namespace sQzLib
             }
             DBConnect.Close(ref conn);
         }
+		public static void DBDelete(uint id) {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+            string iu = "1";
+            DBConnect.Delete(conn, "quest" + iu, "idx", id.ToString());
+        }
         public static void DBSelect()
         {
             if (sIU == IUxx.IU00)
@@ -687,7 +695,8 @@ namespace sQzLib
                 while (reader.Read())
                 {
                     Question q = new Question();
-                    string[] s = reader.GetString(1).Split('\n');//hardcode
+                    q.mId = reader.GetUInt32(0);//hardcode
+                    string[] s = reader.GetString(1).Split('\n');
                     q.mStmt = s[0];
                     q.nAns = 4;
                     q.vAns = new string[4];
@@ -762,7 +771,8 @@ namespace sQzLib
                         continue;
                     ++i;
                     Question q = new Question();
-                    string[] s = reader.GetString(1).Split('\n');//hardcode
+                    q.mId = reader.GetUInt32(0);//hardcode
+                    string[] s = reader.GetString(1).Split('\n');
                     q.mStmt = "(" + siu + ')' + s[0];
                     q.nAns = 4;
                     q.vAns = new string[4];
