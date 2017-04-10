@@ -25,12 +25,16 @@ namespace sQzServer0
         List<CheckBox> vChk;
         List<uint> vQId;
         IUxx mSelQCat;
+        List<Question> vDBQuest;
+        List<Question> vQuest;
 
         public Prep0()
         {
             ShowsNavigationUI = false;
             InitializeComponent();
             mSelQCat = IUxx.IU00;
+            vDBQuest = new List<Question>();
+            vQuest = new List<Question>();
         }
 
         private void btnInsDate_Click(object sender, RoutedEventArgs e)
@@ -178,11 +182,12 @@ namespace sQzServer0
             string filePath = null;
             if (result == true)
                 filePath = dlg.FileName;
-            Question.ReadTxt(Utils.ReadFile(filePath));
-            LoadQuest(false);
+            vQuest.Clear();
+            Question.ReadTxt(Utils.ReadFile(filePath), ref vQuest);
+            ShowQuest(false);
         }
 
-        private void LoadQuest(bool db) //same as Operation0.xaml
+        private void ShowQuest(bool db) //same as Operation0.xaml
         {
             bool dark = true;
             Color c = new Color();
@@ -190,12 +195,13 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
                 int x = -1;
-                Grid g = db ? gQuest : gwQuest;
+                Grid g = db ? gDBQuest : gQuest;
                 g.Children.Clear();
 				g.RowDefinitions.Clear();
+                List<Question> vq = db ? vDBQuest : vQuest;
                 vChk = new List<CheckBox>();
                 vQId = new List<uint>();
-                foreach (Question q in Question.svQuest[0])
+                foreach (Question q in vq)
                 {
                     TextBlock i = new TextBlock();
 					Grid.SetRow(i, ++x);
@@ -219,12 +225,15 @@ namespace sQzServer0
 
         private void btnInsQuest_Click(object sender, RoutedEventArgs e)
         {
-            if (0 < gwQuest.Children.Count)
+            if (0 < gQuest.Children.Count)
             {
+                gDBQuest.Children.Clear();
                 gQuest.Children.Clear();
-                gwQuest.Children.Clear();
-                Question.DBInsert(mSelQCat);
-                LoadQuest(true);
+                vDBQuest.Clear();
+                Question.DBInsert(mSelQCat, vQuest);
+                vQuest.Clear();
+                Question.DBSelect(mSelQCat, ref vDBQuest);
+                ShowQuest(true);
             }
         }
 
@@ -233,11 +242,10 @@ namespace sQzServer0
             ListBox l = (ListBox)sender;
             if (Enum.IsDefined(typeof(IUxx), l.SelectedIndex + 1))
             {
-                if(Question.svQuest != null)
-                    Question.svQuest[0].Clear();
+                vDBQuest.Clear();
                 mSelQCat = (IUxx)l.SelectedIndex + 1;
-                Question.DBSelect(mSelQCat);
-                LoadQuest(true);
+                Question.DBSelect(mSelQCat, ref vDBQuest);
+                ShowQuest(true);
             }
         }
 
@@ -266,12 +274,16 @@ namespace sQzServer0
                     uint qId;
                     if (uint.TryParse(c.Name.Substring(1), out qId))
                     {
-                        Question.DBDelete(vQId[(int)qId]);
+                        Question.DBDelete(mSelQCat, vQId[(int)qId]);
                         toUpdate = true;
                     }
                 }
             if (toUpdate)
-                LoadQuest(true);
+            {
+                vDBQuest.Clear();
+                Question.DBSelect(mSelQCat, ref vDBQuest);
+                ShowQuest(true);
+            }
         }
     }
 }

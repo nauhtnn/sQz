@@ -40,7 +40,7 @@
                     <Button Content="Del" Grid.Column="1" x:Name="btnDel" Click="btnDel_Click"  Width="60" Height="30"/>
                 </Grid>
                 <ScrollViewer Width="472" Height="410" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
-				    <Grid x:Name="gQuest">
+				    <Grid x:Name="gDBQuest">
 					    <Grid.ColumnDefinitions>
 						    <ColumnDefinition Width="420"/>
 						    <ColumnDefinition Width="30"/>
@@ -53,7 +53,7 @@
                 <Button x:Name="btnInsQuest" Content="&lt;&lt;" Height="30" Width="60" Click="btnInsQuest_Click"></Button>
             </StackPanel>
             <ScrollViewer Width="472" Height="410" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
-                <Grid x:Name="gwQuest">
+                <Grid x:Name="gQuest">
 					<Grid.ColumnDefinitions>
 						<ColumnDefinition Width="420"/>
 						<ColumnDefinition Width="30"/>

@@ -347,26 +347,20 @@ namespace sQzLib
             os.Write("</div></div>");
         }
 
-        public static void ReadTxt()
+        public static void ReadTxt(ref List<Question> l)
         {
-            ReadTxt(Utils.ReadFile("qz1.txt"));
+            ReadTxt(Utils.ReadFile("qz1.txt"), ref l);
         }
 
-        public static void ReadTxt(string buf)
+        public static void ReadTxt(string buf, ref List<Question> l)
         {
             if (buf == null)
                 return;
-            //else
-            //"buf size = " + buf.Length + '\n';
-            //sQzCS.Page pg = new sQzCS.Page();
-            //StartRead(Utils.Split(buf, '\n'), pg.mSt);
-            svQuest = new List<Question>[1];
-            svQuest[0] = new List<Question>();
             StartRead(Utils.Split(buf, '\n'), null);
             Question q = new Question();
             while (q.Read())
             {
-                svQuest[0].Add(q);
+                l.Add(q);
                 q = new Question();
             }
             q = null;
@@ -635,7 +629,7 @@ namespace sQzLib
             sbArrwKey = null;
             sRdy = sRdywKey = false;
         }
-        public static void DBInsert(IUxx eIU)
+        public static void DBInsert(IUxx eIU, List<Question> vq)
         {
             if (eIU == IUxx.IU00)
                 return;
@@ -645,7 +639,7 @@ namespace sQzLib
             string[] attbs = new string[2];//hardcode
             attbs[0] = "body";
             attbs[1] = "ansKeys";
-            foreach (Question q in svQuest[0])
+            foreach (Question q in vq)
             {
                 string[] vals = new string[2];
                 vals[0] = "'" + q.mStmt.Replace("'", "\\'") + '\n';
@@ -666,14 +660,16 @@ namespace sQzLib
             }
             DBConnect.Close(ref conn);
         }
-		public static void DBDelete(uint id) {
+		public static void DBDelete(IUxx eIU, uint id) {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string iu = "1";
+            string iu = eIU.ToString().Substring(2);
+            if (iu[0] == '0')
+                iu = iu.Substring(1);
             DBConnect.Delete(conn, "quest" + iu, "idx", id.ToString());
         }
-        public static void DBSelect(IUxx eIU)
+        public static void DBSelect(IUxx eIU, ref List<Question> l)
         {
             if (eIU == IUxx.IU00)
                 return;
@@ -685,8 +681,6 @@ namespace sQzLib
                 iu = iu.Substring(1);
             string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            svQuest = new List<Question>[1];
-            svQuest[0] = new List<Question>();
             if (reader != null)
             {
                 while (reader.Read())
@@ -704,7 +698,7 @@ namespace sQzLib
                     for (int i = 0; i < 4; ++i)
                         q.vKeys[i] = (x[i] == '1');
                     q.mIU = eIU;
-                    svQuest[0].Add(q);
+                    l.Add(q);
                 }
                 reader.Close();
             }
