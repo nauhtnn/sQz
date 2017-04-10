@@ -225,7 +225,7 @@ namespace sQzServer0
 
         private void btnInsQuest_Click(object sender, RoutedEventArgs e)
         {
-            if (0 < gQuest.Children.Count)
+            if (mSelQCat != IUxx.IU00 && 0 < vQuest.Count)
             {
                 gDBQuest.Children.Clear();
                 gQuest.Children.Clear();
