@@ -24,10 +24,13 @@ namespace sQzServer0
     {
         List<CheckBox> vChk;
         List<uint> vQId;
+        IUxx mSelQCat;
+
         public Prep0()
         {
             ShowsNavigationUI = false;
             InitializeComponent();
+            mSelQCat = IUxx.IU00;
         }
 
         private void btnInsDate_Click(object sender, RoutedEventArgs e)
@@ -220,7 +223,7 @@ namespace sQzServer0
             {
                 gQuest.Children.Clear();
                 gwQuest.Children.Clear();
-                Question.DBInsert();
+                Question.DBInsert(mSelQCat);
                 LoadQuest(true);
             }
         }
@@ -232,8 +235,8 @@ namespace sQzServer0
             {
                 if(Question.svQuest != null)
                     Question.svQuest[0].Clear();
-                Question.sIU = (IUxx)l.SelectedIndex + 1;
-                Question.DBSelect();
+                mSelQCat = (IUxx)l.SelectedIndex + 1;
+                Question.DBSelect(mSelQCat);
                 LoadQuest(true);
             }
         }

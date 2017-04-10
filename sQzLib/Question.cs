@@ -66,7 +66,6 @@ namespace sQzLib
         public uint mId;
         public string mStmt; //statement
         int nAns;
-        public static IUxx sIU = IUxx.IU00;
         public IUxx mIU;
         public string[] vAns;
         public bool[] vKeys;
@@ -91,7 +90,6 @@ namespace sQzLib
         public Question() {
             nAns = 0;
             vAns = null;
-            mIU = sIU;
             bChoiceSort = true;
             qType = QuestType.Single;
             cType = ContentType.Raw;
@@ -290,7 +288,6 @@ namespace sQzLib
             }
             if (1 < keyC && qType == QuestType.Single)
                 qType = QuestType.Multiple;
-            mIU = sIU;
             return true;
         }
         public void write(System.IO.StreamWriter os, int idx, ref int col)
@@ -638,9 +635,9 @@ namespace sQzLib
             sbArrwKey = null;
             sRdy = sRdywKey = false;
         }
-        public static void DBInsert()
+        public static void DBInsert(IUxx eIU)
         {
-            if (sIU == IUxx.IU00)
+            if (eIU == IUxx.IU00)
                 return;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -662,7 +659,7 @@ namespace sQzLib
                     else
                         vals[1] += '0';
                 vals[1] += "'";
-                string iu = sIU.ToString().Substring(2);//hardcode
+                string iu = eIU.ToString().Substring(2);//hardcode
                 if (iu[0] == '0')
                     iu = iu.Substring(1);
                 DBConnect.Ins(conn, "quest" + iu, attbs, vals);
@@ -676,14 +673,14 @@ namespace sQzLib
             string iu = "1";
             DBConnect.Delete(conn, "quest" + iu, "idx", id.ToString());
         }
-        public static void DBSelect()
+        public static void DBSelect(IUxx eIU)
         {
-            if (sIU == IUxx.IU00)
+            if (eIU == IUxx.IU00)
                 return;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string iu = sIU.ToString().Substring(2);//hardcode
+            string iu = eIU.ToString().Substring(2);//hardcode
             if (iu[0] == '0')
                 iu = iu.Substring(1);
             string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null, null);
@@ -706,7 +703,7 @@ namespace sQzLib
                     q.vKeys = new bool[4];
                     for (int i = 0; i < 4; ++i)
                         q.vKeys[i] = (x[i] == '1');
-                    q.mIU = sIU;
+                    q.mIU = eIU;
                     svQuest[0].Add(q);
                 }
                 reader.Close();
@@ -717,6 +714,8 @@ namespace sQzLib
 
         public static void DBSelect(IUxx iu, int n, ref List<Question> l)
         {
+            if (iu == IUxx.IU00)
+                return;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
@@ -782,7 +781,7 @@ namespace sQzLib
                     q.vKeys = new bool[4];
                     for (int k = 0; k < 4; ++k)
                         q.vKeys[k] = (x[k] == '1');
-                    q.mIU = sIU;
+                    q.mIU = iu;
                     l.Add(q);
                 }
                 reader.Close();
