@@ -28,10 +28,12 @@ namespace sQzServer1
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        Dictionary<int, TextBlock> vMark;
         Dictionary<int, TextBlock> vComp;
         Dictionary<int, TextBlock> vTime1;
         Dictionary<int, TextBlock> vTime2;
+        Dictionary<int, TextBlock> vMark;
+        Dictionary<int, CheckBox> vLock;//supervisor side
+        Dictionary<int, bool> vbLock;//examinee side
 
         public Operation1()
         {
@@ -45,10 +47,12 @@ namespace sQzServer1
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            vMark = new Dictionary<int, TextBlock>();
             vComp = new Dictionary<int, TextBlock>();
             vTime1 = new Dictionary<int, TextBlock>();
             vTime2 = new Dictionary<int, TextBlock>();
+            vMark = new Dictionary<int, TextBlock>();
+            vLock = new Dictionary<int, CheckBox>();
+            vbLock = new Dictionary<int, bool>();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -151,17 +155,28 @@ namespace sQzServer1
                         if (cname == null)
                             cname = "";
                         Examinee ee = Examinee.svExaminee[rid];
-                        if (ee.mTime1.Hour == 0)
+                        bool lck;
+                        if (!vbLock.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out lck))
+                            lck = false;//err, default value benefits examinees
+                        if (!lck)
                         {
                             ee.mTime1 = DateTime.Now;
                             ee.mComp = cname;
                             Dispatcher.Invoke(() =>
                             {
-                                TextBlock t = null;
+                                TextBlock t;
                                 if (vComp.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
                                     t.Text = cname;
                                 if (vTime1.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
                                     t.Text = ee.mTime1.ToString("HH:mm");
+                                CheckBox cbx;
+                                if (vLock.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out cbx))
+                                {
+                                    cbx.IsChecked = true;
+                                    cbx.IsEnabled = true;
+                                }
+                                if (vbLock.Keys.Contains((int)lv * Examinee.svExaminee[rid].mId))
+                                    vbLock[(int)lv * Examinee.svExaminee[rid].mId] = true;
                             });
                             Examinee.SrvrToAuthArr(rid, out outMsg);
                         }
@@ -218,13 +233,21 @@ namespace sQzServer1
                     {
                         Examinee.svExaminee[rid].mMark = mark;
                         Examinee.svExaminee[rid].mTime2 = DateTime.Now;
+                        if (vbLock.Keys.Contains((int)lv * id))
+                            vbLock[(int)lv * id] = true;
                         Dispatcher.Invoke(() =>
                         {
                             TextBlock t = null;
-                            if (vMark.TryGetValue((int)lv * id, out t))//todo
-                                t.Text = mark.ToString();
                             if (vTime2.TryGetValue((int)lv * id, out t))//todo
                                 t.Text = Examinee.svExaminee[rid].mTime2.ToString("HH:mm");
+                            if (vMark.TryGetValue((int)lv * id, out t))
+                                t.Text = mark.ToString();
+                            CheckBox cbx;
+                            if (vLock.TryGetValue((int)lv * id, out cbx))
+                            {
+                                cbx.IsChecked = true;
+                                cbx.IsEnabled = false;
+                            }
                         });
                     }
                     outMsg = BitConverter.GetBytes(mark);
@@ -249,50 +272,70 @@ namespace sQzServer1
                         vMark.Clear();
                         vTime1.Clear();
                         vTime2.Clear();
-                        int rid = 1;
-                        foreach (Examinee st in Examinee.svExaminee)
+                        int rid = 0;
+                        foreach (Examinee nee in Examinee.svExaminee)
                         {
                             RowDefinition rd = new RowDefinition();
                             rd.Height = new GridLength(20);
                             gNee.RowDefinitions.Add(rd);
                             TextBlock t = new TextBlock();
-                            t.Text = st.ID;
-                            Grid.SetRow(t, rid);
+                            t.Text = nee.ID;
+                            Grid.SetRow(t, ++rid);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            t.Text = st.mName;
+                            t.Text = nee.mName;
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 1);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            t.Text = st.mBirthdate;
+                            t.Text = nee.mBirthdate;
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 2);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            vComp.Add((int)st.mLvl * st.mId, t);
+                            int idx = (int)nee.mLvl * nee.mId;
+                            vComp.Add(idx, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 3);
                             gNee.Children.Add(t);
+                            CheckBox cbx = new CheckBox();
+                            cbx.Name = "c" + idx;
+                            cbx.Unchecked += cbxLock_Unchecked;
+                            cbx.IsEnabled = true;//default value empowers supervisors
+                            Grid.SetRow(cbx, rid);
+                            Grid.SetColumn(cbx, 7);
+                            vLock.Add(idx, cbx);
+                            gNee.Children.Add(cbx);
                             t = new TextBlock();
-                            if(st.mTime1.Hour != 0)
-                                t.Text = st.mTime1.ToString("HH:mm");
-                            vTime1.Add((int)st.mLvl * st.mId, t);
+                            if (nee.mTime1.Hour != 0)
+                            {
+                                t.Text = nee.mTime1.ToString("HH:mm");
+                                vbLock.Add(idx, true);
+                            }
+                            else
+                            {
+                                vbLock.Add(idx, false);
+                                cbx.IsEnabled = false;
+                            }
+                            vTime1.Add(idx, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 4);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            if (st.mTime2.Hour != 0)
-                                t.Text = st.mTime2.ToString("HH:mm");
-                            vTime2.Add((int)st.mLvl * st.mId, t);
+                            if (nee.mTime2.Hour != 0)
+                                t.Text = nee.mTime2.ToString("HH:mm");
+                            vTime2.Add(idx, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 5);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            if (st.mMark != ushort.MaxValue)
-                                t.Text = st.mMark.ToString();
-                            vMark.Add((int)st.mLvl * st.mId, t);
-                            Grid.SetRow(t, rid++);
+                            if (nee.mMark != ushort.MaxValue)
+                            {
+                                t.Text = nee.mMark.ToString();
+                                cbx.IsEnabled = false;
+                            }
+                            vMark.Add(idx, t);
+                            Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 6);
                             gNee.Children.Add(t);
                         }
@@ -308,6 +351,14 @@ namespace sQzServer1
                     return false;
             }
             return true;
+        }
+
+        private void cbxLock_Unchecked(object sender, RoutedEventArgs e)
+        {
+            CheckBox cbx = sender as CheckBox;
+            int key;
+            if (int.TryParse(cbx.Name.Substring(1), out key))
+                vbLock[key] = false;//todo: safer
         }
 
         public bool ClntBufPrep(ref byte[] outBuf)
