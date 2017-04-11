@@ -440,8 +440,12 @@ namespace sQzClient
         private void btnExit_Click(object sender, RoutedEventArgs e)
         {
             WPopup.s.wpCb = Exit;
-            WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT],
-                Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], "exit");
+            if(btnSubmit.IsEnabled)
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_1],
+                    Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], "exit");
+            else
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_2],
+                    Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], null);
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
