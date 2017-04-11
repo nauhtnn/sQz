@@ -77,6 +77,8 @@ namespace sQzClient
             //double rt = spMain.RenderSize.Width / 1280;
             //spMain.RenderTransform = new ScaleTransform(rt, rt);
 
+            WPopup.nwIns(w);
+
             string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
                 ")" + Txt.s._[(int)TxI.AUTH_MSG];
             //Dispatcher.Invoke(() => {

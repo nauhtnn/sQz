@@ -199,9 +199,9 @@ namespace sQzLib
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            if (mCode == mC.Text)
+            if (mCode == null || mCode == mC.Text)
             {
-                mC.Text = null;
+                mC.Text = string.Empty;
                 bOk = true;
                 mW.Close();
             }
@@ -214,6 +214,12 @@ namespace sQzLib
                     _s = new WPopup();
                 return _s;
             }
+        }
+
+        public static void nwIns(Window oner)
+        {
+            _s = new WPopup();
+            _s.owner = oner;
         }
 
         public WPopupCb wpCb

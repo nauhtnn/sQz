@@ -299,7 +299,10 @@ namespace sQzServer1
                             Grid.SetColumn(t, 3);
                             gNee.Children.Add(t);
                             CheckBox cbx = new CheckBox();
-                            cbx.Name = "c" + idx;
+                            if (idx < 0)
+                                cbx.Name = "n" + (-idx);
+                            else
+                                cbx.Name = "p" + idx;
                             cbx.Unchecked += cbxLock_Unchecked;
                             cbx.IsEnabled = true;//default value empowers supervisors
                             Grid.SetRow(cbx, rid);
@@ -358,7 +361,11 @@ namespace sQzServer1
             CheckBox cbx = sender as CheckBox;
             int key;
             if (int.TryParse(cbx.Name.Substring(1), out key))
+            {
+                if (cbx.Name[0] == 'n')
+                    key = -key;
                 vbLock[key] = false;//todo: safer
+            }
         }
 
         public bool ClntBufPrep(ref byte[] outBuf)
