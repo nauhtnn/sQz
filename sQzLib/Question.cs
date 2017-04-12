@@ -62,15 +62,14 @@ namespace sQzLib
 
     public class Question
     {
-		public static List<Question>[] svQuest = null;
         public uint mId;
         public string mStmt; //statement
-        int nAns;
+        public int nAns;
         public IUxx mIU;
         public string[] vAns;
         public bool[] vKeys;
         bool bChoiceSort;
-        QuestType qType;
+        public QuestType qType;
         ContentType cType;
         static string[] svToken;
         static int siToken;
@@ -80,12 +79,6 @@ namespace sQzLib
         int qSubs;
         static string[] aPattern = { "\\([a-zA-Z]\\)", "[a-zA-Z]\\." };
         List<int> aSubs;
-        public static byte[][] sbArrwKey = null;
-        static bool sRdywKey = false;
-        public static byte[] sbArr = null;
-        static bool sRdy = false;
-        static int sSeed = 1;
-        public static int siArr = -1;
 
         public Question() {
             nAns = 0;
@@ -219,12 +212,6 @@ namespace sQzLib
         public static void StartRead(string[] v, Settings s) {
             svToken = v;
             siToken = 0;
-            if (svQuest == null)
-            {
-                svQuest = new List<Question>[1];
-                svQuest[0] = new List<Question>();
-            }
-            svQuest[0].Clear();
         }
 
         public bool Read()
@@ -290,83 +277,62 @@ namespace sQzLib
                 qType = QuestType.Multiple;
             return true;
         }
-        public void write(System.IO.StreamWriter os, int idx, ref int col)
-        {
-            if (cType == ContentType.Image)
-            {
-                if (col == 1)
-                    os.Write("<div class='cl'></div><div class='cl1'></div>");
-                col = 2;//Program.MAX_COLUMN;
-            }
-            else
-                ++col;
-            if (cType == ContentType.Image)
-                os.Write("<div class='cl2'");
-            else
-                os.Write("<div class='cl'");
-            os.Write("><div class='qid'>" + idx +
-                "</div><div class='q'><div class='stmt'>");
-            if (qType == QuestType.Multiple)
-                os.Write("<i>(Câu hỏi nhiều lựa chọn)</i><br>");
-            os.Write(mStmt);
-            os.Write("</div>\n");
-            if (qType == QuestType.Single ||
-                qType == QuestType.Multiple)
-                wrtChoices(os, idx);
-        }
-        void wrtChoices(System.IO.StreamWriter os, int idx)
-        {
-            string header = "<div name='" + idx + "'class='c'><span class='cid'>(", middle;
-            if (qType == QuestType.Single)
-                middle = ")</span><input type='radio'";
-            else //Multiple
-                middle = ")</span><input type='checkbox'";
-            middle = middle + " name='-" + idx + "' value='";
-            char j = 'A';
-            List<string> choices = new List<string>(vAns);
-            List<bool> keys = new List<bool>(vKeys);
-            Random r = new Random();
-            while (0 < choices.Count)
-            {
-                int i = 0;
-                if (bChoiceSort && 1 < choices.Count)
-                    i = r.Next(choices.Count);
-                os.Write(header + j + middle);
-                if (keys[i])
-                {
-                    char k = (char)(j - 'A' + '0');
-                    os.Write(k + "'>");
-                }
-                else
-                    os.Write("#'>");
-                os.WriteLine(choices[i] + "</div>");
-                choices.RemoveAt(i);
-                keys.RemoveAt(i);
-                ++j;
-            }
-            os.Write("</div></div>");
-        }
-
-        public static void ReadTxt(ref List<Question> l)
-        {
-            ReadTxt(Utils.ReadFile("qz1.txt"), ref l);
-        }
-
-        public static void ReadTxt(string buf, ref List<Question> l)
-        {
-            if (buf == null)
-                return;
-            StartRead(Utils.Split(buf, '\n'), null);
-            Question q = new Question();
-            while (q.Read())
-            {
-                l.Add(q);
-                q = new Question();
-            }
-            q = null;
-            sRdy = sRdywKey = false;
-            ToByteArr(true);
-        }
+        //public void write(System.IO.StreamWriter os, int idx, ref int col)
+        //{
+        //    if (cType == ContentType.Image)
+        //    {
+        //        if (col == 1)
+        //            os.Write("<div class='cl'></div><div class='cl1'></div>");
+        //        col = 2;//Program.MAX_COLUMN;
+        //    }
+        //    else
+        //        ++col;
+        //    if (cType == ContentType.Image)
+        //        os.Write("<div class='cl2'");
+        //    else
+        //        os.Write("<div class='cl'");
+        //    os.Write("><div class='qid'>" + idx +
+        //        "</div><div class='q'><div class='stmt'>");
+        //    if (qType == QuestType.Multiple)
+        //        os.Write("<i>(Câu hỏi nhiều lựa chọn)</i><br>");
+        //    os.Write(mStmt);
+        //    os.Write("</div>\n");
+        //    if (qType == QuestType.Single ||
+        //        qType == QuestType.Multiple)
+        //        wrtChoices(os, idx);
+        //}
+        //void wrtChoices(System.IO.StreamWriter os, int idx)
+        //{
+        //    string header = "<div name='" + idx + "'class='c'><span class='cid'>(", middle;
+        //    if (qType == QuestType.Single)
+        //        middle = ")</span><input type='radio'";
+        //    else //Multiple
+        //        middle = ")</span><input type='checkbox'";
+        //    middle = middle + " name='-" + idx + "' value='";
+        //    char j = 'A';
+        //    List<string> choices = new List<string>(vAns);
+        //    List<bool> keys = new List<bool>(vKeys);
+        //    Random r = new Random();
+        //    while (0 < choices.Count)
+        //    {
+        //        int i = 0;
+        //        if (bChoiceSort && 1 < choices.Count)
+        //            i = r.Next(choices.Count);
+        //        os.Write(header + j + middle);
+        //        if (keys[i])
+        //        {
+        //            char k = (char)(j - 'A' + '0');
+        //            os.Write(k + "'>");
+        //        }
+        //        else
+        //            os.Write("#'>");
+        //        os.WriteLine(choices[i] + "</div>");
+        //        choices.RemoveAt(i);
+        //        keys.RemoveAt(i);
+        //        ++j;
+        //    }
+        //    os.Write("</div></div>");
+        //}
 
         public override string ToString()
         {
@@ -376,290 +342,11 @@ namespace sQzLib
             return s;
         }
 
-        public static void ToByteArr(bool woKey)
-        {
-            woKey = false;
-            if (svQuest == null || svQuest.Length == 0)
-                return;
-            List<byte[]> l = new List<byte[]>();
-            List<bool> lk = new List<bool>();
-            //l.Add(BitConverter.GetBytes(svQuest.Length));
-            //if(woKey)
-            //    lk.Add(false);
-            sbArrwKey = new byte[svQuest.Length][];
-            int i = -1;
-            foreach (List<Question> ls in svQuest)
-            {
-                l.Clear();
-                l.Add(BitConverter.GetBytes(ls.Count));
-                foreach (Question q in ls)//todo: foreach
-                {
-                    //qType
-                    l.Add(BitConverter.GetBytes((int)q.qType));
-                    if (woKey)
-                        lk.Add(false);
-                    //stmt
-                    byte[] b = System.Text.Encoding.UTF8.GetBytes(q.mStmt);
-                    l.Add(BitConverter.GetBytes(b.Length));
-                    l.Add(b);
-                    if (woKey)
-                    {
-                        lk.Add(false);
-                        lk.Add(false);
-                    }
-                    //ans
-                    l.Add(BitConverter.GetBytes(q.nAns));
-                    if (woKey)
-                        lk.Add(false);
-                    for (int j = 0; j < q.nAns; ++j)
-                    {
-                        //each ans
-                        b = System.Text.Encoding.UTF8.GetBytes(q.vAns[j]);
-                        l.Add(BitConverter.GetBytes(b.Length));
-                        l.Add(b);
-                        if (woKey)
-                        {
-                            lk.Add(false);
-                            lk.Add(false);
-                        }
-                    }
-                    //keys
-                    for (int j = 0; j < q.nAns; ++j)
-                    {
-                        l.Add(BitConverter.GetBytes(q.vKeys[j]));
-                        if (woKey)
-                            lk.Add(true);
-                    }
-                }
-                //join
-                int sz = 0;
-                int szk = 0;
-                for (int j = 0; j < l.Count; ++j)//foreach
-                {
-                    sz += l[j].Length;
-                    if (woKey && lk[j])
-                        szk += l[j].Length;
-                }
-                if (woKey)
-                    sbArr = new byte[sz - szk];
-                sbArrwKey[++i] = new byte[sz];
-                int offs = 0;
-                for (int j = 0; j < l.Count; ++j)//foreach
-                {
-                    Buffer.BlockCopy(l[j], 0, sbArrwKey[i], offs, l[j].Length);
-                    if (woKey && !lk[j])
-                        Buffer.BlockCopy(l[j], 0, sbArr, offs, l[j].Length);
-                    offs += l[j].Length;
-                }
-            }
-            sRdywKey = true;
-            if (woKey)
-                sRdy = true;
-        }
-
-        public static void ReadByteArr(byte[] buf, ref int offs, bool wKey)
-        {
-            wKey = true;
-            if (buf == null)
-                return;
-            int offs0 = offs;
-            int l = buf.Length - offs;
-            if (l < 4)
-                return;
-            int nExSh = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            l -= 4;
-            if (nExSh < 1)
-                svQuest = null;
-            else
-                svQuest = new List<Question>[nExSh];
-            if (1 == nExSh)
-            {
-                if (l < 4)
-                    return;
-                siArr = BitConverter.ToInt32(buf, offs);
-                offs += 4;
-                l -= 4;
-            }
-            int sz = 0, i = -1;
-            sbArrwKey = new byte[nExSh][];
-            while (++i < nExSh)
-            {
-                if (l < 4)
-                    return;
-                int nQuest = BitConverter.ToInt32(buf, offs);
-                offs += 4;
-                l -= 4;
-                svQuest[i] = new List<Question>();
-                while (0 < nQuest)
-                {
-                    Question q = new Question();
-                    //qType
-                    if (l < 4)
-                        break;
-                    q.qType = (QuestType)BitConverter.ToInt32(buf, offs);
-                    l -= 4;
-                    offs += 4;
-                    //stmt
-                    if (l < 4)
-                        break;
-                    sz = BitConverter.ToInt32(buf, offs);
-                    l -= 4;
-                    offs += 4;
-                    if (l < sz)
-                        break;
-                    byte[] ar = new byte[sz];
-                    Buffer.BlockCopy(buf, offs, ar, 0, sz);
-                    l -= sz;
-                    offs += sz;
-                    q.mStmt = System.Text.Encoding.UTF8.GetString(ar);
-                    //ans
-                    if (l < 4)
-                        break;
-                    q.nAns = BitConverter.ToInt32(buf, offs);
-                    l -= 4;
-                    offs += 4;
-                    q.vAns = new string[q.nAns];
-                    bool brk = false;
-                    for (int j = 0; j < q.nAns; ++j)
-                    {
-                        //each ans
-                        if (l < 4)
-                        {
-                            brk = true;
-                            break;
-                        }
-                        sz = BitConverter.ToInt32(buf, offs);
-                        l -= 4;
-                        offs += 4;
-                        if (l < sz)
-                        {
-                            brk = true;
-                            break;
-                        }
-                        ar = new byte[sz];
-                        Buffer.BlockCopy(buf, offs, ar, 0, sz);
-                        l -= sz;
-                        offs += sz;
-                        q.vAns[j] = System.Text.Encoding.UTF8.GetString(ar);
-                    }
-                    if (brk)
-                        break;
-                    //keys
-                    if (wKey)
-                    {
-                        if (l < q.nAns)
-                            break;
-                        q.vKeys = new bool[q.nAns];
-                        for (int j = 0; j < q.nAns; ++j)
-                            q.vKeys[j] = BitConverter.ToBoolean(buf, offs++);
-                        l -= q.nAns;
-                    }
-                    --nQuest;
-                    svQuest[i].Add(q);
-                }
-                if (wKey && !Array.Equals(buf, sbArrwKey))
-                {
-                    sz = offs - offs0;
-                    if (sz == buf.Length)
-                        sbArrwKey[i] = (byte[])buf.Clone();
-                    else
-                    {
-                        sbArrwKey[i] = new byte[sz];
-                        Buffer.BlockCopy(buf, offs0, sbArrwKey[i], 0, sz);
-                    }
-                    sRdy = false;
-                    sRdywKey = true;
-                }
-            }
-            //if(!wKey && !Array.Equals(buf, sbArr))
-            //{
-            //    sz = offs - offs0;
-            //    if (sz == buf.Length)
-            //        sbArr = (byte[])buf.Clone();
-            //    else
-            //    {
-            //        sbArr = new byte[sz];
-            //        Buffer.BlockCopy(buf, 0, sbArrwKey, 0, sz);
-            //    }
-            //    sRdy = true;
-            //    sRdywKey = false;
-            //}
-        }
-
-        public static byte[] Arr(bool all)
-        {
-            if (sbArrwKey == null)
-                return null;//todo
-            byte[] ar;
-            if (all && 1 < sbArrwKey.Length)
-            {
-                int sz = 4;
-                foreach (byte[] a in sbArrwKey)
-                    sz += a.Length;
-                ar = new byte[sz];
-                int offs = 0;
-                Buffer.BlockCopy(BitConverter.GetBytes(sbArrwKey.Length), 0, ar, offs, 4);
-                offs += 4;
-                foreach(byte[] a in sbArrwKey)
-                {
-                    Buffer.BlockCopy(a, 0, ar, offs, a.Length);
-                    offs += a.Length;
-                }
-            }
-            else
-            {
-                ++siArr;
-                if (sbArrwKey.Length <= siArr)
-                    siArr = 0;
-                ar = new byte[sbArrwKey[siArr].Length + 8];
-                Buffer.BlockCopy(BitConverter.GetBytes(1), 0, ar, 0, 4);
-                Buffer.BlockCopy(BitConverter.GetBytes(siArr), 0, ar, 4, 4);
-                Buffer.BlockCopy(sbArrwKey[siArr], 0, ar, 8, sbArrwKey[siArr].Length);
-            }
-            return ar;
-        }
-
         public static void Clear()
         {
-            foreach (List<Question> l in svQuest)
-                l.Clear();
             siToken = 0;//safe to be 0
-            sbArr = null;
-            sbArrwKey = null;
-            sRdy = sRdywKey = false;
         }
-        public static void DBInsert(IUxx eIU, List<Question> vq)
-        {
-            if (eIU == IUxx.IU00)
-                return;
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
-            string[] attbs = new string[2];//hardcode
-            attbs[0] = "body";
-            attbs[1] = "ansKeys";
-            foreach (Question q in vq)
-            {
-                string[] vals = new string[2];
-                vals[0] = "'" + q.mStmt.Replace("'", "\\'") + '\n';
-                for (int i = 0; i < q.nAns; ++i)
-                    vals[0] += q.vAns[i].Replace("'", "\\'") + '\n';
-                vals[0] += "'";
-                vals[1] = "'";
-                for (int i = 0; i < q.nAns; ++i)
-                    if (q.vKeys[i])
-                        vals[1] += '1';
-                    else
-                        vals[1] += '0';
-                vals[1] += "'";
-                string iu = eIU.ToString().Substring(2);//hardcode
-                if (iu[0] == '0')
-                    iu = iu.Substring(1);
-                DBConnect.Ins(conn, "quest" + iu, attbs, vals);
-            }
-            DBConnect.Close(ref conn);
-        }
+        
 		public static void DBDelete(IUxx eIU, uint id) {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -668,119 +355,6 @@ namespace sQzLib
             if (iu[0] == '0')
                 iu = iu.Substring(1);
             DBConnect.Delete(conn, "quest" + iu, "idx", id.ToString());
-        }
-        public static void DBSelect(IUxx eIU, ref List<Question> l)
-        {
-            if (eIU == IUxx.IU00)
-                return;
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
-            string iu = eIU.ToString().Substring(2);//hardcode
-            if (iu[0] == '0')
-                iu = iu.Substring(1);
-            string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null, null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            if (reader != null)
-            {
-                while (reader.Read())
-                {
-                    Question q = new Question();
-                    q.mId = reader.GetUInt32(0);//hardcode
-                    string[] s = reader.GetString(1).Split('\n');
-                    q.mStmt = s[0];
-                    q.nAns = 4;
-                    q.vAns = new string[4];
-                    for (int i = 0; i < 4; ++i)
-                        q.vAns[i] = s[i + 1];
-                    string x = reader.GetString(2);
-                    q.vKeys = new bool[4];
-                    for (int i = 0; i < 4; ++i)
-                        q.vKeys[i] = (x[i] == '1');
-                    q.mIU = eIU;
-                    l.Add(q);
-                }
-                reader.Close();
-            }
-            DBConnect.Close(ref conn);
-            ToByteArr(true);
-        }
-
-        public static void DBSelect(IUxx iu, int n, ref List<Question> l)
-        {
-            if (iu == IUxx.IU00)
-                return;
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
-            string siu = iu.ToString().Substring(2);//hardcode
-            if (siu[0] == '0')
-                siu = siu.Substring(1);
-            //randomize
-            int nn = DBConnect.Count(conn, "quest" + siu);
-            if (nn < 1 || nn < n)
-                return;
-            int[] vSel = new int[n];
-            int i;
-            for (i = 0; i < n; ++i)
-                vSel[i] = -1;
-            ++sSeed;
-            if (sSeed == int.MaxValue)
-                sSeed = 1;
-            Random r = new Random(sSeed);
-            i = n;
-            while(0 < i)
-            {
-                int sel = r.Next() % nn;
-                int idx = Array.IndexOf(vSel, sel);
-                bool fw = sel % 2 == 0;
-                while(-1 < idx)
-                {
-                    if (fw)
-                        ++sel;
-                    else
-                        --sel;
-                    if(sel < 0 || sel == nn)
-                    {
-                        fw = sel < 0;
-                        continue;
-                    }
-                    idx = Array.IndexOf(vSel, sel);
-                }
-                --i;
-                vSel[i] = sel;
-            }
-            Array.Sort(vSel);
-            //
-            string qry = DBConnect.mkQrySelect("quest" + siu, null, null, null, null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            i = 0;
-            int ii = -1;
-            if (reader != null)
-            {
-                while (reader.Read() && i < n)
-                {
-                    if (++ii != vSel[i])
-                        continue;
-                    ++i;
-                    Question q = new Question();
-                    q.mId = reader.GetUInt32(0);//hardcode
-                    string[] s = reader.GetString(1).Split('\n');
-                    q.mStmt = "(" + siu + ')' + s[0];
-                    q.nAns = 4;
-                    q.vAns = new string[4];
-                    for (int k = 0; k < 4; ++k)
-                        q.vAns[k] = s[k + 1];
-                    string x = reader.GetString(2);
-                    q.vKeys = new bool[4];
-                    for (int k = 0; k < 4; ++k)
-                        q.vKeys[k] = (x[k] == '1');
-                    q.mIU = iu;
-                    l.Add(q);
-                }
-                reader.Close();
-            }
-            DBConnect.Close(ref conn);
         }
     }
 }

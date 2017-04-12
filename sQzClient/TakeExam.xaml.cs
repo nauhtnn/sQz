@@ -25,6 +25,8 @@ namespace sQzClient
         UICbMsg mCbMsg;
         System.Timers.Timer mTimer;
 
+        public QuestSheet mQSh;
+
         List<ListBox> vLbx;
 
         Client2 mClnt;
@@ -46,6 +48,8 @@ namespace sQzClient
             txtWelcome.Text = Examinee.sAuthNee.ToString();
 
             ShowsNavigationUI = false;
+
+            mQSh = new QuestSheet();
         }
 
         private void LoadTxt()
@@ -123,7 +127,7 @@ namespace sQzClient
             Label l = new Label();
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             int nAns = 4;//hardcode
-            int i = 0, n = Question.svQuest[0].Count;
+            int i = 0, n = mQSh.vQuest.Count;
             vlblAnsSh = new Label[n][];
             vbAns = new bool[n][];
             //top line
@@ -157,11 +161,12 @@ namespace sQzClient
             gAnsSh.Children.Add(l);
             //next lines
             int j = 0;
-            for (j = 1, i = 0; j < Question.svQuest[0].Count; ++j)
+            foreach(Question q in mQSh.vQuest)
             {
                 gAnsSh.RowDefinitions.Add(new RowDefinition());
-                vlblAnsSh[j - 1] = new Label[nAns];
-                vbAns[j - 1] = new bool[nAns];
+                vlblAnsSh[j] = new Label[nAns];
+                vbAns[j] = new bool[nAns];
+                ++j;
                 l = new Label();
                 l.Content = j;
                 l.BorderBrush = brBK;
@@ -239,7 +244,7 @@ namespace sQzClient
             qs.Background = Theme.s._[(int)BrushId.Q_BG];
             qs.ColumnDefinitions.Add(new ColumnDefinition());
             qs.ColumnDefinitions.Add(new ColumnDefinition());
-            int n = Question.svQuest[0].Count;
+            int n = mQSh.vQuest.Count;
             for (int i = 1, j = 0; i <= n; i += 2, ++j)
             {
                 qs.RowDefinitions.Add(new RowDefinition());
@@ -278,7 +283,7 @@ namespace sQzClient
             q.Children.Add(l);
             StackPanel con = new StackPanel();
             TextBlock stmt = new TextBlock();
-            Question quest = Question.svQuest[0][idx - 1];
+            Question quest = mQSh.vQuest[idx - 1];
             stmt.Text = quest.mStmt;
             stmt.TextWrapping = TextWrapping.Wrap;
             stmt.Width = qaWh;
@@ -343,7 +348,7 @@ namespace sQzClient
         {
             int n = vbAns.Length * 4, i = 0, k = 0; //hardcode
             mbAns = new byte[n];
-            for (i = 0, k = 0, n = Question.svQuest[0].Count; i < n; ++i)
+            for (i = 0, k = 0, n = mQSh.vQuest.Count; i < n; ++i)
                 for (int j = 0; j < 4; ++j, ++k)//hardcode
                     mbAns[k] = Convert.ToByte(vbAns[i][j]);
             mState = NetCode.Submiting;
@@ -388,7 +393,7 @@ namespace sQzClient
                     Buffer.BlockCopy(BitConverter.GetBytes(Examinee.sAuthNee.mId),
                         0, outBuf, offs, 2);
                     offs += 2;
-                    Buffer.BlockCopy(BitConverter.GetBytes(Question.siArr),
+                    Buffer.BlockCopy(BitConverter.GetBytes(mQSh.mId),
                         0, outBuf, offs, 4);
                     offs += 4;
                     Buffer.BlockCopy(mbAns, 0, outBuf, offs, mbAns.Length);

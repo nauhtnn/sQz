@@ -77,7 +77,7 @@ namespace sQzLib
 			date = To422(date);
 			if(date == null)
 				return;
-            date = "'" + date + "'";
+            date = "('" + date + "')";
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;

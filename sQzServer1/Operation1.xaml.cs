@@ -34,6 +34,9 @@ namespace sQzServer1
         Dictionary<int, TextBlock> vMark;
         Dictionary<int, CheckBox> vLock;//supervisor side
         Dictionary<int, bool> vbLock;//examinee side
+        QuestShPack mQShPack;
+        int mQShIdx;
+        int mQShMaxIdx;
 
         public Operation1()
         {
@@ -141,6 +144,7 @@ namespace sQzServer1
 
         public bool SrvrCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg)
         {
+            QuestSheet qs;
             switch (c)
             {
                 case NetCode.Dating:
@@ -198,17 +202,20 @@ namespace sQzServer1
                     }
                     break;
                 case NetCode.ExamRetrieving:
-                    outMsg = Question.Arr(false);
-                    //outMsg = Question.sbArr;
+                    uint qshidx = mQShPack.vSheet.Keys.ElementAt(mQShIdx);
+                    if (mQShMaxIdx < ++mQShIdx)
+                        mQShIdx = 0;
+                    if(mQShPack.vSheet.TryGetValue(qshidx, out qs))
+                        outMsg = qs.aQuest;
                     break;
                 case NetCode.Submiting:
                     lv = (ExamLvl)BitConverter.ToInt32(dat, offs);
                     offs += 4;
-                    int id = BitConverter.ToUInt16(dat, offs);
+                    uint id = BitConverter.ToUInt16(dat, offs);
                     offs += 2;
-                    int siArr = BitConverter.ToInt32(dat, offs);
+                    uint qid = BitConverter.ToUInt32(dat, offs);
                     offs += 4;
-                    if (dat.Length - offs != Question.svQuest[0].Count * 4)//hardcode
+                    if (dat.Length - offs != 30 * 4)//hardcode
                     {
                         outMsg = BitConverter.GetBytes(101);//todo
                         break;
@@ -216,34 +223,37 @@ namespace sQzServer1
                     ushort mark = 0;
                     int j, k;
                     --offs;
-                    foreach(Question q in Question.svQuest[siArr])
-                    {
-                        j = 0;
-                        k = offs;
-                        foreach (bool b in q.vKeys)
-                            if (dat[++k] != Convert.ToByte(b))
-                                break;
-                            else
-                                ++j;
-                        if (j == q.vKeys.Length)
-                            ++mark;
-                        offs += q.vKeys.Length;
-                    }
-                    if (Examinee.svLvId2Idx.TryGetValue((int)lv * id, out rid))
+                    
+                    if(mQShPack.vSheet.TryGetValue(qid, out qs))
+                        foreach(Question q in qs.vQuest)
+                        {
+                            j = 0;
+                            k = offs;
+                            foreach (bool b in q.vKeys)
+                                if (dat[++k] != Convert.ToByte(b))
+                                    break;
+                                else
+                                    ++j;
+                            if (j == q.vKeys.Length)
+                                ++mark;
+                            offs += q.vKeys.Length;
+                        }
+                    int idx = (int)lv * (int)id;
+                    if (Examinee.svLvId2Idx.TryGetValue(idx, out rid))
                     {
                         Examinee.svExaminee[rid].mMark = mark;
                         Examinee.svExaminee[rid].mTime2 = DateTime.Now;
-                        if (vbLock.Keys.Contains((int)lv * id))
-                            vbLock[(int)lv * id] = true;
+                        if (vbLock.Keys.Contains(idx))
+                            vbLock[idx] = true;
                         Dispatcher.Invoke(() =>
                         {
                             TextBlock t = null;
-                            if (vTime2.TryGetValue((int)lv * id, out t))//todo
+                            if (vTime2.TryGetValue(idx, out t))//todo
                                 t.Text = Examinee.svExaminee[rid].mTime2.ToString("HH:mm");
-                            if (vMark.TryGetValue((int)lv * id, out t))
+                            if (vMark.TryGetValue(idx, out t))
                                 t.Text = mark.ToString();
                             CheckBox cbx;
-                            if (vLock.TryGetValue((int)lv * id, out cbx))
+                            if (vLock.TryGetValue(idx, out cbx))
                             {
                                 cbx.IsChecked = true;
                                 cbx.IsEnabled = false;
@@ -347,8 +357,10 @@ namespace sQzServer1
                     break;
                 case NetCode.QuestAnsKeyRetrieving:
                     offs = 0;
-                    Question.ReadByteArr(buf, ref offs, true);
-                    Question.ToByteArr(true);
+                    mQShPack = new QuestShPack();
+                    mQShPack.ReadByte(buf, ref offs, true);
+                    mQShIdx = 0;
+                    mQShMaxIdx = mQShPack.vSheet.Keys.Count - 1;
                     LoadQuest();
                     mState = NetCode.PrepMark;
                     return false;
@@ -393,16 +405,15 @@ namespace sQzServer1
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
                 tbcQuest.Items.Clear();
-                int e = 0;
-                foreach (List<Question> l in Question.svQuest)
+                foreach (QuestSheet qs in mQShPack.vSheet.Values)
                 {
                     TabItem ti = new TabItem();
-                    ti.Header = ++e;
+                    ti.Header = qs.mId;
                     ScrollViewer svwr = new ScrollViewer();
                     svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                     StackPanel sp = new StackPanel();
                     int x = 0;
-                    foreach (Question q in l)
+                    foreach (Question q in qs.vQuest)
                     {
                         TextBlock i = new TextBlock();
                         i.Text = ++x + ") " + q.ToString();

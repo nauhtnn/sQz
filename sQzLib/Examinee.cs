@@ -15,11 +15,6 @@ PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(
 
 namespace sQzLib
 {
-    public enum ExamLvl
-    {
-        Basis = -1,
-        Advance = 1
-    }
     public class Examinee
     {
         public static List<Examinee> svExaminee = new List<Examinee>();
@@ -158,24 +153,19 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string[] attbs = new string[6];//hardcode
-            attbs[0] = "dateIdx";
-            attbs[1] = "level";
-            attbs[2] = "idx";
-            attbs[3] = "name";
-            attbs[4] = "birthdate";
-            attbs[5] = "birthplace";
+            string attbs = "dateIdx,level,idx,name,birthdate,birthplace";
+            StringBuilder vals = new StringBuilder();
             foreach (Examinee s in svExaminee)
             {
-                string[] vals = new string[6];
-                vals[0] = "" + dateIdx;
-                vals[1] = "" + (int)s.mLvl;
-                vals[2] = "" + s.mId;
-                vals[3] = "'" + s.mName + "'";
-                vals[4] = "'" + s.mBirthdate + "'";
-                vals[5] = "'" + s.mBirthplace + "'";
-                DBConnect.Ins(conn, "examinees", attbs, vals);
+                vals.Append("(" + dateIdx + ",");
+                vals.Append((int)s.mLvl + ",");
+                vals.Append(s.mId + ",");
+                vals.Append("'" + s.mName + "',");
+                vals.Append("'" + s.mBirthdate + "',");
+                vals.Append("'" + s.mBirthplace + "'),");
             }
+            vals.Remove(vals.Length - 1, 1);//remove the last comma
+            DBConnect.Ins(conn, "examinees", attbs, vals.ToString());
             DBConnect.Close(ref conn);
         }
 

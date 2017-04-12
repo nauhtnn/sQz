@@ -104,35 +104,17 @@ namespace sQzLib
         }
 
         //Insert statement
-        public static void Ins(MySqlConnection conn, string tb, string[] vAttb, string[] vVal)
+        public static void Ins(MySqlConnection conn, string tb, string vAttb, string vals)
         {
-            if (vAttb == null || vVal == null)
-                return;
-            if (vAttb.Length != vVal.Length)
+            if (vAttb == null || vals == null)
                 return;
             int lastIdx = vAttb.Length - 1;
-            //string query = "INSERT INTO tableinfo (name, age) VALUES('John Smith', '33')";
-            string query = "INSERT INTO " + tb + "(";
-            for (int i = 0; i < lastIdx; ++i)
-                query += vAttb[i] + ",";
-            query += vAttb[lastIdx] + ")VALUES(";
-            for (int i = 0; i < lastIdx; ++i)
-                query += vVal[i] + ",";
-            query += vVal[lastIdx] + ")";
+            StringBuilder qry = new StringBuilder();
+            qry.Append("INSERT INTO " + tb + "(" + vAttb + ")VALUES");
+            qry.Append(vals);
             
-            //create command and assign the query and connection from the constructor
-            MySqlCommand cmd = new MySqlCommand(query, conn);
+            MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
 
-            //Execute command
-            cmd.ExecuteNonQuery();
-        }
-
-        public static void Ins(MySqlConnection conn, string tb, string attb, string val)
-        {
-            if (attb == null || val == null)
-                return;
-            string query = "INSERT INTO " + tb + "(" + attb + ")VALUES(" + val + ")";
-            MySqlCommand cmd = new MySqlCommand(query, conn);
             cmd.ExecuteNonQuery();
         }
 

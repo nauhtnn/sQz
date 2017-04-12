@@ -49,6 +49,8 @@
     <Compile Include="Date.cs" />
     <Compile Include="DBConnect.cs" />
     <Compile Include="Examinee.cs" />
+    <Compile Include="QuestShPack.cs" />
+    <Compile Include="QuestSheet.cs" />
     <Compile Include="FirewallHandler.cs" />
     <Compile Include="HotkeyHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

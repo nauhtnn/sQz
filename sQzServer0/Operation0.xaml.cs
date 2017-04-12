@@ -26,6 +26,7 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         Dictionary<int, TextBlock> vMark;
+        QuestShPack mQShPack;
 
         public Operation0()
         {
@@ -34,6 +35,7 @@ namespace sQzServer0
             mServer = new Server2(SrvrCodeHndl);
             mCbMsg = new UICbMsg();
             vMark = new Dictionary<int, TextBlock>();
+            mQShPack = new QuestShPack();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -205,28 +207,39 @@ namespace sQzServer0
 			int n = 1;
             if (t != null && 0 < t.Text.Length && !int.TryParse(t.Text, out n))
                 n = 1;
-			Question.svQuest = new List<Question>[n];
+            int[][] x = new int[2][];
+            x[0] = QuestSheet.GetBasicIU();
+            x[1] = QuestSheet.GetAdvanceIU();
+            uint[] qId = new uint[2];
+            qId[0] = 170412000;
+            qId[1] = 170412500;
 			while(0 < n) {
-				int v;
-				List<Question> l = new List<Question>();
-				for (int i = 1; i < 16; ++i)
+				for(int i = 0; i < 2; ++i)
 				{
-					t = (TextBox)FindName("tbxIU" + i);
-					if (t != null && 0 < t.Text.Length)
-					{
-						if (int.TryParse(t.Text, out v) && 0 < v)
-						{
-							IUxx iu = (IUxx)i;
-							Question.DBSelect(iu, v, ref l);
-						}
-					}
-				}
-				--n;
-				if(0 < l.Count)
-					Question.svQuest[n] = l;
-			}
-            if (0 < Question.svQuest.Length)
-                Question.ToByteArr(false);
+                    QuestSheet qs = new QuestSheet();
+                    foreach (int j in x[i])
+                    {
+                        t = (TextBox)FindName("tbxIU" + j);
+                        if (t != null && 0 < t.Text.Length)
+                        {
+                            int v;
+                            if (int.TryParse(t.Text, out v) && 0 < v)
+                            {
+                                IUxx iu = (IUxx)j;
+                                qs.DBSelect(iu, v);
+                            }
+                        }
+                    }
+                    if (0 < qs.vQuest.Count)
+                    {
+                        qs.mId = ++qId[i];
+                        mQShPack.vSheet.Add(qs.mId, qs);
+                    }
+                }
+                --n;
+            }
+            foreach (QuestSheet qs in mQShPack.vSheet.Values)
+                qs.ToByte(false);
             LoadQuest();
         }
 
@@ -238,15 +251,14 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
 				tbcQuest.Items.Clear();
-				int e = 0;
-				foreach(List<Question> l in Question.svQuest) {
+				foreach(QuestSheet qs in mQShPack.vSheet.Values) {
 					TabItem ti = new TabItem();
-					ti.Header = ++e;
+					ti.Header = qs.mId;
                     ScrollViewer svwr = new ScrollViewer();
                     svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 					StackPanel sp = new StackPanel();
                     int x = 0;
-                    foreach (Question q in l)
+                    foreach (Question q in qs.vQuest)
 					{
 						TextBlock i = new TextBlock();
 						i.Text = ++x + ") " + q.ToString();
@@ -299,7 +311,7 @@ namespace sQzServer0
                     break;
                 case NetCode.QuestAnsKeyRetrieving:
                     //outMsg = Question.sbArr;
-                    outMsg = Question.Arr(true);
+                    outMsg = mQShPack.ToByte(false);
                     return false;
                     //break;
                 case NetCode.SrvrSubmitting:
