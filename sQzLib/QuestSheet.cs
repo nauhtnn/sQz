@@ -5,6 +5,12 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
+/*
+CREATE TABLE IF NOT EXISTS `questsh` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
+ `idx` SMALLINT(2) UNSIGNED, `vquest` VARCHAR(1024),
+ PRIMARY KEY(`dateIdx`,`level`,`idx`));
+*/
+
 namespace sQzLib
 {
     public enum ExamLvl
@@ -199,7 +205,7 @@ namespace sQzLib
             string iu = eIU.ToString().Substring(2);//hardcode
             if (iu[0] == '0')
                 iu = iu.Substring(1);
-            string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null, null);
+            string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             if (reader != null)
             {
@@ -272,7 +278,7 @@ namespace sQzLib
             }
             Array.Sort(vSel);
             //
-            string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null, null);
+            string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             i = 0;
             int ii = -1;
@@ -329,6 +335,35 @@ namespace sQzLib
             if (iu[0] == '0')
                 iu = iu.Substring(1);
             DBConnect.Ins(conn, "quest" + iu, "body,ansKeys", vals.ToString());
+            DBConnect.Close(ref conn);
+        }
+
+        public void DBMkInsQry(uint dateIdx, ref StringBuilder vals)
+        {
+            vals.Append("(" + dateIdx + "," + (int)eLvl + "," + mId + ",");
+            foreach(Question q in vQuest)
+                vals.Append(q.mId + "|");
+            vals.Remove(vals.Length - 1, 1);//remove the last '|'
+            vals.Append("),");
+        }
+
+        public void DBSelect(uint dateIdx, ExamLvl lv, ushort idx)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+            StringBuilder cond = new StringBuilder();
+            cond.Append("dateIdx=" + dateIdx);
+            cond.Append(" AND level=" + (int)lv);
+            cond.Append(" AND idx=" + idx);
+            string qry = DBConnect.mkQrySelect("questsh", "quest", cond.ToString(), null);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            List<int> r = new List<int>();
+            if (reader != null && reader.Read())
+            {
+                r.Add(reader.GetInt16(0) * reader.GetUInt16(1));
+                reader.Close();
+            }
             DBConnect.Close(ref conn);
         }
     }

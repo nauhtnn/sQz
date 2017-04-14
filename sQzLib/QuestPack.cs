@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
@@ -63,6 +64,37 @@ namespace sQzLib
                     vSheet.Add(qs.mId, qs);
                 --nSh;
             }
+        }
+
+        public List<int> DBSelect(uint dateIdx)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return null;
+            string qry = DBConnect.mkQrySelect("questsh", "level, idx", "dateIdx=" + dateIdx, null);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            List<int> r = new List<int>();
+            if (reader != null)
+            {
+                while (reader.Read())
+                    r.Add(reader.GetInt16(0) * reader.GetUInt16(1));
+                reader.Close();
+            }
+            DBConnect.Close(ref conn);
+            return r;
+        }
+
+        public void DBIns(uint dateIdx)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+            StringBuilder vals = new StringBuilder();
+            foreach (QuestSheet qs in vSheet.Values)
+                qs.DBMkInsQry(dateIdx, ref vals);
+            vals.Remove(vals.Length - 1, 1);//remove the last comma
+            DBConnect.Ins(conn, "questsh", "dateIdx,level,idx,vQuest", vals.ToString());//todo: catch exception
+            DBConnect.Close(ref conn);
         }
     }
 }

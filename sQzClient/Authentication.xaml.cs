@@ -29,6 +29,7 @@ namespace sQzClient
         bool bRunning;
         string mNeeId;
         string mBirdate;
+        ExamDate mDt;
 
         public Authentication()
         {
@@ -42,6 +43,8 @@ namespace sQzClient
             bRunning = true;
 
             mNeeId = mBirdate = string.Empty;
+
+            mDt = new ExamDate();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -123,12 +126,12 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Dating:
-                    Date.ReadByteArr(buf, ref offs);
+                    mDt.ReadByte(buf, ref offs);
                     Dispatcher.Invoke(() => {
-                        if (Date.sbArr != null)
-                            txtDate.Text = Txt.s._[(int)TxI.DATE] + Encoding.UTF8.GetString(Date.sbArr);
-                        else
+                        if (mDt.mDt.Year == ExamDate.INVALID)
                             txtDate.Text = "No connection";
+                        else
+                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.mDt.ToString("dd/MM/yyyy HH:mm");
                     });
                     mState = NetCode.Authenticating;
                     break;

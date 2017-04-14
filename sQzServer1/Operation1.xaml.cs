@@ -28,6 +28,7 @@ namespace sQzServer1
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
+        ExamDate mDt;
         Dictionary<int, TextBlock> vComp;
         Dictionary<int, TextBlock> vTime1;
         Dictionary<int, TextBlock> vTime2;
@@ -51,6 +52,8 @@ namespace sQzServer1
             mCbMsg = new UICbMsg();
             bRunning = true;
 
+            mDt = new ExamDate();
+
             vComp = new Dictionary<int, TextBlock>();
             vTime1 = new Dictionary<int, TextBlock>();
             vTime2 = new Dictionary<int, TextBlock>();
@@ -63,28 +66,6 @@ namespace sQzServer1
             aTimer.Elapsed += UpdateSrvrMsg;
             aTimer.AutoReset = true;
             aTimer.Enabled = true;
-        }
-
-        public byte[] ResponseMsg(char code)
-        {
-            byte[] msg = null;
-            switch (code)
-            {
-                case (char)NetCode.Dating:
-                    msg = Date.sbArr;//check null
-                    break;
-                case (char)NetCode.Authenticating:
-                    msg = null;
-                    break;
-                case (char)NetCode.ExamRetrieving:
-                    break;
-                case (char)NetCode.Submiting:
-                    break;
-                default:
-                    msg = BitConverter.GetBytes((char)NetCode.Unknown);
-                    break;
-            }
-            return msg;
         }
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
@@ -149,7 +130,9 @@ namespace sQzServer1
             switch (c)
             {
                 case NetCode.Dating:
-                    outMsg = Date.sbArr;
+                    outMsg = new byte[mDt.GetByteCount()];
+                    int offst = 0;
+                    mDt.ToByte(outMsg, ref offst);
                     break;
                 case NetCode.Authenticating:
                     string cname;
@@ -256,11 +239,12 @@ namespace sQzServer1
             switch (mState)
             {
                 case NetCode.DateStudentRetriving:
-                    Date.ReadByteArr(buf, ref offs);
+                    if (mDt.ReadByte(buf, ref offs))
+                        return false;
                     Examinee.ReadByteArr(buf, ref offs);
                     Dispatcher.Invoke(() => {
-                        if (Date.sbArr != null)
-                            txtDate.Text = Encoding.UTF8.GetString(Date.sbArr);
+                        if (mDt.mDt.Year != ExamDate.INVALID)
+                            txtDate.Text = mDt.mDt.ToString(ExamDate.FORM_H);
                         vComp.Clear();
                         vMark.Clear();
                         vTime1.Clear();

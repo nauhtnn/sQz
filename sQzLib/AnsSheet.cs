@@ -6,6 +6,13 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
+/*
+CREATE TABLE IF NOT EXISTS `anssh` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
+`neeIdx` SMALLINT(2) UNSIGNED, `ans` CHAR(120) CHARACTER SET `ansi`,
+PRIMARY KEY(`dateIdx`, `level`, `neeIdx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`)
+FOREIGN KEY(`neeIdx`) REFERENCES examinees(`idx`));
+*/
+
 namespace sQzLib
 {
     public class AnsItem: StackPanel

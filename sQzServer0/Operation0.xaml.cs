@@ -25,6 +25,7 @@ namespace sQzServer0
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
+        ExamDate mDt;
         Dictionary<int, TextBlock> vMark;
         QuestPack mQPack;
         AnsPack mAnsPack;
@@ -38,6 +39,7 @@ namespace sQzServer0
             vMark = new Dictionary<int, TextBlock>();
             mQPack = new QuestPack();
             mAnsPack = new AnsPack();
+            mDt = new ExamDate();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -58,15 +60,20 @@ namespace sQzServer0
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
             if (i == null)
                 return;
-            Date.Select((string)i.Content);
-            Examinee.DBSelect(Date.sDBIdx);
-            LoadStudents();
+            if (uint.TryParse(i.Name.Substring(1), out mDt.mIdx))
+            {
+                ExamDate.Parse((string)i.Content, ExamDate.FORM_H, out mDt.mDt);
+                Examinee.DBSelect(mDt.mIdx);
+                LoadStudents();
+            }
+            else
+                mDt.mIdx = uint.MaxValue;
         }
 
         private void LoadDates()
         {
-            Date.DBSelect();
-            if (0 < Date.svDate.Count)
+            Dictionary<uint, DateTime> v = mDt.DBSelect();
+            if (0 < v.Keys.Count)
             {
                 bool dark = true;
                 Color c = new Color();
@@ -74,14 +81,15 @@ namespace sQzServer0
                 c.B = c.G = c.R = 0xf0;
                 Dispatcher.Invoke(() => {
                     lbxDate.Items.Clear();
-                    foreach (string s in Date.svDate)
+                    foreach (uint i in v.Keys)
                     {
-                        ListBoxItem i = new ListBoxItem();
-                        i.Content = s;
+                        ListBoxItem it = new ListBoxItem();
+                        it.Content = v[i].ToString("dd/MM/yyyy HH:mm");
+                        it.Name = "_" + i;
                         dark = !dark;
                         if (dark)
-                            i.Background = new SolidColorBrush(c);
-                        lbxDate.Items.Add(i);
+                            it.Background = new SolidColorBrush(c);
+                        lbxDate.Items.Add(it);
                     }
                 });
             }
@@ -205,6 +213,8 @@ namespace sQzServer0
 
         private void btnExGen_Click(object sender, RoutedEventArgs e)
         {
+            if (mDt.mIdx == uint.MaxValue)
+                return;
 			TextBox t = (TextBox)FindName("tbxNe");
 			int n = 1;
             if (t != null && 0 < t.Text.Length && !int.TryParse(t.Text, out n))
@@ -212,9 +222,7 @@ namespace sQzServer0
             int[][] x = new int[2][];
             x[0] = QuestSheet.GetBasicIU();
             x[1] = QuestSheet.GetAdvanceIU();
-            uint[] qId = new uint[2];
-            qId[0] = 170412000;
-            qId[1] = 170412500;
+            ushort qid = 0;
 			while(0 < n) {
 				for(int i = 0; i < 2; ++i)
 				{
@@ -234,7 +242,7 @@ namespace sQzServer0
                     }
                     if (0 < qs.vQuest.Count)
                     {
-                        qs.mId = ++qId[i];
+                        qs.mId = ++qid;
                         mQPack.vSheet.Add(qs.mId, qs);
                     }
                 }
@@ -243,6 +251,7 @@ namespace sQzServer0
             foreach (QuestSheet qs in mQPack.vSheet.Values)
                 qs.ToByte();
             mAnsPack.ExtractKey(mQPack);
+            mQPack.DBIns(mDt.mIdx);
             LoadQuest();
         }
 
@@ -298,17 +307,14 @@ namespace sQzServer0
             {
                 case NetCode.DateStudentRetriving:
                     int sz = 0;
-                    if (Date.sbArr != null)
-                        sz += Date.sbArr.Length;
+                    if (mDt.mIdx == uint.MaxValue)
+                        return false;
+                    sz += mDt.GetByteCount();
                     if (Examinee.sbArr != null)
-                        sz += Examinee.sbArr.Length;
+                        sz += Examinee.sbArr.Length;//todo: safer
                     outMsg = new byte[sz];
                     sz = 0;
-                    if (Date.sbArr != null)
-                    {
-                        sz = Date.sbArr.Length;
-                        Buffer.BlockCopy(Date.sbArr, 0, outMsg, 0, sz);
-                    }
+                    mDt.ToByte(outMsg, ref sz);
                     if (Examinee.sbArr != null)
                         Buffer.BlockCopy(Examinee.sbArr, 0, outMsg, sz, Examinee.sbArr.Length);
                     break;

@@ -32,7 +32,7 @@ namespace sQzLib
                 server = "localhost";
                 database = "sQz";
                 uid = "root";
-                password = "1234";
+                password = "helloW1";
             }
             else
             {
@@ -148,23 +148,18 @@ namespace sQzLib
             return n;
         }
 
-        public static string mkQrySelect(string tb, string[] vAttb, string cdAttb,
-            string cdAttbVal, string[] vGpAttb)
+        public static string mkQrySelect(string tb, string attbs, string cond,
+            string[] vGpAttb)
         {
             string query = "SELECT";
             int lastIdx = 0;
-            if (vAttb == null)
-                query += " * ";
+            if (attbs == null)
+                query += " *";
             else
-            {
-                lastIdx = vAttb.Length - 1;
-                for (int i = 0; i < lastIdx; ++i)
-                    query += vAttb[i] + ",";
-                query += vAttb[lastIdx] + " ";
-            }
+                query += attbs;
             query += " FROM " + tb;
-            if (cdAttb != null && cdAttbVal != null)
-                query += " WHERE " + cdAttb + "=" + cdAttbVal;
+            if (cond != null)
+                query += " WHERE " + cond;
             if (vGpAttb != null)
             {
                 query += " GROUP BY ";

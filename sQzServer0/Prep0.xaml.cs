@@ -27,6 +27,7 @@ namespace sQzServer0
         IUxx mSelQCat;
         QuestSheet mDBQSh;
         QuestSheet mQSh;
+        ExamDate mDt;
 
         public Prep0()
         {
@@ -35,21 +36,22 @@ namespace sQzServer0
             mSelQCat = IUxx.IU00;
             mDBQSh = new QuestSheet();
             mQSh = new QuestSheet();
+            mDt = new ExamDate();
         }
 
         private void btnInsDate_Click(object sender, RoutedEventArgs e)
         {
-            if (Date.Chk224(tbxDate.Text))
+            if (!ExamDate.Parse(tbxDate.Text, ExamDate.FORM_H, out mDt.mDt))
             {
-                Date.DBInsert(tbxDate.Text);
+                mDt.DBInsert();
                 LoadDate();
             }
         }
 
         private void LoadDate()
         {
-            Date.DBSelect();
-            if(0 < Date.svDate.Count)
+            Dictionary<uint, DateTime> v = mDt.DBSelect();
+            if(0 < v.Keys.Count)
             {
                 bool dark = true;
                 Color c = new Color();
@@ -57,14 +59,15 @@ namespace sQzServer0
                 c.B = c.G = c.R = 0xf0;
                 Dispatcher.Invoke(() => {
                     lbxDate.Items.Clear();
-                    foreach (string s in Date.svDate)
+                    foreach (uint i in v.Keys)
                     {
-                        ListBoxItem i = new ListBoxItem();
-                        i.Content = s;
+                        ListBoxItem it = new ListBoxItem();
+                        it.Name = "_" + i;
+                        it.Content = v[i].ToString("dd/MM/yyyy HH:mm");
                         dark = !dark;
                         if (dark)
-                            i.Background = new SolidColorBrush(c);
-                        lbxDate.Items.Add(i);
+                            it.Background = new SolidColorBrush(c);
+                        lbxDate.Items.Add(it);
                     }
                 });
             }
@@ -150,10 +153,10 @@ namespace sQzServer0
 
         private void btnInsNee_Click(object sender, RoutedEventArgs e)
         {
-            if (Date.sDBIdx != uint.MaxValue)
+            if (mDt.mIdx != uint.MaxValue)
             {
                 lbxNewStu.Items.Clear();
-                Examinee.DBInsert(Date.sDBIdx);
+                Examinee.DBInsert(mDt.mIdx);
                 LoadExaminees(false);
             }
         }
@@ -164,9 +167,13 @@ namespace sQzServer0
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
             if (i == null)
                 return;
-            Date.Select((string)i.Content);
-            Examinee.DBSelect(Date.sDBIdx);
-            LoadExaminees(false);
+            if (uint.TryParse(i.Name.Substring(1), out mDt.mIdx))
+            {
+                Examinee.DBSelect(mDt.mIdx);
+                LoadExaminees(false);
+            }
+            else
+                mDt.mIdx = uint.MaxValue;
         }
 
         private void btnQBrowse_Click(object sender, RoutedEventArgs e)

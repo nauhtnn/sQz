@@ -48,7 +48,7 @@
     <Compile Include="AnsPack.cs" />
     <Compile Include="AnsSheet.cs" />
     <Compile Include="Client2.cs" />
-    <Compile Include="Date.cs" />
+    <Compile Include="ExamDate.cs" />
     <Compile Include="DBConnect.cs" />
     <Compile Include="Examinee.cs" />
     <Compile Include="QuestPack.cs" />

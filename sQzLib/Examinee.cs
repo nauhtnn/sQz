@@ -6,11 +6,11 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 /*
-CREATE TABLE IF NOT EXISTS `examinees` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
+CREATE TABLE IF NOT EXISTS `examinee` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
 `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
-`birthdate` CHAR(10) CHARACTER SET `ascii`, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
+`birthdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
 `dt1` TIME, `dt2` TIME, `mark` SMALLINT(2) UNSIGNED, 
-PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`));
+PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES date(`idx`));
 */
 
 namespace sQzLib
@@ -91,22 +91,22 @@ namespace sQzLib
             if (buf == null)
                 return;
             svExaminee.Clear();
-            string[] students = buf.Split('\n');
-            foreach (string stu in students)
+            string[] vs = buf.Split('\n');
+            foreach (string s in vs)
             {
-                Examinee stud = new Examinee();
-                string[] s = stu.Split('\t');
-                if (s.Length == 4) //todo: hardcode, unsafe
+                Examinee nee = new Examinee();
+                string[] v = s.Split('\t');
+                if (v.Length == 4) //todo: hardcode, unsafe
                 {
-                    if ((s[0])[0] == 'A')
-                        stud.mLvl = ExamLvl.Basis;
+                    if ((v[0])[0] == 'A')
+                        nee.mLvl = ExamLvl.Basis;
                     else
-                        stud.mLvl = ExamLvl.Advance;
-                    stud.mId = Convert.ToUInt16(s[0].Substring(1));
-                    stud.mName = s[1];
-                    stud.mBirthdate = s[2];
-                    stud.mBirthplace = s[3];
-                    svExaminee.Add(stud);
+                        nee.mLvl = ExamLvl.Advance;
+                    nee.mId = Convert.ToUInt16(v[0].Substring(1));
+                    nee.mName = v[1];
+                    nee.mBirthdate = v[2];
+                    nee.mBirthplace = v[3];
+                    svExaminee.Add(nee);
                 }
             }
             ToByteArr();
@@ -117,7 +117,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string qry = DBConnect.mkQrySelect("examinees", null, "dateIdx", "" + dateIdx, null);
+            string qry = DBConnect.mkQrySelect("examinee", null, "dateIdx=" + dateIdx, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             svExaminee.Clear();
             svLvId2Idx.Clear();
@@ -131,7 +131,7 @@ namespace sQzLib
                     s.mLvl = (ExamLvl)(reader.GetInt16(1));//hardcode
                     s.mId = reader.GetUInt16(2);
                     s.mName = reader.GetString(3);
-                    s.mBirthdate = reader.GetString(4);
+                    s.mBirthdate = reader.GetDateTime(4).ToString(ExamDate.FORM);
                     s.mBirthplace = reader.GetString(5);
                     if (reader.IsDBNull(6) || !DateTime.TryParse(reader.GetString(6), out s.mTime1))
                         s.mTime1 = DateTime.Parse("00:00");
@@ -150,6 +150,8 @@ namespace sQzLib
 
         public static void DBInsert(uint dateIdx)
         {
+            if (svExaminee == null || svExaminee.Count < 1)
+                return;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
@@ -161,11 +163,11 @@ namespace sQzLib
                 vals.Append((int)s.mLvl + ",");
                 vals.Append(s.mId + ",");
                 vals.Append("'" + s.mName + "',");
-                vals.Append("'" + s.mBirthdate + "',");
+                vals.Append("'" + ExamDate.ToMysqlForm(s.mBirthdate, ExamDate.FORM) + "',");
                 vals.Append("'" + s.mBirthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            DBConnect.Ins(conn, "examinees", attbs, vals.ToString());
+            DBConnect.Ins(conn, "examinee", attbs, vals.ToString());
             DBConnect.Close(ref conn);
         }
 
@@ -616,7 +618,7 @@ namespace sQzLib
             if (conn == null)
                 return;
 			foreach(Examinee nee in svExaminee) {
-				StringBuilder qry = new StringBuilder("UPDATE `examinees` SET ");
+				StringBuilder qry = new StringBuilder("UPDATE `examinee` SET ");
                 if (nee.mTime1.Hour != 0)
                 {
                     qry.Append("dt1='" + nee.mTime1.ToString("HH:mm") + "'");
