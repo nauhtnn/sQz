@@ -156,7 +156,7 @@ namespace sQzClient
                 case NetCode.ExamRetrieving:
                     offs = 0;
                     QuestSheet qs = new QuestSheet();
-                    qs.ReadByte(buf, ref offs, false);
+                    qs.ReadByte(buf, ref offs);
                     Dispatcher.Invoke(() =>
                     {
                         //NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));

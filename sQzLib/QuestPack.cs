@@ -6,59 +6,40 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    public class QuestShPack
+    public class QuestPack
     {
         public Dictionary<uint, QuestSheet> vSheet;
-        public QuestShPack()
+        public QuestPack()
         {
             vSheet = new Dictionary<uint, QuestSheet>();
         }
 
         //only Operation0 uses this.
         //optimization: return byte[] instead of List<byte[]>.
-        public byte[] ToByte(bool woKey)
+        public byte[] ToByte()
         {
-            woKey = false;
             List<byte[]> l = new List<byte[]>();
-            //List<bool> lk = new List<bool>();
-            //if(woKey)
-            //    lk.Add(false);
             l.Add(BitConverter.GetBytes(vSheet.Values.Count));//opt?
             foreach (QuestSheet qs in vSheet.Values)
-            {
-                foreach (byte[] i in qs.ToByte(woKey))
+                foreach (byte[] i in qs.ToByte())
                     l.Add(i);
-            }
             //join
             int sz = 0;
-            //int szk = 0;
             foreach (byte[] i in l)
-            {
                 sz += i.Length;
-                //if (woKey && lk[j])
-                //    szk += l[j].Length;
-            }
-            //if (woKey)
-            //    sbArr = new byte[sz - szk];
             byte[] r = new byte[sz];
             int offs = 0;
             foreach (byte[] i in l)
             {
                 Buffer.BlockCopy(i, 0, r, offs, i.Length);
-                //if (woKey && !lk[j])
-                //    Buffer.BlockCopy(l[j], 0, sbArr, offs, l[j].Length);
                 offs += i.Length;
             }
             return r;
-            //sRdywKey = true;
-            //if (woKey)
-            //    sRdy = true;
         }
 
         //only Operation1 uses this.
-        public void ReadByte(byte[] buf, ref int offs, bool wKey)
+        public void ReadByte(byte[] buf, ref int offs)
         {
-            wKey = true;
             vSheet.Clear();
             if (buf == null)
                 return;
@@ -74,10 +55,11 @@ namespace sQzLib
             while(0 < nSh)
             {
                 QuestSheet qs = new QuestSheet();
-                bool err = qs.ReadByte(buf, ref offs, wKey);
+                bool err = qs.ReadByte(buf, ref offs);
                 if (err)
                     break;
-                //if (!vSheet.TryGetValue(qs.mId, out qs))//todo safer
+                QuestSheet x;
+                if (!vSheet.TryGetValue(qs.mId, out x))
                     vSheet.Add(qs.mId, qs);
                 --nSh;
             }

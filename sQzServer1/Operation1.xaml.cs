@@ -34,9 +34,10 @@ namespace sQzServer1
         Dictionary<int, TextBlock> vMark;
         Dictionary<int, CheckBox> vLock;//supervisor side
         Dictionary<int, bool> vbLock;//examinee side
-        QuestShPack mQShPack;
+        QuestPack mQPack;
         int mQShIdx;
         int mQShMaxIdx;
+        AnsPack mAnsPack;
 
         public Operation1()
         {
@@ -142,7 +143,7 @@ namespace sQzServer1
             mServer.Stop(ref dummy);
         }
 
-        public bool SrvrCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg)
+        public bool SrvrCodeHndl(NetCode c, byte[] buf, int offs, ref byte[] outMsg)
         {
             QuestSheet qs;
             switch (c)
@@ -153,7 +154,7 @@ namespace sQzServer1
                 case NetCode.Authenticating:
                     string cname;
                     ExamLvl lv;
-                    int rid = Examinee.SrvrReadAuthArr(dat, offs, out lv, out cname);
+                    int rid = Examinee.SrvrReadAuthArr(buf, offs, out lv, out cname);
                     if (-1 < rid)
                     {
                         if (cname == null)
@@ -202,43 +203,25 @@ namespace sQzServer1
                     }
                     break;
                 case NetCode.ExamRetrieving:
-                    uint qshidx = mQShPack.vSheet.Keys.ElementAt(mQShIdx);
+                    uint qshidx = mQPack.vSheet.Keys.ElementAt(mQShIdx);
                     if (mQShMaxIdx < ++mQShIdx)
                         mQShIdx = 0;
-                    if(mQShPack.vSheet.TryGetValue(qshidx, out qs))
+                    if(mQPack.vSheet.TryGetValue(qshidx, out qs))
                         outMsg = qs.aQuest;
                     break;
                 case NetCode.Submiting:
-                    lv = (ExamLvl)BitConverter.ToInt32(dat, offs);
-                    offs += 4;
-                    uint id = BitConverter.ToUInt16(dat, offs);
-                    offs += 2;
-                    uint qid = BitConverter.ToUInt32(dat, offs);
-                    offs += 4;
-                    if (dat.Length - offs != 30 * 4)//hardcode
+                    ushort mark = 0;
+                    AnsSheet s = new AnsSheet();
+                    s.ReadByte(buf, ref offs);
+                    AnsSheet wKey;
+                    if(!mAnsPack.vSheet.TryGetValue(s.mId, out wKey))
                     {
                         outMsg = BitConverter.GetBytes(101);//todo
                         break;
                     }
-                    ushort mark = 0;
-                    int j, k;
-                    --offs;
-                    
-                    if(mQShPack.vSheet.TryGetValue(qid, out qs))
-                        foreach(Question q in qs.vQuest)
-                        {
-                            j = 0;
-                            k = offs;
-                            foreach (bool b in q.vKeys)
-                                if (dat[++k] != Convert.ToByte(b))
-                                    break;
-                                else
-                                    ++j;
-                            if (j == q.vKeys.Length)
-                                ++mark;
-                            offs += q.vKeys.Length;
-                        }
-                    int idx = (int)lv * (int)id;
+                    mark = wKey.Mark(s.aAns);
+                    //int idx = (int)lv * (int)id;
+                    int idx = (int)s.eLvl * s.mNeeId;
                     if (Examinee.svLvId2Idx.TryGetValue(idx, out rid))
                     {
                         Examinee.svExaminee[rid].mMark = mark;
@@ -353,16 +336,20 @@ namespace sQzServer1
                             gNee.Children.Add(t);
                         }
                     });
-                    mState = NetCode.QuestAnsKeyRetrieving;
+                    mState = NetCode.QuestRetrieving;
                     break;
-                case NetCode.QuestAnsKeyRetrieving:
+                case NetCode.QuestRetrieving:
                     offs = 0;
-                    mQShPack = new QuestShPack();
-                    mQShPack.ReadByte(buf, ref offs, true);
+                    mQPack = new QuestPack();
+                    mQPack.ReadByte(buf, ref offs);
                     mQShIdx = 0;
-                    mQShMaxIdx = mQShPack.vSheet.Keys.Count - 1;
+                    mQShMaxIdx = mQPack.vSheet.Keys.Count - 1;
                     LoadQuest();
-                    mState = NetCode.PrepMark;
+                    mState = NetCode.AnsKeyRetrieving;
+                    break;
+                case NetCode.AnsKeyRetrieving:
+                    mAnsPack = new AnsPack();
+                    mAnsPack.ReadByte(buf, ref offs);
                     return false;
             }
             return true;
@@ -387,7 +374,10 @@ namespace sQzServer1
                 case NetCode.DateStudentRetriving:
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
-                case NetCode.QuestAnsKeyRetrieving:
+                case NetCode.QuestRetrieving:
+                    outBuf = BitConverter.GetBytes((int)mState);
+                    break;
+                case NetCode.AnsKeyRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.SrvrSubmitting:
@@ -405,7 +395,7 @@ namespace sQzServer1
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
                 tbcQuest.Items.Clear();
-                foreach (QuestSheet qs in mQShPack.vSheet.Values)
+                foreach (QuestSheet qs in mQPack.vSheet.Values)
                 {
                     TabItem ti = new TabItem();
                     ti.Header = qs.mId;

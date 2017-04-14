@@ -26,7 +26,8 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         Dictionary<int, TextBlock> vMark;
-        QuestShPack mQShPack;
+        QuestPack mQPack;
+        AnsPack mAnsPack;
 
         public Operation0()
         {
@@ -35,7 +36,8 @@ namespace sQzServer0
             mServer = new Server2(SrvrCodeHndl);
             mCbMsg = new UICbMsg();
             vMark = new Dictionary<int, TextBlock>();
-            mQShPack = new QuestShPack();
+            mQPack = new QuestPack();
+            mAnsPack = new AnsPack();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -233,13 +235,14 @@ namespace sQzServer0
                     if (0 < qs.vQuest.Count)
                     {
                         qs.mId = ++qId[i];
-                        mQShPack.vSheet.Add(qs.mId, qs);
+                        mQPack.vSheet.Add(qs.mId, qs);
                     }
                 }
                 --n;
             }
-            foreach (QuestSheet qs in mQShPack.vSheet.Values)
-                qs.ToByte(false);
+            foreach (QuestSheet qs in mQPack.vSheet.Values)
+                qs.ToByte();
+            mAnsPack.ExtractKey(mQPack);
             LoadQuest();
         }
 
@@ -251,7 +254,7 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
 				tbcQuest.Items.Clear();
-				foreach(QuestSheet qs in mQShPack.vSheet.Values) {
+				foreach(QuestSheet qs in mQPack.vSheet.Values) {
 					TabItem ti = new TabItem();
 					ti.Header = qs.mId;
                     ScrollViewer svwr = new ScrollViewer();
@@ -309,11 +312,14 @@ namespace sQzServer0
                     if (Examinee.sbArr != null)
                         Buffer.BlockCopy(Examinee.sbArr, 0, outMsg, sz, Examinee.sbArr.Length);
                     break;
-                case NetCode.QuestAnsKeyRetrieving:
-                    //outMsg = Question.sbArr;
-                    outMsg = mQShPack.ToByte(false);
+                case NetCode.QuestRetrieving:
+                    outMsg = mQPack.ToByte();
+                    break;
+                case NetCode.AnsKeyRetrieving:
+                    outMsg = new byte[mAnsPack.GetByteCount()];
+                    offs = 0;
+                    mAnsPack.ToByte(ref outMsg, ref offs);
                     return false;
-                    //break;
                 case NetCode.SrvrSubmitting:
                     Examinee.ReadMarkArr(dat, ref offs);
 					Examinee.Update();

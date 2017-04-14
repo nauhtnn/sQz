@@ -14,7 +14,7 @@ namespace sQzLib
     }
     public class QuestSheet
     {
-        ExamLvl eLvl;
+        public ExamLvl eLvl;
         public uint mId;
         public List<Question> vQuest;
         public byte[] aQuest;
@@ -52,58 +52,34 @@ namespace sQzLib
 
         //only Optimization0 uses this.
         //optimization: return List<byte[]> instead of byte[]
-        public List<byte[]> ToByte(bool woKey)
+        public List<byte[]> ToByte()
         {
-            woKey = false;
             List<byte[]> l = new List<byte[]>();
-            //List<bool> lk = new List<bool>();
             l.Add(BitConverter.GetBytes(mId));
             l.Add(BitConverter.GetBytes(vQuest.Count));
             foreach (Question q in vQuest)
             {
                 //qType
                 //l.Add(BitConverter.GetBytes((int)q.qType));
-                //if (woKey)
-                //    lk.Add(false);
                 //stmt
                 byte[] b = Encoding.UTF8.GetBytes(q.mStmt);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
-                //if (woKey)
-                //{
-                //    lk.Add(false);
-                //    lk.Add(false);
-                //}
                 //ans
                 //l.Add(BitConverter.GetBytes(q.nAns));
-                //if (woKey)
-                //    lk.Add(false);
                 for (int j = 0; j < q.nAns; ++j)
                 {
                     //each ans
                     b = Encoding.UTF8.GetBytes(q.vAns[j]);
                     l.Add(BitConverter.GetBytes(b.Length));
                     l.Add(b);
-                    //if (woKey)
-                    //{
-                    //    lk.Add(false);
-                    //    lk.Add(false);
-                    //}
-                }
-                //keys
-                for (int j = 0; j < q.nAns; ++j)
-                {
-                    l.Add(BitConverter.GetBytes(q.vKeys[j]));
-                    //if (woKey)
-                    //    lk.Add(true);
                 }
             }
             return l;
         }
 
-        public bool ReadByte(byte[] buf, ref int offs, bool wKey)
+        public bool ReadByte(byte[] buf, ref int offs)
         {
-            wKey = true;
             if (buf == null)
                 return true;
             int offs0 = offs;
@@ -178,45 +154,20 @@ namespace sQzLib
                 }
                 if (err)
                     break;
-                //keys
-                if (wKey)
-                {
-                    if (l < q.nAns)
-                        break;
-                    q.vKeys = new bool[q.nAns];
-                    for (int j = 0; j < q.nAns; ++j)
-                        q.vKeys[j] = BitConverter.ToBoolean(buf, offs++);
-                    l -= q.nAns;
-                }
                 --nq;
                 vQuest.Add(q);
             }
-            if (wKey && !Array.Equals(buf, aQuest))
+            if (!Array.Equals(buf, aQuest))
             {
                 int sz = offs - offs0;
                 if (sz == buf.Length)
-                    aQuest = (byte[])buf.Clone();
+                    aQuest = buf.Clone() as byte[];
                 else
                 {
                     aQuest = new byte[sz];
                     Buffer.BlockCopy(buf, offs0, aQuest, 0, sz);
                 }
-                //sRdy = false;
-                //sRdywKey = true;
             }
-            //if (!wKey && !Array.Equals(buf, sbArr))
-            //{
-            //    sz = offs - offs0;
-            //    if (sz == buf.Length)
-            //        sbArr = (byte[])buf.Clone();
-            //    else
-            //    {
-            //        sbArr = new byte[sz];
-            //        Buffer.BlockCopy(buf, 0, sbArrwKey, 0, sz);
-            //    }
-            //    sRdy = true;
-            //    sRdywKey = false;
-            //}
             return err;
         }
 
@@ -234,7 +185,6 @@ namespace sQzLib
                 q = new Question();
             }
             q = null;
-            //sRdy = sRdywKey = false;
         }
 
         //only Server0 uses this.

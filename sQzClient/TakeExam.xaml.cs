@@ -15,9 +15,6 @@ namespace sQzClient
     /// </summary>
     public partial class TakeExam : Page
     {
-        Label[][] vlblAnsSh;
-        bool[][] vbAns;
-        byte[] mbAns;
         DateTime kDtStart;
         TimeSpan dtRemn;
         TimeSpan kDtDuration;
@@ -27,14 +24,14 @@ namespace sQzClient
 
         public QuestSheet mQSh;
 
-        List<ListBox> vLbx;
-
         Client2 mClnt;
         NetCode mState;
 
         public static double qaWh;
         double qiWh;
         Thickness qMrg;
+
+        AnsSheet mAnsSh;
 
         public TakeExam()
         {
@@ -43,7 +40,6 @@ namespace sQzClient
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
             bRunning = true;
-            vLbx = new List<ListBox>();
 
             txtWelcome.Text = Examinee.sAuthNee.ToString();
 
@@ -128,8 +124,10 @@ namespace sQzClient
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             int nAns = 4;//hardcode
             int i = 0, n = mQSh.vQuest.Count;
-            vlblAnsSh = new Label[n][];
-            vbAns = new bool[n][];
+            AnsItem.SInit(Window.GetWindow(this).FontSize);
+            mAnsSh = new AnsSheet();
+            mAnsSh.Init(mQSh, Examinee.sAuthNee.mId);
+            mAnsSh.InitView(mQSh, qaWh);
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
@@ -160,13 +158,11 @@ namespace sQzClient
             Grid.SetColumn(l, i);
             gAnsSh.Children.Add(l);
             //next lines
-            int j = 0;
-            foreach(Question q in mQSh.vQuest)
+            n -= 2;
+            int j = 1;
+            for (; j < n; ++j)
             {
                 gAnsSh.RowDefinitions.Add(new RowDefinition());
-                vlblAnsSh[j] = new Label[nAns];
-                vbAns[j] = new bool[nAns];
-                ++j;
                 l = new Label();
                 l.Content = j;
                 l.BorderBrush = brBK;
@@ -178,7 +174,7 @@ namespace sQzClient
                 gAnsSh.Children.Add(l);
                 for (i = 1; i < nAns; ++i)
                 {
-                    l = new Label();
+                    l = mAnsSh.vAnsItem[j - 1][i - 1].lbl;
                     l.BorderBrush = brBK;
                     l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
                     l.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -186,8 +182,6 @@ namespace sQzClient
                     Grid.SetRow(l, j);
                     Grid.SetColumn(l, i);
                     gAnsSh.Children.Add(l);
-                    vlblAnsSh[j - 1][i - 1] = l;
-                    vbAns[j - 1][i - 1] = false;
                 }
                 l = new Label();
                 l.BorderBrush = brBK;
@@ -196,13 +190,9 @@ namespace sQzClient
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, i);
                 gAnsSh.Children.Add(l);
-                vlblAnsSh[j - 1][nAns - 1] = l;
-                vbAns[j - 1][nAns - 1] = false;
             }
             //bottom lines
             gAnsSh.RowDefinitions.Add(new RowDefinition());
-            vlblAnsSh[j - 1] = new Label[nAns];
-            vbAns[j - 1] = new bool[nAns];
             l = new Label();
             l.Content = j;
             l.BorderBrush = brBK;
@@ -214,15 +204,13 @@ namespace sQzClient
             gAnsSh.Children.Add(l);
             for (i = 1; i < nAns; ++i)
             {
-                l = new Label();
+                l = mAnsSh.vAnsItem[j - 1][i - 1].lbl;
                 l.BorderBrush = brBK;
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.MB];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, i);
                 gAnsSh.Children.Add(l);
-                vlblAnsSh[j - 1][i - 1] = l;
-                vbAns[j - 1][i - 1] = false;
             }
             l = new Label();
             l.BorderBrush = brBK;
@@ -231,8 +219,6 @@ namespace sQzClient
             Grid.SetRow(l, j);
             Grid.SetColumn(l, i);
             gAnsSh.Children.Add(l);
-            vlblAnsSh[j - 1][nAns - 1] = l;
-            vbAns[j - 1][nAns - 1] = false;
 
             //for (j = Question.svQuest[0].Count; -1 < j; --j)
             //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
@@ -295,62 +281,14 @@ namespace sQzClient
             Thickness zero = new Thickness(0);
             stmtCon.Margin = stmtCon.Padding = zero;
             con.Children.Add(stmtCon);
-            ListBox answers = new ListBox();
-            answers.Width = qaWh;
-            answers.Name = "_" + idx;
-            //answers.HorizontalContentAlignment = HorizontalAlignment.Stretch;
-            answers.SelectionChanged += Ans_SelectionChanged;
-            for (int i = 0; i < quest.vAns.Length; ++i)
-            {
-                ListBoxItem ans = new ListBoxItem();
-                char aa = (char)('A' + i);
-                AnsItem ai = new AnsItem(quest.vAns[i], "" + aa);
-                ans.Content = ai;
-                ans.Name = "_" + i;
-                answers.Items.Add(ans);
-            }
-            answers.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
-            answers.BorderThickness = new Thickness(0, 4, 0, 0);
-            vLbx.Add(answers);
-            con.Children.Add(answers);
+            con.Children.Add(mAnsSh.vlbxAns[idx-1]);
             q.Children.Add(con);
             q.Background = Theme.s._[(int)BrushId.BG];
             return q;
         }
 
-        private void Ans_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ListBox l = (ListBox)sender;
-            if (l.SelectedItem == null)
-                return;
-            int qid = Convert.ToInt32(l.Name.Substring(1));
-            for(int i = 0, n = l.Items.Count; i < n; ++i)
-            {
-                ListBoxItem li = (ListBoxItem)l.Items[i];
-                if (li.IsSelected)
-                {
-                    vlblAnsSh[qid - 1][i].Content = 'X';
-                    vbAns[qid - 1][i] = true;
-                    AnsItem ai = (AnsItem)li.Content;
-                    ai.Selected();
-                }
-                else
-                {
-                    vlblAnsSh[qid - 1][i].Content = string.Empty;
-                    vbAns[qid - 1][i] = false;
-                    AnsItem ai = (AnsItem)li.Content;
-                    ai.Unselected();
-                }
-            }
-        }
-
         public void Submit()
         {
-            int n = vbAns.Length * 4, i = 0, k = 0; //hardcode
-            mbAns = new byte[n];
-            for (i = 0, k = 0, n = mQSh.vQuest.Count; i < n; ++i)
-                for (int j = 0; j < 4; ++j, ++k)//hardcode
-                    mbAns[k] = Convert.ToByte(vbAns[i][j]);
             mState = NetCode.Submiting;
             mClnt.ConnectWR(ref mCbMsg);
             DisableAll();
@@ -381,22 +319,13 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Submiting:
-                    int sz = 14 + mbAns.Length;
+                    int sz = 4 + mAnsSh.GetByteCount();
                     int offs = 0;
                     outBuf = new byte[sz];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState),
                         0, outBuf, offs, 4);
                     offs += 4;
-                    Buffer.BlockCopy(BitConverter.GetBytes((int)Examinee.sAuthNee.mLvl),
-                        0, outBuf, offs, 4);
-                    offs += 4;
-                    Buffer.BlockCopy(BitConverter.GetBytes(Examinee.sAuthNee.mId),
-                        0, outBuf, offs, 2);
-                    offs += 2;
-                    Buffer.BlockCopy(BitConverter.GetBytes(mQSh.mId),
-                        0, outBuf, offs, 4);
-                    offs += 4;
-                    Buffer.BlockCopy(mbAns, 0, outBuf, offs, mbAns.Length);
+                    mAnsSh.ToByte(ref outBuf, ref offs);
                     break;
                 case NetCode.Resubmit:
                     break;
@@ -430,8 +359,6 @@ namespace sQzClient
 
         private void DisableAll()
         {
-            foreach(ListBox lbx in vLbx)
-                lbx.IsEnabled = false;
             btnSubmit.IsEnabled = false;
             mTimer.Stop();
             btnExit.IsEnabled = true;
@@ -458,57 +385,6 @@ namespace sQzClient
             bRunning = false;
             WPopup.s.cncl = false;
             mClnt.Close();
-        }
-    }
-
-    public class AnsItem : StackPanel
-    {
-        public static CornerRadius sCr = new CornerRadius();
-        //public static Thickness sTh = new Thickness(4);
-        Border mB;
-        static bool sI = false;
-        public void SInit()
-        {
-            if(!sI)
-                sCr.BottomLeft = sCr.BottomRight = sCr.TopLeft = sCr.TopRight = 50;
-        }
-        
-        public AnsItem(string t, string i)
-        {
-            SInit();
-            Orientation = Orientation.Horizontal;
-            mB = new Border();
-            mB.Width = mB.Height = 30;
-            mB.CornerRadius = sCr;
-            //mB.BorderThickness = sTh;
-            mB.Background = Theme.s._[(int)BrushId.Q_BG];
-            TextBlock tb = new TextBlock();
-            tb.Text = i;
-            tb.Foreground = Theme.s._[(int)BrushId.QID_BG];
-            tb.VerticalAlignment = VerticalAlignment.Center;
-            tb.HorizontalAlignment = HorizontalAlignment.Center;
-            mB.Child = tb;
-            Children.Add(mB);
-            TextBlock ansTxt = new TextBlock();
-            ansTxt.Text = t;
-            ansTxt.TextWrapping = TextWrapping.Wrap;
-            ansTxt.Width = TakeExam.qaWh - mB.Width;//hardcode
-            ansTxt.VerticalAlignment = VerticalAlignment.Center;
-            Children.Add(ansTxt);
-        }
-
-        public void Selected()
-        {
-            mB.Background = Theme.s._[(int)BrushId.QID_BG];
-            TextBlock t = (TextBlock)mB.Child;
-            t.Foreground = Theme.s._[(int)BrushId.QID_Color];
-        }
-
-        public void Unselected()
-        {
-            mB.Background = Theme.s._[(int)BrushId.Q_BG];
-            TextBlock t = (TextBlock)mB.Child;
-            t.Foreground = Theme.s._[(int)BrushId.QID_BG];
         }
     }
 }
