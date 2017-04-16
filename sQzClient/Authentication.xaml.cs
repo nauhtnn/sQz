@@ -30,6 +30,7 @@ namespace sQzClient
         string mNeeId;
         string mBirdate;
         ExamDate mDt;
+        Examinee mNee;
 
         public Authentication()
         {
@@ -45,6 +46,7 @@ namespace sQzClient
             mNeeId = mBirdate = string.Empty;
 
             mDt = new ExamDate();
+            mNee = new Examinee();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -71,7 +73,7 @@ namespace sQzClient
             }
             ExamLvl lv = ExamLvl.Basis;
             ushort id = ushort.MaxValue;
-            if(!Examinee.ToID(mNeeId, ref lv, ref id))
+            if(!Examinee.ParseTxId(mNeeId, ref lv, ref id))
             {
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOTI]);
                 return;
@@ -136,7 +138,7 @@ namespace sQzClient
                     mState = NetCode.Authenticating;
                     break;
                 case NetCode.Authenticating:
-                    bool rs = Examinee.ClntReadAuthArr(buf, ref offs, out Examinee.sAuthNee);
+                    bool rs = mNee.ReadByteSgning(buf, ref offs);
                     l = buf.Length - offs;
                     if(rs)
                     {
@@ -165,6 +167,7 @@ namespace sQzClient
                         //NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
                         TakeExam tx = new TakeExam();
                         tx.mQSh = qs;
+                        tx.mNee = mNee;
                         NavigationService.Navigate(tx);
                     });
                     break;

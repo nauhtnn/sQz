@@ -21,7 +21,7 @@ namespace sQzLib
     public class QuestSheet
     {
         public ExamLvl eLvl;
-        public uint mId;
+        public ushort uId;
         public List<Question> vQuest;
         public byte[] aQuest;
 
@@ -32,7 +32,7 @@ namespace sQzLib
             eLvl = ExamLvl.Basis;
             vQuest = new List<Question>();
             aQuest = null;
-            mId = 0;
+            uId = 0;
         }
 
         public static int[] GetBasicIU()
@@ -61,7 +61,7 @@ namespace sQzLib
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(mId));
+            l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(vQuest.Count));
             foreach (Question q in vQuest)
             {
@@ -92,7 +92,7 @@ namespace sQzLib
             int l = buf.Length - offs;
             if (l < 4)
                 return true;
-            mId = BitConverter.ToUInt32(buf, offs);
+            uId = BitConverter.ToUInt16(buf, offs);
             offs += 4;
             l -= 4;
             if (l < 4)
@@ -212,7 +212,7 @@ namespace sQzLib
                 while (reader.Read())
                 {
                     Question q = new Question();
-                    q.mId = reader.GetUInt32(0);//hardcode
+                    q.uId = reader.GetUInt32(0);//hardcode
                     string[] s = reader.GetString(1).Split('\n');
                     q.mStmt = s[0];
                     q.nAns = 4;
@@ -290,7 +290,7 @@ namespace sQzLib
                         continue;
                     ++i;
                     Question q = new Question();
-                    q.mId = reader.GetUInt32(0);//hardcode
+                    q.uId = reader.GetUInt32(0);//hardcode
                     string[] s = reader.GetString(1).Split('\n');
                     q.mStmt = "(" + iu + ')' + s[0];
                     q.nAns = 4;
@@ -340,9 +340,9 @@ namespace sQzLib
 
         public void DBAppendInsQry(uint dateIdx, ref StringBuilder vals)
         {
-            vals.Append("(" + dateIdx + "," + (int)eLvl + "," + mId + ",'");
+            vals.Append("(" + dateIdx + "," + (int)eLvl + "," + uId + ",'");
             foreach(Question q in vQuest)
-                vals.Append(((short)q.mIU).ToString() + '_' + q.mId + '-');
+                vals.Append(((short)q.mIU).ToString() + '_' + q.uId + '-');
             vals.Remove(vals.Length - 1, 1);//remove the last '-'
             vals.Append("'),");
         }
@@ -383,7 +383,7 @@ namespace sQzLib
                         if(reader.Read())
                         {
                             Question q = new Question();
-                            q.mId = reader.GetUInt32(0);//hardcode
+                            q.uId = reader.GetUInt32(0);//hardcode
                             string[] s = reader.GetString(1).Split('\n');
                             q.mStmt = "(" + iuid[0] + ')' + s[0];
                             q.nAns = 4;

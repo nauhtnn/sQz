@@ -60,8 +60,8 @@ namespace sQzLib
                 if (err)
                     break;
                 QuestSheet x;
-                if (!vSheet.TryGetValue(qs.mId, out x))
-                    vSheet.Add(qs.mId, qs);
+                if (!vSheet.TryGetValue(qs.uId, out x))
+                    vSheet.Add(qs.uId, qs);
                 --nSh;
             }
         }
@@ -95,6 +95,17 @@ namespace sQzLib
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             DBConnect.Ins(conn, "questsh", "dateIdx,level,idx,vQuest", vals.ToString());//todo: catch exception
             DBConnect.Close(ref conn);
+        }
+
+        public ushort DBCurQSId(uint dtIdx, ExamLvl lv)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return 0;
+            ushort id = (ushort)DBConnect.Max(conn, "questsh", "idx",
+                    "dateIdx=" + dtIdx + " AND level=" + (short)lv);
+            DBConnect.Close(ref conn);
+            return id;
         }
     }
 }

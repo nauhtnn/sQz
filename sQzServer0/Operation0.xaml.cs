@@ -26,9 +26,11 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         ExamDate mDt;
-        Dictionary<int, TextBlock> vMark;
+        Dictionary<short, TextBlock> vMark;
         QuestPack mQPack;
         AnsPack mAnsPack;
+        ExamRoom mRoom;
+        ushort[] uQSId;
 
         public Operation0()
         {
@@ -36,10 +38,12 @@ namespace sQzServer0
             ShowsNavigationUI = false;
             mServer = new Server2(SrvrCodeHndl);
             mCbMsg = new UICbMsg();
-            vMark = new Dictionary<int, TextBlock>();
+            vMark = new Dictionary<short, TextBlock>();
             mQPack = new QuestPack();
             mAnsPack = new AnsPack();
             mDt = new ExamDate();
+            mRoom = new ExamRoom();
+            uQSId = new ushort[2];
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -60,14 +64,16 @@ namespace sQzServer0
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
             if (i == null)
                 return;
-            if (uint.TryParse(i.Name.Substring(1), out mDt.mIdx))
+            if (uint.TryParse(i.Name.Substring(1), out mDt.uId))
             {
                 ExamDate.Parse((string)i.Content, ExamDate.FORM_H, out mDt.mDt);
-                Examinee.DBSelect(mDt.mIdx);
+                mRoom.DBSelect(mDt.uId);
                 LoadStudents();
+                uQSId[0] = mQPack.DBCurQSId(mDt.uId, ExamLvl.Basis);
+                uQSId[1] = mQPack.DBCurQSId(mDt.uId, ExamLvl.Advance);
             }
             else
-                mDt.mIdx = uint.MaxValue;
+                mDt.uId = uint.MaxValue;
         }
 
         private void LoadDates()
@@ -105,33 +111,33 @@ namespace sQzServer0
                 int rid = 0;
                 vMark.Clear();
                 gNee.Children.Clear();
-                foreach (Examinee st in Examinee.svExaminee)
+                foreach (Examinee e in mRoom.vExaminee.Values)
                 {
                     RowDefinition rd = new RowDefinition();
                     rd.Height = new GridLength(20);
                     gNee.RowDefinitions.Add(rd);
                     TextBlock t = new TextBlock();
-                    t.Text = st.ID;
+                    t.Text = e.tId;
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     Grid.SetRow(t, rid);
                     gNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = st.mName;
+                    t.Text = e.tName;
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
                     gNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = st.mBirthdate;
+                    t.Text = e.tBirdate;
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 2);
                     gNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = st.mBirthplace;
+                    t.Text = e.tBirthplace;
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     Grid.SetRow(t, rid);
@@ -140,9 +146,9 @@ namespace sQzServer0
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
-                    vMark.Add((int)st.mLvl * st.mId, t);
-                    if(st.mMark != ushort.MaxValue)
-                        t.Text = st.mMark.ToString();
+                    vMark.Add((short)(e.Lvl * e.uId), t);
+                    if(e.uGrade != ushort.MaxValue)
+                        t.Text = e.uGrade.ToString();
                     Grid.SetRow(t, rid++);
                     Grid.SetColumn(t, 4);
                     gNee.Children.Add(t);
@@ -155,10 +161,10 @@ namespace sQzServer0
         {
             Dispatcher.Invoke(() => {
                 TextBlock t;
-                foreach (Examinee st in Examinee.svExaminee)
+                foreach (Examinee e in mRoom.vExaminee.Values)
                 {
-                    if(st.mMark != ushort.MaxValue && vMark.TryGetValue((int)st.mLvl * st.mId, out t))
-                        t.Text = "" + st.mMark;
+                    if(e.uGrade != ushort.MaxValue && vMark.TryGetValue((short)(e.Lvl * e.uId), out t))
+                        t.Text = "" + e.uGrade;
                 }
             });
         }
@@ -211,9 +217,14 @@ namespace sQzServer0
             mServer.Stop(ref mCbMsg);
         }
 
+        private void DBReadCurQSId()
+        {
+            
+        }
+
         private void btnExGen_Click(object sender, RoutedEventArgs e)
         {
-            if (mDt.mIdx == uint.MaxValue)
+            if (mDt.uId == uint.MaxValue)
                 return;
 			TextBox t = (TextBox)FindName("tbxNe");
 			int n = 1;
@@ -222,7 +233,6 @@ namespace sQzServer0
             int[][] x = new int[2][];
             x[0] = QuestSheet.GetBasicIU();
             x[1] = QuestSheet.GetAdvanceIU();
-            ushort qid = 0;
 			while(0 < n) {
 				for(int i = 0; i < 2; ++i)
 				{
@@ -242,8 +252,8 @@ namespace sQzServer0
                     }
                     if (0 < qs.vQuest.Count)
                     {
-                        qs.mId = ++qid;
-                        mQPack.vSheet.Add(qs.mId, qs);
+                        qs.uId = ++uQSId[i];
+                        mQPack.vSheet.Add(qs.uId, qs);
                     }
                 }
                 --n;
@@ -251,7 +261,7 @@ namespace sQzServer0
             foreach (QuestSheet qs in mQPack.vSheet.Values)
                 qs.ToByte();
             mAnsPack.ExtractKey(mQPack);
-            mQPack.DBIns(mDt.mIdx);
+            mQPack.DBIns(mDt.uId);
             LoadQuest();
         }
 
@@ -265,7 +275,7 @@ namespace sQzServer0
 				tbcQuest.Items.Clear();
 				foreach(QuestSheet qs in mQPack.vSheet.Values) {
 					TabItem ti = new TabItem();
-					ti.Header = qs.mId;
+					ti.Header = qs.uId;
                     ScrollViewer svwr = new ScrollViewer();
                     svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 					StackPanel sp = new StackPanel();
@@ -307,16 +317,17 @@ namespace sQzServer0
             {
                 case NetCode.DateStudentRetriving:
                     int sz = 0;
-                    if (mDt.mIdx == uint.MaxValue)
+                    if (mDt.uId == uint.MaxValue)
                         return false;
                     sz += mDt.GetByteCount();
-                    if (Examinee.sbArr != null)
-                        sz += Examinee.sbArr.Length;//todo: safer
+                    byte[] es = mRoom.ToByte();
+                    if(es != null)
+                        sz += es.Length;
                     outMsg = new byte[sz];
                     sz = 0;
                     mDt.ToByte(outMsg, ref sz);
-                    if (Examinee.sbArr != null)
-                        Buffer.BlockCopy(Examinee.sbArr, 0, outMsg, sz, Examinee.sbArr.Length);
+                    if (es != null)
+                        Buffer.BlockCopy(es, 0, outMsg, sz, es.Length);
                     break;
                 case NetCode.QuestRetrieving:
                     outMsg = mQPack.ToByte();
@@ -327,8 +338,8 @@ namespace sQzServer0
                     mAnsPack.ToByte(ref outMsg, ref offs);
                     return false;
                 case NetCode.SrvrSubmitting:
-                    Examinee.ReadMarkArr(dat, ref offs);
-					Examinee.Update();
+                    mRoom.ReadByteGrade(dat, ref offs);
+					mRoom.UpdateRs();
                     LoadMarks();
                     break;
                 default:

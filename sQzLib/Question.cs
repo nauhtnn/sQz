@@ -62,7 +62,7 @@ namespace sQzLib
 
     public class Question
     {
-        public uint mId;
+        public uint uId;
         public string mStmt; //statement
         public int nAns;
         public IUxx mIU;

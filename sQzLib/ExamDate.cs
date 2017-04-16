@@ -17,7 +17,7 @@ namespace sQzLib
     {
         public DateTime mDt;
         static CultureInfo sCultInfo = null;
-        public uint mIdx;
+        public uint uId;
         public const int INVALID = 2016;
         public const string FORM_H = "dd/MM/yyyy HH:mm";
         public const string FORM = "dd/MM/yyyy";
@@ -26,7 +26,7 @@ namespace sQzLib
         public ExamDate()
         {
             Parse("01/01/2016 01:00", FORM_H, out mDt);
-            mIdx = uint.MaxValue;
+            uId = uint.MaxValue;
         }
 
         public void DBInsert()

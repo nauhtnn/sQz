@@ -32,6 +32,7 @@ namespace sQzClient
         Thickness qMrg;
 
         AnsSheet mAnsSh;
+        public Examinee mNee;
 
         public TakeExam()
         {
@@ -41,11 +42,12 @@ namespace sQzClient
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            txtWelcome.Text = Examinee.sAuthNee.ToString();
+            //txtWelcome.Text = Examinee.sAuthNee.ToString();
 
             ShowsNavigationUI = false;
 
             mQSh = new QuestSheet();
+            mNee = new Examinee();
         }
 
         private void LoadTxt()
@@ -79,7 +81,7 @@ namespace sQzClient
 
             WPopup.nwIns(w);
 
-            string msg = Examinee.sAuthNee.ID + " (" + Examinee.sAuthNee.mName +
+            string msg = mNee.tId + " (" + mNee.tName +
                 ")" + Txt.s._[(int)TxI.AUTH_MSG];
             //Dispatcher.Invoke(() => {
                 WPopup.s.wpCb = ShowQuestion;
@@ -126,7 +128,7 @@ namespace sQzClient
             int i = 0, n = mQSh.vQuest.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
             mAnsSh = new AnsSheet();
-            mAnsSh.Init(mQSh, Examinee.sAuthNee.mId);
+            mAnsSh.Init(mQSh, mNee.uId);
             mAnsSh.InitView(mQSh, qaWh);
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());

@@ -45,8 +45,8 @@ namespace sQzLib
                 AnsSheet i = new AnsSheet();
                 i.ExtractKey(qs);
                 AnsSheet x;
-                if(!vSheet.TryGetValue(i.mId, out x))
-                    vSheet.Add(i.mId, i);
+                if(!vSheet.TryGetValue(i.uId, out x))
+                    vSheet.Add(i.uId, i);
             }
         }
 
@@ -70,8 +70,8 @@ namespace sQzLib
                 i.ReadByte(buf, ref offs);
                 //if (err)
                 //    break;
-                //if (!vSheet.TryGetValue(qs.mId, out qs))//todo safer
-                    vSheet.Add(i.mId, i);
+                //if (!vSheet.TryGetValue(qs.uId, out qs))//todo safer
+                    vSheet.Add(i.uId, i);
                 --nSh;
             }
         }

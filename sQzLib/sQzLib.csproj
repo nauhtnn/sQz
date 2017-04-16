@@ -51,6 +51,7 @@
     <Compile Include="ExamDate.cs" />
     <Compile Include="DBConnect.cs" />
     <Compile Include="Examinee.cs" />
+    <Compile Include="ExamRoom.cs" />
     <Compile Include="QuestPack.cs" />
     <Compile Include="QuestSheet.cs" />
     <Compile Include="FirewallHandler.cs" />

@@ -92,17 +92,17 @@ namespace sQzLib
         public ListBox[] vlbxAns;
         public AnsItem[][] vAnsItem;
         public byte[] aAns;
-        public uint mId;
+        public ushort uId;
         public ExamLvl eLvl;
-        public ushort mNeeId;
+        public ushort uNeeId;
 
         public AnsSheet() {}
 
         public void Init(QuestSheet qs, ushort neeId)
         {
-            mId = qs.mId;
+            uId = qs.uId;
             eLvl = qs.eLvl;
-            mNeeId = neeId;
+            uNeeId = neeId;
             aAns = new byte[qs.vQuest.Count * 4];//hardcode
             int i = -1;
             foreach (Question q in qs.vQuest)
@@ -117,6 +117,16 @@ namespace sQzLib
                     for(int j = 0; j < q.nAns; ++j)
                         aAns[i * 4 + j] = 0;
             }
+        }
+
+        public short Lvl
+        {
+            get { return (short)eLvl; }
+        }
+
+        public short Id
+        {
+            get { return (short)((short)eLvl * uId); }
         }
 
         public void InitView(QuestSheet qs, double w)
@@ -155,13 +165,13 @@ namespace sQzLib
         public void ToByte(ref byte[] buf, ref int offs)
         {
             //todo: check length for safety
-            Buffer.BlockCopy(BitConverter.GetBytes(mId),
+            Buffer.BlockCopy(BitConverter.GetBytes(uId),
                         0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes((int)eLvl),
+            Buffer.BlockCopy(BitConverter.GetBytes(Lvl),
                         0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes(mNeeId),
+            Buffer.BlockCopy(BitConverter.GetBytes(uNeeId),
                 0, buf, offs, 2);
             offs += 2;
             Buffer.BlockCopy(BitConverter.GetBytes(aAns.Length), 0, buf, offs, 4);
@@ -175,17 +185,17 @@ namespace sQzLib
             int l = buf.Length - offs;
             if (l < 4)
                 return;
-            mId = BitConverter.ToUInt32(buf, offs);
+            uId = BitConverter.ToUInt16(buf, offs);
             offs += 4;
             l -= 4;
             if (l < 4)
                 return;
-            eLvl = (ExamLvl)BitConverter.ToInt32(buf, offs);
+            eLvl = (ExamLvl)BitConverter.ToInt16(buf, offs);
             offs += 4;
             l -= 4;
             if (l < 2)
                 return;
-            mNeeId = BitConverter.ToUInt16(buf, offs);
+            uNeeId = BitConverter.ToUInt16(buf, offs);
             offs += 2;
             l -= 2;
             if (l < 4)
@@ -200,7 +210,7 @@ namespace sQzLib
             offs += sz;
         }
 
-        public ushort Mark(byte[] ans)
+        public ushort Grade(byte[] ans)
         {
             if (ans == null)
                 return 101;
@@ -226,7 +236,7 @@ namespace sQzLib
         //only Operation0 uses this.
         public void ExtractKey(QuestSheet qs)
         {
-            mId = qs.mId;
+            uId = qs.uId;
             if (qs.vQuest != null && qs.vQuest.First() != null && qs.vQuest.First().vKeys != null)
                 aAns = new byte[qs.vQuest.Count * 4];//hardcode
             else

@@ -59,13 +59,15 @@ namespace sQzServer0
 
         private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            lbxExam.Items.Clear();
+            spQSh.Children.Clear();
             ListBox l = (ListBox)sender;
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
             if (i == null)
                 return;
-            if (uint.TryParse(i.Name.Substring(1), out mDt.mIdx))
+            if (uint.TryParse(i.Name.Substring(1), out mDt.uId))
             {
-                List<int> v = mQPack.DBSelect(mDt.mIdx);
+                List<int> v = mQPack.DBSelect(mDt.uId);
                 foreach(int j in v)
                 {
                     ListBoxItem it = new ListBoxItem();
@@ -109,7 +111,7 @@ namespace sQzServer0
                     return;
             }
             mQSh = new QuestSheet();
-            mQSh.DBSelect(mDt.mIdx, lv, id);
+            mQSh.DBSelect(mDt.uId, lv, id);
 
             int x = 0;
             bool dark = true;

@@ -142,7 +142,33 @@ namespace sQzLib
             int n;
 
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            try { if (!int.TryParse(cmd.ExecuteScalar() + "", out n)) n = 0; }
+            try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
+            catch (MySqlException) { n = 0; }
+
+            return n;
+        }
+
+        //Max statement
+        public static int Max(MySqlConnection conn, string tb, string attb, string cond)
+        {
+            string query = "SELECT MAX(" + attb + ") FROM " + tb + " WHERE " + cond;
+            int n;
+
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
+            catch (MySqlException) { n = 0; }
+
+            return n;
+        }
+
+        //Min statement
+        public static int Min(MySqlConnection conn, string tb, string attb, string cond)
+        {
+            string query = "SELECT MIN(" + attb + ") FROM " + tb + " WHERE " + cond;
+            int n;
+
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
             catch (MySqlException) { n = 0; }
 
             return n;

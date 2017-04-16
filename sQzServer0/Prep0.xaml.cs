@@ -28,6 +28,7 @@ namespace sQzServer0
         QuestSheet mDBQSh;
         QuestSheet mQSh;
         ExamDate mDt;
+        ExamRoom mRoom;
 
         public Prep0()
         {
@@ -37,6 +38,7 @@ namespace sQzServer0
             mDBQSh = new QuestSheet();
             mQSh = new QuestSheet();
             mDt = new ExamDate();
+            mRoom = new ExamRoom();
         }
 
         private void btnInsDate_Click(object sender, RoutedEventArgs e)
@@ -123,7 +125,7 @@ namespace sQzServer0
                 else
                     l = lbxStudent;
                 l.Items.Clear();
-                foreach (Examinee s in Examinee.svExaminee)
+                foreach (Examinee s in mRoom.vExaminee.Values)
                 {
                     ListBoxItem i = new ListBoxItem();
                     i.Content = s.ToString();
@@ -147,16 +149,16 @@ namespace sQzServer0
             string filePath = null;
             if (result == true)
                 filePath = dlg.FileName;
-            Examinee.ReadTxt(Utils.ReadFile(filePath));
+            mRoom.ReadTxt(Utils.ReadFile(filePath));
             LoadExaminees(true);
         }
 
         private void btnInsNee_Click(object sender, RoutedEventArgs e)
         {
-            if (mDt.mIdx != uint.MaxValue)
+            if (mDt.uId != uint.MaxValue)
             {
                 lbxNewStu.Items.Clear();
-                Examinee.DBInsert(mDt.mIdx);
+                mRoom.DBInsert(mDt.uId);
                 LoadExaminees(false);
             }
         }
@@ -167,13 +169,13 @@ namespace sQzServer0
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
             if (i == null)
                 return;
-            if (uint.TryParse(i.Name.Substring(1), out mDt.mIdx))
+            if (uint.TryParse(i.Name.Substring(1), out mDt.uId))
             {
-                Examinee.DBSelect(mDt.mIdx);
+                mRoom.DBSelect(mDt.uId);
                 LoadExaminees(false);
             }
             else
-                mDt.mIdx = uint.MaxValue;
+                mDt.uId = uint.MaxValue;
         }
 
         private void btnQBrowse_Click(object sender, RoutedEventArgs e)
@@ -223,7 +225,7 @@ namespace sQzServer0
 					RowDefinition rd = new RowDefinition();
 					g.RowDefinitions.Add(rd);
                     g.Children.Add(chk);
-                    vQId.Add(q.mId);
+                    vQId.Add(q.uId);
                     vChk.Add(chk);
                 }
             });

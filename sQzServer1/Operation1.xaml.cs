@@ -29,12 +29,13 @@ namespace sQzServer1
         UICbMsg mCbMsg;
         bool bRunning;
         ExamDate mDt;
-        Dictionary<int, TextBlock> vComp;
-        Dictionary<int, TextBlock> vTime1;
-        Dictionary<int, TextBlock> vTime2;
-        Dictionary<int, TextBlock> vMark;
-        Dictionary<int, CheckBox> vLock;//supervisor side
-        Dictionary<int, bool> vbLock;//examinee side
+        ExamRoom mRoom;
+        Dictionary<short, TextBlock> vComp;
+        Dictionary<short, TextBlock> vTime1;
+        Dictionary<short, TextBlock> vTime2;
+        Dictionary<short, TextBlock> vMark;
+        Dictionary<short, CheckBox> vLock;//supervisor side
+        Dictionary<short, bool> vbLock;//examinee side
         QuestPack mQPack;
         int mQShIdx;
         int mQShMaxIdx;
@@ -53,13 +54,14 @@ namespace sQzServer1
             bRunning = true;
 
             mDt = new ExamDate();
+            mRoom = new ExamRoom();
 
-            vComp = new Dictionary<int, TextBlock>();
-            vTime1 = new Dictionary<int, TextBlock>();
-            vTime2 = new Dictionary<int, TextBlock>();
-            vMark = new Dictionary<int, TextBlock>();
-            vLock = new Dictionary<int, CheckBox>();
-            vbLock = new Dictionary<int, bool>();
+            vComp = new Dictionary<short, TextBlock>();
+            vTime1 = new Dictionary<short, TextBlock>();
+            vTime2 = new Dictionary<short, TextBlock>();
+            vMark = new Dictionary<short, TextBlock>();
+            vLock = new Dictionary<short, CheckBox>();
+            vbLock = new Dictionary<short, bool>();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -127,6 +129,8 @@ namespace sQzServer1
         public bool SrvrCodeHndl(NetCode c, byte[] buf, int offs, ref byte[] outMsg)
         {
             QuestSheet qs;
+            short lvid;
+            Examinee e;
             switch (c)
             {
                 case NetCode.Dating:
@@ -135,43 +139,38 @@ namespace sQzServer1
                     mDt.ToByte(outMsg, ref offst);
                     break;
                 case NetCode.Authenticating:
-                    string cname;
-                    ExamLvl lv;
-                    int rid = Examinee.SrvrReadAuthArr(buf, offs, out lv, out cname);
-                    if (-1 < rid)
+                    e = mRoom.ReadByteSgning(buf, offs);
+                    if (e != null)
                     {
-                        if (cname == null)
-                            cname = "";
-                        Examinee ee = Examinee.svExaminee[rid];
                         bool lck;
-                        if (!vbLock.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out lck))
+                        if (!vbLock.TryGetValue((short)(e.Lvl * e.uId), out lck))
                             lck = false;//err, default value benefits examinees
                         if (!lck)
                         {
-                            ee.mTime1 = DateTime.Now;
-                            ee.mComp = cname;
+                            e.dtTim1 = DateTime.Now;
                             Dispatcher.Invoke(() =>
                             {
                                 TextBlock t;
-                                if (vComp.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
-                                    t.Text = cname;
-                                if (vTime1.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out t))
-                                    t.Text = ee.mTime1.ToString("HH:mm");
+                                lvid = (short)(e.Lvl * e.uId);
+                                if (vComp.TryGetValue(lvid, out t))
+                                    t.Text = e.tComp;
+                                if (vTime1.TryGetValue(lvid, out t))
+                                    t.Text = e.dtTim1.ToString("HH:mm");
                                 CheckBox cbx;
-                                if (vLock.TryGetValue((int)lv * Examinee.svExaminee[rid].mId, out cbx))
+                                if (vLock.TryGetValue(lvid, out cbx))
                                 {
                                     cbx.IsChecked = true;
                                     cbx.IsEnabled = true;
                                 }
-                                if (vbLock.Keys.Contains((int)lv * Examinee.svExaminee[rid].mId))
-                                    vbLock[(int)lv * Examinee.svExaminee[rid].mId] = true;
+                                if (vbLock.Keys.Contains(lvid))
+                                    vbLock[lvid] = true;
                             });
-                            Examinee.SrvrToAuthArr(rid, out outMsg);
+                            e.ToByte(out outMsg);
                         }
                         else
                         {
                             string msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
-                                ee.mTime1.ToString("HH:mm dd/MM/yyyy") + Txt.s._[(int)TxI.SIGNIN_AL_2] + ee.mComp + ".";
+                                e.dtTim1.ToString("HH:mm dd/MM/yyyy") + Txt.s._[(int)TxI.SIGNIN_AL_2] + e.tComp + ".";
                             byte[] b = Encoding.UTF8.GetBytes(msg);
                             outMsg = new byte[5 + b.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
@@ -193,40 +192,38 @@ namespace sQzServer1
                         outMsg = qs.aQuest;
                     break;
                 case NetCode.Submiting:
-                    ushort mark = 0;
                     AnsSheet s = new AnsSheet();
                     s.ReadByte(buf, ref offs);
                     AnsSheet wKey;
-                    if(!mAnsPack.vSheet.TryGetValue(s.mId, out wKey))
+                    if(!mAnsPack.vSheet.TryGetValue(s.uId, out wKey))
                     {
                         outMsg = BitConverter.GetBytes(101);//todo
                         break;
                     }
-                    mark = wKey.Mark(s.aAns);
-                    //int idx = (int)lv * (int)id;
-                    int idx = (int)s.eLvl * s.mNeeId;
-                    if (Examinee.svLvId2Idx.TryGetValue(idx, out rid))
+                    ushort grade = wKey.Grade(s.aAns);
+                    lvid = (short)(s.Lvl * s.uNeeId);
+                    if (mRoom.vExaminee.TryGetValue(lvid, out e))
                     {
-                        Examinee.svExaminee[rid].mMark = mark;
-                        Examinee.svExaminee[rid].mTime2 = DateTime.Now;
-                        if (vbLock.Keys.Contains(idx))
-                            vbLock[idx] = true;
+                        e.uGrade = grade;
+                        e.dtTim2 = DateTime.Now;
+                        if (vbLock.Keys.Contains(lvid))
+                            vbLock[lvid] = true;
                         Dispatcher.Invoke(() =>
                         {
                             TextBlock t = null;
-                            if (vTime2.TryGetValue(idx, out t))//todo
-                                t.Text = Examinee.svExaminee[rid].mTime2.ToString("HH:mm");
-                            if (vMark.TryGetValue(idx, out t))
-                                t.Text = mark.ToString();
+                            if (vTime2.TryGetValue(lvid, out t))//todo
+                                t.Text = e.dtTim2.ToString("HH:mm");
+                            if (vMark.TryGetValue(lvid, out t))
+                                t.Text = grade.ToString();
                             CheckBox cbx;
-                            if (vLock.TryGetValue(idx, out cbx))
+                            if (vLock.TryGetValue(lvid, out cbx))
                             {
                                 cbx.IsChecked = true;
                                 cbx.IsEnabled = false;
                             }
                         });
                     }
-                    outMsg = BitConverter.GetBytes(mark);
+                    outMsg = BitConverter.GetBytes(grade);
                     break;
                 default:
                     return false;
@@ -241,7 +238,7 @@ namespace sQzServer1
                 case NetCode.DateStudentRetriving:
                     if (mDt.ReadByte(buf, ref offs))
                         return false;
-                    Examinee.ReadByteArr(buf, ref offs);
+                    mRoom.ReadByte(buf, ref offs);
                     Dispatcher.Invoke(() => {
                         if (mDt.mDt.Year != ExamDate.INVALID)
                             txtDate.Text = mDt.mDt.ToString(ExamDate.FORM_H);
@@ -250,71 +247,71 @@ namespace sQzServer1
                         vTime1.Clear();
                         vTime2.Clear();
                         int rid = 0;
-                        foreach (Examinee nee in Examinee.svExaminee)
+                        foreach (Examinee e in mRoom.vExaminee.Values)
                         {
                             RowDefinition rd = new RowDefinition();
                             rd.Height = new GridLength(20);
                             gNee.RowDefinitions.Add(rd);
                             TextBlock t = new TextBlock();
-                            t.Text = nee.ID;
+                            t.Text = e.tId;
                             Grid.SetRow(t, ++rid);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            t.Text = nee.mName;
+                            t.Text = e.tName;
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 1);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            t.Text = nee.mBirthdate;
+                            t.Text = e.tBirdate;
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 2);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            int idx = (int)nee.mLvl * nee.mId;
-                            vComp.Add(idx, t);
+                            short lvid = (short)(e.Lvl * e.uId);
+                            vComp.Add(lvid, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 3);
                             gNee.Children.Add(t);
                             CheckBox cbx = new CheckBox();
-                            if (idx < 0)
-                                cbx.Name = "n" + (-idx);
+                            if (lvid < 0)
+                                cbx.Name = "n" + (-lvid);
                             else
-                                cbx.Name = "p" + idx;
+                                cbx.Name = "p" + lvid;
                             cbx.Unchecked += cbxLock_Unchecked;
                             cbx.IsEnabled = true;//default value empowers supervisors
                             Grid.SetRow(cbx, rid);
                             Grid.SetColumn(cbx, 7);
-                            vLock.Add(idx, cbx);
+                            vLock.Add(lvid, cbx);
                             gNee.Children.Add(cbx);
                             t = new TextBlock();
-                            if (nee.mTime1.Hour != 0)
+                            if (e.dtTim1.Hour != 0)
                             {
-                                t.Text = nee.mTime1.ToString("HH:mm");
-                                vbLock.Add(idx, true);
+                                t.Text = e.dtTim1.ToString("HH:mm");
+                                vbLock.Add(lvid, true);
                             }
                             else
                             {
-                                vbLock.Add(idx, false);
+                                vbLock.Add(lvid, false);
                                 cbx.IsEnabled = false;
                             }
-                            vTime1.Add(idx, t);
+                            vTime1.Add(lvid, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 4);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            if (nee.mTime2.Hour != 0)
-                                t.Text = nee.mTime2.ToString("HH:mm");
-                            vTime2.Add(idx, t);
+                            if (e.dtTim2.Hour != 0)
+                                t.Text = e.dtTim2.ToString("HH:mm");
+                            vTime2.Add(lvid, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 5);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            if (nee.mMark != ushort.MaxValue)
+                            if (e.uGrade != ushort.MaxValue)
                             {
-                                t.Text = nee.mMark.ToString();
+                                t.Text = e.uGrade.ToString();
                                 cbx.IsEnabled = false;
                             }
-                            vMark.Add(idx, t);
+                            vMark.Add(lvid, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 6);
                             gNee.Children.Add(t);
@@ -342,11 +339,11 @@ namespace sQzServer1
         private void cbxLock_Unchecked(object sender, RoutedEventArgs e)
         {
             CheckBox cbx = sender as CheckBox;
-            int key;
-            if (int.TryParse(cbx.Name.Substring(1), out key))
+            short key;
+            if (short.TryParse(cbx.Name.Substring(1), out key))
             {
                 if (cbx.Name[0] == 'n')
-                    key = -key;
+                    key = (short)-key;
                 vbLock[key] = false;//todo: safer
             }
         }
@@ -365,7 +362,7 @@ namespace sQzServer1
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.SrvrSubmitting:
-                    Examinee.ToMarkArr(BitConverter.GetBytes((int)mState), out outBuf);
+                    mRoom.ToByteGrade(BitConverter.GetBytes((int)mState), out outBuf);
                     break;
             }
             return true;
@@ -382,7 +379,7 @@ namespace sQzServer1
                 foreach (QuestSheet qs in mQPack.vSheet.Values)
                 {
                     TabItem ti = new TabItem();
-                    ti.Header = qs.mId;
+                    ti.Header = qs.uId;
                     ScrollViewer svwr = new ScrollViewer();
                     svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
                     StackPanel sp = new StackPanel();
