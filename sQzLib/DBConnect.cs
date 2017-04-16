@@ -151,10 +151,10 @@ namespace sQzLib
         public static string mkQrySelect(string tb, string attbs, string cond,
             string[] vGpAttb)
         {
-            string query = "SELECT";
+            string query = "SELECT ";
             int lastIdx = 0;
             if (attbs == null)
-                query += " *";
+                query += "*";
             else
                 query += attbs;
             query += " FROM " + tb;

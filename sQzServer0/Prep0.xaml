@@ -13,6 +13,7 @@
             <TextBox x:Name="tbxDate" Height="60" Width="160" />
             <Button x:Name="btnInsDate"  Content="Insert Date" Height="60" Width="100" Click="btnInsDate_Click"/>
             <Button x:Name="btnNeeBrowse" Content="Browse Examinee" Height="60" Width="160" Click="btnNeeBrowse_Click" HorizontalAlignment="Right"/>
+            <Button Content="history" Click="btnHistory_Click"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
             <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto">

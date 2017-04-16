@@ -1,0 +1,22 @@
+﻿<Page x:Class="sQzServer0.ExamHistory"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:sQzServer0"
+      mc:Ignorable="d" 
+      d:DesignHeight="720" d:DesignWidth="1280"
+      Title="ExamHistory">
+
+    <StackPanel Orientation="Horizontal" Margin="10,5,10,0" Loaded="Main_Loaded">
+        <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto">
+            <ListBox x:Name="lbxDate" Width="200" SelectionChanged="lbxDate_SelectionChanged"/>
+        </ScrollViewer>
+        <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
+            <ListBox x:Name="lbxExam" Width="200" SelectionChanged="lbxExam_SelectionChanged"/>
+        </ScrollViewer>
+        <ScrollViewer Width="840" Height="700" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
+            <StackPanel x:Name="spQSh"/>
+        </ScrollViewer>
+    </StackPanel>
+</Page>

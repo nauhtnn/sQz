@@ -91,7 +91,7 @@ namespace sQzLib
                 return;
             StringBuilder vals = new StringBuilder();
             foreach (QuestSheet qs in vSheet.Values)
-                qs.DBMkInsQry(dateIdx, ref vals);
+                qs.DBAppendInsQry(dateIdx, ref vals);
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             DBConnect.Ins(conn, "questsh", "dateIdx,level,idx,vQuest", vals.ToString());//todo: catch exception
             DBConnect.Close(ref conn);

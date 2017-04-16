@@ -288,5 +288,13 @@ namespace sQzServer0
                 ShowQuest(true);
             }
         }
+
+        private void btnHistory_Click(object sender, RoutedEventArgs e)
+        {
+            Dispatcher.Invoke(() =>
+            {
+                NavigationService.Navigate(new Uri("ExamHistory.xaml", UriKind.Relative));
+            });
+        }
     }
 }

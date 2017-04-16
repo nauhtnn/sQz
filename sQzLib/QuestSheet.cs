@@ -338,33 +338,69 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public void DBMkInsQry(uint dateIdx, ref StringBuilder vals)
+        public void DBAppendInsQry(uint dateIdx, ref StringBuilder vals)
         {
-            vals.Append("(" + dateIdx + "," + (int)eLvl + "," + mId + ",");
+            vals.Append("(" + dateIdx + "," + (int)eLvl + "," + mId + ",'");
             foreach(Question q in vQuest)
-                vals.Append(q.mId + "|");
-            vals.Remove(vals.Length - 1, 1);//remove the last '|'
-            vals.Append("),");
+                vals.Append(((short)q.mIU).ToString() + '_' + q.mId + '-');
+            vals.Remove(vals.Length - 1, 1);//remove the last '-'
+            vals.Append("'),");
         }
 
-        public void DBSelect(uint dateIdx, ExamLvl lv, ushort idx)
+        public void DBSelect(uint dateIdx, short lv, ushort idx)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
             StringBuilder cond = new StringBuilder();
             cond.Append("dateIdx=" + dateIdx);
-            cond.Append(" AND level=" + (int)lv);
+            cond.Append(" AND level=" + lv);
             cond.Append(" AND idx=" + idx);
-            string qry = DBConnect.mkQrySelect("questsh", "quest", cond.ToString(), null);
+            string qry = DBConnect.mkQrySelect("questsh", "vquest", cond.ToString(), null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            List<int> r = new List<int>();
+            string qIds = null;
             if (reader != null && reader.Read())
             {
-                r.Add(reader.GetInt16(0) * reader.GetUInt16(1));
+                qIds = reader.GetString(0);
                 reader.Close();
             }
-            DBConnect.Close(ref conn);
+            if (qIds == null)
+            {
+                DBConnect.Close(ref conn);
+                return;
+            }
+            vQuest.Clear();
+            string[] vQId = qIds.Split('-');
+            foreach(string qid in vQId)
+            {
+                string[] iuid = qid.Split('_');
+                if(iuid.Length == 2)
+                {
+                    qry = DBConnect.mkQrySelect("quest" + iuid[0], null, "idx=" + iuid[1], null);
+                    reader = DBConnect.exeQrySelect(conn, qry);
+                    if (reader != null)
+                    {
+                        if(reader.Read())
+                        {
+                            Question q = new Question();
+                            q.mId = reader.GetUInt32(0);//hardcode
+                            string[] s = reader.GetString(1).Split('\n');
+                            q.mStmt = "(" + iuid[0] + ')' + s[0];
+                            q.nAns = 4;
+                            q.vAns = new string[4];
+                            for (int k = 0; k < 4; ++k)
+                                q.vAns[k] = s[k + 1];
+                            string x = reader.GetString(2);
+                            q.vKeys = new bool[4];
+                            for (int k = 0; k < 4; ++k)
+                                q.vKeys[k] = (x[k] == '1');
+                            q.mIU = (IUxx)int.Parse(iuid[0]);
+                            vQuest.Add(q);
+                        }
+                        reader.Close();
+                    }
+                }
+            }
         }
     }
 }
