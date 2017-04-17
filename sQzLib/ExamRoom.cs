@@ -27,15 +27,21 @@ namespace sQzLib
                 string[] v = s.Split('\t');
                 if (v.Length == 4) //todo: hardcode, unsafe
                 {
-                    if ((v[0])[0] == 'C')
+                    if (v[0].Length < 3)
+                        continue;
+                    if (v[0][0] == 'C' && v[0][1] == 'B')
                         nee.eLvl = ExamLvl.Basis;
-                    else
+                    else if (v[0][0] == 'N' && v[0][1] == 'C')
                         nee.eLvl = ExamLvl.Advance;
-                    nee.uId = Convert.ToUInt16(v[0].Substring(1));
-                    nee.tName = v[1];
-                    nee.tBirdate = v[2];
-                    nee.tBirthplace = v[3];
-                    vExaminee.Add((short)(nee.Lvl * nee.uId), nee);
+                    else
+                        continue;
+                    if (ushort.TryParse(v[0].Substring(2), out nee.uId))
+                    {
+                        nee.tName = v[1];
+                        nee.tBirdate = v[2];
+                        nee.tBirthplace = v[3];
+                        vExaminee.Add((short)(nee.Lvl * nee.uId), nee);
+                    }
                 }
             }
         }

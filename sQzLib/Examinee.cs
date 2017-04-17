@@ -76,9 +76,9 @@ namespace sQzLib
         {
             StringBuilder s = new StringBuilder();
             if (eLvl == ExamLvl.Basis)
-                s.Append('A');
+                s.Append("CB");
             else
-                s.Append('B');
+                s.Append("NC");
             s.AppendFormat("{0}, {1}, {2}, ", uId, tName, tBirdate);
             s.Append(tBirthplace);
             return s.ToString();
