@@ -9,7 +9,7 @@ using MySql.Data.MySqlClient;
 CREATE TABLE IF NOT EXISTS `examinee` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
 `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birthdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
-`dt1` TIME, `dt2` TIME, `mark` SMALLINT(2) UNSIGNED, 
+`dt1` TIME, `dt2` TIME, `grade` SMALLINT(2) UNSIGNED, `comp` VARCHAR(32),
 PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES date(`idx`));
 */
 
@@ -32,6 +32,7 @@ namespace sQzLib
         public Examinee() {
             uGrade = ushort.MaxValue;
             dtTim1 = dtTim2 = DateTime.Parse("2016/01/01");
+            tComp = null;
         }
         public string tId {
             get {
@@ -119,72 +120,6 @@ namespace sQzLib
                 Buffer.BlockCopy(b, 0, buf, offs, b.Length);
             }
         }
-        
-        public bool ReadByteSgning(byte[] buf, ref int offs)
-        {
-            int l = buf.Length - offs;
-            if (l < 2)
-                return false;
-            Lvl = BitConverter.ToInt16(buf, offs);
-            l -= 2;
-            offs += 2;
-            if (l < 2)
-                return false;
-            uId = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
-            if (l < 4)
-                return false;
-            int sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return false;
-            tName = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
-            if (l < 4)
-                return false;
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return false;
-            tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
-            if (l < 4)
-                return false;
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return false;
-            tBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
-
-            l -= sz;
-            offs += sz;
-            if (l < 4)
-                return false;
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return false;
-            DateTime.TryParse(Encoding.UTF8.GetString(buf, offs, sz), out dtTim1);
-
-            l -= sz;
-            offs += sz;
-            if (l < 4)
-                return false;
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return false;
-            tComp = Encoding.UTF8.GetString(buf, offs, sz);
-            return true;
-        }
 
         public List<byte[]> ToByte()
         {
@@ -207,6 +142,14 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
             l.Add(BitConverter.GetBytes(uGrade));
+            if(tComp == null)
+                l.Add(BitConverter.GetBytes(0));
+            else
+            {
+                b = Encoding.UTF8.GetBytes(tComp);
+                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(b);
+            }
             return l;
         }
 
@@ -297,6 +240,85 @@ namespace sQzLib
             uGrade = BitConverter.ToUInt16(buf, offs);
             l -= 2;
             offs += 2;
+            if (l < 4)
+                return true;
+            sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (0 < sz)
+            {
+                tComp = Encoding.UTF8.GetString(buf, offs, sz);
+                offs += sz;
+            }
+            return false;
+        }
+
+        public List<byte[]> ToByteGrade()
+        {
+            List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(Lvl));
+            l.Add(BitConverter.GetBytes(uId));
+            l.Add(BitConverter.GetBytes(dtTim1.Hour));
+            l.Add(BitConverter.GetBytes(dtTim1.Minute));
+            l.Add(BitConverter.GetBytes(dtTim2.Hour));
+            l.Add(BitConverter.GetBytes(dtTim2.Minute));
+            l.Add(BitConverter.GetBytes(uGrade));
+            if (tComp == null)
+                l.Add(BitConverter.GetBytes(0));
+            else
+            {
+                byte[] b = Encoding.UTF8.GetBytes(tComp);
+                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(b);
+            }
+            return l;
+        }
+
+        public bool ReadByteGrade2(byte[] buf, ref int offs)
+        {
+            int l = buf.Length - offs;
+            if (l < 4)
+                return true;
+            int h = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (l < 4)
+                return true;
+            int m = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            string t = "" + h.ToString("d2") + ":" + m.ToString("d2");
+            if (!DateTime.TryParse(t, out dtTim1))
+                dtTim1 = DateTime.Parse("00:00");
+            if (l < 4)
+                return true;
+            h = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (l < 4)
+                return true;
+            m = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (!DateTime.TryParse(h.ToString("d2") + ':' + m.ToString("d2"), out dtTim2))
+                dtTim2 = DateTime.Parse("00:00");
+            if (l < 2)
+                return true;
+            uGrade = BitConverter.ToUInt16(buf, offs);
+            l -= 2;
+            offs += 2;
+            if (l < 4)
+                return true;
+            int sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if(0 < sz)
+            {
+                if (l < sz)
+                    return true;
+                tComp = Encoding.UTF8.GetString(buf, offs, sz);
+                offs += sz;
+            }
             return false;
         }
     }

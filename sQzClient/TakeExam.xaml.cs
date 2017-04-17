@@ -307,9 +307,9 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Submiting:
-                    ushort mark = BitConverter.ToUInt16(buf, offs);
-                    //txtRs.Text = Txt.s._[(int)TxI.RESULT] + mark;
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.RESULT] + mark);
+                    ushort grade = BitConverter.ToUInt16(buf, offs);
+                    //txtRs.Text = Txt.s._[(int)TxI.RESULT] + grade;
+                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.RESULT] + grade);
                     return false;
             }
             return true;

@@ -71,6 +71,8 @@ namespace sQzLib
                         s.dtTim2 = DateTime.Parse("00:00");
                     if (!reader.IsDBNull(8))
                         s.uGrade = reader.GetUInt16(8);
+                    if (!reader.IsDBNull(9))
+                        s.tComp = reader.GetString(9);
                     vExaminee.Add((short)(s.Lvl * s.uId), s);
                 }
                 reader.Close();
@@ -142,7 +144,7 @@ namespace sQzLib
             }
         }
 
-        public void UpdateRs()
+        public void DBUpdateRs()
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -157,7 +159,9 @@ namespace sQzLib
                     {
                         qry.Append(",dt2='" + e.dtTim2.ToString("HH:mm") + "'");
                         if (e.uGrade != short.MaxValue)
-                            qry.Append(",mark=" + e.uGrade);
+                            qry.Append(",grade=" + e.uGrade);
+                        if (e.tComp != null)
+                            qry.Append(",comp='" + e.tComp + "'");
                     }
                     qry.Append(" WHERE dateIdx=" + e.uDtId +
                         " AND level=" + (int)e.eLvl + " AND idx=" + e.uId);
@@ -211,15 +215,8 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(vExaminee.Count));
             foreach (Examinee e in vExaminee.Values)
-            {
-                l.Add(BitConverter.GetBytes(e.Lvl));
-                l.Add(BitConverter.GetBytes(e.uId));
-                l.Add(BitConverter.GetBytes(e.dtTim1.Hour));
-                l.Add(BitConverter.GetBytes(e.dtTim1.Minute));
-                l.Add(BitConverter.GetBytes(e.dtTim2.Hour));
-                l.Add(BitConverter.GetBytes(e.dtTim2.Minute));
-                l.Add(BitConverter.GetBytes(e.uGrade));
-            }
+                foreach (byte[] b in e.ToByteGrade())
+                    l.Add(b);
             //join
             int sz = 0;
             if (prefix != null)
@@ -266,37 +263,7 @@ namespace sQzLib
                 Examinee e;
                 if (!vExaminee.TryGetValue((short)(lv * id), out e))
                     continue;
-                if (l < 4)
-                    return;
-                int h = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                if (l < 4)
-                    return;
-                int m = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                string t = "" + h.ToString("d2") + ":" + m.ToString("d2");
-                if (!DateTime.TryParse(t, out e.dtTim1))
-                    e.dtTim1 = DateTime.Parse("00:00");
-                if (l < 4)
-                    return;
-                h = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                if (l < 4)
-                    return;
-                m = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                if (!DateTime.TryParse(h.ToString("d2") + ':' + m.ToString("d2"), out e.dtTim2))
-                    e.dtTim2 = DateTime.Parse("00:00");
-                if (l < 2)
-                    return;
-                ushort mark = BitConverter.ToUInt16(buf, offs);
-                l -= 2;
-                offs += 2;
-                e.uGrade = mark;
+                e.ReadByteGrade2(buf, ref offs);
             }
         }
     }

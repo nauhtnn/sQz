@@ -8,9 +8,9 @@ using System.Windows.Controls;
 
 /*
 CREATE TABLE IF NOT EXISTS `anssh` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
-`neeIdx` SMALLINT(2) UNSIGNED, `ans` CHAR(120) CHARACTER SET `ansi`,
-PRIMARY KEY(`dateIdx`, `level`, `neeIdx`), FOREIGN KEY(`dateIdx`) REFERENCES dates(`idx`)
-FOREIGN KEY(`neeIdx`) REFERENCES examinees(`idx`));
+`neeIdx` SMALLINT(2) UNSIGNED, `ans` CHAR(120) CHARACTER SET `utf8`,
+PRIMARY KEY(`dateIdx`, `level`, `neeIdx`), FOREIGN KEY(`dateIdx`) REFERENCES date(`idx`),
+FOREIGN KEY(`neeIdx`) REFERENCES examinee(`idx`));
 */
 
 namespace sQzLib
@@ -218,7 +218,7 @@ namespace sQzLib
                 return 102;
             if (ans.Length != aAns.Length)
                 return 103;
-            ushort mark = 0;
+            ushort grade = 0;
             int offs = 0;
             while(offs < aAns.Length)
             {
@@ -227,10 +227,10 @@ namespace sQzLib
                     if (ans[offs] != aAns[offs])
                         break;
                 if (offs == offs2)
-                    ++mark;
+                    ++grade;
                 offs = offs2;
             }
-            return mark;
+            return grade;
         }
 
         //only Operation0 uses this.

@@ -154,13 +154,24 @@ namespace sQzClient
                     {
                         if (l < 4)
                             break;
-                        int sz = BitConverter.ToInt32(buf, offs);
+                        int errc = BitConverter.ToInt32(buf, offs);
                         offs += 4;
                         l -= 4;
-                        string txt = Encoding.UTF8.GetString(buf, offs, sz);
-                        Dispatcher.Invoke(() => {
-                            WPopup.s.ShowDialog(txt);
-                        });
+                        string msg = null;
+                        if (errc == (int)TxI.SIGNIN_AL_1)
+                        {
+                            if (!mNee.ReadByte(buf, ref offs))
+                            {
+                                msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
+                                    mNee.dtTim1.ToString("HH:mm dd/MM/yyyy") + Txt.s._[(int)TxI.SIGNIN_AL_2] + mNee.tComp + ".";
+                            }
+                        }
+                        else if (errc == (int)TxI.SIGNIN_NO)
+                            msg = Txt.s._[(int)TxI.SIGNIN_NO];
+                        if(msg != null)
+                            Dispatcher.Invoke(() => {
+                                WPopup.s.ShowDialog(msg);
+                            });
                     }
                     break;
                 case NetCode.ExamRetrieving:

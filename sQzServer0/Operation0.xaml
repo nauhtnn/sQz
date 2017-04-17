@@ -13,7 +13,7 @@
             <ScrollViewer Width="100" Height="320" VerticalScrollBarVisibility="Auto">
                 <ListBox x:Name="lbxDate" Width="100"/>
             </ScrollViewer>
-            <ScrollViewer Width="516" Height="320" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Width="776" Height="320" VerticalScrollBarVisibility="Auto">
                 <StackPanel>
                     <Grid>
                         <Grid.ColumnDefinitions>
@@ -22,6 +22,9 @@
                             <ColumnDefinition Width="80"/>
                             <ColumnDefinition Width="140"/>
                             <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
@@ -30,7 +33,10 @@
                         <TextBlock x:Name="txtName" Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
                         <TextBlock x:Name="txtBirdate" Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
                         <TextBlock x:Name="txtBirpl" Grid.Column="3" Text="Birthplace" Background="Gold" TextAlignment="Center"/>
-                        <TextBlock x:Name="txtMark" Grid.Column="4" Text="Mark" Background="Azure" TextAlignment="Center"/>
+                        <TextBlock x:Name="txtGrade" Grid.Column="4" Text="Grade" Background="Azure" TextAlignment="Center"/>
+                        <TextBlock x:Name="txtDt1" Grid.Column="5" Text="Dt1" Background="Azure" TextAlignment="Center"/>
+                        <TextBlock x:Name="txtDt2" Grid.Column="6" Text="Dt2" Background="Azure" TextAlignment="Center"/>
+                        <TextBlock x:Name="txtComp" Grid.Column="7" Text="Comp" Background="Azure" TextAlignment="Center"/>
                     </Grid>
                     <Grid x:Name="gNee">
                         <Grid.ColumnDefinitions>
@@ -39,6 +45,9 @@
                             <ColumnDefinition Width="80"/>
                             <ColumnDefinition Width="140"/>
                             <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="140"/>
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </StackPanel>

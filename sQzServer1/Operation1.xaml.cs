@@ -173,18 +173,20 @@ namespace sQzServer1
                         }
                         else
                         {
-                            string msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
-                                e.dtTim1.ToString("HH:mm dd/MM/yyyy") + Txt.s._[(int)TxI.SIGNIN_AL_2] + e.tComp + ".";
-                            byte[] b = Encoding.UTF8.GetBytes(msg);
-                            outMsg = new byte[5 + b.Length];
+                            byte[] a;
+                            e.ToByte(out a);
+                            outMsg = new byte[5 + a.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
-                            Buffer.BlockCopy(BitConverter.GetBytes(b.Length), 0, outMsg, 1, 4);
-                            Buffer.BlockCopy(b, 0, outMsg, 5, b.Length);
+                            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL_1), 0, outMsg, 1, 4);
+                            Buffer.BlockCopy(a, 0, outMsg, 5, a.Length);
+                            return false;//close
                         }
                     }
                     else
                     {
-                        outMsg = BitConverter.GetBytes(false);
+                        outMsg = new byte[5];
+                        Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
+                        Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NO), 0, outMsg, 1, 4);
                         return false;//close
                     }
                     break;

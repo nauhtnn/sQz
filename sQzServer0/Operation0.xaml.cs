@@ -26,7 +26,10 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         ExamDate mDt;
-        Dictionary<short, TextBlock> vMark;
+        Dictionary<short, TextBlock> vGrade;
+        Dictionary<short, TextBlock> vDt1;
+        Dictionary<short, TextBlock> vDt2;
+        Dictionary<short, TextBlock> vComp;
         QuestPack mQPack;
         AnsPack mAnsPack;
         ExamRoom mRoom;
@@ -38,7 +41,10 @@ namespace sQzServer0
             ShowsNavigationUI = false;
             mServer = new Server2(SrvrCodeHndl);
             mCbMsg = new UICbMsg();
-            vMark = new Dictionary<short, TextBlock>();
+            vGrade = new Dictionary<short, TextBlock>();
+            vDt1 = new Dictionary<short, TextBlock>();
+            vDt2 = new Dictionary<short, TextBlock>();
+            vComp = new Dictionary<short, TextBlock>();
             mQPack = new QuestPack();
             mAnsPack = new AnsPack();
             mDt = new ExamDate();
@@ -68,7 +74,7 @@ namespace sQzServer0
             {
                 ExamDate.Parse((string)i.Content, ExamDate.FORM_H, out mDt.mDt);
                 mRoom.DBSelect(mDt.uId);
-                LoadStudents();
+                LoadExaminees();
                 uQSId[0] = mQPack.DBCurQSId(mDt.uId, ExamLvl.Basis);
                 uQSId[1] = mQPack.DBCurQSId(mDt.uId, ExamLvl.Advance);
             }
@@ -101,18 +107,22 @@ namespace sQzServer0
             }
         }
 
-        private void LoadStudents() //same as Prep0.xaml
+        private void LoadExaminees() //same as Prep0.xaml
         {
             Dispatcher.Invoke(() => {
                 Color c = new Color();
                 c.A = 0xff;
                 c.B = c.G = c.R = 0xf0;
                 bool dark = false;
-                int rid = 0;
-                vMark.Clear();
+                int rid = -1;
+                vGrade.Clear();
+                vDt1.Clear();
+                vDt2.Clear();
+                vComp.Clear();
                 gNee.Children.Clear();
                 foreach (Examinee e in mRoom.vExaminee.Values)
                 {
+                    rid++;
                     RowDefinition rd = new RowDefinition();
                     rd.Height = new GridLength(20);
                     gNee.RowDefinitions.Add(rd);
@@ -146,25 +156,58 @@ namespace sQzServer0
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
-                    vMark.Add((short)(e.Lvl * e.uId), t);
+                    vGrade.Add((short)(e.Lvl * e.uId), t);
                     if(e.uGrade != ushort.MaxValue)
                         t.Text = e.uGrade.ToString();
-                    Grid.SetRow(t, rid++);
+                    Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
+                    gNee.Children.Add(t);
+                    t = new TextBlock();
+                    if (dark)
+                        t.Background = new SolidColorBrush(c);
+                    vDt1.Add((short)(e.Lvl * e.uId), t);
+                    if (e.dtTim1.Year != ExamDate.INVALID)
+                        t.Text = e.dtTim1.ToString("HH:mm");
+                    Grid.SetRow(t, rid);
+                    Grid.SetColumn(t, 5);
+                    gNee.Children.Add(t);
+                    t = new TextBlock();
+                    if (dark)
+                        t.Background = new SolidColorBrush(c);
+                    vDt2.Add((short)(e.Lvl * e.uId), t);
+                    if (e.dtTim2.Year != ExamDate.INVALID)
+                        t.Text = e.dtTim2.ToString("HH:mm");
+                    Grid.SetRow(t, rid);
+                    Grid.SetColumn(t, 6);
+                    gNee.Children.Add(t);
+                    t = new TextBlock();
+                    if (dark)
+                        t.Background = new SolidColorBrush(c);
+                    vComp.Add((short)(e.Lvl * e.uId), t);
+                    if (e.tComp != null)
+                        t.Text = e.tComp;
+                    Grid.SetRow(t, rid);
+                    Grid.SetColumn(t, 7);
                     gNee.Children.Add(t);
                     dark = !dark;
                 }
             });
         }
 
-        private void LoadMarks()
+        private void UpdateRs()
         {
             Dispatcher.Invoke(() => {
                 TextBlock t;
                 foreach (Examinee e in mRoom.vExaminee.Values)
                 {
-                    if(e.uGrade != ushort.MaxValue && vMark.TryGetValue((short)(e.Lvl * e.uId), out t))
+                    if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue((short)(e.Lvl * e.uId), out t))
                         t.Text = "" + e.uGrade;
+                    if (e.dtTim1.Hour != ExamDate.INVALID && vDt1.TryGetValue((short)(e.Lvl * e.uId), out t))
+                        t.Text = e.dtTim1.ToString("HH:mm");
+                    if (e.dtTim2.Hour != ExamDate.INVALID && vDt2.TryGetValue((short)(e.Lvl * e.uId), out t))
+                        t.Text = e.dtTim2.ToString("HH:mm");
+                    if (e.tComp != null && vComp.TryGetValue((short)(e.Lvl * e.uId), out t))
+                        t.Text = e.tComp;
                 }
             });
         }
@@ -339,8 +382,8 @@ namespace sQzServer0
                     return false;
                 case NetCode.SrvrSubmitting:
                     mRoom.ReadByteGrade(dat, ref offs);
-					mRoom.UpdateRs();
-                    LoadMarks();
+					mRoom.DBUpdateRs();
+                    UpdateRs();
                     break;
                 default:
                     outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
@@ -405,7 +448,7 @@ namespace sQzServer0
             txtBirpl.Text = t._[(int)TxI.BIRPL];
             txtName.Text = t._[(int)TxI.NEE_NAME];
             txtId.Text = t._[(int)TxI.NEEID_S];
-            txtMark.Text = t._[(int)TxI.MARK];
+            txtGrade.Text = t._[(int)TxI.MARK];
         }
     }
 }
