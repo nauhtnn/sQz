@@ -29,10 +29,10 @@
                 </ScrollViewer>
             </StackPanel>
             <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1020" Height="540" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
-                <Grid x:Name="gQuest" Width="1020">
+                <Grid x:Name="gQuest" Width="1000">
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="510"/>
-                        <ColumnDefinition Width="510"/>
+                        <ColumnDefinition Width="500"/>
+                        <ColumnDefinition Width="500"/>
                     </Grid.ColumnDefinitions>
                 </Grid>
             </ScrollViewer>

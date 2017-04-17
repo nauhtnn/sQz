@@ -75,8 +75,8 @@ namespace sQzClient
 
             LoadTxt();
 
-            //double rt = spMain.RenderSize.Width / 1280;
-            //spMain.RenderTransform = new ScaleTransform(rt, rt);
+            double rt = spMain.RenderSize.Width / 1280;
+            spMain.RenderTransform = new ScaleTransform(rt, rt);
 
             WPopup.nwIns(w);
 
@@ -184,7 +184,7 @@ namespace sQzClient
                     Grid.SetColumn(l, i);
                     gAnsSh.Children.Add(l);
                 }
-                l = new Label();
+                l = l = mAnsSh.vAnsItem[j - 1][i - 1].lbl;
                 l.BorderBrush = brBK;
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -213,7 +213,7 @@ namespace sQzClient
                 Grid.SetColumn(l, i);
                 gAnsSh.Children.Add(l);
             }
-            l = new Label();
+            l = mAnsSh.vAnsItem[j - 1][i - 1].lbl;
             l.BorderBrush = brBK;
             l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -227,28 +227,24 @@ namespace sQzClient
 
         void InitQuestPanel()
         {
-            Grid qs = new Grid();
-            qs.Background = Theme.s._[(int)BrushId.Q_BG];
-            qs.ColumnDefinitions.Add(new ColumnDefinition());
-            qs.ColumnDefinitions.Add(new ColumnDefinition());
+            gQuest.Background = Theme.s._[(int)BrushId.Q_BG];
             int n = mQSh.vQuest.Count;
             for (int i = 1, j = 0; i <= n; i += 2, ++j)
             {
-                qs.RowDefinitions.Add(new RowDefinition());
+                gQuest.RowDefinitions.Add(new RowDefinition());
                 StackPanel q = CreateQuestion(i);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 0);
-                qs.Children.Add(q);
+                gQuest.Children.Add(q);
             }
             for (int i = 2, j = 0; i <= n; i += 2, ++j)
             {
                 StackPanel q = CreateQuestion(i);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 1);
-                qs.Children.Add(q);
+                gQuest.Children.Add(q);
             }
-            qs.Background = Theme.s._[(int)BrushId.BG];
-            svwrQSh.Content = qs;
+            gQuest.Background = Theme.s._[(int)BrushId.BG];
         }
 
         StackPanel CreateQuestion(int idx)
@@ -309,6 +305,7 @@ namespace sQzClient
                 case NetCode.Submiting:
                     ushort grade = BitConverter.ToUInt16(buf, offs);
                     //txtRs.Text = Txt.s._[(int)TxI.RESULT] + grade;
+                    btnSubmit.Content = grade;
                     WPopup.s.ShowDialog(Txt.s._[(int)TxI.RESULT] + grade);
                     return false;
             }

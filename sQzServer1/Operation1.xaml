@@ -11,16 +11,16 @@
     <StackPanel x:Name="spMain" Loaded="spMain_Loaded">
         <TextBlock x:Name="txtDate" Text="Connecting..." HorizontalAlignment="Center"></TextBlock>
         <StackPanel Orientation="Horizontal" Margin="10">
-            <ScrollViewer x:Name="svwrStt" Width="300" Height="600" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer x:Name="svwrStt" Width="240" Height="600" VerticalScrollBarVisibility="Auto">
                 <TextBlock x:Name="lblStatus" Width="240" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
             </ScrollViewer>
-            <ScrollViewer Width="760" Height="600" VerticalScrollBarVisibility="Auto">
+            <ScrollViewer Width="710" Height="600" VerticalScrollBarVisibility="Auto">
                 <Grid x:Name="gNee">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40"/>
-                        <ColumnDefinition Width="180"/>
+                        <ColumnDefinition Width="150"/>
                         <ColumnDefinition Width="80"/>
-                        <ColumnDefinition Width="140"/>
+                        <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="100"/>
                         <ColumnDefinition Width="60"/>
@@ -39,7 +39,7 @@
                     <TextBlock Grid.Column="7" Text="Lock" Background="Azure" TextAlignment="Center"/>
                 </Grid>
             </ScrollViewer>
-            <TabControl x:Name="tbcQuest" Width="260" Height="600"/>
+            <TabControl x:Name="tbcQuest" Width="300" Height="600"/>
         </StackPanel>
         <StackPanel Orientation="Horizontal">
             <Button x:Name="btnConnect" Content="Connect srvr" Click="btnConnect_Click"  Width="80"/>

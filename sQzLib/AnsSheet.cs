@@ -18,6 +18,7 @@ namespace sQzLib
     public class AnsItem: StackPanel
     {
         public static CornerRadius sCr;
+        public const double HARDCODEW = 420;
         static double sW;
         Border mB;
 
@@ -31,8 +32,9 @@ namespace sQzLib
             sW = w;
         }
 
-        public AnsItem(string txt, int idx)
+        public AnsItem(string txt, int idx, double w)
         {
+            w -= 10;//alignment
             StackPanel sp = new StackPanel();
             sp.Orientation = Orientation.Horizontal;
             mB = new Border();
@@ -49,12 +51,13 @@ namespace sQzLib
             TextBlock ansTxt = new TextBlock();
             ansTxt.Text = txt;
             ansTxt.TextWrapping = TextWrapping.Wrap;
-            ansTxt.Width = 470;// TakeExam.qaWh - mB.Width;//hardcode
+            ansTxt.Width = w - mB.Width;
             ansTxt.VerticalAlignment = VerticalAlignment.Center;
             sp.Children.Add(ansTxt);
 
             mLbxItem = new ListBoxItem();
             mLbxItem.Content = sp;
+            mLbxItem.Padding = new Thickness(0);
             mLbxItem.Name = "_" + idx.ToString();
 
             mLbl = new Label();
@@ -140,7 +143,7 @@ namespace sQzLib
             {
                 ++idx;
                 ListBox lbxAns = new ListBox();
-                lbxAns.Width = w;// qaWh;
+                lbxAns.Width = w;
                 lbxAns.Name = "_" + idx;
                 lbxAns.SelectionChanged += Ans_SelectionChanged;
                 lbxAns.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
@@ -150,7 +153,7 @@ namespace sQzLib
                 vAnsItem[aidx] = new AnsItem[q.vAns.Length];
                 for (int i = 0; i < q.vAns.Length; ++i)
                 {
-                    AnsItem ai = new AnsItem(q.vAns[i], i);
+                    AnsItem ai = new AnsItem(q.vAns[i], i, w);
                     vAnsItem[aidx][i] = ai;
                     lbxAns.Items.Add(ai.lbxi);
                 }

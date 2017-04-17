@@ -236,9 +236,10 @@ namespace sQzLib
                     mW.Width = ((0.1 < value.RenderSize.Width) ? value.RenderSize.Width :
                         SystemParameters.PrimaryScreenWidth) / 2;
                     mW.Height = ((0.1 < value.RenderSize.Height) ? value.RenderSize.Height :
-                        SystemParameters.PrimaryScreenHeight) / 3;
+                        SystemParameters.PrimaryScreenHeight) / 2;
+                    mG.RowDefinitions[2].Height = mG.RowDefinitions[1].Height = new GridLength(mW.Height / 6);
                     if (0 < value.FontSize)
-                        mT.FontSize = value.FontSize;
+                        mT.FontSize = value.FontSize * 1.2;
                 }
             }
         }
