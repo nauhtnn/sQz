@@ -36,36 +36,36 @@ namespace sQzLib
         public string tId {
             get {
                 if (eLvl == ExamLvl.Basis)
-                    return "CB_" + uId;
+                    return "CB" + uId;
                 else
-                    return "NC_" + uId;
+                    return "NC" + uId;
             }
         }
-        public static bool ParseTxId(string s, ref ExamLvl lv, ref ushort id)
+        public bool ParseTxId(string s)
         {
             if(s == null || s.Length < 3)
-                return false;
+                return true;
             if (s[0] == 'C' && s[1] == 'B')
             {
-                if (ushort.TryParse(s.Substring(2), out id))
+                if (ushort.TryParse(s.Substring(2), out uId))
                 {
-                    lv = ExamLvl.Basis;
-                    return true;
+                    eLvl = ExamLvl.Basis;
+                    return false;
                 }
                 else
-                    return false;
+                    return true;
             }
             else if (s[0] == 'N' && s[1] == 'C')
             {
-                if (ushort.TryParse(s.Substring(2), out id))
+                if (ushort.TryParse(s.Substring(2), out uId))
                 {
-                    lv = ExamLvl.Advance;
-                    return true;
+                    eLvl = ExamLvl.Advance;
+                    return false;
                 }
                 else
-                    return false;
+                    return true;
             }
-            return false;
+            return true;
         }
         public short Lvl
         {
@@ -84,36 +84,29 @@ namespace sQzLib
             return s.ToString();
         }
 
-        public static void ClntToAuthArr(out byte[] buf, int state, string rid, string birdate)
+        public void ToByteSgning(out byte[] buf, int state)
         {
-            if (birdate == null || birdate.Length != 10)
+            if (tBirdate == null || tBirdate.Length != 10)
             {
                 buf = null;
                 return;
             }
-            byte[] a = Encoding.UTF8.GetBytes(birdate);
+            byte[] a = Encoding.UTF8.GetBytes(tBirdate);
             byte[] b = null;
             try {
                b = Encoding.UTF8.GetBytes(Environment.MachineName);
             } catch(InvalidOperationException) { b = null; }
             ExamLvl lv = ExamLvl.Basis;
-            ushort id = 0;
-            bool rs = ParseTxId(rid, ref lv, ref id);
-            if (!rs)
-            {
-                buf = null;
-                return;
-            }
             if (b == null)
-                buf = new byte[14 + a.Length];
+                buf = new byte[12 + a.Length];
             else
-                buf = new byte[14 + a.Length + 4 + b.Length];
+                buf = new byte[12 + a.Length + 4 + b.Length];
             int offs = 0;
             Buffer.BlockCopy(BitConverter.GetBytes(state), 0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes((int)lv), 0, buf, offs, 4);
-            offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes(id), 0, buf, offs, 2);
+            Buffer.BlockCopy(BitConverter.GetBytes((short)lv), 0, buf, offs, 2);
+            offs += 2;
+            Buffer.BlockCopy(BitConverter.GetBytes(uId), 0, buf, offs, 2);
             offs += 2;
             Buffer.BlockCopy(BitConverter.GetBytes(a.Length), 0, buf, offs, 4);
             offs += 4;
@@ -130,18 +123,11 @@ namespace sQzLib
         public bool ReadByteSgning(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
-            if (l < 1)
-                return false;
-            bool rs = BitConverter.ToBoolean(buf, offs);
-            l -= 1;
-            offs += 1;
-            if (!rs)
-                return false;
-            if (l < 4)
+            if (l < 2)
                 return false;
             Lvl = BitConverter.ToInt16(buf, offs);
-            l -= 4;
-            offs += 4;
+            l -= 2;
+            offs += 2;
             if (l < 2)
                 return false;
             uId = BitConverter.ToUInt16(buf, offs);
@@ -232,7 +218,7 @@ namespace sQzLib
                 sz += i.Length;
             buf = new byte[sz];
             sz = 0;
-            foreach(byte[] i in l)
+            foreach (byte[] i in l)
             {
                 Buffer.BlockCopy(i, 0, buf, sz, i.Length);
                 sz += i.Length;
@@ -242,7 +228,7 @@ namespace sQzLib
         public bool ReadByte(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
-            if (l < 2)
+            if (l < 2)      
                 return true;
             Lvl = BitConverter.ToInt16(buf, offs);
             l -= 2;
@@ -306,7 +292,7 @@ namespace sQzLib
             offs += 4;
             if (!DateTime.TryParse(h.ToString("d2") + ':' + m.ToString("d2"), out dtTim2))
                 dtTim2 = DateTime.Parse("00:00");
-            if (l < 4)
+            if (l < 2)
                 return true;
             uGrade = BitConverter.ToUInt16(buf, offs);
             l -= 2;

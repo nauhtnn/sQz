@@ -165,7 +165,11 @@ namespace sQzServer1
                                 if (vbLock.Keys.Contains(lvid))
                                     vbLock[lvid] = true;
                             });
-                            e.ToByte(out outMsg);
+                            byte[] a;
+                            e.ToByte(out a);
+                            outMsg = new byte[1 + a.Length];
+                            Buffer.BlockCopy(BitConverter.GetBytes(true), 0, outMsg, 0, 1);
+                            Buffer.BlockCopy(a, 0, outMsg, 1, a.Length);
                         }
                         else
                         {

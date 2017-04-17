@@ -108,7 +108,6 @@ namespace sQzLib
         {
             if (vAttb == null || vals == null)
                 return;
-            int lastIdx = vAttb.Length - 1;
             StringBuilder qry = new StringBuilder();
             qry.Append("INSERT INTO " + tb + "(" + vAttb + ")VALUES");
             qry.Append(vals);
@@ -175,10 +174,9 @@ namespace sQzLib
         }
 
         public static string mkQrySelect(string tb, string attbs, string cond,
-            string[] vGpAttb)
+            string gpAttbs)
         {
             string query = "SELECT ";
-            int lastIdx = 0;
             if (attbs == null)
                 query += "*";
             else
@@ -186,14 +184,8 @@ namespace sQzLib
             query += " FROM " + tb;
             if (cond != null)
                 query += " WHERE " + cond;
-            if (vGpAttb != null)
-            {
-                query += " GROUP BY ";
-                lastIdx = vGpAttb.Length - 1;
-                for (int i = 0; i < lastIdx; ++i)
-                    query += vGpAttb[i] + ",";
-                query += vGpAttb[lastIdx];
-            }
+            if (gpAttbs != null)
+                query += " GROUP BY " + gpAttbs;
 
             return query;
         }

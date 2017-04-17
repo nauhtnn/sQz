@@ -32,7 +32,7 @@ namespace sQzClient
         Thickness qMrg;
 
         AnsSheet mAnsSh;
-        public Examinee mNee;
+        public Examinee mNee;//reference to Auth.mNee
 
         public TakeExam()
         {
@@ -47,7 +47,6 @@ namespace sQzClient
             ShowsNavigationUI = false;
 
             mQSh = new QuestSheet();
-            mNee = new Examinee();
         }
 
         private void LoadTxt()

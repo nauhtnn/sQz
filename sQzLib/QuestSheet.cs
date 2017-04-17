@@ -90,11 +90,11 @@ namespace sQzLib
                 return true;
             int offs0 = offs;
             int l = buf.Length - offs;
-            if (l < 4)
+            if (l < 2)
                 return true;
             uId = BitConverter.ToUInt16(buf, offs);
-            offs += 4;
-            l -= 4;
+            offs += 2;
+            l -= 2;
             if (l < 4)
                 return true;
             int nq = BitConverter.ToInt32(buf, offs);

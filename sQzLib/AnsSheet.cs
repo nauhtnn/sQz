@@ -159,18 +159,18 @@ namespace sQzLib
 
         public int GetByteCount()
         {
-            return 14 + aAns.Length;
+            return 12 + aAns.Length;
         }
 
         public void ToByte(ref byte[] buf, ref int offs)
         {
             //todo: check length for safety
             Buffer.BlockCopy(BitConverter.GetBytes(uId),
-                        0, buf, offs, 4);
-            offs += 4;
+                        0, buf, offs, 2);
+            offs += 2;
             Buffer.BlockCopy(BitConverter.GetBytes(Lvl),
-                        0, buf, offs, 4);
-            offs += 4;
+                        0, buf, offs, 2);
+            offs += 2;
             Buffer.BlockCopy(BitConverter.GetBytes(uNeeId),
                 0, buf, offs, 2);
             offs += 2;
@@ -183,16 +183,16 @@ namespace sQzLib
         public void ReadByte(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
-            if (l < 4)
+            if (l < 2)
                 return;
             uId = BitConverter.ToUInt16(buf, offs);
-            offs += 4;
-            l -= 4;
-            if (l < 4)
+            offs += 2;
+            l -= 2;
+            if (l < 2)
                 return;
             eLvl = (ExamLvl)BitConverter.ToInt16(buf, offs);
-            offs += 4;
-            l -= 4;
+            offs += 2;
+            l -= 2;
             if (l < 2)
                 return;
             uNeeId = BitConverter.ToUInt16(buf, offs);

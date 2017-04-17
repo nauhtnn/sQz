@@ -48,7 +48,6 @@ namespace sQzLib
             string qry = DBConnect.mkQrySelect("examinee", null, "dateIdx=" + dateIdx, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             vExaminee.Clear();
-            int i = -1;
             if (reader != null)
             {
                 while (reader.Read())

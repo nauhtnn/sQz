@@ -27,10 +27,9 @@ namespace sQzClient
         NetCode mState;
         UICbMsg mCbMsg;
         bool bRunning;
-        string mNeeId;
-        string mBirdate;
         ExamDate mDt;
         Examinee mNee;
+        TakeExam pgTkExm;
 
         public Authentication()
         {
@@ -42,8 +41,6 @@ namespace sQzClient
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
             bRunning = true;
-
-            mNeeId = mBirdate = string.Empty;
 
             mDt = new ExamDate();
             mNee = new Examinee();
@@ -63,17 +60,15 @@ namespace sQzClient
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            mNeeId = tbxNeeId.Text;
-            mBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
-            DateTime dummy;
-            if (!DateTime.TryParse(mBirdate, out dummy))
+            mNee.tBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
+            DateTime dum;
+            if (!DateTime.TryParse(mNee.tBirdate, out dum))
             {
+                mNee.tBirdate = null;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOTI]);
                 return;
             }
-            ExamLvl lv = ExamLvl.Basis;
-            ushort id = ushort.MaxValue;
-            if(!Examinee.ParseTxId(mNeeId, ref lv, ref id))
+            if(mNee.ParseTxId(tbxNeeId.Text))
             {
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOTI]);
                 return;
@@ -138,12 +133,22 @@ namespace sQzClient
                     mState = NetCode.Authenticating;
                     break;
                 case NetCode.Authenticating:
-                    bool rs = mNee.ReadByteSgning(buf, ref offs);
                     l = buf.Length - offs;
+                    if (l < 1)
+                        return false;
+                    bool rs = BitConverter.ToBoolean(buf, offs);
+                    ++offs;
                     if(rs)
                     {
-                        mState = NetCode.ExamRetrieving;
-                        return true;//continue
+                        rs = mNee.ReadByte(buf, ref offs);
+                        l = buf.Length - offs;
+                        if (!rs)
+                        {
+                            mState = NetCode.ExamRetrieving;
+                            return true;//continue
+                        }
+                        else
+                            return false;
                     }
                     else
                     {
@@ -165,10 +170,10 @@ namespace sQzClient
                     Dispatcher.Invoke(() =>
                     {
                         //NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
-                        TakeExam tx = new TakeExam();
-                        tx.mQSh = qs;
-                        tx.mNee = mNee;
-                        NavigationService.Navigate(tx);
+                        pgTkExm = new TakeExam();
+                        pgTkExm.mNee = mNee;
+                        pgTkExm.mQSh = qs;
+                        NavigationService.Navigate(pgTkExm);
                     });
                     break;
             }
@@ -183,7 +188,7 @@ namespace sQzClient
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.Authenticating:
-                    Examinee.ClntToAuthArr(out outBuf, (int)mState, mNeeId, mBirdate);
+                    mNee.ToByteSgning(out outBuf, (int)mState);
                     break;
                 case NetCode.ExamRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);
