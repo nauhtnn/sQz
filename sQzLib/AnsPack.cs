@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
@@ -44,8 +45,8 @@ namespace sQzLib
             {
                 AnsSheet i = new AnsSheet();
                 i.ExtractKey(qs);
-                AnsSheet x;
-                if(!vSheet.TryGetValue(i.uId, out x))
+                AnsSheet dum;
+                if(!vSheet.TryGetValue(i.uId, out dum))
                     vSheet.Add(i.uId, i);
             }
         }
@@ -70,7 +71,8 @@ namespace sQzLib
                 i.ReadByte(buf, ref offs);
                 //if (err)
                 //    break;
-                //if (!vSheet.TryGetValue(qs.uId, out qs))//todo safer
+                AnsSheet dum;
+                if (!vSheet.TryGetValue(i.uId, out dum))
                     vSheet.Add(i.uId, i);
                 --nSh;
             }

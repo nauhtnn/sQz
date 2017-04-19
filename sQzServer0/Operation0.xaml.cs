@@ -31,7 +31,7 @@ namespace sQzServer0
         Dictionary<short, TextBlock> vDt2;
         Dictionary<short, TextBlock> vComp;
         QuestPack mQPack;
-        AnsPack mAnsPack;
+        AnsPack mKeyPack;
         ExamRoom mRoom;
         ushort[] uQSId;
 
@@ -46,7 +46,7 @@ namespace sQzServer0
             vDt2 = new Dictionary<short, TextBlock>();
             vComp = new Dictionary<short, TextBlock>();
             mQPack = new QuestPack();
-            mAnsPack = new AnsPack();
+            mKeyPack = new AnsPack();
             mDt = new ExamDate();
             mRoom = new ExamRoom();
             uQSId = new ushort[2];
@@ -96,7 +96,7 @@ namespace sQzServer0
                     foreach (uint i in v.Keys)
                     {
                         ListBoxItem it = new ListBoxItem();
-                        it.Content = v[i].ToString("dd/MM/yyyy HH:mm");
+                        it.Content = v[i].ToString(ExamDate.FORM_H);
                         it.Name = "_" + i;
                         dark = !dark;
                         if (dark)
@@ -194,7 +194,7 @@ namespace sQzServer0
             });
         }
 
-        private void UpdateRs()
+        private void UpdateRsView()
         {
             Dispatcher.Invoke(() => {
                 TextBlock t;
@@ -303,7 +303,7 @@ namespace sQzServer0
             }
             foreach (QuestSheet qs in mQPack.vSheet.Values)
                 qs.ToByte();
-            mAnsPack.ExtractKey(mQPack);
+            mKeyPack.ExtractKey(mQPack);
             mQPack.DBIns(mDt.uId);
             LoadQuest();
         }
@@ -354,7 +354,7 @@ namespace sQzServer0
             Window.GetWindow(this).Close();
         }
 
-        public bool SrvrCodeHndl(NetCode c, byte[] dat, int offs, ref byte[] outMsg)
+        public bool SrvrCodeHndl(NetCode c, byte[] buf, int offs, ref byte[] outMsg)
         {
             switch (c)
             {
@@ -376,17 +376,17 @@ namespace sQzServer0
                     outMsg = mQPack.ToByte();
                     break;
                 case NetCode.AnsKeyRetrieving:
-                    outMsg = new byte[mAnsPack.GetByteCount()];
+                    outMsg = new byte[mKeyPack.GetByteCount()];
                     offs = 0;
-                    mAnsPack.ToByte(ref outMsg, ref offs);
+                    mKeyPack.ToByte(ref outMsg, ref offs);
                     return false;
                 case NetCode.SrvrSubmitting:
-                    mRoom.ReadByteGrade(dat, ref offs);
+                    mRoom.ReadByteGrade(buf, ref offs);
 					mRoom.DBUpdateRs();
-                    UpdateRs();
+                    UpdateRsView();
                     break;
                 default:
-                    outMsg = BitConverter.GetBytes((Int32)NetCode.Unknown);
+                    outMsg = BitConverter.GetBytes((int)NetCode.Unknown);
                     break;
             }
             return true;

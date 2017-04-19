@@ -58,27 +58,51 @@ namespace sQzLib
             {
                 while (reader.Read())
                 {
-                    Examinee s = new Examinee();
-                    s.uDtId = dateIdx;
-                    s.Lvl = reader.GetInt16(1);
-                    s.uId = reader.GetUInt16(2);
-                    s.tName = reader.GetString(3);
-                    s.tBirdate = reader.GetDateTime(4).ToString(ExamDate.FORM);
-                    s.tBirthplace = reader.GetString(5);
-                    if (reader.IsDBNull(6) || !DateTime.TryParse(reader.GetString(6), out s.dtTim1))
-                        s.dtTim1 = DateTime.Parse("00:00");
-                    if (reader.IsDBNull(7) || !DateTime.TryParse(reader.GetString(7), out s.dtTim2))
-                        s.dtTim2 = DateTime.Parse("00:00");
+                    Examinee e = new Examinee();
+                    e.uDtId = dateIdx;
+                    e.Lvl = reader.GetInt16(1);
+                    e.uId = reader.GetUInt16(2);
+                    e.tName = reader.GetString(3);
+                    e.tBirdate = reader.GetDateTime(4).ToString(ExamDate.FORM_R);
+                    e.tBirthplace = reader.GetString(5);
+                    if (reader.IsDBNull(6) || !DateTime.TryParse(reader.GetString(6), out e.dtTim1))
+                        e.dtTim1 = DateTime.Parse("00:00");
+                    if (reader.IsDBNull(7) || !DateTime.TryParse(reader.GetString(7), out e.dtTim2))
+                        e.dtTim2 = DateTime.Parse("00:00");
                     if (!reader.IsDBNull(8))
-                        s.uGrade = reader.GetUInt16(8);
+                        e.uGrade = reader.GetUInt16(8);
                     if (!reader.IsDBNull(9))
-                        s.tComp = reader.GetString(9);
-                    vExaminee.Add((short)(s.Lvl * s.uId), s);
+                        e.tComp = reader.GetString(9);
+                    vExaminee.Add((short)(e.Lvl * e.uId), e);
                 }
                 reader.Close();
             }
             DBConnect.Close(ref conn);
-            ToByte();
+        }
+
+        public Dictionary<int, ushort>  DBSelectId(uint dateIdx, out Dictionary<int, string> vAns)
+        {
+            vAns = new Dictionary<int, string>();
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return null;
+            string qry = DBConnect.mkQrySelect("examinee", "level,idx,questIdx,anssh", "dateIdx=" + dateIdx, null);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            Dictionary<int, ushort> r = new Dictionary<int, ushort>();
+            if (reader != null)
+            {
+                while (reader.Read())
+                {
+                    int id = reader.GetInt16(0) * reader.GetUInt16(1);
+                    if(!reader.IsDBNull(2))
+                        r.Add(id, reader.GetUInt16(2));
+                    if (!reader.IsDBNull(3))
+                        vAns.Add(id, reader.GetString(3));
+                }
+                reader.Close();
+            }
+            DBConnect.Close(ref conn);
+            return r;
         }
 
         public void DBInsert(uint dateIdx)
@@ -96,7 +120,7 @@ namespace sQzLib
                 vals.Append(e.Lvl + ",");
                 vals.Append(e.uId + ",");
                 vals.Append("'" + e.tName + "',");
-                vals.Append("'" + ExamDate.ToMysqlForm(e.tBirdate, ExamDate.FORM) + "',");
+                vals.Append("'" + ExamDate.ToMysqlForm(e.tBirdate, ExamDate.FORM_R) + "',");
                 vals.Append("'" + e.tBirthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
@@ -162,6 +186,17 @@ namespace sQzLib
                             qry.Append(",grade=" + e.uGrade);
                         if (e.tComp != null)
                             qry.Append(",comp='" + e.tComp + "'");
+                        if (e.mAnsSh != null)
+                        {
+                            qry.Append(",questIdx=" + e.mAnsSh.uId);
+                            if (e.mAnsSh.aAns != null)
+                            {
+                                qry.Append(",anssh='");
+                                foreach (byte i in e.mAnsSh.aAns)
+                                    qry.Append(i);
+                                qry.Append("'");
+                            }
+                        }
                     }
                     qry.Append(" WHERE dateIdx=" + e.uDtId +
                         " AND level=" + (int)e.eLvl + " AND idx=" + e.uId);
@@ -263,7 +298,8 @@ namespace sQzLib
                 Examinee e;
                 if (!vExaminee.TryGetValue((short)(lv * id), out e))
                     continue;
-                e.ReadByteGrade2(buf, ref offs);
+                if (e.ReadByteGrade(buf, ref offs))
+                    break;
             }
         }
     }

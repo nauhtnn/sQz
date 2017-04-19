@@ -10,7 +10,10 @@ CREATE TABLE IF NOT EXISTS `examinee` (`dateIdx` INT(4) UNSIGNED, `level` SMALLI
 `idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birthdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
 `dt1` TIME, `dt2` TIME, `grade` SMALLINT(2) UNSIGNED, `comp` VARCHAR(32),
+`questIdx` SMALLINT(2) UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
 PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES date(`idx`));
+
+FOREIGN KEY(`questIdx`) REFERENCES questsh(`idx`));
 */
 
 namespace sQzLib
@@ -28,10 +31,11 @@ namespace sQzLib
         public string tComp;
         public DateTime dtTim1;
 		public DateTime dtTim2;
+        public AnsSheet mAnsSh;
 
         public Examinee() {
             uGrade = ushort.MaxValue;
-            dtTim1 = dtTim2 = DateTime.Parse("2016/01/01");
+            dtTim1 = dtTim2 = DateTime.Parse(ExamDate.DT2016);
             tComp = null;
         }
         public string tId {
@@ -271,10 +275,18 @@ namespace sQzLib
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
             }
+            if(mAnsSh == null)
+                l.Add(BitConverter.GetBytes(0));
+            else
+            {
+                l.Add(BitConverter.GetBytes(mAnsSh.aAns.Length));
+                l.Add((mAnsSh.aAns.Clone() as byte[]));
+                l.Add(BitConverter.GetBytes(mAnsSh.uId));
+            }
             return l;
         }
 
-        public bool ReadByteGrade2(byte[] buf, ref int offs)
+        public bool ReadByteGrade(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
             if (l < 4)
@@ -317,7 +329,28 @@ namespace sQzLib
                 if (l < sz)
                     return true;
                 tComp = Encoding.UTF8.GetString(buf, offs, sz);
+                l -= sz;
                 offs += sz;
+            }
+            if (l < 4)
+                return true;
+            sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (0 < sz)
+            {
+                if (l < sz)
+                    return true;
+                mAnsSh = new AnsSheet();
+                mAnsSh.aAns = new byte[sz];
+                Buffer.BlockCopy(buf, offs, mAnsSh.aAns, 0, sz);
+                l -= sz;
+                offs += sz;
+                if (l < 2)
+                    return true;
+                mAnsSh.uId = BitConverter.ToUInt16(buf, offs);
+                l -= 2;
+                offs += 2;
             }
             return false;
         }

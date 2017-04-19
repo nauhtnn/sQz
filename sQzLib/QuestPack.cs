@@ -59,14 +59,14 @@ namespace sQzLib
                 bool err = qs.ReadByte(buf, ref offs);
                 if (err)
                     break;
-                QuestSheet x;
-                if (!vSheet.TryGetValue(qs.uId, out x))
+                QuestSheet dum;
+                if (!vSheet.TryGetValue(qs.uId, out dum))
                     vSheet.Add(qs.uId, qs);
                 --nSh;
             }
         }
 
-        public List<int> DBSelect(uint dateIdx)
+        public List<int> DBSelectId(uint dateIdx)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)

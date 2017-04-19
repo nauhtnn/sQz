@@ -39,6 +39,7 @@ namespace sQzServer1
         QuestPack mQPack;
         int mQShIdx;
         int mQShMaxIdx;
+        AnsPack mKeyPack;
         AnsPack mAnsPack;
 
         public Operation1()
@@ -200,16 +201,17 @@ namespace sQzServer1
                 case NetCode.Submiting:
                     AnsSheet s = new AnsSheet();
                     s.ReadByte(buf, ref offs);
-                    AnsSheet wKey;
-                    if(!mAnsPack.vSheet.TryGetValue(s.uId, out wKey))
+                    AnsSheet keySh;
+                    if(!mKeyPack.vSheet.TryGetValue(s.uId, out keySh))
                     {
                         outMsg = BitConverter.GetBytes(101);//todo
                         break;
                     }
-                    ushort grade = wKey.Grade(s.aAns);
+                    ushort grade = keySh.Grade(s.aAns);
                     lvid = (short)(s.Lvl * s.uNeeId);
                     if (mRoom.vExaminee.TryGetValue(lvid, out e))
                     {
+                        e.mAnsSh = s;
                         e.uGrade = grade;
                         e.dtTim2 = DateTime.Now;
                         if (vbLock.Keys.Contains(lvid))
@@ -335,8 +337,9 @@ namespace sQzServer1
                     mState = NetCode.AnsKeyRetrieving;
                     break;
                 case NetCode.AnsKeyRetrieving:
+                    mKeyPack = new AnsPack();
+                    mKeyPack.ReadByte(buf, ref offs);
                     mAnsPack = new AnsPack();
-                    mAnsPack.ReadByte(buf, ref offs);
                     return false;
             }
             return true;

@@ -6,19 +6,11 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 
-/*
-CREATE TABLE IF NOT EXISTS `anssh` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
-`neeIdx` SMALLINT(2) UNSIGNED, `ans` CHAR(120) CHARACTER SET `utf8`,
-PRIMARY KEY(`dateIdx`, `level`, `neeIdx`), FOREIGN KEY(`dateIdx`) REFERENCES date(`idx`),
-FOREIGN KEY(`neeIdx`) REFERENCES examinee(`idx`));
-*/
-
 namespace sQzLib
 {
     public class AnsItem: StackPanel
     {
         public static CornerRadius sCr;
-        public const double HARDCODEW = 420;
         static double sW;
         Border mB;
 
@@ -225,13 +217,13 @@ namespace sQzLib
             int offs = 0;
             while(offs < aAns.Length)
             {
-                int offs2 = offs + 4;
-                for(; offs < offs2; ++offs)
+                int offs4 = offs + 4;
+                for(; offs < offs4; ++offs)
                     if (ans[offs] != aAns[offs])
                         break;
-                if (offs == offs2)
+                if (offs == offs4)
                     ++grade;
-                offs = offs2;
+                offs = offs4;
             }
             return grade;
         }

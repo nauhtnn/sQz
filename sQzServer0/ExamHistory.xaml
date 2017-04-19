@@ -9,12 +9,17 @@
       Title="ExamHistory">
 
     <StackPanel Orientation="Horizontal" Margin="10,5,10,0" Loaded="Main_Loaded">
-        <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Width="200" Height="600" VerticalScrollBarVisibility="Auto">
             <ListBox x:Name="lbxDate" Width="200" SelectionChanged="lbxDate_SelectionChanged"/>
         </ScrollViewer>
-        <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
-            <ListBox x:Name="lbxExam" Width="200" SelectionChanged="lbxExam_SelectionChanged"/>
-        </ScrollViewer>
+        <StackPanel Height="600">
+            <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
+                <ListBox x:Name="lbxExam" Width="200" SelectionChanged="lbxExam_SelectionChanged"/>
+            </ScrollViewer>
+            <ScrollViewer Width="200" Height="400" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
+                <ListBox x:Name="lbxNee" Width="200" SelectionChanged="lbxNee_SelectionChanged"/>
+            </ScrollViewer>
+        </StackPanel>
         <ScrollViewer Width="840" Height="700" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
             <StackPanel x:Name="spQSh"/>
         </ScrollViewer>
