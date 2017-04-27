@@ -87,15 +87,16 @@ namespace sQzLib
         public ListBox[] vlbxAns;
         public AnsItem[][] vAnsItem;
         public byte[] aAns;
-        public ushort uId;
+        public ushort uQSId;
         public ExamLvl eLvl;
         public ushort uNeeId;
+        public bool bChanged;
 
-        public AnsSheet() {}
+        public AnsSheet() { bChanged = false; }
 
         public void Init(QuestSheet qs, ushort neeId)
         {
-            uId = qs.uId;
+            uQSId = qs.uId;
             eLvl = qs.eLvl;
             uNeeId = neeId;
             aAns = new byte[qs.vQuest.Count * 4];//hardcode
@@ -121,7 +122,7 @@ namespace sQzLib
 
         public short Id
         {
-            get { return (short)((short)eLvl * uId); }
+            get { return (short)((short)eLvl * uQSId); }
         }
 
         public void InitView(QuestSheet qs, double w)
@@ -160,7 +161,7 @@ namespace sQzLib
         public void ToByte(ref byte[] buf, ref int offs)
         {
             //todo: check length for safety
-            Buffer.BlockCopy(BitConverter.GetBytes(uId),
+            Buffer.BlockCopy(BitConverter.GetBytes(uQSId),
                         0, buf, offs, 2);
             offs += 2;
             Buffer.BlockCopy(BitConverter.GetBytes(Lvl),
@@ -180,7 +181,7 @@ namespace sQzLib
             int l = buf.Length - offs;
             if (l < 2)
                 return;
-            uId = BitConverter.ToUInt16(buf, offs);
+            uQSId = BitConverter.ToUInt16(buf, offs);
             offs += 2;
             l -= 2;
             if (l < 2)
@@ -231,7 +232,7 @@ namespace sQzLib
         //only Operation0 uses this.
         public void ExtractKey(QuestSheet qs)
         {
-            uId = qs.uId;
+            uQSId = qs.uId;
             if (qs.vQuest != null && qs.vQuest.First() != null && qs.vQuest.First().vKeys != null)
                 aAns = new byte[qs.vQuest.Count * 4];//hardcode
             else
@@ -250,15 +251,14 @@ namespace sQzLib
 
         private void Ans_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            bChanged = true;
             ListBox l = sender as ListBox;
             if (l.SelectedItem == null)
                 return;
             int qid = Convert.ToInt32(l.Name.Substring(1));
-            //for (int i = 0, n = l.Items.Count; i < n; ++i)
             int i = -1;
             foreach(ListBoxItem li in l.Items)
             {
-                //ListBoxItem li = (ListBoxItem)l.Items[i];
                 ++i;
                 if (li.IsSelected)
                 {

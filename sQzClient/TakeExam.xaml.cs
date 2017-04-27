@@ -18,6 +18,8 @@ namespace sQzClient
         DateTime kDtStart;
         TimeSpan dtRemn;
         TimeSpan kDtDuration;
+        DateTime dtLastLog;
+        TimeSpan kLogIntvl;
         bool bRunning;
         UICbMsg mCbMsg;
         System.Timers.Timer mTimer;
@@ -96,7 +98,7 @@ namespace sQzClient
             mTimer.Elapsed += UpdateSrvrMsg;
             mTimer.AutoReset = true;
             mTimer.Enabled = true;
-            kDtStart = DateTime.Now;
+            dtLastLog = kDtStart = DateTime.Now;
             string t = Utils.ReadFile("Duration.txt");
             int m = -1, s = -1;
             if (t != null)
@@ -112,6 +114,7 @@ namespace sQzClient
             }
             if (m < 0 || s < 0)
                 dtRemn = kDtDuration = new TimeSpan(0, 30, 0);
+            kLogIntvl = new TimeSpan(0, 0, 30);
             WPopup.s.wpCb = null;
         }
 
@@ -331,26 +334,27 @@ namespace sQzClient
             return true;
         }
 
-        private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
+        private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
             if (bRunning)
                 Dispatcher.Invoke(() =>
                 {
                     if (0 < dtRemn.Ticks)
                     {
-                        dtRemn = kDtDuration - (DateTime.Now - kDtStart);
                         txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
+                        dtRemn = kDtDuration - (DateTime.Now - kDtStart);
+                        if (mAnsSh.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
+                        {
+                            dtLastLog = DateTime.Now;
+                            mNee.ToLogFile(dtLastLog.Hour, dtLastLog.Minute);
+                            mAnsSh.bChanged = false;
+                        }
                     }
                     else
                     {
-                        txtRTime.Text = "0:0";
-                        btnSubmit_Click(null, null);
-                        System.Threading.Thread th = new System.Threading.Thread(() => {
-                            Dispatcher.Invoke(() => {
-                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
-                            });
-                        });
-                        th.Start();
+                        txtRTime.Text = "00:00";
+                        Submit();
+                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
                     }
                 });
         }

@@ -37,9 +37,10 @@
             <TextBlock x:Name="txtNeeIdMsg" Grid.Row="2"/>
             <TextBlock x:Name="txtDMYMsg" Grid.Row="2" Grid.Column="1"/>
             <Button x:Name="btnSignIn" Grid.Row="3"  Background="#1c64e7" Foreground="White" Width="160" Click="btnSignIn_Click" BorderThickness="0"/>
+            <Button x:Name="btnOpenLog" Content="Open log" Grid.Row="3" Grid.Column="1"  Width="160" Click="btnOpenLog_Click"/>
         </Grid>
         <TextBlock x:Name="txtAuth" Height="48" TextAlignment="Center"/>
-        <ScrollViewer Width="600" Height="256" VerticalScrollBarVisibility="Auto">
+        <ScrollViewer Width="1200" Height="256" VerticalScrollBarVisibility="Auto">
             <TextBox x:Name="lblStatus" TextWrapping="Wrap" Text="TextBox" Width="600"/>
         </ScrollViewer>
         <Button x:Name="btnExit" Content="Exit" Height="48" Width="160" Click="btnExit_Click"/>

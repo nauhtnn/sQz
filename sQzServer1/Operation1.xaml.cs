@@ -202,7 +202,7 @@ namespace sQzServer1
                     AnsSheet s = new AnsSheet();
                     s.ReadByte(buf, ref offs);
                     AnsSheet keySh;
-                    if(!mKeyPack.vSheet.TryGetValue(s.uId, out keySh))
+                    if(!mKeyPack.vSheet.TryGetValue(s.uQSId, out keySh))
                     {
                         outMsg = BitConverter.GetBytes(101);//todo
                         break;

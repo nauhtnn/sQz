@@ -33,6 +33,8 @@ namespace sQzLib
 		public DateTime dtTim2;
         public AnsSheet mAnsSh;
 
+        const string tLogPrefx = "sQz\\nee";
+
         public Examinee() {
             uGrade = ushort.MaxValue;
             dtTim1 = dtTim2 = DateTime.Parse(ExamDate.DT2016);
@@ -281,7 +283,7 @@ namespace sQzLib
             {
                 l.Add(BitConverter.GetBytes(mAnsSh.aAns.Length));
                 l.Add((mAnsSh.aAns.Clone() as byte[]));
-                l.Add(BitConverter.GetBytes(mAnsSh.uId));
+                l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
             }
             return l;
         }
@@ -348,11 +350,71 @@ namespace sQzLib
                 offs += sz;
                 if (l < 2)
                     return true;
-                mAnsSh.uId = BitConverter.ToUInt16(buf, offs);
+                mAnsSh.uQSId = BitConverter.ToUInt16(buf, offs);
                 l -= 2;
                 offs += 2;
             }
             return false;
+        }
+
+        public void ToLogFile(int h, int m)
+        {
+            var fileName = System.IO.Path.Combine(Environment.GetFolderPath(
+                Environment.SpecialFolder.ApplicationData), tLogPrefx + h + '-' + m);
+            System.IO.BinaryWriter w = null;
+            try
+            {
+                w = new System.IO.BinaryWriter(System.IO.File.OpenWrite(fileName),
+                    Encoding.UTF8);
+            }
+            catch (UnauthorizedAccessException) { w = null; }
+            if(w != null)
+            {
+                ToLogFile(w);
+                w.Close();
+            }
+        }
+
+        private void ToLogFile(System.IO.BinaryWriter w)
+        {
+            w.Write(uDtId);
+            w.Write(Lvl);
+            w.Write(uId);
+            w.Write(uGrade);
+            w.Write(tComp.Length);
+            if (0 < tComp.Length)
+                w.Write(tComp);
+            w.Write(dtTim1.Hour);
+            w.Write(dtTim1.Minute);
+            w.Write(dtTim2.Hour);
+            w.Write(dtTim2.Minute);
+        }
+
+        public bool ReadLogFile(string filePath)
+        {
+            System.IO.BinaryReader r = null;
+            if (System.IO.File.Exists(filePath))
+                try
+                {
+                    r = new System.IO.BinaryReader(System.IO.File.OpenRead(filePath));
+                }
+                catch (UnauthorizedAccessException) { r = null; }
+            if (r == null)
+                return false;
+            uDtId = r.ReadUInt32();
+            eLvl = (ExamLvl)r.ReadInt16();
+            uId = r.ReadUInt16();
+            uGrade = r.ReadUInt16();
+            int sz = r.ReadInt32();
+            if (0 < sz)
+                tComp = r.ReadString();
+            int h = r.ReadInt32();
+            int m = r.ReadInt32();
+            ExamDate.Parse(h.ToString() + ':' + m, ExamDate.FORM_h, out dtTim1);
+            h = r.ReadInt32();
+            m = r.ReadInt32();
+            ExamDate.Parse(h.ToString() + ':' + m, ExamDate.FORM_h, out dtTim2);
+            return true;
         }
     }
 }

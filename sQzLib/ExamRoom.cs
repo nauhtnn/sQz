@@ -59,7 +59,7 @@ namespace sQzLib
                 while (reader.Read())
                 {
                     Examinee e = new Examinee();
-                    e.uDtId = dateIdx;
+                    e.uDtId = dateIdx;//reader.GetUInt16(0)
                     e.Lvl = reader.GetInt16(1);
                     e.uId = reader.GetUInt16(2);
                     e.tName = reader.GetString(3);
@@ -188,7 +188,7 @@ namespace sQzLib
                             qry.Append(",comp='" + e.tComp + "'");
                         if (e.mAnsSh != null)
                         {
-                            qry.Append(",questIdx=" + e.mAnsSh.uId);
+                            qry.Append(",questIdx=" + e.mAnsSh.uQSId);
                             if (e.mAnsSh.aAns != null)
                             {
                                 qry.Append(",anssh='");

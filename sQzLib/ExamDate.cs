@@ -21,6 +21,7 @@ namespace sQzLib
         public const int INVALID = 2016;
         public const string DT2016 = "2016/01/01 01:00";
         public const string MYSQL2016 = "2016-01-01";
+        public const string FORM_h = "H:m";
         public const string FORM_H = "yyyy/MM/dd HH:mm";
         public const string FORM = "yyyy/MM/dd";
         public const string FORM_RH = "dd/MM/yyyy HH:mm";

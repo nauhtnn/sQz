@@ -211,12 +211,45 @@ namespace sQzClient
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
             if (bRunning && mCbMsg.ToUp())
-                Dispatcher.Invoke(() => { WPopup.s.ShowDialog(mCbMsg.txt); });
+                Dispatcher.Invoke(() => {
+                    //WPopup.s.ShowDialog(mCbMsg.txt);
+                    lblStatus.Text += mCbMsg.txt;
+                });
         }
 
         private void btnExit_Click(object sender, RoutedEventArgs e)
         {
             Window.GetWindow(this).Close();
+        }
+
+        protected override void OnKeyUp(KeyEventArgs e)
+        {
+            mCbMsg += e.Key.ToString();
+            base.OnKeyUp(e);
+        }
+
+        private void btnOpenLog_Click(object sender, RoutedEventArgs e)
+        {
+            Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
+
+            // set filter for file extension and default file extension 
+            //dlg.DefaultExt = ".bin";
+            //dlg.Filter = "binary file (*.bin)|*.bin";
+            bool? result = dlg.ShowDialog();
+
+            string filePath = null;
+            if (result == true)
+                filePath = dlg.FileName;
+            if (filePath != null && mNee.ReadLogFile(filePath))
+            {
+                tbxNeeId.Text = mNee.tId;
+                txtNeeIdMsg.Text = Txt.s._[(int)TxI.AUTH_MSG];
+            }
+            else
+            {
+                tbxNeeId.Text = "";
+                txtNeeIdMsg.Text = Txt.s._[(int)TxI.BIRDATE_MSG];
+            }
         }
     }
 }
