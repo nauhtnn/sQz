@@ -33,12 +33,31 @@ namespace sQzLib
 		public DateTime dtTim2;
         public AnsSheet mAnsSh;
 
-        const string tLogPrefx = "sQz\\nee";
+        public const int eSIGNING = 0;
+        public const int eINFO = 1;
+        public const int eAUTHENTICATED = 2;
+        public const int eEXAMING = 3;
+        public const int eSUBMITTING = 4;
+        public const int eFINISHED = 5;
+        public int eStt;
+
+        const string tLOG_PREFX = "sQz\\nee";
 
         public Examinee() {
+            Reset();
+        }
+        public void Reset()
+        {
+            tBirdate = null;
+            tBirthplace = null;
+            tName = null;
+            uDtId = uint.MaxValue;
+            uId = ushort.MaxValue;
+            eStt = eSIGNING;
             uGrade = ushort.MaxValue;
-            dtTim1 = dtTim2 = DateTime.Parse(ExamDate.DT2016);
-            tComp = null;
+            dtTim1 = dtTim2 = ExamDate.INVALID_DT;
+            tComp = string.Empty;
+            mAnsSh = new AnsSheet();
         }
         public string tId {
             get {
@@ -52,11 +71,15 @@ namespace sQzLib
         {
             if(s == null || s.Length < 3)
                 return true;
+            ushort tuId;
             if (s[0] == 'C' && s[1] == 'B')
             {
-                if (ushort.TryParse(s.Substring(2), out uId))
+                if (ushort.TryParse(s.Substring(2), out tuId))
                 {
+                    if (eLvl != ExamLvl.Basis || uId != tuId)
+                        Reset();
                     eLvl = ExamLvl.Basis;
+                    uId = tuId;
                     return false;
                 }
                 else
@@ -64,8 +87,11 @@ namespace sQzLib
             }
             else if (s[0] == 'N' && s[1] == 'C')
             {
-                if (ushort.TryParse(s.Substring(2), out uId))
+                if (ushort.TryParse(s.Substring(2), out tuId))
                 {
+                    if (eLvl != ExamLvl.Advance || uId != tuId)
+                        Reset();
+                    uId = tuId;
                     eLvl = ExamLvl.Advance;
                     return false;
                 }
@@ -91,72 +117,67 @@ namespace sQzLib
             return s.ToString();
         }
 
-        public void ToByteSgning(out byte[] buf, int state)
-        {
-            if (tBirdate == null || tBirdate.Length != 10)
-            {
-                buf = null;
-                return;
-            }
-            byte[] a = Encoding.UTF8.GetBytes(tBirdate);
-            byte[] b = null;
-            try {
-               b = Encoding.UTF8.GetBytes(Environment.MachineName);
-            } catch(InvalidOperationException) { b = null; }
-            ExamLvl lv = ExamLvl.Basis;
-            if (b == null)
-                buf = new byte[12 + a.Length];
-            else
-                buf = new byte[12 + a.Length + 4 + b.Length];
-            int offs = 0;
-            Buffer.BlockCopy(BitConverter.GetBytes(state), 0, buf, offs, 4);
-            offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes((short)lv), 0, buf, offs, 2);
-            offs += 2;
-            Buffer.BlockCopy(BitConverter.GetBytes(uId), 0, buf, offs, 2);
-            offs += 2;
-            Buffer.BlockCopy(BitConverter.GetBytes(a.Length), 0, buf, offs, 4);
-            offs += 4;
-            Buffer.BlockCopy(a, 0, buf, offs, a.Length);
-            offs += a.Length;
-            if (b != null)
-            {
-                Buffer.BlockCopy(BitConverter.GetBytes(b.Length), 0, buf, offs, 4);
-                offs += 4;
-                Buffer.BlockCopy(b, 0, buf, offs, b.Length);
-            }
-        }
-
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            byte[] b = BitConverter.GetBytes(Lvl);
-            l.Add(b);
-            b = BitConverter.GetBytes(uId);
-            l.Add(b);
-            b = Encoding.UTF8.GetBytes(tName);
+            l.Add(BitConverter.GetBytes(uDtId));
+            l.Add(BitConverter.GetBytes(Lvl));
+            l.Add(BitConverter.GetBytes(uId));
+            byte[] b = Encoding.UTF8.GetBytes(tBirdate);
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
-            b = Encoding.UTF8.GetBytes(tBirdate);
+            b = Encoding.UTF8.GetBytes(tComp);
+            l.Add(BitConverter.GetBytes(b.Length));
+            if(0 < b.Length)
+                l.Add(b);
+            l.Add(BitConverter.GetBytes(eStt));
+            if (eStt == eSIGNING)
+                return l;
+            b = Encoding.UTF8.GetBytes(tName);
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
             b = Encoding.UTF8.GetBytes(tBirthplace);
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
+            if (eStt == eINFO)
+                return l;
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
             l.Add(BitConverter.GetBytes(dtTim1.Minute));
+            if (eStt == eAUTHENTICATED)
+                return l;
+            l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
+            if (eStt == eEXAMING)
+                return l;
+            if (mAnsSh.aAns == null)
+                l.Add(BitConverter.GetBytes(false));
+            else
+            {
+                l.Add(BitConverter.GetBytes(true));
+                l.Add(mAnsSh.aAns);
+            }
+            if (eStt == eSUBMITTING)
+                return l;
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
             l.Add(BitConverter.GetBytes(uGrade));
-            if(tComp == null)
-                l.Add(BitConverter.GetBytes(0));
-            else
-            {
-                b = Encoding.UTF8.GetBytes(tComp);
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(b);
-            }
             return l;
+        }
+
+        public void ToByte(out byte[] buf, int prfx)
+        {
+            List<byte[]> l = ToByte();
+            int sz = 4;
+            foreach (byte[] i in l)
+                sz += i.Length;
+            buf = new byte[sz];
+            sz = 0;
+            Buffer.BlockCopy(BitConverter.GetBytes(prfx), 0, buf, sz, 4);
+            sz += 4;
+            foreach (byte[] i in l)
+            {
+                Buffer.BlockCopy(i, 0, buf, sz, i.Length);
+                sz += i.Length;
+            }
         }
 
         public void ToByte(out byte[] buf)
@@ -177,7 +198,12 @@ namespace sQzLib
         public bool ReadByte(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
-            if (l < 2)      
+            if (l < 4)
+                return true;
+            uDtId = BitConverter.ToUInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (l < 2)
                 return true;
             Lvl = BitConverter.ToInt16(buf, offs);
             l -= 2;
@@ -194,9 +220,12 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return true;
-            tName = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
+            if (0 < sz)
+            {
+                tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
+                l -= sz;
+                offs += sz;
+            }
             if (l < 4)
                 return true;
             sz = BitConverter.ToInt32(buf, offs);
@@ -204,7 +233,27 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return true;
-            tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
+            if (0 < sz)
+            {
+                tComp = Encoding.UTF8.GetString(buf, offs, sz);
+                l -= sz;
+                offs += sz;
+            }
+            if (l < 4)
+                return true;
+            eStt = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (eStt == eSIGNING)
+                return false;
+            if (l < 4)
+                return true;
+            sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (l < sz)
+                return true;
+            tName = Encoding.UTF8.GetString(buf, offs, sz);
             l -= sz;
             offs += sz;
             if (l < 4)
@@ -217,6 +266,8 @@ namespace sQzLib
             tBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
             l -= sz;
             offs += sz;
+            if (eStt == eINFO)
+                return false;
             if (l < 4)
                 return true;
             int h = BitConverter.ToInt32(buf, offs);
@@ -227,8 +278,37 @@ namespace sQzLib
             int m = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (!DateTime.TryParse(h.ToString("d2") + ':' + m.ToString("d2"), out dtTim1))
-                dtTim1 = DateTime.Parse("00:00");
+            if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim1))
+                dtTim1 = ExamDate.INVALID_DT;
+            if (eStt == eAUTHENTICATED)
+                return false;
+            if (l < 4)
+                return true;
+            mAnsSh.uQSId = BitConverter.ToUInt16(buf, offs);
+            l -= 2;
+            offs += 2;
+            if (eStt == eEXAMING)
+                return false;
+            if (l < 1)
+                return true;
+            if (BitConverter.ToBoolean(buf, offs))
+            {
+                l -= 1;
+                offs += 1;
+                if (l < 120)
+                    return true;
+                mAnsSh.aAns = new byte[120];//hardcode
+                Buffer.BlockCopy(buf, offs, mAnsSh.aAns, 0, 120);
+                l -= 120;
+                offs += 120;
+            }
+            else
+            {
+                l -= 1;
+                offs += 1;
+            }
+            if (eStt == eSUBMITTING)
+                return false;
             if (l < 4)
                 return true;
             h = BitConverter.ToInt32(buf, offs);
@@ -239,128 +319,43 @@ namespace sQzLib
             m = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (!DateTime.TryParse(h.ToString("d2") + ':' + m.ToString("d2"), out dtTim2))
-                dtTim2 = DateTime.Parse("00:00");
+            if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim2))
+                dtTim2 = ExamDate.INVALID_DT;
             if (l < 2)
                 return true;
             uGrade = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
+            //l -= 2;
             offs += 2;
-            if (l < 4)
-                return true;
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (0 < sz)
-            {
-                tComp = Encoding.UTF8.GetString(buf, offs, sz);
-                offs += sz;
-            }
             return false;
         }
 
-        public List<byte[]> ToByteGrade()
+        public void Merge(Examinee e)
         {
-            List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(Lvl));
-            l.Add(BitConverter.GetBytes(uId));
-            l.Add(BitConverter.GetBytes(dtTim1.Hour));
-            l.Add(BitConverter.GetBytes(dtTim1.Minute));
-            l.Add(BitConverter.GetBytes(dtTim2.Hour));
-            l.Add(BitConverter.GetBytes(dtTim2.Minute));
-            l.Add(BitConverter.GetBytes(uGrade));
-            if (tComp == null)
-                l.Add(BitConverter.GetBytes(0));
-            else
-            {
-                byte[] b = Encoding.UTF8.GetBytes(tComp);
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(b);
-            }
-            if(mAnsSh == null)
-                l.Add(BitConverter.GetBytes(0));
-            else
-            {
-                l.Add(BitConverter.GetBytes(mAnsSh.aAns.Length));
-                l.Add((mAnsSh.aAns.Clone() as byte[]));
-                l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
-            }
-            return l;
-        }
-
-        public bool ReadByteGrade(byte[] buf, ref int offs)
-        {
-            int l = buf.Length - offs;
-            if (l < 4)
-                return true;
-            int h = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < 4)
-                return true;
-            int m = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            string t = "" + h.ToString("d2") + ":" + m.ToString("d2");
-            if (!DateTime.TryParse(t, out dtTim1))
-                dtTim1 = DateTime.Parse("00:00");
-            if (l < 4)
-                return true;
-            h = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < 4)
-                return true;
-            m = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (!DateTime.TryParse(h.ToString("d2") + ':' + m.ToString("d2"), out dtTim2))
-                dtTim2 = DateTime.Parse("00:00");
-            if (l < 2)
-                return true;
-            uGrade = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
-            if (l < 4)
-                return true;
-            int sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if(0 < sz)
-            {
-                if (l < sz)
-                    return true;
-                tComp = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-            }
-            if (l < 4)
-                return true;
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (0 < sz)
-            {
-                if (l < sz)
-                    return true;
-                mAnsSh = new AnsSheet();
-                mAnsSh.aAns = new byte[sz];
-                Buffer.BlockCopy(buf, offs, mAnsSh.aAns, 0, sz);
-                l -= sz;
-                offs += sz;
-                if (l < 2)
-                    return true;
-                mAnsSh.uQSId = BitConverter.ToUInt16(buf, offs);
-                l -= 2;
-                offs += 2;
-            }
-            return false;
+            if (e.eStt != eSIGNING && uDtId != e.uDtId || eStt == eFINISHED)
+                return;
+            if (Lvl != e.Lvl || uId != e.uId
+                || tBirdate != e.tBirdate)
+                return;
+            tComp += e.tComp;
+            if (e.eStt < eStt || e.eStt < eEXAMING)
+                return;
+            eStt = e.eStt;
+            mAnsSh.uQSId = e.mAnsSh.uQSId;
+            dtTim1 = e.dtTim1;
+            if (e.eStt == eEXAMING)
+                return;
+            mAnsSh.aAns = e.mAnsSh.aAns;
+            if (e.eStt == eSUBMITTING)
+                return;
+            dtTim2 = e.dtTim2;
+            uGrade = e.uGrade;
         }
 
         public void ToLogFile(int h, int m)
         {
             var fileName = System.IO.Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.ApplicationData), tLogPrefx + h + '-' + m);
+                Environment.SpecialFolder.ApplicationData), tLOG_PREFX +
+                (Lvl * uId) + '-' + h.ToString("d2") + m.ToString("d2"));
             System.IO.BinaryWriter w = null;
             try
             {
@@ -370,24 +365,21 @@ namespace sQzLib
             catch (UnauthorizedAccessException) { w = null; }
             if(w != null)
             {
-                ToLogFile(w);
+                w.Write(uDtId);
+                w.Write(Lvl);
+                w.Write(uId);
+                w.Write(uGrade);
+                w.Write(tComp.Length);
+                if (0 < tComp.Length)
+                    w.Write(tComp);
+                w.Write(dtTim1.Hour);
+                w.Write(dtTim1.Minute);
+                w.Write(dtTim2.Hour);
+                w.Write(dtTim2.Minute);
+                w.Write(mAnsSh.uQSId);
+                w.Write(mAnsSh.aAns, 0, mAnsSh.aAns.Length);
                 w.Close();
             }
-        }
-
-        private void ToLogFile(System.IO.BinaryWriter w)
-        {
-            w.Write(uDtId);
-            w.Write(Lvl);
-            w.Write(uId);
-            w.Write(uGrade);
-            w.Write(tComp.Length);
-            if (0 < tComp.Length)
-                w.Write(tComp);
-            w.Write(dtTim1.Hour);
-            w.Write(dtTim1.Minute);
-            w.Write(dtTim2.Hour);
-            w.Write(dtTim2.Minute);
         }
 
         public bool ReadLogFile(string filePath)
@@ -414,6 +406,8 @@ namespace sQzLib
             h = r.ReadInt32();
             m = r.ReadInt32();
             ExamDate.Parse(h.ToString() + ':' + m, ExamDate.FORM_h, out dtTim2);
+            mAnsSh.uQSId = r.ReadUInt16();
+            mAnsSh.aAns = r.ReadBytes(120);//mAnsSh.aAns.Length//hardcode
             return true;
         }
     }

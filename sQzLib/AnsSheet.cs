@@ -14,8 +14,8 @@ namespace sQzLib
         static double sW;
         Border mB;
 
-        Label mLbl;
-        ListBoxItem mLbxItem;
+        public Label mLbl;
+        public ListBoxItem mLbxItem;
 
         public static void SInit(double w)
         {
@@ -55,7 +55,7 @@ namespace sQzLib
             mLbl = new Label();
         }
 
-        public Label lbl
+        public Label lbl //mLbl is public after all
         {
             get { return mLbl; }
         }
@@ -92,26 +92,27 @@ namespace sQzLib
         public ushort uNeeId;
         public bool bChanged;
 
-        public AnsSheet() { bChanged = false; }
+        public AnsSheet() {
+            bChanged = false;
+            aAns = null;
+            uQSId = ushort.MaxValue;
+        }
 
-        public void Init(QuestSheet qs, ushort neeId)
+        public void Init(QuestSheet qs, ushort neeId)//todo: only use qs.uId
         {
             uQSId = qs.uId;
             eLvl = qs.eLvl;
             uNeeId = neeId;
-            aAns = new byte[qs.vQuest.Count * 4];//hardcode
-            int i = -1;
-            foreach (Question q in qs.vQuest)
+            if (aAns == null)
             {
-                ++i;
-                if (q.vKeys != null){
-                    int j = -1;
-                    foreach (bool x in q.vKeys)
-                        aAns[i * 4 + ++j] = Convert.ToByte(x);
-                }
-                else
-                    for(int j = 0; j < q.nAns; ++j)
+                aAns = new byte[qs.vQuest.Count * 4];//hardcode
+                int i = -1;
+                foreach (Question q in qs.vQuest)
+                {
+                    ++i;
+                    for (int j = 0; j < q.nAns; ++j)
                         aAns[i * 4 + j] = 0;
+                }
             }
         }
 
@@ -131,7 +132,7 @@ namespace sQzLib
             vAnsItem = new AnsItem[qs.vQuest.Count][];
             
             int idx = -1;
-            int aidx = -1;
+            int j = -1;
             foreach (Question q in qs.vQuest)
             {
                 ++idx;
@@ -142,12 +143,17 @@ namespace sQzLib
                 lbxAns.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
                 lbxAns.BorderThickness = new Thickness(0, 4, 0, 0);
                 vlbxAns[idx] = lbxAns;
-                ++aidx;
-                vAnsItem[aidx] = new AnsItem[q.vAns.Length];
+                vAnsItem[idx] = new AnsItem[q.vAns.Length];
                 for (int i = 0; i < q.vAns.Length; ++i)
                 {
                     AnsItem ai = new AnsItem(q.vAns[i], i, w);
-                    vAnsItem[aidx][i] = ai;
+                    ++j;//update view from log
+                    if (aAns[j] == Convert.ToByte(true))
+                    {
+                        ai.mLbl.Content = 'X';
+                        ai.mLbxItem.IsSelected = true;
+                    }
+                    vAnsItem[idx][i] = ai;
                     lbxAns.Items.Add(ai.lbxi);
                 }
             }

@@ -60,19 +60,23 @@ namespace sQzClient
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
+            if(mNee.ParseTxId(tbxNeeId.Text))
+            {
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);
+                return;
+            }
             mNee.tBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
             DateTime dum;
             if (!DateTime.TryParse(mNee.tBirdate, out dum))
             {
                 mNee.tBirdate = null;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOTI]);
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
                 return;
             }
-            if(mNee.ParseTxId(tbxNeeId.Text))
+            try
             {
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOTI]);
-                return;
-            }
+                mNee.tComp = Environment.MachineName;
+            } catch(InvalidOperationException) { mNee.tComp = null; }
             Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
         }
@@ -114,12 +118,13 @@ namespace sQzClient
             txtNeeId.Text = t._[(int)TxI.NEEID];
             txtBirdate.Text = t._[(int)TxI.BIRDATE] + t._[(int)TxI.BIRDATE_MSG];
             btnSignIn.Content = t._[(int)TxI.SIGNIN];
+            btnOpenLog.Content = t._[(int)TxI.OPEN_LOG];
             btnExit.Content = t._[(int)TxI.EXIT];
         }
 
         public bool ClntBufHndl(byte[] buf, int offs)
         {
-            int l;
+            int l, errc;
             switch (mState)
             {
                 case NetCode.Dating:
@@ -140,6 +145,7 @@ namespace sQzClient
                     ++offs;
                     if(rs)
                     {
+                        mNee.eStt = Examinee.eAUTHENTICATED;
                         rs = mNee.ReadByte(buf, ref offs);
                         l = buf.Length - offs;
                         if (!rs)
@@ -154,20 +160,21 @@ namespace sQzClient
                     {
                         if (l < 4)
                             break;
-                        int errc = BitConverter.ToInt32(buf, offs);
+                        errc = BitConverter.ToInt32(buf, offs);
                         offs += 4;
                         l -= 4;
                         string msg = null;
                         if (errc == (int)TxI.SIGNIN_AL_1)
                         {
+                            mNee.eStt = Examinee.eAUTHENTICATED;
                             if (!mNee.ReadByte(buf, ref offs))
                             {
                                 msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
                                     mNee.dtTim1.ToString("HH:mm dd/MM/yyyy") + Txt.s._[(int)TxI.SIGNIN_AL_2] + mNee.tComp + ".";
                             }
                         }
-                        else if (errc == (int)TxI.SIGNIN_NO)
-                            msg = Txt.s._[(int)TxI.SIGNIN_NO];
+                        else if (errc == (int)TxI.SIGNIN_NOK)
+                            msg = Txt.s._[(int)TxI.SIGNIN_NOK];
                         if(msg != null)
                             Dispatcher.Invoke(() => {
                                 WPopup.s.ShowDialog(msg);
@@ -175,9 +182,21 @@ namespace sQzClient
                     }
                     break;
                 case NetCode.ExamRetrieving:
-                    offs = 0;
+                    errc = BitConverter.ToInt32(buf, offs);
+                    offs += 4;
+                    if(errc == (int)TxI.QSH_NFOUND)
+                    {
+                        mState = NetCode.Authenticating;
+                        Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QSH_NFOUND]));
+                        break;
+                    }
                     QuestSheet qs = new QuestSheet();
-                    qs.ReadByte(buf, ref offs);
+                    if (qs.ReadByte(buf, ref offs))
+                    {
+                        mState = NetCode.Authenticating;
+                        Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QSH_READ_ER]));
+                        break;
+                    }
                     Dispatcher.Invoke(() =>
                     {
                         //NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
@@ -199,10 +218,12 @@ namespace sQzClient
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.Authenticating:
-                    mNee.ToByteSgning(out outBuf, (int)mState);
+                    mNee.ToByte(out outBuf, (int)mState);
                     break;
                 case NetCode.ExamRetrieving:
-                    outBuf = BitConverter.GetBytes((int)mState);
+                    outBuf = new byte[6];//hardcode
+                    Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 4, 2);
                     break;
             }
             return true;
@@ -243,7 +264,7 @@ namespace sQzClient
             if (filePath != null && mNee.ReadLogFile(filePath))
             {
                 tbxNeeId.Text = mNee.tId;
-                txtNeeIdMsg.Text = Txt.s._[(int)TxI.AUTH_MSG];
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
             }
             else
             {

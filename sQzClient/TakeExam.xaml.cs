@@ -32,8 +32,6 @@ namespace sQzClient
         public static double qaWh;
         double qiWh;
         Thickness qMrg;
-
-        AnsSheet mAnsSh;
         public Examinee mNee;//reference to Auth.mNee
 
         public TakeExam()
@@ -116,6 +114,7 @@ namespace sQzClient
                 dtRemn = kDtDuration = new TimeSpan(0, 30, 0);
             kLogIntvl = new TimeSpan(0, 0, 30);
             WPopup.s.wpCb = null;
+            mNee.eStt = Examinee.eEXAMING;
         }
 
         void InitLeftPanel()
@@ -129,9 +128,8 @@ namespace sQzClient
             int nAns = 4;//hardcode
             int i = 0, n = mQSh.vQuest.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
-            mAnsSh = new AnsSheet();
-            mAnsSh.Init(mQSh, mNee.uId);
-            mAnsSh.InitView(mQSh, qaWh);
+            mNee.mAnsSh.Init(mQSh, mNee.uId);
+            mNee.mAnsSh.InitView(mQSh, qaWh);
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
@@ -178,7 +176,7 @@ namespace sQzClient
                 gAnsSh.Children.Add(l);
                 for (i = 1; i < nAns; ++i)
                 {
-                    l = mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+                    l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
                     l.BorderBrush = brBK;
                     l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
                     l.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -187,7 +185,7 @@ namespace sQzClient
                     Grid.SetColumn(l, i);
                     gAnsSh.Children.Add(l);
                 }
-                l = l = mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+                l = l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
                 l.BorderBrush = brBK;
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -208,7 +206,7 @@ namespace sQzClient
             gAnsSh.Children.Add(l);
             for (i = 1; i < nAns; ++i)
             {
-                l = mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+                l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
                 l.BorderBrush = brBK;
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.MB];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -216,7 +214,7 @@ namespace sQzClient
                 Grid.SetColumn(l, i);
                 gAnsSh.Children.Add(l);
             }
-            l = mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+            l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
             l.BorderBrush = brBK;
             l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -281,7 +279,7 @@ namespace sQzClient
             Thickness zero = new Thickness(0);
             stmtCon.Margin = stmtCon.Padding = zero;
             con.Children.Add(stmtCon);
-            con.Children.Add(mAnsSh.vlbxAns[idx-1]);
+            con.Children.Add(mNee.mAnsSh.vlbxAns[idx-1]);
             q.Children.Add(con);
             q.Background = Theme.s._[(int)BrushId.BG];
             return q;
@@ -290,6 +288,7 @@ namespace sQzClient
         public void Submit()
         {
             mState = NetCode.Submiting;
+            mNee.eStt = Examinee.eSUBMITTING;
             mClnt.ConnectWR(ref mCbMsg);
             DisableAll();
         }
@@ -320,13 +319,13 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Submiting:
-                    int sz = 4 + mAnsSh.GetByteCount();
+                    int sz = 4 + mNee.mAnsSh.GetByteCount();
                     int offs = 0;
                     outBuf = new byte[sz];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState),
                         0, outBuf, offs, 4);
                     offs += 4;
-                    mAnsSh.ToByte(ref outBuf, ref offs);
+                    mNee.mAnsSh.ToByte(ref outBuf, ref offs);
                     break;
                 case NetCode.Resubmit:
                     break;
@@ -343,11 +342,11 @@ namespace sQzClient
                     {
                         txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
                         dtRemn = kDtDuration - (DateTime.Now - kDtStart);
-                        if (mAnsSh.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
+                        if (mNee.mAnsSh.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
                         {
                             dtLastLog = DateTime.Now;
                             mNee.ToLogFile(dtLastLog.Hour, dtLastLog.Minute);
-                            mAnsSh.bChanged = false;
+                            mNee.mAnsSh.bChanged = false;
                         }
                     }
                     else

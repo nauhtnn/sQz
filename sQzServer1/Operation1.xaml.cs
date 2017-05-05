@@ -136,8 +136,8 @@ namespace sQzServer1
             {
                 case NetCode.Dating:
                     outMsg = new byte[mDt.GetByteCount()];
-                    int offst = 0;
-                    mDt.ToByte(outMsg, ref offst);
+                    offs = 0;
+                    mDt.ToByte(outMsg, ref offs);
                     break;
                 case NetCode.Authenticating:
                     e = mRoom.ReadByteSgning(buf, offs);
@@ -148,7 +148,8 @@ namespace sQzServer1
                             lck = false;//err, default value benefits examinees
                         if (!lck)
                         {
-                            e.dtTim1 = DateTime.Now;
+                            if(e.dtTim1.Hour == ExamDate.INVALID)
+                                e.dtTim1 = DateTime.Now;
                             Dispatcher.Invoke(() =>
                             {
                                 TextBlock t;
@@ -187,16 +188,29 @@ namespace sQzServer1
                     {
                         outMsg = new byte[5];
                         Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
-                        Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NO), 0, outMsg, 1, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, outMsg, 1, 4);
                         return false;//close
                     }
                     break;
                 case NetCode.ExamRetrieving:
-                    uint qshidx = mQPack.vSheet.Keys.ElementAt(mQShIdx);
-                    if (mQShMaxIdx < ++mQShIdx)
-                        mQShIdx = 0;
-                    if(mQPack.vSheet.TryGetValue(qshidx, out qs))
-                        outMsg = qs.aQuest;
+                    uint qshidx = BitConverter.ToUInt16(buf, offs);
+                    if (qshidx == ushort.MaxValue)
+                    {
+                        if (mQShMaxIdx < ++mQShIdx)
+                            mQShIdx = 0;
+                        qshidx = mQPack.vSheet.Keys.ElementAt(mQShIdx);
+                    }
+                    if (mQPack.vSheet.TryGetValue(qshidx, out qs))
+                    {
+                        outMsg = new byte[qs.aQuest.Length + 4];
+                        Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
+                        Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
+                    }
+                    else
+                    {
+                        mCbMsg += Txt.s._[(int)TxI.QSH_NFOUND] + qshidx;
+                        outMsg = BitConverter.GetBytes((int)TxI.QSH_NFOUND);
+                    }
                     break;
                 case NetCode.Submiting:
                     AnsSheet s = new AnsSheet();
@@ -211,6 +225,7 @@ namespace sQzServer1
                     lvid = (short)(s.Lvl * s.uNeeId);
                     if (mRoom.vExaminee.TryGetValue(lvid, out e))
                     {
+                        e.eStt = Examinee.eFINISHED;
                         e.mAnsSh = s;
                         e.uGrade = grade;
                         e.dtTim2 = DateTime.Now;
@@ -231,6 +246,8 @@ namespace sQzServer1
                             }
                         });
                     }
+                    else
+                        mCbMsg += "ERROR submit clnt not found " + lvid + "-" + grade;//todo
                     outMsg = BitConverter.GetBytes(grade);
                     break;
                 default:
@@ -292,7 +309,7 @@ namespace sQzServer1
                             vLock.Add(lvid, cbx);
                             gNee.Children.Add(cbx);
                             t = new TextBlock();
-                            if (e.dtTim1.Hour != 0)
+                            if (e.dtTim1.Hour != ExamDate.INVALID)
                             {
                                 t.Text = e.dtTim1.ToString("HH:mm");
                                 vbLock.Add(lvid, true);
@@ -307,7 +324,7 @@ namespace sQzServer1
                             Grid.SetColumn(t, 4);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            if (e.dtTim2.Hour != 0)
+                            if (e.dtTim2.Hour != ExamDate.INVALID)
                                 t.Text = e.dtTim2.ToString("HH:mm");
                             vTime2.Add(lvid, t);
                             Grid.SetRow(t, rid);
@@ -331,7 +348,7 @@ namespace sQzServer1
                     offs = 0;
                     mQPack = new QuestPack();
                     mQPack.ReadByte(buf, ref offs);
-                    mQShIdx = 0;
+                    mQShIdx = -1;
                     mQShMaxIdx = mQPack.vSheet.Keys.Count - 1;
                     LoadQuest();
                     mState = NetCode.AnsKeyRetrieving;

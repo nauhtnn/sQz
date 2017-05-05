@@ -71,7 +71,7 @@ namespace sQzLib
         {
             if (code == 10061)
             {
-                cbm += Txt.s._[(int)TxI.CONN_NOTI];
+                cbm += Txt.s._[(int)TxI.CONN_NOK];
                 return false;
             }
             return true;

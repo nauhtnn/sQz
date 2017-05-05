@@ -59,16 +59,24 @@ namespace sQzLib
                 while (reader.Read())
                 {
                     Examinee e = new Examinee();
+                    e.eStt = Examinee.eINFO;
                     e.uDtId = dateIdx;//reader.GetUInt16(0)
                     e.Lvl = reader.GetInt16(1);
                     e.uId = reader.GetUInt16(2);
                     e.tName = reader.GetString(3);
                     e.tBirdate = reader.GetDateTime(4).ToString(ExamDate.FORM_R);
                     e.tBirthplace = reader.GetString(5);
-                    if (reader.IsDBNull(6) || !DateTime.TryParse(reader.GetString(6), out e.dtTim1))
-                        e.dtTim1 = DateTime.Parse("00:00");
-                    if (reader.IsDBNull(7) || !DateTime.TryParse(reader.GetString(7), out e.dtTim2))
-                        e.dtTim2 = DateTime.Parse("00:00");
+                    if (reader.IsDBNull(6))
+                        e.dtTim1 = ExamDate.INVALID_DT;
+                    else
+                        DateTime.TryParse(reader.GetString(6), out e.dtTim1);
+                    if (reader.IsDBNull(7))
+                        e.dtTim2 = ExamDate.INVALID_DT;
+                    else
+                    {
+                        e.eStt = Examinee.eFINISHED;
+                        DateTime.TryParse(reader.GetString(7), out e.dtTim2);
+                    }
                     if (!reader.IsDBNull(8))
                         e.uGrade = reader.GetUInt16(8);
                     if (!reader.IsDBNull(9))
@@ -208,34 +216,18 @@ namespace sQzLib
 
         public Examinee ReadByteSgning(byte[] buf, int offs)
         {
-            int l = buf.Length - offs;
-            if (l < 2)
-                return null;
-            short lv = BitConverter.ToInt16(buf, offs);
-            l -= 2;
-            offs += 2;
-            if (l < 2)
-                return null;
-            ushort id = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
-            if (l < 4)
-                return null;
-            int sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return null;
-            string date = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
-            short key = (short)(lv * id);
-            Examinee e;
-            if(vExaminee.TryGetValue(key, out e) && e.tBirdate == date)
+            Examinee e = new Examinee();
+            e.ReadByte(buf, ref offs);
+            Examinee o;
+            short key = (short)(e.Lvl * e.uId);
+            if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
             {
-                if (4 < l)
-                    e.tComp = Encoding.UTF8.GetString(buf, offs + 4, l - 4);
-                return e;
+                //vExaminee.Remove(key);
+                //vExaminee.Add(key, e);
+                o.Merge(e);
+                if (o.eStt < Examinee.eAUTHENTICATED)
+                    o.eStt = Examinee.eAUTHENTICATED;
+                return o;
             }
             return null;
         }
@@ -250,7 +242,7 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(vExaminee.Count));
             foreach (Examinee e in vExaminee.Values)
-                foreach (byte[] b in e.ToByteGrade())
+                foreach (byte[] b in e.ToByte())
                     l.Add(b);
             //join
             int sz = 0;
@@ -285,21 +277,14 @@ namespace sQzLib
             while (0 < n)
             {
                 --n;
-                if (l < 2)
-                    return;
-                short lv = BitConverter.ToInt16(buf, offs);
-                l -= 2;
-                offs += 2;
-                if (l < 2)
-                    return;
-                ushort id = BitConverter.ToUInt16(buf, offs);
-                l -= 2;
-                offs += 2;
-                Examinee e;
-                if (!vExaminee.TryGetValue((short)(lv * id), out e))
-                    continue;
-                if (e.ReadByteGrade(buf, ref offs))
+                Examinee e = new Examinee();
+                if (e.ReadByte(buf, ref offs))
                     break;
+                Examinee o;
+                if (!vExaminee.TryGetValue((short)(e.Lvl * e.uId), out o))
+                    continue;
+                else
+                    o.Merge(e);
             }
         }
     }

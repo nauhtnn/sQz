@@ -18,8 +18,8 @@ namespace sQzLib
         public DateTime mDt;
         static CultureInfo sCultInfo = null;
         public uint uId;
-        public const int INVALID = 2016;
-        public const string DT2016 = "2016/01/01 01:00";
+        public const int INVALID = 0;
+        public static DateTime INVALID_DT = DateTime.Parse("2016/01/01 00:00");//h = m = INVALID
         public const string MYSQL2016 = "2016-01-01";
         public const string FORM_h = "H:m";
         public const string FORM_H = "yyyy/MM/dd HH:mm";
@@ -30,7 +30,7 @@ namespace sQzLib
 
         public ExamDate()
         {
-            Parse(DT2016, FORM_H, out mDt);
+            mDt = INVALID_DT;
             uId = uint.MaxValue;
         }
 
