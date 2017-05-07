@@ -26,6 +26,8 @@ namespace sQzClient
 
         public QuestSheet mQSh;
 
+        bool bPendingChg;
+
         Client2 mClnt;
         NetCode mState;
 
@@ -47,6 +49,8 @@ namespace sQzClient
             ShowsNavigationUI = false;
 
             mQSh = new QuestSheet();
+
+            bPendingChg = false;
         }
 
         private void LoadTxt()
@@ -129,7 +133,8 @@ namespace sQzClient
             int i = 0, n = mQSh.vQuest.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
             mNee.mAnsSh.Init(mQSh, mNee.uId);
-            mNee.mAnsSh.InitView(mQSh, qaWh);
+            mNee.mAnsSh.InitView(mQSh, qaWh, ItemSelChgCB);
+            bPendingChg = false;
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
@@ -345,13 +350,17 @@ namespace sQzClient
                         if (mNee.mAnsSh.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
                         {
                             dtLastLog = DateTime.Now;
-                            mNee.ToLogFile(dtLastLog.Hour, dtLastLog.Minute);
+                            mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
                             mNee.mAnsSh.bChanged = false;
+                            txtLogTim.Text = "last sav at " + dtRemn.Minutes + ':' + dtRemn.Seconds;
+                            txtChg.Text = "no pending change to sav";
+                            bPendingChg = false;
                         }
                     }
                     else
                     {
                         txtRTime.Text = "00:00";
+                        //todo: log
                         Submit();
                         WPopup.s.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
                     }
@@ -386,6 +395,18 @@ namespace sQzClient
             bRunning = false;
             WPopup.s.cncl = false;
             mClnt.Close();
+        }
+
+        private void ItemSelChgCB()
+        {
+            bPendingChg = true;
+            Dispatcher.Invoke(() => {
+                if (bPendingChg)
+                {
+                    txtChg.Text = "there is pending change to log";
+                    bPendingChg = false;
+                }
+            });
         }
     }
 }

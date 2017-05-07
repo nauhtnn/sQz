@@ -351,11 +351,11 @@ namespace sQzLib
             uGrade = e.uGrade;
         }
 
-        public void ToLogFile(int h, int m)
+        public void ToLogFile(int m, int s)
         {
             var fileName = System.IO.Path.Combine(Environment.GetFolderPath(
                 Environment.SpecialFolder.ApplicationData), tLOG_PREFX +
-                (Lvl * uId) + '-' + h.ToString("d2") + m.ToString("d2"));
+                (Lvl * uId) + '-' + m.ToString("d2") + s.ToString("d2"));
             System.IO.BinaryWriter w = null;
             try
             {

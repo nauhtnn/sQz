@@ -8,6 +8,8 @@ using System.Windows.Controls;
 
 namespace sQzLib
 {
+    public delegate void DgEvntCB();
+
     public class AnsItem: StackPanel
     {
         public static CornerRadius sCr;
@@ -91,11 +93,13 @@ namespace sQzLib
         public ExamLvl eLvl;
         public ushort uNeeId;
         public bool bChanged;
+        DgEvntCB dgSelChgCB;
 
         public AnsSheet() {
             bChanged = false;
             aAns = null;
             uQSId = ushort.MaxValue;
+            dgSelChgCB = null;
         }
 
         public void Init(QuestSheet qs, ushort neeId)//todo: only use qs.uId
@@ -126,8 +130,11 @@ namespace sQzLib
             get { return (short)((short)eLvl * uQSId); }
         }
 
-        public void InitView(QuestSheet qs, double w)
+        public void InitView(QuestSheet qs, double w, DgEvntCB cb)
         {
+            if (cb != null)
+                dgSelChgCB = cb;
+
             vlbxAns = new ListBox[qs.vQuest.Count];
             vAnsItem = new AnsItem[qs.vQuest.Count][];
             
@@ -277,6 +284,7 @@ namespace sQzLib
                     vAnsItem[qid][i].Unselected();
                 }
             }
+            dgSelChgCB?.Invoke();
         }
     }
 }

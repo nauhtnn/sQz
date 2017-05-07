@@ -52,6 +52,7 @@
             <TextBlock x:Name="txtRTime" Background="#ffffbb" Foreground="#00356b" Grid.Column="2" FontSize="28" TextAlignment="Center"/>
             <Button x:Name="btnExit" Grid.Column="3" Content="Close" Click="btnExit_Click" FontSize="20"/>
         </Grid>
-        <TextBlock x:Name="txtRs" Text="ABD"/>
+        <TextBlock x:Name="txtLogTim" Text="ltim"/>
+        <TextBlock x:Name="txtChg" Text="change"/>
     </StackPanel>
 </Page>

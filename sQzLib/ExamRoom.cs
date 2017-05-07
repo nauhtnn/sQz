@@ -193,7 +193,11 @@ namespace sQzLib
                         if (e.uGrade != short.MaxValue)
                             qry.Append(",grade=" + e.uGrade);
                         if (e.tComp != null)
+                        {
+                            if (32 < e.tComp.Length)
+                                e.tComp = e.tComp.Substring(0, 32);//todo: more responsive
                             qry.Append(",comp='" + e.tComp + "'");
+                        }
                         if (e.mAnsSh != null)
                         {
                             qry.Append(",questIdx=" + e.mAnsSh.uQSId);
