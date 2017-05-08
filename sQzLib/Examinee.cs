@@ -41,7 +41,10 @@ namespace sQzLib
         public const int eFINISHED = 5;
         public int eStt;
 
-        const string tLOG_PREFX = "sQz\\nee";
+        public StringBuilder tLog;
+
+        const string tLOG_DIR = "sQz\\";
+        const string tLOG_PRE = "sav";
 
         public Examinee() {
             Reset();
@@ -58,6 +61,7 @@ namespace sQzLib
             dtTim1 = dtTim2 = ExamDate.INVALID_DT;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
+            tLog = new StringBuilder();
         }
         public string tId {
             get {
@@ -351,10 +355,22 @@ namespace sQzLib
             uGrade = e.uGrade;
         }
 
-        public void ToLogFile(int m, int s)
+        public bool ToLogFile(int m, int s)
         {
-            var fileName = System.IO.Path.Combine(Environment.GetFolderPath(
-                Environment.SpecialFolder.ApplicationData), tLOG_PREFX +
+            bool err = false;
+            string p = null;
+            try
+            {
+                p = System.IO.Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData), tLOG_DIR);
+                if (!System.IO.Directory.Exists(p))
+                    System.IO.Directory.CreateDirectory(p);
+            }
+            catch (System.IO.DirectoryNotFoundException) { err = true; }
+            catch(UnauthorizedAccessException) { err = true; }
+            if (err)
+                return true;
+            var fileName = System.IO.Path.Combine(p, tLOG_PRE +
                 (Lvl * uId) + '-' + m.ToString("d2") + s.ToString("d2"));
             System.IO.BinaryWriter w = null;
             try
@@ -362,27 +378,29 @@ namespace sQzLib
                 w = new System.IO.BinaryWriter(System.IO.File.OpenWrite(fileName),
                     Encoding.UTF8);
             }
-            catch (UnauthorizedAccessException) { w = null; }
-            if(w != null)
-            {
-                w.Write(uDtId);
-                w.Write(Lvl);
-                w.Write(uId);
-                w.Write(uGrade);
-                w.Write(tComp.Length);
-                if (0 < tComp.Length)
-                    w.Write(tComp);
-                w.Write(dtTim1.Hour);
-                w.Write(dtTim1.Minute);
-                w.Write(dtTim2.Hour);
-                w.Write(dtTim2.Minute);
-                w.Write(mAnsSh.uQSId);
-                w.Write(mAnsSh.aAns, 0, mAnsSh.aAns.Length);
-                w.Close();
-            }
+            catch (UnauthorizedAccessException) { err = true; }
+            if (err)
+                return true;
+            w.Write(uDtId);
+            w.Write(Lvl);
+            w.Write(uId);
+            w.Write(uGrade);
+            w.Write(tComp.Length);
+            if (0 < tComp.Length)
+                w.Write(tComp);
+            w.Write(dtTim1.Hour);
+            w.Write(dtTim1.Minute);
+            w.Write(dtTim2.Hour);
+            w.Write(dtTim2.Minute);
+            w.Write(m);
+            w.Write(s);
+            w.Write(mAnsSh.uQSId);
+            w.Write(mAnsSh.aAns, 0, mAnsSh.aAns.Length);
+            w.Close();
+            return false;
         }
 
-        public bool ReadLogFile(string filePath)
+        public bool ReadLogFile(string filePath, out TimeSpan ts)
         {
             System.IO.BinaryReader r = null;
             if (System.IO.File.Exists(filePath))
@@ -392,13 +410,15 @@ namespace sQzLib
                 }
                 catch (UnauthorizedAccessException) { r = null; }
             if (r == null)
+            {
+                ts = new TimeSpan(1, 0, 0);
                 return false;
+            }
             uDtId = r.ReadUInt32();
             eLvl = (ExamLvl)r.ReadInt16();
             uId = r.ReadUInt16();
             uGrade = r.ReadUInt16();
-            int sz = r.ReadInt32();
-            if (0 < sz)
+            if (0 < r.ReadInt32())
                 tComp = r.ReadString();
             int h = r.ReadInt32();
             int m = r.ReadInt32();
@@ -406,9 +426,17 @@ namespace sQzLib
             h = r.ReadInt32();
             m = r.ReadInt32();
             ExamDate.Parse(h.ToString() + ':' + m, ExamDate.FORM_h, out dtTim2);
+            h = r.ReadInt32();
+            m = r.ReadInt32();
+            ts = new TimeSpan(0, h, m);
             mAnsSh.uQSId = r.ReadUInt16();
             mAnsSh.aAns = r.ReadBytes(120);//mAnsSh.aAns.Length//hardcode
             return true;
+        }
+
+        public void UpdateLogStr(string s)
+        {
+            tLog.Append(s);
         }
     }
 }

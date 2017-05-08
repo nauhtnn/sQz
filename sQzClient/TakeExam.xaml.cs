@@ -17,7 +17,7 @@ namespace sQzClient
     {
         DateTime kDtStart;
         TimeSpan dtRemn;
-        TimeSpan kDtDuration;
+        public TimeSpan kDtDuration;
         DateTime dtLastLog;
         TimeSpan kLogIntvl;
         bool bRunning;
@@ -51,6 +51,7 @@ namespace sQzClient
             mQSh = new QuestSheet();
 
             bPendingChg = false;
+            kDtDuration = new TimeSpan(1, 0, 0);
         }
 
         private void LoadTxt()
@@ -101,21 +102,26 @@ namespace sQzClient
             mTimer.AutoReset = true;
             mTimer.Enabled = true;
             dtLastLog = kDtStart = DateTime.Now;
-            string t = Utils.ReadFile("Duration.txt");
-            int m = -1, s = -1;
-            if (t != null)
+            if (kDtDuration.Hours == 1)
             {
-                string[] vt = t.Split('\t');
-                if (vt.Length == 2)
+                string t = Utils.ReadFile("Duration.txt");
+                int m = -1, s = -1;
+                if (t != null)
                 {
-                    int.TryParse(vt[0], out m);
-                    int.TryParse(vt[1], out s);
+                    string[] vt = t.Split('\t');
+                    if (vt.Length == 2)
+                    {
+                        int.TryParse(vt[0], out m);
+                        int.TryParse(vt[1], out s);
+                    }
+                    if (-1 < m && -1 < s)
+                        dtRemn = kDtDuration = new TimeSpan(0, m, s);
                 }
-                if (-1 < m && -1 < s)
-                    dtRemn = kDtDuration = new TimeSpan(0, m, s);
+                if (m < 0 || s < 0)
+                    dtRemn = kDtDuration = new TimeSpan(0, 30, 0);
             }
-            if (m < 0 || s < 0)
-                dtRemn = kDtDuration = new TimeSpan(0, 30, 0);
+            else
+                dtRemn = kDtDuration;
             kLogIntvl = new TimeSpan(0, 0, 30);
             WPopup.s.wpCb = null;
             mNee.eStt = Examinee.eEXAMING;
