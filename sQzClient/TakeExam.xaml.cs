@@ -122,7 +122,10 @@ namespace sQzClient
             mTimer.Enabled = true;
             dtLastLog = kDtStart = DateTime.Now;
             WPopup.s.wpCb = null;
-            mNee.eStt = Examinee.eEXAMING;
+            if (mNee.eStt < Examinee.eEXAMING)
+                mNee.eStt = Examinee.eEXAMING;
+            else if (mNee.eStt == Examinee.eSUBMITTING)
+                Submit();
         }
 
         void InitLeftPanel()
@@ -297,12 +300,12 @@ namespace sQzClient
 
         public void Submit()
         {
+            bRunning = false;
+            DisableAll();
             mState = NetCode.Submiting;
             mNee.eStt = Examinee.eSUBMITTING;
-            if (mNee.mAnsSh.bChanged)
-                mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+            mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             mClnt.ConnectWR(ref mCbMsg);
-            DisableAll();
         }
 
         private void btnSubmit_Click(object sender, RoutedEventArgs e)
@@ -367,7 +370,6 @@ namespace sQzClient
                 else
                 {
                     dtRemn = new TimeSpan(0, 0, 0);
-                    mNee.ToLogFile(0, 0);
                     bRunning = false;
                     Dispatcher.Invoke(() =>
                     {
