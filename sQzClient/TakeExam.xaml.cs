@@ -85,12 +85,15 @@ namespace sQzClient
 
             WPopup.nwIns(w);
 
-            string msg = mNee.tId + " (" + mNee.tName +
-                ")" + Txt.s._[(int)TxI.AUTH_MSG];
-            //Dispatcher.Invoke(() => {
-                WPopup.s.wpCb = ShowQuestion;
-                WPopup.s.ShowDialog(msg);
-            //});
+            System.Text.StringBuilder msg = new System.Text.StringBuilder();
+            msg.Append(mNee.tId + " (" + mNee.tName + ")");
+            if (kDtDuration.Minutes == 30)
+                msg.Append(Txt.s._[(int)TxI.EXAMING_MSG_1]);
+            else
+                msg.AppendFormat(Txt.s._[(int)TxI.EXAMING_MSG_2],
+                    kDtDuration.Minutes, kDtDuration.Seconds);
+            WPopup.s.wpCb = ShowQuestion;
+            WPopup.s.ShowDialog(msg.ToString());
         }
 
         void ShowQuestion()
@@ -140,7 +143,7 @@ namespace sQzClient
             AnsItem.SInit(Window.GetWindow(this).FontSize);
             mNee.mAnsSh.Init(mQSh, mNee.uId);
             mNee.mAnsSh.InitView(mQSh, qaWh, ItemSelChgCB);
-            bPendingChg = false;
+            txtChg.Text = string.Empty;
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
@@ -358,8 +361,8 @@ namespace sQzClient
                             dtLastLog = DateTime.Now;
                             mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
                             mNee.mAnsSh.bChanged = false;
-                            txtLogTim.Text = "last sav at " + dtRemn.Minutes + ':' + dtRemn.Seconds;
-                            txtChg.Text = "no pending change to sav";
+                            txtLogTim.Text = Txt.s._[(int)TxI.LOG_MGS] + dtRemn.Minutes + ':' + dtRemn.Seconds;
+                            txtChg.Text = string.Empty;
                             bPendingChg = false;
                         }
                     }
@@ -409,7 +412,7 @@ namespace sQzClient
             Dispatcher.Invoke(() => {
                 if (bPendingChg)
                 {
-                    txtChg.Text = "there is pending change to log";
+                    txtChg.Text = Txt.s._[(int)TxI.LOG_PENDING_MSG];
                     bPendingChg = false;
                 }
             });
