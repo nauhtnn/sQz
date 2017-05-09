@@ -32,7 +32,7 @@ namespace sQzLib
                 server = "localhost";
                 database = "sQz";
                 uid = "root";
-                password = "helloW1";
+                password = "1234";
             }
             else
             {

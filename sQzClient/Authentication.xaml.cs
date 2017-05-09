@@ -30,7 +30,6 @@ namespace sQzClient
         ExamDate mDt;
         Examinee mNee;
         TakeExam pgTkExm;
-        TimeSpan dtDuration;
 
         public Authentication()
         {
@@ -46,7 +45,7 @@ namespace sQzClient
             mDt = new ExamDate();
             mNee = new Examinee();
 
-            dtDuration = new TimeSpan(1, 0, 0);
+            mNee.kDtDuration = new TimeSpan(1, 0, 0);
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -206,8 +205,6 @@ namespace sQzClient
                         pgTkExm = new TakeExam();
                         pgTkExm.mNee = mNee;
                         pgTkExm.mQSh = qs;
-                        if (dtDuration.Hours == 0)
-                            pgTkExm.kDtDuration = dtDuration;
                         NavigationService.Navigate(pgTkExm);
                     });
                     break;
@@ -266,7 +263,7 @@ namespace sQzClient
             string filePath = null;
             if (result == true)
                 filePath = dlg.FileName;
-            if (filePath != null && mNee.ReadLogFile(filePath, out dtDuration))
+            if (filePath != null && mNee.ReadLogFile(filePath))
             {
                 tbxNeeId.Text = mNee.tId;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);

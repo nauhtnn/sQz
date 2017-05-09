@@ -17,7 +17,6 @@ namespace sQzClient
     {
         DateTime kDtStart;
         TimeSpan dtRemn;
-        public TimeSpan kDtDuration;
         DateTime dtLastLog;
         TimeSpan kLogIntvl;
         bool bRunning;
@@ -51,7 +50,6 @@ namespace sQzClient
             mQSh = new QuestSheet();
 
             bPendingChg = false;
-            kDtDuration = new TimeSpan(1, 0, 0);
         }
 
         private void LoadTxt()
@@ -87,44 +85,40 @@ namespace sQzClient
 
             System.Text.StringBuilder msg = new System.Text.StringBuilder();
             msg.Append(mNee.tId + " (" + mNee.tName + ")");
-            if (kDtDuration.Minutes == 30)
+            if (mNee.kDtDuration.Minutes == 30)
                 msg.Append(Txt.s._[(int)TxI.EXAMING_MSG_1]);
             else
                 msg.AppendFormat(Txt.s._[(int)TxI.EXAMING_MSG_2],
-                    kDtDuration.Minutes, kDtDuration.Seconds);
+                    mNee.kDtDuration.Minutes, mNee.kDtDuration.Seconds);
             WPopup.s.wpCb = ShowQuestion;
             WPopup.s.ShowDialog(msg.ToString());
         }
 
         void ShowQuestion()
         {
-            Dispatcher.Invoke(()=> { svwrQSh.Visibility = Visibility.Visible; });
+            svwrQSh.Visibility = Visibility.Visible;
 
             mTimer = new System.Timers.Timer(1000);
             mTimer.Elapsed += UpdateSrvrMsg;
             mTimer.AutoReset = true;
             mTimer.Enabled = true;
             dtLastLog = kDtStart = DateTime.Now;
-            if (kDtDuration.Hours == 1)
+            string t = Utils.ReadFile("Duration.txt");
+            int m = -1, s = -1;
+            if (t != null)
             {
-                string t = Utils.ReadFile("Duration.txt");
-                int m = -1, s = -1;
-                if (t != null)
+                string[] vt = t.Split('\t');
+                if (vt.Length == 2)
                 {
-                    string[] vt = t.Split('\t');
-                    if (vt.Length == 2)
-                    {
-                        int.TryParse(vt[0], out m);
-                        int.TryParse(vt[1], out s);
-                    }
-                    if (-1 < m && -1 < s)
-                        dtRemn = kDtDuration = new TimeSpan(0, m, s);
+                    int.TryParse(vt[0], out m);
+                    int.TryParse(vt[1], out s);
                 }
-                if (m < 0 || s < 0)
-                    dtRemn = kDtDuration = new TimeSpan(0, 30, 0);
+                if (-1 < m && -1 < s)
+                    dtRemn = mNee.kDtDuration = new TimeSpan(0, m, s);
             }
-            else
-                dtRemn = kDtDuration;
+            if (m < 0 || s < 0)
+                dtRemn = mNee.kDtDuration;
+            txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
             kLogIntvl = new TimeSpan(0, 0, 30);
             WPopup.s.wpCb = null;
             mNee.eStt = Examinee.eEXAMING;
@@ -144,6 +138,7 @@ namespace sQzClient
             mNee.mAnsSh.Init(mQSh, mNee.uId);
             mNee.mAnsSh.InitView(mQSh, qaWh, ItemSelChgCB);
             txtChg.Text = string.Empty;
+            mNee.mAnsSh.bChanged = false;
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
@@ -355,7 +350,7 @@ namespace sQzClient
                     if (0 < dtRemn.Ticks)
                     {
                         txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
-                        dtRemn = kDtDuration - (DateTime.Now - kDtStart);
+                        dtRemn = mNee.kDtDuration - (DateTime.Now - kDtStart);
                         if (mNee.mAnsSh.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
                         {
                             dtLastLog = DateTime.Now;

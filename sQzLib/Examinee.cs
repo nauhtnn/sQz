@@ -41,6 +41,8 @@ namespace sQzLib
         public const int eFINISHED = 5;
         public int eStt;
 
+        public TimeSpan kDtDuration;
+
         public StringBuilder tLog;
 
         const string tLOG_DIR = "sQz\\";
@@ -61,6 +63,7 @@ namespace sQzLib
             dtTim1 = dtTim2 = ExamDate.INVALID_DT;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
+            kDtDuration = new TimeSpan(0, 30, 0);
             tLog = new StringBuilder();
         }
         public string tId {
@@ -400,7 +403,7 @@ namespace sQzLib
             return false;
         }
 
-        public bool ReadLogFile(string filePath, out TimeSpan ts)
+        public bool ReadLogFile(string filePath)
         {
             System.IO.BinaryReader r = null;
             if (System.IO.File.Exists(filePath))
@@ -410,10 +413,7 @@ namespace sQzLib
                 }
                 catch (UnauthorizedAccessException) { r = null; }
             if (r == null)
-            {
-                ts = new TimeSpan(1, 0, 0);
                 return false;
-            }
             uDtId = r.ReadUInt32();
             eLvl = (ExamLvl)r.ReadInt16();
             uId = r.ReadUInt16();
@@ -428,7 +428,7 @@ namespace sQzLib
             ExamDate.Parse(h.ToString() + ':' + m, ExamDate.FORM_h, out dtTim2);
             h = r.ReadInt32();
             m = r.ReadInt32();
-            ts = new TimeSpan(0, h, m);
+            kDtDuration = new TimeSpan(0, h, m);
             mAnsSh.uQSId = r.ReadUInt16();
             mAnsSh.aAns = r.ReadBytes(120);//mAnsSh.aAns.Length//hardcode
             return true;
