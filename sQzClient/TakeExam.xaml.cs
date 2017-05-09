@@ -25,7 +25,7 @@ namespace sQzClient
 
         public QuestSheet mQSh;
 
-        bool bPendingChg;
+        //bool bPendingChg;
 
         Client2 mClnt;
         NetCode mState;
@@ -49,7 +49,7 @@ namespace sQzClient
 
             mQSh = new QuestSheet();
 
-            bPendingChg = false;
+            //bPendingChg = false;
         }
 
         private void LoadTxt()
@@ -83,6 +83,24 @@ namespace sQzClient
 
             WPopup.nwIns(w);
 
+            string t = Utils.ReadFile("Duration.txt");
+            int m = -1, s = -1;
+            if (t != null)
+            {
+                string[] vt = t.Split('\t');
+                if (vt.Length == 2)
+                {
+                    int.TryParse(vt[0], out m);
+                    int.TryParse(vt[1], out s);
+                }
+                if (-1 < m && -1 < s)
+                    dtRemn = mNee.kDtDuration = new TimeSpan(0, m, s);
+            }
+            if (m < 0 || s < 0)
+                dtRemn = mNee.kDtDuration;
+            txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
+            kLogIntvl = new TimeSpan(0, 0, 30);
+
             System.Text.StringBuilder msg = new System.Text.StringBuilder();
             msg.Append(mNee.tId + " (" + mNee.tName + ")");
             if (mNee.kDtDuration.Minutes == 30)
@@ -103,23 +121,6 @@ namespace sQzClient
             mTimer.AutoReset = true;
             mTimer.Enabled = true;
             dtLastLog = kDtStart = DateTime.Now;
-            string t = Utils.ReadFile("Duration.txt");
-            int m = -1, s = -1;
-            if (t != null)
-            {
-                string[] vt = t.Split('\t');
-                if (vt.Length == 2)
-                {
-                    int.TryParse(vt[0], out m);
-                    int.TryParse(vt[1], out s);
-                }
-                if (-1 < m && -1 < s)
-                    dtRemn = mNee.kDtDuration = new TimeSpan(0, m, s);
-            }
-            if (m < 0 || s < 0)
-                dtRemn = mNee.kDtDuration;
-            txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
-            kLogIntvl = new TimeSpan(0, 0, 30);
             WPopup.s.wpCb = null;
             mNee.eStt = Examinee.eEXAMING;
         }
@@ -137,7 +138,7 @@ namespace sQzClient
             AnsItem.SInit(Window.GetWindow(this).FontSize);
             mNee.mAnsSh.Init(mQSh, mNee.uId);
             mNee.mAnsSh.InitView(mQSh, qaWh, ItemSelChgCB);
-            txtChg.Text = string.Empty;
+            //txtChg.Text = string.Empty;
             mNee.mAnsSh.bChanged = false;
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
@@ -298,6 +299,8 @@ namespace sQzClient
         {
             mState = NetCode.Submiting;
             mNee.eStt = Examinee.eSUBMITTING;
+            if (mNee.mAnsSh.bChanged)
+                mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             mClnt.ConnectWR(ref mCbMsg);
             DisableAll();
         }
@@ -315,7 +318,6 @@ namespace sQzClient
             {
                 case NetCode.Submiting:
                     ushort grade = BitConverter.ToUInt16(buf, offs);
-                    //txtRs.Text = Txt.s._[(int)TxI.RESULT] + grade;
                     btnSubmit.Content = grade;
                     WPopup.s.ShowDialog(Txt.s._[(int)TxI.RESULT] + grade);
                     return false;
@@ -345,30 +347,36 @@ namespace sQzClient
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
             if (bRunning)
-                Dispatcher.Invoke(() =>
+            {
+                if (0 < dtRemn.Ticks)
                 {
-                    if (0 < dtRemn.Ticks)
+                    dtRemn = mNee.kDtDuration - (DateTime.Now - kDtStart);
+                    if (mNee.mAnsSh.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
                     {
-                        txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
-                        dtRemn = mNee.kDtDuration - (DateTime.Now - kDtStart);
-                        if (mNee.mAnsSh.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
-                        {
-                            dtLastLog = DateTime.Now;
-                            mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
-                            mNee.mAnsSh.bChanged = false;
-                            txtLogTim.Text = Txt.s._[(int)TxI.LOG_MGS] + dtRemn.Minutes + ':' + dtRemn.Seconds;
-                            txtChg.Text = string.Empty;
-                            bPendingChg = false;
-                        }
+                        dtLastLog = DateTime.Now;
+                        mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+                        //txtLogTim.Text = Txt.s._[(int)TxI.LOG_MGS] + dtRemn.Minutes + ':' + dtRemn.Seconds;
+                        //txtChg.Text = string.Empty;
+                        //bPendingChg = false;
                     }
-                    else
+                    Dispatcher.Invoke(() =>
                     {
-                        txtRTime.Text = "00:00";
-                        //todo: log
-                        Submit();
+                        txtRTime.Text = dtRemn.Minutes.ToString() + " : " + dtRemn.Seconds;
+                    });
+                }
+                else
+                {
+                    dtRemn = new TimeSpan(0, 0, 0);
+                    mNee.ToLogFile(0, 0);
+                    bRunning = false;
+                    Dispatcher.Invoke(() =>
+                    {
+                        txtRTime.Text = "0 : 0";
                         WPopup.s.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
-                    }
-                });
+                        Submit();
+                    });
+                }
+            }
         }
 
         private void DisableAll()
@@ -380,6 +388,8 @@ namespace sQzClient
 
         void Exit()
         {
+            if (mNee.mAnsSh.bChanged)
+                mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             Window.GetWindow(this).Close();
         }
 
@@ -403,14 +413,14 @@ namespace sQzClient
 
         private void ItemSelChgCB()
         {
-            bPendingChg = true;
-            Dispatcher.Invoke(() => {
-                if (bPendingChg)
-                {
-                    txtChg.Text = Txt.s._[(int)TxI.LOG_PENDING_MSG];
-                    bPendingChg = false;
-                }
-            });
+            //bPendingChg = true;
+            //Dispatcher.Invoke(() => {
+            //    if (bPendingChg)
+            //    {
+            //        txtChg.Text = Txt.s._[(int)TxI.LOG_PENDING_MSG];
+            //        bPendingChg = false;
+            //    }
+            //});
         }
     }
 }

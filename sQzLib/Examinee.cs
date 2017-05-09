@@ -400,6 +400,7 @@ namespace sQzLib
             w.Write(mAnsSh.uQSId);
             w.Write(mAnsSh.aAns, 0, mAnsSh.aAns.Length);
             w.Close();
+            mAnsSh.bChanged = false;
             return false;
         }
 
