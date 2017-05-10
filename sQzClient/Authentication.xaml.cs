@@ -147,7 +147,8 @@ namespace sQzClient
                     ++offs;
                     if(rs)
                     {
-                        mNee.eStt = Examinee.eAUTHENTICATED;
+                        if(mNee.eStt < Examinee.eAUTHENTICATED)
+                            mNee.eStt = Examinee.eAUTHENTICATED;
                         rs = mNee.ReadByte(buf, ref offs);
                         l = buf.Length - offs;
                         if (!rs)
@@ -168,7 +169,8 @@ namespace sQzClient
                         string msg = null;
                         if (errc == (int)TxI.SIGNIN_AL_1)
                         {
-                            mNee.eStt = Examinee.eAUTHENTICATED;
+                            if (mNee.eStt < Examinee.eAUTHENTICATED)
+                                mNee.eStt = Examinee.eAUTHENTICATED;
                             if (!mNee.ReadByte(buf, ref offs))
                             {
                                 msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +

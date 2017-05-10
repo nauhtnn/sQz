@@ -83,18 +83,21 @@ namespace sQzClient
 
             WPopup.nwIns(w);
 
-            string t = Utils.ReadFile("Duration.txt");
             int m = -1, s = -1;
-            if (t != null)
+            if (mNee.eStt < Examinee.eSUBMITTING)
             {
-                string[] vt = t.Split('\t');
-                if (vt.Length == 2)
+                string t = Utils.ReadFile("Duration.txt");
+                if (t != null)
                 {
-                    int.TryParse(vt[0], out m);
-                    int.TryParse(vt[1], out s);
+                    string[] vt = t.Split('\t');
+                    if (vt.Length == 2)
+                    {
+                        int.TryParse(vt[0], out m);
+                        int.TryParse(vt[1], out s);
+                    }
+                    if (-1 < m && -1 < s)
+                        dtRemn = mNee.kDtDuration = new TimeSpan(0, m, s);
                 }
-                if (-1 < m && -1 < s)
-                    dtRemn = mNee.kDtDuration = new TimeSpan(0, m, s);
             }
             if (m < 0 || s < 0)
                 dtRemn = mNee.kDtDuration;

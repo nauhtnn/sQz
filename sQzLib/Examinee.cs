@@ -140,12 +140,20 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(eStt));
             if (eStt == eSIGNING)
                 return l;
-            b = Encoding.UTF8.GetBytes(tName);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
-            b = Encoding.UTF8.GetBytes(tBirthplace);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
+            if (tName != null)//todo, and tBirday != null, too
+            {
+                b = Encoding.UTF8.GetBytes(tName);
+                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(b);
+                b = Encoding.UTF8.GetBytes(tBirthplace);
+                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(b);
+            }
+            else
+            {
+                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(BitConverter.GetBytes(b.Length));
+            }
             if (eStt == eINFO)
                 return l;
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
@@ -260,9 +268,12 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return true;
-            tName = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
+            if (0 < sz)
+            {
+                tName = Encoding.UTF8.GetString(buf, offs, sz);
+                l -= sz;
+                offs += sz;
+            }
             if (l < 4)
                 return true;
             sz = BitConverter.ToInt32(buf, offs);
@@ -270,9 +281,12 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return true;
-            tBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
+            if (0 < sz)
+            {
+                tBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
+                l -= sz;
+                offs += sz;
+            }
             if (eStt == eINFO)
                 return false;
             if (l < 4)
@@ -289,7 +303,7 @@ namespace sQzLib
                 dtTim1 = ExamDate.INVALID_DT;
             if (eStt == eAUTHENTICATED)
                 return false;
-            if (l < 4)
+            if (l < 2)
                 return true;
             mAnsSh.uQSId = BitConverter.ToUInt16(buf, offs);
             l -= 2;
@@ -338,7 +352,7 @@ namespace sQzLib
 
         public void Merge(Examinee e)
         {
-            if (e.eStt != eSIGNING && uDtId != e.uDtId || eStt == eFINISHED)
+            if (uDtId != e.uDtId || eStt == eFINISHED)
                 return;
             if (Lvl != e.Lvl || uId != e.uId
                 || tBirdate != e.tBirdate)
@@ -388,6 +402,7 @@ namespace sQzLib
             w.Write(Lvl);
             w.Write(uId);
             w.Write(uGrade);
+            w.Write(eStt);
             w.Write(tComp.Length);
             if (0 < tComp.Length)
                 w.Write(tComp);
@@ -419,6 +434,7 @@ namespace sQzLib
             eLvl = (ExamLvl)r.ReadInt16();
             uId = r.ReadUInt16();
             uGrade = r.ReadUInt16();
+            eStt = r.ReadInt32();
             if (0 < r.ReadInt32())
                 tComp = r.ReadString();
             int h = r.ReadInt32();
