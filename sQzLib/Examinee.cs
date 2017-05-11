@@ -151,8 +151,8 @@ namespace sQzLib
             }
             else
             {
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(BitConverter.GetBytes(0));
+                l.Add(BitConverter.GetBytes(0));
             }
             if (eStt == eINFO)
                 return l;
