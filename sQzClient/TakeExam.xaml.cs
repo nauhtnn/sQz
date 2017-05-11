@@ -176,7 +176,7 @@ namespace sQzClient
             Grid.SetColumn(l, i);
             gAnsSh.Children.Add(l);
             //next lines
-            n -= 2;
+            //n -= 1;
             int j = 1;
             for (; j < n; ++j)
             {
