@@ -247,12 +247,6 @@ namespace sQzClient
             Window.GetWindow(this).Close();
         }
 
-        protected override void OnKeyUp(KeyEventArgs e)
-        {
-            mCbMsg += e.Key.ToString();
-            base.OnKeyUp(e);
-        }
-
         private void btnOpenLog_Click(object sender, RoutedEventArgs e)
         {
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
