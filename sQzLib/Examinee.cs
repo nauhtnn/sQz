@@ -352,14 +352,21 @@ namespace sQzLib
 
         public void Merge(Examinee e)
         {
-            if (uDtId != e.uDtId || eStt == eFINISHED)
+            //only server0 knows uDtId, then send it to server1 and client
+            //server1 reads bytes from server0
+            //server1 merges bytes from client
+            if ((e.uDtId != uint.MaxValue && uDtId != e.uDtId)
+                || eStt == eFINISHED)
                 return;
             if (Lvl != e.Lvl || uId != e.uId
                 || tBirdate != e.tBirdate)
                 return;
             tComp += e.tComp;
             if (e.eStt < eStt || e.eStt < eEXAMING)
+            {
+                mAnsSh.uQSId = ushort.MaxValue;//reset
                 return;
+            }
             eStt = e.eStt;
             mAnsSh.uQSId = e.mAnsSh.uQSId;
             dtTim1 = e.dtTim1;
