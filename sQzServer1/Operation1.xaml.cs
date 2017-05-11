@@ -140,15 +140,18 @@ namespace sQzServer1
                     mDt.ToByte(outMsg, ref offs);
                     break;
                 case NetCode.Authenticating:
-                    e = mRoom.ReadByteSgning(buf, offs);
-                    if (e != null)
+                    //e = mRoom.ReadByteSgning(buf, offs);
+                    e = new Examinee();
+                    e.ReadByte(buf, ref offs);
+                    bool lck;
+                    if (!vbLock.TryGetValue((short)(e.Lvl * e.uId), out lck))
+                        lck = false;//err, default value benefits examinees
+                    if (!lck)
                     {
-                        bool lck;
-                        if (!vbLock.TryGetValue((short)(e.Lvl * e.uId), out lck))
-                            lck = false;//err, default value benefits examinees
-                        if (!lck)
+                        e = mRoom.Signing(e);
+                        if (e != null)
                         {
-                            if(e.dtTim1.Hour == ExamDate.INVALID)
+                            if (e.dtTim1.Hour == ExamDate.INVALID)
                                 e.dtTim1 = DateTime.Now;
                             Dispatcher.Invoke(() =>
                             {
@@ -175,20 +178,20 @@ namespace sQzServer1
                         }
                         else
                         {
-                            byte[] a;
-                            e.ToByte(out a);
-                            outMsg = new byte[5 + a.Length];
+                            outMsg = new byte[5];
                             Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
-                            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL_1), 0, outMsg, 1, 4);
-                            Buffer.BlockCopy(a, 0, outMsg, 5, a.Length);
+                            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, outMsg, 1, 4);
                             return false;//close
                         }
                     }
                     else
                     {
-                        outMsg = new byte[5];
+                        byte[] a;
+                        e.ToByte(out a);
+                        outMsg = new byte[5 + a.Length];
                         Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
-                        Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, outMsg, 1, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL_1), 0, outMsg, 1, 4);
+                        Buffer.BlockCopy(a, 0, outMsg, 5, a.Length);
                         return false;//close
                     }
                     break;

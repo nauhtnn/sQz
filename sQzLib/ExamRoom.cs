@@ -236,6 +236,20 @@ namespace sQzLib
             return null;
         }
 
+        public Examinee Signing(Examinee e)
+        {
+            Examinee o;
+            short key = (short)(e.Lvl * e.uId);
+            if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
+            {
+                o.Merge(e);
+                if (o.eStt < Examinee.eAUTHENTICATED)
+                    o.eStt = Examinee.eAUTHENTICATED;
+                return o;
+            }
+            return null;
+        }
+
         public void ToByteGrade(byte[] prefix, out byte[] buf)
         {
             if (vExaminee.Count == 0)

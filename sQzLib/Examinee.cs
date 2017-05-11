@@ -361,12 +361,15 @@ namespace sQzLib
             if (Lvl != e.Lvl || uId != e.uId
                 || tBirdate != e.tBirdate)
                 return;
-            tComp += e.tComp;
-            if (e.eStt < eStt || e.eStt < eEXAMING)
+            tComp = e.tComp;
+            if (e.eStt < eEXAMING)
             {
+                eStt = e.eStt;
                 mAnsSh.uQSId = ushort.MaxValue;//reset
                 return;
             }
+            //if (e.eStt < eStt)
+            //    return;
             eStt = e.eStt;
             mAnsSh.uQSId = e.mAnsSh.uQSId;
             dtTim1 = e.dtTim1;
