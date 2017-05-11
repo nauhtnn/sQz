@@ -384,6 +384,8 @@ namespace sQzServer0
                     mRoom.ReadByteGrade(buf, ref offs);
 					mRoom.DBUpdateRs();
                     UpdateRsView();
+                    outMsg = BitConverter.GetBytes(1);
+                    mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
                     break;
                 default:
                     outMsg = BitConverter.GetBytes((int)NetCode.Unknown);

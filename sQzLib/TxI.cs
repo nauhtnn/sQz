@@ -35,6 +35,8 @@ namespace sQzLib {
 		ANS_SHEET,
 		SUBMIT,
 		SUBMIT_CAUT,
+		SRVR_SUBMT_OK,
+		SRVR_DB_OK,
 		BTN_CNCL,
 		SAVE,
 		SAVE_MSG,

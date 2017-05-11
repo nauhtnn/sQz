@@ -361,6 +361,10 @@ namespace sQzServer1
                     mKeyPack.ReadByte(buf, ref offs);
                     mAnsPack = new AnsPack();
                     return false;
+                case NetCode.SrvrSubmitting:
+                    if (buf.Length - offs == 4 && BitConverter.ToInt32(buf, offs) == 1)
+                        mCbMsg += Txt.s._[(int)TxI.SRVR_SUBMT_OK];
+                    return false;
             }
             return true;
         }
