@@ -13,6 +13,7 @@ using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
+using MySql.Data.MySqlClient;
 using sQzLib;
 
 namespace sQzServer0
@@ -27,8 +28,7 @@ namespace sQzServer0
         IUxx mSelQCat;
         QuestSheet mDBQSh;
         QuestSheet mQSh;
-        ExamDate mDt;
-        ExamRoom mRoom;
+        ExamSlot mSl;
 
         public Prep0()
         {
@@ -37,22 +37,21 @@ namespace sQzServer0
             mSelQCat = IUxx.IU00;
             mDBQSh = new QuestSheet();
             mQSh = new QuestSheet();
-            mDt = new ExamDate();
-            mRoom = new ExamRoom();
+            mSl = new ExamSlot();
         }
 
         private void btnInsDate_Click(object sender, RoutedEventArgs e)
         {
-            if (!ExamDate.Parse(tbxDate.Text, ExamDate.FORM_H, out mDt.mDt))
+            if (!ExamSlot.Parse(tbxDate.Text, ExamSlot.FORM_H, out mSl.mDt))
             {
-                mDt.DBInsert();
+                mSl.DBInsert();
                 LoadDate();
             }
         }
 
         private void LoadDate()
         {
-            Dictionary<uint, DateTime> v = mDt.DBSelect();
+            Dictionary<uint, DateTime> v = mSl.DBSelect();
             if(0 < v.Keys.Count)
             {
                 bool dark = true;
@@ -125,15 +124,16 @@ namespace sQzServer0
                 else
                     l = lbxStudent;
                 l.Items.Clear();
-                foreach (Examinee s in mRoom.vExaminee.Values)
-                {
-                    ListBoxItem i = new ListBoxItem();
-                    i.Content = s.ToString();
-                    dark = !dark;
-                    if (dark)
-                        i.Background = new SolidColorBrush(c);
-                    l.Items.Add(i);
-                }
+                foreach(ExamRoom r in mSl.vRoom.Values)
+                    foreach (Examinee e in r.vExaminee.Values)
+                    {
+                        ListBoxItem i = new ListBoxItem();
+                        i.Content = e.ToString();
+                        dark = !dark;
+                        if (dark)
+                            i.Background = new SolidColorBrush(c);
+                        l.Items.Add(i);
+                    }
             });
         }
 
@@ -149,16 +149,20 @@ namespace sQzServer0
             string filePath = null;
             if (result == true)
                 filePath = dlg.FileName;
-            mRoom.ReadTxt(Utils.ReadFile(filePath));
+            string buf = Utils.ReadFile(filePath);
+            if (buf == null)
+                return;
+            mSl.ReadS(buf);
+            
             LoadExaminees(true);
         }
 
         private void btnInsNee_Click(object sender, RoutedEventArgs e)
         {
-            if (mDt.uId != uint.MaxValue)
+            if (mSl.uId != uint.MaxValue)
             {
                 lbxNewStu.Items.Clear();
-                mRoom.DBInsert(mDt.uId);
+                mSl.DBInsertNee();
                 LoadExaminees(false);
             }
         }
@@ -169,13 +173,13 @@ namespace sQzServer0
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
             if (i == null)
                 return;
-            if (uint.TryParse(i.Name.Substring(1), out mDt.uId))
+            if (uint.TryParse(i.Name.Substring(1), out mSl.uId))
             {
-                mRoom.DBSelect(mDt.uId);
+                mSl.DBSelectNee();
                 LoadExaminees(false);
             }
             else
-                mDt.uId = uint.MaxValue;
+                mSl.uId = uint.MaxValue;
         }
 
         private void btnQBrowse_Click(object sender, RoutedEventArgs e)

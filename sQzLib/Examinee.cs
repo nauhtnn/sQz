@@ -6,21 +6,23 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 /*
-CREATE TABLE IF NOT EXISTS `examinee` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
-`idx` SMALLINT(2) UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
-`birthdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
-`dt1` TIME, `dt2` TIME, `grade` SMALLINT(2) UNSIGNED, `comp` VARCHAR(32),
-`questIdx` SMALLINT(2) UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
-PRIMARY KEY(`dateIdx`, `level`, `idx`), FOREIGN KEY(`dateIdx`) REFERENCES date(`idx`));
+CREATE TABLE IF NOT EXISTS `examinee`(`slId` INT(4) UNSIGNED,
+`rId` TINYINT UNSIGNED, `lvl` TINYINT,
+`id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
+`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
+`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
+`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
+PRIMARY KEY(`slId`, `lvl`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
 
-FOREIGN KEY(`questIdx`) REFERENCES questsh(`idx`));
+FOREIGN KEY(`qId`) REFERENCES questsh(`idx`));
 */
 
 namespace sQzLib
 {
     public class Examinee
     {
-        public uint uDtId;
+        public uint uSlId;
+        public int uRId;//ushort
         public ExamLvl eLvl;
         public ushort uId;
         public string tName;
@@ -56,11 +58,11 @@ namespace sQzLib
             tBirdate = null;
             tBirthplace = null;
             tName = null;
-            uDtId = uint.MaxValue;
+            uSlId = uint.MaxValue;
             uId = ushort.MaxValue;
             eStt = eSIGNING;
             uGrade = ushort.MaxValue;
-            dtTim1 = dtTim2 = ExamDate.INVALID_DT;
+            dtTim1 = dtTim2 = ExamSlot.INVALID_DT;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
             kDtDuration = new TimeSpan(0, 30, 0);
@@ -115,19 +117,19 @@ namespace sQzLib
         public override string ToString()
         {
             StringBuilder s = new StringBuilder();
+            s.Append(uRId + ", ");
             if (eLvl == ExamLvl.Basis)
                 s.Append("CB");
             else
                 s.Append("NC");
-            s.AppendFormat("{0}, {1}, {2}, ", uId, tName, tBirdate);
-            s.Append(tBirthplace);
+            s.AppendFormat("{0}, {1}, {2}, {3}", uId, tName, tBirdate, tBirthplace);
             return s.ToString();
         }
 
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(uDtId));
+            l.Add(BitConverter.GetBytes(uSlId));
             l.Add(BitConverter.GetBytes(Lvl));
             l.Add(BitConverter.GetBytes(uId));
             byte[] b = Encoding.UTF8.GetBytes(tBirdate);
@@ -215,7 +217,7 @@ namespace sQzLib
             int l = buf.Length - offs;
             if (l < 4)
                 return true;
-            uDtId = BitConverter.ToUInt32(buf, offs);
+            uSlId = BitConverter.ToUInt32(buf, offs);
             l -= 4;
             offs += 4;
             if (l < 2)
@@ -300,7 +302,7 @@ namespace sQzLib
             l -= 4;
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim1))
-                dtTim1 = ExamDate.INVALID_DT;
+                dtTim1 = ExamSlot.INVALID_DT;
             if (eStt == eAUTHENTICATED)
                 return false;
             if (l < 2)
@@ -341,7 +343,7 @@ namespace sQzLib
             l -= 4;
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim2))
-                dtTim2 = ExamDate.INVALID_DT;
+                dtTim2 = ExamSlot.INVALID_DT;
             if (l < 2)
                 return true;
             uGrade = BitConverter.ToUInt16(buf, offs);
@@ -352,10 +354,10 @@ namespace sQzLib
 
         public void Merge(Examinee e)
         {
-            //only server0 knows uDtId, then send it to server1 and client
+            //only server0 knows uSlId, then send it to server1 and client
             //server1 reads bytes from server0
             //server1 merges bytes from client
-            if ((e.uDtId != uint.MaxValue && uDtId != e.uDtId)
+            if ((e.uSlId != uint.MaxValue && uSlId != e.uSlId)
                 || eStt == eFINISHED)
                 return;
             if (Lvl != e.Lvl || uId != e.uId
@@ -408,7 +410,7 @@ namespace sQzLib
             catch (UnauthorizedAccessException) { err = true; }
             if (err)
                 return true;
-            w.Write(uDtId);
+            w.Write(uSlId);
             w.Write(Lvl);
             w.Write(uId);
             w.Write(uGrade);
@@ -440,7 +442,7 @@ namespace sQzLib
                 catch (UnauthorizedAccessException) { r = null; }
             if (r == null)
                 return false;
-            uDtId = r.ReadUInt32();
+            uSlId = r.ReadUInt32();
             eLvl = (ExamLvl)r.ReadInt16();
             uId = r.ReadUInt16();
             uGrade = r.ReadUInt16();
@@ -449,10 +451,10 @@ namespace sQzLib
                 tComp = r.ReadString();
             int h = r.ReadInt32();
             int m = r.ReadInt32();
-            ExamDate.Parse(h.ToString() + ':' + m, ExamDate.FORM_h, out dtTim1);
+            ExamSlot.Parse(h.ToString() + ':' + m, ExamSlot.FORM_h, out dtTim1);
             h = r.ReadInt32();
             m = r.ReadInt32();
-            ExamDate.Parse(h.ToString() + ':' + m, ExamDate.FORM_h, out dtTim2);
+            ExamSlot.Parse(h.ToString() + ':' + m, ExamSlot.FORM_h, out dtTim2);
             h = r.ReadInt32();
             m = r.ReadInt32();
             kDtDuration = new TimeSpan(0, h, m);

@@ -66,12 +66,12 @@ namespace sQzLib
             }
         }
 
-        public List<int> DBSelectId(uint dateIdx)
+        public List<int> DBSelectId(uint slId)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return null;
-            string qry = DBConnect.mkQrySelect("questsh", "level, idx", "dateIdx=" + dateIdx, null);
+            string qry = DBConnect.mkQrySelect("questsh", "level, idx", "slId=" + slId, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             List<int> r = new List<int>();
             if (reader != null)
@@ -84,16 +84,16 @@ namespace sQzLib
             return r;
         }
 
-        public void DBIns(uint dateIdx)
+        public void DBIns(uint slId)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
             StringBuilder vals = new StringBuilder();
             foreach (QuestSheet qs in vSheet.Values)
-                qs.DBAppendInsQry(dateIdx, ref vals);
+                qs.DBAppendInsQry(slId, ref vals);
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            DBConnect.Ins(conn, "questsh", "dateIdx,level,idx,vQuest", vals.ToString());//todo: catch exception
+            DBConnect.Ins(conn, "questsh", "slId,level,idx,vQuest", vals.ToString());//todo: catch exception
             DBConnect.Close(ref conn);
         }
 
@@ -103,7 +103,7 @@ namespace sQzLib
             if (conn == null)
                 return 0;
             ushort id = (ushort)DBConnect.Max(conn, "questsh", "idx",
-                    "dateIdx=" + dtIdx + " AND level=" + (short)lv);
+                    "slId=" + dtIdx + " AND level=" + (short)lv);
             DBConnect.Close(ref conn);
             return id;
         }

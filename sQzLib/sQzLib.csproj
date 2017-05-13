@@ -48,10 +48,10 @@
     <Compile Include="AnsPack.cs" />
     <Compile Include="AnsSheet.cs" />
     <Compile Include="Client2.cs" />
-    <Compile Include="ExamDate.cs" />
     <Compile Include="DBConnect.cs" />
     <Compile Include="Examinee.cs" />
     <Compile Include="ExamRoom.cs" />
+    <Compile Include="ExamSlot.cs" />
     <Compile Include="QuestPack.cs" />
     <Compile Include="QuestSheet.cs" />
     <Compile Include="FirewallHandler.cs" />

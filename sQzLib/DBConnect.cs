@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    class DBConnect
+    public class DBConnect
     {
         //public MySqlConnection connection;
         static string server;

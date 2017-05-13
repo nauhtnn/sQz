@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 /*
-CREATE TABLE IF NOT EXISTS `questsh` (`dateIdx` INT(4) UNSIGNED, `level` SMALLINT(2),
- `idx` SMALLINT(2) UNSIGNED, `vquest` VARCHAR(1024),
- PRIMARY KEY(`dateIdx`,`level`,`idx`));
+CREATE TABLE IF NOT EXISTS `questsh` (`slId` INT(4) UNSIGNED, `level` SMALLINT,
+ `idx` SMALLINT UNSIGNED, `vquest` VARCHAR(1024),
+ PRIMARY KEY(`slId`,`level`,`idx`));
 */
 
 namespace sQzLib
@@ -338,22 +338,22 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public void DBAppendInsQry(uint dateIdx, ref StringBuilder vals)
+        public void DBAppendInsQry(uint slId, ref StringBuilder vals)
         {
-            vals.Append("(" + dateIdx + "," + (int)eLvl + "," + uId + ",'");
+            vals.Append("(" + slId + "," + (int)eLvl + "," + uId + ",'");
             foreach(Question q in vQuest)
                 vals.Append(((short)q.mIU).ToString() + '_' + q.uId + '-');
             vals.Remove(vals.Length - 1, 1);//remove the last '-'
             vals.Append("'),");
         }
 
-        public void DBSelect(uint dateIdx, short lv, ushort idx)
+        public void DBSelect(uint slId, short lv, ushort idx)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
             StringBuilder cond = new StringBuilder();
-            cond.Append("dateIdx=" + dateIdx);
+            cond.Append("slId=" + slId);
             cond.Append(" AND level=" + lv);
             cond.Append(" AND idx=" + idx);
             string qry = DBConnect.mkQrySelect("questsh", "vquest", cond.ToString(), null);

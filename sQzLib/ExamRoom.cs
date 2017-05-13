@@ -9,92 +9,21 @@ namespace sQzLib
 {
     public class ExamRoom
     {
-        public Dictionary<short, Examinee> vExaminee;
-        public ExamRoom()
+        public int uId;
+        public Dictionary<int, Examinee> vExaminee;
+        public ExamRoom(int id)
         {
-            vExaminee = new Dictionary<short, Examinee>();
+            uId = id;
+            vExaminee = new Dictionary<int, Examinee>();
         }
 
-        public void ReadTxt(string buf)
-        {
-            if (buf == null)
-                return;
-            vExaminee.Clear();
-            string[] vs = buf.Split('\n');
-            foreach (string s in vs)
-            {
-                Examinee nee = new Examinee();
-                string[] v = s.Split('\t');
-                if (v.Length == 4) //todo: hardcode, unsafe
-                {
-                    if (v[0].Length < 3)
-                        continue;
-                    if (v[0][0] == 'C' && v[0][1] == 'B')
-                        nee.eLvl = ExamLvl.Basis;
-                    else if (v[0][0] == 'N' && v[0][1] == 'C')
-                        nee.eLvl = ExamLvl.Advance;
-                    else
-                        continue;
-                    if (ushort.TryParse(v[0].Substring(2), out nee.uId))
-                    {
-                        nee.tName = v[1];
-                        nee.tBirdate = v[2];
-                        nee.tBirthplace = v[3];
-                        vExaminee.Add((short)(nee.Lvl * nee.uId), nee);
-                    }
-                }
-            }
-        }
-
-        public void DBSelect(uint dateIdx)
-        {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
-            string qry = DBConnect.mkQrySelect("examinee", null, "dateIdx=" + dateIdx, null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            vExaminee.Clear();
-            if (reader != null)
-            {
-                while (reader.Read())
-                {
-                    Examinee e = new Examinee();
-                    e.eStt = Examinee.eINFO;
-                    e.uDtId = dateIdx;//reader.GetUInt16(0)
-                    e.Lvl = reader.GetInt16(1);
-                    e.uId = reader.GetUInt16(2);
-                    e.tName = reader.GetString(3);
-                    e.tBirdate = reader.GetDateTime(4).ToString(ExamDate.FORM_R);
-                    e.tBirthplace = reader.GetString(5);
-                    if (reader.IsDBNull(6))
-                        e.dtTim1 = ExamDate.INVALID_DT;
-                    else
-                        DateTime.TryParse(reader.GetString(6), out e.dtTim1);
-                    if (reader.IsDBNull(7))
-                        e.dtTim2 = ExamDate.INVALID_DT;
-                    else
-                    {
-                        e.eStt = Examinee.eFINISHED;
-                        DateTime.TryParse(reader.GetString(7), out e.dtTim2);
-                    }
-                    if (!reader.IsDBNull(8))
-                        e.uGrade = reader.GetUInt16(8);
-                    if (!reader.IsDBNull(9))
-                        e.tComp = reader.GetString(9);
-                    vExaminee.Add((short)(e.Lvl * e.uId), e);
-                }
-                reader.Close();
-            }
-            DBConnect.Close(ref conn);
-        }
-
-        public Dictionary<int, ushort>  DBSelectId(uint dateIdx, out Dictionary<int, string> vAns)
+        public Dictionary<int, ushort>  DBSelectId(uint slId, out Dictionary<int, string> vAns)
         {
             vAns = new Dictionary<int, string>();
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return null;
-            string qry = DBConnect.mkQrySelect("examinee", "level,idx,questIdx,anssh", "dateIdx=" + dateIdx, null);
+            string qry = DBConnect.mkQrySelect("examinee", "lvl,id,qId,anssh", "slId=" + slId, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             Dictionary<int, ushort> r = new Dictionary<int, ushort>();
             if (reader != null)
@@ -113,22 +42,22 @@ namespace sQzLib
             return r;
         }
 
-        public void DBInsert(uint dateIdx)
+        public void DBInsert()
         {
             if (vExaminee == null || vExaminee.Count < 1)
                 return;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string attbs = "dateIdx,level,idx,name,birthdate,birthplace";
+            string attbs = "slId,lvl,id,name,birdate,birthplace";
             StringBuilder vals = new StringBuilder();
             foreach (Examinee e in vExaminee.Values)
             {
-                vals.Append("(" + dateIdx + ",");
+                vals.Append("(" + e.uSlId + ",");
                 vals.Append(e.Lvl + ",");
                 vals.Append(e.uId + ",");
                 vals.Append("'" + e.tName + "',");
-                vals.Append("'" + ExamDate.ToMysqlForm(e.tBirdate, ExamDate.FORM_R) + "',");
+                vals.Append("'" + ExamSlot.ToMysqlForm(e.tBirdate, ExamSlot.FORM_R) + "',");
                 vals.Append("'" + e.tBirthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
@@ -200,7 +129,7 @@ namespace sQzLib
                         }
                         if (e.mAnsSh != null)
                         {
-                            qry.Append(",questIdx=" + e.mAnsSh.uQSId);
+                            qry.Append(",qId=" + e.mAnsSh.uQSId);
                             if (e.mAnsSh.aAns != null)
                             {
                                 qry.Append(",anssh='");
@@ -210,7 +139,7 @@ namespace sQzLib
                             }
                         }
                     }
-                    qry.Append(" WHERE dateIdx=" + e.uDtId +
+                    qry.Append(" WHERE slId=" + e.uSlId +
                         " AND level=" + (int)e.eLvl + " AND idx=" + e.uId);
                     DBConnect.Update(conn, qry.ToString());
                 }

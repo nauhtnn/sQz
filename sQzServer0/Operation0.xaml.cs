@@ -25,14 +25,14 @@ namespace sQzServer0
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamDate mDt;
+        ExamSlot mSl;
         Dictionary<short, TextBlock> vGrade;
         Dictionary<short, TextBlock> vDt1;
         Dictionary<short, TextBlock> vDt2;
         Dictionary<short, TextBlock> vComp;
         QuestPack mQPack;
         AnsPack mKeyPack;
-        ExamRoom mRoom;
+        Dictionary<uint, ExamRoom> vRoom;
         ushort[] uQSId;
 
         public Operation0()
@@ -47,8 +47,8 @@ namespace sQzServer0
             vComp = new Dictionary<short, TextBlock>();
             mQPack = new QuestPack();
             mKeyPack = new AnsPack();
-            mDt = new ExamDate();
-            mRoom = new ExamRoom();
+            mSl = new ExamSlot();
+            vRoom = new Dictionary<uint, ExamRoom>();
             uQSId = new ushort[2];
 
             lbxDate.SelectionMode = SelectionMode.Single;
@@ -70,21 +70,21 @@ namespace sQzServer0
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
             if (i == null)
                 return;
-            if (uint.TryParse(i.Name.Substring(1), out mDt.uId))
+            if (uint.TryParse(i.Name.Substring(1), out mSl.uId))
             {
-                ExamDate.Parse((string)i.Content, ExamDate.FORM_H, out mDt.mDt);
-                mRoom.DBSelect(mDt.uId);
+                ExamSlot.Parse(i.Content as string, ExamSlot.FORM_H, out mSl.mDt);
+                mSl.DBSelectNee();
                 LoadExaminees();
-                uQSId[0] = mQPack.DBCurQSId(mDt.uId, ExamLvl.Basis);
-                uQSId[1] = mQPack.DBCurQSId(mDt.uId, ExamLvl.Advance);
+                uQSId[0] = mQPack.DBCurQSId(mSl.uId, ExamLvl.Basis);
+                uQSId[1] = mQPack.DBCurQSId(mSl.uId, ExamLvl.Advance);
             }
             else
-                mDt.uId = uint.MaxValue;
+                mSl.uId = uint.MaxValue;
         }
 
         private void LoadDates()
         {
-            Dictionary<uint, DateTime> v = mDt.DBSelect();
+            Dictionary<uint, DateTime> v = mSl.DBSelect();
             if (0 < v.Keys.Count)
             {
                 bool dark = true;
@@ -96,7 +96,7 @@ namespace sQzServer0
                     foreach (uint i in v.Keys)
                     {
                         ListBoxItem it = new ListBoxItem();
-                        it.Content = v[i].ToString(ExamDate.FORM_H);
+                        it.Content = v[i].ToString(ExamSlot.FORM_H);
                         it.Name = "_" + i;
                         dark = !dark;
                         if (dark)
@@ -120,77 +120,78 @@ namespace sQzServer0
                 vDt2.Clear();
                 vComp.Clear();
                 gNee.Children.Clear();
-                foreach (Examinee e in mRoom.vExaminee.Values)
-                {
-                    rid++;
-                    RowDefinition rd = new RowDefinition();
-                    rd.Height = new GridLength(20);
-                    gNee.RowDefinitions.Add(rd);
-                    TextBlock t = new TextBlock();
-                    t.Text = e.tId;
-                    if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    Grid.SetRow(t, rid);
-                    gNee.Children.Add(t);
-                    t = new TextBlock();
-                    t.Text = e.tName;
-                    if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 1);
-                    gNee.Children.Add(t);
-                    t = new TextBlock();
-                    t.Text = e.tBirdate;
-                    if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 2);
-                    gNee.Children.Add(t);
-                    t = new TextBlock();
-                    t.Text = e.tBirthplace;
-                    if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 3);
-                    gNee.Children.Add(t);
-                    t = new TextBlock();
-                    if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    vGrade.Add((short)(e.Lvl * e.uId), t);
-                    if(e.uGrade != ushort.MaxValue)
-                        t.Text = e.uGrade.ToString();
-                    Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 4);
-                    gNee.Children.Add(t);
-                    t = new TextBlock();
-                    if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    vDt1.Add((short)(e.Lvl * e.uId), t);
-                    if (e.dtTim1.Year != ExamDate.INVALID)
-                        t.Text = e.dtTim1.ToString("HH:mm");
-                    Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 5);
-                    gNee.Children.Add(t);
-                    t = new TextBlock();
-                    if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    vDt2.Add((short)(e.Lvl * e.uId), t);
-                    if (e.dtTim2.Year != ExamDate.INVALID)
-                        t.Text = e.dtTim2.ToString("HH:mm");
-                    Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 6);
-                    gNee.Children.Add(t);
-                    t = new TextBlock();
-                    if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    vComp.Add((short)(e.Lvl * e.uId), t);
-                    if (e.tComp != null)
-                        t.Text = e.tComp;
-                    Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 7);
-                    gNee.Children.Add(t);
-                    dark = !dark;
-                }
+                foreach(ExamRoom r in mSl.vRoom.Values)
+                    foreach (Examinee e in r.vExaminee.Values)
+                    {
+                        rid++;
+                        RowDefinition rd = new RowDefinition();
+                        rd.Height = new GridLength(20);
+                        gNee.RowDefinitions.Add(rd);
+                        TextBlock t = new TextBlock();
+                        t.Text = e.tId;
+                        if (dark)
+                            t.Background = new SolidColorBrush(c);
+                        Grid.SetRow(t, rid);
+                        gNee.Children.Add(t);
+                        t = new TextBlock();
+                        t.Text = e.tName;
+                        if (dark)
+                            t.Background = new SolidColorBrush(c);
+                        Grid.SetRow(t, rid);
+                        Grid.SetColumn(t, 1);
+                        gNee.Children.Add(t);
+                        t = new TextBlock();
+                        t.Text = e.tBirdate;
+                        if (dark)
+                            t.Background = new SolidColorBrush(c);
+                        Grid.SetRow(t, rid);
+                        Grid.SetColumn(t, 2);
+                        gNee.Children.Add(t);
+                        t = new TextBlock();
+                        t.Text = e.tBirthplace;
+                        if (dark)
+                            t.Background = new SolidColorBrush(c);
+                        Grid.SetRow(t, rid);
+                        Grid.SetColumn(t, 3);
+                        gNee.Children.Add(t);
+                        t = new TextBlock();
+                        if (dark)
+                            t.Background = new SolidColorBrush(c);
+                        vGrade.Add((short)(e.Lvl * e.uId), t);
+                        if(e.uGrade != ushort.MaxValue)
+                            t.Text = e.uGrade.ToString();
+                        Grid.SetRow(t, rid);
+                        Grid.SetColumn(t, 4);
+                        gNee.Children.Add(t);
+                        t = new TextBlock();
+                        if (dark)
+                            t.Background = new SolidColorBrush(c);
+                        vDt1.Add((short)(e.Lvl * e.uId), t);
+                        if (e.dtTim1.Year != ExamSlot.INVALID)
+                            t.Text = e.dtTim1.ToString("HH:mm");
+                        Grid.SetRow(t, rid);
+                        Grid.SetColumn(t, 5);
+                        gNee.Children.Add(t);
+                        t = new TextBlock();
+                        if (dark)
+                            t.Background = new SolidColorBrush(c);
+                        vDt2.Add((short)(e.Lvl * e.uId), t);
+                        if (e.dtTim2.Year != ExamSlot.INVALID)
+                            t.Text = e.dtTim2.ToString("HH:mm");
+                        Grid.SetRow(t, rid);
+                        Grid.SetColumn(t, 6);
+                        gNee.Children.Add(t);
+                        t = new TextBlock();
+                        if (dark)
+                            t.Background = new SolidColorBrush(c);
+                        vComp.Add((short)(e.Lvl * e.uId), t);
+                        if (e.tComp != null)
+                            t.Text = e.tComp;
+                        Grid.SetRow(t, rid);
+                        Grid.SetColumn(t, 7);
+                        gNee.Children.Add(t);
+                        dark = !dark;
+                    }
             });
         }
 
@@ -198,17 +199,18 @@ namespace sQzServer0
         {
             Dispatcher.Invoke(() => {
                 TextBlock t;
-                foreach (Examinee e in mRoom.vExaminee.Values)
-                {
-                    if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue((short)(e.Lvl * e.uId), out t))
-                        t.Text = "" + e.uGrade;
-                    if (e.dtTim1.Hour != ExamDate.INVALID && vDt1.TryGetValue((short)(e.Lvl * e.uId), out t))
-                        t.Text = e.dtTim1.ToString("HH:mm");
-                    if (e.dtTim2.Hour != ExamDate.INVALID && vDt2.TryGetValue((short)(e.Lvl * e.uId), out t))
-                        t.Text = e.dtTim2.ToString("HH:mm");
-                    if (e.tComp != null && vComp.TryGetValue((short)(e.Lvl * e.uId), out t))
-                        t.Text = e.tComp;
-                }
+                foreach(ExamRoom r in vRoom.Values)
+                    foreach (Examinee e in r.vExaminee.Values)
+                    {
+                        if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue((short)(e.Lvl * e.uId), out t))
+                            t.Text = "" + e.uGrade;
+                        if (e.dtTim1.Hour != ExamSlot.INVALID && vDt1.TryGetValue((short)(e.Lvl * e.uId), out t))
+                            t.Text = e.dtTim1.ToString("HH:mm");
+                        if (e.dtTim2.Hour != ExamSlot.INVALID && vDt2.TryGetValue((short)(e.Lvl * e.uId), out t))
+                            t.Text = e.dtTim2.ToString("HH:mm");
+                        if (e.tComp != null && vComp.TryGetValue((short)(e.Lvl * e.uId), out t))
+                            t.Text = e.tComp;
+                    }
             });
         }
 
@@ -267,7 +269,7 @@ namespace sQzServer0
 
         private void btnExGen_Click(object sender, RoutedEventArgs e)
         {
-            if (mDt.uId == uint.MaxValue)
+            if (mSl.uId == uint.MaxValue)
                 return;
 			TextBox t = (TextBox)FindName("tbxNe");
 			int n = 1;
@@ -304,7 +306,7 @@ namespace sQzServer0
             foreach (QuestSheet qs in mQPack.vSheet.Values)
                 qs.ToByte();
             mKeyPack.ExtractKey(mQPack);
-            mQPack.DBIns(mDt.uId);
+            mQPack.DBIns(mSl.uId);
             LoadQuest();
         }
 
@@ -356,41 +358,41 @@ namespace sQzServer0
 
         public bool SrvrCodeHndl(NetCode c, byte[] buf, int offs, ref byte[] outMsg)
         {
-            switch (c)
-            {
-                case NetCode.DateStudentRetriving:
-                    int sz = 0;
-                    if (mDt.uId == uint.MaxValue)
-                        return false;
-                    sz += mDt.GetByteCount();
-                    byte[] es = mRoom.ToByte();
-                    if(es != null)
-                        sz += es.Length;
-                    outMsg = new byte[sz];
-                    sz = 0;
-                    mDt.ToByte(outMsg, ref sz);
-                    if (es != null)
-                        Buffer.BlockCopy(es, 0, outMsg, sz, es.Length);
-                    break;
-                case NetCode.QuestRetrieving:
-                    outMsg = mQPack.ToByte();
-                    break;
-                case NetCode.AnsKeyRetrieving:
-                    outMsg = new byte[mKeyPack.GetByteCount()];
-                    offs = 0;
-                    mKeyPack.ToByte(ref outMsg, ref offs);
-                    return false;
-                case NetCode.SrvrSubmitting:
-                    mRoom.ReadByteGrade(buf, ref offs);
-					mRoom.DBUpdateRs();
-                    UpdateRsView();
-                    outMsg = BitConverter.GetBytes(1);
-                    mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
-                    break;
-                default:
-                    outMsg = BitConverter.GetBytes((int)NetCode.Unknown);
-                    break;
-            }
+     //       switch (c)
+     //       {
+     //           case NetCode.DateStudentRetriving:
+     //               int sz = 0;
+     //               if (mSl.uId == uint.MaxValue)
+     //                   return false;
+     //               sz += mSl.GetByteCount();
+     //               byte[] es = mSl.ToByte();
+     //               if(es != null)
+     //                   sz += es.Length;
+     //               outMsg = new byte[sz];
+     //               sz = 0;
+     //               mSl.ToByte(outMsg, ref sz);
+     //               if (es != null)
+     //                   Buffer.BlockCopy(es, 0, outMsg, sz, es.Length);
+     //               break;
+     //           case NetCode.QuestRetrieving:
+     //               outMsg = mQPack.ToByte();
+     //               break;
+     //           case NetCode.AnsKeyRetrieving:
+     //               outMsg = new byte[mKeyPack.GetByteCount()];
+     //               offs = 0;
+     //               mKeyPack.ToByte(ref outMsg, ref offs);
+     //               return false;
+     //           case NetCode.SrvrSubmitting:
+     //               mRoom.ReadByteGrade(buf, ref offs);
+					//mRoom.DBUpdateRs();
+     //               UpdateRsView();
+     //               outMsg = BitConverter.GetBytes(1);
+     //               mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
+     //               break;
+     //           default:
+     //               outMsg = BitConverter.GetBytes((int)NetCode.Unknown);
+     //               break;
+     //       }
             return true;
         }
 
