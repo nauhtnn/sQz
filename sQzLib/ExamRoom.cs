@@ -49,11 +49,12 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string attbs = "slId,lvl,id,name,birdate,birthplace";
+            string attbs = "slId,rid,lvl,id,name,birdate,birthplace";
             StringBuilder vals = new StringBuilder();
             foreach (Examinee e in vExaminee.Values)
             {
                 vals.Append("(" + e.uSlId + ",");
+                vals.Append(e.uRId + ",");
                 vals.Append(e.Lvl + ",");
                 vals.Append(e.uId + ",");
                 vals.Append("'" + e.tName + "',");

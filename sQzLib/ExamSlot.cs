@@ -159,7 +159,7 @@ namespace sQzLib
             if (conn == null)
                 return;
             string qry = DBConnect.mkQrySelect("examinee",
-                "`rId`,`lvl`,`id`,`name`,`birdate`,`birthplace`,`dt1`,`dt2`,`grd`,`comp`,`qId`,`anssh`",
+                "rId,lvl,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
                 "slId=" + uId, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             foreach (ExamRoom r in vRoom.Values)
