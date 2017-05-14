@@ -120,7 +120,7 @@ namespace sQzLib
             }
         }
 
-        public short Lvl
+        public short Lv
         {
             get { return (short)eLvl; }
         }
@@ -177,7 +177,7 @@ namespace sQzLib
             Buffer.BlockCopy(BitConverter.GetBytes(uQSId),
                         0, buf, offs, 2);
             offs += 2;
-            Buffer.BlockCopy(BitConverter.GetBytes(Lvl),
+            Buffer.BlockCopy(BitConverter.GetBytes(Lv),
                         0, buf, offs, 2);
             offs += 2;
             Buffer.BlockCopy(BitConverter.GetBytes(uNeeId),

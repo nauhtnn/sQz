@@ -27,7 +27,7 @@ namespace sQzClient
         NetCode mState;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamDate mDt;
+        DateTime mDt;
         Examinee mNee;
         TakeExam pgTkExm;
 
@@ -42,7 +42,7 @@ namespace sQzClient
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            mDt = new ExamDate();
+            mDt = ExamSlot.INVALID_DT;
             mNee = new Examinee();
 
             mNee.kDtDuration = new TimeSpan(1, 0, 0);
@@ -130,12 +130,12 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Dating:
-                    mDt.ReadByte(buf, ref offs);
+                    ExamSlot.ReadByteDt(buf, ref offs, out mDt);
                     Dispatcher.Invoke(() => {
-                        if (mDt.mDt.Year == ExamDate.INVALID)
+                        if (mDt.Year == ExamSlot.INVALID)
                             txtDate.Text = "No connection";
                         else
-                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.mDt.ToString("dd/MM/yyyy HH:mm");
+                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(ExamSlot.FORM_RH);
                     });
                     mState = NetCode.Authenticating;
                     break;

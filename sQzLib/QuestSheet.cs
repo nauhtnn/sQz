@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 /*
-CREATE TABLE IF NOT EXISTS `questsh` (`slId` INT(4) UNSIGNED, `level` SMALLINT,
- `idx` SMALLINT UNSIGNED, `vquest` VARCHAR(1024),
- PRIMARY KEY(`slId`,`level`,`idx`));
+CREATE TABLE IF NOT EXISTS `questsh` (`slId` INT(4) UNSIGNED, `lv` SMALLINT,
+ `id` SMALLINT UNSIGNED, `vquest` VARCHAR(1024),
+ PRIMARY KEY(`slId`,`lv`,`id`));
 */
 
 namespace sQzLib
@@ -354,8 +354,8 @@ namespace sQzLib
                 return;
             StringBuilder cond = new StringBuilder();
             cond.Append("slId=" + slId);
-            cond.Append(" AND level=" + lv);
-            cond.Append(" AND idx=" + idx);
+            cond.Append(" AND lv=" + lv);
+            cond.Append(" AND id=" + idx);
             string qry = DBConnect.mkQrySelect("questsh", "vquest", cond.ToString(), null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             string qIds = null;
@@ -376,7 +376,7 @@ namespace sQzLib
                 string[] iuid = qid.Split('_');
                 if(iuid.Length == 2)
                 {
-                    qry = DBConnect.mkQrySelect("quest" + iuid[0], null, "idx=" + iuid[1], null);
+                    qry = DBConnect.mkQrySelect("quest" + iuid[0], null, "id=" + iuid[1], null);
                     reader = DBConnect.exeQrySelect(conn, qry);
                     if (reader != null)
                     {

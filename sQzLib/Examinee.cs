@@ -6,15 +6,49 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 /*
-CREATE TABLE IF NOT EXISTS `examinee`(`slId` INT(4) UNSIGNED,
-`rId` TINYINT UNSIGNED, `lvl` TINYINT,
+CREATE TABLE IF NOT EXISTS `exnee1`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
 `id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
 `t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
 `qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
-PRIMARY KEY(`slId`, `lvl`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
+PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
 
-FOREIGN KEY(`qId`) REFERENCES questsh(`idx`));
+CREATE TABLE IF NOT EXISTS `exnee2`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+`id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
+`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
+`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
+`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
+PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
+
+CREATE TABLE IF NOT EXISTS `exnee3`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+`id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
+`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
+`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
+`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
+PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
+
+CREATE TABLE IF NOT EXISTS `exnee4`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+`id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
+`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
+`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
+`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
+PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
+
+CREATE TABLE IF NOT EXISTS `exnee5`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+`id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
+`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
+`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
+`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
+PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
+
+CREATE TABLE IF NOT EXISTS `exnee6`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+`id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
+`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
+`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
+`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
+PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
+
+FOREIGN KEY(`qId`) REFERENCES questsh(`id`));
 */
 
 namespace sQzLib
@@ -22,7 +56,6 @@ namespace sQzLib
     public class Examinee
     {
         public uint uSlId;
-        public int uRId;//ushort
         public ExamLvl eLvl;
         public ushort uId;
         public string tName;
@@ -49,6 +82,8 @@ namespace sQzLib
 
         const string tLOG_DIR = "sQz\\";
         const string tLOG_PRE = "sav";
+
+        public const string tDBtbl = "exnee";
 
         public Examinee() {
             Reset();
@@ -109,7 +144,7 @@ namespace sQzLib
             }
             return true;
         }
-        public short Lvl
+        public short Lv
         {
             get { return (short)eLvl; }
             set { eLvl = (ExamLvl)value; }
@@ -117,12 +152,9 @@ namespace sQzLib
         public override string ToString()
         {
             StringBuilder s = new StringBuilder();
-            s.Append(uRId + ", ");
-            if (eLvl == ExamLvl.Basis)
-                s.Append("CB");
-            else
-                s.Append("NC");
-            s.AppendFormat("{0}, {1}, {2}, {3}", uId, tName, tBirdate, tBirthplace);
+            s.AppendFormat("{0}, {1}, {2}, {3}, {4}",
+                (eLvl == ExamLvl.Basis) ? "CB" : "NC",
+                uId, tName, tBirdate, tBirthplace);
             return s.ToString();
         }
 
@@ -130,7 +162,7 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uSlId));
-            l.Add(BitConverter.GetBytes(Lvl));
+            l.Add(BitConverter.GetBytes(Lv));
             l.Add(BitConverter.GetBytes(uId));
             byte[] b = Encoding.UTF8.GetBytes(tBirdate);
             l.Add(BitConverter.GetBytes(b.Length));
@@ -222,7 +254,7 @@ namespace sQzLib
             offs += 4;
             if (l < 2)
                 return true;
-            Lvl = BitConverter.ToInt16(buf, offs);
+            Lv = BitConverter.ToInt16(buf, offs);
             l -= 2;
             offs += 2;
             if (l < 2)
@@ -360,7 +392,7 @@ namespace sQzLib
             if ((e.uSlId != uint.MaxValue && uSlId != e.uSlId)
                 || eStt == eFINISHED)
                 return;
-            if (Lvl != e.Lvl || uId != e.uId
+            if (Lv != e.Lv || uId != e.uId
                 || tBirdate != e.tBirdate)
                 return;
             tComp = e.tComp;
@@ -400,7 +432,7 @@ namespace sQzLib
             if (err)
                 return true;
             var fileName = System.IO.Path.Combine(p, tLOG_PRE +
-                (Lvl * uId) + '-' + m.ToString("d2") + s.ToString("d2"));
+                (Lv * uId) + '-' + m.ToString("d2") + s.ToString("d2"));
             System.IO.BinaryWriter w = null;
             try
             {
@@ -411,7 +443,7 @@ namespace sQzLib
             if (err)
                 return true;
             w.Write(uSlId);
-            w.Write(Lvl);
+            w.Write(Lv);
             w.Write(uId);
             w.Write(uGrade);
             w.Write(eStt);

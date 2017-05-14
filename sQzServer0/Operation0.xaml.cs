@@ -26,10 +26,10 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         ExamSlot mSl;
-        Dictionary<short, TextBlock> vGrade;
-        Dictionary<short, TextBlock> vDt1;
-        Dictionary<short, TextBlock> vDt2;
-        Dictionary<short, TextBlock> vComp;
+        Dictionary<int, TextBlock> vGrade;
+        Dictionary<int, TextBlock> vDt1;
+        Dictionary<int, TextBlock> vDt2;
+        Dictionary<int, TextBlock> vComp;
         QuestPack mQPack;
         AnsPack mKeyPack;
         Dictionary<uint, ExamRoom> vRoom;
@@ -41,10 +41,10 @@ namespace sQzServer0
             ShowsNavigationUI = false;
             mServer = new Server2(SrvrCodeHndl);
             mCbMsg = new UICbMsg();
-            vGrade = new Dictionary<short, TextBlock>();
-            vDt1 = new Dictionary<short, TextBlock>();
-            vDt2 = new Dictionary<short, TextBlock>();
-            vComp = new Dictionary<short, TextBlock>();
+            vGrade = new Dictionary<int, TextBlock>();
+            vDt1 = new Dictionary<int, TextBlock>();
+            vDt2 = new Dictionary<int, TextBlock>();
+            vComp = new Dictionary<int, TextBlock>();
             mQPack = new QuestPack();
             mKeyPack = new AnsPack();
             mSl = new ExamSlot();
@@ -157,7 +157,7 @@ namespace sQzServer0
                         t = new TextBlock();
                         if (dark)
                             t.Background = new SolidColorBrush(c);
-                        vGrade.Add((short)(e.Lvl * e.uId), t);
+                        vGrade.Add(e.Lv * e.uId, t);
                         if(e.uGrade != ushort.MaxValue)
                             t.Text = e.uGrade.ToString();
                         Grid.SetRow(t, rid);
@@ -166,7 +166,7 @@ namespace sQzServer0
                         t = new TextBlock();
                         if (dark)
                             t.Background = new SolidColorBrush(c);
-                        vDt1.Add((short)(e.Lvl * e.uId), t);
+                        vDt1.Add(e.Lv * e.uId, t);
                         if (e.dtTim1.Year != ExamSlot.INVALID)
                             t.Text = e.dtTim1.ToString("HH:mm");
                         Grid.SetRow(t, rid);
@@ -175,7 +175,7 @@ namespace sQzServer0
                         t = new TextBlock();
                         if (dark)
                             t.Background = new SolidColorBrush(c);
-                        vDt2.Add((short)(e.Lvl * e.uId), t);
+                        vDt2.Add(e.Lv * e.uId, t);
                         if (e.dtTim2.Year != ExamSlot.INVALID)
                             t.Text = e.dtTim2.ToString("HH:mm");
                         Grid.SetRow(t, rid);
@@ -184,7 +184,7 @@ namespace sQzServer0
                         t = new TextBlock();
                         if (dark)
                             t.Background = new SolidColorBrush(c);
-                        vComp.Add((short)(e.Lvl * e.uId), t);
+                        vComp.Add(e.Lv * e.uId, t);
                         if (e.tComp != null)
                             t.Text = e.tComp;
                         Grid.SetRow(t, rid);
@@ -202,13 +202,13 @@ namespace sQzServer0
                 foreach(ExamRoom r in vRoom.Values)
                     foreach (Examinee e in r.vExaminee.Values)
                     {
-                        if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue((short)(e.Lvl * e.uId), out t))
+                        if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.Lv * e.uId, out t))
                             t.Text = "" + e.uGrade;
-                        if (e.dtTim1.Hour != ExamSlot.INVALID && vDt1.TryGetValue((short)(e.Lvl * e.uId), out t))
+                        if (e.dtTim1.Hour != ExamSlot.INVALID && vDt1.TryGetValue(e.Lv * e.uId, out t))
                             t.Text = e.dtTim1.ToString("HH:mm");
-                        if (e.dtTim2.Hour != ExamSlot.INVALID && vDt2.TryGetValue((short)(e.Lvl * e.uId), out t))
+                        if (e.dtTim2.Hour != ExamSlot.INVALID && vDt2.TryGetValue(e.Lv * e.uId, out t))
                             t.Text = e.dtTim2.ToString("HH:mm");
-                        if (e.tComp != null && vComp.TryGetValue((short)(e.Lvl * e.uId), out t))
+                        if (e.tComp != null && vComp.TryGetValue(e.Lv * e.uId, out t))
                             t.Text = e.tComp;
                     }
             });
@@ -358,41 +358,44 @@ namespace sQzServer0
 
         public bool SrvrCodeHndl(NetCode c, byte[] buf, int offs, ref byte[] outMsg)
         {
-     //       switch (c)
-     //       {
-     //           case NetCode.DateStudentRetriving:
-     //               int sz = 0;
-     //               if (mSl.uId == uint.MaxValue)
-     //                   return false;
-     //               sz += mSl.GetByteCount();
-     //               byte[] es = mSl.ToByte();
-     //               if(es != null)
-     //                   sz += es.Length;
-     //               outMsg = new byte[sz];
-     //               sz = 0;
-     //               mSl.ToByte(outMsg, ref sz);
-     //               if (es != null)
-     //                   Buffer.BlockCopy(es, 0, outMsg, sz, es.Length);
-     //               break;
-     //           case NetCode.QuestRetrieving:
-     //               outMsg = mQPack.ToByte();
-     //               break;
-     //           case NetCode.AnsKeyRetrieving:
-     //               outMsg = new byte[mKeyPack.GetByteCount()];
-     //               offs = 0;
-     //               mKeyPack.ToByte(ref outMsg, ref offs);
-     //               return false;
-     //           case NetCode.SrvrSubmitting:
-     //               mRoom.ReadByteGrade(buf, ref offs);
-					//mRoom.DBUpdateRs();
-     //               UpdateRsView();
-     //               outMsg = BitConverter.GetBytes(1);
-     //               mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
-     //               break;
-     //           default:
-     //               outMsg = BitConverter.GetBytes((int)NetCode.Unknown);
-     //               break;
-     //       }
+            switch (c)
+            {
+                case NetCode.DateStudentRetriving:
+                    int sz = 0;
+                    if (mSl.uId == uint.MaxValue ||
+                        buf.Length - offs < 4)
+                        return false;
+                    int rId = BitConverter.ToInt32(buf, offs);
+                    offs += 4;
+                    sz += mSl.GetByteCountDt();
+                    byte[] es = mSl.ToByteR(rId);
+                    if (es != null)
+                        sz += es.Length;
+                    outMsg = new byte[sz];
+                    sz = 0;
+                    ExamSlot.ToByteDt(outMsg, ref sz, mSl.mDt);
+                    if (es != null)
+                        Buffer.BlockCopy(es, 0, outMsg, sz, es.Length);
+                    break;
+                case NetCode.QuestRetrieving:
+                    outMsg = mQPack.ToByte();
+                    break;
+                case NetCode.AnsKeyRetrieving:
+                    outMsg = new byte[mKeyPack.GetByteCount()];
+                    offs = 0;
+                    mKeyPack.ToByte(ref outMsg, ref offs);
+                    return false;
+                case NetCode.SrvrSubmitting:
+                    mSl.ReadByteGrade(buf, ref offs);
+                    mSl.DBUpdateRs();
+                    UpdateRsView();
+                    outMsg = BitConverter.GetBytes(1);
+                    mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
+                    break;
+                default:
+                    outMsg = BitConverter.GetBytes((int)NetCode.Unknown);
+                    break;
+            }
             return true;
         }
 
@@ -400,13 +403,11 @@ namespace sQzServer0
         {
             for(int i = 1; i < 16; ++i)
             {
-                TextBox t = (TextBox)FindName("tbxIU" + i);
+                TextBox t = FindName("tbxIU" + i) as TextBox;
                 if(t != null)
                 {
                     t.Text = "0";
                     t.MaxLength = 2;
-                    t.KeyDown += txtIU_KeyDown;
-                    t.TextChanged += tbxIU_TextChanged;
                 }
             }
             tbxNq.Text = "0";
@@ -427,14 +428,6 @@ namespace sQzServer0
                 }
             }
             tbxNq.Text = "" + n;
-        }
-
-        private void txtIU_KeyDown(object sender, KeyEventArgs e)
-        {
-            //TextBox t = sender as TextBox;
-            //short v;
-            //if(!short.TryParse(t.Text, out v))
-            //    e.Handled = true;
         }
 
         private void LoadTxt()

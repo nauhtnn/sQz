@@ -36,8 +36,12 @@ namespace sQzLib
             uId = uint.MaxValue;
 
             vRoom = new Dictionary<int, ExamRoom>();
-            for (int i = 1; i < 6; ++i)//todo: read from db
-                vRoom.Add(i, new ExamRoom(i));
+            for (int i = 1; i < 7; ++i)//todo: read from db
+            {
+                ExamRoom r = new ExamRoom();
+                r.uId = i;
+                vRoom.Add(i, r);
+            }
         }
 
         public void DBInsert()
@@ -65,27 +69,32 @@ namespace sQzLib
             return r;
         }
 
-        public int GetByteCount()
+        public int GetByteCountDt()
         {
-            return 16;
+            return 20;
         }
 
-        public void ToByte(byte[] buf, ref int offs)
+        public static void ToByteDt(byte[] buf, ref int offs, DateTime dt)
         {
-            Buffer.BlockCopy(BitConverter.GetBytes(mDt.Year), 0, buf, offs, 4);
+            Array.Copy(BitConverter.GetBytes(dt.Year), 0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes(mDt.Month), 0, buf, offs, 4);
+            Array.Copy(BitConverter.GetBytes(dt.Month), 0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes(mDt.Day), 0, buf, offs, 4);
+            Array.Copy(BitConverter.GetBytes(dt.Day), 0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes(mDt.Hour), 0, buf, offs, 4);
+            Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, offs, 4);
+            offs += 4;
+            Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, offs, 4);
             offs += 4;
         }
 
-        public bool ReadByte(byte[] buf, ref int offs)
+        public static bool ReadByteDt(byte[] buf, ref int offs, out DateTime dt)
         {
-            if (buf.Length - offs < 16)
+            if (buf.Length - offs < 20)
+            {
+                dt = INVALID_DT;
                 return true;
+            }
             int y = BitConverter.ToInt32(buf, offs);
             offs += 4;
             int M = BitConverter.ToInt32(buf, offs);
@@ -94,10 +103,20 @@ namespace sQzLib
             offs += 4;
             int H = BitConverter.ToInt32(buf, offs);
             offs += 4;
+            int m = BitConverter.ToInt32(buf, offs);
+            offs += 4;
             if (Parse(y.ToString("d4") + '/' + M.ToString("d2") + '/' + d.ToString("d2") +
-                ' ' + H.ToString("00") + ":00", FORM_H, out mDt))
+                ' ' + H.ToString("d2") + ':' + m.ToString("d2"), FORM_H, out dt))
                 return true;
             return false;
+        }
+
+        public byte[] ToByteR(int rId)
+        {
+            ExamRoom r;
+            if (vRoom.TryGetValue(rId, out r))
+                return r.ToByte();
+            return null;
         }
 
         public static bool Parse(string s, string form, out DateTime dt)
@@ -122,7 +141,7 @@ namespace sQzLib
             string[] vs = buf.Split('\n');
             foreach (string s in vs)
             {
-                Examinee nee = new Examinee();
+                Examinee e = new Examinee();
                 string[] v = s.Split('\t');
                 if (v.Length == 5)
                 {
@@ -130,19 +149,20 @@ namespace sQzLib
                         continue;
                     v[0] = v[0].ToUpper();
                     if (v[0][0] == 'C' && v[0][1] == 'B')
-                        nee.eLvl = ExamLvl.Basis;
+                        e.eLvl = ExamLvl.Basis;
                     else if (v[0][0] == 'N' && v[0][1] == 'C')
-                        nee.eLvl = ExamLvl.Advance;
+                        e.eLvl = ExamLvl.Advance;
                     else
                         continue;
-                    if (!ushort.TryParse(v[0].Substring(2), out nee.uId)
-                        || !int.TryParse(v[1], out nee.uRId) || !vRoom.ContainsKey(nee.uRId))
+                    int uRId;
+                    if (!ushort.TryParse(v[0].Substring(2), out e.uId)
+                        || !int.TryParse(v[1], out uRId) || !vRoom.ContainsKey(uRId))
                         continue;
-                    nee.uSlId = uId;
-                    nee.tName = v[2].Trim();
-                    nee.tBirdate = v[3];
-                    nee.tBirthplace = v[4].Trim();
-                    vRoom[nee.uRId].vExaminee.Add(nee.Lvl * nee.uId, nee);
+                    e.uSlId = uId;
+                    e.tName = v[2].Trim();
+                    e.tBirdate = v[3];
+                    e.tBirthplace = v[4].Trim();
+                    vRoom[uRId].vExaminee.Add(e.Lv * e.uId, e);
                 }
             }
         }
@@ -158,37 +178,66 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string qry = DBConnect.mkQrySelect("examinee",
-                "rId,lvl,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
-                "slId=" + uId, null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             foreach (ExamRoom r in vRoom.Values)
-                r.vExaminee.Clear();
-            if (reader != null)
             {
-                while (reader.Read())
+                r.vExaminee.Clear();
+                string qry = DBConnect.mkQrySelect(Examinee.tDBtbl + r.uId,
+                    "lv,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
+                    "slId=" + uId, null);
+                MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+                if (reader != null)
                 {
-                    Examinee e = new Examinee();
-                    e.eStt = Examinee.eINFO;
-                    e.uSlId = uId;
-                    e.uRId = reader.GetInt16(0);
-                    e.Lvl = reader.GetInt16(1);
-                    e.uId = reader.GetUInt16(2);
-                    e.tName = reader.GetString(3);
-                    e.tBirdate = reader.GetDateTime(4).ToString(FORM_R);
-                    e.tBirthplace = reader.GetString(5);
-                    e.dtTim1 = (reader.IsDBNull(6)) ? INVALID_DT :
-                        e.dtTim1 = DateTime.Parse(reader.GetString(6));
-                    e.dtTim2 = (reader.IsDBNull(7)) ? INVALID_DT :
-                        DateTime.Parse(reader.GetString(7));
-                    if (!reader.IsDBNull(8))
-                        e.uGrade = reader.GetUInt16(8);
-                    if (!reader.IsDBNull(9))
-                        e.tComp = reader.GetString(9);
-                    vRoom[e.uRId].vExaminee.Add((short)(e.Lvl * e.uId), e);
+                    while (reader.Read())
+                    {
+                        Examinee e = new Examinee();
+                        e.eStt = Examinee.eINFO;
+                        e.uSlId = uId;
+                        e.Lv = reader.GetInt16(0);
+                        e.uId = reader.GetUInt16(1);
+                        e.tName = reader.GetString(2);
+                        e.tBirdate = reader.GetDateTime(3).ToString(FORM_R);
+                        e.tBirthplace = reader.GetString(4);
+                        e.dtTim1 = (reader.IsDBNull(5)) ? INVALID_DT :
+                            e.dtTim1 = DateTime.Parse(reader.GetString(5));
+                        e.dtTim2 = (reader.IsDBNull(6)) ? INVALID_DT :
+                            DateTime.Parse(reader.GetString(6));
+                        if (!reader.IsDBNull(7))
+                            e.uGrade = reader.GetUInt16(7);
+                        if (!reader.IsDBNull(8))
+                            e.tComp = reader.GetString(8);
+                        r.vExaminee.Add(e.Lv * e.uId, e);
+                    }
+                    reader.Close();
                 }
-                reader.Close();
             }
+            DBConnect.Close(ref conn);
+        }
+
+        public void ReadByteGrade(byte[] buf, ref int offs)
+        {
+            List<Examinee> v = new List<Examinee>();
+            while(true)
+            {
+                if (buf.Length - offs < 4)
+                    break;
+                int rId = BitConverter.ToInt32(buf, offs);
+                offs += 4;
+                ExamRoom r;
+                if (!vRoom.TryGetValue(rId, out r))
+                    break;
+                if (r.ReadByteGrade(buf, ref offs, ref v))
+                    break;
+            }
+            //todo: v
+        }
+
+        public void DBUpdateRs()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+            foreach (ExamRoom r in vRoom.Values)
+                r.DBUpdateRs(conn);
             DBConnect.Close(ref conn);
         }
     }

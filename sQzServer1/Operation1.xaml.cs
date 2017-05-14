@@ -28,14 +28,14 @@ namespace sQzServer1
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamDate mDt;
+        DateTime mDt;
         ExamRoom mRoom;
-        Dictionary<short, TextBlock> vComp;
-        Dictionary<short, TextBlock> vTime1;
-        Dictionary<short, TextBlock> vTime2;
-        Dictionary<short, TextBlock> vMark;
-        Dictionary<short, CheckBox> vLock;//supervisor side
-        Dictionary<short, bool> vbLock;//examinee side
+        Dictionary<int, TextBlock> vComp;
+        Dictionary<int, TextBlock> vTime1;
+        Dictionary<int, TextBlock> vTime2;
+        Dictionary<int, TextBlock> vMark;
+        Dictionary<int, CheckBox> vLock;//supervisor side
+        Dictionary<int, bool> vbLock;//examinee side
         QuestPack mQPack;
         int mQShIdx;
         int mQShMaxIdx;
@@ -54,15 +54,16 @@ namespace sQzServer1
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            mDt = new ExamDate();
+            mDt = ExamSlot.INVALID_DT;
             mRoom = new ExamRoom();
+            mRoom.uId = 2;//todo
 
-            vComp = new Dictionary<short, TextBlock>();
-            vTime1 = new Dictionary<short, TextBlock>();
-            vTime2 = new Dictionary<short, TextBlock>();
-            vMark = new Dictionary<short, TextBlock>();
-            vLock = new Dictionary<short, CheckBox>();
-            vbLock = new Dictionary<short, bool>();
+            vComp = new Dictionary<int, TextBlock>();
+            vTime1 = new Dictionary<int, TextBlock>();
+            vTime2 = new Dictionary<int, TextBlock>();
+            vMark = new Dictionary<int, TextBlock>();
+            vLock = new Dictionary<int, CheckBox>();
+            vbLock = new Dictionary<int, bool>();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -130,33 +131,33 @@ namespace sQzServer1
         public bool SrvrCodeHndl(NetCode c, byte[] buf, int offs, ref byte[] outMsg)
         {
             QuestSheet qs;
-            short lvid;
+            int lvid;
             Examinee e;
             switch (c)
             {
                 case NetCode.Dating:
-                    outMsg = new byte[mDt.GetByteCount()];
+                    outMsg = new byte[20];
                     offs = 0;
-                    mDt.ToByte(outMsg, ref offs);
+                    ExamSlot.ToByteDt(outMsg, ref offs, mDt);
                     break;
                 case NetCode.Authenticating:
                     //e = mRoom.ReadByteSgning(buf, offs);
                     e = new Examinee();
                     e.ReadByte(buf, ref offs);
                     bool lck;
-                    if (!vbLock.TryGetValue((short)(e.Lvl * e.uId), out lck))
+                    if (!vbLock.TryGetValue((int)(e.Lv * e.uId), out lck))
                         lck = false;//err, default value benefits examinees
                     if (!lck)
                     {
                         e = mRoom.Signing(e);
                         if (e != null)
                         {
-                            if (e.dtTim1.Hour == ExamDate.INVALID)
+                            if (e.dtTim1.Hour == ExamSlot.INVALID)
                                 e.dtTim1 = DateTime.Now;
                             Dispatcher.Invoke(() =>
                             {
                                 TextBlock t;
-                                lvid = (short)(e.Lvl * e.uId);
+                                lvid = (int)(e.Lv * e.uId);
                                 if (vComp.TryGetValue(lvid, out t))
                                     t.Text = e.tComp;
                                 if (vTime1.TryGetValue(lvid, out t))
@@ -225,7 +226,7 @@ namespace sQzServer1
                         break;
                     }
                     ushort grade = keySh.Grade(s.aAns);
-                    lvid = (short)(s.Lvl * s.uNeeId);
+                    lvid = s.Lv * s.uNeeId;
                     if (mRoom.vExaminee.TryGetValue(lvid, out e))
                     {
                         e.eStt = Examinee.eFINISHED;
@@ -264,12 +265,12 @@ namespace sQzServer1
             switch (mState)
             {
                 case NetCode.DateStudentRetriving:
-                    if (mDt.ReadByte(buf, ref offs))
+                    if (ExamSlot.ReadByteDt(buf, ref offs, out mDt))
                         return false;
                     mRoom.ReadByte(buf, ref offs);
                     Dispatcher.Invoke(() => {
-                        if (mDt.mDt.Year != ExamDate.INVALID)
-                            txtDate.Text = mDt.mDt.ToString(ExamDate.FORM_H);
+                        if (mDt.Year != ExamSlot.INVALID)
+                            txtDate.Text = mDt.ToString(ExamSlot.FORM_H);
                         vComp.Clear();
                         vMark.Clear();
                         vTime1.Clear();
@@ -295,7 +296,7 @@ namespace sQzServer1
                             Grid.SetColumn(t, 2);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            short lvid = (short)(e.Lvl * e.uId);
+                            int lvid = (int)(e.Lv * e.uId);
                             vComp.Add(lvid, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 3);
@@ -312,7 +313,7 @@ namespace sQzServer1
                             vLock.Add(lvid, cbx);
                             gNee.Children.Add(cbx);
                             t = new TextBlock();
-                            if (e.dtTim1.Hour != ExamDate.INVALID)
+                            if (e.dtTim1.Hour != ExamSlot.INVALID)
                             {
                                 t.Text = e.dtTim1.ToString("HH:mm");
                                 vbLock.Add(lvid, true);
@@ -327,7 +328,7 @@ namespace sQzServer1
                             Grid.SetColumn(t, 4);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            if (e.dtTim2.Hour != ExamDate.INVALID)
+                            if (e.dtTim2.Hour != ExamSlot.INVALID)
                                 t.Text = e.dtTim2.ToString("HH:mm");
                             vTime2.Add(lvid, t);
                             Grid.SetRow(t, rid);
@@ -372,11 +373,11 @@ namespace sQzServer1
         private void cbxLock_Unchecked(object sender, RoutedEventArgs e)
         {
             CheckBox cbx = sender as CheckBox;
-            short key;
-            if (short.TryParse(cbx.Name.Substring(1), out key))
+            int key;
+            if (int.TryParse(cbx.Name.Substring(1), out key))
             {
                 if (cbx.Name[0] == 'n')
-                    key = (short)-key;
+                    key = (int)-key;
                 vbLock[key] = false;//todo: safer
             }
         }
@@ -386,7 +387,9 @@ namespace sQzServer1
             switch (mState)
             {
                 case NetCode.DateStudentRetriving:
-                    outBuf = BitConverter.GetBytes((int)mState);
+                    outBuf = new byte[8];
+                    Array.Copy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
+                    Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, outBuf, 4, 4);
                     break;
                 case NetCode.QuestRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);

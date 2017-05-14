@@ -11,9 +11,9 @@ namespace sQzLib
     {
         public int uId;
         public Dictionary<int, Examinee> vExaminee;
-        public ExamRoom(int id)
+        public ExamRoom()
         {
-            uId = id;
+            uId = ushort.MaxValue;
             vExaminee = new Dictionary<int, Examinee>();
         }
 
@@ -23,7 +23,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return null;
-            string qry = DBConnect.mkQrySelect("examinee", "lvl,id,qId,anssh", "slId=" + slId, null);
+            string qry = DBConnect.mkQrySelect("examinee", "lv,id,qId,anssh", "slId=" + slId, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             Dictionary<int, ushort> r = new Dictionary<int, ushort>();
             if (reader != null)
@@ -49,20 +49,19 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string attbs = "slId,rid,lvl,id,name,birdate,birthplace";
+            string attbs = "slId,lv,id,name,birdate,birthplace";
             StringBuilder vals = new StringBuilder();
             foreach (Examinee e in vExaminee.Values)
             {
                 vals.Append("(" + e.uSlId + ",");
-                vals.Append(e.uRId + ",");
-                vals.Append(e.Lvl + ",");
+                vals.Append(e.Lv + ",");
                 vals.Append(e.uId + ",");
                 vals.Append("'" + e.tName + "',");
                 vals.Append("'" + ExamSlot.ToMysqlForm(e.tBirdate, ExamSlot.FORM_R) + "',");
                 vals.Append("'" + e.tBirthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            DBConnect.Ins(conn, "examinee", attbs, vals.ToString());
+            DBConnect.Ins(conn, Examinee.tDBtbl + uId, attbs, vals.ToString());
             DBConnect.Close(ref conn);
         }
 
@@ -102,26 +101,23 @@ namespace sQzLib
             {
                 Examinee e = new Examinee();
                 if(!e.ReadByte(buf, ref offs))
-                    vExaminee.Add((short)(e.Lvl * e.uId), e);
+                    vExaminee.Add((short)(e.Lv * e.uId), e);
             }
         }
 
-        public void DBUpdateRs()
+        public void DBUpdateRs(MySqlConnection conn)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
             foreach (Examinee e in vExaminee.Values)
             {
-                StringBuilder qry = new StringBuilder("UPDATE `examinee` SET ");
+                StringBuilder qry = new StringBuilder("UPDATE exnee" + uId + " SET ");
                 if (e.dtTim1.Hour != 0)
                 {
-                    qry.Append("dt1='" + e.dtTim1.ToString("HH:mm") + "'");
+                    qry.Append("t1='" + e.dtTim1.ToString("HH:mm") + "'");
                     if (e.dtTim2.Hour != 0)
                     {
-                        qry.Append(",dt2='" + e.dtTim2.ToString("HH:mm") + "'");
+                        qry.Append(",t2='" + e.dtTim2.ToString("HH:mm") + "'");
                         if (e.uGrade != short.MaxValue)
-                            qry.Append(",grade=" + e.uGrade);
+                            qry.Append(",grd=" + e.uGrade);
                         if (e.tComp != null)
                         {
                             if (32 < e.tComp.Length)
@@ -141,11 +137,10 @@ namespace sQzLib
                         }
                     }
                     qry.Append(" WHERE slId=" + e.uSlId +
-                        " AND level=" + (int)e.eLvl + " AND idx=" + e.uId);
+                        " AND lv=" + (int)e.eLvl + " AND id=" + e.uId);
                     DBConnect.Update(conn, qry.ToString());
                 }
             }
-            DBConnect.Close(ref conn);
         }
 
         public Examinee ReadByteSgning(byte[] buf, int offs)
@@ -153,7 +148,7 @@ namespace sQzLib
             Examinee e = new Examinee();
             e.ReadByte(buf, ref offs);
             Examinee o;
-            short key = (short)(e.Lvl * e.uId);
+            short key = (short)(e.Lv * e.uId);
             if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
             {
                 //vExaminee.Remove(key);
@@ -169,7 +164,7 @@ namespace sQzLib
         public Examinee Signing(Examinee e)
         {
             Examinee o;
-            short key = (short)(e.Lvl * e.uId);
+            short key = (short)(e.Lv * e.uId);
             if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
             {
                 o.Merge(e);
@@ -212,13 +207,13 @@ namespace sQzLib
             }
         }
 
-        public void ReadByteGrade(byte[] buf, ref int offs)
+        public bool ReadByteGrade(byte[] buf, ref int offs, ref List<Examinee> v)
         {
             if (buf == null || vExaminee.Count < 1)
-                return;
+                return true;
             int l = buf.Length - offs;
             if (l < 4)
-                return;
+                return true;
             int n = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
@@ -229,11 +224,12 @@ namespace sQzLib
                 if (e.ReadByte(buf, ref offs))
                     break;
                 Examinee o;
-                if (!vExaminee.TryGetValue((short)(e.Lvl * e.uId), out o))
-                    continue;
-                else
+                if (vExaminee.TryGetValue(e.Lv * e.uId, out o))
                     o.Merge(e);
+                else
+                    v.Add(e);
             }
+            return false;
         }
     }
 }
