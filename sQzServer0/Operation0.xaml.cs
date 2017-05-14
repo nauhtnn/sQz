@@ -276,13 +276,14 @@ namespace sQzServer0
             int[][] x = new int[2][];
             x[0] = QuestSheet.GetBasicIU();
             x[1] = QuestSheet.GetAdvanceIU();
+            List<QuestSheet> l = new List<QuestSheet>();
 			while(0 < n) {
 				for(int i = 0; i < 2; ++i)
 				{
                     QuestSheet qs = new QuestSheet();
                     foreach (int j in x[i])
                     {
-                        t = (TextBox)FindName("tbxIU" + j);
+                        t = FindName("tbxIU" + j) as TextBox;
                         if (t != null && 0 < t.Text.Length)
                         {
                             int v;
@@ -297,6 +298,7 @@ namespace sQzServer0
                     {
                         qs.uId = ++uQSId[i];
                         mQPack.vSheet.Add(qs.uId, qs);
+                        l.Add(qs);
                     }
                 }
                 --n;
@@ -304,7 +306,7 @@ namespace sQzServer0
             foreach (QuestSheet qs in mQPack.vSheet.Values)
                 qs.ToByte();
             mKeyPack.ExtractKey(mQPack);
-            mQPack.DBIns(mSl.uId);
+            mQPack.DBIns(mSl.uId, l);
             LoadQuest();
         }
 

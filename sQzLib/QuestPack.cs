@@ -84,26 +84,26 @@ namespace sQzLib
             return r;
         }
 
-        public void DBIns(uint slId)
+        public void DBIns(uint slId, List<QuestSheet> l)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
             StringBuilder vals = new StringBuilder();
-            foreach (QuestSheet qs in vSheet.Values)
+            foreach (QuestSheet qs in l)
                 qs.DBAppendInsQry(slId, ref vals);
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             DBConnect.Ins(conn, "questsh", "slId,lv,id,vQuest", vals.ToString());//todo: catch exception
             DBConnect.Close(ref conn);
         }
 
-        public ushort DBCurQSId(uint dtIdx, ExamLvl lv)
+        public ushort DBCurQSId(uint slId, ExamLvl lv)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return 0;
             ushort id = (ushort)DBConnect.Max(conn, "questsh", "id",
-                    "slId=" + dtIdx + " AND lv=" + (short)lv);
+                    "slId=" + slId + " AND lv=" + (short)lv);
             DBConnect.Close(ref conn);
             return id;
         }
