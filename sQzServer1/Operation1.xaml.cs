@@ -398,7 +398,10 @@ namespace sQzServer1
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.SrvrSubmitting:
-                    mRoom.ToByteGrade(BitConverter.GetBytes((int)mState), out outBuf);
+                    byte[] prefx = new byte[8];
+                    Array.Copy(BitConverter.GetBytes((int)mState), prefx, 4);
+                    Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, prefx, 4, 4);
+                    mRoom.ToByteGrade(prefx, out outBuf);
                     break;
             }
             return true;

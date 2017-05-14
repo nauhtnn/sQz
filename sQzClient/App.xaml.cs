@@ -96,17 +96,22 @@ namespace sQzClient
 
                 bool bAlt = GetKeyState(0x12) == KEYSTATE_PRESSED_NOT_TOGGLED ||
                     GetKeyState(0x12) == KEYSTATE_PRESSED_TOGGLED;
-                if (bAlt && (hookStruct.KeyCode == 0x09 || hookStruct.KeyCode == 0x73))
-                    //pressed
-                    return 1;
+                //if (bAlt && (hookStruct.KeyCode == 0x09 || hookStruct.KeyCode == 0x73))
+                //    //pressed
+                //    return 1;
                 //else //released
                 //bool bCtrl = GetKeyState(0x11) == KEYSTATE_PRESSED_NOT_TOGGLED ||
                 //    GetKeyState(0x11) == KEYSTATE_PRESSED_TOGGLED;
-                //if (bCtrl && hookStruct.KeyCode == 0x1b)
-                if (hookStruct.KeyCode == 0x1b)
-                    return 1;
-                if (hookStruct.KeyCode == 0x5b || hookStruct.KeyCode == 0x5c)
-                    return 1;
+                //if (hookStruct.KeyCode == 0x1b)
+                //    return 1;
+                //if (hookStruct.KeyCode == 0x5b || hookStruct.KeyCode == 0x5c)
+                //    return 1;
+                //bool bWind = GetKeyState(0x5b) == KEYSTATE_PRESSED_NOT_TOGGLED ||
+                //    GetKeyState(0x5b) == KEYSTATE_PRESSED_TOGGLED ||
+                //    GetKeyState(0x5c) == KEYSTATE_PRESSED_NOT_TOGGLED ||
+                //    GetKeyState(0x5c) == KEYSTATE_PRESSED_TOGGLED;
+                //if (bWind && hookStruct.KeyCode == 0x4c)
+                    //return 1;
             }
 
             // Pass to other keyboard handlers. This allows other applications with hooks to 

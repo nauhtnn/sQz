@@ -32,7 +32,6 @@ namespace sQzServer0
         Dictionary<int, TextBlock> vComp;
         QuestPack mQPack;
         AnsPack mKeyPack;
-        Dictionary<uint, ExamRoom> vRoom;
         ushort[] uQSId;
 
         public Operation0()
@@ -48,7 +47,6 @@ namespace sQzServer0
             mQPack = new QuestPack();
             mKeyPack = new AnsPack();
             mSl = new ExamSlot();
-            vRoom = new Dictionary<uint, ExamRoom>();
             uQSId = new ushort[2];
 
             lbxDate.SelectionMode = SelectionMode.Single;
@@ -199,11 +197,11 @@ namespace sQzServer0
         {
             Dispatcher.Invoke(() => {
                 TextBlock t;
-                foreach(ExamRoom r in vRoom.Values)
+                foreach(ExamRoom r in mSl.vRoom.Values)
                     foreach (Examinee e in r.vExaminee.Values)
                     {
                         if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.Lv * e.uId, out t))
-                            t.Text = "" + e.uGrade;
+                            t.Text = e.uGrade.ToString();
                         if (e.dtTim1.Hour != ExamSlot.INVALID && vDt1.TryGetValue(e.Lv * e.uId, out t))
                             t.Text = e.dtTim1.ToString("HH:mm");
                         if (e.dtTim2.Hour != ExamSlot.INVALID && vDt2.TryGetValue(e.Lv * e.uId, out t))
