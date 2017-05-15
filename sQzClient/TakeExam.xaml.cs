@@ -388,6 +388,8 @@ namespace sQzClient
         {
             btnSubmit.IsEnabled = false;
             mTimer.Stop();
+            foreach (ListBox l in mNee.mAnsSh.vlbxAns)
+                l.IsEnabled = false;
             btnExit.IsEnabled = true;
         }
 
