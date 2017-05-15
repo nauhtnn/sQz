@@ -260,11 +260,6 @@ namespace sQzServer0
             mServer.Stop(ref mCbMsg);
         }
 
-        private void DBReadCurQSId()
-        {
-            
-        }
-
         private void btnExGen_Click(object sender, RoutedEventArgs e)
         {
             if (mSl.uId == uint.MaxValue)
@@ -409,28 +404,40 @@ namespace sQzServer0
                 TextBox t = FindName("tbxIU" + i) as TextBox;
                 if(t != null)
                 {
-                    t.Text = "0";
                     t.MaxLength = 2;
+                    t.PreviewKeyDown += tbxIU_PrevwKeyDown;
+                    t.TextChanged += tbxIU_TextChanged;
+                    
                 }
             }
             tbxNq.Text = "0";
         }
 
+        private void tbxIU_PrevwKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Delete && e.Key != Key.Back && e.Key != Key.Tab &&
+                ((int)e.Key < (int)Key.Left || (int)Key.Down < (int)e.Key) &&
+                ((int)e.Key < (int)Key.D0 || (int)Key.D9 < (int)e.Key))
+                e.Handled = true;
+        }
+
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
         {
-            int n = 0, v;
-            for (int i = 1; i < 16; ++i)
+            bool bas = true, adv = false;//todo
+            int n = 0, i;
+            for(int j = 1; j < 7; ++j)
             {
-                TextBox t = (TextBox)FindName("tbxIU" + i);
-                if (t != null && 0 < t.Text.Length)
-                {
-                    if (int.TryParse(t.Text, out v))
-                        n += v;
-                    else
-                        t.Text = "0";
-                }
+                TextBox t = FindName("tbxIU" + j) as TextBox;
+                if (t != null && int.TryParse(t.Text, out i) && 0 < i)
+                    n += i;
+                else
+                    bas = false;
             }
-            tbxNq.Text = "" + n;
+            tbxNq.Text = n.ToString();
+            if ((bas && adv) || n != 30)
+                btnExGen.IsEnabled = false;
+            else
+                btnExGen.IsEnabled = true;
         }
 
         private void LoadTxt()
