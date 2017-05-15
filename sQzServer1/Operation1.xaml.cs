@@ -41,6 +41,7 @@ namespace sQzServer1
         int mQShMaxIdx;
         AnsPack mKeyPack;
         AnsPack mAnsPack;
+        bool bAllNee;
 
         public Operation1()
         {
@@ -56,7 +57,10 @@ namespace sQzServer1
 
             mDt = ExamSlot.INVALID_DT;
             mRoom = new ExamRoom();
-            mRoom.uId = 2;//todo
+            if(System.IO.File.Exists("RoomId.txt"))
+                mRoom.uId = int.Parse(System.IO.File.ReadAllText("RoomId.txt"));
+            else
+                mRoom.uId = 2;//todo
 
             vComp = new Dictionary<int, TextBlock>();
             vTime1 = new Dictionary<int, TextBlock>();
@@ -64,6 +68,8 @@ namespace sQzServer1
             vMark = new Dictionary<int, TextBlock>();
             vLock = new Dictionary<int, CheckBox>();
             vbLock = new Dictionary<int, bool>();
+
+            bAllNee = false;
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -389,7 +395,10 @@ namespace sQzServer1
                 case NetCode.DateStudentRetriving:
                     outBuf = new byte[8];
                     Array.Copy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
-                    Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, outBuf, 4, 4);
+                    if(bAllNee)
+                        Array.Copy(BitConverter.GetBytes(0), 0, outBuf, 4, 4);
+                    else
+                        Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, outBuf, 4, 4);
                     break;
                 case NetCode.QuestRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);
@@ -447,6 +456,16 @@ namespace sQzServer1
             mState = NetCode.SrvrSubmitting;
             Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
+        }
+
+        private void ckbAllNee_Checked(object sender, RoutedEventArgs e)
+        {
+            bAllNee = true;
+        }
+
+        private void ckbAllNee_Unchecked(object sender, RoutedEventArgs e)
+        {
+            bAllNee = false;
         }
     }
 }

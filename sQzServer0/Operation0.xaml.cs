@@ -368,14 +368,17 @@ namespace sQzServer0
                     int rId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
                     sz += mSl.GetByteCountDt();
-                    byte[] es = mSl.ToByteR(rId);
-                    if (es != null)
-                        sz += es.Length;
+                    List<byte[]> es = mSl.ToByteR(rId);
+                    foreach(byte[] i in es)
+                        sz += i.Length;
                     outMsg = new byte[sz];
                     sz = 0;
                     ExamSlot.ToByteDt(outMsg, ref sz, mSl.mDt);
-                    if (es != null)
-                        Buffer.BlockCopy(es, 0, outMsg, sz, es.Length);
+                    foreach (byte[] i in es)
+                    {
+                        Buffer.BlockCopy(i, 0, outMsg, sz, i.Length);
+                        sz += i.Length;
+                    }
                     break;
                 case NetCode.QuestRetrieving:
                     outMsg = mQPack.ToByte();

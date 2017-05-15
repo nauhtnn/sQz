@@ -111,12 +111,20 @@ namespace sQzLib
             return false;
         }
 
-        public byte[] ToByteR(int rId)
+        public List<byte[]> ToByteR(int rId)
         {
+            List<byte[]> l = new List<byte[]>();
             ExamRoom r;
-            if (vRoom.TryGetValue(rId, out r))
-                return r.ToByte();
-            return null;
+            if (rId == 0)
+                foreach (ExamRoom i in vRoom.Values)
+                {
+                    byte[] a = i.ToByte();
+                    if (4 < a.Length)
+                        l.Add(a);
+                }
+            else if (vRoom.TryGetValue(rId, out r))
+                l.Add(r.ToByte());
+            return l;
         }
 
         public static bool Parse(string s, string form, out DateTime dt)

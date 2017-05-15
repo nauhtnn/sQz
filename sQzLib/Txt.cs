@@ -29,7 +29,7 @@ namespace sQzLib
 			get{
 				if(_s == null) {
 					_s = new Txt();
-					_s.ReadByte("../../../samples/GUI-vi.bin");
+					_s.ReadByte("GUI-vi.bin");
 				}
 				return _s;
 			}
