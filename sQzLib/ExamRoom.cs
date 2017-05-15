@@ -183,12 +183,16 @@ namespace sQzLib
                 return;
             }
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(vExaminee.Count));
+            int n = 0;
             foreach (Examinee e in vExaminee.Values)
-                foreach (byte[] b in e.ToByte())
-                    l.Add(b);
+                if (e.uGrade != ushort.MaxValue)
+                {
+                    ++n;
+                    foreach (byte[] b in e.ToByte())
+                        l.Add(b);
+                }
             //join
-            int sz = 0;
+            int sz = 4;//sizeof(n)
             if (prefix != null)
                 sz += prefix.Length;
             foreach (byte[] i in l)
@@ -200,6 +204,8 @@ namespace sQzLib
                 Buffer.BlockCopy(prefix, 0, buf, offs, prefix.Length);
                 offs += prefix.Length;
             }
+            Array.Copy(BitConverter.GetBytes(n), 0, buf, offs, 4);
+            offs += 4;
             foreach (byte[] i in l)
             {
                 Buffer.BlockCopy(i, 0, buf, offs, i.Length);
@@ -209,7 +215,7 @@ namespace sQzLib
 
         public bool ReadByteGrade(byte[] buf, ref int offs, ref List<Examinee> v)
         {
-            if (buf == null || vExaminee.Count < 1)
+            if (buf == null)
                 return true;
             int l = buf.Length - offs;
             if (l < 4)
@@ -222,7 +228,7 @@ namespace sQzLib
                 --n;
                 Examinee e = new Examinee();
                 if (e.ReadByte(buf, ref offs))
-                    break;
+                    return true;
                 Examinee o;
                 if (vExaminee.TryGetValue(e.Lv * e.uId, out o))
                     o.Merge(e);

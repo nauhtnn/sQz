@@ -335,7 +335,10 @@ namespace sQzLib
             l -= 4;
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim1))
+            {
                 dtTim1 = ExamSlot.INVALID_DT;
+                return true;
+            }
             if (eStt == eAUTHENTICATED)
                 return false;
             if (l < 2)
@@ -376,7 +379,10 @@ namespace sQzLib
             l -= 4;
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim2))
-                dtTim2 = ExamSlot.INVALID_DT;
+            {
+                dtTim1 = ExamSlot.INVALID_DT;
+                return true;
+            }
             if (l < 2)
                 return true;
             uGrade = BitConverter.ToUInt16(buf, offs);

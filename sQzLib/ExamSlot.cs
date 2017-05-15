@@ -227,7 +227,8 @@ namespace sQzLib
         public void ReadByteGrade(byte[] buf, ref int offs)
         {
             List<Examinee> v = new List<Examinee>();
-            while(true)
+            List<Examinee> l = new List<Examinee>();
+            while (true)
             {
                 if (buf.Length - offs < 4)
                     break;
@@ -238,8 +239,22 @@ namespace sQzLib
                     break;
                 if (r.ReadByteGrade(buf, ref offs, ref v))
                     break;
+                foreach (Examinee e in v)
+                {
+                    Examinee o;
+                    bool unfound = true;
+                    foreach (ExamRoom i in vRoom.Values)
+                        if (i.uId != rId && i.vExaminee.TryGetValue(e.Lv * e.uId, out o))
+                        {
+                            unfound = false;
+                            o.Merge(e);
+                            break;
+                        }
+                    if (unfound)
+                        l.Add(e);
+                }
+                v.Clear();
             }
-            //todo: v
         }
 
         public void DBUpdateRs()
