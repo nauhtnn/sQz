@@ -361,13 +361,12 @@ namespace sQzClient
                     {
                         dtLastLog = DateTime.Now;
                         mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
-                        //txtLogTim.Text = Txt.s._[(int)TxI.LOG_MGS] + dtRemn.Minutes + ':' + dtRemn.Seconds;
-                        //txtChg.Text = string.Empty;
-                        //bPendingChg = false;
                     }
                     Dispatcher.Invoke(() =>
                     {
                         txtRTime.Text = dtRemn.Minutes.ToString() + " : " + dtRemn.Seconds;
+                        if (!btnSubmit.IsEnabled && dtRemn.Minutes < 28)//hardcode
+                            btnSubmit.IsEnabled = true;
                     });
                 }
                 else

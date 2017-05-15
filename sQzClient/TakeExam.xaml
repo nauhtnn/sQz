@@ -48,7 +48,7 @@
                 <RowDefinition Height="48"/>
             </Grid.RowDefinitions>
             <TextBlock x:Name="txtWelcome" Background="#ffffbb" Foreground="#00356b" FontSize="18"/>
-            <Button x:Name="btnSubmit" Grid.Column="1" FontSize="20" Click="btnSubmit_Click" Background="#1c64e7" Foreground="White" BorderThickness="0"/>
+            <Button x:Name="btnSubmit" Grid.Column="1" FontSize="20" Click="btnSubmit_Click" Background="#1c64e7" Foreground="White" BorderThickness="0" IsEnabled="False"/>
             <TextBlock x:Name="txtRTime" Background="#ffffbb" Foreground="#00356b" Grid.Column="2" FontSize="28" TextAlignment="Center"/>
             <Button x:Name="btnExit" Grid.Column="3" Content="Close" Click="btnExit_Click" FontSize="20"/>
         </Grid>
