@@ -106,15 +106,16 @@ namespace sQzLib
         public string tId {
             get {
                 if (eLvl == ExamLvl.Basis)
-                    return "CB" + uId;
+                    return "CB" + uId.ToString("d3");
                 else
-                    return "NC" + uId;
+                    return "NC" + uId.ToString("d3");
             }
         }
         public bool ParseTxId(string s)
         {
-            if(s == null || s.Length < 3)
+            if(s == null || s.Length != 5)
                 return true;
+            s = s.ToUpper();
             ushort tuId;
             if (s[0] == 'C' && s[1] == 'B')
             {
@@ -152,7 +153,7 @@ namespace sQzLib
         public override string ToString()
         {
             StringBuilder s = new StringBuilder();
-            s.AppendFormat("{0}, {1}, {2}, {3}, {4}",
+            s.AppendFormat("{0}{1}, {2}, {3}, {4}",
                 (eLvl == ExamLvl.Basis) ? "CB" : "NC",
                 uId, tName, tBirdate, tBirthplace);
             return s.ToString();

@@ -144,8 +144,11 @@ namespace sQzLib
             return MYSQL2016;
         }
 
-        public void ReadS(string buf)
+        public void ReadF(string fp)
         {
+            string buf = Utils.ReadFile(fp);
+            if (buf == null)
+                return;
             string[] vs = buf.Split('\n');
             foreach (string s in vs)
             {

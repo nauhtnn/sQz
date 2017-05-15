@@ -149,10 +149,7 @@ namespace sQzServer0
             string filePath = null;
             if (result == true)
                 filePath = dlg.FileName;
-            string buf = Utils.ReadFile(filePath);
-            if (buf == null)
-                return;
-            mSl.ReadS(buf);
+            mSl.ReadF(filePath);
             
             LoadExaminees(true);
         }
