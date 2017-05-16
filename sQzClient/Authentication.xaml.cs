@@ -1,19 +1,9 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Data;
-using System.Windows.Documents;
-using System.Windows.Input;
-using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
-using System.Windows.Shapes;
 using System.Threading;
-using System.Net.Sockets;
+using System.Windows.Media.Effects;
 using sQzLib;
 
 namespace sQzClient
@@ -26,10 +16,12 @@ namespace sQzClient
         Client2 mClnt;
         NetCode mState;
         UICbMsg mCbMsg;
-        bool bRunning;
+        //bool bRunning;
+        bool bBtnBusy;
         DateTime mDt;
         Examinee mNee;
         TakeExam pgTkExm;
+        BlurEffect mBlurEff;
 
         public Authentication()
         {
@@ -40,7 +32,8 @@ namespace sQzClient
             mState = NetCode.Dating;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
-            bRunning = true;
+            //bRunning = true;
+            bBtnBusy = false;
 
             mDt = ExamSlot.INVALID_DT;
             mNee = new Examinee();
@@ -56,8 +49,13 @@ namespace sQzClient
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            if(mNee.ParseTxId(tbxId.Text))
+            if (bBtnBusy)
+                return;
+            bBtnBusy = true;
+            if (mNee.ParseTxId(tbxId.Text))
             {
+                spMain.Effect = mBlurEff;
+                WPopup.s.wpCb = Deblur;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);
                 return;
             }
@@ -66,6 +64,8 @@ namespace sQzClient
             if (!DateTime.TryParse(mNee.tBirdate, out dum))
             {
                 mNee.tBirdate = null;
+                spMain.Effect = mBlurEff;
+                WPopup.s.wpCb = Deblur;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
                 return;
             }
@@ -79,7 +79,8 @@ namespace sQzClient
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            bRunning = false;
+            //bRunning = false;
+            bBtnBusy = true;
             WPopup.s.cncl = false;
             mClnt.Close();
         }
@@ -103,6 +104,8 @@ namespace sQzClient
             //FirewallHandler fwHndl = new FirewallHandler(3);
             //lblStatus.Text += fwHndl.OpenFirewall();
 
+            mBlurEff = new BlurEffect();
+
             Thread th = new Thread(() => {
                 if (mClnt.ConnectWR(ref mCbMsg))
                     EnableControls();
@@ -110,6 +113,8 @@ namespace sQzClient
                 {
                     Dispatcher.Invoke(() => {
                         btnReconn.IsEnabled = true;
+                        spMain.Effect = mBlurEff;
+                        WPopup.s.wpCb = Deblur;
                         WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);});
                 }});
             th.Start();
@@ -136,9 +141,6 @@ namespace sQzClient
                 case NetCode.Dating:
                     ExamSlot.ReadByteDt(buf, ref offs, out mDt);
                     Dispatcher.Invoke(() => {
-                        if (mDt.Year == ExamSlot.INVALID)
-                            txtDate.Text = "No connection";
-                        else
                             txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(ExamSlot.FORM_RH);
                     });
                     mState = NetCode.Authenticating;
@@ -146,7 +148,7 @@ namespace sQzClient
                 case NetCode.Authenticating:
                     l = buf.Length - offs;
                     if (l < 1)
-                        return false;
+                        break;
                     bool rs = BitConverter.ToBoolean(buf, offs);
                     ++offs;
                     if(rs)
@@ -160,8 +162,6 @@ namespace sQzClient
                             mState = NetCode.ExamRetrieving;
                             return true;//continue
                         }
-                        else
-                            return false;
                     }
                     else
                     {
@@ -185,6 +185,8 @@ namespace sQzClient
                             msg = Txt.s._[(int)TxI.SIGNIN_NOK];
                         if(msg != null)
                             Dispatcher.Invoke(() => {
+                                spMain.Effect = mBlurEff;
+                                WPopup.s.wpCb = Deblur;
                                 WPopup.s.ShowDialog(msg);
                             });
                     }
@@ -195,6 +197,8 @@ namespace sQzClient
                     if(errc == (int)TxI.QS_NFOUND)
                     {
                         mState = NetCode.Authenticating;
+                        spMain.Effect = mBlurEff;
+                        WPopup.s.wpCb = Deblur;
                         Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND]));
                         break;
                     }
@@ -202,6 +206,8 @@ namespace sQzClient
                     if (qs.ReadByte(buf, ref offs))
                     {
                         mState = NetCode.Authenticating;
+                        spMain.Effect = mBlurEff;
+                        WPopup.s.wpCb = Deblur;
                         Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]));
                         break;
                     }
@@ -215,6 +221,7 @@ namespace sQzClient
                     });
                     break;
             }
+            bBtnBusy = false;
             return false;
         }
 
@@ -248,11 +255,17 @@ namespace sQzClient
 
         private void btnExit_Click(object sender, RoutedEventArgs e)
         {
+            if (bBtnBusy)
+                return;
+            bBtnBusy = true;
             Window.GetWindow(this).Close();
         }
 
         private void btnOpenLog_Click(object sender, RoutedEventArgs e)
         {
+            if (bBtnBusy)
+                return;
+            bBtnBusy = true;
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
             // set filter for file extension and default file extension 
@@ -266,6 +279,8 @@ namespace sQzClient
             if (filePath != null && mNee.ReadLogFile(filePath))
             {
                 tbxId.Text = mNee.tId;
+                spMain.Effect = mBlurEff;
+                WPopup.s.wpCb = Deblur;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
             }
         }
@@ -300,6 +315,9 @@ namespace sQzClient
 
         private void btnReconn_Click(object sender, RoutedEventArgs e)
         {
+            if (bBtnBusy)
+                return;
+            bBtnBusy = true;
             Thread th = new Thread(() => {
                 if (mClnt.ConnectWR(ref mCbMsg))
                     EnableControls();
@@ -307,11 +325,19 @@ namespace sQzClient
                 {
                     Dispatcher.Invoke(() => {
                         btnReconn.IsEnabled = true;
+                        spMain.Effect = mBlurEff;
+                        WPopup.s.wpCb = Deblur;
                         WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
                     });
                 }
             });
             th.Start();
+        }
+
+        private void Deblur()
+        {
+            spMain.Effect = null;
+            bBtnBusy = false;
         }
     }
 }
