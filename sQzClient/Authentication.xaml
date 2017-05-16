@@ -8,7 +8,6 @@
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="Authentication">
 
-
     <StackPanel x:Name="spMain" Loaded="Main_Loaded">
         <StackPanel.Background>
             <ImageBrush ImageSource="C:\Windows\Web\Wallpaper\Windows\img0.jpg" Stretch="None"/>
@@ -27,26 +26,26 @@
                 <RowDefinition Height="30"/>
                 <RowDefinition Height="64"/>
                 <RowDefinition Height="48"/>
+                <RowDefinition Height="64"/>
+                <RowDefinition Height="48"/>
             </Grid.RowDefinitions>
-            <TextBlock x:Name="txtNeeId" Text="Examinee Id" Height="30" TextAlignment="Center" Foreground="#00356b"/>
-            <TextBox x:Name="tbxNeeId" Grid.Row="1" Height="30" Width="96" MaxLength="5" TextAlignment="Center" Foreground="#00356b"/>
+            <TextBlock x:Name="txtId" Height="30" TextAlignment="Center" Foreground="#00356b"/>
+            <TextBox x:Name="tbxId" Grid.Row="1" Height="30" Width="96" MaxLength="5" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
             <TextBlock x:Name="txtBirdate" Grid.Column="1" Height="30" TextAlignment="Center" Foreground="#00356b"/>
             <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
-                <TextBox x:Name="tbxD" Height="30" Width="48" MaxLength="2" TextAlignment="Center" Foreground="#00356b"/>
+                <TextBox x:Name="tbxD" Height="30" Width="48" MaxLength="2" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
                 <TextBlock Text="/" Width="10" TextAlignment="Center"/>
-                <TextBox x:Name="tbxM" Height="30" Width="48" MaxLength="2" TextAlignment="Center" Foreground="#00356b"/>
+                <TextBox x:Name="tbxM" Height="30" Width="48" MaxLength="2" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
                 <TextBlock Text="/" Width="10" TextAlignment="Center"/>
-                <TextBox x:Name="tbxY" Height="30" Width="96" MaxLength="4" TextAlignment="Center" Foreground="#00356b"/>
+                <TextBox x:Name="tbxY" Height="30" Width="96" MaxLength="4" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
             </StackPanel>
-            <TextBlock x:Name="txtNeeIdMsg" Grid.Row="2"/>
-            <TextBlock x:Name="txtDMYMsg" Grid.Row="2" Grid.Column="1"/>
-            <Button x:Name="btnSignIn" Grid.Row="3"  Background="#1c64e7" Foreground="White" Width="160" Click="btnSignIn_Click" BorderThickness="0"/>
-            <Button x:Name="btnOpenLog" Content="Open log" Grid.Row="3" Grid.Column="1"  Width="160" Click="btnOpenLog_Click"/>
+            <Button x:Name="btnSignIn" Grid.Row="3" Background="#1c64e7" Foreground="White" Width="160" Click="btnSignIn_Click" BorderThickness="0" IsEnabled="False"/>
+            <Button x:Name="btnOpenLog" Grid.Row="3" Grid.Column="1" Width="160" Click="btnOpenLog_Click" IsEnabled="False"/>
+            <Button x:Name="btnReconn" Grid.Row="6" Height="48" Width="160" Click="btnReconn_Click" IsEnabled="False"/>
+            <Button x:Name="btnExit" Grid.Row="6" Grid.Column="1" Background="#f15a23" Foreground="White" Height="48" Width="160" Click="btnExit_Click"/>
         </Grid>
-        <TextBlock x:Name="txtAuth" Height="48" TextAlignment="Center"/>
         <!--<ScrollViewer Width="1200" Height="256" VerticalScrollBarVisibility="Auto">
             <TextBox x:Name="lblStatus" TextWrapping="Wrap" Text="TextBox" Width="600"/>
         </ScrollViewer>-->
-        <Button x:Name="btnExit" Content="Exit" Height="48" Width="160" Click="btnExit_Click"/>
     </StackPanel>
 </Page>

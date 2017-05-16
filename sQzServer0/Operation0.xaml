@@ -83,9 +83,9 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="txtNe" Text="N of exam" Grid.Column="0" Margin="5" Height="25"/>
-                <TextBox x:Name="tbxNe" Width="30" Grid.Column="1" Margin="5"/>
-                <Button Grid.Row="0" x:Name="btnExGen" Content="Create Q Sh" Grid.Column="2" Click="btnExGen_Click"/>
+                <TextBlock x:Name="txtNqs" Grid.Column="0" Margin="5" Height="25"/>
+                <TextBox x:Name="tbxNqs" Width="30" Grid.Column="1" Margin="5"/>
+                <Button Grid.Row="0" x:Name="btnQSGen" Grid.Column="2" Click="btnQSGen_Click" IsEnabled="False"/>
                 <TextBlock x:Name="txtNq" Text="N of quest" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
                 <TextBlock x:Name="tbxNq" Width="30" Grid.Row="1" Grid.Column="1" Margin="5"/>
                 <TextBlock Text="module 2" Grid.Row="2" Grid.Column="0" Margin="5" />

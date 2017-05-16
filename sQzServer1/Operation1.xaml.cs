@@ -218,8 +218,8 @@ namespace sQzServer1
                     }
                     else
                     {
-                        mCbMsg += Txt.s._[(int)TxI.QSH_NFOUND] + qshidx;
-                        outMsg = BitConverter.GetBytes((int)TxI.QSH_NFOUND);
+                        mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + qshidx;
+                        outMsg = BitConverter.GetBytes((int)TxI.QS_NFOUND);
                     }
                     break;
                 case NetCode.Submiting:

@@ -54,15 +54,9 @@ namespace sQzClient
             aTimer.Enabled = true;
         }
 
-        private void Connect(Object source, System.Timers.ElapsedEventArgs e)
-        {
-            Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
-            th.Start();
-        }
-
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            if(mNee.ParseTxId(tbxNeeId.Text))
+            if(mNee.ParseTxId(tbxId.Text))
             {
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);
                 return;
@@ -109,7 +103,16 @@ namespace sQzClient
             //FirewallHandler fwHndl = new FirewallHandler(3);
             //lblStatus.Text += fwHndl.OpenFirewall();
 
-            Connect(null, null);
+            Thread th = new Thread(() => {
+                if (mClnt.ConnectWR(ref mCbMsg))
+                    EnableControls();
+                else
+                {
+                    Dispatcher.Invoke(() => {
+                        btnReconn.IsEnabled = true;
+                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);});
+                }});
+            th.Start();
         }
 
         private void LoadTxt()
@@ -117,10 +120,11 @@ namespace sQzClient
             Txt t = Txt.s;
             txtLalgitc.Text = t._[(int)TxI.LALGITC];
             txtWelcome.Text = t._[(int)TxI.WELCOME];
-            txtNeeId.Text = t._[(int)TxI.NEEID];
+            txtId.Text = t._[(int)TxI.NEEID];
             txtBirdate.Text = t._[(int)TxI.BIRDATE] + t._[(int)TxI.BIRDATE_MSG];
             btnSignIn.Content = t._[(int)TxI.SIGNIN];
             btnOpenLog.Content = t._[(int)TxI.OPEN_LOG];
+            btnReconn.Content = t._[(int)TxI.CONN];
             btnExit.Content = t._[(int)TxI.EXIT];
         }
 
@@ -188,17 +192,17 @@ namespace sQzClient
                 case NetCode.ExamRetrieving:
                     errc = BitConverter.ToInt32(buf, offs);
                     offs += 4;
-                    if(errc == (int)TxI.QSH_NFOUND)
+                    if(errc == (int)TxI.QS_NFOUND)
                     {
                         mState = NetCode.Authenticating;
-                        Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QSH_NFOUND]));
+                        Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND]));
                         break;
                     }
                     QuestSheet qs = new QuestSheet();
                     if (qs.ReadByte(buf, ref offs))
                     {
                         mState = NetCode.Authenticating;
-                        Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QSH_READ_ER]));
+                        Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]));
                         break;
                     }
                     Dispatcher.Invoke(() =>
@@ -261,14 +265,53 @@ namespace sQzClient
                 filePath = dlg.FileName;
             if (filePath != null && mNee.ReadLogFile(filePath))
             {
-                tbxNeeId.Text = mNee.tId;
+                tbxId.Text = mNee.tId;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
             }
-            else
+        }
+
+        private void EnableControls()
+        {
+            Dispatcher.Invoke(() =>
             {
-                tbxNeeId.Text = "";
-                txtNeeIdMsg.Text = Txt.s._[(int)TxI.BIRDATE_MSG];
-            }
+                tbxId.IsEnabled =
+                tbxD.IsEnabled =
+                tbxM.IsEnabled =
+                tbxY.IsEnabled =
+                btnOpenLog.IsEnabled =
+                btnSignIn.IsEnabled = true;
+                btnReconn.IsEnabled = false;
+            });
+        }
+
+        private void DisableControls()
+        {
+            Dispatcher.Invoke(() =>
+            {
+                tbxId.IsEnabled =
+                tbxD.IsEnabled =
+                tbxM.IsEnabled =
+                tbxY.IsEnabled =
+                btnOpenLog.IsEnabled =
+                btnReconn.IsEnabled =
+                btnSignIn.IsEnabled = false;
+            });
+        }
+
+        private void btnReconn_Click(object sender, RoutedEventArgs e)
+        {
+            Thread th = new Thread(() => {
+                if (mClnt.ConnectWR(ref mCbMsg))
+                    EnableControls();
+                else
+                {
+                    Dispatcher.Invoke(() => {
+                        btnReconn.IsEnabled = true;
+                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
+                    });
+                }
+            });
+            th.Start();
         }
     }
 }

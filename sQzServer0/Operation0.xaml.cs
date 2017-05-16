@@ -260,11 +260,11 @@ namespace sQzServer0
             mServer.Stop(ref mCbMsg);
         }
 
-        private void btnExGen_Click(object sender, RoutedEventArgs e)
+        private void btnQSGen_Click(object sender, RoutedEventArgs e)
         {
             if (mSl.uId == uint.MaxValue)
                 return;
-			TextBox t = (TextBox)FindName("tbxNe");
+			TextBox t = (TextBox)FindName("tbxNqs");
 			int n = 1;
             if (t != null && 0 < t.Text.Length && !int.TryParse(t.Text, out n))
                 n = 1;
@@ -435,9 +435,9 @@ namespace sQzServer0
             }
             tbxNq.Text = n.ToString();
             if ((bas && adv) || n != 30)
-                btnExGen.IsEnabled = false;
+                btnQSGen.IsEnabled = false;
             else
-                btnExGen.IsEnabled = true;
+                btnQSGen.IsEnabled = true;
         }
 
         private void LoadTxt()
@@ -447,9 +447,9 @@ namespace sQzServer0
             btnStartSrvr.Content = t._[(int)TxI.STRT_SRVR];
             btnStopSrvr.Content = t._[(int)TxI.STOP_SRVR];
             btnPrep.Content = t._[(int)TxI.PREP];
-            btnExGen.Content = t._[(int)TxI.EX_GEN];
+            btnQSGen.Content = t._[(int)TxI.QS_GEN];
             btnExit.Content = t._[(int)TxI.EXIT];
-            txtNe.Text = t._[(int)TxI.EX_SH_N];
+            txtNqs.Text = t._[(int)TxI.QS_N];
             txtNq.Text = t._[(int)TxI.Q_N];
             txtBirdate.Text = t._[(int)TxI.BIRDATE];
             txtBirpl.Text = t._[(int)TxI.BIRPL];
