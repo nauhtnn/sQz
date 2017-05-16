@@ -92,9 +92,9 @@ namespace sQzServer1
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
 
-            FirewallHandler fwHndl = new FirewallHandler(1);
-            string msg = fwHndl.OpenFirewall();
-            lblStatus.Text = msg;
+            //FirewallHandler fwHndl = new FirewallHandler(1);
+            //string msg = fwHndl.OpenFirewall();
+            //lblStatus.Text = msg;
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)

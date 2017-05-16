@@ -8,7 +8,11 @@
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="Authentication">
 
-    <StackPanel x:Name="spMain" Loaded="Main_Loaded" Background="#f3f3ee">
+
+    <StackPanel x:Name="spMain" Loaded="Main_Loaded">
+        <StackPanel.Background>
+            <ImageBrush ImageSource="C:\Windows\Web\Wallpaper\Windows\img0.jpg" Stretch="None"/>
+        </StackPanel.Background>
         <TextBlock Height="16" Background="#f3f3ee"/>
         <TextBlock x:Name="txtLalgitc" Height="64" Background="#a51c30" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" FontSize="32" FontWeight="Bold"/>
         <TextBlock x:Name="txtWelcome" Text="Welcome" Background="White" Foreground="#8c1515" Height="48" VerticalAlignment="Center" TextAlignment="Center" FontSize="24" />
@@ -40,9 +44,9 @@
             <Button x:Name="btnOpenLog" Content="Open log" Grid.Row="3" Grid.Column="1"  Width="160" Click="btnOpenLog_Click"/>
         </Grid>
         <TextBlock x:Name="txtAuth" Height="48" TextAlignment="Center"/>
-        <ScrollViewer Width="1200" Height="256" VerticalScrollBarVisibility="Auto">
+        <!--<ScrollViewer Width="1200" Height="256" VerticalScrollBarVisibility="Auto">
             <TextBox x:Name="lblStatus" TextWrapping="Wrap" Text="TextBox" Width="600"/>
-        </ScrollViewer>
+        </ScrollViewer>-->
         <Button x:Name="btnExit" Content="Exit" Height="48" Width="160" Click="btnExit_Click"/>
     </StackPanel>
 </Page>

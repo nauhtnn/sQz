@@ -106,8 +106,8 @@ namespace sQzClient
             //spMain.RenderTransform = st;
             WPopup.s.owner = w;
 
-            FirewallHandler fwHndl = new FirewallHandler(3);
-            lblStatus.Text += fwHndl.OpenFirewall();
+            //FirewallHandler fwHndl = new FirewallHandler(3);
+            //lblStatus.Text += fwHndl.OpenFirewall();
 
             Connect(null, null);
         }
@@ -235,11 +235,11 @@ namespace sQzClient
 
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
-            if (bRunning && mCbMsg.ToUp())
-                Dispatcher.Invoke(() => {
-                    //WPopup.s.ShowDialog(mCbMsg.txt);
-                    lblStatus.Text += mCbMsg.txt;
-                });
+            //if (bRunning && mCbMsg.ToUp())
+            //    Dispatcher.Invoke(() => {
+            //        //WPopup.s.ShowDialog(mCbMsg.txt);
+            //        lblStatus.Text += mCbMsg.txt;
+            //    });
         }
 
         private void btnExit_Click(object sender, RoutedEventArgs e)

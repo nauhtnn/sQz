@@ -231,9 +231,9 @@ namespace sQzServer0
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
 
-            FirewallHandler fwHndl = new FirewallHandler(0);
-            string msg = fwHndl.OpenFirewall();
-            lblStatus.Text = msg;
+            //FirewallHandler fwHndl = new FirewallHandler(0);
+            //string msg = fwHndl.OpenFirewall();
+            //lblStatus.Text = msg;
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
