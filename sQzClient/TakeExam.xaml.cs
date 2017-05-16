@@ -25,8 +25,6 @@ namespace sQzClient
 
         public QuestSheet mQSh;
 
-        //bool bPendingChg;
-
         Client2 mClnt;
         NetCode mState;
 
@@ -43,13 +41,9 @@ namespace sQzClient
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            //txtWelcome.Text = Examinee.sAuthNee.ToString();
-
             ShowsNavigationUI = false;
 
             mQSh = new QuestSheet();
-
-            //bPendingChg = false;
         }
 
         private void LoadTxt()
@@ -75,6 +69,8 @@ namespace sQzClient
 
             InitLeftPanel();
             InitQuestPanel();
+
+            txtWelcome.Text = mNee.ToString();
 
             LoadTxt();
 
@@ -143,8 +139,7 @@ namespace sQzClient
             int i = 0, n = mQSh.vQuest.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
             mNee.mAnsSh.Init(mQSh, mNee.uId);
-            mNee.mAnsSh.InitView(mQSh, qaWh, ItemSelChgCB);
-            //txtChg.Text = string.Empty;
+            mNee.mAnsSh.InitView(mQSh, qaWh, null);
             mNee.mAnsSh.bChanged = false;
             //top line
             gAnsSh.RowDefinitions.Add(new RowDefinition());
@@ -415,18 +410,6 @@ namespace sQzClient
             bRunning = false;
             WPopup.s.cncl = false;
             mClnt.Close();
-        }
-
-        private void ItemSelChgCB()
-        {
-            //bPendingChg = true;
-            //Dispatcher.Invoke(() => {
-            //    if (bPendingChg)
-            //    {
-            //        txtChg.Text = Txt.s._[(int)TxI.LOG_PENDING_MSG];
-            //        bPendingChg = false;
-            //    }
-            //});
         }
     }
 }

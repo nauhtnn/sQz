@@ -150,12 +150,13 @@ namespace sQzLib
             get { return (short)eLvl; }
             set { eLvl = (ExamLvl)value; }
         }
+
         public override string ToString()
         {
             StringBuilder s = new StringBuilder();
             s.AppendFormat("{0}{1}, {2}, {3}, {4}",
                 (eLvl == ExamLvl.Basis) ? "CB" : "NC",
-                uId, tName, tBirdate, tBirthplace);
+                uId.ToString("d3"), tName, tBirdate, tBirthplace);
             return s.ToString();
         }
 
