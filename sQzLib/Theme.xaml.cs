@@ -123,6 +123,7 @@ namespace sQzLib
         TextBlock mT;
         TextBox mC;
         WPopupCb _wpCb;
+        WPopupCb _wpCb2;
         static WPopup _s;
         Button mBtnOk;
         Button mBtnCncl;
@@ -189,7 +190,7 @@ namespace sQzLib
             bCnclEvnt = true;
             mCode = null;
 
-            _wpCb = null;
+            _wpCb = _wpCb2 = null;
         }
 
         private void BtnCncl_Click(object sender, RoutedEventArgs e)
@@ -225,6 +226,11 @@ namespace sQzLib
         public WPopupCb wpCb
         {
             set { _wpCb = value; }
+        }
+
+        public WPopupCb wpCb2
+        {
+            set { _wpCb2 = value; }
         }
 
         public Window owner
@@ -287,6 +293,8 @@ namespace sQzLib
                 _wpCb?.Invoke();
                 bOk = false;
             }
+            else
+                _wpCb2?.Invoke();
             if (bCollapse)
             {
                 Window s = sender as Window;

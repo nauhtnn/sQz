@@ -2,10 +2,8 @@
 //using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Collections.Generic;
-using System.Windows.Navigation;
+using System.Windows.Media.Effects;
 using sQzLib;
 
 namespace sQzClient
@@ -20,6 +18,8 @@ namespace sQzClient
         DateTime dtLastLog;
         TimeSpan kLogIntvl;
         bool bRunning;
+        bool bBtnBusy;
+        BlurEffect mBlurEff;
         UICbMsg mCbMsg;
         System.Timers.Timer mTimer;
 
@@ -70,6 +70,9 @@ namespace sQzClient
             InitLeftPanel();
             InitQuestPanel();
 
+            mBlurEff = new BlurEffect();
+            bBtnBusy = false;
+
             txtWelcome.Text = mNee.ToString();
 
             LoadTxt();
@@ -78,6 +81,7 @@ namespace sQzClient
             spMain.RenderTransform = new ScaleTransform(rt, rt);
 
             WPopup.nwIns(w);
+            WPopup.s.wpCb2 = Deblur;
 
             int m = -1, s = -1;
             if (mNee.eStt < Examinee.eSUBMITTING)
@@ -108,11 +112,15 @@ namespace sQzClient
                 msg.AppendFormat(Txt.s._[(int)TxI.EXAMING_MSG_2],
                     mNee.kDtDuration.Minutes, mNee.kDtDuration.Seconds);
             WPopup.s.wpCb = ShowQuestion;
+            spMain.Effect = mBlurEff;
             WPopup.s.ShowDialog(msg.ToString());
         }
 
         void ShowQuestion()
         {
+            WPopup.s.wpCb = null;
+            spMain.Effect = null;
+            bBtnBusy = false;
             svwrQSh.Visibility = Visibility.Visible;
 
             mTimer = new System.Timers.Timer(1000);
@@ -298,6 +306,9 @@ namespace sQzClient
 
         public void Submit()
         {
+            bBtnBusy = true;//
+            spMain.Effect = null;
+            WPopup.s.wpCb = null;
             bRunning = false;
             DisableAll();
             mState = NetCode.Submiting;
@@ -308,7 +319,11 @@ namespace sQzClient
 
         private void btnSubmit_Click(object sender, RoutedEventArgs e)
         {
+            if (bBtnBusy)
+                return;
+            bBtnBusy = true;
             WPopup.s.wpCb = Submit;
+            spMain.Effect = mBlurEff;
             WPopup.s.ShowDialog(Txt.s._[(int)TxI.SUBMIT_CAUT],
                 Txt.s._[(int)TxI.SUBMIT], Txt.s._[(int)TxI.BTN_CNCL], null);
         }
@@ -320,10 +335,13 @@ namespace sQzClient
                 case NetCode.Submiting:
                     ushort grade = BitConverter.ToUInt16(buf, offs);
                     btnSubmit.Content = grade;
+                    WPopup.s.wpCb = Deblur;
+                    spMain.Effect = mBlurEff;
                     WPopup.s.ShowDialog(Txt.s._[(int)TxI.RESULT] + grade);
-                    return false;
+                    break;
             }
-            return true;
+            bBtnBusy = false;
+            return false;
         }
 
         public bool ClntBufPrep(ref byte[] outBuf)
@@ -371,6 +389,8 @@ namespace sQzClient
                     Dispatcher.Invoke(() =>
                     {
                         txtRTime.Text = "0 : 0";
+                        WPopup.s.wpCb = Deblur;
+                        spMain.Effect = mBlurEff;
                         WPopup.s.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
                         Submit();
                     });
@@ -389,6 +409,8 @@ namespace sQzClient
 
         void Exit()
         {
+            //WPopup.s.wpCb = null;
+            //bBtnBusy = false;
             if (mNee.mAnsSh.bChanged)
                 mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             Window.GetWindow(this).Close();
@@ -396,8 +418,12 @@ namespace sQzClient
 
         private void btnExit_Click(object sender, RoutedEventArgs e)
         {
+            if (bBtnBusy)
+                return;
+            bBtnBusy = true;
             WPopup.s.wpCb = Exit;
-            if(btnSubmit.IsEnabled)
+            spMain.Effect = mBlurEff;
+            if (btnSubmit.IsEnabled)
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_1],
                     Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], "exit");
             else
@@ -410,6 +436,13 @@ namespace sQzClient
             bRunning = false;
             WPopup.s.cncl = false;
             mClnt.Close();
+        }
+
+        private void Deblur()
+        {
+            WPopup.s.wpCb = null;
+            spMain.Effect = null;
+            bBtnBusy = false;
         }
     }
 }
