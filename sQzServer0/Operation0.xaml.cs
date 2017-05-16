@@ -434,7 +434,7 @@ namespace sQzServer0
                     bas = false;
             }
             tbxNq.Text = n.ToString();
-            if ((bas && adv) || n != 30)
+            if ((!bas && !adv) || n != 30)
                 btnQSGen.IsEnabled = false;
             else
                 btnQSGen.IsEnabled = true;
