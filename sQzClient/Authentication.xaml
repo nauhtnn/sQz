@@ -13,9 +13,9 @@
             <ImageBrush ImageSource="C:\Windows\Web\Wallpaper\Windows\img0.jpg" Stretch="None"/>
         </StackPanel.Background>
         <TextBlock Height="16" Background="#f3f3ee"/>
-        <TextBlock x:Name="txtLalgitc" Height="64" Background="#a51c30" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" FontSize="32" FontWeight="Bold"/>
-        <TextBlock x:Name="txtWelcome" Text="Welcome" Background="White" Foreground="#8c1515" Height="48" VerticalAlignment="Center" TextAlignment="Center" FontSize="24" />
-        <TextBlock x:Name="txtDate" Height="48" Background="White" Foreground="#8c1515" TextAlignment="Center" FontSize="24"/>
+        <TextBlock x:Name="txtLalgitc" Height="80" Background="#a51c30" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" FontSize="40" FontWeight="Bold" Padding="0,8,0,0"/>
+        <TextBlock x:Name="txtWelcome" Background="White" Foreground="#8c1515" Height="60" VerticalAlignment="Center" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
+        <TextBlock x:Name="txtDate" Height="60" Background="White" Foreground="#8c1515" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
         <Grid HorizontalAlignment="Center" Margin="0,30,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="400"/>
