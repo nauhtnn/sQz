@@ -10,11 +10,11 @@ namespace sQzLib
     public class ExamRoom
     {
         public int uId;
-        public Dictionary<int, Examinee> vExaminee;
+        public Dictionary<int, ExamineeA> vExaminee;
         public ExamRoom()
         {
             uId = ushort.MaxValue;
-            vExaminee = new Dictionary<int, Examinee>();
+            vExaminee = new Dictionary<int, ExamineeA>();
         }
 
         public Dictionary<int, ushort>  DBSelectId(uint slId, out Dictionary<int, string> vAns)
@@ -51,7 +51,7 @@ namespace sQzLib
                 return;
             string attbs = "slId,lv,id,name,birdate,birthplace";
             StringBuilder vals = new StringBuilder();
-            foreach (Examinee e in vExaminee.Values)
+            foreach (ExamineeA e in vExaminee.Values)
             {
                 vals.Append("(" + e.uSlId + ",");
                 vals.Append(e.Lv + ",");
@@ -61,7 +61,7 @@ namespace sQzLib
                 vals.Append("'" + e.tBirthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            DBConnect.Ins(conn, Examinee.tDBtbl + uId, attbs, vals.ToString());
+            DBConnect.Ins(conn, ExamineeA.tDBtbl + uId, attbs, vals.ToString());
             DBConnect.Close(ref conn);
         }
 
@@ -70,7 +70,7 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             byte[] b = BitConverter.GetBytes(vExaminee.Count);
             l.Add(b);
-            foreach (Examinee e in vExaminee.Values)
+            foreach (ExamineeA e in vExaminee.Values)
                 foreach (byte[] i in e.ToByte())
                     l.Add(i);
             //join
@@ -86,7 +86,7 @@ namespace sQzLib
             }
             return b;
         }
-        public void ReadByte(byte[] buf, ref int offs)
+        public void ReadByteS1(byte[] buf, ref int offs)
         {
             vExaminee.Clear();
             if (buf == null)
@@ -99,7 +99,7 @@ namespace sQzLib
             offs += 4;
             for (int i = 0; i < n; ++i)
             {
-                Examinee e = new Examinee();
+                ExamineeS1 e = new ExamineeS1();
                 if(!e.ReadByte(buf, ref offs))
                     vExaminee.Add((short)(e.Lv * e.uId), e);
             }
@@ -107,7 +107,7 @@ namespace sQzLib
 
         public void DBUpdateRs(MySqlConnection conn)
         {
-            foreach (Examinee e in vExaminee.Values)
+            foreach (ExamineeA e in vExaminee.Values)
             {
                 StringBuilder qry = new StringBuilder("UPDATE exnee" + uId + " SET ");
                 if (e.dtTim1.Hour != 0)
@@ -143,33 +143,33 @@ namespace sQzLib
             }
         }
 
-        public Examinee ReadByteSgning(byte[] buf, int offs)
+        public ExamineeA ReadByteC(byte[] buf, int offs)
         {
-            Examinee e = new Examinee();
+            ExamineeS1 e = new ExamineeS1();
             e.ReadByte(buf, ref offs);
-            Examinee o;
+            ExamineeA o;
             short key = (short)(e.Lv * e.uId);
             if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
             {
                 //vExaminee.Remove(key);
                 //vExaminee.Add(key, e);
                 o.Merge(e);
-                if (o.eStt < Examinee.eAUTHENTICATED)
-                    o.eStt = Examinee.eAUTHENTICATED;
+                if (o.eStt < ExamineeA.eAUTHENTICATED)
+                    o.eStt = ExamineeA.eAUTHENTICATED;
                 return o;
             }
             return null;
         }
 
-        public Examinee Signing(Examinee e)
+        public ExamineeA Signing(ExamineeA e)
         {
-            Examinee o;
+            ExamineeA o;
             short key = (short)(e.Lv * e.uId);
             if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
             {
                 o.Merge(e);
-                if (o.eStt < Examinee.eAUTHENTICATED)
-                    o.eStt = Examinee.eAUTHENTICATED;
+                if (o.eStt < ExamineeA.eAUTHENTICATED)
+                    o.eStt = ExamineeA.eAUTHENTICATED;
                 return o;
             }
             return null;
@@ -184,7 +184,7 @@ namespace sQzLib
             }
             List<byte[]> l = new List<byte[]>();
             int n = 0;
-            foreach (Examinee e in vExaminee.Values)
+            foreach (ExamineeA e in vExaminee.Values)
                 if (e.uGrade != ushort.MaxValue)
                 {
                     ++n;
@@ -213,7 +213,7 @@ namespace sQzLib
             }
         }
 
-        public bool ReadByteGrade(byte[] buf, ref int offs, ref List<Examinee> v)
+        public bool ReadByteS0(byte[] buf, ref int offs, ref List<ExamineeA> v)
         {
             if (buf == null)
                 return true;
@@ -226,10 +226,10 @@ namespace sQzLib
             while (0 < n)
             {
                 --n;
-                Examinee e = new Examinee();
+                ExamineeS0 e = new ExamineeS0();
                 if (e.ReadByte(buf, ref offs))
                     return true;
-                Examinee o;
+                ExamineeA o;
                 if (vExaminee.TryGetValue(e.Lv * e.uId, out o))
                     o.Merge(e);
                 else

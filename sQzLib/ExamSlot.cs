@@ -152,7 +152,7 @@ namespace sQzLib
             string[] vs = buf.Split('\n');
             foreach (string s in vs)
             {
-                Examinee e = new Examinee();
+                ExamineeS0 e = new ExamineeS0();
                 string[] v = s.Split('\t');
                 if (v.Length == 5)
                 {
@@ -192,7 +192,7 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
             {
                 r.vExaminee.Clear();
-                string qry = DBConnect.mkQrySelect(Examinee.tDBtbl + r.uId,
+                string qry = DBConnect.mkQrySelect(ExamineeS0.tDBtbl + r.uId,
                     "lv,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
                     "slId=" + uId, null);
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
@@ -200,8 +200,8 @@ namespace sQzLib
                 {
                     while (reader.Read())
                     {
-                        Examinee e = new Examinee();
-                        e.eStt = Examinee.eINFO;
+                        ExamineeS0 e = new ExamineeS0();
+                        e.eStt = ExamineeS0.eINFO;
                         e.uSlId = uId;
                         e.Lv = reader.GetInt16(0);
                         e.uId = reader.GetUInt16(1);
@@ -224,10 +224,10 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public void ReadByteGrade(byte[] buf, ref int offs)
+        public void ReadByteNee(byte[] buf, ref int offs)
         {
-            List<Examinee> v = new List<Examinee>();
-            List<Examinee> l = new List<Examinee>();
+            List<ExamineeA> v = new List<ExamineeA>();
+            List<ExamineeA> l = new List<ExamineeA>();
             while (true)
             {
                 if (buf.Length - offs < 4)
@@ -237,11 +237,11 @@ namespace sQzLib
                 ExamRoom r;
                 if (!vRoom.TryGetValue(rId, out r))
                     break;
-                if (r.ReadByteGrade(buf, ref offs, ref v))
+                if (r.ReadByteS0(buf, ref offs, ref v))
                     break;
-                foreach (Examinee e in v)
+                foreach (ExamineeS0 e in v)
                 {
-                    Examinee o;
+                    ExamineeA o;
                     bool unfound = true;
                     foreach (ExamRoom i in vRoom.Values)
                         if (i.uId != rId && i.vExaminee.TryGetValue(e.Lv * e.uId, out o))

@@ -119,7 +119,7 @@ namespace sQzServer0
                 vComp.Clear();
                 gNee.Children.Clear();
                 foreach(ExamRoom r in mSl.vRoom.Values)
-                    foreach (Examinee e in r.vExaminee.Values)
+                    foreach (ExamineeA e in r.vExaminee.Values)
                     {
                         rid++;
                         RowDefinition rd = new RowDefinition();
@@ -198,7 +198,7 @@ namespace sQzServer0
             Dispatcher.Invoke(() => {
                 TextBlock t;
                 foreach(ExamRoom r in mSl.vRoom.Values)
-                    foreach (Examinee e in r.vExaminee.Values)
+                    foreach (ExamineeA e in r.vExaminee.Values)
                     {
                         if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.Lv * e.uId, out t))
                             t.Text = e.uGrade.ToString();
@@ -384,7 +384,7 @@ namespace sQzServer0
                     mKeyPack.ToByte(ref outMsg, ref offs);
                     return false;
                 case NetCode.SrvrSubmitting:
-                    mSl.ReadByteGrade(buf, ref offs);
+                    mSl.ReadByteNee(buf, ref offs);
                     mSl.DBUpdateRs();
                     UpdateRsView();
                     outMsg = BitConverter.GetBytes(1);

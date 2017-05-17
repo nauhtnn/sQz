@@ -125,7 +125,7 @@ namespace sQzServer0
                     l = lbxStudent;
                 l.Items.Clear();
                 foreach(ExamRoom r in mSl.vRoom.Values)
-                    foreach (Examinee e in r.vExaminee.Values)
+                    foreach (ExamineeA e in r.vExaminee.Values)
                     {
                         ListBoxItem i = new ListBoxItem();
                         i.Content = e.ToString();

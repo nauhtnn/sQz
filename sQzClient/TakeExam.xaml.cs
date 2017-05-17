@@ -31,7 +31,7 @@ namespace sQzClient
         public static double qaWh;
         double qiWh;
         Thickness qMrg;
-        public Examinee mNee;//reference to Auth.mNee
+        public ExamineeA mNee;//reference to Auth.mNee
 
         public TakeExam()
         {
@@ -84,7 +84,7 @@ namespace sQzClient
             WPopup.s.wpCb2 = Deblur;
 
             int m = -1, s = -1;
-            if (mNee.eStt < Examinee.eSUBMITTING)
+            if (mNee.eStt < ExamineeA.eSUBMITTING)
             {
                 string t = Utils.ReadFile("Duration.txt");
                 if (t != null)
@@ -129,9 +129,9 @@ namespace sQzClient
             mTimer.Enabled = true;
             dtLastLog = kDtStart = DateTime.Now;
             WPopup.s.wpCb = null;
-            if (mNee.eStt < Examinee.eEXAMING)
-                mNee.eStt = Examinee.eEXAMING;
-            else if (mNee.eStt == Examinee.eSUBMITTING)
+            if (mNee.eStt < ExamineeA.eEXAMING)
+                mNee.eStt = ExamineeA.eEXAMING;
+            else if (mNee.eStt == ExamineeA.eSUBMITTING)
                 Submit();
         }
 
@@ -312,7 +312,7 @@ namespace sQzClient
             bRunning = false;
             DisableAll();
             mState = NetCode.Submiting;
-            mNee.eStt = Examinee.eSUBMITTING;
+            mNee.eStt = ExamineeA.eSUBMITTING;
             mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             mClnt.ConnectWR(ref mCbMsg);
         }

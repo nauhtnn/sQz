@@ -49,7 +49,10 @@
     <Compile Include="AnsSheet.cs" />
     <Compile Include="Client2.cs" />
     <Compile Include="DBConnect.cs" />
-    <Compile Include="Examinee.cs" />
+    <Compile Include="ExamineeA.cs" />
+    <Compile Include="ExamineeC.cs" />
+    <Compile Include="ExamineeS0.cs" />
+    <Compile Include="ExamineeS1.cs" />
     <Compile Include="ExamRoom.cs" />
     <Compile Include="ExamSlot.cs" />
     <Compile Include="QuestPack.cs" />

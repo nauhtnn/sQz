@@ -138,7 +138,7 @@ namespace sQzServer1
         {
             QuestSheet qs;
             int lvid;
-            Examinee e;
+            ExamineeA e;
             switch (c)
             {
                 case NetCode.Dating:
@@ -148,7 +148,7 @@ namespace sQzServer1
                     break;
                 case NetCode.Authenticating:
                     //e = mRoom.ReadByteSgning(buf, offs);
-                    e = new Examinee();
+                    e = new ExamineeS0();
                     e.ReadByte(buf, ref offs);
                     bool lck;
                     if (!vbLock.TryGetValue((int)(e.Lv * e.uId), out lck))
@@ -235,7 +235,7 @@ namespace sQzServer1
                     lvid = s.Lv * s.uNeeId;
                     if (mRoom.vExaminee.TryGetValue(lvid, out e))
                     {
-                        e.eStt = Examinee.eFINISHED;
+                        e.eStt = ExamineeA.eFINISHED;
                         e.mAnsSh = s;
                         e.uGrade = grade;
                         e.dtTim2 = DateTime.Now;
@@ -273,7 +273,7 @@ namespace sQzServer1
                 case NetCode.DateStudentRetriving:
                     if (ExamSlot.ReadByteDt(buf, ref offs, out mDt))
                         return false;
-                    mRoom.ReadByte(buf, ref offs);
+                    mRoom.ReadByteS1(buf, ref offs);
                     Dispatcher.Invoke(() => {
                         if (mDt.Year != ExamSlot.INVALID)
                             txtDate.Text = mDt.ToString(ExamSlot.FORM_H);
@@ -282,7 +282,7 @@ namespace sQzServer1
                         vTime1.Clear();
                         vTime2.Clear();
                         int rid = 0;
-                        foreach (Examinee e in mRoom.vExaminee.Values)
+                        foreach (ExamineeA e in mRoom.vExaminee.Values)
                         {
                             RowDefinition rd = new RowDefinition();
                             rd.Height = new GridLength(20);

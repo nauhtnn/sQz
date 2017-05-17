@@ -19,7 +19,7 @@ namespace sQzClient
         //bool bRunning;
         bool bBtnBusy;
         DateTime mDt;
-        Examinee mNee;
+        ExamineeA mNee;
         TakeExam pgTkExm;
         BlurEffect mBlurEff;
 
@@ -36,7 +36,7 @@ namespace sQzClient
             bBtnBusy = false;
 
             mDt = ExamSlot.INVALID_DT;
-            mNee = new Examinee();
+            mNee = new ExamineeC();
 
             mNee.kDtDuration = new TimeSpan(1, 0, 0);
 
@@ -153,8 +153,8 @@ namespace sQzClient
                     ++offs;
                     if(rs)
                     {
-                        if(mNee.eStt < Examinee.eAUTHENTICATED)
-                            mNee.eStt = Examinee.eAUTHENTICATED;
+                        if(mNee.eStt < ExamineeA.eAUTHENTICATED)
+                            mNee.eStt = ExamineeA.eAUTHENTICATED;
                         rs = mNee.ReadByte(buf, ref offs);
                         l = buf.Length - offs;
                         if (!rs)
@@ -173,8 +173,8 @@ namespace sQzClient
                         string msg = null;
                         if (errc == (int)TxI.SIGNIN_AL_1)
                         {
-                            if (mNee.eStt < Examinee.eAUTHENTICATED)
-                                mNee.eStt = Examinee.eAUTHENTICATED;
+                            if (mNee.eStt < ExamineeA.eAUTHENTICATED)
+                                mNee.eStt = ExamineeA.eAUTHENTICATED;
                             if (!mNee.ReadByte(buf, ref offs))
                             {
                                 msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
