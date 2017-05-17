@@ -8,7 +8,6 @@ namespace sQzLib
 {
     public sealed class ExamineeS1: ExamineeA
     {
-        public bool bFromC;
         public ExamineeS1()
         {
             bFromC = true;

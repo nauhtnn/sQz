@@ -378,7 +378,8 @@ namespace sQzClient
                     Dispatcher.Invoke(() =>
                     {
                         txtRTime.Text = dtRemn.Minutes.ToString() + " : " + dtRemn.Seconds;
-                        if (!btnSubmit.IsEnabled && dtRemn.Minutes < 28)//hardcode
+                        if (!btnSubmit.IsEnabled && dtRemn.Minutes < 30
+                                && dtRemn.Seconds < 50)//hardcode
                             btnSubmit.IsEnabled = true;
                     });
                 }

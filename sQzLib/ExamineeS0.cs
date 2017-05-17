@@ -36,8 +36,6 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
             l.Add(BitConverter.GetBytes(dtTim1.Minute));
 
-            l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
-
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
             l.Add(BitConverter.GetBytes(uGrade));

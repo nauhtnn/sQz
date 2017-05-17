@@ -100,6 +100,7 @@ namespace sQzLib
             for (int i = 0; i < n; ++i)
             {
                 ExamineeS1 e = new ExamineeS1();
+                e.bFromC = false;
                 if(!e.ReadByte(buf, ref offs))
                     vExaminee.Add((short)(e.Lv * e.uId), e);
             }

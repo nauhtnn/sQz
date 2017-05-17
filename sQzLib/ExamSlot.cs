@@ -201,7 +201,6 @@ namespace sQzLib
                     while (reader.Read())
                     {
                         ExamineeS0 e = new ExamineeS0();
-                        e.eStt = ExamineeS0.eINFO;
                         e.uSlId = uId;
                         e.Lv = reader.GetInt16(0);
                         e.uId = reader.GetUInt16(1);
@@ -209,11 +208,16 @@ namespace sQzLib
                         e.tBirdate = reader.GetDateTime(3).ToString(FORM_R);
                         e.tBirthplace = reader.GetString(4);
                         e.dtTim1 = (reader.IsDBNull(5)) ? INVALID_DT :
-                            e.dtTim1 = DateTime.Parse(reader.GetString(5));
+                            DateTime.Parse(reader.GetString(5));
                         e.dtTim2 = (reader.IsDBNull(6)) ? INVALID_DT :
                             DateTime.Parse(reader.GetString(6));
                         if (!reader.IsDBNull(7))
+                        {
+                            e.eStt = ExamineeA.eFINISHED;
                             e.uGrade = reader.GetUInt16(7);
+                        }
+                        else
+                            e.eStt = ExamineeA.eINFO;
                         if (!reader.IsDBNull(8))
                             e.tComp = reader.GetString(8);
                         r.vExaminee.Add(e.Lv * e.uId, e);

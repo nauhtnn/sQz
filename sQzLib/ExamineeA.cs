@@ -85,6 +85,8 @@ namespace sQzLib
 
         public const string tDBtbl = "exnee";
 
+        public bool bFromC;//used by ExamineeS1
+
         public ExamineeA() {
             Reset();
         }

@@ -148,7 +148,7 @@ namespace sQzServer1
                     break;
                 case NetCode.Authenticating:
                     //e = mRoom.ReadByteSgning(buf, offs);
-                    e = new ExamineeS0();
+                    e = new ExamineeS1();
                     e.ReadByte(buf, ref offs);
                     bool lck;
                     if (!vbLock.TryGetValue((int)(e.Lv * e.uId), out lck))
@@ -178,6 +178,7 @@ namespace sQzServer1
                                     vbLock[lvid] = true;
                             });
                             byte[] a;
+                            e.bFromC = true;
                             e.ToByte(out a);
                             outMsg = new byte[1 + a.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(true), 0, outMsg, 0, 1);
