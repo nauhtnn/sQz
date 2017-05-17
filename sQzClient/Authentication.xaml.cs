@@ -73,7 +73,7 @@ namespace sQzClient
             try
             {
                 mNee.tComp = Environment.MachineName;
-            } catch(InvalidOperationException) { mNee.tComp = null; }
+            } catch(InvalidOperationException) { mNee.tComp = "unknown"; }//todo
             Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
         }

@@ -220,6 +220,8 @@ namespace sQzLib
                             e.eStt = ExamineeA.eINFO;
                         if (!reader.IsDBNull(8))
                             e.tComp = reader.GetString(8);
+                        else
+                            e.tComp = "unknown";//todo
                         r.vExaminee.Add(e.Lv * e.uId, e);
                     }
                     reader.Close();

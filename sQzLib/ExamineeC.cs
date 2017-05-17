@@ -27,6 +27,7 @@ namespace sQzLib
 
                 b = Encoding.UTF8.GetBytes(tComp);
                 l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(b);
             }
 
             if (eStt < eEXAMING)

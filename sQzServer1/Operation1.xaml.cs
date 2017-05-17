@@ -40,7 +40,6 @@ namespace sQzServer1
         int mQShIdx;
         int mQShMaxIdx;
         AnsPack mKeyPack;
-        AnsPack mAnsPack;
         bool bAllNee;
         bool bStrtReqQSh;
         bool bQShReqting;
@@ -409,16 +408,18 @@ namespace sQzServer1
                 case NetCode.AnsKeyRetrieving:
                     mKeyPack = new AnsPack();
                     mKeyPack.ReadByte(buf, ref offs);
-                    mAnsPack = new AnsPack();
                     return false;
                 case NetCode.RequestQuestSheet:
                     bool rs = BitConverter.ToBoolean(buf, offs++);
                     if(rs)
                     {
                         if (mQPack.ReadByte1(buf, ref offs))
+                        {
+                            mKeyPack.ReadByte1(buf, ref offs);
                             Dispatcher.Invoke(() => ShowQuest());
-                        btnStartSrvr_Click(null, null);
+                        }
                     }
+                    btnStartSrvr_Click(null, null);
                     bQShReqting = false;
                     mState = NetCode.Unknown;
                     return false;
