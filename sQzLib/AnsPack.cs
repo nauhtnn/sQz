@@ -45,10 +45,21 @@ namespace sQzLib
             {
                 AnsSheet i = new AnsSheet();
                 i.ExtractKey(qs);
-                AnsSheet dum;
-                if(!vSheet.TryGetValue(i.uQSId, out dum))
+                if(!vSheet.ContainsKey(i.uQSId))
                     vSheet.Add(i.uQSId, i);
             }
+        }
+
+        public AnsSheet ExtractKey(QuestSheet qs)
+        {
+            AnsSheet i = new AnsSheet();
+            i.ExtractKey(qs);
+            if (!vSheet.ContainsKey(i.uQSId))
+            {
+                vSheet.Add(i.uQSId, i);
+                return i;
+            }
+            return null;
         }
 
         //only Operation1 uses this.
@@ -71,11 +82,20 @@ namespace sQzLib
                 i.ReadByte(buf, ref offs);
                 //if (err)
                 //    break;
-                AnsSheet dum;
-                if (!vSheet.TryGetValue(i.uQSId, out dum))
+                if (!vSheet.ContainsKey(i.uQSId))
                     vSheet.Add(i.uQSId, i);
                 --nSh;
             }
+        }
+
+        public void ReadByte1(byte[] buf, ref int offs)
+        {
+            if (buf == null)
+                return;
+            AnsSheet i = new AnsSheet();
+            if(!i.ReadByte(buf, ref offs) &&
+                !vSheet.ContainsKey(i.uQSId))
+                vSheet.Add(i.uQSId, i);
         }
     }
 }

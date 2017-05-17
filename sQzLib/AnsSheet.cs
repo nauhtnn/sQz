@@ -189,34 +189,35 @@ namespace sQzLib
             offs += aAns.Length;
         }
 
-        public void ReadByte(byte[] buf, ref int offs)
+        public bool ReadByte(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
             if (l < 2)
-                return;
+                return true;
             uQSId = BitConverter.ToUInt16(buf, offs);
             offs += 2;
             l -= 2;
             if (l < 2)
-                return;
+                return true;
             eLvl = (ExamLvl)BitConverter.ToInt16(buf, offs);
             offs += 2;
             l -= 2;
             if (l < 2)
-                return;
+                return true;
             uNeeId = BitConverter.ToUInt16(buf, offs);
             offs += 2;
             l -= 2;
             if (l < 4)
-                return;
+                return true;
             int sz = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
             if (l < sz)
-                return;
+                return true;
             aAns = new byte[sz];
             Buffer.BlockCopy(buf, offs, aAns, 0, sz);
             offs += sz;
+            return false;
         }
 
         public ushort Grade(byte[] ans)

@@ -391,8 +391,12 @@ namespace sQzServer0
                         QuestSheet qs = new QuestSheet();
                         if (qs.DBSelect(mSl.uId, -1, (ushort)qsId))
                         {
+                            mQPack.vSheet.Add(qs.uId, qs);
+                            AnsSheet a = mKeyPack.ExtractKey(qs);
                             List<byte[]> bs = qs.ToByte();
                             sz = 1;
+                            if (a != null)
+                                sz += a.GetByteCount();
                             foreach (byte[] b in bs)
                                 sz += b.Length;
                             outMsg = new byte[sz];
@@ -403,8 +407,8 @@ namespace sQzServer0
                                 Array.Copy(b, 0, outMsg, offs, b.Length);
                                 offs += b.Length;
                             }
-                            qs.uId = (ushort)qsId;
-                            mQPack.vSheet.Add(qs.uId, qs);
+                            if(a != null)
+                                a.ToByte(ref outMsg, ref offs);
                             Dispatcher.Invoke(() => ShowQuest());
                         }
                         else
