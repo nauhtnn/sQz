@@ -6,29 +6,18 @@ namespace sQzLib
 {
     public enum NetCode
     {
-        //PrepDateStudent = 0,
         DateStudentRetriving = 0,
-        //DateStudentRetrieved,
-        //PrepQuestAnsKey,
         QuestRetrieving,
         AnsKeyRetrieving,
-        //QuestAnsKeyRetrieved,
-        PrepMark,
+        RequestQuestSheet,
         SrvrSubmitting,
         SrvrSubmitted,
-        //PrepDate = 'a',
         Dating,
-        //Dated,
-        //PrepAuth,
         Authenticating,
-        //Authenticated,
-        //PrepExamRet,
         ExamRetrieving,
-        //ExamRetrieved,
         Submiting,
         Submitted,
         Resubmit,
-        //ToClose,
         Unknown
     }
 

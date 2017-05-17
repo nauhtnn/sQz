@@ -42,6 +42,9 @@ namespace sQzServer1
         AnsPack mKeyPack;
         AnsPack mAnsPack;
         bool bAllNee;
+        bool bStrtReqQSh;
+        bool bQShReqting;
+        int uReqQSh;
 
         public Operation1()
         {
@@ -70,6 +73,8 @@ namespace sQzServer1
             vbLock = new Dictionary<int, bool>();
 
             bAllNee = false;
+            bStrtReqQSh = bQShReqting = false;
+            uReqQSh = ushort.MaxValue;
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -99,12 +104,13 @@ namespace sQzServer1
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
         {
+            btnStopSrvr_Click(null, null);
             //todo: check th state to return
             Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
         }
 
-        private void StartSrvr_Click(object sender, RoutedEventArgs e)
+        private void btnStartSrvr_Click(object sender, RoutedEventArgs e)
         {
             Thread th = new Thread(() => { mServer.Start(ref mCbMsg); });
             th.Start();
@@ -112,12 +118,24 @@ namespace sQzServer1
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
-            if (bRunning && mCbMsg.ToUp())
-                Dispatcher.Invoke(() => {
-                    lblStatus.Text += mCbMsg.txt; });
+            if (bRunning)
+            {
+                if(bStrtReqQSh)
+                {
+                    mState = NetCode.RequestQuestSheet;
+                    btnConnect_Click(null, null);
+                    bStrtReqQSh = false;
+                    bQShReqting = true;
+                }
+                if (mCbMsg.ToUp())
+                    Dispatcher.Invoke(() =>
+                    {
+                        lblStatus.Text += mCbMsg.txt;
+                    });
+            }
         }
 
-        private void StopSrvr_Click(object sender, RoutedEventArgs e)
+        private void btnStopSrvr_Click(object sender, RoutedEventArgs e)
         {
             mServer.Stop(ref mCbMsg);
         }
@@ -223,7 +241,7 @@ namespace sQzServer1
                     }
                     break;
                 case NetCode.ExamRetrieving:
-                    uint qshidx = BitConverter.ToUInt16(buf, offs);
+                    int qshidx = BitConverter.ToUInt16(buf, offs);
                     if (qshidx == ushort.MaxValue)
                     {
                         if (mQShMaxIdx < ++mQShIdx)
@@ -240,6 +258,11 @@ namespace sQzServer1
                     {
                         mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + qshidx;
                         outMsg = BitConverter.GetBytes((int)TxI.QS_NFOUND);
+                        if (!bQShReqting)
+                        {
+                            bStrtReqQSh = true;
+                            uReqQSh = qshidx;
+                        }
                     }
                     break;
                 case NetCode.Submiting:
@@ -380,13 +403,24 @@ namespace sQzServer1
                     mQPack.ReadByte(buf, ref offs);
                     mQShIdx = -1;
                     mQShMaxIdx = mQPack.vSheet.Keys.Count - 1;
-                    LoadQuest();
+                    ShowQuest();
                     mState = NetCode.AnsKeyRetrieving;
                     break;
                 case NetCode.AnsKeyRetrieving:
                     mKeyPack = new AnsPack();
                     mKeyPack.ReadByte(buf, ref offs);
                     mAnsPack = new AnsPack();
+                    return false;
+                case NetCode.RequestQuestSheet:
+                    bool rs = BitConverter.ToBoolean(buf, offs++);
+                    if(rs)
+                    {
+                        if (mQPack.ReadByte1(buf, ref offs))
+                            Dispatcher.Invoke(() => ShowQuest());
+                        btnStartSrvr_Click(null, null);
+                    }
+                    bQShReqting = false;
+                    mState = NetCode.Unknown;
                     return false;
                 case NetCode.SrvrSubmitting:
                     if (buf.Length - offs == 4 && BitConverter.ToInt32(buf, offs) == 1)
@@ -426,6 +460,11 @@ namespace sQzServer1
                 case NetCode.AnsKeyRetrieving:
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
+                case NetCode.RequestQuestSheet:
+                    outBuf = new byte[8];
+                    Array.Copy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
+                    Array.Copy(BitConverter.GetBytes(uReqQSh), 0, outBuf, 4, 4);
+                    break;
                 case NetCode.SrvrSubmitting:
                     byte[] prefx = new byte[8];
                     Array.Copy(BitConverter.GetBytes((int)mState), prefx, 4);
@@ -436,7 +475,7 @@ namespace sQzServer1
             return true;
         }
 
-        private void LoadQuest() //same as Operation0.xaml
+        private void ShowQuest() //same as Operation0.xaml
         {
             bool dark = true;
             Color c = new Color();

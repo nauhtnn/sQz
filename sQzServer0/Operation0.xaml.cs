@@ -302,10 +302,10 @@ namespace sQzServer0
                 qs.ToByte();
             mKeyPack.ExtractKey(mQPack);
             mQPack.DBIns(mSl.uId, l);
-            LoadQuest();
+            ShowQuest();
         }
 
-        private void LoadQuest()
+        private void ShowQuest()
         {
             bool dark = true;
             Color c = new Color();
@@ -382,6 +382,36 @@ namespace sQzServer0
                     outMsg = new byte[mKeyPack.GetByteCount()];
                     offs = 0;
                     mKeyPack.ToByte(ref outMsg, ref offs);
+                    return false;
+                case NetCode.RequestQuestSheet:
+                    if (buf.Length - offs == 4)
+                    {
+                        int qsId = BitConverter.ToInt32(buf, offs);
+                        offs += 4;
+                        QuestSheet qs = new QuestSheet();
+                        if (qs.DBSelect(mSl.uId, -1, (ushort)qsId))
+                        {
+                            List<byte[]> bs = qs.ToByte();
+                            sz = 1;
+                            foreach (byte[] b in bs)
+                                sz += b.Length;
+                            outMsg = new byte[sz];
+                            Array.Copy(BitConverter.GetBytes(true), 0, outMsg, 0, 1);
+                            offs = 1;
+                            foreach (byte[] b in bs)
+                            {
+                                Array.Copy(b, 0, outMsg, offs, b.Length);
+                                offs += b.Length;
+                            }
+                            qs.uId = (ushort)qsId;
+                            mQPack.vSheet.Add(qs.uId, qs);
+                            Dispatcher.Invoke(() => ShowQuest());
+                        }
+                        else
+                            outMsg = BitConverter.GetBytes(false);
+                    }
+                    else
+                        outMsg = BitConverter.GetBytes(false);
                     return false;
                 case NetCode.SrvrSubmitting:
                     mSl.ReadByteNee(buf, ref offs);

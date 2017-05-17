@@ -9,10 +9,10 @@ namespace sQzLib
 {
     public class QuestPack
     {
-        public Dictionary<uint, QuestSheet> vSheet;
+        public Dictionary<int, QuestSheet> vSheet;
         public QuestPack()
         {
-            vSheet = new Dictionary<uint, QuestSheet>();
+            vSheet = new Dictionary<int, QuestSheet>();
         }
 
         //only Operation0 uses this.
@@ -56,14 +56,28 @@ namespace sQzLib
             while(0 < nSh)
             {
                 QuestSheet qs = new QuestSheet();
-                bool err = qs.ReadByte(buf, ref offs);
-                if (err)
+                if(qs.ReadByte(buf, ref offs))
                     break;
-                QuestSheet dum;
-                if (!vSheet.TryGetValue(qs.uId, out dum))
+                if (!vSheet.ContainsKey(qs.uId))
                     vSheet.Add(qs.uId, qs);
                 --nSh;
             }
+        }
+
+        public bool ReadByte1(byte[] buf, ref int offs)
+        {
+            if (buf == null)
+                return false;
+            int offs0 = offs;
+            QuestSheet qs = new QuestSheet();
+            if(qs.ReadByte(buf, ref offs))
+                return false;
+            if (!vSheet.ContainsKey(qs.uId))
+            {
+                vSheet.Add(qs.uId, qs);
+                return true;
+            }
+            return false;
         }
 
         public List<int> DBSelectId(uint slId)

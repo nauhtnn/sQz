@@ -347,11 +347,11 @@ namespace sQzLib
             vals.Append("'),");
         }
 
-        public void DBSelect(uint slId, short lv, ushort idx)
+        public bool DBSelect(uint slId, short lv, ushort idx)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return;
+                return false;
             StringBuilder cond = new StringBuilder();
             cond.Append("slId=" + slId);
             cond.Append(" AND lv=" + lv);
@@ -367,8 +367,9 @@ namespace sQzLib
             if (qIds == null)
             {
                 DBConnect.Close(ref conn);
-                return;
+                return false;
             }
+            uId = idx;
             vQuest.Clear();
             string[] vQId = qIds.Split('-');
             foreach(string qid in vQId)
@@ -376,7 +377,7 @@ namespace sQzLib
                 string[] iuid = qid.Split('_');
                 if(iuid.Length == 2)
                 {
-                    qry = DBConnect.mkQrySelect("quest" + iuid[0], null, "id=" + iuid[1], null);
+                    qry = DBConnect.mkQrySelect("quest" + iuid[0], null, "idx=" + iuid[1], null);
                     reader = DBConnect.exeQrySelect(conn, qry);
                     if (reader != null)
                     {
@@ -401,6 +402,7 @@ namespace sQzLib
                     }
                 }
             }
+            return true;
         }
     }
 }
