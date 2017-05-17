@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
@@ -19,7 +20,7 @@ namespace sQzClient
         //bool bRunning;
         bool bBtnBusy;
         DateTime mDt;
-        ExamineeA mNee;
+        ExamineeC mNee;
         TakeExam pgTkExm;
         BlurEffect mBlurEff;
 
@@ -153,12 +154,12 @@ namespace sQzClient
                     ++offs;
                     if(rs)
                     {
-                        if(mNee.eStt < ExamineeA.eAUTHENTICATED)
-                            mNee.eStt = ExamineeA.eAUTHENTICATED;
-                        rs = mNee.ReadByte(buf, ref offs);
+                        ExamineeC e = new ExamineeC();
+                        rs = e.ReadByte(buf, ref offs);
                         l = buf.Length - offs;
                         if (!rs)
                         {
+                            mNee.Merge(e);
                             mState = NetCode.ExamRetrieving;
                             return true;//continue
                         }
@@ -173,13 +174,25 @@ namespace sQzClient
                         string msg = null;
                         if (errc == (int)TxI.SIGNIN_AL_1)
                         {
-                            if (mNee.eStt < ExamineeA.eAUTHENTICATED)
-                                mNee.eStt = ExamineeA.eAUTHENTICATED;
-                            if (!mNee.ReadByte(buf, ref offs))
-                            {
-                                msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
-                                    mNee.dtTim1.ToString("HH:mm dd/MM/yyyy") + Txt.s._[(int)TxI.SIGNIN_AL_2] + mNee.tComp + ".";
-                            }
+                            if (l < 4)
+                                break;
+                            int sz = BitConverter.ToInt32(buf, offs);
+                            l -= 4;
+                            offs += 4;
+                            if (l < sz)
+                                break;
+                            string comp = Encoding.UTF8.GetString(buf, offs, sz);
+                            l -= 4;
+                            offs += 4;
+                            if (l < 8)
+                                break;
+                            int h = BitConverter.ToInt32(buf, offs);
+                            offs += 4;
+                            int m = BitConverter.ToInt32(buf, offs);
+                            offs += 4;
+                            l -= 8;
+                            msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
+                                h + ':' + m + Txt.s._[(int)TxI.SIGNIN_AL_2] + mNee.tComp + ".";
                         }
                         else if (errc == (int)TxI.SIGNIN_NOK)
                             msg = Txt.s._[(int)TxI.SIGNIN_NOK];

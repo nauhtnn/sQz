@@ -85,9 +85,11 @@ namespace sQzLib
 
         public const string tDBtbl = "exnee";
 
-        public bool bFromC;//used by ExamineeS1
+        public bool bFromC;//used by NeeS1
+        public bool bLog;//used by NeeS1 and NeeC
 
         public ExamineeA() {
+            bFromC = bLog = false;
             Reset();
         }
         public void Reset()
@@ -198,8 +200,8 @@ namespace sQzLib
 
         public abstract bool ReadByte(byte[] buf, ref int offs);
 
-        public void Merge(ExamineeA e)
-        {
+        public abstract void Merge(ExamineeA e);
+        /*{
             //only server0 knows uSlId, then send it to server1 and client
             //server1 reads bytes from server0
             //server1 merges bytes from client
@@ -228,7 +230,7 @@ namespace sQzLib
                 return;
             dtTim2 = e.dtTim2;
             uGrade = e.uGrade;
-        }
+        }*/
 
         public bool ToLogFile(int m, int s)
         {
@@ -261,9 +263,6 @@ namespace sQzLib
             w.Write(uId);
             w.Write(uGrade);
             w.Write(eStt);
-            w.Write(tComp.Length);
-            if (0 < tComp.Length)
-                w.Write(tComp);
             w.Write(dtTim1.Hour);
             w.Write(dtTim1.Minute);
             w.Write(dtTim2.Hour);

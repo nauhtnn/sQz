@@ -8,10 +8,7 @@ namespace sQzLib
 {
     public sealed class ExamineeS1: ExamineeA
     {
-        public ExamineeS1()
-        {
-            bFromC = true;
-        }
+        public ExamineeS1() { }
 
         public override List<byte[]> ToByte()
         {
@@ -32,22 +29,24 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(eStt));
             if (eEXAMING < eStt)
-            {
                 l.Add(BitConverter.GetBytes(uGrade));
-                return l;
+
+            if (eStt < eFINISHED || bLog)
+            {
+                byte[] b = Encoding.UTF8.GetBytes(tBirdate);
+                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(b);
+
+                b = Encoding.UTF8.GetBytes(tName);
+                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(b);
+
+                b = Encoding.UTF8.GetBytes(tBirthplace);
+                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(b);
+
+                bLog = false;
             }
-
-            byte[] b = Encoding.UTF8.GetBytes(tBirdate);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
-
-            b = Encoding.UTF8.GetBytes(tName);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
-
-            b = Encoding.UTF8.GetBytes(tBirthplace);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
 
             return l;
         }
@@ -56,7 +55,7 @@ namespace sQzLib
         {
             int l = buf.Length - offs;
 
-            if (l < 12)
+            if (l < 13)
                 return true;
             uSlId = BitConverter.ToUInt32(buf, offs);
             l -= 4;
@@ -74,7 +73,11 @@ namespace sQzLib
             l -= 4;
             offs += 4;
 
-            if (eStt < eSUBMITTING)
+            bLog = BitConverter.ToBoolean(buf, offs);
+            l -= 1;
+            offs += 1;
+
+            if (eStt < eEXAMING || bLog)
             {
                 if (l < 4)
                     return true;
@@ -83,12 +86,9 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     return true;
-                if (0 < sz)
-                {
-                    tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
-                    l -= sz;
-                    offs += sz;
-                }
+                tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
+                l -= sz;
+                offs += sz;
 
                 if (l < 4)
                     return true;
@@ -97,12 +97,9 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     return true;
-                if (0 < sz)
-                {
-                    tComp = Encoding.UTF8.GetString(buf, offs, sz);
-                    l -= sz;
-                    offs += sz;
-                }
+                tComp = Encoding.UTF8.GetString(buf, offs, sz);
+                l -= sz;
+                offs += sz;
             }
 
             if (eStt < eEXAMING)
@@ -249,6 +246,44 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
             l.Add(BitConverter.GetBytes(uGrade));
             return l;
+        }
+
+        public override void Merge(ExamineeA e)
+        {
+            if (bFromC)
+                MergeC(e);
+            else
+                MergeS(e);
+        }
+
+        public void MergeC(ExamineeA e)
+        {
+            if (eStt == eFINISHED)
+                return;
+            if (e.eStt < eEXAMING)
+                eStt = eEXAMING;
+            else
+                eStt = e.eStt;
+            bLog = e.bLog;
+            if (eStt < eEXAMING || bLog)
+                tComp = e.tComp;
+            if (eStt < eEXAMING)
+                return;
+            mAnsSh = new AnsSheet();
+            mAnsSh.uQSId = e.mAnsSh.uQSId;
+
+            if (eStt < eSUBMITTING)
+                return;
+            mAnsSh.aAns = e.mAnsSh.aAns;
+        }
+
+        public void MergeS(ExamineeA e)
+        {
+            //suppose e.eStt = eFINISHED
+            eStt = e.eStt;
+            dtTim1 = e.dtTim1;
+            dtTim2 = e.dtTim2;
+            uGrade = e.uGrade;
         }
     }
 }

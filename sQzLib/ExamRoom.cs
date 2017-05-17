@@ -65,7 +65,7 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public byte[] ToByte()
+        public byte[] ToByteS1()
         {
             List<byte[]> l = new List<byte[]>();
             byte[] b = BitConverter.GetBytes(vExaminee.Count);
@@ -101,8 +101,22 @@ namespace sQzLib
             {
                 ExamineeS1 e = new ExamineeS1();
                 e.bFromC = false;
-                if(!e.ReadByte(buf, ref offs))
-                    vExaminee.Add((short)(e.Lv * e.uId), e);
+                if (!e.ReadByte(buf, ref offs))
+                {
+                    if (e.eStt == ExamineeA.eINFO)
+                    {
+                        if (!vExaminee.ContainsKey(e.Lv * e.uId))
+                            vExaminee.Add(e.Lv * e.uId, e);
+                    }
+                    else
+                    {
+                        ExamineeA o;
+                        if (vExaminee.TryGetValue(e.Lv * e.uId, out o))
+                            o.Merge(e);
+                        else
+                            vExaminee.Add(e.Lv * e.uId, e);
+                    }
+                }
             }
         }
 
@@ -144,24 +158,6 @@ namespace sQzLib
             }
         }
 
-        public ExamineeA ReadByteC(byte[] buf, int offs)
-        {
-            ExamineeS1 e = new ExamineeS1();
-            e.ReadByte(buf, ref offs);
-            ExamineeA o;
-            short key = (short)(e.Lv * e.uId);
-            if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
-            {
-                //vExaminee.Remove(key);
-                //vExaminee.Add(key, e);
-                o.Merge(e);
-                if (o.eStt < ExamineeA.eAUTHENTICATED)
-                    o.eStt = ExamineeA.eAUTHENTICATED;
-                return o;
-            }
-            return null;
-        }
-
         public ExamineeA Signing(ExamineeA e)
         {
             ExamineeA o;
@@ -169,14 +165,12 @@ namespace sQzLib
             if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
             {
                 o.Merge(e);
-                if (o.eStt < ExamineeA.eAUTHENTICATED)
-                    o.eStt = ExamineeA.eAUTHENTICATED;
                 return o;
             }
             return null;
         }
 
-        public void ToByteGrade(byte[] prefix, out byte[] buf)
+        public void ToByteS0(byte[] prefix, out byte[] buf)
         {
             if (vExaminee.Count == 0)
             {
@@ -186,7 +180,7 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             int n = 0;
             foreach (ExamineeA e in vExaminee.Values)
-                if (e.uGrade != ushort.MaxValue)
+                if (e.eStt == ExamineeA.eFINISHED)
                 {
                     ++n;
                     foreach (byte[] b in e.ToByte())

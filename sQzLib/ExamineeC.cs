@@ -16,9 +16,10 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(Lv));
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(eStt));
+			l.Add(BitConverter.GetBytes(bLog));
             byte[] b;
 
-            if (eStt < eSUBMITTING)//todo optmz
+            if (eStt < eEXAMING || bLog)
             {
                 b = Encoding.UTF8.GetBytes(tBirdate);
                 l.Add(BitConverter.GetBytes(b.Length));
@@ -56,43 +57,59 @@ namespace sQzLib
                 uGrade = BitConverter.ToUInt16(buf, offs);
                 l -= 2;
                 offs += 2;
-                return false;
             }
 
-            if (l < 4)
-                return true;
-            int sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return true;
-            tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
+			if(eStt < eSUBMITTING || bLog)
+			{
+				if (l < 4)
+					return true;
+				int sz = BitConverter.ToInt32(buf, offs);
+				l -= 4;
+				offs += 4;
+				if (l < sz)
+					return true;
+				tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
+				l -= sz;
+				offs += sz;
 
-            if (l < 4)
-                return true;
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return true;
-            tName = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
+				if (l < 4)
+					return true;
+				sz = BitConverter.ToInt32(buf, offs);
+				l -= 4;
+				offs += 4;
+				if (l < sz)
+					return true;
+				tName = Encoding.UTF8.GetString(buf, offs, sz);
+				l -= sz;
+				offs += sz;
 
-            if (l < 4)
-                return true;
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return true;
-            tBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
+				if (l < 4)
+					return true;
+				sz = BitConverter.ToInt32(buf, offs);
+				l -= 4;
+				offs += 4;
+				if (l < sz)
+					return true;
+				tBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
+				l -= sz;
+				offs += sz;
+				
+				bLog = false;
+			}
 
             return false;
+        }
+
+        public override void Merge(ExamineeA e)
+        {
+            if (e.eStt == eFINISHED)
+                uGrade = e.uGrade;
+            if (e.eStt < eFINISHED || bLog)
+            {
+                tBirdate = e.tBirdate;
+                tName = e.tName;
+                tBirthplace = e.tBirthplace;
+            }
         }
     }
 }

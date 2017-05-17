@@ -108,5 +108,17 @@ namespace sQzLib
 
             return false;
         }
+
+        public override void Merge(ExamineeA e)
+        {
+            if (eStt == eFINISHED)
+                return;
+            //suppose eStt = eINFO and e.eStt = eFINISHED
+            tComp = e.tComp;
+            mAnsSh = e.mAnsSh;
+            dtTim1 = e.dtTim1;
+            uGrade = e.uGrade;
+            dtTim2 = e.dtTim2;
+        }
     }
 }

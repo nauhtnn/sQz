@@ -118,12 +118,12 @@ namespace sQzLib
             if (rId == 0)
                 foreach (ExamRoom i in vRoom.Values)
                 {
-                    byte[] a = i.ToByte();
+                    byte[] a = i.ToByteS1();
                     if (4 < a.Length)
                         l.Add(a);
                 }
             else if (vRoom.TryGetValue(rId, out r))
-                l.Add(r.ToByte());
+                l.Add(r.ToByteS1());
             return l;
         }
 

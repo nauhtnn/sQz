@@ -147,8 +147,8 @@ namespace sQzServer1
                     ExamSlot.ToByteDt(outMsg, ref offs, mDt);
                     break;
                 case NetCode.Authenticating:
-                    //e = mRoom.ReadByteSgning(buf, offs);
                     e = new ExamineeS1();
+                    e.bFromC = true;
                     e.ReadByte(buf, ref offs);
                     bool lck;
                     if (!vbLock.TryGetValue((int)(e.Lv * e.uId), out lck))
@@ -194,12 +194,27 @@ namespace sQzServer1
                     }
                     else
                     {
-                        byte[] a;
-                        e.ToByte(out a);
-                        outMsg = new byte[5 + a.Length];
+                        byte[] comp;
+                        DateTime dt;
+                        if (mRoom.vExaminee.TryGetValue(e.Lv * e.uId, out e))
+                        {
+                            comp = Encoding.UTF8.GetBytes(e.tComp);
+                            dt = e.dtTim1;
+                        }
+                        else
+                        {
+                            comp = Encoding.UTF8.GetBytes("unknown");//todo
+                            dt = DateTime.Now;
+                        }
+                        outMsg = new byte[17 + comp.Length];
                         Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
                         Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL_1), 0, outMsg, 1, 4);
-                        Buffer.BlockCopy(a, 0, outMsg, 5, a.Length);
+                        Buffer.BlockCopy(BitConverter.GetBytes(comp.Length), 0, outMsg, 5, 4);
+                        Buffer.BlockCopy(comp, 0, outMsg, 9, comp.Length);
+                        offs = 9 + comp.Length;
+                        Buffer.BlockCopy(BitConverter.GetBytes(dt.Hour), 0, outMsg, offs, 4);
+                        offs += 4;
+                        Buffer.BlockCopy(BitConverter.GetBytes(dt.Minute), 0, outMsg, offs, 4);
                         return false;//close
                     }
                     break;
@@ -411,7 +426,7 @@ namespace sQzServer1
                     byte[] prefx = new byte[8];
                     Array.Copy(BitConverter.GetBytes((int)mState), prefx, 4);
                     Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, prefx, 4, 4);
-                    mRoom.ToByteGrade(prefx, out outBuf);
+                    mRoom.ToByteS0(prefx, out outBuf);
                     break;
             }
             return true;
