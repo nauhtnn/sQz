@@ -210,8 +210,12 @@ namespace sQzServer1
                         Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
                         Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL_1), 0, outMsg, 1, 4);
                         Buffer.BlockCopy(BitConverter.GetBytes(comp.Length), 0, outMsg, 5, 4);
-                        Buffer.BlockCopy(comp, 0, outMsg, 9, comp.Length);
-                        offs = 9 + comp.Length;
+                        offs = 9;
+                        if (0 < comp.Length)
+                        {
+                            Buffer.BlockCopy(comp, 0, outMsg, offs, comp.Length);
+                            offs += comp.Length;
+                        }
                         Buffer.BlockCopy(BitConverter.GetBytes(dt.Hour), 0, outMsg, offs, 4);
                         offs += 4;
                         Buffer.BlockCopy(BitConverter.GetBytes(dt.Minute), 0, outMsg, offs, 4);

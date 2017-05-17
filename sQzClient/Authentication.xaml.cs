@@ -181,9 +181,13 @@ namespace sQzClient
                             offs += 4;
                             if (l < sz)
                                 break;
-                            string comp = Encoding.UTF8.GetString(buf, offs, sz);
-                            l -= 4;
-                            offs += 4;
+                            string comp = "";
+                            if (0 < sz)
+                            {
+                                comp = Encoding.UTF8.GetString(buf, offs, sz);
+                                l -= sz;
+                                offs += sz;
+                            }
                             if (l < 8)
                                 break;
                             int h = BitConverter.ToInt32(buf, offs);
@@ -210,9 +214,12 @@ namespace sQzClient
                     if(errc == (int)TxI.QS_NFOUND)
                     {
                         mState = NetCode.Authenticating;
-                        spMain.Effect = mBlurEff;
-                        WPopup.s.wpCb = Deblur;
-                        Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND]));
+                        Dispatcher.Invoke(() =>
+                        {
+                            spMain.Effect = mBlurEff;
+                            WPopup.s.wpCb = Deblur;
+                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND]);
+                        });
                         break;
                     }
                     QuestSheet qs = new QuestSheet();
@@ -221,7 +228,12 @@ namespace sQzClient
                         mState = NetCode.Authenticating;
                         spMain.Effect = mBlurEff;
                         WPopup.s.wpCb = Deblur;
-                        Dispatcher.Invoke(() => WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]));
+                        Dispatcher.Invoke(() =>
+                        {
+                            spMain.Effect = mBlurEff;
+                            WPopup.s.wpCb = Deblur;
+                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]);
+                        });
                         break;
                     }
                     Dispatcher.Invoke(() =>

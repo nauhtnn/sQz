@@ -201,36 +201,6 @@ namespace sQzLib
         public abstract bool ReadByte(byte[] buf, ref int offs);
 
         public abstract void Merge(ExamineeA e);
-        /*{
-            //only server0 knows uSlId, then send it to server1 and client
-            //server1 reads bytes from server0
-            //server1 merges bytes from client
-            if ((e.uSlId != uint.MaxValue && uSlId != e.uSlId)
-                || eStt == eFINISHED)
-                return;
-            if (Lv != e.Lv || uId != e.uId
-                || tBirdate != e.tBirdate)
-                return;
-            tComp = e.tComp;
-            if (e.eStt < eEXAMING)
-            {
-                eStt = e.eStt;
-                mAnsSh.uQSId = ushort.MaxValue;//reset
-                return;
-            }
-            //if (e.eStt < eStt)
-            //    return;
-            eStt = e.eStt;
-            mAnsSh.uQSId = e.mAnsSh.uQSId;
-            dtTim1 = e.dtTim1;
-            if (e.eStt == eEXAMING)
-                return;
-            mAnsSh.aAns = e.mAnsSh.aAns;
-            if (e.eStt == eSUBMITTING)
-                return;
-            dtTim2 = e.dtTim2;
-            uGrade = e.uGrade;
-        }*/
 
         public bool ToLogFile(int m, int s)
         {
@@ -261,16 +231,21 @@ namespace sQzLib
             w.Write(uSlId);
             w.Write(Lv);
             w.Write(uId);
-            w.Write(uGrade);
             w.Write(eStt);
-            w.Write(dtTim1.Hour);
-            w.Write(dtTim1.Minute);
-            w.Write(dtTim2.Hour);
-            w.Write(dtTim2.Minute);
-            w.Write(m);
-            w.Write(s);
             w.Write(mAnsSh.uQSId);
-            w.Write(mAnsSh.aAns, 0, mAnsSh.aAns.Length);
+            w.Write(mAnsSh.aAns, 0, 120);//mAnsSh.aAns.Length);
+            if (eStt == eFINISHED)
+            {
+                w.Write(dtTim1.Hour);
+                w.Write(dtTim1.Minute);
+                w.Write(dtTim2.Hour);
+                w.Write(dtTim2.Minute);
+            }
+            else
+            {
+                w.Write(m);
+                w.Write(s);
+            }
             w.Close();
             mAnsSh.bChanged = false;
             return false;
@@ -290,21 +265,26 @@ namespace sQzLib
             uSlId = r.ReadUInt32();
             eLvl = (ExamLvl)r.ReadInt16();
             uId = r.ReadUInt16();
-            uGrade = r.ReadUInt16();
             eStt = r.ReadInt32();
-            if (0 < r.ReadInt32())
-                tComp = r.ReadString();
-            int h = r.ReadInt32();
-            int m = r.ReadInt32();
-            ExamSlot.Parse(h.ToString() + ':' + m, ExamSlot.FORM_h, out dtTim1);
-            h = r.ReadInt32();
-            m = r.ReadInt32();
-            ExamSlot.Parse(h.ToString() + ':' + m, ExamSlot.FORM_h, out dtTim2);
-            h = r.ReadInt32();
-            m = r.ReadInt32();
-            kDtDuration = new TimeSpan(0, h, m);
             mAnsSh.uQSId = r.ReadUInt16();
-            mAnsSh.aAns = r.ReadBytes(120);//mAnsSh.aAns.Length//hardcode
+            mAnsSh.aAns = r.ReadBytes(120);
+            int h, m;
+            if(eStt == eFINISHED)
+            {
+                h = r.ReadInt32();
+                m = r.ReadInt32();
+                ExamSlot.Parse(h.ToString() + ':' + m, ExamSlot.FORM_h, out dtTim1);
+                h = r.ReadInt32();
+                m = r.ReadInt32();
+                ExamSlot.Parse(h.ToString() + ':' + m, ExamSlot.FORM_h, out dtTim2);
+            }
+            else
+            {
+                h = r.ReadInt32();
+                m = r.ReadInt32();
+                kDtDuration = new TimeSpan(0, h, m);
+            }
+            bLog = true;
             return true;
         }
 
