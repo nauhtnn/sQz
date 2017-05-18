@@ -18,7 +18,6 @@ namespace sQzClient
         NetCode mState;
         UICbMsg mCbMsg;
         bool bRunning;
-        bool bBtnBusy;
         DateTime mDt;
         ExamineeC mNee;
         TakeExam pgTkExm;
@@ -34,30 +33,20 @@ namespace sQzClient
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
             bRunning = true;
-            bBtnBusy = false;
 
             mDt = ExamSlot.INVALID_DT;
             mNee = new ExamineeC();
 
             mNee.kDtDuration = new TimeSpan(1, 0, 0);
-
-            System.Timers.Timer aTimer = new System.Timers.Timer(2000);
-            // Hook up the Elapsed event for the timer. 
-            aTimer.Elapsed += UpdateSrvrMsg;
-            aTimer.AutoReset = true;
-            aTimer.Enabled = true;
         }
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            if (bBtnBusy)
-                return;
-            bBtnBusy = true;
             if (mNee.ParseTxId(tbxId.Text))
             {
                 spMain.Effect = mBlurEff;
-                WPopup.s.wpCb = Deblur;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);
+                spMain.Effect = null;
                 return;
             }
             mNee.tBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
@@ -66,22 +55,25 @@ namespace sQzClient
             {
                 mNee.tBirdate = null;
                 spMain.Effect = mBlurEff;
-                WPopup.s.wpCb = Deblur;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
+                spMain.Effect = null;
                 return;
             }
             try
             {
                 mNee.tComp = Environment.MachineName;
             } catch(InvalidOperationException) { mNee.tComp = "unknown"; }//todo
-            Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
+            DisableControls();
+            Thread th = new Thread(() => {
+                if (!mClnt.ConnectWR(ref mCbMsg) && bRunning)
+                    Dispatcher.Invoke(()=> EnableControls());
+            });
             th.Start();
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bRunning = false;
-            bBtnBusy = true;
             WPopup.s.cncl = false;
             mClnt.Close();
         }
@@ -107,18 +99,7 @@ namespace sQzClient
 
             mBlurEff = new BlurEffect();
 
-            Thread th = new Thread(() => {
-                if (mClnt.ConnectWR(ref mCbMsg))
-                    EnableControls();
-                else if(bRunning)
-                {
-                    Dispatcher.Invoke(() => {
-                        btnReconn.IsEnabled = true;
-                        spMain.Effect = mBlurEff;
-                        WPopup.s.wpCb = Deblur;
-                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);});
-                }});
-            th.Start();
+            btnReconn_Click(null, null);
         }
 
         private void LoadTxt()
@@ -140,10 +121,11 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Dating:
-                    ExamSlot.ReadByteDt(buf, ref offs, out mDt);
+                    ExamSlot.ReadByteDt(buf, ref offs, out mDt);//todo: check data
                     if(bRunning)
                         Dispatcher.Invoke(() => {
                             txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(ExamSlot.FORM_RH);
+                            EnableControls();
                         });
                     mState = NetCode.Authenticating;
                     break;
@@ -251,7 +233,6 @@ namespace sQzClient
                         });
                     break;
             }
-            bBtnBusy = false;
             return false;
         }
 
@@ -274,95 +255,70 @@ namespace sQzClient
             return true;
         }
 
-        private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
-        {
-            //if (bRunning && mCbMsg.ToUp())
-            //    Dispatcher.Invoke(() => {
-            //        //WPopup.s.ShowDialog(mCbMsg.txt);
-            //        lblStatus.Text += mCbMsg.txt;
-            //    });
-        }
-
         private void btnExit_Click(object sender, RoutedEventArgs e)
         {
-            if (bBtnBusy)
-                return;
-            bBtnBusy = true;
+            DisableControls();
             Window.GetWindow(this).Close();
         }
 
         private void btnOpenLog_Click(object sender, RoutedEventArgs e)
         {
-            if (bBtnBusy)
-                return;
-            bBtnBusy = true;
+            //DisableControls();
             Microsoft.Win32.OpenFileDialog dlg = new Microsoft.Win32.OpenFileDialog();
 
             // set filter for file extension and default file extension 
             //dlg.DefaultExt = ".bin";
             //dlg.Filter = "binary file (*.bin)|*.bin";
+            spMain.Effect = mBlurEff;
             bool? result = dlg.ShowDialog();
 
             string filePath = null;
             if (result == true)
                 filePath = dlg.FileName;
-            if (filePath != null && mNee.ReadLogFile(filePath))
+            if (filePath != null)
             {
-                tbxId.Text = mNee.tId;
-                spMain.Effect = mBlurEff;
-                WPopup.s.wpCb = Deblur;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
+                if(mNee.ReadLogFile(filePath))
+                {
+                    tbxId.Text = mNee.tId;
+                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
+                }
+                else
+                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
             }
+            spMain.Effect = null;
+            //EnableControls();
         }
 
         private void EnableControls()
         {
-            if(bRunning)
-                Dispatcher.Invoke(() =>
-                {
-                    tbxId.IsEnabled =
-                    tbxD.IsEnabled =
-                    tbxM.IsEnabled =
-                    tbxY.IsEnabled =
-                    btnOpenLog.IsEnabled =
-                    btnSignIn.IsEnabled = true;
-                    btnReconn.IsEnabled = false;
-                });
+            tbxId.IsEnabled =
+            tbxD.IsEnabled =
+            tbxM.IsEnabled =
+            tbxY.IsEnabled =
+            btnOpenLog.IsEnabled =
+            btnSignIn.IsEnabled = true;
         }
 
         private void DisableControls()
         {
-            if(bRunning)
-                Dispatcher.Invoke(() =>
-                {
-                    tbxId.IsEnabled =
-                    tbxD.IsEnabled =
-                    tbxM.IsEnabled =
-                    tbxY.IsEnabled =
-                    btnOpenLog.IsEnabled =
-                    btnReconn.IsEnabled =
-                    btnSignIn.IsEnabled = false;
-                });
+            tbxId.IsEnabled =
+            tbxD.IsEnabled =
+            tbxM.IsEnabled =
+            tbxY.IsEnabled =
+            btnOpenLog.IsEnabled =
+            btnSignIn.IsEnabled = false;
         }
 
         private void btnReconn_Click(object sender, RoutedEventArgs e)
         {
-            if (bBtnBusy)
-                return;
-            bBtnBusy = true;
             Thread th = new Thread(() => {
-                if (mClnt.ConnectWR(ref mCbMsg))
-                    EnableControls();
-                else
-                {
-                    if(bRunning)
-                        Dispatcher.Invoke(() => {
-                            btnReconn.IsEnabled = true;
-                            spMain.Effect = mBlurEff;
-                            WPopup.s.wpCb = Deblur;
-                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
-                        });
-                }
+                if (!mClnt.ConnectWR(ref mCbMsg) && bRunning)
+                    Dispatcher.Invoke(() =>
+                    {
+                        spMain.Effect = mBlurEff;
+                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
+                        spMain.Effect = null;
+                    });
             });
             th.Start();
         }
@@ -370,7 +326,8 @@ namespace sQzClient
         private void Deblur()
         {
             spMain.Effect = null;
-            bBtnBusy = false;
+            if (!btnReconn.IsEnabled)
+                EnableControls();
         }
     }
 }
