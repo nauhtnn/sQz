@@ -1,5 +1,4 @@
 ﻿using System;
-//using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -333,11 +332,50 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Submiting:
-                    ushort grade = BitConverter.ToUInt16(buf, offs);
-                    btnSubmit.Content = grade;
-                    WPopup.s.wpCb = Deblur;
-                    spMain.Effect = mBlurEff;
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.RESULT] + grade);
+                    //ushort grade = BitConverter.ToUInt16(buf, offs);
+                    bool rs;
+                    string msg = null;
+                    int l = buf.Length - offs;
+                    if(l < 1)
+                    {
+                        rs = false;
+                        msg = "received data is null";
+                    }
+                    else
+                        rs = BitConverter.ToBoolean(buf, offs++);
+                    if(rs)
+                    {
+                        ExamineeC e = new ExamineeC();
+                        if (e.ReadByte(buf, ref offs))
+                        {
+                            mNee.Merge(e);
+                            btnSubmit.Content = mNee.uGrade;
+                            msg = Txt.s._[(int)TxI.RESULT] + mNee.uGrade;
+                        }
+                        else
+                            msg = "received data is error";
+                    }
+                    else if(msg == null)
+                    {
+                        if(l < 4)
+                            msg = "received data is error";
+                        else
+                        {
+                            int sz = BitConverter.ToInt32(buf, offs);
+                            l -= 4;
+                            offs += 4;
+                            if(l < sz)
+                                msg = "received data is error";
+                            else
+                                msg = System.Text.Encoding.UTF8.GetString(buf, offs, sz);
+                        }
+                    }
+                    if (bRunning)
+                        Dispatcher.Invoke(() => {
+                            WPopup.s.wpCb = Deblur;
+                            spMain.Effect = mBlurEff;
+                            WPopup.s.ShowDialog(msg);
+                        });
                     break;
             }
             bBtnBusy = false;
@@ -349,15 +387,16 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Submiting:
-                    int sz = 4 + mNee.mAnsSh.GetByteCount();
-                    int offs = 0;
-                    outBuf = new byte[sz];
-                    Buffer.BlockCopy(BitConverter.GetBytes((int)mState),
-                        0, outBuf, offs, 4);
-                    offs += 4;
-                    mNee.mAnsSh.ToByte(ref outBuf, ref offs);
+                    mNee.ToByte(out outBuf, (int)mState);
+                    //int sz = 4 + mNee.mAnsSh.GetByteCount();
+                    //int offs = 0;
+                    //outBuf = new byte[sz];
+                    //Buffer.BlockCopy(BitConverter.GetBytes((int)mState),
+                    //    0, outBuf, offs, 4);
+                    //offs += 4;
+                    //mNee.mAnsSh.ToByte(ref outBuf, ref offs);
                     break;
-                case NetCode.Resubmit:
+                case NetCode.Resubmit://todo
                     break;
             }
             return true;

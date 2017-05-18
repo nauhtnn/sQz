@@ -53,7 +53,7 @@ namespace sQzLib
             l -= 4;
             offs += 4;
 
-            if (eEXAMING < eStt)
+            if (eStt == eFINISHED)
             {
                 uGrade = BitConverter.ToUInt16(buf, offs);
                 l -= 2;
@@ -103,14 +103,18 @@ namespace sQzLib
 
         public override void Merge(ExamineeA e)
         {
-            if (e.eStt == eFINISHED)
+            eStt = e.eStt;
+            if (eStt == eFINISHED)
                 uGrade = e.uGrade;
-            if (e.eStt < eFINISHED || bLog)
+            if (eStt < eFINISHED || bLog)
             {
                 tBirdate = e.tBirdate;
                 tName = e.tName;
                 tBirthplace = e.tBirthplace;
             }
+            if(bLog && eSIGNING < eStt && e is ExamineeC)
+                mAnsSh = e.mAnsSh;
+            bLog = false;
         }
     }
 }

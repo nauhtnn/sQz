@@ -156,6 +156,7 @@ namespace sQzClient
                     if(rs)
                     {
                         ExamineeC e = new ExamineeC();
+                        e.bLog = mNee.bLog;
                         rs = e.ReadByte(buf, ref offs);
                         l = buf.Length - offs;
                         if (!rs)
