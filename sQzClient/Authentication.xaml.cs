@@ -17,7 +17,7 @@ namespace sQzClient
         Client2 mClnt;
         NetCode mState;
         UICbMsg mCbMsg;
-        //bool bRunning;
+        bool bRunning;
         bool bBtnBusy;
         DateTime mDt;
         ExamineeC mNee;
@@ -33,7 +33,7 @@ namespace sQzClient
             mState = NetCode.Dating;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
-            //bRunning = true;
+            bRunning = true;
             bBtnBusy = false;
 
             mDt = ExamSlot.INVALID_DT;
@@ -80,7 +80,7 @@ namespace sQzClient
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            //bRunning = false;
+            bRunning = false;
             bBtnBusy = true;
             WPopup.s.cncl = false;
             mClnt.Close();
@@ -110,7 +110,7 @@ namespace sQzClient
             Thread th = new Thread(() => {
                 if (mClnt.ConnectWR(ref mCbMsg))
                     EnableControls();
-                else
+                else if(bRunning)
                 {
                     Dispatcher.Invoke(() => {
                         btnReconn.IsEnabled = true;
@@ -141,9 +141,10 @@ namespace sQzClient
             {
                 case NetCode.Dating:
                     ExamSlot.ReadByteDt(buf, ref offs, out mDt);
-                    Dispatcher.Invoke(() => {
+                    if(bRunning)
+                        Dispatcher.Invoke(() => {
                             txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(ExamSlot.FORM_RH);
-                    });
+                        });
                     mState = NetCode.Authenticating;
                     break;
                 case NetCode.Authenticating:
@@ -200,7 +201,7 @@ namespace sQzClient
                         }
                         else if (errc == (int)TxI.SIGNIN_NOK)
                             msg = Txt.s._[(int)TxI.SIGNIN_NOK];
-                        if(msg != null)
+                        if(bRunning && msg != null)
                             Dispatcher.Invoke(() => {
                                 spMain.Effect = mBlurEff;
                                 WPopup.s.wpCb = Deblur;
@@ -214,12 +215,13 @@ namespace sQzClient
                     if(errc == (int)TxI.QS_NFOUND)
                     {
                         mState = NetCode.Authenticating;
-                        Dispatcher.Invoke(() =>
-                        {
-                            spMain.Effect = mBlurEff;
-                            WPopup.s.wpCb = Deblur;
-                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND]);
-                        });
+                        if(bRunning)
+                            Dispatcher.Invoke(() =>
+                            {
+                                spMain.Effect = mBlurEff;
+                                WPopup.s.wpCb = Deblur;
+                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND]);
+                            });
                         break;
                     }
                     QuestSheet qs = new QuestSheet();
@@ -228,22 +230,24 @@ namespace sQzClient
                         mState = NetCode.Authenticating;
                         spMain.Effect = mBlurEff;
                         WPopup.s.wpCb = Deblur;
-                        Dispatcher.Invoke(() =>
-                        {
-                            spMain.Effect = mBlurEff;
-                            WPopup.s.wpCb = Deblur;
-                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]);
-                        });
+                        if(bRunning)
+                            Dispatcher.Invoke(() =>
+                            {
+                                spMain.Effect = mBlurEff;
+                                WPopup.s.wpCb = Deblur;
+                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]);
+                            });
                         break;
                     }
-                    Dispatcher.Invoke(() =>
-                    {
-                        //NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
-                        pgTkExm = new TakeExam();
-                        pgTkExm.mNee = mNee;
-                        pgTkExm.mQSh = qs;
-                        NavigationService.Navigate(pgTkExm);
-                    });
+                    if(bRunning)
+                        Dispatcher.Invoke(() =>
+                        {
+                            //NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
+                            pgTkExm = new TakeExam();
+                            pgTkExm.mNee = mNee;
+                            pgTkExm.mQSh = qs;
+                            NavigationService.Navigate(pgTkExm);
+                        });
                     break;
             }
             bBtnBusy = false;
@@ -312,30 +316,32 @@ namespace sQzClient
 
         private void EnableControls()
         {
-            Dispatcher.Invoke(() =>
-            {
-                tbxId.IsEnabled =
-                tbxD.IsEnabled =
-                tbxM.IsEnabled =
-                tbxY.IsEnabled =
-                btnOpenLog.IsEnabled =
-                btnSignIn.IsEnabled = true;
-                btnReconn.IsEnabled = false;
-            });
+            if(bRunning)
+                Dispatcher.Invoke(() =>
+                {
+                    tbxId.IsEnabled =
+                    tbxD.IsEnabled =
+                    tbxM.IsEnabled =
+                    tbxY.IsEnabled =
+                    btnOpenLog.IsEnabled =
+                    btnSignIn.IsEnabled = true;
+                    btnReconn.IsEnabled = false;
+                });
         }
 
         private void DisableControls()
         {
-            Dispatcher.Invoke(() =>
-            {
-                tbxId.IsEnabled =
-                tbxD.IsEnabled =
-                tbxM.IsEnabled =
-                tbxY.IsEnabled =
-                btnOpenLog.IsEnabled =
-                btnReconn.IsEnabled =
-                btnSignIn.IsEnabled = false;
-            });
+            if(bRunning)
+                Dispatcher.Invoke(() =>
+                {
+                    tbxId.IsEnabled =
+                    tbxD.IsEnabled =
+                    tbxM.IsEnabled =
+                    tbxY.IsEnabled =
+                    btnOpenLog.IsEnabled =
+                    btnReconn.IsEnabled =
+                    btnSignIn.IsEnabled = false;
+                });
         }
 
         private void btnReconn_Click(object sender, RoutedEventArgs e)
@@ -348,12 +354,13 @@ namespace sQzClient
                     EnableControls();
                 else
                 {
-                    Dispatcher.Invoke(() => {
-                        btnReconn.IsEnabled = true;
-                        spMain.Effect = mBlurEff;
-                        WPopup.s.wpCb = Deblur;
-                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
-                    });
+                    if(bRunning)
+                        Dispatcher.Invoke(() => {
+                            btnReconn.IsEnabled = true;
+                            spMain.Effect = mBlurEff;
+                            WPopup.s.wpCb = Deblur;
+                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
+                        });
                 }
             });
             th.Start();
