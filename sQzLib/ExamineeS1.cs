@@ -28,7 +28,7 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(eStt));
-            if (eEXAMING < eStt)
+            if (eStt == eFINISHED)
                 l.Add(BitConverter.GetBytes(uGrade));
 
             if (eStt < eFINISHED || bLog)
@@ -44,9 +44,9 @@ namespace sQzLib
                 b = Encoding.UTF8.GetBytes(tBirthplace);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
-
-                bLog = false;
             }
+
+            bLog = false;
 
             return l;
         }

@@ -265,42 +265,66 @@ namespace sQzServer1
                     }
                     break;
                 case NetCode.Submiting:
-                    AnsSheet s = new AnsSheet();
-                    s.ReadByte(buf, ref offs);
-                    AnsSheet keySh;
-                    if(!mKeyPack.vSheet.TryGetValue(s.uQSId, out keySh))
+                    //AnsSheet s = new AnsSheet();
+                    //s.ReadByte(buf, ref offs);
+                    e = new ExamineeS1();
+                    if (e.ReadByte(buf, ref offs))
                     {
-                        outMsg = BitConverter.GetBytes(101);//todo
-                        break;
-                    }
-                    ushort grade = keySh.Grade(s.aAns);
-                    lvid = s.Lv * s.uNeeId;
-                    if (mRoom.vExaminee.TryGetValue(lvid, out e))
-                    {
-                        e.eStt = ExamineeA.eFINISHED;
-                        e.mAnsSh = s;
-                        e.uGrade = grade;
-                        e.dtTim2 = DateTime.Now;
-                        if (vbLock.Keys.Contains(lvid))
-                            vbLock[lvid] = true;
-                        Dispatcher.Invoke(() =>
+                        AnsSheet keySh;
+                        if (!mKeyPack.vSheet.TryGetValue(e.mAnsSh.uQSId, out keySh))
                         {
-                            TextBlock t = null;
-                            if (vTime2.TryGetValue(lvid, out t))//todo
-                                t.Text = e.dtTim2.ToString("HH:mm");
-                            if (vMark.TryGetValue(lvid, out t))
-                                t.Text = grade.ToString();
-                            CheckBox cbx;
-                            if (vLock.TryGetValue(lvid, out cbx))
-                            {
-                                cbx.IsChecked = true;
-                                cbx.IsEnabled = false;
-                            }
-                        });
+                            outMsg = BitConverter.GetBytes(101);//todo
+                            break;
+                        }
+                        lvid = e.Lv * e.uId;
+                        ExamineeA o;
+                        if (mRoom.vExaminee.TryGetValue(lvid, out o))
+                        {
+                            o.eStt = ExamineeA.eFINISHED;
+                            o.mAnsSh = e.mAnsSh;
+                            o.uGrade = keySh.Grade(e.mAnsSh.aAns);
+                            o.dtTim2 = DateTime.Now;
+                            if (vbLock.Keys.Contains(lvid))
+                                vbLock[lvid] = true;
+                            Thread th = new Thread(() =>
+                                Dispatcher.Invoke(() =>
+                                {
+                                    TextBlock t = null;
+                                    if (vTime2.TryGetValue(lvid, out t))//todo
+                                        t.Text = o.dtTim2.ToString("HH:mm");
+                                    if (vMark.TryGetValue(lvid, out t))
+                                        t.Text = o.uGrade.ToString();
+                                    CheckBox cbx;
+                                    if (vLock.TryGetValue(lvid, out cbx))
+                                    {
+                                        cbx.IsChecked = true;
+                                        cbx.IsEnabled = false;
+                                    }
+                                }));
+                            th.Start();
+                            outMsg = BitConverter.GetBytes(o.uGrade);
+                        }
+                        else
+                        {
+                            string s = "ERROR submitting clnt not found " + lvid;//todo
+                            mCbMsg += s;
+                            byte[] b = Encoding.UTF8.GetBytes(s);
+                            outMsg = new byte[5 + b.Length];
+                            Array.Copy(BitConverter.GetBytes(false), outMsg, 1);
+                            Array.Copy(BitConverter.GetBytes(b.Length), 0, outMsg, 1, 4);
+                            Array.Copy(b, 0, outMsg, 5, b.Length);
+                        }
                     }
                     else
-                        mCbMsg += "ERROR submit clnt not found " + lvid + "-" + grade;//todo
-                    outMsg = BitConverter.GetBytes(grade);
+                    {
+                        string s = "ERROR submitting clnt's data is error";//todo
+                        mCbMsg += s;
+                        byte[] b = Encoding.UTF8.GetBytes(s);
+                        outMsg = new byte[5 + b.Length];
+                        Array.Copy(BitConverter.GetBytes(false), outMsg, 1);
+                        Array.Copy(BitConverter.GetBytes(b.Length), 0, outMsg, 1, 4);
+                        Array.Copy(b, 0, outMsg, 5, b.Length);
+                    }
                     break;
                 default:
                     return false;
