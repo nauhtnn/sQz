@@ -203,5 +203,11 @@ namespace sQzClient
         public static extern short GetKeyState(int virtualKey);
 
         #endregion
+
+        protected override void OnDeactivated(EventArgs e)
+        {
+            //MainWindow.Topmost = true;
+            base.OnDeactivated(e);
+        }
     }
 }
