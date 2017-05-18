@@ -268,7 +268,8 @@ namespace sQzServer1
                     //AnsSheet s = new AnsSheet();
                     //s.ReadByte(buf, ref offs);
                     e = new ExamineeS1();
-                    if (e.ReadByte(buf, ref offs))
+                    e.bFromC = true;
+                    if (!e.ReadByte(buf, ref offs))
                     {
                         AnsSheet keySh;
                         if (!mKeyPack.vSheet.TryGetValue(e.mAnsSh.uQSId, out keySh))
@@ -302,7 +303,7 @@ namespace sQzServer1
                                     }
                                 }));
                             th.Start();
-                            outMsg = BitConverter.GetBytes(o.uGrade);
+                            o.ToByte(out outMsg, 0);
                         }
                         else
                         {

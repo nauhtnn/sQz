@@ -113,6 +113,10 @@ namespace sQzClient
             WPopup.s.wpCb = ShowQuestion;
             spMain.Effect = mBlurEff;
             WPopup.s.ShowDialog(msg.ToString());
+            if (mNee.eStt < ExamineeA.eEXAMING)
+                mNee.eStt = ExamineeA.eEXAMING;
+            else if (mNee.eStt == ExamineeA.eSUBMITTING)
+                Submit();
         }
 
         void ShowQuestion()
@@ -127,11 +131,6 @@ namespace sQzClient
             mTimer.AutoReset = true;
             mTimer.Enabled = true;
             dtLastLog = kDtStart = DateTime.Now;
-            WPopup.s.wpCb = null;
-            if (mNee.eStt < ExamineeA.eEXAMING)
-                mNee.eStt = ExamineeA.eEXAMING;
-            else if (mNee.eStt == ExamineeA.eSUBMITTING)
-                Submit();
         }
 
         void InitLeftPanel()
@@ -333,20 +332,21 @@ namespace sQzClient
             {
                 case NetCode.Submiting:
                     //ushort grade = BitConverter.ToUInt16(buf, offs);
-                    bool rs;
+                    int rs;
                     string msg = null;
                     int l = buf.Length - offs;
-                    if(l < 1)
+                    if(l < 4)
                     {
-                        rs = false;
-                        msg = "received data is null";
+                        rs = -1;
+                        msg = "received data is null";//todo
                     }
                     else
-                        rs = BitConverter.ToBoolean(buf, offs++);
-                    if(rs)
+                        rs = BitConverter.ToInt32(buf, offs);
+                    offs += 4;
+                    if(rs == 0)
                     {
                         ExamineeC e = new ExamineeC();
-                        if (e.ReadByte(buf, ref offs))
+                        if (!e.ReadByte(buf, ref offs))
                         {
                             mNee.Merge(e);
                             btnSubmit.Content = mNee.uGrade;
@@ -370,12 +370,11 @@ namespace sQzClient
                                 msg = System.Text.Encoding.UTF8.GetString(buf, offs, sz);
                         }
                     }
-                    if (bRunning)
-                        Dispatcher.Invoke(() => {
-                            WPopup.s.wpCb = Deblur;
-                            spMain.Effect = mBlurEff;
-                            WPopup.s.ShowDialog(msg);
-                        });
+                    Dispatcher.Invoke(() => {
+                        WPopup.s.wpCb = Deblur;
+                        spMain.Effect = mBlurEff;
+                        WPopup.s.ShowDialog(msg);
+                    });
                     break;
             }
             bBtnBusy = false;

@@ -94,9 +94,9 @@ namespace sQzLib
 				tBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
 				l -= sz;
 				offs += sz;
-				
-				bLog = false;
-			}
+            }
+
+            bLog = false;
 
             return false;
         }
@@ -112,8 +112,6 @@ namespace sQzLib
                 tName = e.tName;
                 tBirthplace = e.tBirthplace;
             }
-            if(bLog && eSIGNING < eStt && e is ExamineeC)
-                mAnsSh = e.mAnsSh;
             bLog = false;
         }
     }
