@@ -172,7 +172,7 @@ namespace sQzServer1
                         lck = false;//err, default value benefits examinees
                     if (!lck)
                     {
-                        e = mRoom.Signing(e);
+                        e = mRoom.Signin(e);
                         if (e != null)
                         {
                             if (e.dtTim1.Hour == ExamSlot.INVALID)

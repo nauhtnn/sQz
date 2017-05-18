@@ -100,7 +100,7 @@ namespace sQzLib
             for (int i = 0; i < n; ++i)
             {
                 ExamineeS1 e = new ExamineeS1();
-                e.bFromC = false;
+                //e.bFromC = false;
                 if (!e.ReadByte(buf, ref offs))
                 {
                     if (e.eStt == ExamineeA.eINFO)
@@ -112,7 +112,10 @@ namespace sQzLib
                     {
                         ExamineeA o;
                         if (vExaminee.TryGetValue(e.Lv * e.uId, out o))
+                        {
+                            o.bFromC = false;
                             o.Merge(e);
+                        }
                         else
                             vExaminee.Add(e.Lv * e.uId, e);
                     }
@@ -158,12 +161,13 @@ namespace sQzLib
             }
         }
 
-        public ExamineeA Signing(ExamineeA e)
+        public ExamineeA Signin(ExamineeA e)
         {
             ExamineeA o;
             short key = (short)(e.Lv * e.uId);
             if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
             {
+                o.bFromC = true;
                 o.Merge(e);
                 return o;
             }
@@ -222,11 +226,15 @@ namespace sQzLib
             {
                 --n;
                 ExamineeS0 e = new ExamineeS0();
+                //e.bFromC = false;
                 if (e.ReadByte(buf, ref offs))
                     return true;
                 ExamineeA o;
                 if (vExaminee.TryGetValue(e.Lv * e.uId, out o))
+                {
+                    //o.bFromC = false;
                     o.Merge(e);
+                }
                 else
                     v.Add(e);
             }

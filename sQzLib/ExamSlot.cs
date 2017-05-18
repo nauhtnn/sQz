@@ -253,6 +253,7 @@ namespace sQzLib
                         if (i.uId != rId && i.vExaminee.TryGetValue(e.Lv * e.uId, out o))
                         {
                             unfound = false;
+                            //o.bFromC = false;
                             o.Merge(e);
                             break;
                         }
