@@ -115,8 +115,6 @@ namespace sQzClient
         public bool ClntBufHndl(byte[] buf)
         {
             int offs = 0;
-            NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
-            offs += 4;
             int l, errc;
             switch (mState)
             {

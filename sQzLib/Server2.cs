@@ -52,9 +52,9 @@ namespace sQzLib
                 bool p = false;
                 try { p = mTcpListr.Pending(); }
                 catch (InvalidOperationException e) {
-                    p = false;
                     cbMsg += "\nEx: " + e.Message;
                     Stop(ref cbMsg);
+                    break;
                 }
                 if (p)
                 {
@@ -66,10 +66,8 @@ namespace sQzLib
                     {
                         cbMsg += "\nEx: " + e.Message;
                         Stop(ref cbMsg);
-                    }
-
-                    if (!bListning)
                         break;
+                    }
 
                     try { stream = cli.GetStream(); }
                     catch (InvalidOperationException e)
@@ -80,68 +78,64 @@ namespace sQzLib
 
                     byte[] buf = new byte[1024 * 1024];
 
-                    List<byte[]> vRecvMsg = new List<byte[]>();
-                    int nExpByte, nByte, nnByte;
+                    int nByte;
                     while (bRW1)
                     {
-                        vRecvMsg.Clear();
-                        nnByte = 0;
                         //Incoming message may be larger than the buffer size.
                         //Do not rely on stream.DataAvailable, because the response
                         //  may be split into multiple TCP packets, and a packet
                         //  has not yet been delivered at the moment checking DataAvailable
                         try
                         {
-                            nnByte += nByte = stream.Read(buf, 0, buf.Length);
+                            nByte = stream.Read(buf, 0, buf.Length);
                         }
                         catch (System.IO.IOException e)
                         {
                             cbMsg += "\nEx: " + e.Message;
-                            nnByte = nByte = 0;
-                            bRW1 = false;
-                        }
-                        if (4 < nByte)
-                        {
-                            nExpByte = BitConverter.ToInt32(buf, 0);
-                            nByte -= 4;
-                            nnByte -= 4;
-                            byte[] x = new byte[nByte];//use new buf
-                            Buffer.BlockCopy(buf, 4, x, 0, nByte);
-                            vRecvMsg.Add(x);
-                        }
-                        else
                             break;
-                        
-                        while (bRW1 && nnByte < nExpByte)
+                        }
+                        if (nByte < 4)
+                            break;
+
+                        int nLength = BitConverter.ToInt32(buf, 0);
+                        nByte -= 4;
+
+                        if (nLength < 1)
+                            break;
+
+                        byte[] recvMsg = new byte[nLength];
+
+                        int offs = 0;
+                        if (0 < nByte)
+                        {
+                            if (nLength < nByte)
+                                nByte = nLength;
+                            Buffer.BlockCopy(buf, 4, recvMsg, offs, nByte);
+                            nLength -= nByte;
+                            offs += nByte;
+                        }
+
+                        while (bRW1 && 0 < nLength)
                         {
                             try
                             {
-                                nnByte += nByte = stream.Read(buf, 0, buf.Length);
+                                nByte = stream.Read(buf, 0, buf.Length);
                             }
                             catch (System.IO.IOException e)
                             {
                                 cbMsg += "\nEx: " + e.Message;
                                 bRW1 = false;
                             }
-                            if (bRW1 && 0 < nByte)
+                            if (bRW1)
                             {
-                                byte[] x = new byte[nByte];//use new buf
-                                Buffer.BlockCopy(buf, 0, x, 0, nByte);
-                                vRecvMsg.Add(x);
+                                if (nLength < nByte)
+                                    nByte = nLength;
+                                Buffer.BlockCopy(buf, 0, recvMsg, 0, nByte);
+                                nLength -= nByte;
+                                offs += nByte;
                             }
                         }
 
-                        byte[] recvMsg = null;
-                        if (bRW1 && 0 < vRecvMsg.Count)
-                        {
-                            recvMsg = new byte[nnByte];
-                            int offs = 0;
-                            foreach(byte[] i in vRecvMsg)
-                            {
-                                Buffer.BlockCopy(i, 0, recvMsg, offs, i.Length);
-                                offs += i.Length;
-                            }
-                        }
                         if (bRW1 && recvMsg != null && 3 < recvMsg.Length)
                         {
                             byte[] msg;
