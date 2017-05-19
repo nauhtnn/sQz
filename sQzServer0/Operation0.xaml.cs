@@ -452,7 +452,7 @@ namespace sQzServer0
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox t = FindName("tbxNqs") as TextBox;
-            if(t == null || int.Parse(t.Text) == 0)
+            if(t == null || t.Text == null || t.Text.Length == 0 || int.Parse(t.Text) == 0)
             {
                 btnQSGen.IsEnabled = false;
                 return;
@@ -464,7 +464,7 @@ namespace sQzServer0
                 foreach(int j in QuestSheet.GetIUId(-1))
                 {
                     t = FindName("tbxIU" + j) as TextBox;
-                    if (t != null && 0 < (i = int.Parse(t.Text)))
+                    if (t != null && t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
                         n += i;
                     else
                         bG = false;
@@ -480,7 +480,7 @@ namespace sQzServer0
                 foreach (int j in QuestSheet.GetIUId(1))
                 {
                     t = FindName("tbxIU" + j) as TextBox;
-                    if (t != null && 0 < (i = int.Parse(t.Text)))
+                    if (t != null && t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
                         n += i;
                     else
                         bG = false;

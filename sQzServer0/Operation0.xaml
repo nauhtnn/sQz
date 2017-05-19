@@ -85,7 +85,7 @@
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
                 <TextBlock x:Name="txtNqs" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
-                <TextBox x:Name="tbxNqs" Grid.Row="1" Width="30" Grid.Column="1" Margin="5"/>
+                <TextBox x:Name="tbxNqs" Grid.Row="1" Width="30" Grid.Column="1" Margin="5" Text="0"/>
                 <Button x:Name="btnQSGen" Grid.Row="1" Grid.Column="2" Click="btnQSGen_Click" IsEnabled="False"/>
                 <TextBlock x:Name="txtNq" Grid.Row="2" Grid.Column="0" Margin="5" Height="25"/>
                 <TextBlock x:Name="tbxNq" Width="30" Grid.Row="2" Grid.Column="1" Margin="5"/>

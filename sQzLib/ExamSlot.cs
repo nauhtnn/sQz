@@ -156,17 +156,16 @@ namespace sQzLib
                 string[] v = s.Split('\t');
                 if (v.Length == 5)
                 {
-                    if (v[0].Length < 3)
+                    if (v[0].Length < 2)
                         continue;
                     v[0] = v[0].ToUpper();
-                    if (v[0][0] == 'C' && v[0][1] == 'B')
-                        e.eLv = ExamLv.A;
-                    else if (v[0][0] == 'N' && v[0][1] == 'C')
-                        e.eLv = ExamLv.B;
+                    ExamLv x;
+                    if(Enum.TryParse(v[0].Substring(0, 1), out x))
+                        e.eLv = x;
                     else
                         continue;
                     int uRId;
-                    if (!int.TryParse(v[0].Substring(2), out e.uId)
+                    if (!int.TryParse(v[0].Substring(1), out e.uId)
                         || !int.TryParse(v[1], out uRId) || !vRoom.ContainsKey(uRId))
                         continue;
                     e.uSlId = uId;
@@ -203,7 +202,7 @@ namespace sQzLib
                         ExamineeS0 e = new ExamineeS0();
                         e.uSlId = uId;
                         int lv;
-                        if (Enum.IsDefined(typeof(ExamLv), lv = reader.GetInt32(0)))
+                        if (Enum.IsDefined(typeof(ExamLv), lv = reader.GetInt16(0)))
                             e.eLv = (ExamLv)lv;
                         e.uId = reader.GetInt32(1);
                         e.tName = reader.GetString(2);
