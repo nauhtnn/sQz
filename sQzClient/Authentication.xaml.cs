@@ -3,8 +3,8 @@ using System.Text;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Navigation;
+using System.Windows.Media;
 using System.Threading;
-using System.Windows.Media.Effects;
 using sQzLib;
 
 namespace sQzClient
@@ -21,7 +21,6 @@ namespace sQzClient
         DateTime mDt;
         ExamineeC mNee;
         TakeExam pgTkExm;
-        BlurEffect mBlurEff;
 
         public Authentication()
         {
@@ -44,9 +43,9 @@ namespace sQzClient
         {
             if (mNee.ParseTxId(tbxId.Text))
             {
-                spMain.Effect = mBlurEff;
+                spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);
-                spMain.Effect = null;
+                spMain.Opacity = 1;
                 return;
             }
             mNee.tBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
@@ -54,9 +53,9 @@ namespace sQzClient
             if (!DateTime.TryParse(mNee.tBirdate, out dum))
             {
                 mNee.tBirdate = null;
-                spMain.Effect = mBlurEff;
+                spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
-                spMain.Effect = null;
+                spMain.Opacity = 1;
                 return;
             }
             try
@@ -96,8 +95,6 @@ namespace sQzClient
 
             //FirewallHandler fwHndl = new FirewallHandler(3);
             //lblStatus.Text += fwHndl.OpenFirewall();
-
-            mBlurEff = new BlurEffect();
 
             btnReconn_Click(null, null);
         }
@@ -186,9 +183,9 @@ namespace sQzClient
                             msg = Txt.s._[(int)TxI.SIGNIN_NOK];
                         if(bRunning && msg != null)
                             Dispatcher.Invoke(() => {
-                                spMain.Effect = mBlurEff;
-                                WPopup.s.wpCb = Deblur;
+                                spMain.Opacity = 0.5;
                                 WPopup.s.ShowDialog(msg);
+                                spMain.Opacity = 1;
                             });
                     }
                     break;
@@ -201,9 +198,9 @@ namespace sQzClient
                         if(bRunning)
                             Dispatcher.Invoke(() =>
                             {
-                                spMain.Effect = mBlurEff;
-                                WPopup.s.wpCb = Deblur;
+                                spMain.Opacity = 0.5;
                                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND]);
+                                spMain.Opacity = 1;
                             });
                         break;
                     }
@@ -211,21 +208,18 @@ namespace sQzClient
                     if (qs.ReadByte(buf, ref offs))
                     {
                         mState = NetCode.Authenticating;
-                        spMain.Effect = mBlurEff;
-                        WPopup.s.wpCb = Deblur;
                         if(bRunning)
                             Dispatcher.Invoke(() =>
                             {
-                                spMain.Effect = mBlurEff;
-                                WPopup.s.wpCb = Deblur;
+                                spMain.Opacity = 0.5;
                                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]);
+                                spMain.Opacity = 1;
                             });
                         break;
                     }
                     if(bRunning)
                         Dispatcher.Invoke(() =>
                         {
-                            //NavigationService.Navigate(new Uri("TakeExam.xaml", UriKind.Relative));
                             pgTkExm = new TakeExam();
                             pgTkExm.mNee = mNee;
                             pgTkExm.mQSh = qs;
@@ -269,7 +263,7 @@ namespace sQzClient
             // set filter for file extension and default file extension 
             //dlg.DefaultExt = ".bin";
             //dlg.Filter = "binary file (*.bin)|*.bin";
-            spMain.Effect = mBlurEff;
+            spMain.Opacity = 0.5;
             bool? result = dlg.ShowDialog();
 
             string filePath = null;
@@ -285,7 +279,7 @@ namespace sQzClient
                 else
                     WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
             }
-            spMain.Effect = null;
+            spMain.Opacity = 1;
             //EnableControls();
         }
 
@@ -315,19 +309,13 @@ namespace sQzClient
                 if (!mClnt.ConnectWR(ref mCbMsg) && bRunning)
                     Dispatcher.Invoke(() =>
                     {
-                        spMain.Effect = mBlurEff;
+                        spMain.Opacity = 0.5;
+                        spMain.OpacityMask = new SolidColorBrush(Colors.Black);
                         WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
-                        spMain.Effect = null;
+                        spMain.Opacity = 1;
                     });
             });
             th.Start();
-        }
-
-        private void Deblur()
-        {
-            spMain.Effect = null;
-            if (!btnReconn.IsEnabled)
-                EnableControls();
         }
     }
 }

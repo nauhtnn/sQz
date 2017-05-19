@@ -13,9 +13,9 @@
             <ImageBrush ImageSource="C:\Windows\Web\Wallpaper\Windows\img0.jpg" Stretch="None"/>
         </StackPanel.Background>
         <TextBlock Height="16" Background="#f3f3ee"/>
-        <TextBlock x:Name="txtLalgitc" Height="80" Background="#a51c30" Foreground="White" TextAlignment="Center" VerticalAlignment="Center" FontSize="40" FontWeight="Bold" Padding="0,8,0,0"/>
-        <TextBlock x:Name="txtWelcome" Background="White" Foreground="#8c1515" Height="60" VerticalAlignment="Center" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
-        <TextBlock x:Name="txtDate" Height="60" Background="White" Foreground="#8c1515" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
+        <TextBlock x:Name="txtLalgitc" Height="80" Background="#a51c30" Foreground="#fff" TextAlignment="Center" VerticalAlignment="Center" FontSize="40" FontWeight="Bold" Padding="0,8,0,0"/>
+        <TextBlock x:Name="txtWelcome" Background="#fff" Foreground="#8c1515" Height="60" VerticalAlignment="Center" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
+        <TextBlock x:Name="txtDate" Height="60" Background="#fff" Foreground="#8c1515" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
         <Grid HorizontalAlignment="Center" Margin="0,30,0,0">
             <Grid.ColumnDefinitions>
                 <ColumnDefinition Width="400"/>
@@ -39,10 +39,10 @@
                 <TextBlock Text="/" Width="10" TextAlignment="Center"/>
                 <TextBox x:Name="tbxY" Height="30" Width="96" MaxLength="4" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
             </StackPanel>
-            <Button x:Name="btnSignIn" Grid.Row="3" Background="#1c64e7" Foreground="White" Width="160" Click="btnSignIn_Click" BorderThickness="0" IsEnabled="False"/>
+            <Button x:Name="btnSignIn" Grid.Row="3" Background="#1c64e7" Foreground="#fff" Width="160" Click="btnSignIn_Click" BorderThickness="0" IsEnabled="False"/>
             <Button x:Name="btnOpenLog" Grid.Row="3" Grid.Column="1" Width="160" Click="btnOpenLog_Click" IsEnabled="False"/>
-            <Button x:Name="btnReconn" Grid.Row="6" Height="48" Width="160" Click="btnReconn_Click" IsEnabled="False"/>
-            <Button x:Name="btnExit" Grid.Row="6" Grid.Column="1" Background="#f15a23" Foreground="White" Height="48" Width="160" Click="btnExit_Click"/>
+            <Button x:Name="btnReconn" Grid.Row="6" Height="48" Width="160" Click="btnReconn_Click"/>
+            <Button x:Name="btnExit" Grid.Row="6" Grid.Column="1" Background="#f15a23" Foreground="#fff" Height="48" Width="160" Click="btnExit_Click"/>
         </Grid>
         <!--<ScrollViewer Width="1200" Height="256" VerticalScrollBarVisibility="Auto">
             <TextBox x:Name="lblStatus" TextWrapping="Wrap" Text="TextBox" Width="600"/>

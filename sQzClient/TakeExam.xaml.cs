@@ -18,7 +18,6 @@ namespace sQzClient
         TimeSpan kLogIntvl;
         bool bRunning;
         bool bBtnBusy;
-        BlurEffect mBlurEff;
         UICbMsg mCbMsg;
         System.Timers.Timer mTimer;
 
@@ -69,7 +68,6 @@ namespace sQzClient
             InitLeftPanel();
             InitQuestPanel();
 
-            mBlurEff = new BlurEffect();
             bBtnBusy = false;
 
             txtWelcome.Text = mNee.ToString();
@@ -80,7 +78,6 @@ namespace sQzClient
             spMain.RenderTransform = new ScaleTransform(rt, rt);
 
             WPopup.nwIns(w);
-            WPopup.s.wpCb2 = Deblur;
 
             int m = -1, s = -1;
             if (mNee.eStt < ExamineeA.eSUBMITTING)
@@ -111,8 +108,9 @@ namespace sQzClient
                 msg.AppendFormat(Txt.s._[(int)TxI.EXAMING_MSG_2],
                     mNee.kDtDuration.Minutes, mNee.kDtDuration.Seconds);
             WPopup.s.wpCb = ShowQuestion;
-            spMain.Effect = mBlurEff;
+            spMain.Opacity = 0.5;
             WPopup.s.ShowDialog(msg.ToString());
+            spMain.Opacity = 1;
             if (mNee.eStt < ExamineeA.eEXAMING)
                 mNee.eStt = ExamineeA.eEXAMING;
             else if (mNee.eStt == ExamineeA.eSUBMITTING)
@@ -321,9 +319,10 @@ namespace sQzClient
                 return;
             bBtnBusy = true;
             WPopup.s.wpCb = Submit;
-            spMain.Effect = mBlurEff;
+            spMain.Opacity = 0.5;
             WPopup.s.ShowDialog(Txt.s._[(int)TxI.SUBMIT_CAUT],
                 Txt.s._[(int)TxI.SUBMIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+            spMain.Opacity = 1;
         }
 
         public bool ClntBufHndl(byte[] buf, int offs)
@@ -371,9 +370,9 @@ namespace sQzClient
                         }
                     }
                     Dispatcher.Invoke(() => {
-                        WPopup.s.wpCb = Deblur;
-                        spMain.Effect = mBlurEff;
+                        spMain.Opacity = 0.5;
                         WPopup.s.ShowDialog(msg);
+                        spMain.Opacity = 1;
                     });
                     break;
             }
@@ -428,9 +427,9 @@ namespace sQzClient
                     Dispatcher.Invoke(() =>
                     {
                         txtRTime.Text = "0 : 0";
-                        WPopup.s.wpCb = Deblur;
-                        spMain.Effect = mBlurEff;
+                        spMain.Opacity = 0.5;
                         WPopup.s.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
+                        spMain.Opacity = 1;
                         Submit();
                     });
                 }
@@ -461,13 +460,14 @@ namespace sQzClient
                 return;
             bBtnBusy = true;
             WPopup.s.wpCb = Exit;
-            spMain.Effect = mBlurEff;
+            spMain.Opacity = 0.5;
             if (btnSubmit.IsEnabled)
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_1],
                     Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], "exit");
             else
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_2],
                     Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+            spMain.Opacity = 1;
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -475,13 +475,6 @@ namespace sQzClient
             bRunning = false;
             WPopup.s.cncl = false;
             mClnt.Close();
-        }
-
-        private void Deblur()
-        {
-            WPopup.s.wpCb = null;
-            spMain.Effect = null;
-            bBtnBusy = false;
         }
     }
 }
