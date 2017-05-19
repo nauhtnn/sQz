@@ -496,5 +496,37 @@ namespace sQzServer0
             txtId.Text = t._[(int)TxI.NEEID_S];
             txtGrade.Text = t._[(int)TxI.MARK];
         }
+
+        private void rdoB_Checked(object sender, RoutedEventArgs e)
+        {
+            for(int i = 1; i < 7; ++i)
+            {
+                TextBox t = FindName("tbxIU" + i) as TextBox;
+                if(t != null)
+                    t.IsEnabled = true;
+            }
+            for (int i = 7; i < 10; ++i)
+            {
+                TextBox t = FindName("tbxIU" + i) as TextBox;
+                if (t != null)
+                    t.IsEnabled = false;
+            }
+        }
+
+        private void rdoA_Checked(object sender, RoutedEventArgs e)
+        {
+            for (int i = 1; i < 7; ++i)
+            {
+                TextBox t = FindName("tbxIU" + i) as TextBox;
+                if (t != null)
+                    t.IsEnabled = false;
+            }
+            for (int i = 7; i < 10; ++i)
+            {
+                TextBox t = FindName("tbxIU" + i) as TextBox;
+                if (t != null)
+                    t.IsEnabled = true;
+            }
+        }
     }
 }
