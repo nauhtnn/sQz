@@ -64,8 +64,12 @@ namespace sQzClient
             } catch(InvalidOperationException) { mNee.tComp = "unknown"; }//todo
             DisableControls();
             Thread th = new Thread(() => {
-                if (!mClnt.ConnectWR(ref mCbMsg) && bRunning)
-                    Dispatcher.Invoke(()=> EnableControls());
+                if (mClnt.ConnectWR(ref mCbMsg) && bRunning)
+                    Dispatcher.Invoke(() =>
+                    {
+                        DisableControls();
+                        btnReconn.IsEnabled = true;
+                    });
             });
             th.Start();
         }
@@ -124,6 +128,7 @@ namespace sQzClient
                         Dispatcher.Invoke(() => {
                             txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(ExamSlot.FORM_RH);
                             EnableControls();
+                            btnReconn.IsEnabled = false;
                         });
                     mState = NetCode.Authenticating;
                     break;
@@ -311,13 +316,14 @@ namespace sQzClient
         private void btnReconn_Click(object sender, RoutedEventArgs e)
         {
             Thread th = new Thread(() => {
-                if (!mClnt.ConnectWR(ref mCbMsg) && bRunning)
+                if (mClnt.ConnectWR(ref mCbMsg) && bRunning)
                     Dispatcher.Invoke(() =>
                     {
                         spMain.Opacity = 0.5;
                         spMain.OpacityMask = new SolidColorBrush(Colors.Black);
                         WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
                         spMain.Opacity = 1;
+                        btnReconn.IsEnabled = true;
                     });
             });
             th.Start();

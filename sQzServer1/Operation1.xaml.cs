@@ -163,6 +163,7 @@ namespace sQzServer1
             {
                 case NetCode.Dating:
                     outMsg = new byte[20];
+                    offs = 0;
                     ExamSlot.ToByteDt(outMsg, ref offs, mDt);
                     return true;
                 case NetCode.Authenticating:

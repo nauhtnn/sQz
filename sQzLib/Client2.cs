@@ -171,7 +171,7 @@ namespace sQzLib
                 cbMsg += Txt.s._[(int)TxI.CONN_CLNT_CE];
             mTcpClnt.Close();
             mTcpClnt = null;
-            return bConn;
+            return !bConn;
         }
 
         public void Close()
