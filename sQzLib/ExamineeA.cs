@@ -1,47 +1,44 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
 
 /*
-CREATE TABLE IF NOT EXISTS `exnee1`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+CREATE TABLE IF NOT EXISTS `nee1`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
 `id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
 `t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
 `qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
 PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
 
-CREATE TABLE IF NOT EXISTS `exnee2`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+CREATE TABLE IF NOT EXISTS `nee2`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
 `id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
 `t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
 `qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
 PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
 
-CREATE TABLE IF NOT EXISTS `exnee3`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+CREATE TABLE IF NOT EXISTS `nee3`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
 `id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
 `t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
 `qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
 PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
 
-CREATE TABLE IF NOT EXISTS `exnee4`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+CREATE TABLE IF NOT EXISTS `nee4`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
 `id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
 `t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
 `qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
 PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
 
-CREATE TABLE IF NOT EXISTS `exnee5`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+CREATE TABLE IF NOT EXISTS `nee5`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
 `id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
 `t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
 `qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
 PRIMARY KEY(`slId`, `lv`, `id`), FOREIGN KEY(`slId`) REFERENCES slot(`id`));
 
-CREATE TABLE IF NOT EXISTS `exnee6`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
+CREATE TABLE IF NOT EXISTS `nee6`(`slId` INT(4) UNSIGNED, `lv` TINYINT,
 `id` SMALLINT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
 `t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
@@ -53,28 +50,40 @@ FOREIGN KEY(`qId`) REFERENCES questsh(`id`));
 
 namespace sQzLib
 {
+    public enum ExamLv
+    {
+        A = 0,
+        B = 1000
+    }
+
+    public enum ExamStt
+    {
+         Signing = 0,
+         Info,
+         Authenticated,
+         Examing,
+         Submitting,
+         Finished
+    }
+
     public abstract class ExamineeA
     {
         public uint uSlId;
-        public ExamLvl eLvl;
-        public ushort uId;
+        public ExamStt eStt;
+        public int mStt { get { return (int)eStt; } }
+        public ExamLv eLv;
+        public int mLv { get { return (int)eLv; } }
+        public int uId;
+        public string tId { get { return eLv + uId.ToString("d3"); } }
         public string tName;
         public string tBirdate;
         public string tBirthplace;
-        public ushort uGrade;
+        public int uGrade;
 
         public string tComp;
         public DateTime dtTim1;
         public DateTime dtTim2;
         public AnsSheet mAnsSh;
-
-        public const int eSIGNING = 0;
-        public const int eINFO = 1;
-        public const int eAUTHENTICATED = 2;
-        public const int eEXAMING = 3;
-        public const int eSUBMITTING = 4;
-        public const int eFINISHED = 5;
-        public int eStt;
 
         public TimeSpan kDtDuration;
 
@@ -83,7 +92,7 @@ namespace sQzLib
         const string tLOG_DIR = "sQz\\";
         const string tLOG_PRE = "sav";
 
-        public const string tDBtbl = "exnee";
+        public const string tDBtbl = "nee";
 
         public bool bFromC;//used by NeeS1
         public bool bLog;//used by NeeS1 and NeeC
@@ -99,7 +108,7 @@ namespace sQzLib
             tName = null;
             uSlId = uint.MaxValue;
             uId = ushort.MaxValue;
-            eStt = eSIGNING;
+            eStt = ExamStt.Signing;
             uGrade = ushort.MaxValue;
             dtTim1 = dtTim2 = ExamSlot.INVALID_DT;
             tComp = string.Empty;
@@ -107,60 +116,30 @@ namespace sQzLib
             kDtDuration = new TimeSpan(0, 30, 0);
             tLog = new StringBuilder();
         }
-        public string tId {
-            get {
-                if (eLvl == ExamLvl.Basis)
-                    return "CB" + uId.ToString("d3");
-                else
-                    return "NC" + uId.ToString("d3");
-            }
-        }
+        
         public bool ParseTxId(string s)
         {
-            if (s == null || s.Length != 5)
+            if (s == null || s.Length != 4)
                 return true;
             s = s.ToUpper();
-            ushort tuId;
-            if (s[0] == 'C' && s[1] == 'B')
-            {
-                if (ushort.TryParse(s.Substring(2), out tuId))
-                {
-                    if (eLvl != ExamLvl.Basis || uId != tuId)
-                        Reset();
-                    eLvl = ExamLvl.Basis;
-                    uId = tuId;
-                    return false;
-                }
-                else
-                    return true;
-            }
-            else if (s[0] == 'N' && s[1] == 'C')
-            {
-                if (ushort.TryParse(s.Substring(2), out tuId))
-                {
-                    if (eLvl != ExamLvl.Advance || uId != tuId)
-                        Reset();
-                    uId = tuId;
-                    eLvl = ExamLvl.Advance;
-                    return false;
-                }
-                else
-                    return true;
-            }
-            return true;
-        }
-        public short Lv
-        {
-            get { return (short)eLvl; }
-            set { eLvl = (ExamLvl)value; }
+            ExamLv lv;
+            if (!Enum.TryParse(s.Substring(0, 1), out lv))
+                return true;
+            int uid;
+            if (!int.TryParse(s.Substring(1), out uid))
+                return true;
+            if (eLv != lv || uId != uid)
+                Reset();
+            eLv = lv;
+            uId = uid;
+            return false;
         }
 
         public override string ToString()
         {
             StringBuilder s = new StringBuilder();
-            s.AppendFormat("{0}{1}, {2}, {3}, {4}",
-                (eLvl == ExamLvl.Basis) ? "CB" : "NC",
-                uId.ToString("d3"), tName, tBirdate, tBirthplace);
+            s.AppendFormat("{0}, {1}, {2}, {3}",
+                tId, tName, tBirdate, tBirthplace);
             return s.ToString();
         }
 
@@ -218,7 +197,7 @@ namespace sQzLib
             if (err)
                 return true;
             var fileName = System.IO.Path.Combine(p, tLOG_PRE +
-                (Lv * uId) + '-' + m.ToString("d2") + s.ToString("d2"));
+                tId + '-' + m.ToString("d2") + s.ToString("d2"));
             System.IO.BinaryWriter w = null;
             try
             {
@@ -229,12 +208,12 @@ namespace sQzLib
             if (err)
                 return true;
             w.Write(uSlId);
-            w.Write(Lv);
+            w.Write(mLv);
             w.Write(uId);
-            w.Write(eStt);
+            w.Write(mStt);
             w.Write(mAnsSh.uQSId);
-            w.Write(mAnsSh.aAns, 0, 120);//mAnsSh.aAns.Length);
-            if (eStt == eFINISHED)
+            w.Write(mAnsSh.aAns, 0, AnsSheet.LEN);
+            if (eStt == ExamStt.Finished)
             {
                 w.Write(dtTim1.Hour);
                 w.Write(dtTim1.Minute);
@@ -263,13 +242,16 @@ namespace sQzLib
             if (r == null)
                 return false;
             uSlId = r.ReadUInt32();
-            eLvl = (ExamLvl)r.ReadInt16();
-            uId = r.ReadUInt16();
-            eStt = r.ReadInt32();
-            mAnsSh.uQSId = r.ReadUInt16();
-            mAnsSh.aAns = r.ReadBytes(120);
+            int x;
+            if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
+                eLv = (ExamLv)x;
+            uId = r.ReadInt32();
+            if (Enum.IsDefined(typeof(ExamStt), x = r.ReadInt32()))
+                eStt = (ExamStt)x;
+            mAnsSh.uQSId = r.ReadInt32();
+            mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
             int h, m;
-            if(eStt == eFINISHED)
+            if(eStt == ExamStt.Finished)
             {
                 h = r.ReadInt32();
                 m = r.ReadInt32();

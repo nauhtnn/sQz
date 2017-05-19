@@ -14,9 +14,9 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uSlId));
-            l.Add(BitConverter.GetBytes(Lv));
+            l.Add(BitConverter.GetBytes(mLv));
             l.Add(BitConverter.GetBytes(uId));
-            l.Add(BitConverter.GetBytes(eStt));
+            l.Add(BitConverter.GetBytes(mStt));
             byte[] b;
 
             b = Encoding.UTF8.GetBytes(tBirdate);
@@ -30,7 +30,7 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
 
-            if (eStt < eFINISHED)
+            if (eStt < ExamStt.Finished)
                 return l;
 
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
@@ -45,22 +45,24 @@ namespace sQzLib
 
         public override bool ReadByte(byte[] buf, ref int offs)
         {
-            //suppose eStt == eFINISHED
+            //suppose eStt == ExamStt.Finished
             int l = buf.Length - offs;
 
-            if (l < 8)
+            if (l < 12)
                 return true;
             uSlId = BitConverter.ToUInt32(buf, offs);
             l -= 4;
             offs += 4;
 
-            Lv = BitConverter.ToInt16(buf, offs);
-            l -= 2;
-            offs += 2;
+            int lv;
+            if (Enum.IsDefined(typeof(ExamLv), lv = BitConverter.ToInt32(buf, offs)))
+                eLv = (ExamLv)lv;
+            l -= 4;
+            offs += 4;
 
-            uId = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
+            uId = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
 
             int h = BitConverter.ToInt32(buf, offs);
             l -= 4;
@@ -76,15 +78,15 @@ namespace sQzLib
                 return true;
             }
 
-            if (l < 122)
+            if (l < AnsSheet.LEN + 4)
                 return true;
-            mAnsSh.uQSId = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
-            mAnsSh.aAns = new byte[120];
-            Array.Copy(buf, offs, mAnsSh.aAns, 0, 120);
-            l -= 120;
-            offs += 120;
+            mAnsSh.uQSId = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            mAnsSh.aAns = new byte[AnsSheet.LEN];
+            Array.Copy(buf, offs, mAnsSh.aAns, 0, AnsSheet.LEN);
+            l -= AnsSheet.LEN;
+            offs += AnsSheet.LEN;
 
             h = BitConverter.ToInt32(buf, offs);
             l -= 4;
@@ -100,20 +102,20 @@ namespace sQzLib
                 return true;
             }
 
-            if (l < 2)
+            if (l < 4)
                 return true;
-            uGrade = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
+            uGrade = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
 
             return false;
         }
 
         public override void Merge(ExamineeA e)
         {
-            if (eStt == eFINISHED)
+            if (eStt == ExamStt.Finished)
                 return;
-            //suppose eStt = eINFO and e.eStt = eFINISHED
+            //suppose eStt = eINFO and e.eStt = ExamStt.Finished
             tComp = e.tComp;
             mAnsSh = e.mAnsSh;
             dtTim1 = e.dtTim1;

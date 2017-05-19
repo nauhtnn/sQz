@@ -13,15 +13,10 @@ CREATE TABLE IF NOT EXISTS `questsh` (`slId` INT(4) UNSIGNED, `lv` SMALLINT,
 
 namespace sQzLib
 {
-    public enum ExamLvl
-    {
-        Basis = -1,
-        Advance = 1,
-    }
     public class QuestSheet
     {
-        public ExamLvl eLvl;
-        public ushort uId;
+        public ExamLv eLv;
+        public int uId;
         public List<Question> vQuest;
         public byte[] aQuest;
 
@@ -29,31 +24,41 @@ namespace sQzLib
 
         public QuestSheet()
         {
-            eLvl = ExamLvl.Basis;
+            eLv = ExamLv.A;
             vQuest = new List<Question>();
             aQuest = null;
             uId = 0;
         }
 
-        public static int[] GetBasicIU()
+        static int[] aB = null;
+        static int[] aA = null;
+        public static int[] GetIUId(int lv)
         {
-            int[] x = new int[6];
-            x[0] = 1;
-            x[1] = 2;
-            x[2] = 3;
-            x[3] = 4;
-            x[4] = 5;
-            x[5] = 6;
-            return x;
-        }
-
-        public static int[] GetAdvanceIU()
-        {
-            int[] x = new int[3];
-            x[0] = 7;
-            x[1] = 8;
-            x[2] = 10;
-            return x;
+            if(lv == -1 || lv == 0)
+            {
+                if (aB == null)
+                {
+                    aB = new int[6];
+                    aB[0] = 1;
+                    aB[1] = 2;
+                    aB[2] = 3;
+                    aB[3] = 4;
+                    aB[4] = 5;
+                    aB[5] = 6;
+                }
+                return aB;
+            }
+            else
+            {
+                if (aA == null)
+                {
+                    aA = new int[3];
+                    aA[0] = 7;
+                    aA[1] = 8;
+                    aA[2] = 10;
+                }
+                return aA;
+            }
         }
 
         //only Optimization0 uses this.
@@ -90,11 +95,11 @@ namespace sQzLib
                 return true;
             int offs0 = offs;
             int l = buf.Length - offs;
-            if (l < 2)
+            if (l < 4)
                 return true;
-            uId = BitConverter.ToUInt16(buf, offs);
-            offs += 2;
-            l -= 2;
+            uId = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            l -= 4;
             if (l < 4)
                 return true;
             int nq = BitConverter.ToInt32(buf, offs);
@@ -340,7 +345,7 @@ namespace sQzLib
 
         public void DBAppendInsQry(uint slId, ref StringBuilder vals)
         {
-            vals.Append("(" + slId + "," + (int)eLvl + "," + uId + ",'");
+            vals.Append("(" + slId + "," + (int)eLv + "," + uId + ",'");
             foreach(Question q in vQuest)
                 vals.Append(((short)q.mIU).ToString() + '_' + q.uId + '-');
             vals.Remove(vals.Length - 1, 1);//remove the last '-'

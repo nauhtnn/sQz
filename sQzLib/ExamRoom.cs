@@ -17,7 +17,7 @@ namespace sQzLib
             vExaminee = new Dictionary<int, ExamineeA>();
         }
 
-        public Dictionary<int, ushort>  DBSelectId(uint slId, out Dictionary<int, string> vAns)
+        public Dictionary<int, int>  DBSelectId(uint slId, out Dictionary<int, string> vAns)
         {
             vAns = new Dictionary<int, string>();
             MySqlConnection conn = DBConnect.Init();
@@ -25,14 +25,14 @@ namespace sQzLib
                 return null;
             string qry = DBConnect.mkQrySelect("examinee", "lv,id,qId,anssh", "slId=" + slId, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
-            Dictionary<int, ushort> r = new Dictionary<int, ushort>();
+            Dictionary<int, int> r = new Dictionary<int, int>();
             if (reader != null)
             {
                 while (reader.Read())
                 {
-                    int id = reader.GetInt16(0) * reader.GetUInt16(1);
+                    int id = reader.GetInt32(0) + reader.GetInt32(1);
                     if(!reader.IsDBNull(2))
-                        r.Add(id, reader.GetUInt16(2));
+                        r.Add(id, reader.GetInt32(2));
                     if (!reader.IsDBNull(3))
                         vAns.Add(id, reader.GetString(3));
                 }
@@ -54,7 +54,7 @@ namespace sQzLib
             foreach (ExamineeA e in vExaminee.Values)
             {
                 vals.Append("(" + e.uSlId + ",");
-                vals.Append(e.Lv + ",");
+                vals.Append(e.mLv + ",");
                 vals.Append(e.uId + ",");
                 vals.Append("'" + e.tName + "',");
                 vals.Append("'" + ExamSlot.ToMysqlForm(e.tBirdate, ExamSlot.FORM_R) + "',");
@@ -103,21 +103,21 @@ namespace sQzLib
                 //e.bFromC = false;
                 if (!e.ReadByte(buf, ref offs))
                 {
-                    if (e.eStt == ExamineeA.eINFO)
+                    if (e.eStt == ExamStt.Info)
                     {
-                        if (!vExaminee.ContainsKey(e.Lv * e.uId))
-                            vExaminee.Add(e.Lv * e.uId, e);
+                        if (!vExaminee.ContainsKey(e.mLv + e.uId))
+                            vExaminee.Add(e.mLv + e.uId, e);
                     }
                     else
                     {
                         ExamineeA o;
-                        if (vExaminee.TryGetValue(e.Lv * e.uId, out o))
+                        if (vExaminee.TryGetValue(e.mLv + e.uId, out o))
                         {
                             o.bFromC = false;
                             o.Merge(e);
                         }
                         else
-                            vExaminee.Add(e.Lv * e.uId, e);
+                            vExaminee.Add(e.mLv + e.uId, e);
                     }
                 }
             }
@@ -155,7 +155,7 @@ namespace sQzLib
                         }
                     }
                     qry.Append(" WHERE slId=" + e.uSlId +
-                        " AND lv=" + (int)e.eLvl + " AND id=" + e.uId);
+                        " AND lv=" + (int)e.mLv + " AND id=" + e.uId);
                     DBConnect.Update(conn, qry.ToString());
                 }
             }
@@ -164,7 +164,7 @@ namespace sQzLib
         public ExamineeA Signin(ExamineeA e)
         {
             ExamineeA o;
-            short key = (short)(e.Lv * e.uId);
+            int key = e.mLv + e.uId;
             if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
             {
                 o.bFromC = true;
@@ -184,7 +184,7 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             int n = 0;
             foreach (ExamineeA e in vExaminee.Values)
-                if (e.eStt == ExamineeA.eFINISHED)
+                if (e.eStt == ExamStt.Finished)
                 {
                     ++n;
                     foreach (byte[] b in e.ToByte())
@@ -230,7 +230,7 @@ namespace sQzLib
                 if (e.ReadByte(buf, ref offs))
                     return true;
                 ExamineeA o;
-                if (vExaminee.TryGetValue(e.Lv * e.uId, out o))
+                if (vExaminee.TryGetValue(e.mLv + e.uId, out o))
                 {
                     //o.bFromC = false;
                     o.Merge(e);

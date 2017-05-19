@@ -13,13 +13,13 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uSlId));
-            l.Add(BitConverter.GetBytes(Lv));
+            l.Add(BitConverter.GetBytes(mLv));
             l.Add(BitConverter.GetBytes(uId));
-            l.Add(BitConverter.GetBytes(eStt));
+            l.Add(BitConverter.GetBytes(mStt));
 			l.Add(BitConverter.GetBytes(bLog));
             byte[] b;
 
-            if (eStt < eEXAMING || bLog)
+            if (eStt < ExamStt.Examing || bLog)
             {
                 b = Encoding.UTF8.GetBytes(tBirdate);
                 l.Add(BitConverter.GetBytes(b.Length));
@@ -30,12 +30,12 @@ namespace sQzLib
                 l.Add(b);
             }
 
-            if (eStt < eEXAMING)
+            if (eStt < ExamStt.Examing)
                 return l;
 
             l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
 
-            if (eStt < eSUBMITTING)
+            if (eStt < ExamStt.Submitting)
                 return l;
 
             l.Add(mAnsSh.aAns);
@@ -49,18 +49,20 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-            eStt = BitConverter.ToInt32(buf, offs);
+            int x;
+            if (Enum.IsDefined(typeof(ExamStt), x = BitConverter.ToInt32(buf, offs)))
+                eStt = (ExamStt)x;
             l -= 4;
             offs += 4;
 
-            if (eStt == eFINISHED)
+            if (eStt == ExamStt.Finished)
             {
-                uGrade = BitConverter.ToUInt16(buf, offs);
-                l -= 2;
-                offs += 2;
+                uGrade = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
             }
 
-			if(eStt < eSUBMITTING || bLog)
+			if(eStt < ExamStt.Submitting || bLog)
 			{
 				if (l < 4)
 					return true;
@@ -104,9 +106,9 @@ namespace sQzLib
         public override void Merge(ExamineeA e)
         {
             eStt = e.eStt;
-            if (eStt == eFINISHED)
+            if (eStt == ExamStt.Finished)
                 uGrade = e.uGrade;
-            if (eStt < eFINISHED || bLog)
+            if (eStt < ExamStt.Finished || bLog)
             {
                 tBirdate = e.tBirdate;
                 tName = e.tName;

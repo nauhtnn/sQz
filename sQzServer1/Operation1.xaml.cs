@@ -171,7 +171,7 @@ namespace sQzServer1
                     e.bFromC = true;
                     e.ReadByte(buf, ref offs);
                     bool lck;
-                    if (!vbLock.TryGetValue((int)(e.Lv * e.uId), out lck))
+                    if (!vbLock.TryGetValue(e.mLv + e.uId, out lck))
                         lck = false;//err, default value benefits examinees
                     if (!lck)
                     {
@@ -183,7 +183,7 @@ namespace sQzServer1
                             Dispatcher.Invoke(() =>
                             {
                                 TextBlock t;
-                                lvid = (int)(e.Lv * e.uId);
+                                lvid = e.mLv + e.uId;
                                 if (vComp.TryGetValue(lvid, out t))
                                     t.Text = e.tComp;
                                 if (vTime1.TryGetValue(lvid, out t))
@@ -216,7 +216,7 @@ namespace sQzServer1
                     {
                         byte[] comp;
                         DateTime dt;
-                        if (mRoom.vExaminee.TryGetValue(e.Lv * e.uId, out e))
+                        if (mRoom.vExaminee.TryGetValue(e.mLv + e.uId, out e))
                         {
                             comp = Encoding.UTF8.GetBytes(e.tComp);
                             dt = e.dtTim1;
@@ -243,7 +243,7 @@ namespace sQzServer1
                     }
                     return true;
                 case NetCode.ExamRetrieving:
-                    int qshidx = BitConverter.ToUInt16(buf, offs);
+                    int qshidx = BitConverter.ToInt32(buf, offs);
                     if (qshidx == ushort.MaxValue)
                     {
                         if (mQShMaxIdx < ++mQShIdx)
@@ -278,11 +278,11 @@ namespace sQzServer1
                             outMsg = BitConverter.GetBytes(101);//todo
                             break;
                         }
-                        lvid = e.Lv * e.uId;
+                        lvid = e.mLv + e.uId;
                         ExamineeA o;
                         if (mRoom.vExaminee.TryGetValue(lvid, out o))
                         {
-                            o.eStt = ExamineeA.eFINISHED;
+                            o.eStt = ExamStt.Finished;
                             o.mAnsSh = e.mAnsSh;
                             o.uGrade = keySh.Grade(e.mAnsSh.aAns);
                             o.dtTim2 = DateTime.Now;
@@ -372,7 +372,7 @@ namespace sQzServer1
                             Grid.SetColumn(t, 2);
                             gNee.Children.Add(t);
                             t = new TextBlock();
-                            int lvid = (int)(e.Lv * e.uId);
+                            int lvid = e.mLv + e.uId;
                             vComp.Add(lvid, t);
                             Grid.SetRow(t, rid);
                             Grid.SetColumn(t, 3);

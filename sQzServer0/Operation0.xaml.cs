@@ -30,9 +30,9 @@ namespace sQzServer0
         Dictionary<int, TextBlock> vDt1;
         Dictionary<int, TextBlock> vDt2;
         Dictionary<int, TextBlock> vComp;
-        QuestPack mQPack;
-        AnsPack mKeyPack;
-        ushort[] uQSId;
+        Dictionary<int, QuestPack> vQPack;
+        Dictionary<int, AnsPack> vKeyPack;
+        Dictionary<int, int> vuQSId;
 
         public Operation0()
         {
@@ -44,10 +44,10 @@ namespace sQzServer0
             vDt1 = new Dictionary<int, TextBlock>();
             vDt2 = new Dictionary<int, TextBlock>();
             vComp = new Dictionary<int, TextBlock>();
-            mQPack = new QuestPack();
-            mKeyPack = new AnsPack();
+            vQPack = new Dictionary<int, QuestPack>();
+            vKeyPack = new Dictionary<int, AnsPack>();
             mSl = new ExamSlot();
-            uQSId = new ushort[2];
+            vuQSId = new Dictionary<int, int>();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -73,8 +73,6 @@ namespace sQzServer0
                 ExamSlot.Parse(i.Content as string, ExamSlot.FORM_H, out mSl.mDt);
                 mSl.DBSelectNee();
                 LoadExaminees();
-                uQSId[0] = mQPack.DBCurQSId(mSl.uId, ExamLvl.Basis);
-                uQSId[1] = mQPack.DBCurQSId(mSl.uId, ExamLvl.Advance);
             }
             else
                 mSl.uId = uint.MaxValue;
@@ -155,7 +153,7 @@ namespace sQzServer0
                         t = new TextBlock();
                         if (dark)
                             t.Background = new SolidColorBrush(c);
-                        vGrade.Add(e.Lv * e.uId, t);
+                        vGrade.Add(e.mLv + e.uId, t);
                         if(e.uGrade != ushort.MaxValue)
                             t.Text = e.uGrade.ToString();
                         Grid.SetRow(t, rid);
@@ -164,7 +162,7 @@ namespace sQzServer0
                         t = new TextBlock();
                         if (dark)
                             t.Background = new SolidColorBrush(c);
-                        vDt1.Add(e.Lv * e.uId, t);
+                        vDt1.Add(e.mLv + e.uId, t);
                         if (e.dtTim1.Year != ExamSlot.INVALID)
                             t.Text = e.dtTim1.ToString("HH:mm");
                         Grid.SetRow(t, rid);
@@ -173,7 +171,7 @@ namespace sQzServer0
                         t = new TextBlock();
                         if (dark)
                             t.Background = new SolidColorBrush(c);
-                        vDt2.Add(e.Lv * e.uId, t);
+                        vDt2.Add(e.mLv + e.uId, t);
                         if (e.dtTim2.Year != ExamSlot.INVALID)
                             t.Text = e.dtTim2.ToString("HH:mm");
                         Grid.SetRow(t, rid);
@@ -182,7 +180,7 @@ namespace sQzServer0
                         t = new TextBlock();
                         if (dark)
                             t.Background = new SolidColorBrush(c);
-                        vComp.Add(e.Lv * e.uId, t);
+                        vComp.Add(e.mLv + e.uId, t);
                         if (e.tComp != null)
                             t.Text = e.tComp;
                         Grid.SetRow(t, rid);
@@ -200,13 +198,13 @@ namespace sQzServer0
                 foreach(ExamRoom r in mSl.vRoom.Values)
                     foreach (ExamineeA e in r.vExaminee.Values)
                     {
-                        if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.Lv * e.uId, out t))
+                        if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.mLv + e.uId, out t))
                             t.Text = e.uGrade.ToString();
-                        if (e.dtTim1.Hour != ExamSlot.INVALID && vDt1.TryGetValue(e.Lv * e.uId, out t))
+                        if (e.dtTim1.Hour != ExamSlot.INVALID && vDt1.TryGetValue(e.mLv + e.uId, out t))
                             t.Text = e.dtTim1.ToString("HH:mm");
-                        if (e.dtTim2.Hour != ExamSlot.INVALID && vDt2.TryGetValue(e.Lv * e.uId, out t))
+                        if (e.dtTim2.Hour != ExamSlot.INVALID && vDt2.TryGetValue(e.mLv + e.uId, out t))
                             t.Text = e.dtTim2.ToString("HH:mm");
-                        if (e.tComp != null && vComp.TryGetValue(e.Lv * e.uId, out t))
+                        if (e.tComp != null && vComp.TryGetValue(e.mLv + e.uId, out t))
                             t.Text = e.tComp;
                     }
             });
@@ -231,9 +229,8 @@ namespace sQzServer0
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
 
-            //FirewallHandler fwHndl = new FirewallHandler(0);
-            //string msg = fwHndl.OpenFirewall();
-            //lblStatus.Text = msg;
+            vuQSId.Add(-1, QuestPack.DBCurQSId(mSl.uId, ExamLv.A));
+            vuQSId.Add(1, QuestPack.DBCurQSId(mSl.uId, ExamLv.B));
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -264,44 +261,32 @@ namespace sQzServer0
         {
             if (mSl.uId == uint.MaxValue)
                 return;
-			TextBox t = (TextBox)FindName("tbxNqs");
-			int n = 1;
-            if (t != null && 0 < t.Text.Length && !int.TryParse(t.Text, out n))
-                n = 1;
-            int[][] x = new int[2][];
-            x[0] = QuestSheet.GetBasicIU();
-            x[1] = QuestSheet.GetAdvanceIU();
+			TextBox t = FindName("tbxNqs") as TextBox;
+            int n = int.Parse(t.Text);
             List<QuestSheet> l = new List<QuestSheet>();
+            int i;
+            if (rdoB.IsChecked.HasValue ? rdoB.IsChecked.Value : false)
+                i = 0;
+            else
+                i = 1;
 			while(0 < n) {
-				for(int i = 0; i < 2; ++i)
-				{
-                    QuestSheet qs = new QuestSheet();
-                    foreach (int j in x[i])
-                    {
-                        t = FindName("tbxIU" + j) as TextBox;
-                        if (t != null && 0 < t.Text.Length)
-                        {
-                            int v;
-                            if (int.TryParse(t.Text, out v) && 0 < v)
-                            {
-                                IUxx iu = (IUxx)j;
-                                qs.DBSelect(iu, v);
-                            }
-                        }
-                    }
-                    if (0 < qs.vQuest.Count)
-                    {
-                        qs.uId = ++uQSId[i];
-                        mQPack.vSheet.Add(qs.uId, qs);
-                        l.Add(qs);
-                    }
+                QuestSheet qs = new QuestSheet();
+                foreach (int j in QuestSheet.GetIUId(i))
+                {
+                    t = FindName("tbxIU" + j) as TextBox;
+                    if (t != null)
+                        qs.DBSelect((IUxx)j, int.Parse(t.Text));
+                }
+                if (0 < qs.vQuest.Count)
+                {
+                    qs.uId = (ushort) ++vuQSId[i];
+                    vQPack[i].vSheet.Add(qs.uId, qs);
+                    l.Add(qs);
                 }
                 --n;
             }
-            foreach (QuestSheet qs in mQPack.vSheet.Values)
-                qs.ToByte();
-            mKeyPack.ExtractKey(mQPack);
-            mQPack.DBIns(mSl.uId, l);
+            vKeyPack[i].ExtractKey(vQPack[i]);
+            vQPack[i].DBIns(mSl.uId, l);
             ShowQuest();
         }
 
@@ -313,28 +298,29 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
 				tbcQuest.Items.Clear();
-				foreach(QuestSheet qs in mQPack.vSheet.Values) {
-					TabItem ti = new TabItem();
-					ti.Header = qs.uId;
-                    ScrollViewer svwr = new ScrollViewer();
-                    svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-					StackPanel sp = new StackPanel();
-                    int x = 0;
-                    foreach (Question q in qs.vQuest)
-					{
-						TextBlock i = new TextBlock();
-						i.Text = ++x + ") " + q.ToString();
-						dark = !dark;
-						if (dark)
-							i.Background = new SolidColorBrush(c);
-						else
-							i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-						sp.Children.Add(i);
-					}
-                    svwr.Content = sp;
-                    ti.Content = svwr;
-					tbcQuest.Items.Add(ti);
-				}
+                foreach(QuestPack p in vQPack.Values)
+				    foreach(QuestSheet qs in p.vSheet.Values) {
+					    TabItem ti = new TabItem();
+					    ti.Header = qs.uId * p.mLv;
+                        ScrollViewer svwr = new ScrollViewer();
+                        svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+					    StackPanel sp = new StackPanel();
+                        int x = 0;
+                        foreach (Question q in qs.vQuest)
+					    {
+						    TextBlock i = new TextBlock();
+						    i.Text = ++x + ") " + q.ToString();
+						    dark = !dark;
+						    if (dark)
+							    i.Background = new SolidColorBrush(c);
+						    else
+							    i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
+						    sp.Children.Add(i);
+					    }
+                        svwr.Content = sp;
+                        ti.Content = svwr;
+					    tbcQuest.Items.Add(ti);
+				    }
             });
         }
 
@@ -381,12 +367,12 @@ namespace sQzServer0
                     }
                     return true;
                 case NetCode.QuestRetrieving:
-                    outMsg = mQPack.ToByte();
+                    outMsg = null;//todo mQPack.ToByte();
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    outMsg = new byte[mKeyPack.GetByteCount()];
+                    outMsg = null; //todo new byte[mKeyPack.GetByteCount()];
                     offs = 0;
-                    mKeyPack.ToByte(ref outMsg, ref offs);
+                    //todo mKeyPack.ToByte(ref outMsg, ref offs);
                     break;
                 case NetCode.RequestQuestSheet:
                     if (buf.Length - offs == 4)
@@ -396,8 +382,8 @@ namespace sQzServer0
                         QuestSheet qs = new QuestSheet();
                         if (qs.DBSelect(mSl.uId, -1, (ushort)qsId))
                         {
-                            mQPack.vSheet.Add(qs.uId, qs);
-                            AnsSheet a = mKeyPack.ExtractKey(qs);
+                            //todo mQPack.vSheet.Add(qs.uId, qs);
+                            AnsSheet a = null;//todo mKeyPack.ExtractKey(qs);
                             List<byte[]> bs = qs.ToByte();
                             sz = 1;
                             if (a != null)
@@ -449,6 +435,9 @@ namespace sQzServer0
                     
                 }
             }
+            tbxNqs.MaxLength = 2;
+            tbxNqs.PreviewKeyDown += tbxIU_PrevwKeyDown;
+            tbxNqs.TextChanged += tbxIU_TextChanged;
             tbxNq.Text = "0";
         }
 
@@ -462,14 +451,20 @@ namespace sQzServer0
 
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
         {
+            TextBox t = FindName("tbxNqs") as TextBox;
+            if(t == null || int.Parse(t.Text) == 0)
+            {
+                btnQSGen.IsEnabled = false;
+                return;
+            }
             int n = 0, i;
             bool bG = true;
-            if(rdoB.IsChecked.HasValue? rdoB.IsChecked.Value : false)
+            if (rdoB.IsChecked.HasValue? rdoB.IsChecked.Value : false)
             {
-                for (int j = 1; j < 7; ++j)
+                foreach(int j in QuestSheet.GetIUId(-1))
                 {
-                    TextBox t = FindName("tbxIU" + j) as TextBox;
-                    if (t != null && int.TryParse(t.Text, out i) && 0 < i)
+                    t = FindName("tbxIU" + j) as TextBox;
+                    if (t != null && 0 < (i = int.Parse(t.Text)))
                         n += i;
                     else
                         bG = false;
@@ -482,10 +477,10 @@ namespace sQzServer0
             }
             else
             {
-                for (int j = 7; j < 10; ++j)
+                foreach (int j in QuestSheet.GetIUId(1))
                 {
-                    TextBox t = FindName("tbxIU" + j) as TextBox;
-                    if (t != null && int.TryParse(t.Text, out i) && 0 < i)
+                    t = FindName("tbxIU" + j) as TextBox;
+                    if (t != null && 0 < (i = int.Parse(t.Text)))
                         n += i;
                     else
                         bG = false;

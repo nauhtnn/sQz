@@ -27,11 +27,11 @@ namespace sQzLib
         public List<byte[]> ToByteC()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(eStt));
-            if (eStt == eFINISHED)
+            l.Add(BitConverter.GetBytes(mStt));
+            if (eStt == ExamStt.Finished)
                 l.Add(BitConverter.GetBytes(uGrade));
 
-            if (eStt < eFINISHED || bLog)
+            if (eStt < ExamStt.Finished || bLog)
             {
                 byte[] b = Encoding.UTF8.GetBytes(tBirdate);
                 l.Add(BitConverter.GetBytes(b.Length));
@@ -61,15 +61,18 @@ namespace sQzLib
             l -= 4;
             offs += 4;
 
-            Lv = BitConverter.ToInt16(buf, offs);
-            l -= 2;
-            offs += 2;
+            int x;
+            if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
+                eLv = (ExamLv)x;
+            l -= 4;
+            offs += 4;
 
-            uId = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
+            uId = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
 
-            eStt = BitConverter.ToInt32(buf, offs);
+            if (Enum.IsDefined(typeof(ExamStt), x = BitConverter.ToInt32(buf, offs)))
+                eStt = (ExamStt)x;
             l -= 4;
             offs += 4;
 
@@ -77,7 +80,7 @@ namespace sQzLib
             l -= 1;
             offs += 1;
 
-            if (eStt < eEXAMING || bLog)
+            if (eStt < ExamStt.Examing || bLog)
             {
                 if (l < 4)
                     return true;
@@ -102,16 +105,16 @@ namespace sQzLib
                 offs += sz;
             }
 
-            if (eStt < eEXAMING)
+            if (eStt < ExamStt.Examing)
                 return false;
 
-            if (l < 2)
+            if (l < 4)
                 return true;
-            mAnsSh.uQSId = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
+            mAnsSh.uQSId = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
 
-            if (eStt < eSUBMITTING)
+            if (eStt < ExamStt.Submitting)
                 return false;
 
             if (l < 120)
@@ -128,21 +131,24 @@ namespace sQzLib
         {
             int l = buf.Length - offs;
 
-            if (l < 12)
+            if (l < 14)
                 return true;
             uSlId = BitConverter.ToUInt32(buf, offs);
             l -= 4;
             offs += 4;
 
-            Lv = BitConverter.ToInt16(buf, offs);
-            l -= 2;
-            offs += 2;
+            int x;
+            if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
+                eLv = (ExamLv)x;
+            l -= 4;
+            offs += 4;
 
-            uId = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
+            uId = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
 
-            eStt = BitConverter.ToInt32(buf, offs);
+            if (Enum.IsDefined(typeof(ExamStt), x = BitConverter.ToInt32(buf, offs)))
+                eStt = (ExamStt)x;
             l -= 4;
             offs += 4;
 
@@ -188,7 +194,7 @@ namespace sQzLib
                 offs += sz;
             }
 
-            if (eStt < eFINISHED)
+            if (eStt < ExamStt.Finished)
                 return false;
 
             int h = BitConverter.ToInt32(buf, offs);
@@ -219,21 +225,21 @@ namespace sQzLib
                 return true;
             }
 
-            if (l < 2)
+            if (l < 4)
                 return true;
-            uGrade = BitConverter.ToUInt16(buf, offs);
-            l -= 2;
-            offs += 2;
+            uGrade = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
 
             return false;
         }
 
         public List<byte[]> ToByteS()
         {
-            //suppose eStt == eFINISHED
+            //suppose eStt == ExamStt.Finished
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uSlId));
-            l.Add(BitConverter.GetBytes(Lv));
+            l.Add(BitConverter.GetBytes(mLv));
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
             l.Add(BitConverter.GetBytes(dtTim1.Minute));
@@ -258,28 +264,28 @@ namespace sQzLib
 
         public void MergeC(ExamineeA e)
         {
-            if (eStt == eFINISHED)
+            if (eStt == ExamStt.Finished)
                 return;
-            if (e.eStt < eEXAMING)
-                eStt = eEXAMING;
+            if (e.eStt < ExamStt.Examing)
+                eStt = ExamStt.Examing;
             else
                 eStt = e.eStt;
             bLog = e.bLog;
-            if (eStt < eEXAMING || bLog)
+            if (eStt < ExamStt.Examing || bLog)
                 tComp = e.tComp;
-            if (eStt < eEXAMING)
+            if (eStt < ExamStt.Examing)
                 return;
             mAnsSh = new AnsSheet();
             mAnsSh.uQSId = e.mAnsSh.uQSId;
 
-            if (eStt < eSUBMITTING)
+            if (eStt < ExamStt.Submitting)
                 return;
             mAnsSh.aAns = e.mAnsSh.aAns;
         }
 
         public void MergeS(ExamineeA e)
         {
-            //suppose e.eStt = eFINISHED
+            //suppose e.eStt = ExamStt.Finished
             eStt = e.eStt;
             dtTim1 = e.dtTim1;
             dtTim2 = e.dtTim2;

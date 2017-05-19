@@ -80,7 +80,7 @@ namespace sQzClient
             WPopup.nwIns(w);
 
             int m = -1, s = -1;
-            if (mNee.eStt < ExamineeA.eSUBMITTING)
+            if (mNee.eStt < ExamStt.Submitting)
             {
                 string t = Utils.ReadFile("Duration.txt");
                 if (t != null)
@@ -111,9 +111,9 @@ namespace sQzClient
             spMain.Opacity = 0.5;
             WPopup.s.ShowDialog(msg.ToString());
             spMain.Opacity = 1;
-            if (mNee.eStt < ExamineeA.eEXAMING)
-                mNee.eStt = ExamineeA.eEXAMING;
-            else if (mNee.eStt == ExamineeA.eSUBMITTING)
+            if (mNee.eStt < ExamStt.Examing)
+                mNee.eStt = ExamStt.Examing;
+            else if (mNee.eStt == ExamStt.Submitting)
                 Submit();
         }
 
@@ -142,7 +142,7 @@ namespace sQzClient
             int nAns = 4;//hardcode
             int i = 0, n = mQSh.vQuest.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
-            mNee.mAnsSh.Init(mQSh, mNee.uId);
+            mNee.mAnsSh.Init(mQSh.uId);
             mNee.mAnsSh.InitView(mQSh, qaWh, null);
             mNee.mAnsSh.bChanged = false;
             //top line
@@ -308,7 +308,7 @@ namespace sQzClient
             bRunning = false;
             DisableAll();
             mState = NetCode.Submiting;
-            mNee.eStt = ExamineeA.eSUBMITTING;
+            mNee.eStt = ExamStt.Submitting;
             mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             mClnt.ConnectWR(ref mCbMsg);
         }

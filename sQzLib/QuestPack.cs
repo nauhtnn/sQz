@@ -9,6 +9,7 @@ namespace sQzLib
 {
     public class QuestPack
     {
+        public int mLv;
         public Dictionary<int, QuestSheet> vSheet;
         public QuestPack()
         {
@@ -91,7 +92,7 @@ namespace sQzLib
             if (reader != null)
             {
                 while (reader.Read())
-                    r.Add(reader.GetInt16(0) * reader.GetUInt16(1));
+                    r.Add(reader.GetInt32(0) * reader.GetUInt16(1));
                 reader.Close();
             }
             DBConnect.Close(ref conn);
@@ -111,7 +112,7 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public ushort DBCurQSId(uint slId, ExamLvl lv)
+        public static int DBCurQSId(uint slId, ExamLv lv)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)

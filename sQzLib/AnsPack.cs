@@ -9,10 +9,10 @@ namespace sQzLib
 {
     public class AnsPack
     {
-        public Dictionary<uint, AnsSheet> vSheet;
+        public Dictionary<int, AnsSheet> vSheet;
         public AnsPack()
         {
-            vSheet = new Dictionary<uint, AnsSheet>();
+            vSheet = new Dictionary<int, AnsSheet>();
         }
 
         public int GetByteCount()

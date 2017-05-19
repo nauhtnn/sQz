@@ -160,20 +160,20 @@ namespace sQzLib
                         continue;
                     v[0] = v[0].ToUpper();
                     if (v[0][0] == 'C' && v[0][1] == 'B')
-                        e.eLvl = ExamLvl.Basis;
+                        e.eLv = ExamLv.A;
                     else if (v[0][0] == 'N' && v[0][1] == 'C')
-                        e.eLvl = ExamLvl.Advance;
+                        e.eLv = ExamLv.B;
                     else
                         continue;
                     int uRId;
-                    if (!ushort.TryParse(v[0].Substring(2), out e.uId)
+                    if (!int.TryParse(v[0].Substring(2), out e.uId)
                         || !int.TryParse(v[1], out uRId) || !vRoom.ContainsKey(uRId))
                         continue;
                     e.uSlId = uId;
                     e.tName = v[2].Trim();
                     e.tBirdate = v[3];
                     e.tBirthplace = v[4].Trim();
-                    vRoom[uRId].vExaminee.Add(e.Lv * e.uId, e);
+                    vRoom[uRId].vExaminee.Add(e.mLv + e.uId, e);
                 }
             }
         }
@@ -202,8 +202,10 @@ namespace sQzLib
                     {
                         ExamineeS0 e = new ExamineeS0();
                         e.uSlId = uId;
-                        e.Lv = reader.GetInt16(0);
-                        e.uId = reader.GetUInt16(1);
+                        int lv;
+                        if (Enum.IsDefined(typeof(ExamLv), lv = reader.GetInt32(0)))
+                            e.eLv = (ExamLv)lv;
+                        e.uId = reader.GetInt32(1);
                         e.tName = reader.GetString(2);
                         e.tBirdate = reader.GetDateTime(3).ToString(FORM_R);
                         e.tBirthplace = reader.GetString(4);
@@ -213,16 +215,16 @@ namespace sQzLib
                             DateTime.Parse(reader.GetString(6));
                         if (!reader.IsDBNull(7))
                         {
-                            e.eStt = ExamineeA.eFINISHED;
-                            e.uGrade = reader.GetUInt16(7);
+                            e.eStt = ExamStt.Finished;
+                            e.uGrade = reader.GetInt32(7);
                         }
                         else
-                            e.eStt = ExamineeA.eINFO;
+                            e.eStt = ExamStt.Info;
                         if (!reader.IsDBNull(8))
                             e.tComp = reader.GetString(8);
                         else
                             e.tComp = "unknown";//todo
-                        r.vExaminee.Add(e.Lv * e.uId, e);
+                        r.vExaminee.Add(e.mLv + e.uId, e);
                     }
                     reader.Close();
                 }
@@ -250,7 +252,7 @@ namespace sQzLib
                     ExamineeA o;
                     bool unfound = true;
                     foreach (ExamRoom i in vRoom.Values)
-                        if (i.uId != rId && i.vExaminee.TryGetValue(e.Lv * e.uId, out o))
+                        if (i.uId != rId && i.vExaminee.TryGetValue(e.mLv + e.uId, out o))
                         {
                             unfound = false;
                             //o.bFromC = false;
