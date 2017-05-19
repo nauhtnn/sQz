@@ -112,8 +112,11 @@ namespace sQzClient
             btnExit.Content = t._[(int)TxI.EXIT];
         }
 
-        public bool ClntBufHndl(byte[] buf, int offs)
+        public bool ClntBufHndl(byte[] buf)
         {
+            int offs = 0;
+            NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
+            offs += 4;
             int l, errc;
             switch (mState)
             {
@@ -230,8 +233,9 @@ namespace sQzClient
             return false;
         }
 
-        public bool ClntBufPrep(ref byte[] outBuf)
+        public byte[] ClntBufPrep()
         {
+            byte[] outBuf;
             switch (mState)
             {
                 case NetCode.Dating:
@@ -245,8 +249,11 @@ namespace sQzClient
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 4, 2);
                     break;
+                default:
+                    outBuf = null;
+                    break;
             }
-            return true;
+            return outBuf;
         }
 
         private void btnExit_Click(object sender, RoutedEventArgs e)

@@ -325,12 +325,14 @@ namespace sQzClient
             spMain.Opacity = 1;
         }
 
-        public bool ClntBufHndl(byte[] buf, int offs)
+        public bool ClntBufHndl(byte[] buf)
         {
+            int offs = 0;
+            NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
+            offs += 4;
             switch (mState)
             {
                 case NetCode.Submiting:
-                    //ushort grade = BitConverter.ToUInt16(buf, offs);
                     int rs;
                     string msg = null;
                     int l = buf.Length - offs;
@@ -380,24 +382,19 @@ namespace sQzClient
             return false;
         }
 
-        public bool ClntBufPrep(ref byte[] outBuf)
+        public byte[] ClntBufPrep()
         {
+            byte[] outBuf;
             switch (mState)
             {
                 case NetCode.Submiting:
                     mNee.ToByte(out outBuf, (int)mState);
-                    //int sz = 4 + mNee.mAnsSh.GetByteCount();
-                    //int offs = 0;
-                    //outBuf = new byte[sz];
-                    //Buffer.BlockCopy(BitConverter.GetBytes((int)mState),
-                    //    0, outBuf, offs, 4);
-                    //offs += 4;
-                    //mNee.mAnsSh.ToByte(ref outBuf, ref offs);
                     break;
-                case NetCode.Resubmit://todo
+                default:
+                    outBuf = null;
                     break;
             }
-            return true;
+            return outBuf;
         }
 
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)

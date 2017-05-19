@@ -52,7 +52,7 @@ namespace sQzServer1
 
             mState = NetCode.DateStudentRetriving;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, true);
-            mServer = new Server2(SrvrCodeHndl);
+            mServer = new Server2(SrvrBufHndl);
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
             bRunning = true;
@@ -151,8 +151,11 @@ namespace sQzServer1
             mServer.Stop(ref dummy);
         }
 
-        public bool SrvrCodeHndl(NetCode c, byte[] buf, int offs, ref byte[] outMsg)
+        public bool SrvrBufHndl(byte[] buf, out byte[] outMsg)
         {
+            int offs = 0;
+            NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
+            offs += 4;
             QuestSheet qs;
             int lvid;
             ExamineeA e;
@@ -160,9 +163,8 @@ namespace sQzServer1
             {
                 case NetCode.Dating:
                     outMsg = new byte[20];
-                    offs = 0;
                     ExamSlot.ToByteDt(outMsg, ref offs, mDt);
-                    break;
+                    return true;
                 case NetCode.Authenticating:
                     e = new ExamineeS1();
                     e.bFromC = true;
@@ -236,9 +238,9 @@ namespace sQzServer1
                         Buffer.BlockCopy(BitConverter.GetBytes(dt.Hour), 0, outMsg, offs, 4);
                         offs += 4;
                         Buffer.BlockCopy(BitConverter.GetBytes(dt.Minute), 0, outMsg, offs, 4);
-                        return false;//close
+                        break;
                     }
-                    break;
+                    return true;
                 case NetCode.ExamRetrieving:
                     int qshidx = BitConverter.ToUInt16(buf, offs);
                     if (qshidx == ushort.MaxValue)
@@ -265,8 +267,6 @@ namespace sQzServer1
                     }
                     break;
                 case NetCode.Submiting:
-                    //AnsSheet s = new AnsSheet();
-                    //s.ReadByte(buf, ref offs);
                     e = new ExamineeS1();
                     e.bFromC = true;
                     if (!e.ReadByte(buf, ref offs))
@@ -328,18 +328,22 @@ namespace sQzServer1
                     }
                     break;
                 default:
-                    return false;
+                    outMsg = null;
+                    break;
             }
-            return true;
+            return false;
         }
 
-        public bool ClntBufHndl(byte[] buf, int offs)
+        public bool ClntBufHndl(byte[] buf)
         {
+            int offs = 0;
+            NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
+            offs += 4;
             switch (mState)
             {
                 case NetCode.DateStudentRetriving:
                     if (ExamSlot.ReadByteDt(buf, ref offs, out mDt))
-                        return false;
+                        break;
                     mRoom.ReadByteS1(buf, ref offs);
                     Dispatcher.Invoke(() => {
                         if (mDt.Year != ExamSlot.INVALID)
@@ -420,20 +424,19 @@ namespace sQzServer1
                         }
                     });
                     mState = NetCode.QuestRetrieving;
-                    break;
+                    return true;
                 case NetCode.QuestRetrieving:
-                    offs = 0;
                     mQPack = new QuestPack();
                     mQPack.ReadByte(buf, ref offs);
                     mQShIdx = -1;
                     mQShMaxIdx = mQPack.vSheet.Keys.Count - 1;
                     ShowQuest();
                     mState = NetCode.AnsKeyRetrieving;
-                    break;
+                    return true;
                 case NetCode.AnsKeyRetrieving:
                     mKeyPack = new AnsPack();
                     mKeyPack.ReadByte(buf, ref offs);
-                    return false;
+                    break;
                 case NetCode.RequestQuestSheet:
                     bool rs = BitConverter.ToBoolean(buf, offs++);
                     if(rs)
@@ -447,13 +450,13 @@ namespace sQzServer1
                     btnStartSrvr_Click(null, null);
                     bQShReqting = false;
                     mState = NetCode.Unknown;
-                    return false;
+                    break;
                 case NetCode.SrvrSubmitting:
                     if (buf.Length - offs == 4 && BitConverter.ToInt32(buf, offs) == 1)
                         mCbMsg += Txt.s._[(int)TxI.SRVR_SUBMT_OK];
-                    return false;
+                    break;
             }
-            return true;
+            return false;
         }
 
         private void cbxLock_Unchecked(object sender, RoutedEventArgs e)
@@ -468,37 +471,38 @@ namespace sQzServer1
             }
         }
 
-        public bool ClntBufPrep(ref byte[] outBuf)
+        public byte[] ClntBufPrep()
         {
+            byte[] outMsg = null;
             switch (mState)
             {
                 case NetCode.DateStudentRetriving:
-                    outBuf = new byte[8];
-                    Array.Copy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
+                    outMsg = new byte[8];
+                    Array.Copy(BitConverter.GetBytes((int)mState), 0, outMsg, 0, 4);
                     if(bAllNee)
-                        Array.Copy(BitConverter.GetBytes(0), 0, outBuf, 4, 4);
+                        Array.Copy(BitConverter.GetBytes(0), 0, outMsg, 4, 4);
                     else
-                        Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, outBuf, 4, 4);
+                        Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, outMsg, 4, 4);
                     break;
                 case NetCode.QuestRetrieving:
-                    outBuf = BitConverter.GetBytes((int)mState);
+                    outMsg = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.AnsKeyRetrieving:
-                    outBuf = BitConverter.GetBytes((int)mState);
+                    outMsg = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.RequestQuestSheet:
-                    outBuf = new byte[8];
-                    Array.Copy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
-                    Array.Copy(BitConverter.GetBytes(uReqQSh), 0, outBuf, 4, 4);
+                    outMsg = new byte[8];
+                    Array.Copy(BitConverter.GetBytes((int)mState), 0, outMsg, 0, 4);
+                    Array.Copy(BitConverter.GetBytes(uReqQSh), 0, outMsg, 4, 4);
                     break;
                 case NetCode.SrvrSubmitting:
                     byte[] prefx = new byte[8];
                     Array.Copy(BitConverter.GetBytes((int)mState), prefx, 4);
                     Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, prefx, 4, 4);
-                    mRoom.ToByteS0(prefx, out outBuf);
+                    mRoom.ToByteS0(prefx, out outMsg);
                     break;
             }
-            return true;
+            return outMsg;
         }
 
         private void ShowQuest() //same as Operation0.xaml

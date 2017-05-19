@@ -11,28 +11,25 @@ namespace sQzLib
         AnsKeyRetrieving,
         RequestQuestSheet,
         SrvrSubmitting,
-        SrvrSubmitted,
         Dating,
         Authenticating,
         ExamRetrieving,
         Submiting,
-        Submitted,
-        Resubmit,
         Unknown
     }
 
-    public delegate bool DgClntBufHndl(byte[] buf, int offs);
-    public delegate bool DgClntBufPrep(ref byte[] outBuf);
+    public delegate bool DgClntBufHndl(byte[] buf);
+    public delegate byte[] DgClntBufPrep();
 
     public class Client2
     {
         string mSrvrAddr;
         int mSrvrPort;
-        TcpClient mClient = null;
+        TcpClient mTcpClnt = null;
         DgClntBufHndl dgBufHndl;
         DgClntBufPrep dgBufPrep;
         bool bRW;
-        bool bAllMsg;
+        bool bCbMsg;
 
         public Client2(DgClntBufHndl hndl, DgClntBufPrep prep, bool allMsg)
         {
@@ -49,7 +46,7 @@ namespace sQzLib
             dgBufHndl = hndl;
             dgBufPrep = prep;
             bRW = false;
-            bAllMsg = allMsg;
+            bCbMsg = allMsg;
         }
 
         public string SrvrAddr { set { mSrvrAddr = value; } }
@@ -68,60 +65,47 @@ namespace sQzLib
 
         public bool ConnectWR(ref UICbMsg cbMsg)
         {
-            if (mClient != null)
+            if (mTcpClnt != null)
                 return false;
-            bool ok = true;
-            mClient = new TcpClient(AddressFamily.InterNetwork);
-            bRW = true;
+            mTcpClnt = new TcpClient(AddressFamily.InterNetwork);
+            bool bConn = true;//srvr side
+            bRW = true;//clnt side
             try {
-                mClient.Connect(mSrvrAddr, mSrvrPort);
+                mTcpClnt.Connect(mSrvrAddr, mSrvrPort);
             } catch (SocketException e) {
                 if (ErrCode2Msg(e.ErrorCode, ref cbMsg))
                     cbMsg += "\nEx: " + e.Message;
-                ok = false;
+                bConn = false;
             }
             NetworkStream stream = null;
-            if(ok)
-                try { stream = mClient.GetStream(); }
-                catch (SocketException e) {
-                    if(ErrCode2Msg(e.ErrorCode, ref cbMsg))
-                        cbMsg += "\nEx: " + e.Message;
-                    ok = false;
-                }
+            if(bConn)
+                stream = mTcpClnt.GetStream();
 
             byte[] buf = new byte[1024 * 1024];
 
-            while (ok && bRW)
+            while (bConn && bRW)
             {
                 //write message to server
-                byte[] msg = null;
-                byte[] msg2 = null;//todo
-                bRW = dgBufPrep(ref msg);
+                byte[] msg = dgBufPrep();
+                if (msg == null)
+                    break;
 
-                if (!bRW || msg == null || msg.Length < sizeof(int))
-                {
-                    bRW = false;
+                try {
+                    stream.Write(BitConverter.GetBytes(msg.Length), 0, 4);
+                    stream.Write(msg, 0, msg.Length);
+                }
+                catch (System.IO.IOException e) {
+                    cbMsg += "\nEx: " + e.Message;
+                    bConn = false;
                     break;
                 }
 
-                msg2 = new byte[4 + msg.Length];
-                Buffer.BlockCopy(BitConverter.GetBytes(msg.Length), 0, msg2, 0, 4);//to optmz
-                Buffer.BlockCopy(msg, 0, msg2, 4, msg.Length);
-
-                try { stream.Write(msg2, 0, msg2.Length); }
-                catch(System.IO.IOException e)
-                {
-                    cbMsg += "\nEx: " + e.Message;
-                    ok = false;
-                }
-
-                if (!ok || !bRW)
+                if (!bRW)
                     break;
 
                 //read message from server
                 List<byte[]> vRecvMsg = new List<byte[]>();
-                byte[] recvMsg = null;
-                int nByte = 0, nnByte = 0, nExpByte = 0;
+                int nExpByte, nByte, nnByte = 0;
 
                 //Incoming message may be larger than the buffer size.
                 //Do not rely on stream.DataAvailable, because the response
@@ -133,7 +117,7 @@ namespace sQzLib
                 } catch (System.IO.IOException e) {
                     cbMsg += "\nEx: " + e.Message;
                     nnByte = nByte = 0;
-                    ok = false;
+                    bConn = false;
                 }
                 if (4 < nByte)
                 {
@@ -145,8 +129,11 @@ namespace sQzLib
                     vRecvMsg.Add(x);
                 }
                 else
-                    break;//todo
-                while (ok && nnByte < nExpByte)
+                {
+                    bConn = false;
+                    break;
+                }
+                while (bConn && bRW && nnByte < nExpByte)
                 {
                     try
                     {
@@ -155,48 +142,41 @@ namespace sQzLib
                     catch (System.IO.IOException e)
                     {
                         cbMsg += "\nEx: " + e.Message;
-                        ok = false;
+                        bConn = false;
                     }
-                    if (ok && 0 < nByte)
+                    if (bConn && 0 < nByte)
                     {
                         byte[] x = new byte[nByte];//use new buf
                         Buffer.BlockCopy(buf, 0, x, 0, nByte);
                         vRecvMsg.Add(x);
                     }
                 }
-                if (0 < vRecvMsg.Count)
+
+                byte[] recvMsg = null;
+                if (bConn && bRW && 0 < vRecvMsg.Count)
                 {
                     recvMsg = new byte[nnByte];
                     int offs = 0;
-                    for (int i = 0; i < vRecvMsg.Count; ++i)
+                    foreach(byte[] i in vRecvMsg)
                     {
-                        Buffer.BlockCopy(vRecvMsg[i], 0, recvMsg, offs, vRecvMsg[i].Length);
-                        offs += vRecvMsg[i].Length;
+                        Buffer.BlockCopy(i, 0, recvMsg, offs, i.Length);
+                        offs += i.Length;
                     }
                 }
 
-                if (ok && recvMsg != null && 0 < recvMsg.Length)
-                {
-                    //NetCode c = (NetCode)BitConverter.ToInt32(recvMsg, 0);
-                    //if (c == NetCode.ToClose)
-                    //    bRW = false;
-                    //else
-                        bRW = dgBufHndl(recvMsg, 0);
-                }
+                if (bRW && recvMsg != null && 0 < recvMsg.Length)
+                    bRW = dgBufHndl(recvMsg);
             }
-            bRW = false;
-            mClient.Close();
-            if(bAllMsg)
+            if (bCbMsg)
                 cbMsg += Txt.s._[(int)TxI.CONN_CLNT_CE];
-            mClient = null;
-            return ok;
+            mTcpClnt.Close();
+            mTcpClnt = null;
+            return bConn;
         }
 
         public void Close()
         {
-            //todo
-            //if (mClient != null && mClient.Connected)
-            //    mClient.Close();
+            bRW = false;
         }
     }
 }

@@ -38,7 +38,7 @@ namespace sQzServer0
         {
             InitializeComponent();
             ShowsNavigationUI = false;
-            mServer = new Server2(SrvrCodeHndl);
+            mServer = new Server2(SrvrBufHndl);
             mCbMsg = new UICbMsg();
             vGrade = new Dictionary<int, TextBlock>();
             vDt1 = new Dictionary<int, TextBlock>();
@@ -351,15 +351,20 @@ namespace sQzServer0
             Window.GetWindow(this).Close();
         }
 
-        public bool SrvrCodeHndl(NetCode c, byte[] buf, int offs, ref byte[] outMsg)
+        public bool SrvrBufHndl(byte[] buf, out byte[] outMsg)
         {
+            int offs = 0;
+            NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
+            offs += 4;
             switch (c)
             {
                 case NetCode.DateStudentRetriving:
                     int sz = 0;
-                    if (mSl.uId == uint.MaxValue ||
-                        buf.Length - offs < 4)
-                        return false;
+                    if (buf.Length - offs < 4)
+                    {
+                        outMsg = null;
+                        break;
+                    }
                     int rId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
                     sz += mSl.GetByteCountDt();
@@ -374,15 +379,15 @@ namespace sQzServer0
                         Buffer.BlockCopy(i, 0, outMsg, sz, i.Length);
                         sz += i.Length;
                     }
-                    break;
+                    return true;
                 case NetCode.QuestRetrieving:
                     outMsg = mQPack.ToByte();
-                    break;
+                    return true;
                 case NetCode.AnsKeyRetrieving:
                     outMsg = new byte[mKeyPack.GetByteCount()];
                     offs = 0;
                     mKeyPack.ToByte(ref outMsg, ref offs);
-                    return false;
+                    break;
                 case NetCode.RequestQuestSheet:
                     if (buf.Length - offs == 4)
                     {
@@ -416,7 +421,7 @@ namespace sQzServer0
                     }
                     else
                         outMsg = BitConverter.GetBytes(false);
-                    return false;
+                    break;
                 case NetCode.SrvrSubmitting:
                     mSl.ReadByteNee(buf, ref offs);
                     mSl.DBUpdateRs();
@@ -425,10 +430,10 @@ namespace sQzServer0
                     mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
                     break;
                 default:
-                    outMsg = BitConverter.GetBytes((int)NetCode.Unknown);
+                    outMsg = null;
                     break;
             }
-            return true;
+            return false;
         }
 
         public void InitQPanel()
