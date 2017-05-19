@@ -462,21 +462,41 @@ namespace sQzServer0
 
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
         {
-            bool bas = true, adv = false;//todo
             int n = 0, i;
-            for(int j = 1; j < 7; ++j)
+            bool bG = true;
+            if(rdoB.IsChecked.HasValue? rdoB.IsChecked.Value : false)
             {
-                TextBox t = FindName("tbxIU" + j) as TextBox;
-                if (t != null && int.TryParse(t.Text, out i) && 0 < i)
-                    n += i;
+                for (int j = 1; j < 7; ++j)
+                {
+                    TextBox t = FindName("tbxIU" + j) as TextBox;
+                    if (t != null && int.TryParse(t.Text, out i) && 0 < i)
+                        n += i;
+                    else
+                        bG = false;
+                }
+                tbxNq.Text = n.ToString();
+                if (bG && n == 30)
+                    btnQSGen.IsEnabled = true;
                 else
-                    bas = false;
+                    btnQSGen.IsEnabled = false;
             }
-            tbxNq.Text = n.ToString();
-            if ((!bas && !adv) || n != 30)
-                btnQSGen.IsEnabled = false;
             else
-                btnQSGen.IsEnabled = true;
+            {
+                for (int j = 7; j < 10; ++j)
+                {
+                    TextBox t = FindName("tbxIU" + j) as TextBox;
+                    if (t != null && int.TryParse(t.Text, out i) && 0 < i)
+                        n += i;
+                    else
+                        bG = false;
+                }
+
+                tbxNq.Text = n.ToString();
+                if (bG && n == 30)
+                    btnQSGen.IsEnabled = true;
+                else
+                    btnQSGen.IsEnabled = false;
+            }
         }
 
         private void LoadTxt()
@@ -497,36 +517,9 @@ namespace sQzServer0
             txtGrade.Text = t._[(int)TxI.MARK];
         }
 
-        private void rdoB_Checked(object sender, RoutedEventArgs e)
+        private void rdo_Checked(object sender, RoutedEventArgs e)
         {
-            for(int i = 1; i < 7; ++i)
-            {
-                TextBox t = FindName("tbxIU" + i) as TextBox;
-                if(t != null)
-                    t.IsEnabled = true;
-            }
-            for (int i = 7; i < 10; ++i)
-            {
-                TextBox t = FindName("tbxIU" + i) as TextBox;
-                if (t != null)
-                    t.IsEnabled = false;
-            }
-        }
-
-        private void rdoA_Checked(object sender, RoutedEventArgs e)
-        {
-            for (int i = 1; i < 7; ++i)
-            {
-                TextBox t = FindName("tbxIU" + i) as TextBox;
-                if (t != null)
-                    t.IsEnabled = false;
-            }
-            for (int i = 7; i < 10; ++i)
-            {
-                TextBox t = FindName("tbxIU" + i) as TextBox;
-                if (t != null)
-                    t.IsEnabled = true;
-            }
+            tbxIU_TextChanged(null, null);
         }
     }
 }

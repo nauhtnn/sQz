@@ -84,10 +84,6 @@
                     <RowDefinition Height="30"/>
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
-                <RadioButton Content="Basic" GroupName="IU" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"
-                             x:Name="rdoB" Checked="rdoB_Checked"/>
-                <RadioButton Content="Advance" GroupName="IU" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
-                             x:Name="rdoA" Checked="rdoA_Checked"/>
                 <TextBlock x:Name="txtNqs" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
                 <TextBox x:Name="tbxNqs" Grid.Row="1" Width="30" Grid.Column="1" Margin="5"/>
                 <Button x:Name="btnQSGen" Grid.Row="1" Grid.Column="2" Click="btnQSGen_Click" IsEnabled="False"/>
@@ -123,6 +119,10 @@
                 <TextBox x:Name="tbxIU14" Width="30" Grid.Row="9" Grid.Column="1" Margin="5" IsEnabled="False"/>
                 <TextBlock Text="module 15" Grid.Row="9" Grid.Column="2" Margin="5" />
                 <TextBox x:Name="tbxIU15" Width="30" Grid.Row="9" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                <RadioButton Content="Basic" GroupName="IU" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"
+                             x:Name="rdoB" Checked="rdo_Checked" />
+                <RadioButton Content="Advance" GroupName="IU" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                             x:Name="rdoA" Checked="rdo_Checked"/>
             </Grid>
             <TabControl x:Name="tbcQuest" Width="400" Height="320"/>
         </StackPanel>
