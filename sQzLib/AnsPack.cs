@@ -24,18 +24,39 @@ namespace sQzLib
         }
 
         //only Operation0 uses this.
-        public bool ToByte(ref byte[] buf, ref int offs)
+        public bool ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
         {
             int l = buf.Length - offs;
             if (l < 4)
                 return true;
-            Buffer.BlockCopy(BitConverter.GetBytes(vSheet.Values.Count), 0, buf, offs, 4);//opt?
+            Buffer.BlockCopy(BitConverter.GetBytes(vSheet.Values.Count), 0, buf, offs, 4);
             offs += 4;
             //l -= 4;
             foreach (AnsSheet i in vSheet.Values)
                 i.ToByte(ref buf, ref offs);
             l = buf.Length - offs;
             return false;
+        }
+
+        public byte[] ToByte()
+        {
+            List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(vSheet.Values.Count));
+            foreach (AnsSheet i in vSheet.Values)
+                l.Add(i.ToByte());
+            int sz = 0;
+            foreach (byte[] x in l)
+                sz += x.Length;
+            if (sz == 0)
+                return null;
+            byte[] buf = new byte[sz];
+            int offs = 0;
+            foreach(byte[] x in l)
+            {
+                Array.Copy(x, 0, buf, offs, x.Length);
+                offs += x.Length;
+            }
+            return buf;
         }
 
         //only Operation0 uses this.

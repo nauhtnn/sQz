@@ -14,8 +14,6 @@ namespace sQzLib
         public ListBox[] vlbxAns;
         public AnsItem[][] vAnsItem;
         public byte[] aAns;
-        public ExamLv eLv;
-        public int mLv { get { return (int)eLv; } }
         public int uQSId;
         public bool bChanged;
         DgEvntCB dgSelChgCB;
@@ -23,7 +21,7 @@ namespace sQzLib
         public AnsSheet() {
             bChanged = false;
             aAns = null;
-            uQSId = ushort.MaxValue;
+            uQSId = 0;
             dgSelChgCB = null;
         }
 
@@ -76,21 +74,27 @@ namespace sQzLib
 
         public int GetByteCount()
         {
-            return 12 + aAns.Length;
+            return 4 + LEN;
         }
 
-        public void ToByte(ref byte[] buf, ref int offs)
+        public void ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
         {
             Buffer.BlockCopy(BitConverter.GetBytes(uQSId),
                         0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes(mLv),
+            Buffer.BlockCopy(aAns, 0, buf, offs, LEN);
+            offs += LEN;
+        }
+
+        public byte[] ToByte()
+        {
+            byte[] buf = new byte[8 + LEN];
+            int offs = 0;
+            Buffer.BlockCopy(BitConverter.GetBytes(uQSId),
                         0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes(aAns.Length), 0, buf, offs, 4);
-            offs += 4;
-            Buffer.BlockCopy(aAns, 0, buf, offs, aAns.Length);
-            offs += aAns.Length;
+            Buffer.BlockCopy(aAns, 0, buf, offs, LEN);
+            return buf;
         }
 
         public bool ReadByte(byte[] buf, ref int offs)
@@ -101,23 +105,11 @@ namespace sQzLib
             uQSId = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
-            if (l < 4)
+            if (l < LEN)
                 return true;
-            int x;
-            if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                eLv = (ExamLv)x;
-            offs += 4;
-            l -= 4;
-            if (l < 4)
-                return true;
-            int sz = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            l -= 4;
-            if (l < sz)
-                return true;
-            aAns = new byte[sz];
-            Buffer.BlockCopy(buf, offs, aAns, 0, sz);
-            offs += sz;
+            aAns = new byte[LEN];
+            Buffer.BlockCopy(buf, offs, aAns, 0, LEN);
+            offs += LEN;
             return false;
         }
 

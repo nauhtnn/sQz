@@ -232,7 +232,7 @@ namespace sQzServer0
                     }
                     return true;
                 case NetCode.QuestRetrieving:
-                    outMsg = null;//todo mQPack.ToByte();
+                    outMsg = mSl.ToByteQPack();
                     return true;
                 case NetCode.AnsKeyRetrieving:
                     outMsg = null; //todo new byte[mKeyPack.GetByteCount()];

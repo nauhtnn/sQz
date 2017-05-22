@@ -405,5 +405,66 @@ namespace sQzLib
             mKeyPack.ExtractKey(l);
             return false;
         }
+
+        public byte[] ToByteQPack()
+        {
+            List<byte[]> l = new List<byte[]>();
+            foreach (QuestPack p in vQPack.Values)
+            {
+                l.Add(BitConverter.GetBytes((int)p.eLv));
+                l.Add(BitConverter.GetBytes(p.vSheet.Count));
+                l.Add(p.ToByte());
+            }
+            int sz = 0;
+            foreach (byte[] x in l)
+                sz += x.Length;
+            byte[] rval = new byte[sz];
+            int offs = 0;
+            foreach(byte[] x in l)
+            {
+                Array.Copy(x, 0, rval, offs, x.Length);
+                offs += x.Length;
+            }
+            return rval;
+        }
+
+        public bool ReadByteQPack(byte[] buf, ref int offs)
+        {
+            int l = buf.Length - offs;
+
+            if (l < 4)
+                return true;
+
+            while(0 < l)
+            {
+                int x;
+                ExamLv lv;
+                if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
+                    lv = (ExamLv)x;
+                else
+                    return true;
+                l -= 4;
+                offs += 4;
+                if (l < 4)
+                    return true;
+                x = BitConverter.ToInt32(buf, offs);
+                l -= 4;
+                offs += 4;
+                while (0 < x)
+                {
+                    --x;
+                    QuestSheet qs = new QuestSheet();
+                    if (qs.ReadByte(buf, ref offs))
+                        return true;
+                    vQPack[lv].vSheet.Add(qs.uId, qs);
+                }
+            }
+            return false;
+        }
+
+        public byte[] ToByteKey()
+        {
+            return mKeyPack.ToByte();
+        }
     }
 }
