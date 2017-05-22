@@ -26,13 +26,6 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         ExamSlot mSl;
-        Dictionary<int, TextBlock> vGrade;
-        Dictionary<int, TextBlock> vDt1;
-        Dictionary<int, TextBlock> vDt2;
-        Dictionary<int, TextBlock> vComp;
-        Dictionary<int, QuestPack> vQPack;
-        Dictionary<int, AnsPack> vKeyPack;
-        Dictionary<int, int> vuQSId;
 
         public Operation0()
         {
@@ -40,14 +33,7 @@ namespace sQzServer0
             ShowsNavigationUI = false;
             mServer = new Server2(SrvrBufHndl);
             mCbMsg = new UICbMsg();
-            vGrade = new Dictionary<int, TextBlock>();
-            vDt1 = new Dictionary<int, TextBlock>();
-            vDt2 = new Dictionary<int, TextBlock>();
-            vComp = new Dictionary<int, TextBlock>();
-            vQPack = new Dictionary<int, QuestPack>();
-            vKeyPack = new Dictionary<int, AnsPack>();
             mSl = new ExamSlot();
-            vuQSId = new Dictionary<int, int>();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -72,7 +58,8 @@ namespace sQzServer0
             {
                 ExamSlot.Parse(i.Content as string, ExamSlot.FORM_H, out mSl.mDt);
                 mSl.DBSelectNee();
-                LoadExaminees();
+                mSl.LoadExaminees(gNee);
+                QuestSheet.DBUpdateCurQSId(mSl.uId);
             }
             else
                 mSl.uId = uint.MaxValue;
@@ -103,113 +90,6 @@ namespace sQzServer0
             }
         }
 
-        private void LoadExaminees() //same as Prep0.xaml
-        {
-            Dispatcher.Invoke(() => {
-                Color c = new Color();
-                c.A = 0xff;
-                c.B = c.G = c.R = 0xf0;
-                bool dark = false;
-                int rid = -1;
-                vGrade.Clear();
-                vDt1.Clear();
-                vDt2.Clear();
-                vComp.Clear();
-                gNee.Children.Clear();
-                foreach(ExamRoom r in mSl.vRoom.Values)
-                    foreach (ExamineeA e in r.vExaminee.Values)
-                    {
-                        rid++;
-                        RowDefinition rd = new RowDefinition();
-                        rd.Height = new GridLength(20);
-                        gNee.RowDefinitions.Add(rd);
-                        TextBlock t = new TextBlock();
-                        t.Text = e.tId;
-                        if (dark)
-                            t.Background = new SolidColorBrush(c);
-                        Grid.SetRow(t, rid);
-                        gNee.Children.Add(t);
-                        t = new TextBlock();
-                        t.Text = e.tName;
-                        if (dark)
-                            t.Background = new SolidColorBrush(c);
-                        Grid.SetRow(t, rid);
-                        Grid.SetColumn(t, 1);
-                        gNee.Children.Add(t);
-                        t = new TextBlock();
-                        t.Text = e.tBirdate;
-                        if (dark)
-                            t.Background = new SolidColorBrush(c);
-                        Grid.SetRow(t, rid);
-                        Grid.SetColumn(t, 2);
-                        gNee.Children.Add(t);
-                        t = new TextBlock();
-                        t.Text = e.tBirthplace;
-                        if (dark)
-                            t.Background = new SolidColorBrush(c);
-                        Grid.SetRow(t, rid);
-                        Grid.SetColumn(t, 3);
-                        gNee.Children.Add(t);
-                        t = new TextBlock();
-                        if (dark)
-                            t.Background = new SolidColorBrush(c);
-                        vGrade.Add(e.mLv + e.uId, t);
-                        if(e.uGrade != ushort.MaxValue)
-                            t.Text = e.uGrade.ToString();
-                        Grid.SetRow(t, rid);
-                        Grid.SetColumn(t, 4);
-                        gNee.Children.Add(t);
-                        t = new TextBlock();
-                        if (dark)
-                            t.Background = new SolidColorBrush(c);
-                        vDt1.Add(e.mLv + e.uId, t);
-                        if (e.dtTim1.Year != ExamSlot.INVALID)
-                            t.Text = e.dtTim1.ToString("HH:mm");
-                        Grid.SetRow(t, rid);
-                        Grid.SetColumn(t, 5);
-                        gNee.Children.Add(t);
-                        t = new TextBlock();
-                        if (dark)
-                            t.Background = new SolidColorBrush(c);
-                        vDt2.Add(e.mLv + e.uId, t);
-                        if (e.dtTim2.Year != ExamSlot.INVALID)
-                            t.Text = e.dtTim2.ToString("HH:mm");
-                        Grid.SetRow(t, rid);
-                        Grid.SetColumn(t, 6);
-                        gNee.Children.Add(t);
-                        t = new TextBlock();
-                        if (dark)
-                            t.Background = new SolidColorBrush(c);
-                        vComp.Add(e.mLv + e.uId, t);
-                        if (e.tComp != null)
-                            t.Text = e.tComp;
-                        Grid.SetRow(t, rid);
-                        Grid.SetColumn(t, 7);
-                        gNee.Children.Add(t);
-                        dark = !dark;
-                    }
-            });
-        }
-
-        private void UpdateRsView()
-        {
-            Dispatcher.Invoke(() => {
-                TextBlock t;
-                foreach(ExamRoom r in mSl.vRoom.Values)
-                    foreach (ExamineeA e in r.vExaminee.Values)
-                    {
-                        if(e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.mLv + e.uId, out t))
-                            t.Text = e.uGrade.ToString();
-                        if (e.dtTim1.Hour != ExamSlot.INVALID && vDt1.TryGetValue(e.mLv + e.uId, out t))
-                            t.Text = e.dtTim1.ToString("HH:mm");
-                        if (e.dtTim2.Hour != ExamSlot.INVALID && vDt2.TryGetValue(e.mLv + e.uId, out t))
-                            t.Text = e.dtTim2.ToString("HH:mm");
-                        if (e.tComp != null && vComp.TryGetValue(e.mLv + e.uId, out t))
-                            t.Text = e.tComp;
-                    }
-            });
-        }
-
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Window w = Window.GetWindow(this);
@@ -229,9 +109,6 @@ namespace sQzServer0
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
 
-            vuQSId.Add(-1, QuestPack.DBCurQSId(mSl.uId, ExamLv.A));
-            vuQSId.Add(1, QuestPack.DBCurQSId(mSl.uId, ExamLv.B));
-
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
             aTimer.Elapsed += UpdateSrvrMsg;
@@ -245,7 +122,7 @@ namespace sQzServer0
             th.Start();
         }
 
-        private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
+        private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
             if (bRunning && mCbMsg.ToUp())
                 Dispatcher.Invoke(() => {
@@ -259,34 +136,22 @@ namespace sQzServer0
 
         private void btnQSGen_Click(object sender, RoutedEventArgs e)
         {
-            if (mSl.uId == uint.MaxValue)
-                return;
 			TextBox t = FindName("tbxNqs") as TextBox;
             int n = int.Parse(t.Text);
-            List<QuestSheet> l = new List<QuestSheet>();
-            int i;
-            if (rdoB.IsChecked.HasValue ? rdoB.IsChecked.Value : false)
-                i = 0;
+            ExamLv lv;
+            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+                lv = ExamLv.A;
             else
-                i = 1;
-			while(0 < n) {
-                QuestSheet qs = new QuestSheet();
-                foreach (int j in QuestSheet.GetIUId(i))
-                {
-                    t = FindName("tbxIU" + j) as TextBox;
-                    if (t != null)
-                        qs.DBSelect((IUxx)j, int.Parse(t.Text));
-                }
-                if (0 < qs.vQuest.Count)
-                {
-                    qs.uId = (ushort) ++vuQSId[i];
-                    vQPack[i].vSheet.Add(qs.uId, qs);
-                    l.Add(qs);
-                }
-                --n;
+                lv = ExamLv.B;
+            List<int> vn = new List<int>();
+            foreach (IUxx i in QuestSheet.GetIUs(lv))
+            {
+                t = FindName(i.ToString()) as TextBox;
+                if (t != null)
+                    vn.Add(int.Parse(t.Text));
             }
-            vKeyPack[i].ExtractKey(vQPack[i]);
-            vQPack[i].DBIns(mSl.uId, l);
+            mSl.GenQPack(n, lv, vn.ToArray());
+            
             ShowQuest();
         }
 
@@ -298,10 +163,10 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
 				tbcQuest.Items.Clear();
-                foreach(QuestPack p in vQPack.Values)
+                foreach(QuestPack p in mSl.vQPack.Values)
 				    foreach(QuestSheet qs in p.vSheet.Values) {
 					    TabItem ti = new TabItem();
-					    ti.Header = qs.uId * p.mLv;
+					    ti.Header = qs.eLv.ToString() + qs.uId;
                         ScrollViewer svwr = new ScrollViewer();
                         svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
 					    StackPanel sp = new StackPanel();
@@ -411,7 +276,7 @@ namespace sQzServer0
                 case NetCode.SrvrSubmitting:
                     mSl.ReadByteNee(buf, ref offs);
                     mSl.DBUpdateRs();
-                    UpdateRsView();
+                    mSl.UpdateRsView();
                     outMsg = BitConverter.GetBytes(1);
                     mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
                     break;
@@ -424,15 +289,14 @@ namespace sQzServer0
 
         public void InitQPanel()
         {
-            for(int i = 1; i < 16; ++i)
+            foreach(IUxx i in QuestSheet.GetAllIUs())
             {
-                TextBox t = FindName("tbxIU" + i) as TextBox;
+                TextBox t = FindName(i.ToString()) as TextBox;
                 if(t != null)
                 {
                     t.MaxLength = 2;
                     t.PreviewKeyDown += tbxIU_PrevwKeyDown;
                     t.TextChanged += tbxIU_TextChanged;
-                    
                 }
             }
             tbxNqs.MaxLength = 2;
@@ -459,11 +323,11 @@ namespace sQzServer0
             }
             int n = 0, i;
             bool bG = true;
-            if (rdoB.IsChecked.HasValue? rdoB.IsChecked.Value : false)
+            if (rdoA.IsChecked.HasValue? rdoA.IsChecked.Value : false)
             {
-                foreach(int j in QuestSheet.GetIUId(-1))
+                foreach(IUxx j in QuestSheet.GetIUs(ExamLv.A))
                 {
-                    t = FindName("tbxIU" + j) as TextBox;
+                    t = FindName(j.ToString()) as TextBox;
                     if (t != null && t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
                         n += i;
                     else
@@ -477,9 +341,9 @@ namespace sQzServer0
             }
             else
             {
-                foreach (int j in QuestSheet.GetIUId(1))
+                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
                 {
-                    t = FindName("tbxIU" + j) as TextBox;
+                    t = FindName(j.ToString()) as TextBox;
                     if (t != null && t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
                         n += i;
                     else

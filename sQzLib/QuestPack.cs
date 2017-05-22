@@ -9,7 +9,8 @@ namespace sQzLib
 {
     public class QuestPack
     {
-        public int mLv;
+        public uint uSlId;
+        public ExamLv eLv;
         public Dictionary<int, QuestSheet> vSheet;
         public QuestPack()
         {
@@ -99,7 +100,31 @@ namespace sQzLib
             return r;
         }
 
-        public void DBIns(uint slId, List<QuestSheet> l)
+        public List<QuestSheet> GenQPack(int n, int[] vn)
+        {
+            List<QuestSheet> l = new List<QuestSheet>();
+            while (0 < n)
+            {
+                QuestSheet qs = new QuestSheet();
+                int j = -1;
+                foreach (IUxx i in QuestSheet.GetIUs(eLv))
+                    qs.DBSelect(i, vn[++j]);
+                if (0 < qs.vQuest.Count)
+                {
+                    qs.eLv = eLv;
+                    if(!qs.UpdateCurQSId())//todo: better error handle
+                    {
+                        vSheet.Add(qs.uId, qs);
+                        l.Add(qs);
+                    }
+                }
+                --n;
+            }
+            DBIns(uSlId, l);
+            return l;
+        }
+
+        public static void DBIns(uint slId, List<QuestSheet> l)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -110,17 +135,6 @@ namespace sQzLib
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             DBConnect.Ins(conn, "questsh", "slId,lv,id,vQuest", vals.ToString());//todo: catch exception
             DBConnect.Close(ref conn);
-        }
-
-        public static int DBCurQSId(uint slId, ExamLv lv)
-        {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return 0;
-            ushort id = (ushort)DBConnect.Max(conn, "questsh", "id",
-                    "slId=" + slId + " AND lv=" + (short)lv);
-            DBConnect.Close(ref conn);
-            return id;
         }
     }
 }

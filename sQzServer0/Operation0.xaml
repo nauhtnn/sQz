@@ -90,39 +90,39 @@
                 <TextBlock x:Name="txtNq" Grid.Row="2" Grid.Column="0" Margin="5" Height="25"/>
                 <TextBlock x:Name="tbxNq" Width="30" Grid.Row="2" Grid.Column="1" Margin="5"/>
                 <TextBlock Text="module 1" Grid.Row="2" Grid.Column="2" Margin="5" Height="25"/>
-                <TextBox x:Name="tbxIU1" Width="30" Grid.Row="2" Grid.Column="3" Margin="5"/>
+                <TextBox x:Name="IU01" Width="30" Grid.Row="2" Grid.Column="3" Margin="5"/>
                 <TextBlock Text="module 2" Grid.Row="3" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="tbxIU2" Width="30" Grid.Row="3" Grid.Column="1" Margin="5"/>
+                <TextBox x:Name="IU02" Width="30" Grid.Row="3" Grid.Column="1" Margin="5"/>
                 <TextBlock Text="module 3" Grid.Row="3" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="tbxIU3" Width="30" Grid.Row="3" Grid.Column="3" Margin="5"/>
+                <TextBox x:Name="IU03" Width="30" Grid.Row="3" Grid.Column="3" Margin="5"/>
                 <TextBlock Text="module 4" Grid.Row="4" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="tbxIU4" Width="30" Grid.Row="4" Grid.Column="1" Margin="5"/>
+                <TextBox x:Name="IU04" Width="30" Grid.Row="4" Grid.Column="1" Margin="5"/>
                 <TextBlock Text="module 5" Grid.Row="4" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="tbxIU5" Width="30" Grid.Row="4" Grid.Column="3" Margin="5"/>
+                <TextBox x:Name="IU05" Width="30" Grid.Row="4" Grid.Column="3" Margin="5"/>
                 <TextBlock Text="module 6" Grid.Row="5" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="tbxIU6" Width="30" Grid.Row="5" Grid.Column="1" Margin="5"/>
+                <TextBox x:Name="IU06" Width="30" Grid.Row="5" Grid.Column="1" Margin="5"/>
                 <TextBlock Text="module 7" Grid.Row="5" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="tbxIU7" Width="30" Grid.Row="5" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                <TextBox x:Name="IU07" Width="30" Grid.Row="5" Grid.Column="3" Margin="5" IsEnabled="False"/>
                 <TextBlock Text="module 8" Grid.Row="6" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="tbxIU8" Width="30" Grid.Row="6" Grid.Column="1" Margin="5" IsEnabled="False"/>
+                <TextBox x:Name="IU08" Width="30" Grid.Row="6" Grid.Column="1" Margin="5" IsEnabled="False"/>
                 <TextBlock Text="module 9" Grid.Row="6" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="tbxIU9" Width="30" Grid.Row="6" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                <TextBox x:Name="IU09" Width="30" Grid.Row="6" Grid.Column="3" Margin="5" IsEnabled="False"/>
                 <TextBlock Text="module 10" Grid.Row="7" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="tbxIU10" Width="30" Grid.Row="7" Grid.Column="1" Margin="5" IsEnabled="False"/>
+                <TextBox x:Name="IU10" Width="30" Grid.Row="7" Grid.Column="1" Margin="5" IsEnabled="False"/>
                 <TextBlock Text="module 11" Grid.Row="7" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="tbxIU11" Width="30" Grid.Row="7" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                <TextBox x:Name="IU11" Width="30" Grid.Row="7" Grid.Column="3" Margin="5" IsEnabled="False"/>
                 <TextBlock Text="module 12" Grid.Row="8" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="tbxIU12" Width="30" Grid.Row="8" Grid.Column="1" Margin="5" IsEnabled="False"/>
+                <TextBox x:Name="IU12" Width="30" Grid.Row="8" Grid.Column="1" Margin="5" IsEnabled="False"/>
                 <TextBlock Text="module 13" Grid.Row="8" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="tbxIU13" Width="30" Grid.Row="8" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                <TextBox x:Name="IU13" Width="30" Grid.Row="8" Grid.Column="3" Margin="5" IsEnabled="False"/>
                 <TextBlock Text="module 14" Grid.Row="9" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="tbxIU14" Width="30" Grid.Row="9" Grid.Column="1" Margin="5" IsEnabled="False"/>
+                <TextBox x:Name="IU14" Width="30" Grid.Row="9" Grid.Column="1" Margin="5" IsEnabled="False"/>
                 <TextBlock Text="module 15" Grid.Row="9" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="tbxIU15" Width="30" Grid.Row="9" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                <TextBox x:Name="IU15" Width="30" Grid.Row="9" Grid.Column="3" Margin="5" IsEnabled="False"/>
                 <RadioButton Content="Basic" GroupName="IU" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"
-                             x:Name="rdoB" Checked="rdo_Checked" />
+                             x:Name="rdoA" Checked="rdo_Checked" />
                 <RadioButton Content="Advance" GroupName="IU" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
-                             x:Name="rdoA" Checked="rdo_Checked"/>
+                             x:Name="rdoB" Checked="rdo_Checked"/>
             </Grid>
             <TabControl x:Name="tbcQuest" Width="400" Height="320"/>
         </StackPanel>

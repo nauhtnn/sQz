@@ -16,6 +16,8 @@ namespace sQzLib
     public class QuestSheet
     {
         public ExamLv eLv;
+        public static int guDBCurAId;
+        public static int guDBCurBId;
         public int uId;
         public List<Question> vQuest;
         public byte[] aQuest;
@@ -30,35 +32,60 @@ namespace sQzLib
             uId = 0;
         }
 
-        static int[] aB = null;
-        static int[] aA = null;
-        public static int[] GetIUId(int lv)
+        static IUxx[] gaA = null;
+        static IUxx[] gaB = null;
+        public static IUxx[] GetIUs(ExamLv lv)
         {
-            if(lv == -1 || lv == 0)
+            if(lv == ExamLv.A)
             {
-                if (aB == null)
+                if (gaA == null)
                 {
-                    aB = new int[6];
-                    aB[0] = 1;
-                    aB[1] = 2;
-                    aB[2] = 3;
-                    aB[3] = 4;
-                    aB[4] = 5;
-                    aB[5] = 6;
+                    gaA = new IUxx[6];
+                    gaA[0] = IUxx.IU01;
+                    gaA[1] = IUxx.IU02;
+                    gaA[2] = IUxx.IU03;
+                    gaA[3] = IUxx.IU04;
+                    gaA[4] = IUxx.IU05;
+                    gaA[5] = IUxx.IU06;
                 }
-                return aB;
+                return gaA;
             }
             else
             {
-                if (aA == null)
+                if (gaB == null)
                 {
-                    aA = new int[3];
-                    aA[0] = 7;
-                    aA[1] = 8;
-                    aA[2] = 10;
+                    gaB = new IUxx[3];
+                    gaB[0] = IUxx.IU07;
+                    gaB[1] = IUxx.IU08;
+                    gaB[2] = IUxx.IU10;
                 }
-                return aA;
+                return gaB;
             }
+        }
+
+        static IUxx[] gaAll = null;
+        public static IUxx[] GetAllIUs()
+        {
+            if(gaAll == null)
+            {
+                gaAll = new IUxx[15];
+                gaAll[0] = IUxx.IU01;
+                gaAll[1] = IUxx.IU02;
+                gaAll[2] = IUxx.IU03;
+                gaAll[3] = IUxx.IU04;
+                gaAll[4] = IUxx.IU05;
+                gaAll[5] = IUxx.IU06;
+                gaAll[6] = IUxx.IU07;
+                gaAll[7] = IUxx.IU08;
+                gaAll[8] = IUxx.IU09;
+                gaAll[9] = IUxx.IU10;
+                gaAll[10] = IUxx.IU11;
+                gaAll[11] = IUxx.IU12;
+                gaAll[12] = IUxx.IU13;
+                gaAll[13] = IUxx.IU14;
+                gaAll[14] = IUxx.IU15;
+            }
+            return gaAll;
         }
 
         //only Optimization0 uses this.
@@ -408,6 +435,47 @@ namespace sQzLib
                 }
             }
             return true;
+        }
+
+        public bool UpdateCurQSId()
+        {
+            if (eLv == ExamLv.A && -1 < guDBCurAId)
+            {
+                uId = ++guDBCurAId;
+                return false;
+            }
+            if (eLv == ExamLv.B && -1 < guDBCurBId)
+            {
+                uId = ++guDBCurBId;
+                return false;
+            }
+            return true;
+        }
+
+        public static bool DBUpdateCurQSId(uint slId)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return true;
+            int uid = DBConnect.MaxUShort(conn, "questsh", "id",
+                    "slId=" + slId + " AND lv=" + (int)ExamLv.A);
+            if (uid < 0)
+            {
+                DBConnect.Close(ref conn);
+                return true;
+            }
+            guDBCurAId = uid;
+
+            uid = DBConnect.MaxUShort(conn, "questsh", "id",
+                    "slId=" + slId + " AND lv=" + (int)ExamLv.B);
+            if (uid < 0)
+            {
+                DBConnect.Close(ref conn);
+                return true;
+            }
+            guDBCurBId = uid;
+
+            return false;
         }
     }
 }

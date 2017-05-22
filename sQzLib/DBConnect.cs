@@ -148,30 +148,38 @@ namespace sQzLib
         }
 
         //Max statement
-        public static int Max(MySqlConnection conn, string tb, string attb, string cond)
+        public static int MaxUShort(MySqlConnection conn, string tb, string attb, string cond)
         {
             string query = "SELECT MAX(" + attb + ") FROM " + tb + " WHERE " + cond;
-            int n;
+            int uShort;
 
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
-            catch (MySqlException) { n = 0; }
+            try {
+                var o = cmd.ExecuteScalar();
+                if (o == null)
+                    uShort = 0;
+                else if (o.ToString().Length == 0)
+                    uShort = 0;
+                else if (!int.TryParse(o.ToString(), out uShort))
+                    uShort = -1;
+            }
+            catch (MySqlException) { uShort = -1; }
 
-            return n;
+            return uShort;
         }
 
         //Min statement
-        public static int Min(MySqlConnection conn, string tb, string attb, string cond)
-        {
-            string query = "SELECT MIN(" + attb + ") FROM " + tb + " WHERE " + cond;
-            int n;
+        //public static int Min(MySqlConnection conn, string tb, string attb, string cond)
+        //{
+        //    string query = "SELECT MIN(" + attb + ") FROM " + tb + " WHERE " + cond;
+        //    int n;
 
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-            try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
-            catch (MySqlException) { n = 0; }
+        //    MySqlCommand cmd = new MySqlCommand(query, conn);
+        //    try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
+        //    catch (MySqlException) { n = 0; }
 
-            return n;
-        }
+        //    return n;
+        //}
 
         public static string mkQrySelect(string tb, string attbs, string cond,
             string gpAttbs)

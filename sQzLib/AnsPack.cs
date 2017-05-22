@@ -39,9 +39,9 @@ namespace sQzLib
         }
 
         //only Operation0 uses this.
-        public void ExtractKey(QuestPack p)
+        public void ExtractKey(List<QuestSheet> l)
         {
-            foreach(QuestSheet qs in p.vSheet.Values)
+            foreach(QuestSheet qs in l)
             {
                 AnsSheet i = new AnsSheet();
                 i.ExtractKey(qs);
