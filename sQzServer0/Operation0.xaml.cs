@@ -219,7 +219,7 @@ namespace sQzServer0
                     int rId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
                     sz += mSl.GetByteCountDt();
-                    List<byte[]> es = mSl.ToByteR(rId);
+                    List<byte[]> es = mSl.ToByteR1(rId);
                     foreach(byte[] i in es)
                         sz += i.Length;
                     outMsg = new byte[sz];
@@ -274,7 +274,7 @@ namespace sQzServer0
                         outMsg = BitConverter.GetBytes(false);
                     break;
                 case NetCode.SrvrSubmitting:
-                    mSl.ReadByteNee(buf, ref offs);
+                    mSl.ReadByteR0(buf, ref offs);
                     mSl.DBUpdateRs();
                     mSl.UpdateRsView();
                     outMsg = BitConverter.GetBytes(1);

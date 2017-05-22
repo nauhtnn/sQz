@@ -74,7 +74,7 @@ namespace sQzLib
         public ExamLv eLv;
         public int mLv { get { return (int)eLv; } }
         public int uId;
-        public string tId { get { return eLv + uId.ToString("d3"); } }
+        public string tId { get { return eLv.ToString() + uId.ToString("d3"); } }
         public string tName;
         public string tBirdate;
         public string tBirthplace;

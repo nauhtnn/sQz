@@ -372,7 +372,7 @@ namespace sQzLib
 
         public void DBAppendInsQry(uint slId, ref StringBuilder vals)
         {
-            vals.Append("(" + slId + "," + (int)eLv + "," + uId + ",'");
+            vals.Append("(" + slId + "," + eLv.ToString("d") + "," + uId + ",'");
             foreach(Question q in vQuest)
                 vals.Append(((short)q.mIU).ToString() + '_' + q.uId + '-');
             vals.Remove(vals.Length - 1, 1);//remove the last '-'

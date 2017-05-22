@@ -131,7 +131,7 @@ namespace sQzLib
             return false;
         }
 
-        public List<byte[]> ToByteR(int rId)
+        public List<byte[]> ToByteR1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
             ExamRoom r;
@@ -139,11 +139,17 @@ namespace sQzLib
                 foreach (ExamRoom i in vRoom.Values)
                 {
                     byte[] a = i.ToByteS1();
-                    if (4 < a.Length)
+                    if (3 < a.Length)
+                    {
+                        l.Add(BitConverter.GetBytes(i.uId));//todo: optmz duplication
                         l.Add(a);
+                    }
                 }
             else if (vRoom.TryGetValue(rId, out r))
+            {
+                l.Add(BitConverter.GetBytes(rId));//todo: optmz duplication
                 l.Add(r.ToByteS1());
+            }
             return l;
         }
 
@@ -251,7 +257,7 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public void ReadByteNee(byte[] buf, ref int offs)
+        public void ReadByteR0(byte[] buf, ref int offs)
         {
             List<ExamineeA> v = new List<ExamineeA>();
             List<ExamineeA> l = new List<ExamineeA>();
@@ -282,6 +288,25 @@ namespace sQzLib
                         l.Add(e);
                 }
                 v.Clear();
+            }
+        }
+
+        public void ReadByteR1(byte[] buf, ref int offs)
+        {
+            while (3 < buf.Length - offs)
+            {
+                int rId = BitConverter.ToInt32(buf, offs);
+                offs += 4;
+                ExamRoom r;
+                if (vRoom.TryGetValue(rId, out r))
+                    r.ReadByteS1(buf, ref offs);
+                else
+                {
+                    r = new ExamRoom();
+                    r.uId = rId;
+                    r.ReadByteS1(buf, ref offs);
+                    vRoom.Add(rId, r);
+                }
             }
         }
 
