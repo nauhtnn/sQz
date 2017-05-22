@@ -437,7 +437,6 @@ namespace sQzLib
             foreach (QuestPack p in vQPack.Values)
             {
                 l.Add(BitConverter.GetBytes((int)p.eLv));
-                l.Add(BitConverter.GetBytes(p.vSheet.Count));
                 l.Add(p.ToByte());
             }
             int sz = 0;
@@ -455,12 +454,7 @@ namespace sQzLib
 
         public bool ReadByteQPack(byte[] buf, ref int offs)
         {
-            int l = buf.Length - offs;
-
-            if (l < 4)
-                return true;
-
-            while(0 < l)
+            while(0 < buf.Length - offs)
             {
                 int x;
                 ExamLv lv;
@@ -468,21 +462,9 @@ namespace sQzLib
                     lv = (ExamLv)x;
                 else
                     return true;
-                l -= 4;
                 offs += 4;
-                if (l < 4)
+                if (vQPack[lv].ReadByte(buf, ref offs))
                     return true;
-                x = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                while (0 < x)
-                {
-                    --x;
-                    QuestSheet qs = new QuestSheet();
-                    if (qs.ReadByte(buf, ref offs))
-                        return true;
-                    vQPack[lv].vSheet.Add(qs.uId, qs);
-                }
             }
             return false;
         }

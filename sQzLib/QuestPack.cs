@@ -41,29 +41,30 @@ namespace sQzLib
         }
 
         //only Operation1 uses this.
-        public void ReadByte(byte[] buf, ref int offs)
+        public bool ReadByte(byte[] buf, ref int offs)
         {
             vSheet.Clear();
             if (buf == null)
-                return;
+                return true;
             int offs0 = offs;
             int l = buf.Length - offs;
             if (l < 4)
-                return;
+                return true;
             int nSh = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
             if (nSh < 1)
-                return;
+                return true;
             while(0 < nSh)
             {
                 QuestSheet qs = new QuestSheet();
                 if(qs.ReadByte(buf, ref offs))
-                    break;
+                    return true;
                 if (!vSheet.ContainsKey(qs.uId))
                     vSheet.Add(qs.uId, qs);
                 --nSh;
             }
+            return false;
         }
 
         public bool ReadByte1(byte[] buf, ref int offs)
