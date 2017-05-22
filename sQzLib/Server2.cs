@@ -140,7 +140,7 @@ namespace sQzLib
                         {
                             byte[] msg;
                             bRW1 = dgHndl(recvMsg, out msg);
-                            if (msg != null || 0 < msg.Length)
+                            if (msg != null && 0 < msg.Length)
                             {
                                 try
                                 {
