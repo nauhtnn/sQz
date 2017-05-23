@@ -144,7 +144,6 @@ namespace sQzLib
             offs += 4;
             l -= 4;
             vQuest = new List<Question>();
-            bool err = false;
             while (0 < nq)
             {
                 Question q = new Question();
@@ -156,17 +155,12 @@ namespace sQzLib
                 //offs += 4;
                 //stmt
                 if (l < 4)
-                {
-                    err = true;
-                    break;
-                }
+                    return true;
                 int sz = BitConverter.ToInt32(buf, offs);
                 l -= 4;
                 offs += 4;
-                if (l < sz) {
-                    err = true;
-                    break;
-                }
+                if (l < sz)
+                    return true;
                 q.mStmt = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
@@ -185,24 +179,16 @@ namespace sQzLib
                 {
                     //each ans
                     if (l < 4)
-                    {
-                        err = true;
-                        break;
-                    }
+                        return true;
                     sz = BitConverter.ToInt32(buf, offs);
                     l -= 4;
                     offs += 4;
                     if (l < sz)
-                    {
-                        err = true;
-                        break;
-                    }
+                        return true;
                     q.vAns[j] = Encoding.UTF8.GetString(buf, offs, sz);
                     l -= sz;
                     offs += sz;
                 }
-                if (err)
-                    break;
                 --nq;
                 vQuest.Add(q);
             }
@@ -217,7 +203,7 @@ namespace sQzLib
                     Buffer.BlockCopy(buf, offs0, aQuest, 0, sz);
                 }
             }
-            return err;
+            return false;
         }
 
         //only Prep0 uses this.
@@ -390,15 +376,15 @@ namespace sQzLib
             vals.Append("'),");
         }
 
-        public bool DBSelect(uint slId, short lv, ushort idx)
+        public bool DBSelect(uint slId, ExamLv lv, int id)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return false;
+                return true;
             StringBuilder cond = new StringBuilder();
             cond.Append("slId=" + slId);
-            cond.Append(" AND lv=" + lv);
-            cond.Append(" AND id=" + idx);
+            cond.Append(" AND lv=" + lv.ToString("d"));
+            cond.Append(" AND id=" + id);
             string qry = DBConnect.mkQrySelect("questsh", "vquest", cond.ToString(), null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
             string qIds = null;
@@ -410,24 +396,24 @@ namespace sQzLib
             if (qIds == null)
             {
                 DBConnect.Close(ref conn);
-                return false;
+                return true;
             }
-            uId = idx;
+            uId = id;
             vQuest.Clear();
             string[] vQId = qIds.Split('-');
             foreach(string qid in vQId)
             {
                 string[] iuid = qid.Split('_');
-                if(iuid.Length == 2)
+                if(iuid.Length == 2)//todo handle error
                 {
                     qry = DBConnect.mkQrySelect("quest" + iuid[0], null, "idx=" + iuid[1], null);
                     reader = DBConnect.exeQrySelect(conn, qry);
-                    if (reader != null)
+                    if (reader != null)//todo handle error
                     {
-                        if(reader.Read())
+                        if(reader.Read())//todo handle error
                         {
                             Question q = new Question();
-                            q.uId = reader.GetUInt32(0);//hardcode
+                            q.uId = reader.GetUInt32(0);
                             string[] s = reader.GetString(1).Split('\n');
                             q.mStmt = "(" + iuid[0] + ')' + s[0];
                             q.nAns = 4;
@@ -445,7 +431,7 @@ namespace sQzLib
                     }
                 }
             }
-            return true;
+            return false;
         }
 
         public bool UpdateCurQSId()

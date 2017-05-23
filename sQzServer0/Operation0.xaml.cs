@@ -243,33 +243,42 @@ namespace sQzServer0
                         int qsId = BitConverter.ToInt32(buf, offs);
                         offs += 4;
                         QuestSheet qs = new QuestSheet();
-                        if (qs.DBSelect(mSl.uId, -1, (ushort)qsId))
+                        ExamLv lv;
+                        if (qsId < (int)ExamLv.B)
+                            lv = ExamLv.A;
+                        else
                         {
-                            //todo mQPack.vSheet.Add(qs.uId, qs);
-                            AnsSheet a = null;//todo mKeyPack.ExtractKey(qs);
+                            lv = ExamLv.B;
+                            qsId -= (int)ExamLv.B;
+                        }
+                        if (qs.DBSelect(mSl.uId, lv, qsId))
+                            outMsg = BitConverter.GetBytes(-1);
+                        else
+                        {
+                            mSl.vQPack[lv].vSheet.Add(qs.uId, qs);
+                            AnsSheet a = mSl.mKeyPack.ExtractKey(qs);
                             List<byte[]> bs = qs.ToByte();
-                            sz = 1;
+                            sz = 4;
                             if (a != null)
                                 sz += a.GetByteCount();
                             foreach (byte[] b in bs)
                                 sz += b.Length;
                             outMsg = new byte[sz];
-                            Array.Copy(BitConverter.GetBytes(true), 0, outMsg, 0, 1);
-                            offs = 1;
+                            Array.Copy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
+                            offs = 4;
                             foreach (byte[] b in bs)
                             {
                                 Array.Copy(b, 0, outMsg, offs, b.Length);
                                 offs += b.Length;
                             }
-                            if(a != null)
+                            if (a != null)
                                 a.ToByte(ref outMsg, ref offs);
                             Dispatcher.Invoke(() => ShowQuest());
                         }
-                        else
-                            outMsg = BitConverter.GetBytes(false);
+
                     }
                     else
-                        outMsg = BitConverter.GetBytes(false);
+                        outMsg = BitConverter.GetBytes(-1);
                     break;
                 case NetCode.SrvrSubmitting:
                     mSl.ReadByteR0(buf, ref offs);
