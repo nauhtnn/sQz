@@ -106,15 +106,14 @@ namespace sQzClient
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            txtLalgitc.Text = ExamLv.A.ToString("d");
-            //txtLalgitc.Text = t._[(int)TxI.LALGITC];
-            //txtWelcome.Text = t._[(int)TxI.WELCOME];
-            //txtId.Text = t._[(int)TxI.NEEID];
-            //txtBirdate.Text = t._[(int)TxI.BIRDATE] + t._[(int)TxI.BIRDATE_MSG];
-            //btnSignIn.Content = t._[(int)TxI.SIGNIN];
-            //btnOpenLog.Content = t._[(int)TxI.OPEN_LOG];
-            //btnReconn.Content = t._[(int)TxI.CONN];
-            //btnExit.Content = t._[(int)TxI.EXIT];
+            txtLalgitc.Text = t._[(int)TxI.LALGITC];
+            txtWelcome.Text = t._[(int)TxI.WELCOME];
+            txtId.Text = t._[(int)TxI.NEEID];
+            txtBirdate.Text = t._[(int)TxI.BIRDATE] + t._[(int)TxI.BIRDATE_MSG];
+            btnSignIn.Content = t._[(int)TxI.SIGNIN];
+            btnOpenLog.Content = t._[(int)TxI.OPEN_LOG];
+            btnReconn.Content = t._[(int)TxI.CONN];
+            btnExit.Content = t._[(int)TxI.EXIT];
         }
 
         public bool ClntBufHndl(byte[] buf)
@@ -249,9 +248,10 @@ namespace sQzClient
                     mNee.ToByte(out outBuf, (int)mState);
                     break;
                 case NetCode.ExamRetrieving:
-                    outBuf = new byte[6];//hardcode
+                    outBuf = new byte[12];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 4, 2);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mLv), 0, outBuf, 4, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 8, 4);
                     break;
                 default:
                     outBuf = null;

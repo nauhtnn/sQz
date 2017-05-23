@@ -21,7 +21,7 @@ namespace sQzLib
         public AnsSheet() {
             bChanged = false;
             aAns = null;
-            uQSId = 0;
+            uQSId = ushort.MaxValue;
             dgSelChgCB = null;
         }
 
