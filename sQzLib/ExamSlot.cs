@@ -473,5 +473,23 @@ namespace sQzLib
         {
             return mKeyPack.ToByte();
         }
+
+        public ExamineeA Signin(ExamineeA e)
+        {
+            ExamineeA o;
+            foreach (ExamRoom r in vRoom.Values)
+                if ((o = r.Signin(e)) != null)
+                    return o;
+            return null;
+        }
+
+        public ExamineeA Find(int lvid)
+        {
+            ExamineeA o;
+            foreach (ExamRoom r in vRoom.Values)
+                if (r.vExaminee.TryGetValue(lvid, out o))
+                    return o;
+            return null;
+        }
     }
 }
