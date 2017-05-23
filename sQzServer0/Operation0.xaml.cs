@@ -235,9 +235,7 @@ namespace sQzServer0
                     outMsg = mSl.ToByteQPack();
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    outMsg = null; //todo new byte[mKeyPack.GetByteCount()];
-                    offs = 0;
-                    //todo mKeyPack.ToByte(ref outMsg, ref offs);
+                    outMsg = mSl.ToByteKey();
                     break;
                 case NetCode.RequestQuestSheet:
                     if (buf.Length - offs == 4)

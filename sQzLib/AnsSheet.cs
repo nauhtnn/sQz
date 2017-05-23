@@ -88,7 +88,7 @@ namespace sQzLib
 
         public byte[] ToByte()
         {
-            byte[] buf = new byte[8 + LEN];
+            byte[] buf = new byte[4 + LEN];
             int offs = 0;
             Buffer.BlockCopy(BitConverter.GetBytes(uQSId),
                         0, buf, offs, 4);
