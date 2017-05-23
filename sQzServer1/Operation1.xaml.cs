@@ -258,12 +258,12 @@ namespace sQzServer1
                         }
                         else
                         {
-                            mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + qshid;
+                            mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + x.ToString() + qshid;
                             outMsg = BitConverter.GetBytes((int)TxI.QS_NFOUND);
                             if (!bQShReqting)
                             {
                                 bStrtReqQSh = true;
-                                uReqQSh = qshid;
+                                uReqQSh = x + qshid;
                             }
                         }
                     }
@@ -436,14 +436,24 @@ namespace sQzServer1
                         offs = 0;//todo handle error
                     break;
                 case NetCode.RequestQuestSheet:
-                    bool rs = BitConverter.ToBoolean(buf, offs++);
-                    if(rs)//todo
+                    int rs = BitConverter.ToInt32(buf, offs);
+                    offs += 4;
+                    if(rs == 0)
                     {
-                        //if (mSl.mQPack.ReadByte1(buf, ref offs))
-                        //{
-                        //    mKeyPack.ReadByte1(buf, ref offs);
-                        //    Dispatcher.Invoke(() => ShowQuest());
-                        //}
+                        ExamLv lv;
+                        if (uReqQSh < (int)ExamLv.B)
+                            lv = ExamLv.A;
+                        else
+                            lv = ExamLv.B;
+                        if (mSl.ReadByteQPack1(lv, buf, ref offs))
+                            offs = 0;//todo handle error
+                        else
+                        {
+                            if (mSl.mKeyPack.ReadByte1(buf, ref offs))
+                                offs = 0;//todo handle error
+                            else
+                                Dispatcher.Invoke(() => ShowQuest());
+                        }
                     }
                     btnStartSrvr_Click(null, null);
                     bQShReqting = false;

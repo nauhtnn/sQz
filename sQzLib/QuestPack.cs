@@ -79,16 +79,14 @@ namespace sQzLib
         public bool ReadByte1(byte[] buf, ref int offs)
         {
             if (buf == null)
-                return false;
+                return true;
             int offs0 = offs;
             QuestSheet qs = new QuestSheet();
             if(qs.ReadByte(buf, ref offs))
-                return false;
-            if (!vSheet.ContainsKey(qs.uId))
-            {
-                vSheet.Add(qs.uId, qs);
                 return true;
-            }
+            if (vSheet.ContainsKey(qs.uId))
+                return true;
+            vSheet.Add(qs.uId, qs);
             ++mMaxQSIdx;
             return false;
         }

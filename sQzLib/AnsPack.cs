@@ -108,14 +108,15 @@ namespace sQzLib
             return false;
         }
 
-        public void ReadByte1(byte[] buf, ref int offs)
+        public bool ReadByte1(byte[] buf, ref int offs)
         {
             if (buf == null)
-                return;
+                return true;
             AnsSheet i = new AnsSheet();
-            if(!i.ReadByte(buf, ref offs) &&
-                !vSheet.ContainsKey(i.uQSId))
-                vSheet.Add(i.uQSId, i);
+            if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.uQSId))
+                return true;
+            vSheet.Add(i.uQSId, i);
+            return false;
         }
     }
 }

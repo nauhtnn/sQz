@@ -469,6 +469,13 @@ namespace sQzLib
             return false;
         }
 
+        public bool ReadByteQPack1(ExamLv lv, byte[] buf, ref int offs)
+        {
+            if (vQPack[lv].ReadByte1(buf, ref offs))
+                return true;
+            return false;
+        }
+
         public byte[] ToByteKey()
         {
             return mKeyPack.ToByte();
