@@ -326,13 +326,15 @@ namespace sQzServer0
             if (rdoA.IsChecked.HasValue? rdoA.IsChecked.Value : false)
             {
                 foreach(IUxx j in QuestSheet.GetIUs(ExamLv.A))
-                {
-                    t = FindName(j.ToString()) as TextBox;
-                    if (t != null && t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
-                        n += i;
+                    if ((t = FindName(j.ToString()) as TextBox) != null)
+                    {
+                        if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
+                            n += i;
+                        else
+                            bG = false;
+                    }
                     else
                         bG = false;
-                }
                 tbxNq.Text = n.ToString();
                 if (bG && n == 30)
                     btnQSGen.IsEnabled = true;
@@ -342,14 +344,16 @@ namespace sQzServer0
             else
             {
                 foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
-                {
-                    t = FindName(j.ToString()) as TextBox;
-                    if (t != null && t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
-                        n += i;
+                    if ((t = FindName(j.ToString()) as TextBox) != null)
+                    {
+                        t.IsEnabled = true;
+                        if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
+                            n += i;
+                        else
+                            bG = false;
+                    }
                     else
                         bG = false;
-                }
-
                 tbxNq.Text = n.ToString();
                 if (bG && n == 30)
                     btnQSGen.IsEnabled = true;
@@ -378,6 +382,25 @@ namespace sQzServer0
 
         private void rdo_Checked(object sender, RoutedEventArgs e)
         {
+            TextBox t;
+            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+            {
+                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.A))
+                    if ((t = FindName(j.ToString()) as TextBox) != null)
+                        t.IsEnabled = true;
+                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
+                    if ((t = FindName(j.ToString()) as TextBox) != null)
+                        t.IsEnabled = false;
+            }
+            else
+            {
+                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
+                    if ((t = FindName(j.ToString()) as TextBox) != null)
+                        t.IsEnabled = true;
+                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.A))
+                    if ((t = FindName(j.ToString()) as TextBox) != null)
+                        t.IsEnabled = false;
+            }
             tbxIU_TextChanged(null, null);
         }
     }
