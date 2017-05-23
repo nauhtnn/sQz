@@ -61,7 +61,10 @@ namespace sQzLib
                 if(qs.ReadByte(buf, ref offs))
                     return true;
                 if (!vSheet.ContainsKey(qs.uId))
+                {
+                    qs.eLv = eLv;//optmz
                     vSheet.Add(qs.uId, qs);
+                }
                 --nSh;
             }
             return false;

@@ -442,14 +442,14 @@ namespace sQzLib
             int sz = 0;
             foreach (byte[] x in l)
                 sz += x.Length;
-            byte[] rval = new byte[sz];
+            byte[] buf = new byte[sz];
             int offs = 0;
             foreach(byte[] x in l)
             {
-                Array.Copy(x, 0, rval, offs, x.Length);
+                Array.Copy(x, 0, buf, offs, x.Length);
                 offs += x.Length;
             }
-            return rval;
+            return buf;
         }
 
         public bool ReadByteQPack(byte[] buf, ref int offs)
