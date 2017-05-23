@@ -169,11 +169,13 @@ namespace sQzServer1
                         lck = false;//err, default value benefits examinees
                     if (!lck)
                     {
+                        ExamineeA o = null;
                         foreach (ExamRoom r in mSl.vRoom.Values)
-                            if ((e = r.Signin(e)) != null)
+                            if ((o = r.Signin(e)) != null)
                                 break;
-                        if (e != null)
+                        if (o != null)
                         {
+                            e = o;//todo: optmz
                             if (e.dtTim1.Hour == ExamSlot.INVALID)
                                 e.dtTim1 = DateTime.Now;
                             Dispatcher.Invoke(() =>
@@ -237,29 +239,37 @@ namespace sQzServer1
                     return true;
                 case NetCode.ExamRetrieving:
                     outMsg = null;
-                    //int qshidx = BitConverter.ToInt32(buf, offs);
-                    //if (qshidx == ushort.MaxValue)
-                    //{
-                    //    if (mQShMaxIdx < ++mQShIdx)
-                    //        mQShIdx = 0;
-                    //    qshidx = mQPack.vSheet.Keys.ElementAt(mQShIdx);
-                    //}
-                    //if (mQPack.vSheet.TryGetValue(qshidx, out qs))
-                    //{
-                    //    outMsg = new byte[qs.aQuest.Length + 4];
-                    //    Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
-                    //    Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
-                    //}
-                    //else
-                    //{
-                    //    mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + qshidx;
-                    //    outMsg = BitConverter.GetBytes((int)TxI.QS_NFOUND);
-                    //    if (!bQShReqting)
-                    //    {
-                    //        bStrtReqQSh = true;
-                    //        uReqQSh = qshidx;
-                    //    }
-                    //}
+                    int x;
+                    if (!Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
+                        break;
+                    offs += 4;
+                    int qshid = BitConverter.ToInt32(buf, offs);
+                    if (qshid == ushort.MaxValue)
+                    {
+                        byte[] a = mSl.vQPack[(ExamLv)x].ToByteNextQS();//todo: check null
+                        outMsg = new byte[a.Length + 4];
+                        Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
+                        Array.Copy(a, 0, outMsg, 4, a.Length);
+                    }
+                    else
+                    {
+                        if (mSl.vQPack[(ExamLv)x].vSheet.TryGetValue(qshid, out qs))
+                        {
+                            outMsg = new byte[qs.aQuest.Length + 4];
+                            Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
+                            Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
+                        }
+                        else
+                        {
+                            mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + qshid;
+                            outMsg = BitConverter.GetBytes((int)TxI.QS_NFOUND);
+                            if (!bQShReqting)
+                            {
+                                bStrtReqQSh = true;
+                                uReqQSh = qshid;
+                            }
+                        }
+                    }
                     break;
                 case NetCode.Submiting:
                     outMsg = null;

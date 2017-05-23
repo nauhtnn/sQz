@@ -12,8 +12,12 @@ namespace sQzLib
         public uint uSlId;
         public ExamLv eLv;
         public Dictionary<int, QuestSheet> vSheet;
+        int mNextQSIdx;
+        int mMaxQSIdx;
         public QuestPack()
         {
+            mNextQSIdx = 0;
+            mMaxQSIdx = -1;
             vSheet = new Dictionary<int, QuestSheet>();
         }
 
@@ -67,6 +71,8 @@ namespace sQzLib
                 }
                 --nSh;
             }
+            mNextQSIdx = 0;
+            mMaxQSIdx = vSheet.Keys.Count - 1;
             return false;
         }
 
@@ -83,6 +89,7 @@ namespace sQzLib
                 vSheet.Add(qs.uId, qs);
                 return true;
             }
+            ++mMaxQSIdx;
             return false;
         }
 
@@ -139,6 +146,15 @@ namespace sQzLib
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             DBConnect.Ins(conn, "questsh", "slId,lv,id,vQuest", vals.ToString());//todo: catch exception
             DBConnect.Close(ref conn);
+        }
+
+        public byte[] ToByteNextQS()
+        {
+            if (mMaxQSIdx < 0)
+                return null;
+            if (mMaxQSIdx < mNextQSIdx)
+                mNextQSIdx = 0;
+            return vSheet.ElementAt(mNextQSIdx++).Value.aQuest;
         }
     }
 }
