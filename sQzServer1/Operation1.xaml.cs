@@ -241,31 +241,33 @@ namespace sQzServer1
                     if (!Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
                         break;
                     offs += 4;
-                    int qshid = BitConverter.ToInt32(buf, offs);
-                    if (qshid == ushort.MaxValue)
+                    int qsid = BitConverter.ToInt32(buf, offs);
+                    if (qsid == ushort.MaxValue)
                     {
-                        byte[] a = mSl.vQPack[(ExamLv)x].ToByteNextQS();//todo: check null
-                        outMsg = new byte[a.Length + 4];
-                        Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
-                        Array.Copy(a, 0, outMsg, 4, a.Length);
-                    }
-                    else
-                    {
-                        if (mSl.vQPack[(ExamLv)x].vSheet.TryGetValue(qshid, out qs))
+                        byte[] a = mSl.vQPack[(ExamLv)x].ToByteNextQS();
+                        if(a != null)
                         {
-                            outMsg = new byte[qs.aQuest.Length + 4];
+                            outMsg = new byte[a.Length + 4];
                             Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
-                            Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
+                            Array.Copy(a, 0, outMsg, 4, a.Length);
                         }
-                        else
+                    }
+                    else if (mSl.vQPack[(ExamLv)x].vSheet.TryGetValue(qsid, out qs))
+                    {
+                        outMsg = new byte[qs.aQuest.Length + 4];
+                        Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
+                        Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
+                    }
+                    if(outMsg == null)
+                    {
+                        mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + (x + qsid);
+                        outMsg = new byte[8];
+                        Array.Copy(BitConverter.GetBytes((int)TxI.QS_NFOUND), 0, outMsg, 0, 4);
+                        Array.Copy(BitConverter.GetBytes(qsid), 0, outMsg, 4, 4);
+                        if (!bQShReqting)
                         {
-                            mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + x.ToString() + qshid;
-                            outMsg = BitConverter.GetBytes((int)TxI.QS_NFOUND);
-                            if (!bQShReqting)
-                            {
-                                bStrtReqQSh = true;
-                                uReqQSh = x + qshid;
-                            }
+                            bStrtReqQSh = true;
+                            uReqQSh = x + qsid;
                         }
                     }
                     break;

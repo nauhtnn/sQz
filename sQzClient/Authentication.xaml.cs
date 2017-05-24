@@ -207,11 +207,13 @@ namespace sQzClient
                     if(errc == (int)TxI.QS_NFOUND)
                     {
                         mState = NetCode.Authenticating;
-                        if(bRunning)
+                        int qsid = BitConverter.ToInt32(buf, offs);
+                        offs += 4;
+                        if (bRunning)
                             Dispatcher.Invoke(() =>
                             {
                                 spMain.Opacity = 0.5;
-                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND]);
+                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND] + qsid);
                                 spMain.Opacity = 1;
                                 EnableControls();
                             });

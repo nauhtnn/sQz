@@ -152,7 +152,10 @@ namespace sQzLib
                 return null;
             if (mMaxQSIdx < mNextQSIdx)
                 mNextQSIdx = 0;
-            return vSheet.ElementAt(mNextQSIdx++).Value.aQuest;
+            if (mNextQSIdx < vSheet.Count)
+                return vSheet.ElementAt(mNextQSIdx++).Value.aQuest;
+            else
+                return null;
         }
     }
 }
