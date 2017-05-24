@@ -67,6 +67,9 @@ namespace sQzClient
                 if (mClnt.ConnectWR(ref mCbMsg) && bRunning)
                     Dispatcher.Invoke(() =>
                     {
+                        spMain.Opacity = 0.5;
+                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
+                        spMain.Opacity = 1;
                         DisableControls();
                         btnReconn.IsEnabled = true;
                     });
@@ -159,7 +162,7 @@ namespace sQzClient
                         offs += 4;
                         l -= 4;
                         string msg = null;
-                        if (errc == (int)TxI.SIGNIN_AL_1)
+                        if (errc == (int)TxI.SIGNIN_AL)
                         {
                             if (l < 4)
                                 break;
@@ -182,8 +185,10 @@ namespace sQzClient
                             int m = BitConverter.ToInt32(buf, offs);
                             offs += 4;
                             l -= 8;
-                            msg = Txt.s._[(int)TxI.SIGNIN_AL_1] +
-                                h + ':' + m + Txt.s._[(int)TxI.SIGNIN_AL_2] + mNee.tComp + ".";
+                            StringBuilder sb = new StringBuilder();
+                            sb.AppendFormat(Txt.s._[(int)TxI.SIGNIN_AL], h.ToString() + ':' + m);
+                            sb.Append(mNee.tComp + '.');
+                            msg = sb.ToString();
                         }
                         else if (errc == (int)TxI.SIGNIN_NOK)
                             msg = Txt.s._[(int)TxI.SIGNIN_NOK];
@@ -192,6 +197,7 @@ namespace sQzClient
                                 spMain.Opacity = 0.5;
                                 WPopup.s.ShowDialog(msg);
                                 spMain.Opacity = 1;
+                                EnableControls();
                             });
                     }
                     break;
@@ -207,6 +213,7 @@ namespace sQzClient
                                 spMain.Opacity = 0.5;
                                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND]);
                                 spMain.Opacity = 1;
+                                EnableControls();
                             });
                         break;
                     }
@@ -220,6 +227,7 @@ namespace sQzClient
                                 spMain.Opacity = 0.5;
                                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]);
                                 spMain.Opacity = 1;
+                                EnableControls();
                             });
                         break;
                     }
@@ -316,12 +324,12 @@ namespace sQzClient
 
         private void btnReconn_Click(object sender, RoutedEventArgs e)
         {
+            btnReconn.IsEnabled = false;
             Thread th = new Thread(() => {
                 if (mClnt.ConnectWR(ref mCbMsg) && bRunning)
                     Dispatcher.Invoke(() =>
                     {
                         spMain.Opacity = 0.5;
-                        spMain.OpacityMask = new SolidColorBrush(Colors.Black);
                         WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
                         spMain.Opacity = 1;
                         btnReconn.IsEnabled = true;

@@ -210,8 +210,11 @@ namespace sQzServer1
                         e = mSl.Find(lvid);
                         if (e == null)
                             e = new ExamineeC();
-                        outMsg = new byte[17 + e.tComp.Length];
-                        Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL_1), 0, outMsg, 0, 4);
+                        if (e.tComp == null)
+                            outMsg = new byte[16];
+                        else
+                            outMsg = new byte[16 + e.tComp.Length];
+                        Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL), 0, outMsg, 0, 4);
                         if(e.tComp == null)
                         {
                             Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 4, 4);
