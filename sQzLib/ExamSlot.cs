@@ -8,7 +8,7 @@ using System.Windows;
 
 /*
 CREATE TABLE IF NOT EXISTS `slot` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
- `dt` DATETIME);
+ `dt` DATETIME, `open` TINYINT);
 */
 
 namespace sQzLib
