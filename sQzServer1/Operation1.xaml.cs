@@ -35,9 +35,7 @@ namespace sQzServer1
         Dictionary<int, CheckBox> vLock;//supervisor side
         Dictionary<int, bool> vbLock;//examinee side
         ExamSlot mSl;
-        int mQShIdx;
-        int mQShMaxIdx;
-        int uRId;
+        int uRId;//todo change to enum
         bool bAllR;
         bool bStrtReqQSh;
         bool bQShReqting;
@@ -65,7 +63,7 @@ namespace sQzServer1
             vbLock = new Dictionary<int, bool>();
 
             bAllR = false;
-            uRId = 0;
+            uRId = 1;//todo
             bStrtReqQSh = bQShReqting = false;
             uReqQSh = ushort.MaxValue;
 
@@ -487,7 +485,10 @@ namespace sQzServer1
                 case NetCode.DateStudentRetriving:
                     outMsg = new byte[8];
                     Array.Copy(BitConverter.GetBytes((int)mState), 0, outMsg, 0, 4);
-                    Array.Copy(BitConverter.GetBytes(uRId), 0, outMsg, 4, 4);
+                    if(bAllR)
+                        Array.Copy(BitConverter.GetBytes(0), 0, outMsg, 4, 4);
+                    else
+                        Array.Copy(BitConverter.GetBytes(uRId), 0, outMsg, 4, 4);
                     break;
                 case NetCode.QuestRetrieving:
                     outMsg = BitConverter.GetBytes((int)mState);
