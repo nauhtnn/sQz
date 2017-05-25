@@ -26,6 +26,7 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         Dictionary<uint, ExamSlot> vSl;
+        Dictionary<uint, ExamSlotView> vSlVw;
         ExamSlot curSl;
 
         public Operation0()
@@ -35,6 +36,7 @@ namespace sQzServer0
             mServer = new Server2(SrvrBufHndl);
             mCbMsg = new UICbMsg();
             vSl = new Dictionary<uint, ExamSlot>();
+            vSlVw = new Dictionary<uint, ExamSlotView>();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -59,14 +61,17 @@ namespace sQzServer0
             {
                 ExamSlot sl = new ExamSlot();
                 sl.uId = uint.Parse(i.Name.Substring(1));
-                if((i.Content as string)[0] == '*')
+                if ((i.Content as string)[0] == '*')
                     ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
                 else
                     ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
                 sl.DBSelectNee();
-                sl.LoadExaminees(gNee);
+                ExamSlotView vw = new ExamSlotView();
+                tbcNee.Items.Add(vw.TabItemExaminee(sl.vRoom.Values.ToList(), grdRefNee,
+                    sl.mDt.ToString(ExamSlot.FORM_SH)));
                 QuestSheet.DBUpdateCurQSId(sl.uId);
                 vSl.Add(sl.uId, sl);
+                vSlVw.Add(sl.uId, vw);
                 curSl = sl;//todo
             }
             else
@@ -294,7 +299,7 @@ namespace sQzServer0
                 case NetCode.SrvrSubmitting:
                     curSl.ReadByteR0(buf, ref offs);
                     curSl.DBUpdateRs();
-                    curSl.UpdateRsView();
+                    vSlVw[curSl.uId].UpdateRsView(curSl.vRoom.Values.ToList());
                     outMsg = BitConverter.GetBytes(1);
                     mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
                     break;

@@ -24,6 +24,7 @@ namespace sQzLib
         public const string FORM_h = "H:m";
         public const string FORM_H = "yyyy/MM/dd HH:mm";
         public const string FORM = "yyyy/MM/dd";
+        public const string FORM_SH = "yy/MM/dd HH:mm";
         public const string FORM_RH = "dd/MM/yyyy HH:mm";
         public const string FORM_R = "dd/MM/yyyy";
         public const string FORM_MYSQL = "yyyy-MM-dd HH:00";
@@ -312,23 +313,6 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
                 r.DBUpdateRs(conn);
             DBConnect.Close(ref conn);
-        }
-
-        public void UpdateRsView()
-        {
-            TextBlock t;
-            foreach (ExamRoom r in vRoom.Values)
-                foreach (ExamineeA e in r.vExaminee.Values)
-                {
-                    if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.mLv + e.uId, out t))
-                        t.Text = e.uGrade.ToString();
-                    if (e.dtTim1.Hour != INVALID && vDt1.TryGetValue(e.mLv + e.uId, out t))
-                        t.Text = e.dtTim1.ToString("HH:mm");
-                    if (e.dtTim2.Hour != INVALID && vDt2.TryGetValue(e.mLv + e.uId, out t))
-                        t.Text = e.dtTim2.ToString("HH:mm");
-                    if (e.tComp != null && vComp.TryGetValue(e.mLv + e.uId, out t))
-                        t.Text = e.tComp;
-                }
         }
 
         public bool GenQPack(int n, ExamLv lv, int[] vn)

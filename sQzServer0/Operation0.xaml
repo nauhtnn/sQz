@@ -37,7 +37,7 @@
                     <TextBlock x:Name="txtDt2" Grid.Column="6" Text="Dt2" Background="Azure" TextAlignment="Center"/>
                     <TextBlock x:Name="txtComp" Grid.Column="7" Text="Comp" Background="Azure" TextAlignment="Center"/>
                 </Grid>
-                <Grid x:Name="gNee" Visibility="Collapsed">
+                <Grid x:Name="grdRefNee" Visibility="Collapsed">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="180"/>
@@ -50,7 +50,7 @@
                     </Grid.ColumnDefinitions>
                 </Grid>
                 <ScrollViewer Width="676" Height="290" VerticalScrollBarVisibility="Auto">
-                    <TabControl x:Name="tbcNee"/>
+                    <TabControl x:Name="tbcNee" TabStripPlacement="Bottom"/>
                 </ScrollViewer>
             </StackPanel>
             <StackPanel>
