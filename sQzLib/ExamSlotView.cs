@@ -26,7 +26,7 @@ namespace sQzLib
             vComp = new Dictionary<int, TextBlock>();
         }
 
-        public TabItem TabItemExaminee(List<ExamRoom> vRoom, Grid refGrid, string hdr)
+        public TabItem TabItemExaminee(ExamSlot sl, Grid refGrid, string hdr)
         {
             Color c = new Color();
             c.A = 0xff;
@@ -40,7 +40,7 @@ namespace sQzLib
                 d.Width = cd.Width;
                 grdNee.ColumnDefinitions.Add(d);
             }
-            foreach (ExamRoom r in vRoom)
+            foreach (ExamRoom r in sl.vRoom.Values)
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
                     rid++;
@@ -113,6 +113,7 @@ namespace sQzLib
                     dark = !dark;
                 }
             tbiNee = new TabItem();
+            tbiNee.Name = "_" + sl.uId;
             tbiNee.Header = hdr;
             tbiNee.Content = grdNee;
             return tbiNee;

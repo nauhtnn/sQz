@@ -27,7 +27,6 @@ namespace sQzServer0
         bool bRunning;
         Dictionary<uint, ExamSlot> vSl;
         Dictionary<uint, ExamSlotView> vSlVw;
-        ExamSlot curSl;
 
         public Operation0()
         {
@@ -67,12 +66,11 @@ namespace sQzServer0
                     ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
                 sl.DBSelectNee();
                 ExamSlotView vw = new ExamSlotView();
-                tbcNee.Items.Add(vw.TabItemExaminee(sl.vRoom.Values.ToList(), grdRefNee,
+                tbcNee.Items.Add(vw.TabItemExaminee(sl, grdRefNee,
                     sl.mDt.ToString(ExamSlot.FORM_SH)));
                 QuestSheet.DBUpdateCurQSId(sl.uId);
                 vSl.Add(sl.uId, sl);
                 vSlVw.Add(sl.uId, vw);
-                curSl = sl;//todo
             }
             else
                 vSl.Remove(uint.Parse(i.Name.Substring(1)));

@@ -9,11 +9,22 @@
       Title="ExamList">
 
     <StackPanel x:Name="spMain" Loaded="Main_Loaded">
-        <StackPanel x:Name="spUp" Orientation="Horizontal" Margin="10">
-            <ScrollViewer Width="150" Height="320" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="lbxDate" Width="150"/>
-            </ScrollViewer>
-            <StackPanel Width="676" Height="320">
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="btnStartSrvr" Width="100" Height="40" Content="Start server" Click="btnStartSrvr_Click"></Button>
+            <Button x:Name="btnStopSrvr" Width="100" Height="40" Content="Stop srvr" Click="btnStopSrvr_Click"></Button>
+            <Button x:Name="btnPrep" Width="100" Height="40" Content="Prepare" Click="btnPrep_Click"></Button>
+            <Button x:Name="btnExit" Content="Exit" Height="40" Width="100" Click="btnExit_Click"/>
+        </StackPanel>
+        <StackPanel x:Name="spRefSl" Orientation="Horizontal" Margin="10">
+            <StackPanel>
+                <ScrollViewer Width="150" Height="320" VerticalScrollBarVisibility="Auto">
+                    <ListBox x:Name="lbxDate" Width="150"/>
+                </ScrollViewer>
+                <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="lblStatus" Width="400" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
+                </ScrollViewer>
+            </StackPanel>
+            <StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40"/>
@@ -52,80 +63,69 @@
                 <ScrollViewer Width="676" Height="290" VerticalScrollBarVisibility="Auto">
                     <TabControl x:Name="tbcNee" TabStripPlacement="Bottom"/>
                 </ScrollViewer>
-            </StackPanel>
-            <StackPanel>
-                <Button x:Name="btnStartSrvr" Width="100" Height="40" Content="Start server" Click="btnStartSrvr_Click"></Button>
-                <Button x:Name="btnStopSrvr" Width="100" Height="40" Content="Stop srvr" Click="btnStopSrvr_Click"></Button>
-                <Button x:Name="btnPrep" Width="100" Height="40" Content="Prepare" Click="btnPrep_Click"></Button>
-                <Button x:Name="btnExit" Content="Exit" Height="40" Width="100" Click="btnExit_Click"/>
-            </StackPanel>
-            <StackPanel x:Name="spLeft">
-                <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
-                    <TextBlock x:Name="lblStatus" Width="400" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
-                </ScrollViewer>
-            </StackPanel>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="10">
-            <Grid>
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="40"/>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="40"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                    <RowDefinition Height="30"/>
-                </Grid.RowDefinitions>
-                <TextBlock x:Name="txtNqs" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
-                <TextBox x:Name="tbxNqs" Grid.Row="1" Width="30" Grid.Column="1" Margin="5" Text="0"/>
-                <Button x:Name="btnQSGen" Grid.Row="1" Grid.Column="2" Click="btnQSGen_Click" IsEnabled="False"/>
-                <TextBlock x:Name="txtNq" Grid.Row="2" Grid.Column="0" Margin="5" Height="25"/>
-                <TextBlock x:Name="tbxNq" Width="30" Grid.Row="2" Grid.Column="1" Margin="5"/>
-                <TextBlock Text="module 1" Grid.Row="2" Grid.Column="2" Margin="5" Height="25"/>
-                <TextBox x:Name="IU01" Width="30" Grid.Row="2" Grid.Column="3" Margin="5"/>
-                <TextBlock Text="module 2" Grid.Row="3" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="IU02" Width="30" Grid.Row="3" Grid.Column="1" Margin="5"/>
-                <TextBlock Text="module 3" Grid.Row="3" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="IU03" Width="30" Grid.Row="3" Grid.Column="3" Margin="5"/>
-                <TextBlock Text="module 4" Grid.Row="4" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="IU04" Width="30" Grid.Row="4" Grid.Column="1" Margin="5"/>
-                <TextBlock Text="module 5" Grid.Row="4" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="IU05" Width="30" Grid.Row="4" Grid.Column="3" Margin="5"/>
-                <TextBlock Text="module 6" Grid.Row="5" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="IU06" Width="30" Grid.Row="5" Grid.Column="1" Margin="5"/>
-                <TextBlock Text="module 7" Grid.Row="5" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="IU07" Width="30" Grid.Row="5" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                <TextBlock Text="module 8" Grid.Row="6" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="IU08" Width="30" Grid.Row="6" Grid.Column="1" Margin="5" IsEnabled="False"/>
-                <TextBlock Text="module 9" Grid.Row="6" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="IU09" Width="30" Grid.Row="6" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                <TextBlock Text="module 10" Grid.Row="7" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="IU10" Width="30" Grid.Row="7" Grid.Column="1" Margin="5" IsEnabled="False"/>
-                <TextBlock Text="module 11" Grid.Row="7" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="IU11" Width="30" Grid.Row="7" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                <TextBlock Text="module 12" Grid.Row="8" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="IU12" Width="30" Grid.Row="8" Grid.Column="1" Margin="5" IsEnabled="False"/>
-                <TextBlock Text="module 13" Grid.Row="8" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="IU13" Width="30" Grid.Row="8" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                <TextBlock Text="module 14" Grid.Row="9" Grid.Column="0" Margin="5" />
-                <TextBox x:Name="IU14" Width="30" Grid.Row="9" Grid.Column="1" Margin="5" IsEnabled="False"/>
-                <TextBlock Text="module 15" Grid.Row="9" Grid.Column="2" Margin="5" />
-                <TextBox x:Name="IU15" Width="30" Grid.Row="9" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                <RadioButton Content="Basic" GroupName="IU" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"
+                <StackPanel Orientation="Horizontal">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="40"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                            <RowDefinition Height="30"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock x:Name="txtNqs" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
+                        <TextBox x:Name="tbxNqs" Grid.Row="1" Width="30" Grid.Column="1" Margin="5" Text="0"/>
+                        <Button x:Name="btnQSGen" Grid.Row="1" Grid.Column="2" Click="btnQSGen_Click" IsEnabled="False"/>
+                        <TextBlock x:Name="txtNq" Grid.Row="2" Grid.Column="0" Margin="5" Height="25"/>
+                        <TextBlock x:Name="tbxNq" Width="30" Grid.Row="2" Grid.Column="1" Margin="5"/>
+                        <TextBlock Text="module 1" Grid.Row="2" Grid.Column="2" Margin="5" Height="25"/>
+                        <TextBox x:Name="IU01" Width="30" Grid.Row="2" Grid.Column="3" Margin="5"/>
+                        <TextBlock Text="module 2" Grid.Row="3" Grid.Column="0" Margin="5" />
+                        <TextBox x:Name="IU02" Width="30" Grid.Row="3" Grid.Column="1" Margin="5"/>
+                        <TextBlock Text="module 3" Grid.Row="3" Grid.Column="2" Margin="5" />
+                        <TextBox x:Name="IU03" Width="30" Grid.Row="3" Grid.Column="3" Margin="5"/>
+                        <TextBlock Text="module 4" Grid.Row="4" Grid.Column="0" Margin="5" />
+                        <TextBox x:Name="IU04" Width="30" Grid.Row="4" Grid.Column="1" Margin="5"/>
+                        <TextBlock Text="module 5" Grid.Row="4" Grid.Column="2" Margin="5" />
+                        <TextBox x:Name="IU05" Width="30" Grid.Row="4" Grid.Column="3" Margin="5"/>
+                        <TextBlock Text="module 6" Grid.Row="5" Grid.Column="0" Margin="5" />
+                        <TextBox x:Name="IU06" Width="30" Grid.Row="5" Grid.Column="1" Margin="5"/>
+                        <TextBlock Text="module 7" Grid.Row="5" Grid.Column="2" Margin="5" />
+                        <TextBox x:Name="IU07" Width="30" Grid.Row="5" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                        <TextBlock Text="module 8" Grid.Row="6" Grid.Column="0" Margin="5" />
+                        <TextBox x:Name="IU08" Width="30" Grid.Row="6" Grid.Column="1" Margin="5" IsEnabled="False"/>
+                        <TextBlock Text="module 9" Grid.Row="6" Grid.Column="2" Margin="5" />
+                        <TextBox x:Name="IU09" Width="30" Grid.Row="6" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                        <TextBlock Text="module 10" Grid.Row="7" Grid.Column="0" Margin="5" />
+                        <TextBox x:Name="IU10" Width="30" Grid.Row="7" Grid.Column="1" Margin="5" IsEnabled="False"/>
+                        <TextBlock Text="module 11" Grid.Row="7" Grid.Column="2" Margin="5" />
+                        <TextBox x:Name="IU11" Width="30" Grid.Row="7" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                        <TextBlock Text="module 12" Grid.Row="8" Grid.Column="0" Margin="5" />
+                        <TextBox x:Name="IU12" Width="30" Grid.Row="8" Grid.Column="1" Margin="5" IsEnabled="False"/>
+                        <TextBlock Text="module 13" Grid.Row="8" Grid.Column="2" Margin="5" />
+                        <TextBox x:Name="IU13" Width="30" Grid.Row="8" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                        <TextBlock Text="module 14" Grid.Row="9" Grid.Column="0" Margin="5" />
+                        <TextBox x:Name="IU14" Width="30" Grid.Row="9" Grid.Column="1" Margin="5" IsEnabled="False"/>
+                        <TextBlock Text="module 15" Grid.Row="9" Grid.Column="2" Margin="5" />
+                        <TextBox x:Name="IU15" Width="30" Grid.Row="9" Grid.Column="3" Margin="5" IsEnabled="False"/>
+                        <RadioButton Content="Basic" GroupName="IU" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"
                              x:Name="rdoA" Checked="rdo_Checked" />
-                <RadioButton Content="Advance" GroupName="IU" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
+                        <RadioButton Content="Advance" GroupName="IU" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"
                              x:Name="rdoB" Checked="rdo_Checked"/>
-            </Grid>
-            <TabControl x:Name="tbcQuest" Width="400" Height="320"/>
+                    </Grid>
+                    <TabControl x:Name="tbcQuest" Width="400" Height="320"/>
+                </StackPanel>
+            </StackPanel>
         </StackPanel>
     </StackPanel>
 </Page>
