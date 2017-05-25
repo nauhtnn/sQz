@@ -51,7 +51,7 @@ namespace sQzServer0
 
         private void LoadDate()
         {
-            Dictionary<uint, DateTime> v = mSl.DBSelect();
+            Dictionary<uint, Tuple<DateTime, bool>> v = ExamSlot.DBSelect();
             if(0 < v.Keys.Count)
             {
                 bool dark = true;
@@ -64,7 +64,7 @@ namespace sQzServer0
                     {
                         ListBoxItem it = new ListBoxItem();
                         it.Name = "_" + i;
-                        it.Content = v[i].ToString("dd/MM/yyyy HH:mm");
+                        it.Content = v[i].Item1.ToString("dd/MM/yyyy HH:mm");
                         dark = !dark;
                         if (dark)
                             it.Background = new SolidColorBrush(c);

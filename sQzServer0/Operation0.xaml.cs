@@ -25,7 +25,8 @@ namespace sQzServer0
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamSlot mSl;
+        Dictionary<uint, ExamSlot> vSl;
+        ExamSlot curSl;
 
         public Operation0()
         {
@@ -33,7 +34,7 @@ namespace sQzServer0
             ShowsNavigationUI = false;
             mServer = new Server2(SrvrBufHndl);
             mCbMsg = new UICbMsg();
-            mSl = new ExamSlot();
+            vSl = new Dictionary<uint, ExamSlot>();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -54,20 +55,27 @@ namespace sQzServer0
             ListBoxItem i = (ListBoxItem)l.SelectedItem;
             if (i == null)
                 return;
-            if (uint.TryParse(i.Name.Substring(1), out mSl.uId))
+            if(i.IsSelected)
             {
-                ExamSlot.Parse(i.Content as string, ExamSlot.FORM_H, out mSl.mDt);
-                mSl.DBSelectNee();
-                mSl.LoadExaminees(gNee);
-                QuestSheet.DBUpdateCurQSId(mSl.uId);
+                ExamSlot sl = new ExamSlot();
+                sl.uId = uint.Parse(i.Name.Substring(1));
+                if((i.Content as string)[0] == '*')
+                    ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
+                else
+                    ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
+                sl.DBSelectNee();
+                sl.LoadExaminees(gNee);
+                QuestSheet.DBUpdateCurQSId(sl.uId);
+                vSl.Add(sl.uId, sl);
+                curSl = sl;//todo
             }
             else
-                mSl.uId = uint.MaxValue;
+                vSl.Remove(uint.Parse(i.Name.Substring(1)));
         }
 
         private void LoadDates()
         {
-            Dictionary<uint, DateTime> v = mSl.DBSelect();
+            Dictionary<uint, Tuple<DateTime, bool>> v = ExamSlot.DBSelect();
             if (0 < v.Keys.Count)
             {
                 bool dark = true;
@@ -79,7 +87,10 @@ namespace sQzServer0
                     foreach (uint i in v.Keys)
                     {
                         ListBoxItem it = new ListBoxItem();
-                        it.Content = v[i].ToString(ExamSlot.FORM_H);
+                        if(v[i].Item2)
+                            it.Content = v[i].Item1.ToString(ExamSlot.FORM_H);
+                        else
+                            it.Content = "*" + v[i].Item1.ToString(ExamSlot.FORM_H);
                         it.Name = "_" + i;
                         dark = !dark;
                         if (dark)
@@ -150,7 +161,7 @@ namespace sQzServer0
                 if (t != null)
                     vn.Add(int.Parse(t.Text));
             }
-            mSl.GenQPack(n, lv, vn.ToArray());
+            curSl.GenQPack(n, lv, vn.ToArray());
             
             ShowQuest();
         }
@@ -163,7 +174,7 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
 				tbcQuest.Items.Clear();
-                foreach(QuestPack p in mSl.vQPack.Values)
+                foreach(QuestPack p in curSl.vQPack.Values)
 				    foreach(QuestSheet qs in p.vSheet.Values) {
 					    TabItem ti = new TabItem();
 					    ti.Header = qs.eLv.ToString() + qs.uId;
@@ -218,13 +229,13 @@ namespace sQzServer0
                     }
                     int rId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
-                    sz += mSl.GetByteCountDt();
-                    List<byte[]> es = mSl.ToByteR1(rId);
+                    sz += curSl.GetByteCountDt();
+                    List<byte[]> es = curSl.ToByteR1(rId);
                     foreach(byte[] i in es)
                         sz += i.Length;
                     outMsg = new byte[sz];
                     sz = 0;
-                    ExamSlot.ToByteDt(outMsg, ref sz, mSl.mDt);
+                    ExamSlot.ToByteDt(outMsg, ref sz, curSl.mDt);
                     foreach (byte[] i in es)
                     {
                         Buffer.BlockCopy(i, 0, outMsg, sz, i.Length);
@@ -232,10 +243,10 @@ namespace sQzServer0
                     }
                     return true;
                 case NetCode.QuestRetrieving:
-                    outMsg = mSl.ToByteQPack();
+                    outMsg = curSl.ToByteQPack();
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    outMsg = mSl.ToByteKey();
+                    outMsg = curSl.ToByteKey();
                     break;
                 case NetCode.RequestQuestSheet:
                     if (buf.Length - offs == 4)
@@ -251,12 +262,12 @@ namespace sQzServer0
                             lv = ExamLv.B;
                             qsId -= (int)ExamLv.B;
                         }
-                        if (qs.DBSelect(mSl.uId, lv, qsId))
+                        if (qs.DBSelect(curSl.uId, lv, qsId))
                             outMsg = BitConverter.GetBytes(-1);
                         else
                         {
-                            mSl.vQPack[lv].vSheet.Add(qs.uId, qs);
-                            AnsSheet a = mSl.mKeyPack.ExtractKey(qs);
+                            curSl.vQPack[lv].vSheet.Add(qs.uId, qs);
+                            AnsSheet a = curSl.mKeyPack.ExtractKey(qs);
                             List<byte[]> bs = qs.ToByte();
                             sz = 4;
                             if (a != null)
@@ -281,9 +292,9 @@ namespace sQzServer0
                         outMsg = BitConverter.GetBytes(-1);
                     break;
                 case NetCode.SrvrSubmitting:
-                    mSl.ReadByteR0(buf, ref offs);
-                    mSl.DBUpdateRs();
-                    mSl.UpdateRsView();
+                    curSl.ReadByteR0(buf, ref offs);
+                    curSl.DBUpdateRs();
+                    curSl.UpdateRsView();
                     outMsg = BitConverter.GetBytes(1);
                     mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
                     break;
