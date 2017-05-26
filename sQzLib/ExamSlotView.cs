@@ -9,14 +9,12 @@ using System.Windows.Media;
 
 namespace sQzLib
 {
-    public class ExamSlotView
+    public class ExamSlotView: StackPanel
     {
         public Dictionary<int, TextBlock> vGrade;
         public Dictionary<int, TextBlock> vDt1;
         public Dictionary<int, TextBlock> vDt2;
         public Dictionary<int, TextBlock> vComp;
-        StackPanel mSp;
-        public TabItem tbiNee;
 
         public ExamSlotView()
         {
@@ -26,9 +24,11 @@ namespace sQzLib
             vComp = new Dictionary<int, TextBlock>();
         }
 
-        public void TabItemExaminee(ExamSlot sl)
+        public void ShowExaminee(ExamSlot sl)
         {
-            Grid grd = mSp.FindName("grdExaminees") as Grid;
+            Grid grd = null;
+            foreach (ScrollViewer scrvwr in Children.OfType<ScrollViewer>())
+                grd = scrvwr.Content as Grid;
             if (grd == null)
                 return;
             Color c = new Color();
@@ -129,8 +129,6 @@ namespace sQzLib
 
         public void ShallowCopy(StackPanel refSp)
         {
-            mSp = new StackPanel();
-
             foreach(Grid refg in refSp.Children.OfType<Grid>())
             {
                 Grid g = new Grid();
@@ -140,13 +138,28 @@ namespace sQzLib
                     d.Width = cd.Width;
                     g.ColumnDefinitions.Add(d);
                 }
+                foreach(TextBlock txt in refg.Children)
+                {
+                    TextBlock t = new TextBlock();
+                    t.Text = txt.Text;
+                    t.Background = txt.Background;
+                    t.Foreground = txt.Foreground;
+                    Grid.SetColumn(t, Grid.GetColumn(txt));
+                    Grid.SetRow(t, Grid.GetRow(txt));
+                    g.Children.Add(t);
+                }
                 g.Name = refg.Name;
+                Children.Add(g);
             }
 
             foreach (ScrollViewer refscrvwr in refSp.Children.OfType<ScrollViewer>())
             {
                 ScrollViewer vwr = new ScrollViewer();
                 Grid refg = refscrvwr.Content as Grid;
+                if (refg == null)
+                    continue;
+                vwr.Width = refscrvwr.Width;
+                vwr.Height = refscrvwr.Height;
                 Grid g = new Grid();
                 foreach (ColumnDefinition cd in refg.ColumnDefinitions)
                 {
@@ -155,6 +168,8 @@ namespace sQzLib
                     g.ColumnDefinitions.Add(d);
                 }
                 g.Name = refg.Name;
+                vwr.Content = g;
+                Children.Add(vwr);
             }
         }
     }

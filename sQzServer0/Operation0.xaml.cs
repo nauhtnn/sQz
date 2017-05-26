@@ -66,7 +66,12 @@ namespace sQzServer0
                     ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
                 sl.DBSelectNee();
                 ExamSlotView vw = new ExamSlotView();
-                vw.ShallowCopy(spRefSl);
+                vw.ShallowCopy(refSp);
+                vw.ShowExaminee(sl);
+                TabItem ti = new TabItem();
+                ti.Header = sl.mDt.ToString(ExamSlot.FORM_SH);
+                ti.Content = vw;
+                tbcSl.Items.Add(ti);
                 QuestSheet.DBUpdateCurQSId(sl.uId);
                 vSl.Add(sl.uId, sl);
                 vSlVw.Add(sl.uId, vw);

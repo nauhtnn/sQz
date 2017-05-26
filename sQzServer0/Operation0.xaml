@@ -15,7 +15,7 @@
             <Button x:Name="btnPrep" Width="100" Height="40" Content="Prepare" Click="btnPrep_Click"></Button>
             <Button x:Name="btnExit" Content="Exit" Height="40" Width="100" Click="btnExit_Click"/>
         </StackPanel>
-        <StackPanel x:Name="spRefSl" Orientation="Horizontal" Margin="10">
+        <StackPanel Orientation="Horizontal" Margin="10">
             <StackPanel>
                 <ScrollViewer Width="150" Height="320" VerticalScrollBarVisibility="Auto">
                     <ListBox x:Name="lbxDate" Width="150"/>
@@ -24,7 +24,8 @@
                     <TextBlock x:Name="lblStatus" Width="400" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
                 </ScrollViewer>
             </StackPanel>
-            <StackPanel>
+            <TabControl x:Name="tbcSl" Width="800"/>
+            <StackPanel x:Name="refSp" Visibility="Collapsed">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40"/>
@@ -49,7 +50,7 @@
                     <TextBlock x:Name="txtComp" Grid.Column="7" Text="Comp" Background="Azure" TextAlignment="Center"/>
                 </Grid>
                 <ScrollViewer Width="676" Height="290" VerticalScrollBarVisibility="Auto">
-                    <Grid Name="grdExaminees" Visibility="Collapsed">
+                    <Grid Name="grdExaminees">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="40"/>
                             <ColumnDefinition Width="180"/>
