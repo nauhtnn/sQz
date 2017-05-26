@@ -66,8 +66,9 @@ namespace sQzServer0
                     ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
                 sl.DBSelectNee();
                 ExamSlotView vw = new ExamSlotView();
-                vw.ShallowCopy(refSp);
-                vw.ShowExaminee(sl);
+                vw.ShallowCopy(refSpSl);
+                vw.mSl = sl;
+                vw.ShowExaminee();
                 TabItem ti = new TabItem();
                 ti.Header = sl.mDt.ToString(ExamSlot.FORM_SH);
                 ti.Content = vw;
@@ -122,7 +123,7 @@ namespace sQzServer0
             LoadTxt();
 
             LoadDates();
-            InitQPanel();
+            //InitQPanel();
 
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
@@ -150,61 +151,6 @@ namespace sQzServer0
         private void btnStopSrvr_Click(object sender, RoutedEventArgs e)
         {
             mServer.Stop(ref mCbMsg);
-        }
-
-        private void btnQSGen_Click(object sender, RoutedEventArgs e)
-        {
-			TextBox t = FindName("tbxNqs") as TextBox;
-            int n = int.Parse(t.Text);
-            ExamLv lv;
-            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-                lv = ExamLv.A;
-            else
-                lv = ExamLv.B;
-            List<int> vn = new List<int>();
-            foreach (IUxx i in QuestSheet.GetIUs(lv))
-            {
-                t = FindName(i.ToString()) as TextBox;
-                if (t != null)
-                    vn.Add(int.Parse(t.Text));
-            }
-            //curSl.GenQPack(n, lv, vn.ToArray());
-            
-            ShowQuest();
-        }
-
-        private void ShowQuest()
-        {
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            Dispatcher.Invoke(() => {
-				tbcQuest.Items.Clear();
-        //        foreach(QuestPack p in curSl.vQPack.Values)
-				    //foreach(QuestSheet qs in p.vSheet.Values) {
-					   // TabItem ti = new TabItem();
-					   // ti.Header = qs.eLv.ToString() + qs.uId;
-        //                ScrollViewer svwr = new ScrollViewer();
-        //                svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-					   // StackPanel sp = new StackPanel();
-        //                int x = 0;
-        //                foreach (Question q in qs.vQuest)
-					   // {
-						  //  TextBlock i = new TextBlock();
-						  //  i.Text = ++x + ") " + q.ToString();
-						  //  dark = !dark;
-						  //  if (dark)
-							 //   i.Background = new SolidColorBrush(c);
-						  //  else
-							 //   i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-						  //  sp.Children.Add(i);
-					   // }
-        //                svwr.Content = sp;
-        //                ti.Content = svwr;
-					   // tbcQuest.Items.Add(ti);
-				    //}
-            });
         }
 
         private void btnPrep_Click(object sender, RoutedEventArgs e)
@@ -314,81 +260,6 @@ namespace sQzServer0
             return false;
         }
 
-        public void InitQPanel()
-        {
-            foreach(IUxx i in QuestSheet.GetAllIUs())
-            {
-                TextBox t = FindName(i.ToString()) as TextBox;
-                if(t != null)
-                {
-                    t.MaxLength = 2;
-                    t.PreviewKeyDown += tbxIU_PrevwKeyDown;
-                    t.TextChanged += tbxIU_TextChanged;
-                }
-            }
-            tbxNqs.MaxLength = 2;
-            tbxNqs.PreviewKeyDown += tbxIU_PrevwKeyDown;
-            tbxNqs.TextChanged += tbxIU_TextChanged;
-            tbxNq.Text = "0";
-        }
-
-        private void tbxIU_PrevwKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Delete && e.Key != Key.Back && e.Key != Key.Tab &&
-                ((int)e.Key < (int)Key.Left || (int)Key.Down < (int)e.Key) &&
-                ((int)e.Key < (int)Key.D0 || (int)Key.D9 < (int)e.Key))
-                e.Handled = true;
-        }
-
-        private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            TextBox t = FindName("tbxNqs") as TextBox;
-            if(t == null || t.Text == null || t.Text.Length == 0 || int.Parse(t.Text) == 0)
-            {
-                btnQSGen.IsEnabled = false;
-                return;
-            }
-            int n = 0, i;
-            bool bG = true;
-            if (rdoA.IsChecked.HasValue? rdoA.IsChecked.Value : false)
-            {
-                foreach(IUxx j in QuestSheet.GetIUs(ExamLv.A))
-                    if ((t = FindName(j.ToString()) as TextBox) != null)
-                    {
-                        if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
-                            n += i;
-                        else
-                            bG = false;
-                    }
-                    else
-                        bG = false;
-                tbxNq.Text = n.ToString();
-                if (bG && n == 30)
-                    btnQSGen.IsEnabled = true;
-                else
-                    btnQSGen.IsEnabled = false;
-            }
-            else
-            {
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
-                    if ((t = FindName(j.ToString()) as TextBox) != null)
-                    {
-                        t.IsEnabled = true;
-                        if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
-                            n += i;
-                        else
-                            bG = false;
-                    }
-                    else
-                        bG = false;
-                tbxNq.Text = n.ToString();
-                if (bG && n == 30)
-                    btnQSGen.IsEnabled = true;
-                else
-                    btnQSGen.IsEnabled = false;
-            }
-        }
-
         private void LoadTxt()
         {
             Txt t = Txt.s;
@@ -405,30 +276,6 @@ namespace sQzServer0
             txtName.Text = t._[(int)TxI.NEE_NAME];
             txtId.Text = t._[(int)TxI.NEEID_S];
             txtGrade.Text = t._[(int)TxI.MARK];
-        }
-
-        private void rdo_Checked(object sender, RoutedEventArgs e)
-        {
-            TextBox t;
-            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-            {
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.A))
-                    if ((t = FindName(j.ToString()) as TextBox) != null)
-                        t.IsEnabled = true;
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
-                    if ((t = FindName(j.ToString()) as TextBox) != null)
-                        t.IsEnabled = false;
-            }
-            else
-            {
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
-                    if ((t = FindName(j.ToString()) as TextBox) != null)
-                        t.IsEnabled = true;
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.A))
-                    if ((t = FindName(j.ToString()) as TextBox) != null)
-                        t.IsEnabled = false;
-            }
-            tbxIU_TextChanged(null, null);
         }
     }
 }

@@ -226,8 +226,6 @@ namespace sQzLib
         public void DBSelect(IUxx eIU)
         {
             vQuest.Clear();
-            if (eIU == IUxx.IU00)
-                return;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
@@ -263,8 +261,6 @@ namespace sQzLib
         //only Server0 uses this.
         public void DBSelect(IUxx eIU, int n)
         {
-            if (eIU == IUxx.IU00)
-                return;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
@@ -340,8 +336,6 @@ namespace sQzLib
 
         public void DBInsert(IUxx eIU)
         {
-            if (eIU == IUxx.IU00)
-                return;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
