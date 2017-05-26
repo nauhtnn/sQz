@@ -66,8 +66,7 @@ namespace sQzServer0
                     ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
                 sl.DBSelectNee();
                 ExamSlotView vw = new ExamSlotView();
-                tbcNee.Items.Add(vw.TabItemExaminee(sl, grdRefNee,
-                    sl.mDt.ToString(ExamSlot.FORM_SH)));
+                vw.ShallowCopy(spRefSl);
                 QuestSheet.DBUpdateCurQSId(sl.uId);
                 vSl.Add(sl.uId, sl);
                 vSlVw.Add(sl.uId, vw);
@@ -164,7 +163,7 @@ namespace sQzServer0
                 if (t != null)
                     vn.Add(int.Parse(t.Text));
             }
-            curSl.GenQPack(n, lv, vn.ToArray());
+            //curSl.GenQPack(n, lv, vn.ToArray());
             
             ShowQuest();
         }
@@ -177,29 +176,29 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
 				tbcQuest.Items.Clear();
-                foreach(QuestPack p in curSl.vQPack.Values)
-				    foreach(QuestSheet qs in p.vSheet.Values) {
-					    TabItem ti = new TabItem();
-					    ti.Header = qs.eLv.ToString() + qs.uId;
-                        ScrollViewer svwr = new ScrollViewer();
-                        svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-					    StackPanel sp = new StackPanel();
-                        int x = 0;
-                        foreach (Question q in qs.vQuest)
-					    {
-						    TextBlock i = new TextBlock();
-						    i.Text = ++x + ") " + q.ToString();
-						    dark = !dark;
-						    if (dark)
-							    i.Background = new SolidColorBrush(c);
-						    else
-							    i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-						    sp.Children.Add(i);
-					    }
-                        svwr.Content = sp;
-                        ti.Content = svwr;
-					    tbcQuest.Items.Add(ti);
-				    }
+        //        foreach(QuestPack p in curSl.vQPack.Values)
+				    //foreach(QuestSheet qs in p.vSheet.Values) {
+					   // TabItem ti = new TabItem();
+					   // ti.Header = qs.eLv.ToString() + qs.uId;
+        //                ScrollViewer svwr = new ScrollViewer();
+        //                svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+					   // StackPanel sp = new StackPanel();
+        //                int x = 0;
+        //                foreach (Question q in qs.vQuest)
+					   // {
+						  //  TextBlock i = new TextBlock();
+						  //  i.Text = ++x + ") " + q.ToString();
+						  //  dark = !dark;
+						  //  if (dark)
+							 //   i.Background = new SolidColorBrush(c);
+						  //  else
+							 //   i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
+						  //  sp.Children.Add(i);
+					   // }
+        //                svwr.Content = sp;
+        //                ti.Content = svwr;
+					   // tbcQuest.Items.Add(ti);
+				    //}
             });
         }
 
@@ -232,24 +231,25 @@ namespace sQzServer0
                     }
                     int rId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
-                    sz += curSl.GetByteCountDt();
-                    List<byte[]> es = curSl.ToByteR1(rId);
-                    foreach(byte[] i in es)
-                        sz += i.Length;
-                    outMsg = new byte[sz];
-                    sz = 0;
-                    ExamSlot.ToByteDt(outMsg, ref sz, curSl.mDt);
-                    foreach (byte[] i in es)
-                    {
-                        Buffer.BlockCopy(i, 0, outMsg, sz, i.Length);
-                        sz += i.Length;
-                    }
+                    //sz += curSl.GetByteCountDt();
+                    //List<byte[]> es = curSl.ToByteR1(rId);
+                    //foreach(byte[] i in es)
+                    //    sz += i.Length;
+                    //outMsg = new byte[sz];
+                    //sz = 0;
+                    //ExamSlot.ToByteDt(outMsg, ref sz, curSl.mDt);
+                    //foreach (byte[] i in es)
+                    //{
+                    //    Buffer.BlockCopy(i, 0, outMsg, sz, i.Length);
+                    //    sz += i.Length;
+                    //}
+                    outMsg = null;
                     return true;
                 case NetCode.QuestRetrieving:
-                    outMsg = curSl.ToByteQPack();
+                    outMsg = null;// curSl.ToByteQPack();
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    outMsg = curSl.ToByteKey();
+                    outMsg = null;// curSl.ToByteKey();
                     break;
                 case NetCode.RequestQuestSheet:
                     if (buf.Length - offs == 4)
@@ -265,41 +265,42 @@ namespace sQzServer0
                             lv = ExamLv.B;
                             qsId -= (int)ExamLv.B;
                         }
-                        if (qs.DBSelect(curSl.uId, lv, qsId))
-                            outMsg = BitConverter.GetBytes(-1);
-                        else
-                        {
-                            curSl.vQPack[lv].vSheet.Add(qs.uId, qs);
-                            AnsSheet a = curSl.mKeyPack.ExtractKey(qs);
-                            List<byte[]> bs = qs.ToByte();
-                            sz = 4;
-                            if (a != null)
-                                sz += a.GetByteCount();
-                            foreach (byte[] b in bs)
-                                sz += b.Length;
-                            outMsg = new byte[sz];
-                            Array.Copy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
-                            offs = 4;
-                            foreach (byte[] b in bs)
-                            {
-                                Array.Copy(b, 0, outMsg, offs, b.Length);
-                                offs += b.Length;
-                            }
-                            if (a != null)
-                                a.ToByte(ref outMsg, ref offs);
-                            Dispatcher.Invoke(() => ShowQuest());
-                        }
-
+                        outMsg = null;
+                        //if (qs.DBSelect(curSl.uId, lv, qsId))
+                        //    outMsg = BitConverter.GetBytes(-1);
+                        //else
+                        //{
+                        //    curSl.vQPack[lv].vSheet.Add(qs.uId, qs);
+                        //    AnsSheet a = curSl.mKeyPack.ExtractKey(qs);
+                        //    List<byte[]> bs = qs.ToByte();
+                        //    sz = 4;
+                        //    if (a != null)
+                        //        sz += a.GetByteCount();
+                        //    foreach (byte[] b in bs)
+                        //        sz += b.Length;
+                        //    outMsg = new byte[sz];
+                        //    Array.Copy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
+                        //    offs = 4;
+                        //    foreach (byte[] b in bs)
+                        //    {
+                        //        Array.Copy(b, 0, outMsg, offs, b.Length);
+                        //        offs += b.Length;
+                        //    }
+                        //    if (a != null)
+                        //        a.ToByte(ref outMsg, ref offs);
+                        //    Dispatcher.Invoke(() => ShowQuest());
+                        //}
                     }
                     else
                         outMsg = BitConverter.GetBytes(-1);
                     break;
                 case NetCode.SrvrSubmitting:
-                    curSl.ReadByteR0(buf, ref offs);
-                    curSl.DBUpdateRs();
-                    vSlVw[curSl.uId].UpdateRsView(curSl.vRoom.Values.ToList());
-                    outMsg = BitConverter.GetBytes(1);
-                    mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
+                    //curSl.ReadByteR0(buf, ref offs);
+                    //curSl.DBUpdateRs();
+                    //vSlVw[curSl.uId].UpdateRsView(curSl.vRoom.Values.ToList());
+                    //outMsg = BitConverter.GetBytes(1);
+                    //mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
+                    outMsg = null;
                     break;
                 default:
                     outMsg = null;
