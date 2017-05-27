@@ -104,17 +104,29 @@ namespace sQzLib
         }
 
         //Insert statement
-        public static void Ins(MySqlConnection conn, string tb, string vAttb, string vals)
+        public static int Ins(MySqlConnection conn, string tb,
+            string vAttb, string vals, out string eMsg)
         {
             if (vAttb == null || vals == null)
-                return;
+            {
+                eMsg = "null";
+                return 0;
+            }
             StringBuilder qry = new StringBuilder();
             qry.Append("INSERT INTO " + tb + "(" + vAttb + ")VALUES");
             qry.Append(vals);
             
             MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
-
-            cmd.ExecuteNonQuery();
+            int n;
+            try
+            {
+                n = cmd.ExecuteNonQuery();
+                eMsg = null;
+            } catch(MySqlException e) {
+                n = 0;
+                eMsg = e.ToString();
+            }
+            return n;
         }
 
         //Update statement

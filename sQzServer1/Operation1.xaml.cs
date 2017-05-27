@@ -171,7 +171,7 @@ namespace sQzServer1
                         e = mSl.Signin(e);
                         if (e != null)
                         {
-                            if (e.dtTim1.Hour == ExamSlot.INVALID)
+                            if (e.dtTim1.Hour == DtFmt.INV)
                                 e.dtTim1 = DateTime.Now;
                             Dispatcher.Invoke(() =>
                             {
@@ -349,8 +349,8 @@ namespace sQzServer1
                         break;
                     mSl.ReadByteR1(buf, ref offs);
                     Dispatcher.Invoke(() => {
-                        if (mSl.mDt.Year != ExamSlot.INVALID)
-                            txtDate.Text = mSl.mDt.ToString(ExamSlot.FORM_H);
+                        if (mSl.mDt.Year != DtFmt.INV)
+                            txtDate.Text = mSl.mDt.ToString(DtFmt.H);
                         vComp.Clear();
                         vMark.Clear();
                         vTime1.Clear();
@@ -394,7 +394,7 @@ namespace sQzServer1
                                 vLock.Add(lvid, cbx);
                                 gNee.Children.Add(cbx);
                                 t = new TextBlock();
-                                if (e.dtTim1.Hour != ExamSlot.INVALID)
+                                if (e.dtTim1.Hour != DtFmt.INV)
                                 {
                                     t.Text = e.dtTim1.ToString("HH:mm");
                                     vbLock.Add(lvid, true);
@@ -409,7 +409,7 @@ namespace sQzServer1
                                 Grid.SetColumn(t, 4);
                                 gNee.Children.Add(t);
                                 t = new TextBlock();
-                                if (e.dtTim2.Hour != ExamSlot.INVALID)
+                                if (e.dtTim2.Hour != DtFmt.INV)
                                     t.Text = e.dtTim2.ToString("HH:mm");
                                 vTime2.Add(lvid, t);
                                 Grid.SetRow(t, rid);

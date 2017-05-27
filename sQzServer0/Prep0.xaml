@@ -9,23 +9,40 @@
       Title="Prep0">
 
     <StackPanel x:Name="spMain" Loaded="Main_Loaded">
-        <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-            <TextBox x:Name="tbxDate" Height="60" Width="160" />
-            <Button x:Name="btnInsDate"  Content="Insert Date" Height="60" Width="100" Click="btnInsDate_Click"/>
-            <Button x:Name="btnNeeBrowse" Content="Browse Examinee" Height="60" Width="160" Click="btnNeeBrowse_Click" HorizontalAlignment="Right"/>
-            <Button Content="history" Click="btnHistory_Click"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
-            <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="lbxDate" Width="200" SelectionChanged="lbxDate_SelectionChanged"></ListBox>
-            </ScrollViewer>
-            <ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
-                <ListBox x:Name="lbxStudent" Width="420"></ListBox>
-            </ScrollViewer>
-            <Button x:Name="btnInsNee" Content="&lt;&lt;" Height="30" Width="60" Click="btnInsNee_Click" Margin="5,0,0,5"/>
-            <ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="lbxNewStu" Width="420"></ListBox>
-            </ScrollViewer>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
+                    <TextBox x:Name="tbxBrd" Height="40" Width="120" />
+                    <Button x:Name="btnInsBrd"  Content="+" Height="40" Width="40" Click="btnInsBrd_Click"/>
+                </StackPanel>
+                <ScrollViewer Width="120" Height="200" VerticalScrollBarVisibility="Auto">
+                    <ListBox x:Name="lbxBrd" Width="200" SelectionChanged="lbxBrd_SelectionChanged"/>
+                </ScrollViewer>
+            </StackPanel>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
+                    <TextBox x:Name="tbxSl" Height="60" Width="160" />
+                    <Button x:Name="btnInsSl"  Content="+" Height="60" Width="60" Click="btnInsSl_Click"/>
+                </StackPanel>
+                <ScrollViewer Width="200" Height="200" VerticalScrollBarVisibility="Auto">
+                    <ListBox x:Name="lbxSl" Width="200" SelectionChanged="lbxBrd_SelectionChanged"></ListBox>
+                </ScrollViewer>
+            </StackPanel>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Button x:Name="btnNeeBrowse" Content="Browse Examinee" Height="60" Width="160" Click="btnNeeBrowse_Click" HorizontalAlignment="Right"/>
+                    <Button Content="history" Click="btnHistory_Click"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
+                    <ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
+                        <ListBox x:Name="lbxStudent" Width="420"></ListBox>
+                    </ScrollViewer>
+                    <Button x:Name="btnInsNee" Content="&lt;&lt;" Height="30" Width="60" Click="btnInsNee_Click" Margin="5,0,0,5"/>
+                    <ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto">
+                        <ListBox x:Name="lbxNewStu" Width="420"></ListBox>
+                    </ScrollViewer>
+                </StackPanel>
+            </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
             <ScrollViewer Width="160" Height="410" VerticalScrollBarVisibility="Auto">

@@ -57,7 +57,7 @@ namespace sQzLib
                 vals.Append(e.mLv + ",");
                 vals.Append(e.uId + ",");
                 vals.Append("'" + e.tName + "',");
-                vals.Append("'" + ExamSlot.ToMysqlForm(e.tBirdate, ExamSlot.FORM_R) + "',");
+                vals.Append("'" + DtFmt.ToDtMysql(e.tBirdate, DtFmt.R) + "',");
                 vals.Append("'" + e.tBirthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma

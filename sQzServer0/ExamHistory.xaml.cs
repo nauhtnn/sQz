@@ -50,7 +50,7 @@ namespace sQzServer0
                     {
                         ListBoxItem it = new ListBoxItem();
                         it.Name = "_" + i;
-                        it.Content = v[i].ToString(ExamDate.FORM_H);
+                        it.Content = v[i].ToString(ExamDate.DtFmt.H);
                         dark = !dark;
                         if (dark)
                             it.Background = new SolidColorBrush(c);

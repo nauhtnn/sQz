@@ -25,8 +25,6 @@ namespace sQzServer0
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        Dictionary<uint, ExamSlot> vSl;
-        Dictionary<uint, ExamSlotView> vSlVw;
 
         public Operation0()
         {
@@ -34,8 +32,6 @@ namespace sQzServer0
             ShowsNavigationUI = false;
             mServer = new Server2(SrvrBufHndl);
             mCbMsg = new UICbMsg();
-            vSl = new Dictionary<uint, ExamSlot>();
-            vSlVw = new Dictionary<uint, ExamSlotView>();
 
             lbxDate.SelectionMode = SelectionMode.Single;
             lbxDate.SelectionChanged += lbxDate_SelectionChanged;
@@ -59,26 +55,26 @@ namespace sQzServer0
             if(i.IsSelected)
             {
                 ExamSlot sl = new ExamSlot();
-                sl.uId = uint.Parse(i.Name.Substring(1));
+                //sl.uId = uint.Parse(i.Name.Substring(1));
                 if ((i.Content as string)[0] == '*')
-                    ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
+                    DtFmt.ToDt((i.Content as string).Substring(1), DtFmt.H, out sl.mDt);
                 else
-                    ExamSlot.Parse((i.Content as string).Substring(1), ExamSlot.FORM_H, out sl.mDt);
+                    DtFmt.ToDt((i.Content as string).Substring(1), DtFmt.H, out sl.mDt);
                 sl.DBSelectNee();
                 ExamSlotView vw = new ExamSlotView();
                 vw.ShallowCopy(refSpSl);
                 vw.mSl = sl;
                 vw.ShowExaminee();
                 TabItem ti = new TabItem();
-                ti.Header = sl.mDt.ToString(ExamSlot.FORM_SH);
+                ti.Header = sl.mDt.ToString(DtFmt.SH);
                 ti.Content = vw;
                 tbcSl.Items.Add(ti);
-                QuestSheet.DBUpdateCurQSId(sl.uId);
-                vSl.Add(sl.uId, sl);
-                vSlVw.Add(sl.uId, vw);
+                //QuestSheet.DBUpdateCurQSId(sl.uId);
+                //vSl.Add(sl.uId, sl);
+                //vSlVw.Add(sl.uId, vw);
             }
-            else
-                vSl.Remove(uint.Parse(i.Name.Substring(1)));
+            //else
+            //    vSl.Remove(uint.Parse(i.Name.Substring(1)));
         }
 
         private void LoadDates()
@@ -96,9 +92,9 @@ namespace sQzServer0
                     {
                         ListBoxItem it = new ListBoxItem();
                         if(v[i].Item2)
-                            it.Content = v[i].Item1.ToString(ExamSlot.FORM_H);
+                            it.Content = v[i].Item1.ToString(DtFmt.H);
                         else
-                            it.Content = "*" + v[i].Item1.ToString(ExamSlot.FORM_H);
+                            it.Content = "*" + v[i].Item1.ToString(DtFmt.H);
                         it.Name = "_" + i;
                         dark = !dark;
                         if (dark)

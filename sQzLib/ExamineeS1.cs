@@ -207,7 +207,7 @@ namespace sQzLib
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim1))
             {
-                dtTim1 = ExamSlot.INVALID_DT;
+                dtTim1 = DtFmt.INV_;
                 return true;
             }
 
@@ -221,7 +221,7 @@ namespace sQzLib
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim2))
             {
-                dtTim2 = ExamSlot.INVALID_DT;
+                dtTim2 = DtFmt.INV_;
                 return true;
             }
 

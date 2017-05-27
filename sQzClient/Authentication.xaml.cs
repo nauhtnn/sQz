@@ -33,7 +33,7 @@ namespace sQzClient
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            mDt = ExamSlot.INVALID_DT;
+            mDt = DtFmt.INV_;
             mNee = new ExamineeC();
 
             mNee.kDtDuration = new TimeSpan(1, 0, 0);
@@ -129,7 +129,7 @@ namespace sQzClient
                     ExamSlot.ReadByteDt(buf, ref offs, out mDt);//todo: check data
                     if(bRunning)
                         Dispatcher.Invoke(() => {
-                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(ExamSlot.FORM_RH);
+                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(DtFmt.RH);
                             EnableControls();
                             btnReconn.IsEnabled = false;
                         });

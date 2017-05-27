@@ -28,7 +28,7 @@ namespace sQzServer0
         IUx mSelQCat;
         QuestSheet mDBQSh;
         QuestSheet mQSh;
-        ExamSlot mSl;
+        ExamBoard mBrd;
 
         public Prep0()
         {
@@ -37,54 +37,71 @@ namespace sQzServer0
             mSelQCat = IUx._0;
             mDBQSh = new QuestSheet();
             mQSh = new QuestSheet();
-            mSl = new ExamSlot();
+            mBrd = new ExamBoard();
         }
 
-        private void btnInsDate_Click(object sender, RoutedEventArgs e)
+        private void btnInsBrd_Click(object sender, RoutedEventArgs e)
         {
-            if (!ExamSlot.Parse(tbxDate.Text, ExamSlot.FORM_H, out mSl.mDt))
+            if (DtFmt.ToDt(tbxBrd.Text, DtFmt._, out mBrd.mDt))
             {
-                mSl.DBInsert();
-                LoadDate();
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
+                spMain.Opacity = 1;
+            }
+            else
+            {
+                mBrd.DBIns();
+                LoadBrd();
             }
         }
 
-        private void LoadDate()
+        private void btnInsSl_Click(object sender, RoutedEventArgs e)
         {
-            Dictionary<uint, Tuple<DateTime, bool>> v = ExamSlot.DBSelect();
-            if(0 < v.Keys.Count)
+            DateTime dt;
+            string t = tbxSl.Text;
+            if (DtFmt.ToDt(t, DtFmt.h, out dt))
             {
-                bool dark = true;
-                Color c = new Color();
-                c.A = 0xff;
-                c.B = c.G = c.R = 0xf0;
-                Dispatcher.Invoke(() => {
-                    lbxDate.Items.Clear();
-                    foreach (uint i in v.Keys)
-                    {
-                        ListBoxItem it = new ListBoxItem();
-                        it.Name = "_" + i;
-                        it.Content = v[i].Item1.ToString("dd/MM/yyyy HH:mm");
-                        dark = !dark;
-                        if (dark)
-                            it.Background = new SolidColorBrush(c);
-                        lbxDate.Items.Add(it);
-                    }
-                });
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
+                spMain.Opacity = 1;
+            }
+            else
+            {
+                mBrd.DBInsSl(dt);
+                LoadBrd();
+            }
+        }
+
+        private void LoadBrd()
+        {
+            List<DateTime> v = ExamBoard.DBSel();
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            lbxBrd.Items.Clear();
+            foreach(DateTime dt in v)
+            {
+                ListBoxItem it = new ListBoxItem();
+                it.Content = dt.ToString(DtFmt._);
+                dark = !dark;
+                if (dark)
+                    it.Background = new SolidColorBrush(c);
+                lbxBrd.Items.Add(it);
             }
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Application.Current.MainWindow.FontSize = 16;
-            double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
-            ScaleTransform st = new ScaleTransform(rt, rt);
-            spMain.RenderTransform = st;
+            //double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
+            //ScaleTransform st = new ScaleTransform(rt, rt);
+            //spMain.RenderTransform = st;
 
             LoadTxt();
 
             InitLbxQCatgry();
-            LoadDate();
+            LoadBrd();
         }
 
         void InitLbxQCatgry()
@@ -113,70 +130,73 @@ namespace sQzServer0
 
         private void LoadExaminees(bool fresh) //same as Operation0.xaml
         {
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            Dispatcher.Invoke(() => {
-                ListBox l = null;
-                if (fresh)
-                    l = lbxNewStu;
-                else
-                    l = lbxStudent;
-                l.Items.Clear();
-                foreach(ExamRoom r in mSl.vRoom.Values)
-                    foreach (ExamineeA e in r.vExaminee.Values)
-                    {
-                        ListBoxItem i = new ListBoxItem();
-                        i.Content = e.ToString();
-                        dark = !dark;
-                        if (dark)
-                            i.Background = new SolidColorBrush(c);
-                        l.Items.Add(i);
-                    }
-            });
+            //bool dark = true;
+            //Color c = new Color();
+            //c.A = 0xff;
+            //c.B = c.G = c.R = 0xf0;
+            //Dispatcher.Invoke(() => {
+            //    ListBox l = null;
+            //    if (fresh)
+            //        l = lbxNewStu;
+            //    else
+            //        l = lbxStudent;
+            //    l.Items.Clear();
+            //    foreach(ExamRoom r in mSl.vRoom.Values)
+            //        foreach (ExamineeA e in r.vExaminee.Values)
+            //        {
+            //            ListBoxItem i = new ListBoxItem();
+            //            i.Content = e.ToString();
+            //            dark = !dark;
+            //            if (dark)
+            //                i.Background = new SolidColorBrush(c);
+            //            l.Items.Add(i);
+            //        }
+            //});
         }
 
         private void btnNeeBrowse_Click(object sender, RoutedEventArgs e)
         {
-            OpenFileDialog dlg = new OpenFileDialog();
+            //OpenFileDialog dlg = new OpenFileDialog();
 
-            // set filter for file extension and default file extension 
-            dlg.DefaultExt = ".txt";
-            dlg.Filter = "text documents (*.txt)|*.txt";
-            bool? result = dlg.ShowDialog();
+            //// set filter for file extension and default file extension 
+            //dlg.DefaultExt = ".txt";
+            //dlg.Filter = "text documents (*.txt)|*.txt";
+            //bool? result = dlg.ShowDialog();
 
-            string filePath = null;
-            if (result == true)
-                filePath = dlg.FileName;
-            mSl.ReadF(filePath);
+            //string filePath = null;
+            //if (result == true)
+            //    filePath = dlg.FileName;
+            //mSl.ReadF(filePath);
             
-            LoadExaminees(true);
+            //LoadExaminees(true);
         }
 
         private void btnInsNee_Click(object sender, RoutedEventArgs e)
         {
-            if (mSl.uId != uint.MaxValue)
-            {
-                lbxNewStu.Items.Clear();
-                mSl.DBInsertNee();
-                LoadExaminees(false);
-            }
+            //if (mSl.uId != uint.MaxValue)
+            //{
+            //    lbxNewStu.Items.Clear();
+            //    mSl.DBInsertNee();
+            //    LoadExaminees(false);
+            //}
         }
 
-        private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            ListBox l = (ListBox)sender;
-            ListBoxItem i = (ListBoxItem)l.SelectedItem;
+            ListBox l = sender as ListBox;
+            ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
                 return;
-            if (uint.TryParse(i.Name.Substring(1), out mSl.uId))
+            if(DtFmt.ToDt(i.Content as string, DtFmt._, out mBrd.mDt))
             {
-                mSl.DBSelectNee();
-                LoadExaminees(false);
+                lbxSl.Items.Clear();
+                foreach(DateTime dt in mBrd.DBSelSl())
+                {
+                    ListBoxItem it = new ListBoxItem();
+                    it.Content = dt.ToString(DtFmt.h);
+                    lbxSl.Items.Add(it);
+                }
             }
-            else
-                mSl.uId = uint.MaxValue;
         }
 
         private void btnQBrowse_Click(object sender, RoutedEventArgs e)
@@ -259,7 +279,6 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            btnInsDate.Content = t._[(int)TxI.DATE_ADD];
             btnNeeBrowse.Content = t._[(int)TxI.NEE_ADD];
             btnQBrowse.Content = t._[(int)TxI.Q_ADD];
             btnDel.Content = t._[(int)TxI.DEL];

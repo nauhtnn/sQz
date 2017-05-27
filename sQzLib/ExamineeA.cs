@@ -110,7 +110,7 @@ namespace sQzLib
             uId = ushort.MaxValue;
             eStt = ExamStt.Signing;
             uGrade = ushort.MaxValue;
-            dtTim1 = dtTim2 = ExamSlot.INVALID_DT;
+            dtTim1 = dtTim2 = DtFmt.INV_;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
             kDtDuration = new TimeSpan(0, 30, 0);
@@ -255,10 +255,10 @@ namespace sQzLib
             {
                 h = r.ReadInt32();
                 m = r.ReadInt32();
-                ExamSlot.Parse(h.ToString() + ':' + m, ExamSlot.FORM_h, out dtTim1);
+                DtFmt.ToDt(h.ToString() + ':' + m, DtFmt.h, out dtTim1);
                 h = r.ReadInt32();
                 m = r.ReadInt32();
-                ExamSlot.Parse(h.ToString() + ':' + m, ExamSlot.FORM_h, out dtTim2);
+                DtFmt.ToDt(h.ToString() + ':' + m, DtFmt.h, out dtTim2);
             }
             else
             {

@@ -1,13 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Windows.Controls;
-using System.Globalization;
 using MySql.Data.MySqlClient;
 using System.Windows.Media;
 using System.Windows;
 
 /*
-CREATE TABLE IF NOT EXISTS `slot` (`dt` DATE, `t` TIME, `open` TINYINT,
+CREATE TABLE IF NOT EXISTS `slot` (`dt` DATE, `t` TIME, `open` TINYINT DEFAULT 0,
 PRIMARY KEY(`dt`, `t`), FOREIGN KEY(`dt`) REFERENCES `board`(`dt`));
 */
 
@@ -16,18 +15,7 @@ namespace sQzLib
     public class ExamSlot
     {
         public DateTime mDt;
-        static CultureInfo sCultInfo = null;
-        public uint uId;
-        public const int INVALID = 0;
-        public static DateTime INVALID_DT = DateTime.Parse("2016/01/01 00:00");//h = m = INVALID
-        public const string MYSQL_INVALID = "2016-01-01";
-        public const string FORM_h = "H:m";
-        public const string FORM_H = "yyyy/MM/dd HH:mm";
-        public const string FORM = "yyyy/MM/dd";
-        public const string FORM_SH = "yy/MM/dd HH:mm";
-        public const string FORM_RH = "dd/MM/yyyy HH:mm";
-        public const string FORM_R = "dd/MM/yyyy";
-        public const string FORM_MYSQL = "yyyy-MM-dd HH:00";
+        public bool bOpen;
         public Dictionary<ExamLv, QuestPack> vQPack;
 
         public AnsPack mKeyPack;
@@ -36,8 +24,7 @@ namespace sQzLib
 
         public ExamSlot()
         {
-            mDt = INVALID_DT;
-            uId = uint.MaxValue;
+            mDt = DtFmt.INV_;
 
             vRoom = new Dictionary<int, ExamRoom>();
             for (int i = 1; i < 7; ++i)//todo: read from db
@@ -55,16 +42,6 @@ namespace sQzLib
             vQPack.Add(p.eLv, p);
 
             mKeyPack = new AnsPack();
-        }
-
-        public void DBInsert()
-        {
-            string v = "('" + mDt.ToString(FORM_MYSQL) + "',0)";
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
-            DBConnect.Ins(conn, "slot", "dt,open", v);
-            DBConnect.Close(ref conn);
         }
 
         public static Dictionary<uint, Tuple<DateTime, bool>> DBSelect()
@@ -107,7 +84,7 @@ namespace sQzLib
         {
             if (buf.Length - offs < 20)
             {
-                dt = INVALID_DT;
+                dt = DtFmt.INV_;
                 return true;
             }
             int y = BitConverter.ToInt32(buf, offs);
@@ -120,8 +97,8 @@ namespace sQzLib
             offs += 4;
             int m = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            if (Parse(y.ToString("d4") + '/' + M.ToString("d2") + '/' + d.ToString("d2") +
-                ' ' + H.ToString("d2") + ':' + m.ToString("d2"), FORM_H, out dt))
+            if (DtFmt.ToDt(y.ToString("d4") + '/' + M.ToString("d2") + '/' + d.ToString("d2") +
+                ' ' + H.ToString("d2") + ':' + m.ToString("d2"), DtFmt.H, out dt))
                 return true;
             return false;
         }
@@ -148,23 +125,6 @@ namespace sQzLib
             return l;
         }
 
-        public static bool Parse(string s, string form, out DateTime dt)
-        {
-            if (sCultInfo == null)
-                sCultInfo = CultureInfo.CreateSpecificCulture("en-US");
-            if (DateTime.TryParseExact(s, form, sCultInfo, DateTimeStyles.None, out dt))
-                return false;
-            return true;
-        }
-
-        public static string ToMysqlForm(string s, string curForm)
-        {
-            DateTime dt;
-            if (!Parse(s, curForm, out dt))
-                return dt.ToString(FORM_MYSQL);
-            return MYSQL_INVALID;
-        }
-
         public void ReadF(string fp)
         {
             string buf = Utils.ReadFile(fp);
@@ -189,7 +149,6 @@ namespace sQzLib
                     if (!int.TryParse(v[0].Substring(1), out e.uId)
                         || !int.TryParse(v[1], out uRId) || !vRoom.ContainsKey(uRId))
                         continue;
-                    e.uSlId = uId;
                     e.tName = v[2].Trim();
                     e.tBirdate = v[3];
                     e.tBirthplace = v[4].Trim();
@@ -214,24 +173,23 @@ namespace sQzLib
                 r.vExaminee.Clear();
                 string qry = DBConnect.mkQrySelect(ExamineeS0.tDBtbl + r.uId,
                     "lv,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
-                    "slId=" + uId, null);
+                    null, null);
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
                 if (reader != null)
                 {
                     while (reader.Read())
                     {
                         ExamineeS0 e = new ExamineeS0();
-                        e.uSlId = uId;
                         int lv;
                         if (Enum.IsDefined(typeof(ExamLv), lv = reader.GetInt16(0)))
                             e.eLv = (ExamLv)lv;
                         e.uId = reader.GetInt32(1);
                         e.tName = reader.GetString(2);
-                        e.tBirdate = reader.GetDateTime(3).ToString(FORM_R);
+                        e.tBirdate = reader.GetDateTime(3).ToString(DtFmt.R);
                         e.tBirthplace = reader.GetString(4);
-                        e.dtTim1 = (reader.IsDBNull(5)) ? INVALID_DT :
+                        e.dtTim1 = (reader.IsDBNull(5)) ? DtFmt.INV_ :
                             DateTime.Parse(reader.GetString(5));
-                        e.dtTim2 = (reader.IsDBNull(6)) ? INVALID_DT :
+                        e.dtTim2 = (reader.IsDBNull(6)) ? DtFmt.INV_ :
                             DateTime.Parse(reader.GetString(6));
                         if (!reader.IsDBNull(7))
                         {
@@ -317,7 +275,6 @@ namespace sQzLib
 
         public bool GenQPack(int n, ExamLv lv, int[] vn)
         {
-            vQPack[lv].uSlId = uId;
             List<QuestSheet> l = vQPack[lv].GenQPack(n, vn);
             mKeyPack.ExtractKey(l);
             return false;
