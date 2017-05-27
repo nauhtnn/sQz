@@ -52,7 +52,7 @@ namespace sQzLib
             if (conn == null)
                 return r;
             string qry = DBConnect.mkQrySelect("slot", null, null, null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
             while (reader.Read())
                 r.Add(reader.GetUInt32(0),
                     Tuple.Create(reader.GetDateTime(1), reader.GetBoolean(2)));
@@ -174,7 +174,7 @@ namespace sQzLib
                 string qry = DBConnect.mkQrySelect(ExamineeS0.tDBtbl + r.uId,
                     "lv,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
                     null, null);
-                MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+                MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
                 if (reader != null)
                 {
                     while (reader.Read())

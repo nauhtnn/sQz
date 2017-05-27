@@ -233,7 +233,7 @@ namespace sQzLib
             if (iu[0] == '0')
                 iu = iu.Substring(1);
             string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
             if (reader != null)
             {
                 while (reader.Read())
@@ -304,7 +304,7 @@ namespace sQzLib
             Array.Sort(vSel);
             //
             string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
             i = 0;
             int ii = -1;
             if (reader != null)
@@ -380,7 +380,7 @@ namespace sQzLib
             cond.Append(" AND lv=" + lv.ToString("d"));
             cond.Append(" AND id=" + id);
             string qry = DBConnect.mkQrySelect("questsh", "vquest", cond.ToString(), null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
             string qIds = null;
             if (reader != null && reader.Read())
             {
@@ -401,7 +401,7 @@ namespace sQzLib
                 if(iuid.Length == 2)//todo handle error
                 {
                     qry = DBConnect.mkQrySelect("quest" + iuid[0], null, "idx=" + iuid[1], null);
-                    reader = DBConnect.exeQrySelect(conn, qry);
+                    reader = null;//todo DBConnect.exeQrySelect(conn, qry);
                     if (reader != null)//todo handle error
                     {
                         if(reader.Read())//todo handle error

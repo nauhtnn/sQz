@@ -37,14 +37,22 @@ namespace sQzLib
             return n;
         }
 
-        public static List<DateTime> DBSel()
+        public static List<DateTime> DBSel(out string eMsg)
         {
             List<DateTime> r = new List<DateTime>();
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return r;
+            }
             string qry = DBConnect.mkQrySelect("board", null, null, null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if(reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return null;
+            }
             while (reader.Read())
                 r.Add(reader.GetDateTime(0));
             reader.Close();
@@ -52,14 +60,17 @@ namespace sQzLib
             return r;
         }
 
-        public List<DateTime> DBSelSl()
+        public List<DateTime> DBSelSl(out string eMsg)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return null;
+            }
             string qry = DBConnect.mkQrySelect("slot", "t,open",
                 "dt='" + mDt.ToString(DtFmt._) + "'", null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
                 DBConnect.Close(ref conn);
@@ -69,8 +80,9 @@ namespace sQzLib
             while (reader.Read())
             {
                 ExamSlot sl = new ExamSlot();
+                string s = reader.GetString(0);
                 DtFmt.ToDt(mDt.ToString(DtFmt._) + ' ' +
-                    reader.GetDateTime(0).ToString(DtFmt.h), DtFmt.H, out sl.mDt);
+                    s, DtFmt.HS, out sl.mDt);
                 sl.bOpen = reader.GetBoolean(1);
                 r.Add(sl.mDt);
             }

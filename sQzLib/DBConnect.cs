@@ -210,11 +210,17 @@ namespace sQzLib
             return query;
         }
 
-        public static MySqlDataReader exeQrySelect(MySqlConnection conn, string query) {
+        public static MySqlDataReader exeQrySelect(MySqlConnection conn, string query, out string eMsg) {
             MySqlCommand cmd = new MySqlCommand(query, conn);
             MySqlDataReader d = null;
-            try { d = cmd.ExecuteReader(); }
-            catch(MySqlException) { d = null; }
+            try {
+                d = cmd.ExecuteReader();
+                eMsg = null;
+            }
+            catch(MySqlException e) {
+                d = null;
+                eMsg = Txt.s._[(int)TxI.DB_EXCPT] + e.ToString();
+            }
             return d;
         }
     }

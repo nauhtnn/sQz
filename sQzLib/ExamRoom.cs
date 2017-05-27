@@ -24,7 +24,8 @@ namespace sQzLib
             if (conn == null)
                 return null;
             string qry = DBConnect.mkQrySelect("examinee", "lv,id,qId,anssh", "slId=" + slId, null);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry);
+            string emsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             Dictionary<int, int> r = new Dictionary<int, int>();
             if (reader != null)
             {

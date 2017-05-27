@@ -91,14 +91,22 @@ namespace sQzServer0
                     spMain.Opacity = 0.5;
                     WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_OK]);
                     spMain.Opacity = 1;
-                    LoadBrd();
+                    LoadSl();
                 }
             }
         }
 
         private void LoadBrd()
         {
-            List<DateTime> v = ExamBoard.DBSel();
+            string emsg;
+            List<DateTime> v = ExamBoard.DBSel(out emsg);
+            if(v == null)
+            {
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(emsg);
+                spMain.Opacity = 1;
+                return;
+            }
             bool dark = true;
             Color c = new Color();
             c.A = 0xff;
@@ -117,7 +125,14 @@ namespace sQzServer0
 
         private void LoadSl()
         {
-            List<DateTime> v = mBrd.DBSelSl();
+            string emsg;
+            List<DateTime> v = mBrd.DBSelSl(out emsg);
+            if(v == null)
+            {
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(emsg);
+                spMain.Opacity = 1;
+            }
             bool dark = true;
             Color c = new Color();
             c.A = 0xff;
@@ -230,10 +245,11 @@ namespace sQzServer0
             ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
                 return;
-            if(DtFmt.ToDt(i.Content as string, DtFmt._, out mBrd.mDt))
+            if(!DtFmt.ToDt(i.Content as string, DtFmt._, out mBrd.mDt))
             {
                 lbxSl.Items.Clear();
-                foreach(DateTime dt in mBrd.DBSelSl())
+                string emsg;//rare error to show emsg
+                foreach(DateTime dt in mBrd.DBSelSl(out emsg))
                 {
                     ListBoxItem it = new ListBoxItem();
                     it.Content = dt.ToString(DtFmt.h);
