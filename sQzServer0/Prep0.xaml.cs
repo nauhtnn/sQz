@@ -45,13 +45,25 @@ namespace sQzServer0
             if (DtFmt.ToDt(tbxBrd.Text, DtFmt._, out mBrd.mDt))
             {
                 spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BOARD_NOK]);
                 spMain.Opacity = 1;
             }
             else
             {
-                mBrd.DBIns();
-                LoadBrd();
+                string msg;
+                if(mBrd.DBIns(out msg) == 0)
+                {
+                    spMain.Opacity = 0.5;
+                    WPopup.s.ShowDialog(msg);
+                    spMain.Opacity = 1;
+                }
+                else
+                {
+                    spMain.Opacity = 0.5;
+                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.BOARD_OK]);
+                    spMain.Opacity = 1;
+                    LoadBrd();
+                }
             }
         }
 
@@ -62,13 +74,25 @@ namespace sQzServer0
             if (DtFmt.ToDt(t, DtFmt.h, out dt))
             {
                 spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_NOK]);
                 spMain.Opacity = 1;
             }
             else
             {
-                mBrd.DBInsSl(dt);
-                LoadBrd();
+                string msg;
+                if(mBrd.DBInsSl(dt, out msg) == 0)
+                {
+                    spMain.Opacity = 0.5;
+                    WPopup.s.ShowDialog(msg);
+                    spMain.Opacity = 1;
+                }
+                else
+                {
+                    spMain.Opacity = 0.5;
+                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_OK]);
+                    spMain.Opacity = 1;
+                    LoadBrd();
+                }
             }
         }
 
@@ -91,6 +115,25 @@ namespace sQzServer0
             }
         }
 
+        private void LoadSl()
+        {
+            List<DateTime> v = mBrd.DBSelSl();
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            lbxSl.Items.Clear();
+            foreach (DateTime dt in v)
+            {
+                ListBoxItem it = new ListBoxItem();
+                it.Content = dt.ToString(DtFmt.h);
+                dark = !dark;
+                if (dark)
+                    it.Background = new SolidColorBrush(c);
+                lbxSl.Items.Add(it);
+            }
+        }
+
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Application.Current.MainWindow.FontSize = 16;
@@ -107,7 +150,7 @@ namespace sQzServer0
         void InitLbxQCatgry()
         {
             List<string> qCatName = new List<string>();
-            for (int i = (int)TxI._1; i <= (int)TxI._15; ++i)
+            for (int i = (int)TxI.IU01; i <= (int)TxI.IU15; ++i)
                 qCatName.Add(Txt.s._[i]);
             bool dark = true;
             Color c = new Color();

@@ -61,7 +61,7 @@ namespace sQzLib
                 vals.Append("'" + e.tBirthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            DBConnect.Ins(conn, ExamineeA.tDBtbl + uId, attbs, vals.ToString());
+            //DBConnect.Ins(conn, ExamineeA.tDBtbl + uId, attbs, vals.ToString());
             DBConnect.Close(ref conn);
         }
 

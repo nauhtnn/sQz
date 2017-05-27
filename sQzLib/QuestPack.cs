@@ -142,7 +142,7 @@ namespace sQzLib
             foreach (QuestSheet qs in l)
                 qs.DBAppendInsQry(slId, ref vals);
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            DBConnect.Ins(conn, "questsh", "slId,lv,id,vQuest", vals.ToString());//todo: catch exception
+            //DBConnect.Ins(conn, "questsh", "slId,lv,id,vQuest", vals.ToString());//todo: catch exception
             DBConnect.Close(ref conn);
         }
 

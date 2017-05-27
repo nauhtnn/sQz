@@ -81,5 +81,12 @@ namespace sQzLib {
 		IU13,
 		IU14,
 		IU15,
+		BOARD_NOK,
+		BOARD_OK,
+		DB_NOK,
+		DB_DAT_NOK,
+		DB_EXCPT,
+		SLOT_NOK,
+		SLOT_OK,
 	}
 }

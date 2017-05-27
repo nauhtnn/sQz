@@ -29,7 +29,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
-                eMsg = "null";
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return 0;
             }
             int n = DBConnect.Ins(conn, "board", "dt", v, out eMsg);
@@ -84,7 +84,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
-                eMsg = "null";
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return 0;
             }
             string v = "('" + mDt.ToString(DtFmt._) + "','"

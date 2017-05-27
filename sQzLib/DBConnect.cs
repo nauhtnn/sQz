@@ -109,7 +109,7 @@ namespace sQzLib
         {
             if (vAttb == null || vals == null)
             {
-                eMsg = "null";
+                eMsg = Txt.s._[(int)TxI.DB_DAT_NOK];
                 return 0;
             }
             StringBuilder qry = new StringBuilder();
@@ -124,7 +124,7 @@ namespace sQzLib
                 eMsg = null;
             } catch(MySqlException e) {
                 n = 0;
-                eMsg = e.ToString();
+                eMsg = Txt.s._[(int)TxI.DB_EXCPT] + e.ToString();
             }
             return n;
         }

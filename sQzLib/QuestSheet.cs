@@ -357,7 +357,7 @@ namespace sQzLib
             string iu = eIU.ToString().Substring(2);//hardcode
             if (iu[0] == '0')
                 iu = iu.Substring(1);
-            DBConnect.Ins(conn, "quest" + iu, "body,ansKeys", vals.ToString());
+            //DBConnect.Ins(conn, "quest" + iu, "body,ansKeys", vals.ToString());
             DBConnect.Close(ref conn);
         }
 
