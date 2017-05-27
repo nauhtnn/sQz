@@ -116,7 +116,7 @@ namespace sQzLib
             {
                 QuestSheet qs = new QuestSheet();
                 int j = -1;
-                foreach (IUxx i in QuestSheet.GetIUs(eLv))
+                foreach (IUx i in QuestSheet.GetIUs(eLv))
                     qs.DBSelect(i, vn[++j]);
                 if (0 < qs.vQuest.Count)
                 {

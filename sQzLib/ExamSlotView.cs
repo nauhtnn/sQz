@@ -280,7 +280,7 @@ namespace sQzLib
             else
                 lv = ExamLv.B;
             List<int> vn = new List<int>();
-            foreach (IUxx i in QuestSheet.GetIUs(lv))
+            foreach (IUx i in QuestSheet.GetIUs(lv))
             {
                 t = vTbx[(int)i];
                 if (t != null)
@@ -328,7 +328,7 @@ namespace sQzLib
 
         public void InitQPanel()
         {
-            foreach (IUxx i in QuestSheet.GetAllIUs())
+            foreach (IUx i in QuestSheet.GetAllIUs())
             {
                 TextBox t = vTbx[(int)i];
                 if (t != null)
@@ -357,19 +357,19 @@ namespace sQzLib
             TextBox t;
             if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
             {
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.A))
+                foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
                     if ((t = vTbx[(int)j]) != null)
                         t.IsEnabled = true;
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
+                foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
                     if ((t = vTbx[(int)j]) != null)
                         t.IsEnabled = false;
             }
             else
             {
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
+                foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
                     if ((t = vTbx[(int)j]) != null)
                         t.IsEnabled = true;
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.A))
+                foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
                     if ((t = vTbx[(int)j]) != null)
                         t.IsEnabled = false;
             }
@@ -388,7 +388,7 @@ namespace sQzLib
             bool bG = true;
             if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
             {
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.A))
+                foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
                     if ((t = vTbx[(int)j]) != null)
                     {
                         if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
@@ -406,7 +406,7 @@ namespace sQzLib
             }
             else
             {
-                foreach (IUxx j in QuestSheet.GetIUs(ExamLv.B))
+                foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
                     if ((t = vTbx[(int)j]) != null)
                     {
                         t.IsEnabled = true;

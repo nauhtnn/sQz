@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
 /*
-CREATE TABLE IF NOT EXISTS `questsh` (`slId` INT(4) UNSIGNED, `lv` SMALLINT,
- `id` SMALLINT UNSIGNED, `vquest` VARCHAR(1024),
- PRIMARY KEY(`slId`,`lv`,`id`));
+CREATE TABLE IF NOT EXISTS `qs` (`dt` DATE,
+`id` SMALLINT UNSIGNED, `vquest` VARCHAR(1024),
+PRIMARY KEY(`dt`,`id`), FOREIGN KEY(`dt`) REFERENCES `board`(`dt`));
 */
 
 namespace sQzLib
@@ -32,21 +32,21 @@ namespace sQzLib
             uId = 0;
         }
 
-        static IUxx[] gaA = null;
-        static IUxx[] gaB = null;
-        public static IUxx[] GetIUs(ExamLv lv)
+        static IUx[] gaA = null;
+        static IUx[] gaB = null;
+        public static IUx[] GetIUs(ExamLv lv)
         {
             if(lv == ExamLv.A)
             {
                 if (gaA == null)
                 {
-                    gaA = new IUxx[6];
-                    gaA[0] = IUxx.IU01;
-                    gaA[1] = IUxx.IU02;
-                    gaA[2] = IUxx.IU03;
-                    gaA[3] = IUxx.IU04;
-                    gaA[4] = IUxx.IU05;
-                    gaA[5] = IUxx.IU06;
+                    gaA = new IUx[6];
+                    gaA[0] = IUx._1;
+                    gaA[1] = IUx._2;
+                    gaA[2] = IUx._3;
+                    gaA[3] = IUx._4;
+                    gaA[4] = IUx._5;
+                    gaA[5] = IUx._6;
                 }
                 return gaA;
             }
@@ -54,36 +54,36 @@ namespace sQzLib
             {
                 if (gaB == null)
                 {
-                    gaB = new IUxx[3];
-                    gaB[0] = IUxx.IU07;
-                    gaB[1] = IUxx.IU08;
-                    gaB[2] = IUxx.IU10;
+                    gaB = new IUx[3];
+                    gaB[0] = IUx._7;
+                    gaB[1] = IUx._8;
+                    gaB[2] = IUx._10;
                 }
                 return gaB;
             }
         }
 
-        static IUxx[] gaAll = null;
-        public static IUxx[] GetAllIUs()
+        static IUx[] gaAll = null;
+        public static IUx[] GetAllIUs()
         {
             if(gaAll == null)
             {
-                gaAll = new IUxx[15];
-                gaAll[0] = IUxx.IU01;
-                gaAll[1] = IUxx.IU02;
-                gaAll[2] = IUxx.IU03;
-                gaAll[3] = IUxx.IU04;
-                gaAll[4] = IUxx.IU05;
-                gaAll[5] = IUxx.IU06;
-                gaAll[6] = IUxx.IU07;
-                gaAll[7] = IUxx.IU08;
-                gaAll[8] = IUxx.IU09;
-                gaAll[9] = IUxx.IU10;
-                gaAll[10] = IUxx.IU11;
-                gaAll[11] = IUxx.IU12;
-                gaAll[12] = IUxx.IU13;
-                gaAll[13] = IUxx.IU14;
-                gaAll[14] = IUxx.IU15;
+                gaAll = new IUx[15];
+                gaAll[0] = IUx._1;
+                gaAll[1] = IUx._2;
+                gaAll[2] = IUx._3;
+                gaAll[3] = IUx._4;
+                gaAll[4] = IUx._5;
+                gaAll[5] = IUx._6;
+                gaAll[6] = IUx._7;
+                gaAll[7] = IUx._8;
+                gaAll[8] = IUx._9;
+                gaAll[9] = IUx._10;
+                gaAll[10] = IUx._11;
+                gaAll[11] = IUx._12;
+                gaAll[12] = IUx._13;
+                gaAll[13] = IUx._14;
+                gaAll[14] = IUx._15;
             }
             return gaAll;
         }
@@ -223,7 +223,7 @@ namespace sQzLib
         }
 
         //only Server0 uses this.
-        public void DBSelect(IUxx eIU)
+        public void DBSelect(IUx eIU)
         {
             vQuest.Clear();
             MySqlConnection conn = DBConnect.Init();
@@ -259,7 +259,7 @@ namespace sQzLib
         }
 
         //only Server0 uses this.
-        public void DBSelect(IUxx eIU, int n)
+        public void DBSelect(IUx eIU, int n)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -334,7 +334,7 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public void DBInsert(IUxx eIU)
+        public void DBInsert(IUx eIU)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -418,7 +418,7 @@ namespace sQzLib
                             q.vKeys = new bool[4];
                             for (int k = 0; k < 4; ++k)
                                 q.vKeys[k] = (x[k] == '1');
-                            q.mIU = (IUxx)int.Parse(iuid[0]);
+                            q.mIU = (IUx)int.Parse(iuid[0]);
                             vQuest.Add(q);
                         }
                         reader.Close();

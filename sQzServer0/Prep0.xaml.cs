@@ -25,7 +25,7 @@ namespace sQzServer0
     {
         List<CheckBox> vChk;
         List<uint> vQId;
-        IUxx mSelQCat;
+        IUx mSelQCat;
         QuestSheet mDBQSh;
         QuestSheet mQSh;
         ExamSlot mSl;
@@ -34,7 +34,7 @@ namespace sQzServer0
         {
             ShowsNavigationUI = false;
             InitializeComponent();
-            mSelQCat = IUxx.IU00;
+            mSelQCat = IUx._0;
             mDBQSh = new QuestSheet();
             mQSh = new QuestSheet();
             mSl = new ExamSlot();
@@ -90,7 +90,7 @@ namespace sQzServer0
         void InitLbxQCatgry()
         {
             List<string> qCatName = new List<string>();
-            for (int i = (int)TxI.IU01; i <= (int)TxI.IU15; ++i)
+            for (int i = (int)TxI._1; i <= (int)TxI._15; ++i)
                 qCatName.Add(Txt.s._[i]);
             bool dark = true;
             Color c = new Color();
@@ -234,7 +234,7 @@ namespace sQzServer0
 
         private void btnInsQuest_Click(object sender, RoutedEventArgs e)
         {
-            if (mSelQCat != IUxx.IU00 && 0 < mQSh.vQuest.Count)
+            if (mSelQCat != IUx._0 && 0 < mQSh.vQuest.Count)
             {
                 gDBQuest.Children.Clear();
                 gQuest.Children.Clear();
@@ -248,9 +248,9 @@ namespace sQzServer0
         private void lbxQCatgry_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListBox l = (ListBox)sender;
-            if (Enum.IsDefined(typeof(IUxx), l.SelectedIndex + 1))
+            if (Enum.IsDefined(typeof(IUx), l.SelectedIndex + 1))
             {
-                mSelQCat = (IUxx)l.SelectedIndex + 1;
+                mSelQCat = (IUx)l.SelectedIndex + 1;
                 mDBQSh.DBSelect(mSelQCat);
                 ShowQuest(true);
             }

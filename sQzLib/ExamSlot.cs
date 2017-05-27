@@ -7,8 +7,8 @@ using System.Windows.Media;
 using System.Windows;
 
 /*
-CREATE TABLE IF NOT EXISTS `slot` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
- `dt` DATETIME, `open` TINYINT);
+CREATE TABLE IF NOT EXISTS `slot` (`dt` DATE, `t` TIME, `open` TINYINT,
+PRIMARY KEY(`dt`, `t`), FOREIGN KEY(`dt`) REFERENCES `board`(`dt`));
 */
 
 namespace sQzLib
