@@ -28,19 +28,17 @@
                     <ListBox x:Name="lbxSl" Width="60" SelectionChanged="lbxSl_SelectionChanged"></ListBox>
                 </ScrollViewer>
             </StackPanel>
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Button x:Name="btnNeeBrowse" Content="Browse Examinee" Height="60" Width="160" Click="btnNeeBrowse_Click" HorizontalAlignment="Right"/>
-                    <Button Content="history" Click="btnHistory_Click"/>
-                </StackPanel>
+            <TabControl x:Name="tbcNee" Width="920"/>
+            <StackPanel x:Name="refSl" Visibility="Collapsed">
+                <Button Content="+" Height="60" Width="160"/>
                 <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
-                    <ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">
-                        <ListBox x:Name="lbxStudent" Width="420"></ListBox>
-                    </ScrollViewer>
-                    <Button x:Name="btnInsNee" Content="&lt;&lt;" Height="30" Width="60" Click="btnInsNee_Click" Margin="5,0,0,5"/>
-                    <ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto">
-                        <ListBox x:Name="lbxNewStu" Width="420"></ListBox>
-                    </ScrollViewer>
+                    <!--<ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">-->
+                        <ListBox Name="_1" Width="420" Height="200"/>
+                    <!--</ScrollViewer>-->
+                    <Button Content="&lt;&lt;" Height="30" Width="60" Margin="5,0,0,5"/>
+                    <!--<ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto">-->
+                    <ListBox Name="_2" Width="420" Height="200"/>
+                    <!--</ScrollViewer>-->
                 </StackPanel>
             </StackPanel>
         </StackPanel>

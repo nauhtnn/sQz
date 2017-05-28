@@ -87,6 +87,7 @@
   <ItemGroup>
     <Compile Include="Operation0.xaml.cs" />
     <Compile Include="Prep0.xaml.cs" />
+    <Compile Include="PrepNeeView.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>

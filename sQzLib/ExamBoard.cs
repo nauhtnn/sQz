@@ -14,12 +14,12 @@ namespace sQzLib
     public class ExamBoard
     {
         public DateTime mDt;
-        Dictionary<uint, ExamSlot> vSl;
+        public Dictionary<string, ExamSlot> vSl;
         Dictionary<uint, ExamSlotView> vSlVw;
 
         public ExamBoard()
         {
-            vSl = new Dictionary<uint, ExamSlot>();
+            vSl = new Dictionary<string, ExamSlot>();
             vSlVw = new Dictionary<uint, ExamSlotView>();
         }
 

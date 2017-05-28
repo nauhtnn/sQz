@@ -29,6 +29,7 @@ namespace sQzServer0
         QuestSheet mDBQSh;
         QuestSheet mQSh;
         ExamBoard mBrd;
+        ExamSlot mSl;
 
         public Prep0()
         {
@@ -191,69 +192,21 @@ namespace sQzServer0
             });
         }
 
-        private void LoadExaminees(bool fresh) //same as Operation0.xaml
-        {
-            //bool dark = true;
-            //Color c = new Color();
-            //c.A = 0xff;
-            //c.B = c.G = c.R = 0xf0;
-            //Dispatcher.Invoke(() => {
-            //    ListBox l = null;
-            //    if (fresh)
-            //        l = lbxNewStu;
-            //    else
-            //        l = lbxStudent;
-            //    l.Items.Clear();
-            //    foreach(ExamRoom r in mSl.vRoom.Values)
-            //        foreach (ExamineeA e in r.vExaminee.Values)
-            //        {
-            //            ListBoxItem i = new ListBoxItem();
-            //            i.Content = e.ToString();
-            //            dark = !dark;
-            //            if (dark)
-            //                i.Background = new SolidColorBrush(c);
-            //            l.Items.Add(i);
-            //        }
-            //});
-        }
-
-        private void btnNeeBrowse_Click(object sender, RoutedEventArgs e)
-        {
-            //OpenFileDialog dlg = new OpenFileDialog();
-
-            //// set filter for file extension and default file extension 
-            //dlg.DefaultExt = ".txt";
-            //dlg.Filter = "text documents (*.txt)|*.txt";
-            //bool? result = dlg.ShowDialog();
-
-            //string filePath = null;
-            //if (result == true)
-            //    filePath = dlg.FileName;
-            //mSl.ReadF(filePath);
-            
-            //LoadExaminees(true);
-        }
-
-        private void btnInsNee_Click(object sender, RoutedEventArgs e)
-        {
-            //if (mSl.uId != uint.MaxValue)
-            //{
-            //    lbxNewStu.Items.Clear();
-            //    mSl.DBInsertNee();
-            //    LoadExaminees(false);
-            //}
-        }
-
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+            tbcNee.Items.Clear();
             ListBox l = sender as ListBox;
             ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
+            {
+                lbxSl.IsEnabled = false;
                 return;
+            }
             DateTime dt;
             if(!DtFmt.ToDt(i.Content as string, DtFmt._, out dt))
             {
                 mBrd.mDt = dt;
+                lbxSl.IsEnabled = true;
                 LoadSl();
             }
         }
@@ -264,11 +217,18 @@ namespace sQzServer0
             ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
                 return;
-            if (!DtFmt.ToDt(i.Content as string, DtFmt._, out mBrd.mDt))
-            {
-                lbxSl.Items.Clear();
-                LoadSl();
-            }
+            if (mBrd.vSl.ContainsKey(i.Content as string))
+                return;
+            mSl = new ExamSlot();
+            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out mSl.mDt);
+            PrepNeeView pnv = new PrepNeeView();
+            pnv.mSl = mSl;
+            pnv.ShallowCopy(refSl);
+            pnv.Show(true);
+            TabItem ti = new TabItem();
+            ti.Header = pnv.mSl.mDt.ToString(DtFmt.hh);
+            ti.Content = pnv;
+            tbcNee.Items.Add(ti);
         }
 
         private void btnQBrowse_Click(object sender, RoutedEventArgs e)
@@ -351,7 +311,7 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            btnNeeBrowse.Content = t._[(int)TxI.NEE_ADD];
+            //btnNeeBrowse.Content = t._[(int)TxI.NEE_ADD];
             btnQBrowse.Content = t._[(int)TxI.Q_ADD];
             btnDel.Content = t._[(int)TxI.DEL];
             btnSelAll.Content = t._[(int)TxI.SEL_ALL];
