@@ -83,10 +83,12 @@ namespace sQzLib {
 		IU15,
 		BOARD_NOK,
 		BOARD_OK,
+		BOARD_EXIST,
 		DB_NOK,
 		DB_DAT_NOK,
 		DB_EXCPT,
 		SLOT_NOK,
 		SLOT_OK,
+		SLOT_EXIST,
 	}
 }

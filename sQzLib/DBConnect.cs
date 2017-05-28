@@ -10,39 +10,41 @@ namespace sQzLib
     public class DBConnect
     {
         //public MySqlConnection connection;
-        static string server;
-        static string database;
-        static string uid;
-        static string password;
+        static string server = null;
+        static string database = null;
+        static string uid = null;
+        static string password = null;
         //static bool bConnected;
 
         //Constructor
-        public DBConnect()
-        {
-            //Initialize();
-        }
+        public DBConnect() { }
 
         //Initialize values
         public static MySqlConnection Init()
         {
-            string connStr = null;
-            string s = Utils.ReadFile("Database.txt");
-            if (s == null)
+            if (server == null)
             {
-                server = "localhost";
-                database = "sQz";
-                uid = "root";
-                password = "1234";
+                string s = Utils.ReadFile("Database.txt");
+                if (s != null)
+                {
+                    string[] vs = s.Split('\n');
+                    if(vs.Length == 4)
+                    {
+                        server = vs[0];
+                        database = vs[1];
+                        uid = vs[2];
+                        password = vs[3];
+                    }
+                }
+                if (server == null)
+                {
+                    server = "localhost";
+                    database = "sQz";
+                    uid = "root";
+                    password = "1234";
+                }
             }
-            else
-            {
-                string[] vs = s.Split('\n');
-                server = vs[0];
-                database = vs[0];
-                uid = vs[0];
-                password = vs[0];
-            }
-            connStr = "SERVER=" + server + ";" + "DATABASE=" +
+            string connStr = "SERVER=" + server + ";" + "DATABASE=" +
                 database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";charset=utf8";
             //bConnected = false;
             MySqlConnection conn = new MySqlConnection(connStr);
@@ -63,23 +65,23 @@ namespace sQzLib
                 //bConnected = true;
                 return true;
             }
-            catch (MySqlException ex)
+            catch (MySqlException)
             {
                 //When handling errors, you can your application's response based 
                 //on the error number.
                 //The two most common error numbers when connecting are as follows:
                 //0: Cannot connect to server.
                 //1045: Invalid user name and/or password.
-                switch (ex.Number)
-                {
-                    case 0:
-                        Console.Write("Cannot connect to server.  Contact administrator");
-                        break;
+                //switch (ex.Number)
+                //{
+                //    case 0:
+                //        Console.Write("Cannot connect to server.  Contact administrator");
+                //        break;
 
-                    case 1045:
-                        Console.Write("Invalid username/password, please try again");
-                        break;
-                }
+                //    case 1045:
+                //        Console.Write("Invalid username/password, please try again");
+                //        break;
+                //}
                 return false;
             }
         }
@@ -123,8 +125,16 @@ namespace sQzLib
                 n = cmd.ExecuteNonQuery();
                 eMsg = null;
             } catch(MySqlException e) {
-                n = 0;
-                eMsg = Txt.s._[(int)TxI.DB_EXCPT] + e.ToString();
+                if (e.Number == 1062)
+                {
+                    eMsg = null;
+                    n = -1062;
+                }
+                else
+                {
+                    eMsg = Txt.s._[(int)TxI.DB_EXCPT] + e.ToString();
+                    n = 0;
+                }
             }
             return n;
         }

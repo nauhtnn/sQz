@@ -66,7 +66,7 @@ namespace sQzServer0
                 vw.mSl = sl;
                 vw.ShowExaminee();
                 TabItem ti = new TabItem();
-                ti.Header = sl.mDt.ToString(DtFmt.SH);
+                ti.Header = sl.mDt.ToString(DtFmt.hh);
                 ti.Content = vw;
                 tbcSl.Items.Add(ti);
                 //QuestSheet.DBUpdateCurQSId(sl.uId);

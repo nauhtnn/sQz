@@ -42,7 +42,8 @@ namespace sQzServer0
 
         private void btnInsBrd_Click(object sender, RoutedEventArgs e)
         {
-            if (DtFmt.ToDt(tbxBrd.Text, DtFmt._, out mBrd.mDt))
+            DateTime dt;
+            if (DtFmt.ToDt(tbxBrd.Text, DtFmt._, out dt))
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.BOARD_NOK]);
@@ -50,19 +51,22 @@ namespace sQzServer0
             }
             else
             {
+                ExamBoard eb = new ExamBoard();
+                eb.mDt = dt;
                 string msg;
-                if(mBrd.DBIns(out msg) == 0)
-                {
-                    spMain.Opacity = 0.5;
-                    WPopup.s.ShowDialog(msg);
-                    spMain.Opacity = 1;
-                }
-                else
+                if(0 < eb.DBIns(out msg))
                 {
                     spMain.Opacity = 0.5;
                     WPopup.s.ShowDialog(Txt.s._[(int)TxI.BOARD_OK]);
                     spMain.Opacity = 1;
                     LoadBrd();
+                    tbxBrd.Text = string.Empty;
+                }
+                else
+                {
+                    spMain.Opacity = 0.5;
+                    WPopup.s.ShowDialog(msg);
+                    spMain.Opacity = 1;
                 }
             }
         }
@@ -80,18 +84,19 @@ namespace sQzServer0
             else
             {
                 string msg;
-                if(mBrd.DBInsSl(dt, out msg) == 0)
-                {
-                    spMain.Opacity = 0.5;
-                    WPopup.s.ShowDialog(msg);
-                    spMain.Opacity = 1;
-                }
-                else
+                if(0 < mBrd.DBInsSl(dt, out msg))
                 {
                     spMain.Opacity = 0.5;
                     WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_OK]);
                     spMain.Opacity = 1;
                     LoadSl();
+                    tbxBrd.Text = string.Empty;
+                }
+                else
+                {
+                    spMain.Opacity = 0.5;
+                    WPopup.s.ShowDialog(msg);
+                    spMain.Opacity = 1;
                 }
             }
         }
@@ -115,7 +120,7 @@ namespace sQzServer0
             foreach(DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DtFmt._);
+                it.Content = dt.ToString(DtFmt.__);
                 dark = !dark;
                 if (dark)
                     it.Background = new SolidColorBrush(c);
@@ -141,7 +146,7 @@ namespace sQzServer0
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DtFmt.h);
+                it.Content = dt.ToString(DtFmt.hh);
                 dark = !dark;
                 if (dark)
                     it.Background = new SolidColorBrush(c);
@@ -245,16 +250,24 @@ namespace sQzServer0
             ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
                 return;
-            if(!DtFmt.ToDt(i.Content as string, DtFmt._, out mBrd.mDt))
+            DateTime dt;
+            if(!DtFmt.ToDt(i.Content as string, DtFmt._, out dt))
+            {
+                mBrd.mDt = dt;
+                LoadSl();
+            }
+        }
+
+        private void lbxSl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            ListBox l = sender as ListBox;
+            ListBoxItem i = l.SelectedItem as ListBoxItem;
+            if (i == null)
+                return;
+            if (!DtFmt.ToDt(i.Content as string, DtFmt._, out mBrd.mDt))
             {
                 lbxSl.Items.Clear();
-                string emsg;//rare error to show emsg
-                foreach(DateTime dt in mBrd.DBSelSl(out emsg))
-                {
-                    ListBoxItem it = new ListBoxItem();
-                    it.Content = dt.ToString(DtFmt.h);
-                    lbxSl.Items.Add(it);
-                }
+                LoadSl();
             }
         }
 
