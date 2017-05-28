@@ -68,7 +68,7 @@ namespace sQzLib
 
     public abstract class ExamineeA
     {
-        public uint uSlId;
+        public DateTime mDt;
         public ExamStt eStt;
         public int mStt { get { return (int)eStt; } }
         public ExamLv eLv;
@@ -106,7 +106,7 @@ namespace sQzLib
             tBirdate = null;
             tBirthplace = null;
             tName = null;
-            uSlId = uint.MaxValue;
+            mDt = DtFmt.INV_H;
             uId = ushort.MaxValue;
             eStt = ExamStt.Signing;
             uGrade = ushort.MaxValue;
@@ -207,7 +207,7 @@ namespace sQzLib
             catch (UnauthorizedAccessException) { err = true; }
             if (err)
                 return true;
-            w.Write(uSlId);
+            //w.Write(uSlId);
             w.Write(mLv);
             w.Write(uId);
             w.Write(mStt);
@@ -241,7 +241,7 @@ namespace sQzLib
                 catch (UnauthorizedAccessException) { r = null; }
             if (r == null)
                 return false;
-            uSlId = r.ReadUInt32();
+            //uSlId = r.ReadUInt32();
             int x;
             if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
                 eLv = (ExamLv)x;

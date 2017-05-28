@@ -33,9 +33,9 @@ namespace sQzLib
                 return 0;
             }
             int n = DBConnect.Ins(conn, "board", "dt", v, out eMsg);
-            if(n == -1062)
-                eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.BOARD_EXIST];
             DBConnect.Close(ref conn);
+            if (n == -1062)
+                eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.BOARD_EXIST];
             return n;
         }
 
@@ -104,9 +104,9 @@ namespace sQzLib
             string v = "('" + mDt.ToString(DtFmt._) + "','"
                 + t.ToString(DtFmt.h) + "')";
             int n = DBConnect.Ins(conn, "slot", "dt,t", v, out eMsg);
+            DBConnect.Close(ref conn);
             if (n == -1062)
                 eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.SLOT_EXIST];
-            DBConnect.Close(ref conn);
             return n;
         }
     }

@@ -43,27 +43,37 @@ namespace sQzLib
             return r;
         }
 
-        public void DBInsert()
+        public int DBIns(out string eMsg)
         {
-            if (vExaminee == null || vExaminee.Count < 1)
-                return;
+            if(vExaminee.Count == 0)
+            {
+                eMsg = "null room";
+                return 0;
+            }
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return;
-            string attbs = "slId,lv,id,name,birdate,birthplace";
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return 0;
+            }
+            string attbs = "dt,t,id,name,birdate,birthplace";
             StringBuilder vals = new StringBuilder();
+            //int x = 0;
             foreach (ExamineeA e in vExaminee.Values)
             {
-                vals.Append("(" + e.uSlId + ",");
-                vals.Append(e.mLv + ",");
+                //++x;
+                vals.Append("('" + e.mDt.ToString(DtFmt._) + "',");
+                vals.Append("'" + e.mDt.ToString(DtFmt.hh) + "',");
                 vals.Append(e.uId + ",");
                 vals.Append("'" + e.tName + "',");
-                vals.Append("'" + DtFmt.ToDtMysql(e.tBirdate, DtFmt.R) + "',");
+                vals.Append("'" + DtFmt.ToDtMysql(e.tBirdate, DtFmt.RR) + "',");
                 vals.Append("'" + e.tBirthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            //DBConnect.Ins(conn, ExamineeA.tDBtbl + uId, attbs, vals.ToString());
+            int n = DBConnect.Ins(conn, ExamineeA.tDBtbl + uId,
+                attbs, vals.ToString(), out eMsg);
             DBConnect.Close(ref conn);
+            return n;
         }
 
         public byte[] ToByteS1()
@@ -106,8 +116,8 @@ namespace sQzLib
                 {
                     if (e.eStt == ExamStt.Info)
                     {
-                        if (!vExaminee.ContainsKey(e.mLv + e.uId))
-                            vExaminee.Add(e.mLv + e.uId, e);
+                        if (!vExaminee.ContainsKey(e.uId))
+                            vExaminee.Add(e.uId, e);
                     }
                     else
                     {
@@ -126,40 +136,40 @@ namespace sQzLib
 
         public void DBUpdateRs(MySqlConnection conn)
         {
-            foreach (ExamineeA e in vExaminee.Values)
-            {
-                StringBuilder qry = new StringBuilder("UPDATE exnee" + uId + " SET ");
-                if (e.dtTim1.Hour != 0)
-                {
-                    qry.Append("t1='" + e.dtTim1.ToString("HH:mm") + "'");
-                    if (e.dtTim2.Hour != 0)
-                    {
-                        qry.Append(",t2='" + e.dtTim2.ToString("HH:mm") + "'");
-                        if (e.uGrade != short.MaxValue)
-                            qry.Append(",grd=" + e.uGrade);
-                        if (e.tComp != null)
-                        {
-                            if (32 < e.tComp.Length)
-                                e.tComp = e.tComp.Substring(0, 32);//todo: more responsive
-                            qry.Append(",comp='" + e.tComp + "'");
-                        }
-                        if (e.mAnsSh != null)
-                        {
-                            qry.Append(",qId=" + e.mAnsSh.uQSId);
-                            if (e.mAnsSh.aAns != null)
-                            {
-                                qry.Append(",anssh='");
-                                foreach (byte i in e.mAnsSh.aAns)
-                                    qry.Append(i);
-                                qry.Append("'");
-                            }
-                        }
-                    }
-                    qry.Append(" WHERE slId=" + e.uSlId +
-                        " AND lv=" + (int)e.mLv + " AND id=" + e.uId);
-                    DBConnect.Update(conn, qry.ToString());
-                }
-            }
+            //foreach (ExamineeA e in vExaminee.Values)
+            //{
+            //    StringBuilder qry = new StringBuilder("UPDATE exnee" + uId + " SET ");
+            //    if (e.dtTim1.Hour != 0)
+            //    {
+            //        qry.Append("t1='" + e.dtTim1.ToString("HH:mm") + "'");
+            //        if (e.dtTim2.Hour != 0)
+            //        {
+            //            qry.Append(",t2='" + e.dtTim2.ToString("HH:mm") + "'");
+            //            if (e.uGrade != short.MaxValue)
+            //                qry.Append(",grd=" + e.uGrade);
+            //            if (e.tComp != null)
+            //            {
+            //                if (32 < e.tComp.Length)
+            //                    e.tComp = e.tComp.Substring(0, 32);//todo: more responsive
+            //                qry.Append(",comp='" + e.tComp + "'");
+            //            }
+            //            if (e.mAnsSh != null)
+            //            {
+            //                qry.Append(",qId=" + e.mAnsSh.uQSId);
+            //                if (e.mAnsSh.aAns != null)
+            //                {
+            //                    qry.Append(",anssh='");
+            //                    foreach (byte i in e.mAnsSh.aAns)
+            //                        qry.Append(i);
+            //                    qry.Append("'");
+            //                }
+            //            }
+            //        }
+            //        qry.Append(" WHERE slId=" + e.uSlId +
+            //            " AND lv=" + (int)e.mLv + " AND id=" + e.uId);
+            //        DBConnect.Update(conn, qry.ToString());
+            //    }
+            //}
         }
 
         public ExamineeA Signin(ExamineeA e)

@@ -113,7 +113,7 @@ namespace sQzServer0
         private void btnIns_Click(object sender, RoutedEventArgs e)
         {
             lbxFile.Items.Clear();
-            mSl.DBInsertNee();
+            mSl.DBInsNee();
             Show(true);
         }
     }

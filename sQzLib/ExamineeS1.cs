@@ -57,7 +57,7 @@ namespace sQzLib
 
             if (l < 13)
                 return true;
-            uSlId = BitConverter.ToUInt32(buf, offs);
+            //uSlId = BitConverter.ToUInt32(buf, offs);
             l -= 4;
             offs += 4;
 
@@ -133,7 +133,7 @@ namespace sQzLib
 
             if (l < 14)
                 return true;
-            uSlId = BitConverter.ToUInt32(buf, offs);
+            //uSlId = BitConverter.ToUInt32(buf, offs);
             l -= 4;
             offs += 4;
 
@@ -238,7 +238,7 @@ namespace sQzLib
         {
             //suppose eStt == ExamStt.Finished
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(uSlId));
+            //l.Add(BitConverter.GetBytes(uSlId));
             l.Add(BitConverter.GetBytes(mLv));
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(dtTim1.Hour));

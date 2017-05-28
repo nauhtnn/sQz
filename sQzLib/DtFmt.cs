@@ -19,7 +19,7 @@ namespace sQzLib
         public const string _ = "yyyy-M-d";
         public const string __ = "yyyy-MM-dd";
         public const string RH = "d-M-yyyy HH:mm";
-        public const string R = "d-M-yyyy";
+        public const string RR = "dd-MM-yyyy";
 
         public static bool ToDt(string s, string form, out DateTime dt)
         {

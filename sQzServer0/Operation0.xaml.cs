@@ -60,7 +60,7 @@ namespace sQzServer0
                     DtFmt.ToDt((i.Content as string).Substring(1), DtFmt.H, out sl.mDt);
                 else
                     DtFmt.ToDt((i.Content as string).Substring(1), DtFmt.H, out sl.mDt);
-                sl.DBSelectNee();
+                sl.DBSelNee();
                 ExamSlotView vw = new ExamSlotView();
                 vw.ShallowCopy(refSpSl);
                 vw.mSl = sl;

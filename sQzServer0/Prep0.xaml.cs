@@ -221,6 +221,7 @@ namespace sQzServer0
                 return;
             mSl = new ExamSlot();
             DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out mSl.mDt);
+            mSl.DBSelNee();
             PrepNeeView pnv = new PrepNeeView();
             pnv.mSl = mSl;
             pnv.ShallowCopy(refSl);

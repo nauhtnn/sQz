@@ -13,7 +13,7 @@ namespace sQzLib
         public override List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(uSlId));
+            //l.Add(BitConverter.GetBytes(uSlId));
             l.Add(BitConverter.GetBytes(mLv));
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(mStt));
@@ -50,7 +50,7 @@ namespace sQzLib
 
             if (l < 12)
                 return true;
-            uSlId = BitConverter.ToUInt32(buf, offs);
+            //uSlId = BitConverter.ToUInt32(buf, offs);
             l -= 4;
             offs += 4;
 
