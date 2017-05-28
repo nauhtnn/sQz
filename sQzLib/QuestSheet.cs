@@ -229,11 +229,10 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string iu = eIU.ToString().Substring(2);//hardcode
-            if (iu[0] == '0')
-                iu = iu.Substring(1);
-            string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null);
-            MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
+            string tbl = "q" + eIU.ToString().Substring(1);//hardcode
+            string qry = DBConnect.mkQrySelect(tbl, null, null, null);
+            string emsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             if (reader != null)
             {
                 while (reader.Read())
@@ -264,11 +263,9 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string iu = eIU.ToString().Substring(2);//hardcode
-            if (iu[0] == '0')
-                iu = iu.Substring(1);
+            string tbl = "q" + eIU.ToString().Substring(1);//hardcode
             //randomize
-            int nn = DBConnect.Count(conn, "quest" + iu);
+            int nn = DBConnect.Count(conn, tbl);
             if (nn < 1 || nn < n)
                 return;
             int[] vSel = new int[n];
@@ -303,7 +300,7 @@ namespace sQzLib
             }
             Array.Sort(vSel);
             //
-            string qry = DBConnect.mkQrySelect("quest" + iu, null, null, null);
+            string qry = DBConnect.mkQrySelect(tbl, null, null, null);
             MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
             i = 0;
             int ii = -1;
@@ -317,7 +314,7 @@ namespace sQzLib
                     Question q = new Question();
                     q.uId = reader.GetUInt32(0);//hardcode
                     string[] s = reader.GetString(1).Split('\n');
-                    q.mStmt = "(" + iu + ')' + s[0];
+                    q.mStmt = "(" + tbl + ')' + s[0];
                     q.nAns = 4;
                     q.vAns = new string[4];
                     for (int k = 0; k < 4; ++k)
@@ -354,10 +351,9 @@ namespace sQzLib
                 vals.Append("'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            string iu = eIU.ToString().Substring(2);//hardcode
-            if (iu[0] == '0')
-                iu = iu.Substring(1);
-            //DBConnect.Ins(conn, "quest" + iu, "body,ansKeys", vals.ToString());
+            string tbl = "q" + eIU.ToString().Substring(1);//hardcode
+            string emsg;
+            DBConnect.Ins(conn, tbl, "body,ansKeys", vals.ToString(), out emsg);
             DBConnect.Close(ref conn);
         }
 
