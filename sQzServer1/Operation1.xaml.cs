@@ -28,12 +28,6 @@ namespace sQzServer1
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        Dictionary<int, TextBlock> vComp;
-        Dictionary<int, TextBlock> vTime1;
-        Dictionary<int, TextBlock> vTime2;
-        Dictionary<int, TextBlock> vMark;
-        Dictionary<int, CheckBox> vLock;//supervisor side
-        Dictionary<int, bool> vbLock;//examinee side
         ExamBoard mBrd;
         int uRId;//todo change to enum
         bool bAllR;
@@ -54,13 +48,6 @@ namespace sQzServer1
             bRunning = true;
 
             mBrd = new ExamBoard();
-
-            vComp = new Dictionary<int, TextBlock>();
-            vTime1 = new Dictionary<int, TextBlock>();
-            vTime2 = new Dictionary<int, TextBlock>();
-            vMark = new Dictionary<int, TextBlock>();
-            vLock = new Dictionary<int, CheckBox>();
-            vbLock = new Dictionary<int, bool>();
 
             bAllR = false;
             uRId = 1;//todo
@@ -348,85 +335,7 @@ namespace sQzServer1
                 case NetCode.DateStudentRetriving:
                     if (mBrd.ReadByteR1(buf, ref offs))
                         break;
-                    Dispatcher.Invoke(() =>
-                    {
-                        vComp.Clear();
-                        vMark.Clear();
-                        vTime1.Clear();
-                        vTime2.Clear();
-                        int rid = 0;
-                        foreach(ExamSlot sl in mBrd.vSl.Values)
-                        foreach (ExamRoom r in sl.vRoom.Values)
-                            foreach (ExamineeA e in r.vExaminee.Values)
-                            {
-                                RowDefinition rd = new RowDefinition();
-                                rd.Height = new GridLength(20);
-                                gNee.RowDefinitions.Add(rd);
-                                TextBlock t = new TextBlock();
-                                t.Text = e.tId;
-                                Grid.SetRow(t, ++rid);
-                                gNee.Children.Add(t);
-                                t = new TextBlock();
-                                t.Text = e.tName;
-                                Grid.SetRow(t, rid);
-                                Grid.SetColumn(t, 1);
-                                gNee.Children.Add(t);
-                                t = new TextBlock();
-                                t.Text = e.tBirdate;
-                                Grid.SetRow(t, rid);
-                                Grid.SetColumn(t, 2);
-                                gNee.Children.Add(t);
-                                t = new TextBlock();
-                                int lvid = e.mLv + e.uId;
-                                vComp.Add(lvid, t);
-                                Grid.SetRow(t, rid);
-                                Grid.SetColumn(t, 3);
-                                gNee.Children.Add(t);
-                                CheckBox cbx = new CheckBox();
-                                if (lvid < 0)
-                                    cbx.Name = "n" + (-lvid);
-                                else
-                                    cbx.Name = "p" + lvid;
-                                cbx.Unchecked += cbxLock_Unchecked;
-                                cbx.IsEnabled = true;//default value empowers supervisors
-                                Grid.SetRow(cbx, rid);
-                                Grid.SetColumn(cbx, 7);
-                                vLock.Add(lvid, cbx);
-                                gNee.Children.Add(cbx);
-                                t = new TextBlock();
-                                if (e.dtTim1.Hour != DtFmt.INV)
-                                {
-                                    t.Text = e.dtTim1.ToString("HH:mm");
-                                    vbLock.Add(lvid, true);
-                                }
-                                else
-                                {
-                                    vbLock.Add(lvid, false);
-                                    cbx.IsEnabled = false;
-                                }
-                                vTime1.Add(lvid, t);
-                                Grid.SetRow(t, rid);
-                                Grid.SetColumn(t, 4);
-                                gNee.Children.Add(t);
-                                t = new TextBlock();
-                                if (e.dtTim2.Hour != DtFmt.INV)
-                                    t.Text = e.dtTim2.ToString("HH:mm");
-                                vTime2.Add(lvid, t);
-                                Grid.SetRow(t, rid);
-                                Grid.SetColumn(t, 5);
-                                gNee.Children.Add(t);
-                                t = new TextBlock();
-                                if (e.uGrade != ushort.MaxValue)
-                                {
-                                    t.Text = e.uGrade.ToString();
-                                    cbx.IsEnabled = false;
-                                }
-                                vMark.Add(lvid, t);
-                                Grid.SetRow(t, rid);
-                                Grid.SetColumn(t, 6);
-                                gNee.Children.Add(t);
-                            }
-                    });
+                    Dispatcher.Invoke(() => LoadSl());
                     mState = NetCode.QuestRetrieving;
                     return false;//todo true;
                 case NetCode.QuestRetrieving:
@@ -468,18 +377,6 @@ namespace sQzServer1
                     break;
             }
             return false;
-        }
-
-        private void cbxLock_Unchecked(object sender, RoutedEventArgs e)
-        {
-            CheckBox cbx = sender as CheckBox;
-            int key;
-            if (int.TryParse(cbx.Name.Substring(1), out key))
-            {
-                if (cbx.Name[0] == 'n')
-                    key = (int)-key;
-                vbLock[key] = false;//todo: safer
-            }
         }
 
         public byte[] ClntBufPrep()
@@ -567,6 +464,65 @@ namespace sQzServer1
         private void ckbAllNee_Unchecked(object sender, RoutedEventArgs e)
         {
             bAllR = false;
+        }
+
+        private void lbxSl_Selected(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem i = sender as ListBoxItem;
+            if (i == null)
+                return;
+            foreach (TabItem t in tbcSl.Items)
+                if (t.Name == "_" + (i.Content as string).Replace(':', '_'))
+                    return;
+            ExamSlot sl;
+            if (!mBrd.vSl.TryGetValue(i.Content as string, out sl))
+                return;
+
+            Op1SlotView vw = new Op1SlotView();
+            vw.ShallowCopy(refSl);
+            vw.mSl = sl;
+            vw.ShowExaminee();
+            TabItem ti = new TabItem();
+            ti.Name = "_" + (i.Content as string).Replace(':', '_');
+            ti.Header = sl.mDt.ToString(DtFmt.hh);
+            ti.Content = vw;
+            tbcSl.Items.Add(ti);
+            ti.Focus();
+        }
+
+        private void lbxSl_Unselected(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem i = sender as ListBoxItem;
+            if (i == null)
+                return;
+            mBrd.vSl.Remove(i.Content as string);
+            foreach (TabItem ti in tbcSl.Items)
+                if (ti.Name == "_" + (i.Content as string).Replace(':', '_'))
+                {
+                    tbcSl.Items.Remove(ti);
+                    break;
+                }
+        }
+
+        private void LoadSl()
+        {
+            List<DateTime> v = mBrd.ListSl();
+            //bool dark = true;
+            //Color c = new Color();
+            //c.A = 0xff;
+            //c.B = c.G = c.R = 0xf0;
+            lbxSl.Items.Clear();
+            foreach (DateTime dt in v)
+            {
+                ListBoxItem it = new ListBoxItem();
+                it.Content = dt.ToString(DtFmt.hh);
+                it.Selected += lbxSl_Selected;
+                it.Unselected += lbxSl_Unselected;
+                //dark = !dark;
+                //if (dark)
+                //    it.Background = new SolidColorBrush(c);
+                lbxSl.Items.Add(it);
+            }
         }
     }
 }

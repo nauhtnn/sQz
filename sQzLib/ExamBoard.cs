@@ -15,12 +15,10 @@ namespace sQzLib
     {
         public DateTime mDt;
         public Dictionary<string, ExamSlot> vSl;
-        Dictionary<uint, ExamSlotView> vSlVw;
 
         public ExamBoard()
         {
             vSl = new Dictionary<string, ExamSlot>();
-            vSlVw = new Dictionary<uint, ExamSlotView>();
         }
 
         public int DBIns(out string eMsg)
@@ -108,6 +106,14 @@ namespace sQzLib
             if (n == -1062)
                 eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.SLOT_EXIST];
             return n;
+        }
+
+        public List<DateTime> ListSl()
+        {
+            List<DateTime> r = new List<DateTime>();
+            foreach (ExamSlot sl in vSl.Values)
+                r.Add(sl.mDt);
+            return r;
         }
 
         public byte[] ToByte(int rId)

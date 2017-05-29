@@ -299,7 +299,7 @@ namespace sQzServer0
             ExamSlot sl = new ExamSlot();
             DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out sl.mDt);
             sl.DBSelNee();
-            ExamSlotView vw = new ExamSlotView();
+            Op0SlotView vw = new Op0SlotView();
             vw.ShallowCopy(refSl);
             vw.mSl = sl;
             vw.ShowExaminee();

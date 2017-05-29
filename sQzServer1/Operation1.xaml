@@ -9,13 +9,28 @@
       Title="Operation1">
 
     <StackPanel x:Name="spMain" Loaded="spMain_Loaded">
-        <TextBlock x:Name="txtDate" Text="Connecting..." HorizontalAlignment="Center"></TextBlock>
+        <StackPanel Orientation="Horizontal">
+            <Button x:Name="btnConnect" Content="Connect srvr" Click="btnConnect_Click"  Width="80"/>
+            <Button x:Name="btnStartSrvr" Content="Start srvr" Click="btnStartSrvr_Click" Width="80"/>
+            <Button x:Name="btnStopSrvr" Content="Stop srvr" Click="btnStopSrvr_Click" Width="80"/>
+            <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Width="80"/>
+            <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click"  Width="80"/>
+            <TextBlock Text="all examinees"/>
+            <CheckBox x:Name="ckbAllNee" IsChecked="False" Checked="ckbAllNee_Checked" Unchecked="ckbAllNee_Unchecked"/>
+        </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10">
-            <ScrollViewer x:Name="svwrStt" Width="240" Height="600" VerticalScrollBarVisibility="Auto">
-                <TextBlock x:Name="lblStatus" Width="240" TextWrapping="Wrap" Background="AliceBlue"></TextBlock>
-            </ScrollViewer>
-            <ScrollViewer Width="710" Height="600" VerticalScrollBarVisibility="Auto">
-                <Grid x:Name="gNee">
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock x:Name="txtBrd" Text="2017-05-31"/>
+                    <ListBox x:Name="lbxSl" Width="90" Height="200" SelectionMode="Multiple"/>
+                </StackPanel>
+                <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="lblStatus" Width="400" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
+                </ScrollViewer>
+            </StackPanel>
+            <TabControl x:Name="tbcSl" Width="800"/>
+            <StackPanel x:Name="refSl" Visibility="Collapsed">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40"/>
                         <ColumnDefinition Width="150"/>
@@ -38,17 +53,22 @@
                     <TextBlock Grid.Column="6" Text="Mark" Background="Azure" TextAlignment="Center"/>
                     <TextBlock Grid.Column="7" Text="Lock" Background="Azure" TextAlignment="Center"/>
                 </Grid>
-            </ScrollViewer>
-            <TabControl x:Name="tbcQuest" Width="300" Height="600"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal">
-            <Button x:Name="btnConnect" Content="Connect srvr" Click="btnConnect_Click"  Width="80"/>
-            <Button x:Name="btnStartSrvr" Content="Start srvr" Click="btnStartSrvr_Click" Width="80"/>
-            <Button x:Name="btnStopSrvr" Content="Stop srvr" Click="btnStopSrvr_Click" Width="80"/>
-            <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Width="80"/>
-            <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click"  Width="80"/>
-            <TextBlock Text="all examinees"/>
-            <CheckBox x:Name="ckbAllNee" IsChecked="False" Checked="ckbAllNee_Checked" Unchecked="ckbAllNee_Unchecked"/>
+                <ScrollViewer Width="710" Height="290" VerticalScrollBarVisibility="Auto">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>
+                </ScrollViewer>
+                <TabControl Width="400" Height="320"/>
+            </StackPanel>
         </StackPanel>
     </StackPanel>
 </Page>

@@ -7,16 +7,17 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Input;
 using System.Windows.Media;
+using sQzLib;
 
-namespace sQzLib
+namespace sQzServer0
 {
-    public class ExamSlotView: StackPanel
+    public class Op0SlotView: StackPanel
     {
         public Dictionary<int, TextBlock> vGrade;
         public Dictionary<int, TextBlock> vDt1;
         public Dictionary<int, TextBlock> vDt2;
         public Dictionary<int, TextBlock> vComp;
-        Grid grdExaminee;
+        Grid grdNee;
         Grid grdQCtrl;
         TabControl tbcQuest;
         RadioButton rdoA, rdoB;
@@ -26,7 +27,7 @@ namespace sQzLib
         Button btnQSGen;
         public ExamSlot mSl;
 
-        public ExamSlotView()
+        public Op0SlotView()
         {
             vGrade = new Dictionary<int, TextBlock>();
             vDt1 = new Dictionary<int, TextBlock>();
@@ -48,34 +49,34 @@ namespace sQzLib
                     rid++;
                     RowDefinition rd = new RowDefinition();
                     rd.Height = new GridLength(20);
-                    grdExaminee.RowDefinitions.Add(rd);
+                    grdNee.RowDefinitions.Add(rd);
                     TextBlock t = new TextBlock();
                     t.Text = e.tId;
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     Grid.SetRow(t, rid);
-                    grdExaminee.Children.Add(t);
+                    grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tName;
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
-                    grdExaminee.Children.Add(t);
+                    grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tBirdate;
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 2);
-                    grdExaminee.Children.Add(t);
+                    grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tBirthplace;
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
-                    grdExaminee.Children.Add(t);
+                    grdNee.Children.Add(t);
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
@@ -84,7 +85,7 @@ namespace sQzLib
                         t.Text = e.uGrade.ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
-                    grdExaminee.Children.Add(t);
+                    grdNee.Children.Add(t);
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
@@ -93,7 +94,7 @@ namespace sQzLib
                         t.Text = e.dtTim1.ToString("HH:mm");
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 5);
-                    grdExaminee.Children.Add(t);
+                    grdNee.Children.Add(t);
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
@@ -102,7 +103,7 @@ namespace sQzLib
                         t.Text = e.dtTim2.ToString("HH:mm");
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 6);
-                    grdExaminee.Children.Add(t);
+                    grdNee.Children.Add(t);
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
@@ -111,7 +112,7 @@ namespace sQzLib
                         t.Text = e.tComp;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 7);
-                    grdExaminee.Children.Add(t);
+                    grdNee.Children.Add(t);
                     dark = !dark;
                 }
         }
@@ -154,7 +155,6 @@ namespace sQzLib
                     Grid.SetRow(t, Grid.GetRow(txt));
                     g.Children.Add(t);
                 }
-                g.Name = refg.Name;
                 Children.Add(g);
             }
 
@@ -166,15 +166,15 @@ namespace sQzLib
                     continue;
                 vwr.Width = refscrvwr.Width;
                 vwr.Height = refscrvwr.Height;
-                grdExaminee = new Grid();
+                vwr.HorizontalAlignment = HorizontalAlignment.Left;
+                grdNee = new Grid();
                 foreach (ColumnDefinition cd in refg.ColumnDefinitions)
                 {
                     ColumnDefinition d = new ColumnDefinition();
                     d.Width = cd.Width;
-                    grdExaminee.ColumnDefinitions.Add(d);
+                    grdNee.ColumnDefinitions.Add(d);
                 }
-                grdExaminee.Name = refg.Name;
-                vwr.Content = grdExaminee;
+                vwr.Content = grdNee;
                 Children.Add(vwr);
             }
 
@@ -235,8 +235,7 @@ namespace sQzLib
                         b.HorizontalAlignment = rdo.HorizontalAlignment;
                         b.VerticalAlignment = rdo.VerticalAlignment;
                         b.IsChecked = rdo.IsChecked;
-                        b.Name = rdo.Name;
-                        if (b.Name == "A")//hardcode, 2 cases
+                        if (rdo.Name == "A")//hardcode, 2 cases
                             rdoA = b;
                         else
                             rdoB = b;

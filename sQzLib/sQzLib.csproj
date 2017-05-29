@@ -58,7 +58,6 @@
     <Compile Include="ExamineeS1.cs" />
     <Compile Include="ExamRoom.cs" />
     <Compile Include="ExamSlot.cs" />
-    <Compile Include="ExamSlotView.cs" />
     <Compile Include="QuestPack.cs" />
     <Compile Include="QuestSheet.cs" />
     <Compile Include="FirewallHandler.cs" />
