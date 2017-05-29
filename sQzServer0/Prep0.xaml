@@ -12,21 +12,17 @@
         <StackPanel Orientation="Horizontal">
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-                    <TextBox x:Name="tbxBrd" Height="30" Width="120" />
+                    <TextBox x:Name="tbxBrd" Height="30" Width="110" />
                     <Button x:Name="btnInsBrd"  Content="+" Height="30" Width="30" Click="btnInsBrd_Click"/>
                 </StackPanel>
-                <ScrollViewer Width="120" Height="200" VerticalScrollBarVisibility="Auto">
-                    <ListBox x:Name="lbxBrd" Width="120" SelectionChanged="lbxBrd_SelectionChanged"/>
-                </ScrollViewer>
+                <ListBox x:Name="lbxBrd" Width="140" Height="200" SelectionChanged="lbxBrd_SelectionChanged"/>
             </StackPanel>
             <StackPanel>
                 <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
                     <TextBox x:Name="tbxSl" Height="30" Width="60" />
                     <Button x:Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click"/>
                 </StackPanel>
-                <ScrollViewer Width="60" Height="200" VerticalScrollBarVisibility="Auto">
-                    <ListBox x:Name="lbxSl" Width="60" SelectionMode="Multiple"></ListBox>
-                </ScrollViewer>
+                <ListBox x:Name="lbxSl" Width="90" Height="200" SelectionMode="Multiple"/>
             </StackPanel>
             <TabControl x:Name="tbcNee" Width="920"/>
             <StackPanel x:Name="refSl" Visibility="Collapsed">
@@ -48,9 +44,7 @@
             </StackPanel>
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-            <ScrollViewer Width="160" Height="410" VerticalScrollBarVisibility="Auto">
-                <ListBox x:Name="lbxQCatgry" Width="160" SelectionChanged="lbxQCatgry_SelectionChanged"></ListBox>
-            </ScrollViewer>
+            <ListBox x:Name="lbxQCatgry" Width="160" Height="410" SelectionChanged="lbxQCatgry_SelectionChanged"/>
             <StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions>

@@ -229,7 +229,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string tbl = "q" + eIU.ToString().Substring(1);//hardcode
+            string tbl = "q" + (int)eIU;
             string qry = DBConnect.mkQrySelect(tbl, null, null, null);
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
@@ -238,7 +238,7 @@ namespace sQzLib
                 while (reader.Read())
                 {
                     Question q = new Question();
-                    q.uId = reader.GetUInt32(0);//hardcode
+                    q.uId = reader.GetInt32(0);
                     string[] s = reader.GetString(1).Split('\n');
                     q.mStmt = s[0];
                     q.nAns = 4;
@@ -263,7 +263,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string tbl = "q" + eIU.ToString().Substring(1);//hardcode
+            string tbl = "q" + (int)eIU;
             //randomize
             int nn = DBConnect.Count(conn, tbl);
             if (nn < 1 || nn < n)
@@ -312,7 +312,7 @@ namespace sQzLib
                         continue;
                     ++i;
                     Question q = new Question();
-                    q.uId = reader.GetUInt32(0);//hardcode
+                    q.uId = reader.GetInt32(0);
                     string[] s = reader.GetString(1).Split('\n');
                     q.mStmt = "(" + tbl + ')' + s[0];
                     q.nAns = 4;
@@ -351,7 +351,7 @@ namespace sQzLib
                 vals.Append("'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            string tbl = "q" + eIU.ToString().Substring(1);//hardcode
+            string tbl = "q" + (int)eIU;
             string emsg;
             DBConnect.Ins(conn, tbl, "body,ansKeys", vals.ToString(), out emsg);
             DBConnect.Close(ref conn);
@@ -396,14 +396,14 @@ namespace sQzLib
                 string[] iuid = qid.Split('_');
                 if(iuid.Length == 2)//todo handle error
                 {
-                    qry = DBConnect.mkQrySelect("quest" + iuid[0], null, "idx=" + iuid[1], null);
+                    qry = DBConnect.mkQrySelect("q" + iuid[0], null, "id=" + iuid[1], null);
                     reader = null;//todo DBConnect.exeQrySelect(conn, qry);
                     if (reader != null)//todo handle error
                     {
                         if(reader.Read())//todo handle error
                         {
                             Question q = new Question();
-                            q.uId = reader.GetUInt32(0);
+                            q.uId = reader.GetInt32(0);
                             string[] s = reader.GetString(1).Split('\n');
                             q.mStmt = "(" + iuid[0] + ')' + s[0];
                             q.nAns = 4;

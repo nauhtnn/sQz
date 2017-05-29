@@ -24,7 +24,7 @@ namespace sQzServer0
     public partial class Prep0 : Page
     {
         List<CheckBox> vChk;
-        List<uint> vQId;
+        List<int> vQId;
         IUx mSelQCat;
         QuestSheet mDBQSh;
         QuestSheet mQSh;
@@ -248,7 +248,7 @@ namespace sQzServer0
 				g.RowDefinitions.Clear();
                 QuestSheet qs = db ? mDBQSh : mQSh;
                 vChk = new List<CheckBox>();
-                vQId = new List<uint>();
+                vQId = new List<int>();
                 foreach (Question q in qs.vQuest)
                 {
                     TextBlock i = new TextBlock();
@@ -316,10 +316,10 @@ namespace sQzServer0
             foreach(CheckBox c in vChk)
                 if(c.IsChecked == true)
                 {
-                    uint qId;
-                    if (uint.TryParse(c.Name.Substring(1), out qId))
+                    int uqid;
+                    if (int.TryParse(c.Name.Substring(1), out uqid))
                     {
-                        Question.DBDelete(mSelQCat, vQId[(int)qId]);
+                        Question.DBDelete(mSelQCat, vQId[uqid]);
                         toUpdate = true;
                     }
                 }
@@ -343,8 +343,6 @@ namespace sQzServer0
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
-            if (mBrd.vSl.ContainsKey(i.Content as string))
-                return;
             PrepNeeView pnv = new PrepNeeView();
             pnv.mSlDB = new ExamSlot();
             DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out pnv.mSlDB.mDt);
@@ -365,7 +363,6 @@ namespace sQzServer0
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
-            //mBrd.vSl.Remove(i.Content as string);
             foreach(TabItem ti in tbcNee.Items)
                 if(ti.Name == "_" + (i.Content as string).Replace(':', '_'))
                 {

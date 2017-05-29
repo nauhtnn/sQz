@@ -68,7 +68,7 @@ namespace sQzLib
 
     public class Question
     {
-        public uint uId;
+        public int uId;
         public string mStmt; //statement
         public int nAns;
         public IUx mIU;
@@ -353,12 +353,12 @@ namespace sQzLib
             siToken = 0;//safe to be 0
         }
         
-		public static void DBDelete(IUx eIU, uint id) {
+		public static void DBDelete(IUx eIU, int id) {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string iu = eIU.ToString().Substring(1);
-            DBConnect.Delete(conn, "q" + iu, "id" + id.ToString());
+            string tbl = "q" + (int)eIU;
+            DBConnect.Delete(conn, tbl, "id=" + id.ToString());
         }
     }
 }

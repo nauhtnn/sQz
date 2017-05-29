@@ -17,15 +17,16 @@
         </StackPanel>
         <StackPanel Orientation="Horizontal" Margin="10">
             <StackPanel>
-                <ScrollViewer Width="150" Height="320" VerticalScrollBarVisibility="Auto">
-                    <ListBox x:Name="lbxDate" Width="150"/>
-                </ScrollViewer>
+                <StackPanel Orientation="Horizontal">
+                    <ListBox x:Name="lbxBrd" Width="140" Height="200" SelectionChanged="lbxBrd_SelectionChanged"/>
+                    <ListBox x:Name="lbxSl" Width="90" Height="200" SelectionMode="Multiple"/>
+                </StackPanel>
                 <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
                     <TextBlock x:Name="lblStatus" Width="400" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
                 </ScrollViewer>
             </StackPanel>
             <TabControl x:Name="tbcSl" Width="800"/>
-            <StackPanel x:Name="refSpSl" Visibility="Collapsed">
+            <StackPanel x:Name="refSl" Visibility="Collapsed">
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="40"/>

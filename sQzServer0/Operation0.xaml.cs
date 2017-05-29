@@ -25,6 +25,7 @@ namespace sQzServer0
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
+        ExamBoard mBrd;
 
         public Operation0()
         {
@@ -33,8 +34,7 @@ namespace sQzServer0
             mServer = new Server2(SrvrBufHndl);
             mCbMsg = new UICbMsg();
 
-            lbxDate.SelectionMode = SelectionMode.Single;
-            lbxDate.SelectionChanged += lbxDate_SelectionChanged;
+            mBrd = new ExamBoard();
 
             bRunning = true;
         }
@@ -54,54 +54,36 @@ namespace sQzServer0
                 return;
             if(i.IsSelected)
             {
-                ExamSlot sl = new ExamSlot();
-                //sl.uId = uint.Parse(i.Name.Substring(1));
-                if ((i.Content as string)[0] == '*')
-                    DtFmt.ToDt((i.Content as string).Substring(1), DtFmt.H, out sl.mDt);
-                else
-                    DtFmt.ToDt((i.Content as string).Substring(1), DtFmt.H, out sl.mDt);
-                sl.DBSelNee();
-                ExamSlotView vw = new ExamSlotView();
-                vw.ShallowCopy(refSpSl);
-                vw.mSl = sl;
-                vw.ShowExaminee();
-                TabItem ti = new TabItem();
-                ti.Header = sl.mDt.ToString(DtFmt.hh);
-                ti.Content = vw;
-                tbcSl.Items.Add(ti);
-                //QuestSheet.DBUpdateCurQSId(sl.uId);
-                //vSl.Add(sl.uId, sl);
-                //vSlVw.Add(sl.uId, vw);
+                
             }
             //else
             //    vSl.Remove(uint.Parse(i.Name.Substring(1)));
         }
 
-        private void LoadDates()
+        private void LoadBrd()
         {
-            Dictionary<uint, Tuple<DateTime, bool>> v = ExamSlot.DBSelect();
-            if (0 < v.Keys.Count)
+            string emsg;
+            List<DateTime> v = ExamBoard.DBSel(out emsg);
+            if (v == null)
             {
-                bool dark = true;
-                Color c = new Color();
-                c.A = 0xff;
-                c.B = c.G = c.R = 0xf0;
-                Dispatcher.Invoke(() => {
-                    lbxDate.Items.Clear();
-                    foreach (uint i in v.Keys)
-                    {
-                        ListBoxItem it = new ListBoxItem();
-                        if(v[i].Item2)
-                            it.Content = v[i].Item1.ToString(DtFmt.H);
-                        else
-                            it.Content = "*" + v[i].Item1.ToString(DtFmt.H);
-                        it.Name = "_" + i;
-                        dark = !dark;
-                        if (dark)
-                            it.Background = new SolidColorBrush(c);
-                        lbxDate.Items.Add(it);
-                    }
-                });
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(emsg);
+                spMain.Opacity = 1;
+                return;
+            }
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            lbxBrd.Items.Clear();
+            foreach (DateTime dt in v)
+            {
+                ListBoxItem it = new ListBoxItem();
+                it.Content = dt.ToString(DtFmt.__);
+                dark = !dark;
+                if (dark)
+                    it.Background = new SolidColorBrush(c);
+                lbxBrd.Items.Add(it);
             }
         }
 
@@ -118,7 +100,7 @@ namespace sQzServer0
 
             LoadTxt();
 
-            LoadDates();
+            LoadBrd();
             //InitQPanel();
 
             double rt = spMain.RenderSize.Width / 1280;
@@ -272,6 +254,92 @@ namespace sQzServer0
             txtName.Text = t._[(int)TxI.NEE_NAME];
             txtId.Text = t._[(int)TxI.NEEID_S];
             txtGrade.Text = t._[(int)TxI.MARK];
+        }
+
+        private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            tbcSl.Items.Clear();
+            ListBox l = sender as ListBox;
+            ListBoxItem i = l.SelectedItem as ListBoxItem;
+            if (i == null)
+            {
+                lbxSl.IsEnabled = false;
+                return;
+            }
+            DateTime dt;
+            if (!DtFmt.ToDt(i.Content as string, DtFmt._, out dt))
+            {
+                mBrd.mDt = dt;
+                lbxSl.IsEnabled = true;
+                LoadSl();
+            }
+        }
+
+        private void LoadSl()
+        {
+            string emsg;
+            List<DateTime> v = mBrd.DBSelSl(out emsg);
+            if (v == null)
+            {
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(emsg);
+                spMain.Opacity = 1;
+            }
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            lbxSl.Items.Clear();
+            foreach (DateTime dt in v)
+            {
+                ListBoxItem it = new ListBoxItem();
+                it.Content = dt.ToString(DtFmt.hh);
+                it.Selected += lbxSl_Selected;
+                it.Unselected += lbxSl_Unselected;
+                dark = !dark;
+                if (dark)
+                    it.Background = new SolidColorBrush(c);
+                lbxSl.Items.Add(it);
+            }
+        }
+
+        private void lbxSl_Selected(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem i = sender as ListBoxItem;
+            if (i == null)
+                return;
+            if (mBrd.vSl.ContainsKey(i.Content as string))
+                return;
+
+            ExamSlot sl = new ExamSlot();
+            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out sl.mDt);
+            sl.DBSelNee();
+            ExamSlotView vw = new ExamSlotView();
+            vw.ShallowCopy(refSl);
+            vw.mSl = sl;
+            vw.ShowExaminee();
+            TabItem ti = new TabItem();
+            ti.Name = "_" + (i.Content as string).Replace(':', '_');
+            ti.Header = sl.mDt.ToString(DtFmt.hh);
+            ti.Content = vw;
+            tbcSl.Items.Add(ti);
+            //QuestSheet.DBUpdateCurQSId(sl.uId);
+            mBrd.vSl.Add(i.Content as string, sl);
+            //vSlVw.Add(sl.uId, vw);
+        }
+
+        private void lbxSl_Unselected(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem i = sender as ListBoxItem;
+            if (i == null)
+                return;
+            mBrd.vSl.Remove(i.Content as string);
+            foreach (TabItem ti in tbcSl.Items)
+                if (ti.Name == "_" + (i.Content as string).Replace(':', '_'))
+                {
+                    tbcSl.Items.Remove(ti);
+                    break;
+                }
         }
     }
 }
