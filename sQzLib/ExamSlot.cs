@@ -4,6 +4,7 @@ using System.Windows.Controls;
 using MySql.Data.MySqlClient;
 using System.Windows.Media;
 using System.Windows;
+using System.Text;
 
 /*
 CREATE TABLE IF NOT EXISTS `slot` (`dt` DATE, `t` TIME, `open` TINYINT DEFAULT 0,
@@ -125,45 +126,115 @@ namespace sQzLib
             return l;
         }
 
-        public void ReadF(string fp)
+        public string ReadF(string fp)
         {
             string buf = Utils.ReadFile(fp);
             if (buf == null)
-                return;
+                return null;
             string[] vs = buf.Split('\n');
+            StringBuilder eline = new StringBuilder();
+            StringBuilder dup = new StringBuilder();
+            int i = 0;
             foreach (string s in vs)
             {
+                ++i;
                 ExamineeS0 e = new ExamineeS0();
                 string[] v = s.Split('\t');
                 if (v.Length == 5)
                 {
                     if (v[0].Length < 2)
+                    {
+                        eline.Append(i.ToString() + ", ");
                         continue;
+                    }
                     v[0] = v[0].ToUpper();
                     ExamLv x;
                     if(Enum.TryParse(v[0].Substring(0, 1), out x))
                         e.eLv = x;
                     else
+                    {
+                        eline.Append(i.ToString() + ", ");
                         continue;
-                    int uRId;
+                    }
+                    int urid;
                     if (!int.TryParse(v[0].Substring(1), out e.uId)
-                        || !int.TryParse(v[1], out uRId) || !vRoom.ContainsKey(uRId))
+                        || !int.TryParse(v[1], out urid) || !vRoom.ContainsKey(urid))
+                    {
+                        eline.Append(i.ToString() + ", ");
                         continue;
+                    }
                     e.uId = e.uId + (int)e.eLv;
+                    if(vRoom[urid].vExaminee.ContainsKey(e.uId))
+                    {
+                        dup.Append(e.eLv.ToString() + (e.uId - (int)e.eLv) + ", ");
+                        continue;
+                    }
                     e.mDt = mDt;
                     e.tName = v[2].Trim();
+                    DateTime dt;
+                    if(!DtFmt.ToDt(v[3], DtFmt._, out dt))
+                    {
+                        eline.Append(i.ToString() + ", ");
+                        continue;
+                    }
                     e.tBirdate = v[3];
                     e.tBirthplace = v[4].Trim();
-                    vRoom[uRId].vExaminee.Add(e.mLv + e.uId, e);
+                    if (e.tName.Length == 0 || e.tBirdate.Length == 0 || e.tBirthplace.Length == 0)
+                    {
+                        eline.Append(i.ToString() + ", ");
+                        continue;
+                    }
+                    vRoom[urid].vExaminee.Add(e.uId, e);
                 }
             }
+            StringBuilder r = new StringBuilder();
+            if(0 < dup.Length)
+            {
+                dup.Remove(dup.Length - 2, 2);//remove the last comma
+                r.Append("\n" + Txt.s._[(int)TxI.NEE_ID_EXIST]);
+                r.Append(dup.ToString() + '.');
+            }
+            if (0 < eline.Length)
+            {
+                eline.Remove(eline.Length - 2, 2);//remove the last comma
+                r.Append("\n" + Txt.s._[(int)TxI.NEE_ELINE]);
+                r.Append(dup.ToString() + '.');
+            }
+            if (r.Length == 0)
+                return null;
+            else
+                return Txt.s._[(int)TxI.NEE_FERR] + r.ToString();
         }
 
-        public void DBInsNee()
+        public int DBInsNee(out string eMsg)
         {
-            string eMsg;//todo show dialog
+            int v = 1;
+            StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
-                r.DBIns(out eMsg);
+            {
+                int n = r.DBIns(out eMsg);
+                //if (0 < n)
+                //{
+                //    string[] p = new string[2];
+                //    p[0] = r.uId.ToString();
+                //    p[1] = n.ToString();
+                //    sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DB_OK] + '\n', p);
+                //}
+                //else
+                if(n < 0)
+                {
+                    string[] p = new string[2];
+                    p[0] = r.uId.ToString();
+                    if (n == -1062)
+                        p[1] = Txt.s._[(int)TxI.NEE_EXIST];
+                    else
+                        p[1] = eMsg;
+                    sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DB_NOK] + '\n', p);
+                    v = 0;
+                }
+            }
+            eMsg = sb.ToString();
+            return v;
         }
 
         public void DBSelNee()
@@ -186,6 +257,7 @@ namespace sQzLib
                         ExamineeS0 e = new ExamineeS0();
                         DateTime dt = reader.GetDateTime(0);
                         string t = reader.GetString(1);
+                        DtFmt.ToDt(dt.ToString(DtFmt.__) + ' ' + t, DtFmt.HS, out e.mDt);
                         e.uId = (int) reader.GetUInt32(2);//todo no coerce
                         if (e.uId < (int)ExamLv.B)
                             e.eLv = ExamLv.A;

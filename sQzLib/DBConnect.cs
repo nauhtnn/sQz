@@ -133,7 +133,7 @@ namespace sQzLib
                 else
                 {
                     eMsg = Txt.s._[(int)TxI.DB_EXCPT] + e.ToString();
-                    n = 0;
+                    n = -1;
                 }
             }
             return n;

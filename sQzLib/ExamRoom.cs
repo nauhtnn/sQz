@@ -47,14 +47,14 @@ namespace sQzLib
         {
             if(vExaminee.Count == 0)
             {
-                eMsg = "null room";
+                eMsg = null;
                 return 0;
             }
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
-                return 0;
+                return -1;
             }
             string attbs = "dt,t,id,name,birdate,birthplace";
             StringBuilder vals = new StringBuilder();

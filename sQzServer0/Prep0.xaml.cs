@@ -148,6 +148,8 @@ namespace sQzServer0
             {
                 ListBoxItem it = new ListBoxItem();
                 it.Content = dt.ToString(DtFmt.hh);
+                it.Selected += lbxSl_Selected;
+                it.Unselected += lbxSl_Unselected;
                 dark = !dark;
                 if (dark)
                     it.Background = new SolidColorBrush(c);
@@ -209,27 +211,6 @@ namespace sQzServer0
                 lbxSl.IsEnabled = true;
                 LoadSl();
             }
-        }
-
-        private void lbxSl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ListBox l = sender as ListBox;
-            ListBoxItem i = l.SelectedItem as ListBoxItem;
-            if (i == null)
-                return;
-            if (mBrd.vSl.ContainsKey(i.Content as string))
-                return;
-            mSl = new ExamSlot();
-            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out mSl.mDt);
-            mSl.DBSelNee();
-            PrepNeeView pnv = new PrepNeeView();
-            pnv.mSl = mSl;
-            pnv.ShallowCopy(refSl);
-            pnv.Show(true);
-            TabItem ti = new TabItem();
-            ti.Header = pnv.mSl.mDt.ToString(DtFmt.hh);
-            ti.Content = pnv;
-            tbcNee.Items.Add(ti);
         }
 
         private void btnQBrowse_Click(object sender, RoutedEventArgs e)
@@ -350,6 +331,42 @@ namespace sQzServer0
             {
                 NavigationService.Navigate(new Uri("ExamHistory.xaml", UriKind.Relative));
             });
+        }
+
+        private void lbxSl_Selected(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem i = sender as ListBoxItem;
+            if (i == null)
+                return;
+            if (mBrd.vSl.ContainsKey(i.Content as string))
+                return;
+            mSl = new ExamSlot();
+            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out mSl.mDt);
+            mSl.DBSelNee();
+            mBrd.vSl.Add(i.Content as string, mSl);
+            PrepNeeView pnv = new PrepNeeView();
+            pnv.mSl = mSl;
+            pnv.ShallowCopy(refSl);
+            pnv.Show(true);
+            TabItem ti = new TabItem();
+            ti.Name = "_" + (i.Content as string).Replace(':', '_');
+            ti.Header = pnv.mSl.mDt.ToString(DtFmt.hh);
+            ti.Content = pnv;
+            tbcNee.Items.Add(ti);
+        }
+
+        private void lbxSl_Unselected(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem i = sender as ListBoxItem;
+            if (i == null)
+                return;
+            mBrd.vSl.Remove(i.Content as string);
+            foreach(TabItem ti in tbcNee.Items)
+                if(ti.Name == "_" + (i.Content as string).Replace(':', '_'))
+                {
+                    tbcNee.Items.Remove(ti);
+                    break;
+                }
         }
     }
 }

@@ -81,7 +81,16 @@ namespace sQzServer0
 
             string fp = dlg.FileName;
 
-            mSl.ReadF(fp);
+            string emsg = mSl.ReadF(fp);
+            if(emsg != null)
+            {
+                Window w = Window.GetWindow(this);
+                if(w != null)
+                    w.Opacity = 0.5;
+                WPopup.s.ShowDialog(emsg);
+                if (w != null)
+                    w.Opacity = 1;
+            }
 
             Show(false);
         }
@@ -113,7 +122,9 @@ namespace sQzServer0
         private void btnIns_Click(object sender, RoutedEventArgs e)
         {
             lbxFile.Items.Clear();
-            mSl.DBInsNee();
+            string emsg;
+            if (mSl.DBInsNee(out emsg) <= 0)
+                WPopup.s.ShowDialog(emsg);
             Show(true);
         }
     }

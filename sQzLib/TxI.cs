@@ -90,5 +90,11 @@ namespace sQzLib {
 		SLOT_NOK,
 		SLOT_OK,
 		SLOT_EXIST,
+		NEE_ID_EXIST,
+		NEE_ELINE,
+		NEE_FERR,
+		ROOM_DB_OK,
+		ROOM_DB_NOK,
+		NEE_EXIST,
 	}
 }
