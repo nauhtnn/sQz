@@ -265,7 +265,7 @@ namespace sQzLib
                 return;
             string tbl = "q" + (int)eIU;
             //randomize
-            int nn = DBConnect.Count(conn, tbl);
+            int nn = DBConnect.Count(conn, tbl, "id", null);
             if (nn < 1 || nn < n)
                 return;
             int[] vSel = new int[n];
@@ -301,7 +301,8 @@ namespace sQzLib
             Array.Sort(vSel);
             //
             string qry = DBConnect.mkQrySelect(tbl, null, null, null);
-            MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             i = 0;
             int ii = -1;
             if (reader != null)

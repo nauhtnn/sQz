@@ -46,20 +46,6 @@ namespace sQzServer0
             mServer.Stop(ref dummy);
         }
 
-        private void lbxDate_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ListBox l = (ListBox)sender;
-            ListBoxItem i = (ListBoxItem)l.SelectedItem;
-            if (i == null)
-                return;
-            if(i.IsSelected)
-            {
-                
-            }
-            //else
-            //    vSl.Remove(uint.Parse(i.Name.Substring(1)));
-        }
-
         private void LoadBrd()
         {
             string emsg;
@@ -71,18 +57,18 @@ namespace sQzServer0
                 spMain.Opacity = 1;
                 return;
             }
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
+            //bool dark = true;
+            //Color c = new Color();
+            //c.A = 0xff;
+            //c.B = c.G = c.R = 0xf0;
             lbxBrd.Items.Clear();
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
                 it.Content = dt.ToString(DtFmt.__);
-                dark = !dark;
-                if (dark)
-                    it.Background = new SolidColorBrush(c);
+                //dark = !dark;
+                //if (dark)
+                //    it.Background = new SolidColorBrush(c);
                 lbxBrd.Items.Add(it);
             }
         }
@@ -101,7 +87,6 @@ namespace sQzServer0
             LoadTxt();
 
             LoadBrd();
-            //InitQPanel();
 
             double rt = spMain.RenderSize.Width / 1280;
             spMain.RenderTransform = new ScaleTransform(rt, rt);
@@ -285,10 +270,10 @@ namespace sQzServer0
                 WPopup.s.ShowDialog(emsg);
                 spMain.Opacity = 1;
             }
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
+            //bool dark = true;
+            //Color c = new Color();
+            //c.A = 0xff;
+            //c.B = c.G = c.R = 0xf0;
             lbxSl.Items.Clear();
             foreach (DateTime dt in v)
             {
@@ -296,9 +281,9 @@ namespace sQzServer0
                 it.Content = dt.ToString(DtFmt.hh);
                 it.Selected += lbxSl_Selected;
                 it.Unselected += lbxSl_Unselected;
-                dark = !dark;
-                if (dark)
-                    it.Background = new SolidColorBrush(c);
+                //dark = !dark;
+                //if (dark)
+                //    it.Background = new SolidColorBrush(c);
                 lbxSl.Items.Add(it);
             }
         }
@@ -323,6 +308,7 @@ namespace sQzServer0
             ti.Header = sl.mDt.ToString(DtFmt.hh);
             ti.Content = vw;
             tbcSl.Items.Add(ti);
+            ti.Focus();
             //QuestSheet.DBUpdateCurQSId(sl.uId);
             mBrd.vSl.Add(i.Content as string, sl);
             //vSlVw.Add(sl.uId, vw);

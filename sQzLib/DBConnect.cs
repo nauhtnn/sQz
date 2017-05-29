@@ -161,25 +161,19 @@ namespace sQzLib
             return n;
         }
 
-        //Count statement
-        public static int Count(MySqlConnection conn, string tb)
-        {
-            string query = "SELECT COUNT(*) FROM " + tb;
-            int n;
-
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-            try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
-            catch (MySqlException) { n = 0; }
-
-            return n;
-        }
-
         public static int Count(MySqlConnection conn, string tb, string attbs, string cond)
         {
-            string query = "SELECT COUNT(" + attbs + ") FROM " + tb + " WHERE " + cond;
-            int n;
+            StringBuilder sb = new StringBuilder();
+            sb.Append("SELECT COUNT(");
+            if (attbs == null)
+                sb.Append("*) FROM " + tb);
+            else
+                sb.Append(attbs + ") FROM " + tb);
+            if(cond != null)
+                sb.Append(" WHERE " + cond);
 
-            MySqlCommand cmd = new MySqlCommand(query, conn);
+            int n;
+            MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn);
             try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
             catch (MySqlException) { n = -1; }
 

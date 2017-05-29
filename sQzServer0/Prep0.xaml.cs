@@ -112,18 +112,18 @@ namespace sQzServer0
                 spMain.Opacity = 1;
                 return;
             }
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
+            //bool dark = true;
+            //Color c = new Color();
+            //c.A = 0xff;
+            //c.B = c.G = c.R = 0xf0;
             lbxBrd.Items.Clear();
             foreach(DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
                 it.Content = dt.ToString(DtFmt.__);
-                dark = !dark;
-                if (dark)
-                    it.Background = new SolidColorBrush(c);
+                //dark = !dark;
+                //if (dark)
+                //    it.Background = new SolidColorBrush(c);
                 lbxBrd.Items.Add(it);
             }
         }
@@ -138,10 +138,10 @@ namespace sQzServer0
                 WPopup.s.ShowDialog(emsg);
                 spMain.Opacity = 1;
             }
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
+            //bool dark = true;
+            //Color c = new Color();
+            //c.A = 0xff;
+            //c.B = c.G = c.R = 0xf0;
             lbxSl.Items.Clear();
             foreach (DateTime dt in v)
             {
@@ -149,9 +149,9 @@ namespace sQzServer0
                 it.Content = dt.ToString(DtFmt.hh);
                 it.Selected += lbxSl_Selected;
                 it.Unselected += lbxSl_Unselected;
-                dark = !dark;
-                if (dark)
-                    it.Background = new SolidColorBrush(c);
+                //dark = !dark;
+                //if (dark)
+                //    it.Background = new SolidColorBrush(c);
                 lbxSl.Items.Add(it);
             }
         }
@@ -287,9 +287,9 @@ namespace sQzServer0
         private void lbxQCatgry_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             ListBox l = (ListBox)sender;
-            if (Enum.IsDefined(typeof(IUx), l.SelectedIndex + 1))
+            if (Enum.IsDefined(typeof(IUx), l.SelectedIndex))
             {
-                mSelQCat = (IUx)l.SelectedIndex + 1;
+                mSelQCat = (IUx)l.SelectedIndex;
                 mDBQSh.DBSelect(mSelQCat);
                 ShowQuest(true);
             }
@@ -356,6 +356,7 @@ namespace sQzServer0
             ti.Header = pnv.mSlDB.mDt.ToString(DtFmt.hh);
             ti.Content = pnv;
             tbcNee.Items.Add(ti);
+            ti.Focus();
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)
