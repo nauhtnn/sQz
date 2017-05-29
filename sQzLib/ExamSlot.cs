@@ -74,7 +74,7 @@ namespace sQzLib
 
         public static bool ReadByteDt(byte[] buf, ref int offs, out DateTime dt)
         {
-            if (buf.Length - offs < 20)
+            if (buf.Length - offs < BYTE_COUNT_DT)
             {
                 dt = DtFmt.INV_;
                 return true;

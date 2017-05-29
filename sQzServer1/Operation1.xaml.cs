@@ -142,10 +142,10 @@ namespace sQzServer1
             switch (c)
             {
                 case NetCode.Dating:
-                    //outMsg = new byte[20];
-                    //offs = 0;
-                    //ExamSlot.ToByteDt(outMsg, ref offs, mSl.mDt);
-                    return true;
+                    outMsg = new byte[ExamBoard.BYTE_COUNT_DT];
+                    offs = 0;
+                    ExamBoard.ToByteDt(outMsg, ref offs, mBrd.mDt);
+                    return false;// true;
                 case NetCode.Authenticating:
                     //e = new ExamineeS1();
                     //e.bFromC = true;

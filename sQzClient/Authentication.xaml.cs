@@ -126,14 +126,15 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Dating:
-                    ExamSlot.ReadByteDt(buf, ref offs, out mDt);//todo: check data
-                    if(bRunning)
+                    if(!ExamBoard.ReadByteDt(buf, ref offs, out mDt) && bRunning)
+                    {
                         Dispatcher.Invoke(() => {
-                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(DtFmt.RH);
+                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(DtFmt.RR);
                             EnableControls();
                             btnReconn.IsEnabled = false;
                         });
-                    mState = NetCode.Authenticating;
+                        mState = NetCode.Authenticating;
+                    }
                     break;
                 case NetCode.Authenticating:
                     l = buf.Length - offs;

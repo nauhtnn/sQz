@@ -16,6 +16,8 @@ namespace sQzLib
         public DateTime mDt;
         public Dictionary<string, ExamSlot> vSl;
 
+        public const int BYTE_COUNT_DT = 12;
+
         public ExamBoard()
         {
             vSl = new Dictionary<string, ExamSlot>();
@@ -116,11 +118,41 @@ namespace sQzLib
             return r;
         }
 
+        public static void ToByteDt(byte[] buf, ref int offs, DateTime dt)
+        {
+            Array.Copy(BitConverter.GetBytes(dt.Year), 0, buf, offs, 4);
+            offs += 4;
+            Array.Copy(BitConverter.GetBytes(dt.Month), 0, buf, offs, 4);
+            offs += 4;
+            Array.Copy(BitConverter.GetBytes(dt.Day), 0, buf, offs, 4);
+            offs += 4;
+        }
+
+        public static bool ReadByteDt(byte[] buf, ref int offs, out DateTime dt)
+        {
+            if (buf.Length - offs < BYTE_COUNT_DT)
+            {
+                dt = DtFmt.INV_;
+                return true;
+            }
+            int y = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            int M = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            int d = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            if (DtFmt.ToDt(y.ToString("d4") + '-' + M.ToString("d2") + '-' + d.ToString("d2"), DtFmt._, out dt))
+                return true;
+            return false;
+        }
+
         public byte[] ToByteR1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
-            int sz;
-            byte[] b;
+            byte[] b = new byte[BYTE_COUNT_DT];
+            int sz = 0;
+            ToByteDt(b, ref sz, mDt);
+            l.Add(b);
             foreach (ExamSlot sl in vSl.Values)
             {
                 List<byte[]> x = sl.ToByteR1(rId);
@@ -155,6 +187,8 @@ namespace sQzLib
         public bool ReadByteR1(byte[] buf, ref int offs)
         {
             DateTime dt;
+            if (ReadByteDt(buf, ref offs, out mDt))
+                return true;
             while(ExamSlot.BYTE_COUNT_DT < buf.Length - offs)
             {
                 if (ExamSlot.ReadByteDt(buf, ref offs, out dt))
