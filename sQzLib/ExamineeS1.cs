@@ -131,11 +131,11 @@ namespace sQzLib
         {
             int l = buf.Length - offs;
 
-            if (l < 14)
-                return true;
+            //if (l < 12)
+            //    return true;
             //uSlId = BitConverter.ToUInt32(buf, offs);
-            l -= 4;
-            offs += 4;
+            //l -= 4;
+            //offs += 4;
 
             int x;
             if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))

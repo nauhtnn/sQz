@@ -157,7 +157,7 @@ namespace sQzServer0
                     //    Buffer.BlockCopy(i, 0, outMsg, sz, i.Length);
                     //    sz += i.Length;
                     //}
-                    outMsg = null;
+                    outMsg = mBrd.ToByteR1(rId);
                     return true;
                 case NetCode.QuestRetrieving:
                     outMsg = null;// curSl.ToByteQPack();

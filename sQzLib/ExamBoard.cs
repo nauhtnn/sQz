@@ -109,5 +109,85 @@ namespace sQzLib
                 eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.SLOT_EXIST];
             return n;
         }
+
+        public byte[] ToByte(int rId)
+        {
+            List<byte[]> l = new List<byte[]>();
+            int sz;
+            byte[] b;
+            foreach (ExamSlot sl in vSl.Values)
+            {
+                List<byte[]> x = sl.ToByteR1(rId);
+                sz = 0;
+                foreach (byte[] a in x)
+                    sz += a.Length;
+                b = new byte[sz + 4];
+                Array.Copy(BitConverter.GetBytes(sz), 0, b, 0, 4);
+                sz = 4;
+                foreach(byte[] a in x)
+                {
+                    Array.Copy(a, 0, b, sz, a.Length);
+                    sz += a.Length;
+                }
+                l.Add(b);
+            }
+            sz = 0;
+            foreach (byte[] a in l)
+                sz += a.Length;
+            b = new byte[sz];
+            sz = 0;
+            foreach (byte[] a in l)
+            {
+                Buffer.BlockCopy(a, 0, b, sz, a.Length);
+                sz += a.Length;
+            }
+            return b;
+        }
+
+        public byte[] ToByteR1(int rId)
+        {
+            List<byte[]> l = new List<byte[]>();
+            int sz;
+            byte[] b;
+            foreach (ExamSlot sl in vSl.Values)
+            {
+                List<byte[]> x = sl.ToByteR1(rId);
+                sz = 0;
+                foreach (byte[] a in x)
+                    sz += a.Length;
+                b = new byte[sz + 4];
+                Array.Copy(BitConverter.GetBytes(sz), 0, b, 0, 4);
+                sz = 4;
+                foreach (byte[] a in x)
+                {
+                    Array.Copy(a, 0, b, sz, a.Length);
+                    sz += a.Length;
+                }
+                l.Add(b);
+            }
+            sz = 0;
+            foreach (byte[] a in l)
+                sz += a.Length;
+            b = new byte[sz];
+            sz = 0;
+            foreach (byte[] a in l)
+            {
+                Buffer.BlockCopy(a, 0, b, sz, a.Length);
+                sz += a.Length;
+            }
+            return b;
+        }
+
+        public bool ReadByteR1(byte[] buf, ref int offs)
+        {
+            while(0 < buf.Length - offs)
+            {
+                ExamSlot sl = new ExamSlot();
+                if (sl.ReadByteR1(buf, ref offs))
+                    return true;
+                vSl.Add(sl.mDt.ToString(DtFmt.hh), sl);
+            }
+            return false;
+        }
     }
 }

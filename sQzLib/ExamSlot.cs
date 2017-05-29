@@ -353,9 +353,14 @@ namespace sQzLib
             }
         }
 
-        public void ReadByteR1(byte[] buf, ref int offs)
+        public bool ReadByteR1(byte[] buf, ref int offs)
         {
-            while (3 < buf.Length - offs)
+            if (buf.Length - offs < 4)
+                return true;
+            int l = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            l += offs;
+            while (offs < l)
             {
                 int rId = BitConverter.ToInt32(buf, offs);
                 offs += 4;
@@ -370,6 +375,10 @@ namespace sQzLib
                     vRoom.Add(rId, r);
                 }
             }
+            if (offs == l)
+                return false;
+            else
+                return true;
         }
 
         public void DBUpdateRs()
