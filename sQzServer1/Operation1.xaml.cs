@@ -342,10 +342,10 @@ namespace sQzServer1
                     if (mBrd.ReadByteQPack(buf, ref offs))
                         break;//show err msg
                     mState = NetCode.AnsKeyRetrieving;
-                    return false;//todo true;
+                    return true;
                 case NetCode.AnsKeyRetrieving:
-                    //if (mSl.mKeyPack.ReadByte(buf, ref offs))
-                    //    offs = 0;//todo handle error
+                    if (mBrd.ReadByteKey(buf, ref offs))
+                        offs = 0;//todo handle error
                     break;
                 case NetCode.RequestQuestSheet:
                     //int rs = BitConverter.ToInt32(buf, offs);

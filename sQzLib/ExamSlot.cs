@@ -441,6 +441,11 @@ namespace sQzLib
             return mKeyPack.ToByte();
         }
 
+        public bool ReadByteKey(byte[] buf, ref int offs)
+        {
+            return mKeyPack.ReadByte(buf, ref offs);
+        }
+
         public ExamineeA Signin(ExamineeA e)
         {
             ExamineeA o;

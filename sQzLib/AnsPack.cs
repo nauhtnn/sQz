@@ -95,7 +95,7 @@ namespace sQzLib
             int nSh = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
-            if (nSh < 1)
+            if (nSh < 0)
                 return true;
             while (0 < nSh)
             {

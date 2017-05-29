@@ -151,7 +151,7 @@ namespace sQzServer0
                     outMsg = mBrd.ToByteQPack();
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    outMsg = null;// mBrd.ToByteKey();
+                    outMsg = mBrd.ToByteKey();
                     break;
                 case NetCode.RequestQuestSheet:
                     if (buf.Length - offs == 4)

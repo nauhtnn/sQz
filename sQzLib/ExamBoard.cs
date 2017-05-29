@@ -233,5 +233,50 @@ namespace sQzLib
             else
                 return true;
         }
+
+        public byte[] ToByteKey()
+        {
+            List<byte[]> l = new List<byte[]>();
+            int sz;
+            byte[] b;
+            foreach (ExamSlot sl in vSl.Values)
+            {
+                byte[] x = sl.ToByteKey();
+                b = new byte[ExamSlot.BYTE_COUNT_DT + x.Length];
+                sz = 0;
+                ExamSlot.ToByteDt(b, ref sz, sl.mDt);
+                Array.Copy(x, 0, b, sz, x.Length);
+                l.Add(b);
+            }
+            sz = 0;
+            foreach (byte[] a in l)
+                sz += a.Length;
+            b = new byte[sz];
+            sz = 0;
+            foreach (byte[] a in l)
+            {
+                Buffer.BlockCopy(a, 0, b, sz, a.Length);
+                sz += a.Length;
+            }
+            return b;
+        }
+
+        public bool ReadByteKey(byte[] buf, ref int offs)
+        {
+            DateTime dt;
+            while (ExamSlot.BYTE_COUNT_DT < buf.Length - offs)
+            {
+                if (ExamSlot.ReadByteDt(buf, ref offs, out dt))
+                    return true;
+                ExamSlot sl;
+                if (!vSl.TryGetValue(dt.ToString(DtFmt.hh), out sl) ||
+                    sl.ReadByteKey(buf, ref offs))
+                    return true;
+            }
+            if (offs == buf.Length)
+                return false;
+            else
+                return true;
+        }
     }
 }
