@@ -116,40 +116,6 @@ namespace sQzLib
             return r;
         }
 
-        public byte[] ToByte(int rId)
-        {
-            List<byte[]> l = new List<byte[]>();
-            int sz;
-            byte[] b;
-            foreach (ExamSlot sl in vSl.Values)
-            {
-                List<byte[]> x = sl.ToByteR1(rId);
-                sz = 0;
-                foreach (byte[] a in x)
-                    sz += a.Length;
-                b = new byte[sz + 4];
-                Array.Copy(BitConverter.GetBytes(sz), 0, b, 0, 4);
-                sz = 4;
-                foreach(byte[] a in x)
-                {
-                    Array.Copy(a, 0, b, sz, a.Length);
-                    sz += a.Length;
-                }
-                l.Add(b);
-            }
-            sz = 0;
-            foreach (byte[] a in l)
-                sz += a.Length;
-            b = new byte[sz];
-            sz = 0;
-            foreach (byte[] a in l)
-            {
-                Buffer.BlockCopy(a, 0, b, sz, a.Length);
-                sz += a.Length;
-            }
-            return b;
-        }
-
         public byte[] ToByteR1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
@@ -158,12 +124,14 @@ namespace sQzLib
             foreach (ExamSlot sl in vSl.Values)
             {
                 List<byte[]> x = sl.ToByteR1(rId);
-                sz = 0;
+                sz = ExamSlot.BYTE_COUNT_DT;
                 foreach (byte[] a in x)
                     sz += a.Length;
                 b = new byte[sz + 4];
-                Array.Copy(BitConverter.GetBytes(sz), 0, b, 0, 4);
-                sz = 4;
+                sz = 0;
+                ExamSlot.ToByteDt(b, ref sz, sl.mDt);
+                Array.Copy(BitConverter.GetBytes(b.Length - ExamSlot.BYTE_COUNT_DT - 4), 0, b, sz, 4);
+                sz += 4;
                 foreach (byte[] a in x)
                 {
                     Array.Copy(a, 0, b, sz, a.Length);
@@ -186,14 +154,84 @@ namespace sQzLib
 
         public bool ReadByteR1(byte[] buf, ref int offs)
         {
-            while(0 < buf.Length - offs)
+            DateTime dt;
+            while(ExamSlot.BYTE_COUNT_DT < buf.Length - offs)
             {
-                ExamSlot sl = new ExamSlot();
-                if (sl.ReadByteR1(buf, ref offs))
+                if (ExamSlot.ReadByteDt(buf, ref offs, out dt))
                     return true;
-                vSl.Add(sl.mDt.ToString(DtFmt.hh), sl);
+                ExamSlot sl;
+                if(vSl.TryGetValue(dt.ToString(DtFmt.hh), out sl))
+                {
+                    if (sl.ReadByteR1(buf, ref offs))
+                        return true;
+                }
+                else
+                {
+                    sl = new ExamSlot();
+                    sl.mDt = dt;
+                    if (sl.ReadByteR1(buf, ref offs))
+                        return true;
+                    vSl.Add(sl.mDt.ToString(DtFmt.hh), sl);
+                }
             }
-            return false;
+            if (offs == buf.Length)
+                return false;
+            else
+                return true;
+        }
+
+        public byte[] ToByteQPack()
+        {
+            List<byte[]> l = new List<byte[]>();
+            int sz;
+            byte[] b;
+            foreach (ExamSlot sl in vSl.Values)
+            {
+                List<byte[]> x = sl.ToByteQPack();
+                sz = ExamSlot.BYTE_COUNT_DT;
+                foreach (byte[] a in x)
+                    sz += a.Length;
+                b = new byte[sz + 4];
+                sz = 0;
+                ExamSlot.ToByteDt(b, ref sz, sl.mDt);
+                Array.Copy(BitConverter.GetBytes(b.Length - ExamSlot.BYTE_COUNT_DT - 4), 0, b, sz, 4);
+                sz += 4;
+                foreach (byte[] a in x)
+                {
+                    Array.Copy(a, 0, b, sz, a.Length);
+                    sz += a.Length;
+                }
+                l.Add(b);
+            }
+            sz = 0;
+            foreach (byte[] a in l)
+                sz += a.Length;
+            b = new byte[sz];
+            sz = 0;
+            foreach (byte[] a in l)
+            {
+                Buffer.BlockCopy(a, 0, b, sz, a.Length);
+                sz += a.Length;
+            }
+            return b;
+        }
+
+        public bool ReadByteQPack(byte[] buf, ref int offs)
+        {
+            DateTime dt;
+            while (ExamSlot.BYTE_COUNT_DT < buf.Length - offs)
+            {
+                if (ExamSlot.ReadByteDt(buf, ref offs, out dt))
+                    return true;
+                ExamSlot sl;
+                if(!vSl.TryGetValue(dt.ToString(DtFmt.hh), out sl) ||
+                    sl.ReadByteQPack(buf, ref offs))
+                    return true;
+            }
+            if (offs == buf.Length)
+                return false;
+            else
+                return true;
         }
     }
 }

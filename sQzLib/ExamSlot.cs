@@ -19,6 +19,8 @@ namespace sQzLib
         public bool bOpen;
         public Dictionary<ExamLv, QuestPack> vQPack;
 
+        public const int BYTE_COUNT_DT = 8;
+
         public AnsPack mKeyPack;
 
         public Dictionary<int, ExamRoom> vRoom;
@@ -62,19 +64,8 @@ namespace sQzLib
         //    return r;
         //}
 
-        public int GetByteCountDt()
-        {
-            return 20;
-        }
-
         public static void ToByteDt(byte[] buf, ref int offs, DateTime dt)
         {
-            Array.Copy(BitConverter.GetBytes(dt.Year), 0, buf, offs, 4);
-            offs += 4;
-            Array.Copy(BitConverter.GetBytes(dt.Month), 0, buf, offs, 4);
-            offs += 4;
-            Array.Copy(BitConverter.GetBytes(dt.Day), 0, buf, offs, 4);
-            offs += 4;
             Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, offs, 4);
             offs += 4;
             Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, offs, 4);
@@ -88,18 +79,11 @@ namespace sQzLib
                 dt = DtFmt.INV_;
                 return true;
             }
-            int y = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int M = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int d = BitConverter.ToInt32(buf, offs);
-            offs += 4;
             int H = BitConverter.ToInt32(buf, offs);
             offs += 4;
             int m = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            if (DtFmt.ToDt(y.ToString("d4") + '/' + M.ToString("d2") + '/' + d.ToString("d2") +
-                ' ' + H.ToString("d2") + ':' + m.ToString("d2"), DtFmt.H, out dt))
+            if (DtFmt.ToDt(H.ToString("d2") + ':' + m.ToString("d2"), DtFmt.hh, out dt))
                 return true;
             return false;
         }
@@ -398,7 +382,7 @@ namespace sQzLib
             return false;
         }
 
-        public byte[] ToByteQPack()
+        public List<byte[]> ToByteQPack()
         {
             List<byte[]> l = new List<byte[]>();
             foreach (QuestPack p in vQPack.Values)
@@ -406,22 +390,28 @@ namespace sQzLib
                 l.Add(BitConverter.GetBytes((int)p.eLv));
                 l.Add(p.ToByte());
             }
-            int sz = 0;
-            foreach (byte[] x in l)
-                sz += x.Length;
-            byte[] buf = new byte[sz];
-            int offs = 0;
-            foreach(byte[] x in l)
-            {
-                Array.Copy(x, 0, buf, offs, x.Length);
-                offs += x.Length;
-            }
-            return buf;
+            //int sz = 0;
+            //foreach (byte[] x in l)
+            //    sz += x.Length;
+            //byte[] buf = new byte[sz];
+            //int offs = 0;
+            //foreach(byte[] x in l)
+            //{
+            //    Array.Copy(x, 0, buf, offs, x.Length);
+            //    offs += x.Length;
+            //}
+            //return buf;
+            return l;
         }
 
         public bool ReadByteQPack(byte[] buf, ref int offs)
         {
-            while(0 < buf.Length - offs)
+            if (buf.Length - offs < 4)
+                return true;
+            int l = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            l += offs;
+            while (offs < l)
             {
                 int x;
                 ExamLv lv;
@@ -433,7 +423,10 @@ namespace sQzLib
                 if (vQPack[lv].ReadByte(buf, ref offs))
                     return true;
             }
-            return false;
+            if (offs == l)
+                return false;
+            else
+                return true;
         }
 
         public bool ReadByteQPack1(ExamLv lv, byte[] buf, ref int offs)

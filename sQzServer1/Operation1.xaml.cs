@@ -334,15 +334,15 @@ namespace sQzServer1
             {
                 case NetCode.DateStudentRetriving:
                     if (mBrd.ReadByteR1(buf, ref offs))
-                        break;
+                        break;//show err msg
                     Dispatcher.Invoke(() => LoadSl());
                     mState = NetCode.QuestRetrieving;
-                    return false;//todo true;
-                case NetCode.QuestRetrieving:
-                    //mSl.ReadByteQPack(buf, ref offs);
-                    //ShowQuest();
-                    //mState = NetCode.AnsKeyRetrieving;
                     return true;
+                case NetCode.QuestRetrieving:
+                    if (mBrd.ReadByteQPack(buf, ref offs))
+                        break;//show err msg
+                    mState = NetCode.AnsKeyRetrieving;
+                    return false;//todo true;
                 case NetCode.AnsKeyRetrieving:
                     //if (mSl.mKeyPack.ReadByte(buf, ref offs))
                     //    offs = 0;//todo handle error
@@ -413,41 +413,6 @@ namespace sQzServer1
             return outMsg;
         }
 
-        private void ShowQuest() //same as Operation0.xaml
-        {
-            //bool dark = true;
-            //Color c = new Color();
-            //c.A = 0xff;
-            //c.B = c.G = c.R = 0xf0;
-            //Dispatcher.Invoke(() => {
-            //    tbcQuest.Items.Clear();
-            //    foreach(QuestPack p in mSl.vQPack.Values)
-            //        foreach (QuestSheet qs in p.vSheet.Values)
-            //        {
-            //            TabItem ti = new TabItem();
-            //            ti.Header = qs.eLv.ToString() + qs.uId;
-            //            ScrollViewer svwr = new ScrollViewer();
-            //            svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            //            StackPanel sp = new StackPanel();
-            //            int x = 0;
-            //            foreach (Question q in qs.vQuest)
-            //            {
-            //                TextBlock i = new TextBlock();
-            //                i.Text = ++x + ") " + q.ToString();
-            //                dark = !dark;
-            //                if (dark)
-            //                    i.Background = new SolidColorBrush(c);
-            //                else
-            //                    i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-            //                sp.Children.Add(i);
-            //            }
-            //            svwr.Content = sp;
-            //            ti.Content = svwr;
-            //            tbcQuest.Items.Add(ti);
-            //        }
-            //});
-        }
-
         private void btnSubmit_Click(object sender, RoutedEventArgs e)
         {
             //todo: check th state to return
@@ -482,6 +447,7 @@ namespace sQzServer1
             vw.ShallowCopy(refSl);
             vw.mSl = sl;
             vw.ShowExaminee();
+            vw.ShowQuest(); 
             TabItem ti = new TabItem();
             ti.Name = "_" + (i.Content as string).Replace(':', '_');
             ti.Header = sl.mDt.ToString(DtFmt.hh);

@@ -21,8 +21,10 @@ namespace sQzServer1
         Dictionary<int, CheckBox> vLock;//supervisor side
         Dictionary<int, bool> vbLock;//examinee side
         Grid grdNee;
-        TabControl tbcQuest;
+        public TabControl tbcQuest;
         public ExamSlot mSl;
+        bool bQShowed;
+        bool bNeeShowed;
 
         public Op1SlotView()
         {
@@ -32,10 +34,15 @@ namespace sQzServer1
             vMark = new Dictionary<int, TextBlock>();
             vLock = new Dictionary<int, CheckBox>();
             vbLock = new Dictionary<int, bool>();
+            bQShowed = bNeeShowed = false;
         }
 
         public void ShowExaminee()
         {
+            if (bNeeShowed)
+                return;
+            bNeeShowed = true;
+
             vComp.Clear();
             vMark.Clear();
             vDt1.Clear();
@@ -183,39 +190,41 @@ namespace sQzServer1
             }
         }
 
-        private void ShowQuest()
+        public void ShowQuest()
         {
+            if (bQShowed)
+                return;
+            bQShowed = true;
+
             bool dark = true;
             Color c = new Color();
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
-            Dispatcher.Invoke(() => {
-                tbcQuest.Items.Clear();
-                foreach (QuestPack p in mSl.vQPack.Values)
-                    foreach (QuestSheet qs in p.vSheet.Values)
+            tbcQuest.Items.Clear();
+            foreach (QuestPack p in mSl.vQPack.Values)
+                foreach (QuestSheet qs in p.vSheet.Values)
+                {
+                    TabItem ti = new TabItem();
+                    ti.Header = qs.eLv.ToString() + qs.uId;
+                    ScrollViewer svwr = new ScrollViewer();
+                    svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+                    StackPanel sp = new StackPanel();
+                    int x = 0;
+                    foreach (Question q in qs.vQuest)
                     {
-                        TabItem ti = new TabItem();
-                        ti.Header = qs.eLv.ToString() + qs.uId;
-                        ScrollViewer svwr = new ScrollViewer();
-                        svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-                        StackPanel sp = new StackPanel();
-                        int x = 0;
-                        foreach (Question q in qs.vQuest)
-                        {
-                            TextBlock i = new TextBlock();
-                            i.Text = ++x + ") " + q.ToString();
-                            dark = !dark;
-                            if (dark)
-                                i.Background = new SolidColorBrush(c);
-                            else
-                                i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-                            sp.Children.Add(i);
-                        }
-                        svwr.Content = sp;
-                        ti.Content = svwr;
-                        tbcQuest.Items.Add(ti);
+                        TextBlock i = new TextBlock();
+                        i.Text = ++x + ") " + q.ToString();
+                        dark = !dark;
+                        if (dark)
+                            i.Background = new SolidColorBrush(c);
+                        else
+                            i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
+                        sp.Children.Add(i);
                     }
-            });
+                    svwr.Content = sp;
+                    ti.Content = svwr;
+                    tbcQuest.Items.Add(ti);
+                }
         }
 
         private void cbxLock_Unchecked(object sender, RoutedEventArgs e)

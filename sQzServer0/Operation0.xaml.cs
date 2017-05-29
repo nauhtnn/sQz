@@ -145,25 +145,13 @@ namespace sQzServer0
                     }
                     int rId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
-                    //sz += curSl.GetByteCountDt();
-                    //List<byte[]> es = curSl.ToByteR1(rId);
-                    //foreach(byte[] i in es)
-                    //    sz += i.Length;
-                    //outMsg = new byte[sz];
-                    //sz = 0;
-                    //ExamSlot.ToByteDt(outMsg, ref sz, curSl.mDt);
-                    //foreach (byte[] i in es)
-                    //{
-                    //    Buffer.BlockCopy(i, 0, outMsg, sz, i.Length);
-                    //    sz += i.Length;
-                    //}
                     outMsg = mBrd.ToByteR1(rId);
                     return true;
                 case NetCode.QuestRetrieving:
-                    outMsg = null;// curSl.ToByteQPack();
+                    outMsg = mBrd.ToByteQPack();
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    outMsg = null;// curSl.ToByteKey();
+                    outMsg = null;// mBrd.ToByteKey();
                     break;
                 case NetCode.RequestQuestSheet:
                     if (buf.Length - offs == 4)
