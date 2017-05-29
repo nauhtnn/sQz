@@ -96,5 +96,9 @@ namespace sQzLib {
 		ROOM_DB_OK,
 		ROOM_DB_NOK,
 		NEE_EXIST,
+		ROOM_DEL,
+		ROOM_DEL_N,
+		ROOM_DEL_GRD,
+		ROOM_DEL_ECPT,
 	}
 }

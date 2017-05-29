@@ -13,24 +13,53 @@ namespace sQzServer0
 {
     class PrepNeeView: StackPanel
     {
+        Button btnXdb;
+        Button btnXfl;
         Button btnBrowse;
         Button btnIns;
         ListBox lbxDB;
         ListBox lbxFile;
-        public ExamSlot mSl;
+        public ExamSlot mSlDB;
+        public ExamSlot mSlFile;
 
         public PrepNeeView() { }
         public void ShallowCopy(StackPanel refSp)
         {
-            foreach (Button refb in refSp.Children.OfType<Button>())
+            foreach (Grid refg in refSp.Children.OfType<Grid>())
             {
-                btnBrowse = new Button();
-                btnBrowse.Height = refb.Height;
-                btnBrowse.Width = refb.Width;
-                btnBrowse.Content = "+";//Txt.s._[(int)TxI.NEE_ADD];
-                btnBrowse.IsEnabled = refb.IsEnabled;
-                btnBrowse.Click += btnBrowse_Click;
-                Children.Add(btnBrowse);
+                Grid g = new Grid();
+                foreach (ColumnDefinition cd in refg.ColumnDefinitions)
+                {
+                    ColumnDefinition d = new ColumnDefinition();
+                    d.Width = cd.Width;
+                    g.ColumnDefinitions.Add(d);
+                }
+                foreach (Button btn in refg.Children)
+                {
+                    Button b = new Button();
+                    b.Content = btn.Content;
+                    b.Height = btn.Height;
+                    b.Width = btn.Width;
+                    Grid.SetColumn(b, Grid.GetColumn(btn));
+                    if (btn.Name == "x")
+                    {
+                        btnXdb = b;
+                        b.Click += btnXdb_Click;
+                    }
+                    else if (btn.Name == "a")
+                    {
+                        btnBrowse = b;
+                        b.Click += btnBrowse_Click;
+                    }
+                    else
+                    {
+                        btnXfl = b;
+                        b.Click += btnXfl_Click;
+                    }
+                    g.Children.Add(b);
+                }
+                g.Name = refg.Name;
+                Children.Add(g);
             }
             foreach(StackPanel refsp in refSp.Children.OfType<StackPanel>())
             {
@@ -81,7 +110,7 @@ namespace sQzServer0
 
             string fp = dlg.FileName;
 
-            string emsg = mSl.ReadF(fp);
+            string emsg = mSlDB.ReadF(fp, ref mSlFile);
             if(emsg != null)
             {
                 Window w = Window.GetWindow(this);
@@ -95,6 +124,19 @@ namespace sQzServer0
             Show(false);
         }
 
+        private void btnXdb_Click(object sender, RoutedEventArgs e)
+        {
+            WPopup.s.ShowDialog(mSlDB.DBDelNee());
+            mSlDB.DBSelNee();
+            Show(true);
+        }
+
+        private void btnXfl_Click(object sender, RoutedEventArgs e)
+        {
+            mSlFile.DelNee();
+            Show(false);
+        }
+
         public void Show(bool db)
         {
             bool dark = true;
@@ -102,12 +144,19 @@ namespace sQzServer0
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
             ListBox l = null;
+            ExamSlot sl;
             if (db)
+            {
+                sl = mSlDB;
                 l = lbxDB;
+            }
             else
+            {
+                sl = mSlFile;
                 l = lbxFile;
+            }
             l.Items.Clear();
-            foreach (ExamRoom r in mSl.vRoom.Values)
+            foreach (ExamRoom r in sl.vRoom.Values)
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
                     ListBoxItem i = new ListBoxItem();
@@ -123,8 +172,9 @@ namespace sQzServer0
         {
             lbxFile.Items.Clear();
             string emsg;
-            if (mSl.DBInsNee(out emsg) <= 0)
+            if (mSlFile.DBInsNee(out emsg) <= 0)
                 WPopup.s.ShowDialog(emsg);
+            mSlDB.DBSelNee();
             Show(true);
         }
     }

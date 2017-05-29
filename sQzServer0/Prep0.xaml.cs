@@ -29,7 +29,6 @@ namespace sQzServer0
         QuestSheet mDBQSh;
         QuestSheet mQSh;
         ExamBoard mBrd;
-        ExamSlot mSl;
 
         public Prep0()
         {
@@ -157,6 +156,9 @@ namespace sQzServer0
             }
         }
 
+        private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        { }
+
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Application.Current.MainWindow.FontSize = 16;
@@ -168,6 +170,9 @@ namespace sQzServer0
 
             InitLbxQCatgry();
             LoadBrd();
+            Window w = Window.GetWindow(this);
+            if(w != null)
+                w.Closing += W_Closing;
         }
 
         void InitLbxQCatgry()
@@ -340,17 +345,17 @@ namespace sQzServer0
                 return;
             if (mBrd.vSl.ContainsKey(i.Content as string))
                 return;
-            mSl = new ExamSlot();
-            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out mSl.mDt);
-            mSl.DBSelNee();
-            mBrd.vSl.Add(i.Content as string, mSl);
             PrepNeeView pnv = new PrepNeeView();
-            pnv.mSl = mSl;
+            pnv.mSlDB = new ExamSlot();
+            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out pnv.mSlDB.mDt);
+            pnv.mSlDB.DBSelNee();
+            pnv.mSlFile = new ExamSlot();
+            pnv.mSlFile.mDt = pnv.mSlDB.mDt;
             pnv.ShallowCopy(refSl);
             pnv.Show(true);
             TabItem ti = new TabItem();
             ti.Name = "_" + (i.Content as string).Replace(':', '_');
-            ti.Header = pnv.mSl.mDt.ToString(DtFmt.hh);
+            ti.Header = pnv.mSlDB.mDt.ToString(DtFmt.hh);
             ti.Content = pnv;
             tbcNee.Items.Add(ti);
         }
@@ -360,7 +365,7 @@ namespace sQzServer0
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
-            mBrd.vSl.Remove(i.Content as string);
+            //mBrd.vSl.Remove(i.Content as string);
             foreach(TabItem ti in tbcNee.Items)
                 if(ti.Name == "_" + (i.Content as string).Replace(':', '_'))
                 {

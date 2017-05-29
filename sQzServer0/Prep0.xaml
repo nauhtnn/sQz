@@ -30,15 +30,20 @@
             </StackPanel>
             <TabControl x:Name="tbcNee" Width="920"/>
             <StackPanel x:Name="refSl" Visibility="Collapsed">
-                <Button Content="+" Height="60" Width="160"/>
+                <Grid Height="40">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Button Name="x" Content="X" Height="40" Width="40"/>
+                    <Button Name="a" Content="+" Height="40" Width="40" Grid.Column="1"/>
+                    <Button Content="X" Height="40" Width="40" Grid.Column="2"/>
+                </Grid>
                 <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
-                    <!--<ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto" Margin="10, 0, 0, 0">-->
-                        <ListBox Name="_1" Width="420" Height="200"/>
-                    <!--</ScrollViewer>-->
+                    <ListBox Name="_1" Width="420" Height="200"/>
                     <Button Content="&lt;&lt;" Height="30" Width="60" Margin="5,0,0,5"/>
-                    <!--<ScrollViewer Width="420" Height="200" VerticalScrollBarVisibility="Auto">-->
                     <ListBox Name="_2" Width="420" Height="200"/>
-                    <!--</ScrollViewer>-->
                 </StackPanel>
             </StackPanel>
         </StackPanel>

@@ -357,10 +357,8 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string iu = eIU.ToString().Substring(2);
-            if (iu[0] == '0')
-                iu = iu.Substring(1);
-            DBConnect.Delete(conn, "quest" + iu, "idx", id.ToString());
+            string iu = eIU.ToString().Substring(1);
+            DBConnect.Delete(conn, "q" + iu, "id" + id.ToString());
         }
     }
 }

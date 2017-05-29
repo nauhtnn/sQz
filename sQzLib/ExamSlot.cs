@@ -126,7 +126,7 @@ namespace sQzLib
             return l;
         }
 
-        public string ReadF(string fp)
+        public string ReadF(string fp, ref ExamSlot o)
         {
             string buf = Utils.ReadFile(fp);
             if (buf == null)
@@ -164,7 +164,7 @@ namespace sQzLib
                         continue;
                     }
                     e.uId = e.uId + (int)e.eLv;
-                    if(vRoom[urid].vExaminee.ContainsKey(e.uId))
+                    if(vRoom[urid].vExaminee.ContainsKey(e.uId) || o.vRoom[urid].vExaminee.ContainsKey(e.uId))
                     {
                         dup.Append(e.eLv.ToString() + (e.uId - (int)e.eLv) + ", ");
                         continue;
@@ -184,7 +184,7 @@ namespace sQzLib
                         eline.Append(i.ToString() + ", ");
                         continue;
                     }
-                    vRoom[urid].vExaminee.Add(e.uId, e);
+                    o.vRoom[urid].vExaminee.Add(e.uId, e);
                 }
             }
             StringBuilder r = new StringBuilder();
@@ -213,14 +213,6 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
             {
                 int n = r.DBIns(out eMsg);
-                //if (0 < n)
-                //{
-                //    string[] p = new string[2];
-                //    p[0] = r.uId.ToString();
-                //    p[1] = n.ToString();
-                //    sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DB_OK] + '\n', p);
-                //}
-                //else
                 if(n < 0)
                 {
                     string[] p = new string[2];
@@ -237,6 +229,44 @@ namespace sQzLib
             return v;
         }
 
+        public void DelNee()
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach (ExamRoom r in vRoom.Values)
+                r.vExaminee.Clear();
+        }
+
+        public string DBDelNee()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return Txt.s._[(int)TxI.DB_NOK];
+            StringBuilder sb = new StringBuilder();
+            foreach (ExamRoom r in vRoom.Values)
+            {
+                int n = DBConnect.Count(conn, ExamineeS0.tDBtbl + r.uId,
+                    "dt", "dt='" + mDt.ToString(DtFmt._) +
+                    "' AND t='" + mDt.ToString(DtFmt.hh) +
+                    "' AND grd IS NOT NULL");
+                sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DEL], r.uId);
+                if (0 < n)
+                    sb.Append(Txt.s._[(int)TxI.ROOM_DEL_GRD] + '\n');
+                else if (n < 0)
+                    sb.Append(Txt.s._[(int)TxI.ROOM_DEL_ECPT] + '\n');
+                else
+                {
+                    n = DBConnect.Delete(conn, ExamineeS0.tDBtbl + r.uId,
+                        "dt='" + mDt.ToString(DtFmt._) + "' AND t='" + mDt.ToString(DtFmt.hh) + "'");
+                    if (n < 0)
+                        sb.Append(Txt.s._[(int)TxI.ROOM_DEL_ECPT] + '\n');
+                    else
+                        sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DEL_N] + '\n', n.ToString());
+                }
+            }
+            DBConnect.Close(ref conn);
+            return sb.ToString();
+        }
+
         public void DBSelNee()
         {
             MySqlConnection conn = DBConnect.Init();
@@ -247,7 +277,7 @@ namespace sQzLib
                 r.vExaminee.Clear();
                 string qry = DBConnect.mkQrySelect(ExamineeS0.tDBtbl + r.uId,
                     "dt,t,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
-                    null, null);
+                    "dt='" + mDt.ToString(DtFmt._) + "' AND t='" + mDt.ToString(DtFmt.hh) + "'", null);
                 string emsg;
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
                 if (reader != null)

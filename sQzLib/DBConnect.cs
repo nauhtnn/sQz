@@ -107,15 +107,15 @@ namespace sQzLib
 
         //Insert statement
         public static int Ins(MySqlConnection conn, string tb,
-            string vAttb, string vals, out string eMsg)
+            string attbs, string vals, out string eMsg)
         {
-            if (vAttb == null || vals == null)
+            if (attbs == null || vals == null)
             {
                 eMsg = Txt.s._[(int)TxI.DB_DAT_NOK];
                 return 0;
             }
             StringBuilder qry = new StringBuilder();
-            qry.Append("INSERT INTO " + tb + "(" + vAttb + ")VALUES");
+            qry.Append("INSERT INTO " + tb + "(" + attbs + ")VALUES");
             qry.Append(vals);
             
             MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
@@ -149,11 +149,16 @@ namespace sQzLib
         }
 
         //Delete statement
-        public static void Delete(MySqlConnection conn, string tb, string cdAttb, string cdAttbVal)
+        public static int Delete(MySqlConnection conn, string tb, string cond)
         {
-            string query = "DELETE FROM " + tb + " WHERE " + cdAttb + " = " + cdAttbVal;
+            string query = "DELETE FROM " + tb;
+            if(cond != null)
+                query += " WHERE " + cond;
             MySqlCommand cmd = new MySqlCommand(query, conn);
-            cmd.ExecuteNonQuery();
+            int n;
+            try { n = cmd.ExecuteNonQuery(); }
+            catch (MySqlException) { n = -1; }
+            return n;
         }
 
         //Count statement
@@ -165,6 +170,18 @@ namespace sQzLib
             MySqlCommand cmd = new MySqlCommand(query, conn);
             try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
             catch (MySqlException) { n = 0; }
+
+            return n;
+        }
+
+        public static int Count(MySqlConnection conn, string tb, string attbs, string cond)
+        {
+            string query = "SELECT COUNT(" + attbs + ") FROM " + tb + " WHERE " + cond;
+            int n;
+
+            MySqlCommand cmd = new MySqlCommand(query, conn);
+            try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
+            catch (MySqlException) { n = -1; }
 
             return n;
         }
