@@ -184,26 +184,23 @@ namespace sQzServer1
                             {
                                 foreach(TabItem ti in tbcSl.Items)
                                 {
-                                    if(ti.Name == "_" + dt.ToString(DtFmt.hh).Replace(':', '_'))
+                                    Op1SlotView vw = ti.Content as Op1SlotView;
+                                    if(vw != null)
                                     {
-                                        Op1SlotView vw = ti.Content as Op1SlotView;
-                                        if(vw != null)
+                                        TextBlock t;
+                                        lvid = o.mLv + o.uId;
+                                        if (vw.vComp.TryGetValue(lvid, out t))
+                                            t.Text = o.tComp;
+                                        if (vw.vDt1.TryGetValue(lvid, out t))
+                                            t.Text = o.dtTim1.ToString("HH:mm");
+                                        CheckBox cbx;
+                                        if (vw.vLock.TryGetValue(lvid, out cbx))
                                         {
-                                            TextBlock t;
-                                            lvid = o.mLv + o.uId;
-                                            if (vw.vComp.TryGetValue(lvid, out t))
-                                                t.Text = o.tComp;
-                                            if (vw.vDt1.TryGetValue(lvid, out t))
-                                                t.Text = o.dtTim1.ToString("HH:mm");
-                                            CheckBox cbx;
-                                            if (vw.vLock.TryGetValue(lvid, out cbx))
-                                            {
-                                                cbx.IsChecked = true;
-                                                cbx.IsEnabled = true;
-                                            }
-                                            if (vw.vbLock.Keys.Contains(lvid))
-                                                vw.vbLock[lvid] = true;
+                                            cbx.IsChecked = true;
+                                            cbx.IsEnabled = true;
                                         }
+                                        if (vw.vbLock.Keys.Contains(lvid))
+                                            vw.vbLock[lvid] = true;
                                     }
                                 }
                             });
@@ -304,65 +301,74 @@ namespace sQzServer1
                     }
                     break;
                 case NetCode.Submiting:
-                    //e = new ExamineeS1();
-                    //e.bFromC = true;
-                    //if (!e.ReadByte(buf, ref offs))
-                    //{
-                    //    AnsSheet keySh;
-                    //    if (!mSl.mKeyPack.vSheet.TryGetValue(e.mAnsSh.uQSId, out keySh))
-                    //    {
-                    //        outMsg = BitConverter.GetBytes(101);//todo
-                    //        break;
-                    //    }
-                    //    ExamineeA o;
-                    //    lvid = e.mLv + e.uId;
-                    //    if ((o = mSl.Find(lvid)) != null)
-                    //    {
-                    //        o.eStt = ExamStt.Finished;
-                    //        o.mAnsSh = e.mAnsSh;
-                    //        o.uGrade = keySh.Grade(e.mAnsSh.aAns);
-                    //        o.dtTim2 = DateTime.Now;
-                    //        if (vbLock.Keys.Contains(lvid))
-                    //            vbLock[lvid] = true;
-                    //        Thread th = new Thread(() =>
-                    //            Dispatcher.Invoke(() =>
-                    //            {
-                    //                TextBlock t = null;
-                    //                if (vTime2.TryGetValue(lvid, out t))//todo
-                    //                    t.Text = o.dtTim2.ToString("HH:mm");
-                    //                if (vMark.TryGetValue(lvid, out t))
-                    //                    t.Text = o.uGrade.ToString();
-                    //                CheckBox cbx;
-                    //                if (vLock.TryGetValue(lvid, out cbx))
-                    //                {
-                    //                    cbx.IsChecked = true;
-                    //                    cbx.IsEnabled = false;
-                    //                }
-                    //            }));
-                    //        th.Start();
-                    //        o.ToByte(out outMsg, 0);
-                    //    }
-                    //    else
-                    //    {
-                    //        string s = "ERROR submitting clnt not found " + lvid;//todo
-                    //        mCbMsg += s;
-                    //        byte[] b = Encoding.UTF8.GetBytes(s);
-                    //        outMsg = new byte[5 + b.Length];
-                    //        Array.Copy(BitConverter.GetBytes(false), outMsg, 1);
-                    //        Array.Copy(BitConverter.GetBytes(b.Length), 0, outMsg, 1, 4);
-                    //        Array.Copy(b, 0, outMsg, 5, b.Length);
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    string s = "ERROR submitting clnt's data is error";//todo
-                    //    mCbMsg += s;
-                    //    byte[] b = Encoding.UTF8.GetBytes(s);
-                    //    outMsg = new byte[5 + b.Length];
-                    //    Array.Copy(BitConverter.GetBytes(false), outMsg, 1);
-                    //    Array.Copy(BitConverter.GetBytes(b.Length), 0, outMsg, 1, 4);
-                    //    Array.Copy(b, 0, outMsg, 5, b.Length);
-                    //}
+                    e = new ExamineeS1();
+                    e.bFromC = true;
+                    if (!e.ReadByte(buf, ref offs))
+                    {
+                        AnsSheet keySh = null;
+                        found = false;
+                        foreach(ExamSlot sl in mBrd.vSl.Values)
+                            if(sl.mKeyPack.vSheet.TryGetValue(e.mAnsSh.uQSId, out keySh))
+                            {
+                                found = true;
+                                break;
+                            }
+                        if (!found)
+                        {
+                            outMsg = BitConverter.GetBytes(101);//todo
+                            break;
+                        }
+                        ExamineeA o = null;
+                        lvid = e.mLv + e.uId;
+                        found = false;
+                        foreach (ExamSlot sl in mBrd.vSl.Values)
+                            if ((o = sl.Find(lvid)) != null)
+                                break;
+                        if (o != null)
+                        {
+                            o.eStt = ExamStt.Finished;
+                            o.mAnsSh = e.mAnsSh;
+                            o.uGrade = keySh.Grade(e.mAnsSh.aAns);
+                            o.dtTim2 = DateTime.Now;
+                            foreach (SortedList<int, bool> sl in vfbLock)
+                                if (sl.ContainsKey(lvid))
+                                    sl[lvid] = true;
+                            Thread th = new Thread(() =>
+                                Dispatcher.Invoke(() =>
+                                {
+                                    foreach (TabItem ti in tbcSl.Items)
+                                    {
+                                        Op1SlotView vw = ti.Content as Op1SlotView;
+                                        if (vw != null)
+                                        {
+                                            TextBlock t = null;
+                                            if (vw.vDt2.TryGetValue(lvid, out t))
+                                                t.Text = o.dtTim2.ToString("HH:mm");
+                                            if (vw.vMark.TryGetValue(lvid, out t))
+                                                t.Text = o.uGrade.ToString();
+                                            CheckBox cbx;
+                                            if (vw.vLock.TryGetValue(lvid, out cbx))
+                                            {
+                                                cbx.IsChecked = true;
+                                                cbx.IsEnabled = false;
+                                            }
+                                        }
+                                    }
+                                }));
+                            th.Start();
+                            o.ToByte(out outMsg, 0);
+                        }
+                        else
+                        {
+                            mCbMsg += Txt.s._[(int)TxI.NEEID_NF] + ' ' + lvid;
+                            outMsg = BitConverter.GetBytes((int)TxI.NEEID_NF);
+                        }
+                    }
+                    else
+                    {
+                        mCbMsg += Txt.s._[(int)TxI.RECV_DAT_ER];
+                        outMsg = BitConverter.GetBytes((int)TxI.RECV_DAT_ER);
+                    }
                     break;
                 default:
                     outMsg = null;

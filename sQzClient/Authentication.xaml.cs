@@ -190,6 +190,8 @@ namespace sQzClient
                             msg = Txt.s._[(int)TxI.SIGNIN_NOK];
                         else if (errc == (int)TxI.NEEID_NF)
                             msg = Txt.s._[(int)TxI.NEEID_NF];
+                        else if (errc == (int)TxI.RECV_DAT_ER)
+                            msg = Txt.s._[(int)TxI.RECV_DAT_ER];
                         if (bRunning && msg != null)
                             Dispatcher.Invoke(() => {
                                 spMain.Opacity = 0.5;

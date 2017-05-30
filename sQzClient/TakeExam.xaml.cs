@@ -337,7 +337,7 @@ namespace sQzClient
                     if(l < 4)
                     {
                         rs = -1;
-                        msg = "received data is null";//todo
+                        msg = Txt.s._[(int)TxI.RECV_DAT_ER];
                     }
                     else
                         rs = BitConverter.ToInt32(buf, offs);
@@ -349,22 +349,26 @@ namespace sQzClient
                         {
                             mNee.Merge(e);
                             btnSubmit.Content = mNee.uGrade;
-                            msg = Txt.s._[(int)TxI.RESULT] + mNee.uGrade;
+                            msg = Txt.s._[(int)TxI.RESULT] + Math.Round((float)mNee.uGrade/30, 1).ToString();
                         }
                         else
-                            msg = "received data is error";
+                            msg = Txt.s._[(int)TxI.RECV_DAT_ER];
                     }
+                    else if (rs == (int)TxI.NEEID_NF)
+                        msg = Txt.s._[(int)TxI.NEEID_NF];
+                    else if (rs == (int)TxI.RECV_DAT_ER)
+                        msg = Txt.s._[(int)TxI.RECV_DAT_ER];
                     else if(msg == null)
                     {
                         if(l < 4)
-                            msg = "received data is error";
+                            msg = Txt.s._[(int)TxI.RECV_DAT_ER];
                         else
                         {
                             int sz = BitConverter.ToInt32(buf, offs);
                             l -= 4;
                             offs += 4;
                             if(l < sz)
-                                msg = "received data is error";
+                                msg = Txt.s._[(int)TxI.RECV_DAT_ER];
                             else
                                 msg = System.Text.Encoding.UTF8.GetString(buf, offs, sz);
                         }
