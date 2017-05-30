@@ -210,15 +210,14 @@ namespace sQzServer1
                             byte[] a;
                             o.bFromC = true;
                             o.ToByte(out a);
-                            outMsg = new byte[1 + a.Length];
-                            Buffer.BlockCopy(BitConverter.GetBytes(true), 0, outMsg, 0, 1);
-                            Buffer.BlockCopy(a, 0, outMsg, 1, a.Length);
+                            outMsg = new byte[4 + a.Length];
+                            Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
+                            Buffer.BlockCopy(a, 0, outMsg, 4, a.Length);
                         }
                         else
                         {
-                            outMsg = new byte[5];
-                            Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
-                            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, outMsg, 1, 4);
+                            outMsg = new byte[4];
+                            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, outMsg, 0, 4);
                             return false;//close
                         }
                     }

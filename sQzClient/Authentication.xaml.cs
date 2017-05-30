@@ -138,17 +138,17 @@ namespace sQzClient
                     break;
                 case NetCode.Authenticating:
                     l = buf.Length - offs;
-                    if (l < 1)
+                    if (l < 4)
                         break;
-                    bool rs = BitConverter.ToBoolean(buf, offs);
-                    ++offs;
-                    if(rs)
+                    errc = BitConverter.ToInt32(buf, offs);
+                    offs += 4;
+                    if(errc == 0)
                     {
                         ExamineeC e = new ExamineeC();
                         e.bLog = mNee.bLog;
-                        rs = e.ReadByte(buf, ref offs);
+                        bool b = e.ReadByte(buf, ref offs);
                         l = buf.Length - offs;
-                        if (!rs)
+                        if (!b)
                         {
                             mNee.Merge(e);
                             mState = NetCode.ExamRetrieving;
@@ -157,11 +157,6 @@ namespace sQzClient
                     }
                     else
                     {
-                        if (l < 4)
-                            break;
-                        errc = BitConverter.ToInt32(buf, offs);
-                        offs += 4;
-                        l -= 4;
                         string msg = null;
                         if (errc == (int)TxI.SIGNIN_AL)
                         {
@@ -261,12 +256,10 @@ namespace sQzClient
                     mNee.ToByte(out outBuf, (int)mState);
                     break;
                 case NetCode.ExamRetrieving:
-                    outBuf = new byte[20];
+                    outBuf = new byte[12];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mDt.Hour), 0, outBuf, 4, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mDt.Minute), 0, outBuf, 8, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.uId), 0, outBuf, 12, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 16, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.uId), 0, outBuf, 4, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 8, 4);
                     break;
                 default:
                     outBuf = null;

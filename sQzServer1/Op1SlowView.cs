@@ -77,6 +77,7 @@ namespace sQzServer1
                     CheckBox cbx = new CheckBox();
                     cbx.Name = "_" + lvid;
                     cbx.Unchecked += cbxLock_Unchecked;
+                    cbx.Checked += cbxLock_Checked;
                     cbx.IsEnabled = true;//default value empowers supervisors
                     Grid.SetRow(cbx, rid);
                     Grid.SetColumn(cbx, 7);
