@@ -131,7 +131,7 @@ namespace sQzLib
             if (eLv != lv || uId != uid)
                 Reset();
             eLv = lv;
-            uId = uid;
+            uId = (int)eLv + uid;
             return false;
         }
 

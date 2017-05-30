@@ -34,6 +34,7 @@ namespace sQzServer1
         bool bStrtReqQSh;
         bool bQShReqting;
         int uReqQSh;
+        List<SortedList<int, bool>> vfbLock;
 
         public Operation1()
         {
@@ -59,6 +60,8 @@ namespace sQzServer1
             aTimer.Elapsed += UpdateSrvrMsg;
             aTimer.AutoReset = true;
             aTimer.Enabled = true;
+
+            vfbLock = new List<SortedList<int, bool>>();
         }
 
         private void spMain_Loaded(object sender, RoutedEventArgs e)
@@ -139,125 +142,167 @@ namespace sQzServer1
             QuestSheet qs;
             int lvid;
             ExamineeA e;
+            DateTime dt;
             switch (c)
             {
                 case NetCode.Dating:
                     outMsg = new byte[ExamBoard.BYTE_COUNT_DT];
                     offs = 0;
                     ExamBoard.ToByteDt(outMsg, ref offs, mBrd.mDt);
-                    return false;// true;
+                    return true;
                 case NetCode.Authenticating:
-                    //e = new ExamineeS1();
-                    //e.bFromC = true;
-                    //e.ReadByte(buf, ref offs);
-                    //bool lck;
-                    //lvid = e.mLv + e.uId;
-                    //if (!vbLock.TryGetValue(lvid, out lck))
-                    //    lck = false;//err, default value benefits examinees
-                    //if (!lck)
-                    //{
-                    //    e = mSl.Signin(e);
-                    //    if (e != null)
-                    //    {
-                    //        if (e.dtTim1.Hour == DtFmt.INV)
-                    //            e.dtTim1 = DateTime.Now;
-                    //        Dispatcher.Invoke(() =>
-                    //        {
-                    //            TextBlock t;
-                    //            lvid = e.mLv + e.uId;
-                    //            if (vComp.TryGetValue(lvid, out t))
-                    //                t.Text = e.tComp;
-                    //            if (vTime1.TryGetValue(lvid, out t))
-                    //                t.Text = e.dtTim1.ToString("HH:mm");
-                    //            CheckBox cbx;
-                    //            if (vLock.TryGetValue(lvid, out cbx))
-                    //            {
-                    //                cbx.IsChecked = true;
-                    //                cbx.IsEnabled = true;
-                    //            }
-                    //            if (vbLock.Keys.Contains(lvid))
-                    //                vbLock[lvid] = true;
-                    //        });
-                    //        byte[] a;
-                    //        e.bFromC = true;
-                    //        e.ToByte(out a);
-                    //        outMsg = new byte[1 + a.Length];
-                    //        Buffer.BlockCopy(BitConverter.GetBytes(true), 0, outMsg, 0, 1);
-                    //        Buffer.BlockCopy(a, 0, outMsg, 1, a.Length);
-                    //    }
-                    //    else
-                    //    {
-                    //        outMsg = new byte[5];
-                    //        Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
-                    //        Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, outMsg, 1, 4);
-                    //        return false;//close
-                    //    }
-                    //}
-                    //else
-                    //{
-                    //    e = mSl.Find(lvid);
-                    //    if (e == null)
-                    //        e = new ExamineeC();
-                    //    if (e.tComp == null)
-                    //        outMsg = new byte[16];
-                    //    else
-                    //        outMsg = new byte[16 + e.tComp.Length];
-                    //    Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL), 0, outMsg, 0, 4);
-                    //    if(e.tComp == null)
-                    //    {
-                    //        Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 4, 4);
-                    //        offs = 8;
-                    //    }
-                    //    else
-                    //    {
-                    //        byte[] comp = Encoding.UTF8.GetBytes(e.tComp);
-                    //        Buffer.BlockCopy(BitConverter.GetBytes(comp.Length), 0, outMsg, 4, 4);
-                    //        offs = 8;
-                    //        Buffer.BlockCopy(comp, 0, outMsg, offs, e.tComp.Length);
-                    //        offs += comp.Length;
-                    //    }
+                    e = new ExamineeS1();
+                    e.bFromC = true;
+                    e.ReadByte(buf, ref offs);
+                    bool lck = false;
+                    lvid = e.mLv + e.uId;
+                    bool found = false;
+                    foreach (SortedList<int, bool> l in vfbLock)
+                        if (l.TryGetValue(lvid, out lck))
+                        {
+                            found = true;
+                            break;
+                        }
+                    if (!found)
+                        lck = false;
+                    if (!lck)
+                    {
+                        ExamineeA o = null;
+                        dt = DateTime.Now;
+                        foreach(ExamSlot sl in mBrd.vSl.Values)
+                            if ((o = sl.Signin(e)) != null)
+                            {
+                                dt = sl.Dt;
+                                break;
+                            }
                         
-                    //    Buffer.BlockCopy(BitConverter.GetBytes(e.dtTim1.Hour), 0, outMsg, offs, 4);
-                    //    offs += 4;
-                    //    Buffer.BlockCopy(BitConverter.GetBytes(e.dtTim1.Minute), 0, outMsg, offs, 4);
-                    //    break;
-                    //}
+                        if (o != null)
+                        {
+                            if (o.dtTim1.Hour == DtFmt.INV)
+                                o.dtTim1 = DateTime.Now;
+                            Dispatcher.Invoke(() =>
+                            {
+                                foreach(TabItem ti in tbcSl.Items)
+                                {
+                                    if(ti.Name == "_" + dt.ToString(DtFmt.hh).Replace(':', '_'))
+                                    {
+                                        Op1SlotView vw = ti.Content as Op1SlotView;
+                                        if(vw != null)
+                                        {
+                                            TextBlock t;
+                                            lvid = o.mLv + o.uId;
+                                            if (vw.vComp.TryGetValue(lvid, out t))
+                                                t.Text = o.tComp;
+                                            if (vw.vDt1.TryGetValue(lvid, out t))
+                                                t.Text = o.dtTim1.ToString("HH:mm");
+                                            CheckBox cbx;
+                                            if (vw.vLock.TryGetValue(lvid, out cbx))
+                                            {
+                                                cbx.IsChecked = true;
+                                                cbx.IsEnabled = true;
+                                            }
+                                            if (vw.vbLock.Keys.Contains(lvid))
+                                                vw.vbLock[lvid] = true;
+                                        }
+                                    }
+                                }
+                            });
+                            byte[] a;
+                            o.bFromC = true;
+                            o.ToByte(out a);
+                            outMsg = new byte[1 + a.Length];
+                            Buffer.BlockCopy(BitConverter.GetBytes(true), 0, outMsg, 0, 1);
+                            Buffer.BlockCopy(a, 0, outMsg, 1, a.Length);
+                        }
+                        else
+                        {
+                            outMsg = new byte[5];
+                            Buffer.BlockCopy(BitConverter.GetBytes(false), 0, outMsg, 0, 1);
+                            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, outMsg, 1, 4);
+                            return false;//close
+                        }
+                    }
+                    else
+                    {
+                        ExamineeA o = null;
+                        foreach (ExamSlot sl in mBrd.vSl.Values)
+                            if ((o = sl.Find(lvid)) != null)
+                                break;
+                        if (o == null)
+                            o = new ExamineeC();
+                        if (o.tComp == null)
+                            outMsg = new byte[16];
+                        else
+                            outMsg = new byte[16 + o.tComp.Length];
+                        Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL), 0, outMsg, 0, 4);
+                        if (o.tComp == null)
+                        {
+                            Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 4, 4);
+                            offs = 8;
+                        }
+                        else
+                        {
+                            byte[] comp = Encoding.UTF8.GetBytes(o.tComp);
+                            Buffer.BlockCopy(BitConverter.GetBytes(comp.Length), 0, outMsg, 4, 4);
+                            offs = 8;
+                            Buffer.BlockCopy(comp, 0, outMsg, offs, o.tComp.Length);
+                            offs += comp.Length;
+                        }
+
+                        Buffer.BlockCopy(BitConverter.GetBytes(e.dtTim1.Hour), 0, outMsg, offs, 4);
+                        offs += 4;
+                        Buffer.BlockCopy(BitConverter.GetBytes(e.dtTim1.Minute), 0, outMsg, offs, 4);
+                        break;
+                    }
                     return true;
                 case NetCode.ExamRetrieving:
-                    //outMsg = null;
-                    //int x;
-                    //if (!Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                    //    break;
-                    //offs += 4;
-                    //int qsid = BitConverter.ToInt32(buf, offs);
-                    //if (qsid == ushort.MaxValue)
-                    //{
-                    //    byte[] a = mSl.vQPack[(ExamLv)x].ToByteNextQS();
-                    //    if(a != null)
-                    //    {
-                    //        outMsg = new byte[a.Length + 4];
-                    //        Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
-                    //        Array.Copy(a, 0, outMsg, 4, a.Length);
-                    //    }
-                    //}
-                    //else if (mSl.vQPack[(ExamLv)x].vSheet.TryGetValue(qsid, out qs))
-                    //{
-                    //    outMsg = new byte[qs.aQuest.Length + 4];
-                    //    Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
-                    //    Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
-                    //}
-                    //if(outMsg == null)
-                    //{
-                    //    mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + (x + qsid);
-                    //    outMsg = new byte[8];
-                    //    Array.Copy(BitConverter.GetBytes((int)TxI.QS_NFOUND), 0, outMsg, 0, 4);
-                    //    Array.Copy(BitConverter.GetBytes(qsid), 0, outMsg, 4, 4);
-                    //    if (!bQShReqting)
-                    //    {
-                    //        bStrtReqQSh = true;
-                    //        uReqQSh = x + qsid;
-                    //    }
-                    //}
+                    outMsg = null;
+                    int uid = BitConverter.ToInt32(buf, offs);
+                    ExamSlot slo = null;
+                    foreach (ExamSlot s in mBrd.vSl.Values)
+                        foreach(ExamRoom r in s.vRoom.Values)
+                            if(r.vExaminee.ContainsKey(uid))
+                            {
+                                slo = s;
+                                break;
+                            }
+                    if(slo == null)
+                    {
+                        outMsg = new byte[4];
+                        Array.Copy(BitConverter.GetBytes((int)TxI.NEEID_NF), 0, outMsg, 0, 4);
+                        break;
+                    }
+                    ExamLv lv = (uid < (int)ExamLv.B) ? ExamLv.A : ExamLv.B;
+                    offs += 4;
+                    int qsid = BitConverter.ToInt32(buf, offs);
+                    if (qsid == ushort.MaxValue)
+                    {
+                        byte[] a = slo.vQPack[lv].ToByteNextQS();
+                        if (a != null)
+                        {
+                            outMsg = new byte[a.Length + 4];
+                            Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
+                            Array.Copy(a, 0, outMsg, 4, a.Length);
+                        }
+                    }
+                    else if (slo.vQPack[lv].vSheet.TryGetValue(qsid, out qs))
+                    {
+                        outMsg = new byte[qs.aQuest.Length + 4];
+                        Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
+                        Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
+                    }
+                    if (outMsg == null)
+                    {
+                        mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + ((int)lv + qsid);
+                        outMsg = new byte[8];
+                        Array.Copy(BitConverter.GetBytes((int)TxI.QS_NFOUND), 0, outMsg, 0, 4);
+                        Array.Copy(BitConverter.GetBytes(qsid), 0, outMsg, 4, 4);
+                        if (!bQShReqting)
+                        {
+                            bStrtReqQSh = true;
+                            uReqQSh = (int)lv + qsid;
+                        }
+                    }
                     break;
                 case NetCode.Submiting:
                     //e = new ExamineeS1();
@@ -447,7 +492,8 @@ namespace sQzServer1
             vw.ShallowCopy(refSl);
             vw.mSl = sl;
             vw.ShowExaminee();
-            vw.ShowQuest(); 
+            vw.ShowQuest();
+            vfbLock.Add(vw.vbLock);
             TabItem ti = new TabItem();
             ti.Name = "_" + (i.Content as string).Replace(':', '_');
             ti.Header = sl.Dt.ToString(DtFmt.hh);

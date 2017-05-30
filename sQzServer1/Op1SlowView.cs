@@ -18,8 +18,8 @@ namespace sQzServer1
         public Dictionary<int, TextBlock> vDt2;
         public Dictionary<int, TextBlock> vMark;
         public Dictionary<int, TextBlock> vComp;
-        Dictionary<int, CheckBox> vLock;//supervisor side
-        Dictionary<int, bool> vbLock;//examinee side
+        public SortedList<int, CheckBox> vLock;
+        public SortedList<int, bool> vbLock;
         Grid grdNee;
         public TabControl tbcQuest;
         public ExamSlot mSl;
@@ -32,8 +32,8 @@ namespace sQzServer1
             vDt1 = new Dictionary<int, TextBlock>();
             vDt2 = new Dictionary<int, TextBlock>();
             vMark = new Dictionary<int, TextBlock>();
-            vLock = new Dictionary<int, CheckBox>();
-            vbLock = new Dictionary<int, bool>();
+            vLock = new SortedList<int, CheckBox>();
+            vbLock = new SortedList<int, bool>();
             bQShowed = bNeeShowed = false;
         }
 
@@ -75,10 +75,7 @@ namespace sQzServer1
                     Grid.SetColumn(t, 3);
                     grdNee.Children.Add(t);
                     CheckBox cbx = new CheckBox();
-                    if (lvid < 0)
-                        cbx.Name = "n" + (-lvid);
-                    else
-                        cbx.Name = "p" + lvid;
+                    cbx.Name = "_" + lvid;
                     cbx.Unchecked += cbxLock_Unchecked;
                     cbx.IsEnabled = true;//default value empowers supervisors
                     Grid.SetRow(cbx, rid);
@@ -232,11 +229,15 @@ namespace sQzServer1
             CheckBox cbx = sender as CheckBox;
             int key;
             if (int.TryParse(cbx.Name.Substring(1), out key))
-            {
-                if (cbx.Name[0] == 'n')
-                    key = (int)-key;
-                vbLock[key] = false;//todo: safer
-            }
+                vbLock[key] = false;
+        }
+
+        private void cbxLock_Checked(object sender, RoutedEventArgs e)
+        {
+            CheckBox cbx = sender as CheckBox;
+            int key;
+            if (int.TryParse(cbx.Name.Substring(1), out key))
+                vbLock[key] = false;
         }
     }
 }

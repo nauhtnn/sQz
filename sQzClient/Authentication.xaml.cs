@@ -48,7 +48,7 @@ namespace sQzClient
                 spMain.Opacity = 1;
                 return;
             }
-            mNee.tBirdate = tbxD.Text + "/" + tbxM.Text + "/" + tbxY.Text;
+            mNee.tBirdate = tbxD.Text + "-" + tbxM.Text + "-" + tbxY.Text;
             DateTime dum;
             if (!DateTime.TryParse(mNee.tBirdate, out dum))
             {
@@ -193,7 +193,9 @@ namespace sQzClient
                         }
                         else if (errc == (int)TxI.SIGNIN_NOK)
                             msg = Txt.s._[(int)TxI.SIGNIN_NOK];
-                        if(bRunning && msg != null)
+                        else if (errc == (int)TxI.NEEID_NF)
+                            msg = Txt.s._[(int)TxI.NEEID_NF];
+                        if (bRunning && msg != null)
                             Dispatcher.Invoke(() => {
                                 spMain.Opacity = 0.5;
                                 WPopup.s.ShowDialog(msg);
@@ -259,10 +261,12 @@ namespace sQzClient
                     mNee.ToByte(out outBuf, (int)mState);
                     break;
                 case NetCode.ExamRetrieving:
-                    outBuf = new byte[12];
+                    outBuf = new byte[20];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mLv), 0, outBuf, 4, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 8, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mDt.Hour), 0, outBuf, 4, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mDt.Minute), 0, outBuf, 8, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.uId), 0, outBuf, 12, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 16, 4);
                     break;
                 default:
                     outBuf = null;

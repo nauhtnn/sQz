@@ -12,8 +12,7 @@ namespace sQzLib
         public override List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            //l.Add(BitConverter.GetBytes(uSlId));
-            l.Add(BitConverter.GetBytes(mLv));
+            //l.Add(BitConverter.GetBytes(mLv));
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(mStt));
 			l.Add(BitConverter.GetBytes(bLog));
@@ -32,6 +31,8 @@ namespace sQzLib
 
             if (eStt < ExamStt.Examing)
                 return l;
+
+            l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
 
             l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
 
