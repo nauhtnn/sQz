@@ -297,7 +297,7 @@ namespace sQzServer0
             ti.Content = vw;
             tbcSl.Items.Add(ti);
             ti.Focus();
-            //QuestSheet.DBUpdateCurQSId(sl.uId);
+            QuestSheet.DBUpdateCurQSId(mBrd.mDt);
             mBrd.vSl.Add(i.Content as string, sl);
             //vSlVw.Add(sl.uId, vw);
         }

@@ -181,24 +181,24 @@ namespace sQzLib
         }
 
         //Max statement
-        public static int MaxUShort(MySqlConnection conn, string tb, string attb, string cond)
+        public static int MaxInt(MySqlConnection conn, string tb, string attb, string cond)
         {
             string query = "SELECT MAX(" + attb + ") FROM " + tb + " WHERE " + cond;
-            int uShort;
+            int x;
 
             MySqlCommand cmd = new MySqlCommand(query, conn);
             try {
                 var o = cmd.ExecuteScalar();
                 if (o == null)
-                    uShort = 0;
+                    x = 0;
                 else if (o.ToString().Length == 0)
-                    uShort = 0;
-                else if (!int.TryParse(o.ToString(), out uShort))
-                    uShort = -1;
+                    x = 0;
+                else if (!int.TryParse(o.ToString(), out x))
+                    x = -1;
             }
-            catch (MySqlException) { uShort = -1; }
+            catch (MySqlException) { x = -1; }
 
-            return uShort;
+            return x;
         }
 
         //Min statement

@@ -9,7 +9,7 @@ namespace sQzLib
 {
     public class QuestPack
     {
-        public uint uSlId;
+        public DateTime mDt;
         public ExamLv eLv;
         public Dictionary<int, QuestSheet> vSheet;
         int mNextQSIdx;
@@ -91,13 +91,14 @@ namespace sQzLib
             return false;
         }
 
-        public List<int> DBSelectId(uint slId)
+        public List<int> DBSelectId(DateTime dt)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return null;
-            string qry = DBConnect.mkQrySelect("questsh", "lv,id", "slId=" + slId, null);
-            MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
+            string qry = DBConnect.mkQrySelect("qs", "lv,id", "dt=" + dt.ToString(DtFmt._), null);
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             List<int> r = new List<int>();
             if (reader != null)
             {
@@ -129,20 +130,21 @@ namespace sQzLib
                 }
                 --n;
             }
-            DBIns(uSlId, l);
+            DBIns(mDt, l);
             return l;
         }
 
-        public static void DBIns(uint slId, List<QuestSheet> l)
+        public static void DBIns(DateTime dt, List<QuestSheet> l)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
             StringBuilder vals = new StringBuilder();
             foreach (QuestSheet qs in l)
-                qs.DBAppendInsQry(slId, ref vals);
+                qs.DBAppendInsQry(dt, ref vals);
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            //DBConnect.Ins(conn, "questsh", "slId,lv,id,vQuest", vals.ToString());//todo: catch exception
+            string eMsg;
+            DBConnect.Ins(conn, "qs", "dt,lv,id,vquest", vals.ToString(), out eMsg);//todo: catch exception
             DBConnect.Close(ref conn);
         }
 

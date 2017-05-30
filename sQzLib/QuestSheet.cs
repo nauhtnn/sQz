@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 
 /*
 CREATE TABLE IF NOT EXISTS `qs` (`dt` DATE,
-`id` SMALLINT UNSIGNED, `vquest` VARCHAR(1024),
+`id` SMALLINT, `lv` CHAR, `vquest` VARCHAR(1024),
 PRIMARY KEY(`dt`,`id`), FOREIGN KEY(`dt`) REFERENCES `board`(`dt`));
 */
 
@@ -358,26 +358,27 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public void DBAppendInsQry(uint slId, ref StringBuilder vals)
+        public void DBAppendInsQry(DateTime dt, ref StringBuilder vals)
         {
-            vals.Append("(" + slId + "," + eLv.ToString("d") + "," + uId + ",'");
+            vals.Append("('" + dt.ToString(DtFmt._) + "','" + eLv.ToString() + "'," + uId + ",'");
             foreach(Question q in vQuest)
-                vals.Append(((short)q.mIU).ToString() + '_' + q.uId + '-');
+                vals.Append(((int)q.mIU).ToString() + '_' + q.uId + '-');
             vals.Remove(vals.Length - 1, 1);//remove the last '-'
             vals.Append("'),");
         }
 
-        public bool DBSelect(uint slId, ExamLv lv, int id)
+        public bool DBSelect(DateTime dt, ExamLv lv, int id)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return true;
             StringBuilder cond = new StringBuilder();
-            cond.Append("slId=" + slId);
+            cond.Append("dt='" + dt.ToString(DtFmt._) + "'");
             cond.Append(" AND lv=" + lv.ToString("d"));
             cond.Append(" AND id=" + id);
-            string qry = DBConnect.mkQrySelect("questsh", "vquest", cond.ToString(), null);
-            MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
+            string qry = DBConnect.mkQrySelect("qs", "vquest", cond.ToString(), null);
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             string qIds = null;
             if (reader != null && reader.Read())
             {
@@ -440,13 +441,13 @@ namespace sQzLib
             return true;
         }
 
-        public static bool DBUpdateCurQSId(uint slId)
+        public static bool DBUpdateCurQSId(DateTime dt)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return true;
-            int uid = DBConnect.MaxUShort(conn, "questsh", "id",
-                    "slId=" + slId + " AND lv=" + (int)ExamLv.A);
+            int uid = DBConnect.MaxInt(conn, "qs", "id",
+                    "dt=" + dt.ToString(DtFmt._) + " AND lv='" + ExamLv.A.ToString() + "'");
             if (uid < 0)
             {
                 DBConnect.Close(ref conn);
@@ -454,8 +455,8 @@ namespace sQzLib
             }
             guDBCurAId = uid;
 
-            uid = DBConnect.MaxUShort(conn, "questsh", "id",
-                    "slId=" + slId + " AND lv=" + (int)ExamLv.B);
+            uid = DBConnect.MaxInt(conn, "qs", "id",
+                    "dt=" + dt.ToString(DtFmt._) + " AND lv='" + ExamLv.B.ToString() + "'");
             if (uid < 0)
             {
                 DBConnect.Close(ref conn);
