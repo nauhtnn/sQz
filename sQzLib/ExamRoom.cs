@@ -187,11 +187,11 @@ namespace sQzLib
 
         public void ToByteS0(byte[] prefix, out byte[] buf)
         {
-            if (vExaminee.Count == 0)
-            {
-                buf = prefix;
-                return;
-            }
+            //if (vExaminee.Count == 0)
+            //{
+            //    buf = prefix;
+            //    return;
+            //}
             List<byte[]> l = new List<byte[]>();
             int n = 0;
             foreach (ExamineeA e in vExaminee.Values)

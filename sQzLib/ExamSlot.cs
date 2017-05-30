@@ -472,5 +472,32 @@ namespace sQzLib
                     return o;
             return null;
         }
+
+        public byte[] ToByteR0(byte[] pre)
+        {
+            List<byte[]> l = new List<byte[]>();
+            foreach (ExamRoom r in vRoom.Values)
+            {
+                byte[] prefx = BitConverter.GetBytes(r.uId);
+                byte[] b;
+                r.ToByteS0(prefx, out b);
+                l.Add(b);
+            }
+            int sz = pre.Length;
+            foreach (byte[] b in l)
+                sz += b.Length;
+            //byte[] buf = new byte[sz + 4];
+            byte[] buf = new byte[sz];
+            sz = 0;
+            //Buffer.BlockCopy(BitConverter.GetBytes(vRoom.Count), 0, buf, sz, 4);
+            Buffer.BlockCopy(pre, 0, buf, sz, pre.Length);
+            sz += pre.Length;
+            foreach (byte[] i in l)
+            {
+                Buffer.BlockCopy(i, 0, buf, sz, i.Length);
+                sz += i.Length;
+            }
+            return buf;
+        }
     }
 }

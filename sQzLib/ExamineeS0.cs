@@ -51,8 +51,8 @@ namespace sQzLib
             if (l < 12)
                 return true;
             //uSlId = BitConverter.ToUInt32(buf, offs);
-            l -= 4;
-            offs += 4;
+            //l -= 4;
+            //offs += 4;
 
             int lv;
             if (Enum.IsDefined(typeof(ExamLv), lv = BitConverter.ToInt32(buf, offs)))

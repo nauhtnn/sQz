@@ -50,7 +50,7 @@ namespace sQzServer1
 
             mBrd = new ExamBoard();
 
-            bAllR = false;
+            bAllR = true;//todo false;
             uRId = 1;//todo
             bStrtReqQSh = bQShReqting = false;
             uReqQSh = ushort.MaxValue;
@@ -81,6 +81,8 @@ namespace sQzServer1
             //FirewallHandler fwHndl = new FirewallHandler(1);
             //string msg = fwHndl.OpenFirewall();
             //lblStatus.Text = msg;
+
+            LoadTxt();
         }
 
         private void btnConnect_Click(object sender, RoutedEventArgs e)
@@ -398,39 +400,39 @@ namespace sQzServer1
                         offs = 0;//todo handle error
                     break;
                 case NetCode.RequestQuestSheet:
-                    int rs = BitConverter.ToInt32(buf, offs);
-                    offs += 4;
-                    if (rs == 0)
-                    {
-                        ExamLv lv;
-                        if (uReqQSh < (int)ExamLv.B)
-                            lv = ExamLv.A;
-                        else
-                            lv = ExamLv.B;
-                        ExamSlot sl = mBrd.vSl.First().Value;//todo, use the 1st temporarily
-                        if (sl.ReadByteQPack1(lv, buf, ref offs))
-                            mCbMsg += Txt.s._.[(int)TxI.RECV_QS_ER];
-                        else
-                        {
-                            if (sl.mKeyPack.ReadByte1(buf, ref offs))
-                                mCbMsg += Txt.s._.[(int)TxI.RECV_KEY_ER];
-                            else
-                                Dispatcher.Invoke(() =>
-                                {
-                                    foreach(TabItem ti in tbcSl.Items)
-                                        if(ti.Name == "_" + sl.Dt.ToString(DtFmt.hh).Replace(':', '_'))
-                                        {
-                                            Op1SlotView vw = ti.Content as Op1SlotView;
-                                            if (vw != null)
-                                                vw.ShowQuest();
-                                        }
-                                }
-                                );
-                        }
-                    }
-                    btnStartSrvr_Click(null, null);
-                    bQShReqting = false;
-                    mState = NetCode.Unknown;
+                    //int rs = BitConverter.ToInt32(buf, offs);
+                    //offs += 4;
+                    //if (rs == 0)
+                    //{
+                    //    ExamLv lv;
+                    //    if (uReqQSh < (int)ExamLv.B)
+                    //        lv = ExamLv.A;
+                    //    else
+                    //        lv = ExamLv.B;
+                    //    ExamSlot sl = mBrd.vSl.First().Value;//todo, use the 1st temporarily
+                    //    if (sl.ReadByteQPack1(lv, buf, ref offs))
+                    //        mCbMsg += Txt.s._.[(int)TxI.RECV_QS_ER];
+                    //    else
+                    //    {
+                    //        if (sl.mKeyPack.ReadByte1(buf, ref offs))
+                    //            mCbMsg += Txt.s._.[(int)TxI.RECV_KEY_ER];
+                    //        else
+                    //            Dispatcher.Invoke(() =>
+                    //            {
+                    //                foreach(TabItem ti in tbcSl.Items)
+                    //                    if(ti.Name == "_" + sl.Dt.ToString(DtFmt.hh).Replace(':', '_'))
+                    //                    {
+                    //                        Op1SlotView vw = ti.Content as Op1SlotView;
+                    //                        if (vw != null)
+                    //                            vw.ShowQuest();
+                    //                    }
+                    //            }
+                    //            );
+                    //    }
+                    //}
+                    //btnStartSrvr_Click(null, null);
+                    //bQShReqting = false;
+                    //mState = NetCode.Unknown;
                     break;
                 case NetCode.SrvrSubmitting:
                     if (buf.Length - offs == 4 && BitConverter.ToInt32(buf, offs) == 1)
@@ -465,10 +467,15 @@ namespace sQzServer1
                     Array.Copy(BitConverter.GetBytes(uReqQSh), 0, outMsg, 4, 4);
                     break;
                 case NetCode.SrvrSubmitting:
-                    byte[] prefx = new byte[8];
+                    byte[] prefx = new byte[4];
                     Array.Copy(BitConverter.GetBytes((int)mState), prefx, 4);
                     //Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, prefx, 4, 4);//todo
                     //mRoom.ToByteS0(prefx, out outMsg);
+                    ExamSlot sl = mBrd.vSl.First().Value;
+                    if (sl == null)
+                        outMsg = null;
+                    else
+                        outMsg = sl.ToByteR0(prefx);
                     break;
             }
             return outMsg;
@@ -480,6 +487,16 @@ namespace sQzServer1
             mState = NetCode.SrvrSubmitting;
             Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
+        }
+
+        void LoadTxt()
+        {
+            Txt s = Txt.s;
+            btnClose.Content = s._[(int)TxI.EXIT];
+            btnConnect.Content = s._[(int)TxI.CONN];
+            btnStartSrvr.Content = s._[(int)TxI.STRT_SRVR];
+            btnStopSrvr.Content = s._[(int)TxI.STOP_SRVR];
+            btnSubmit.Content = "Nộp bài";//s._[(int)TxI.SUBMIT];
         }
 
         private void ckbAllNee_Checked(object sender, RoutedEventArgs e)

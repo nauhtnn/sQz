@@ -19,7 +19,7 @@
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <ListBox x:Name="lbxBrd" Width="140" Height="200" SelectionChanged="lbxBrd_SelectionChanged"/>
-                    <ListBox x:Name="lbxSl" Width="90" Height="200" SelectionMode="Multiple"/>
+                    <ListBox x:Name="lbxSl" Width="90" Height="200"/>
                 </StackPanel>
                 <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
                     <TextBlock x:Name="lblStatus" Width="400" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
@@ -123,7 +123,7 @@
                              Name="A"/>
                         <RadioButton Content="Advance" GroupName="IU" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Grid>
-                    <TabControl Width="400" Height="320"/>
+                    <TabControl Width="436" Height="320"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>
