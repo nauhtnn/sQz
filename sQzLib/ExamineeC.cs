@@ -34,8 +34,6 @@ namespace sQzLib
 
             l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
 
-            l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
-
             if (eStt < ExamStt.Submitting)
                 return l;
 

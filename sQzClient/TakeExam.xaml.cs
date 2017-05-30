@@ -348,8 +348,8 @@ namespace sQzClient
                         if (!e.ReadByte(buf, ref offs))
                         {
                             mNee.Merge(e);
-                            btnSubmit.Content = mNee.uGrade;
-                            msg = Txt.s._[(int)TxI.RESULT] + Math.Round((float)mNee.uGrade/30, 1).ToString();
+                            btnSubmit.Content = mNee.Grade;
+                            msg = Txt.s._[(int)TxI.RESULT] + mNee.Grade.ToString();
                         }
                         else
                             msg = Txt.s._[(int)TxI.RECV_DAT_ER];

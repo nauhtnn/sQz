@@ -345,7 +345,7 @@ namespace sQzServer1
                                             if (vw.vDt2.TryGetValue(lvid, out t))
                                                 t.Text = o.dtTim2.ToString("HH:mm");
                                             if (vw.vMark.TryGetValue(lvid, out t))
-                                                t.Text = o.uGrade.ToString();
+                                                t.Text = o.Grade.ToString();
                                             CheckBox cbx;
                                             if (vw.vLock.TryGetValue(lvid, out cbx))
                                             {
