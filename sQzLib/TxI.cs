@@ -102,5 +102,7 @@ namespace sQzLib {
 		ROOM_DEL_ECPT,
 		NEEID_NF,
 		RECV_DAT_ER,
+		RECV_QS_ER,
+		RECV_KEY_ER,
 	}
 }

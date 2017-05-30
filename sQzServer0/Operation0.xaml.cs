@@ -163,35 +163,33 @@ namespace sQzServer0
                         if (qsId < (int)ExamLv.B)
                             lv = ExamLv.A;
                         else
-                        {
                             lv = ExamLv.B;
-                            qsId -= (int)ExamLv.B;
+                        bool found = false;
+
+                        if (qs.DBSelect(curSl.uId, lv, qsId))
+                            outMsg = BitConverter.GetBytes(-1);
+                        else
+                        {
+                            curSl.vQPack[lv].vSheet.Add(qs.uId, qs);
+                            AnsSheet a = curSl.mKeyPack.ExtractKey(qs);
+                            List<byte[]> bs = qs.ToByte();
+                            sz = 4;
+                            if (a != null)
+                                sz += a.GetByteCount();
+                            foreach (byte[] b in bs)
+                                sz += b.Length;
+                            outMsg = new byte[sz];
+                            Array.Copy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
+                            offs = 4;
+                            foreach (byte[] b in bs)
+                            {
+                                Array.Copy(b, 0, outMsg, offs, b.Length);
+                                offs += b.Length;
+                            }
+                            if (a != null)
+                                a.ToByte(ref outMsg, ref offs);
+                            Dispatcher.Invoke(() => ShowQuest());
                         }
-                        outMsg = null;
-                        //if (qs.DBSelect(curSl.uId, lv, qsId))
-                        //    outMsg = BitConverter.GetBytes(-1);
-                        //else
-                        //{
-                        //    curSl.vQPack[lv].vSheet.Add(qs.uId, qs);
-                        //    AnsSheet a = curSl.mKeyPack.ExtractKey(qs);
-                        //    List<byte[]> bs = qs.ToByte();
-                        //    sz = 4;
-                        //    if (a != null)
-                        //        sz += a.GetByteCount();
-                        //    foreach (byte[] b in bs)
-                        //        sz += b.Length;
-                        //    outMsg = new byte[sz];
-                        //    Array.Copy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
-                        //    offs = 4;
-                        //    foreach (byte[] b in bs)
-                        //    {
-                        //        Array.Copy(b, 0, outMsg, offs, b.Length);
-                        //        offs += b.Length;
-                        //    }
-                        //    if (a != null)
-                        //        a.ToByte(ref outMsg, ref offs);
-                        //    Dispatcher.Invoke(() => ShowQuest());
-                        //}
                     }
                     else
                         outMsg = BitConverter.GetBytes(-1);

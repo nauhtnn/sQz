@@ -245,9 +245,9 @@ namespace sQzServer1
                             offs += comp.Length;
                         }
 
-                        Buffer.BlockCopy(BitConverter.GetBytes(e.dtTim1.Hour), 0, outMsg, offs, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes(o.dtTim1.Hour), 0, outMsg, offs, 4);
                         offs += 4;
-                        Buffer.BlockCopy(BitConverter.GetBytes(e.dtTim1.Minute), 0, outMsg, offs, 4);
+                        Buffer.BlockCopy(BitConverter.GetBytes(o.dtTim1.Minute), 0, outMsg, offs, 4);
                         break;
                     }
                     return true;
@@ -398,32 +398,43 @@ namespace sQzServer1
                         offs = 0;//todo handle error
                     break;
                 case NetCode.RequestQuestSheet:
-                    //int rs = BitConverter.ToInt32(buf, offs);
-                    //offs += 4;
-                    //if(rs == 0)
-                    //{
-                    //    ExamLv lv;
-                    //    if (uReqQSh < (int)ExamLv.B)
-                    //        lv = ExamLv.A;
-                    //    else
-                    //        lv = ExamLv.B;
-                    //    if (mSl.ReadByteQPack1(lv, buf, ref offs))
-                    //        offs = 0;//todo handle error
-                    //    else
-                    //    {
-                    //        if (mSl.mKeyPack.ReadByte1(buf, ref offs))
-                    //            offs = 0;//todo handle error
-                    //        else
-                    //            Dispatcher.Invoke(() => ShowQuest());
-                    //    }
-                    //}
-                    //btnStartSrvr_Click(null, null);
-                    //bQShReqting = false;
-                    //mState = NetCode.Unknown;
+                    int rs = BitConverter.ToInt32(buf, offs);
+                    offs += 4;
+                    if (rs == 0)
+                    {
+                        ExamLv lv;
+                        if (uReqQSh < (int)ExamLv.B)
+                            lv = ExamLv.A;
+                        else
+                            lv = ExamLv.B;
+                        ExamSlot sl = mBrd.vSl.First().Value;//todo, use the 1st temporarily
+                        if (sl.ReadByteQPack1(lv, buf, ref offs))
+                            mCbMsg += Txt.s._.[(int)TxI.RECV_QS_ER];
+                        else
+                        {
+                            if (sl.mKeyPack.ReadByte1(buf, ref offs))
+                                mCbMsg += Txt.s._.[(int)TxI.RECV_KEY_ER];
+                            else
+                                Dispatcher.Invoke(() =>
+                                {
+                                    foreach(TabItem ti in tbcSl.Items)
+                                        if(ti.Name == "_" + sl.Dt.ToString(DtFmt.hh).Replace(':', '_'))
+                                        {
+                                            Op1SlotView vw = ti.Content as Op1SlotView;
+                                            if (vw != null)
+                                                vw.ShowQuest();
+                                        }
+                                }
+                                );
+                        }
+                    }
+                    btnStartSrvr_Click(null, null);
+                    bQShReqting = false;
+                    mState = NetCode.Unknown;
                     break;
                 case NetCode.SrvrSubmitting:
-                    //if (buf.Length - offs == 4 && BitConverter.ToInt32(buf, offs) == 1)
-                    //    mCbMsg += Txt.s._[(int)TxI.SRVR_SUBMT_OK];
+                    if (buf.Length - offs == 4 && BitConverter.ToInt32(buf, offs) == 1)
+                        mCbMsg += Txt.s._[(int)TxI.SRVR_SUBMT_OK];
                     break;
             }
             return false;
