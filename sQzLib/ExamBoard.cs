@@ -83,10 +83,12 @@ namespace sQzLib
             {
                 ExamSlot sl = new ExamSlot();
                 string s = reader.GetString(0);
+                DateTime dt;
                 DtFmt.ToDt(mDt.ToString(DtFmt._) + ' ' +
-                    s, DtFmt.HS, out sl.mDt);
+                    s, DtFmt.HS, out dt);
+                sl.Dt = dt;
                 sl.bOpen = reader.GetBoolean(1);
-                r.Add(sl.mDt);
+                r.Add(sl.Dt);
             }
             reader.Close();
             DBConnect.Close(ref conn);
@@ -114,7 +116,7 @@ namespace sQzLib
         {
             List<DateTime> r = new List<DateTime>();
             foreach (ExamSlot sl in vSl.Values)
-                r.Add(sl.mDt);
+                r.Add(sl.Dt);
             return r;
         }
 
@@ -161,7 +163,7 @@ namespace sQzLib
                     sz += a.Length;
                 b = new byte[sz + 4];
                 sz = 0;
-                ExamSlot.ToByteDt(b, ref sz, sl.mDt);
+                ExamSlot.ToByteDt(b, ref sz, sl.Dt);
                 Array.Copy(BitConverter.GetBytes(b.Length - ExamSlot.BYTE_COUNT_DT - 4), 0, b, sz, 4);
                 sz += 4;
                 foreach (byte[] a in x)
@@ -202,10 +204,10 @@ namespace sQzLib
                 else
                 {
                     sl = new ExamSlot();
-                    sl.mDt = dt;
+                    sl.Dt = dt;
                     if (sl.ReadByteR1(buf, ref offs))
                         return true;
-                    vSl.Add(sl.mDt.ToString(DtFmt.hh), sl);
+                    vSl.Add(sl.Dt.ToString(DtFmt.hh), sl);
                 }
             }
             if (offs == buf.Length)
@@ -227,7 +229,7 @@ namespace sQzLib
                     sz += a.Length;
                 b = new byte[sz + 4];
                 sz = 0;
-                ExamSlot.ToByteDt(b, ref sz, sl.mDt);
+                ExamSlot.ToByteDt(b, ref sz, sl.Dt);
                 Array.Copy(BitConverter.GetBytes(b.Length - ExamSlot.BYTE_COUNT_DT - 4), 0, b, sz, 4);
                 sz += 4;
                 foreach (byte[] a in x)
@@ -278,7 +280,7 @@ namespace sQzLib
                 byte[] x = sl.ToByteKey();
                 b = new byte[ExamSlot.BYTE_COUNT_DT + x.Length];
                 sz = 0;
-                ExamSlot.ToByteDt(b, ref sz, sl.mDt);
+                ExamSlot.ToByteDt(b, ref sz, sl.Dt);
                 Array.Copy(x, 0, b, sz, x.Length);
                 l.Add(b);
             }

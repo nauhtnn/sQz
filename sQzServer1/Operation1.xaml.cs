@@ -450,7 +450,7 @@ namespace sQzServer1
             vw.ShowQuest(); 
             TabItem ti = new TabItem();
             ti.Name = "_" + (i.Content as string).Replace(':', '_');
-            ti.Header = sl.mDt.ToString(DtFmt.hh);
+            ti.Header = sl.Dt.ToString(DtFmt.hh);
             ti.Content = vw;
             tbcSl.Items.Add(ti);
             ti.Focus();

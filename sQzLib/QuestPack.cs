@@ -16,6 +16,7 @@ namespace sQzLib
         int mMaxQSIdx;
         public QuestPack()
         {
+            mDt = DtFmt.INV_;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
             vSheet = new Dictionary<int, QuestSheet>();

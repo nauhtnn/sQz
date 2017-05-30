@@ -15,7 +15,7 @@ namespace sQzLib
 {
     public class ExamSlot
     {
-        public DateTime mDt;
+        DateTime mDt;
         public bool bOpen;
         public Dictionary<ExamLv, QuestPack> vQPack;
 
@@ -86,6 +86,15 @@ namespace sQzLib
             if (DtFmt.ToDt(H.ToString("d2") + ':' + m.ToString("d2"), DtFmt.hh, out dt))
                 return true;
             return false;
+        }
+
+        public DateTime Dt {
+            get { return mDt; }
+            set {
+                mDt = value;
+                foreach (QuestPack p in vQPack.Values)
+                    p.mDt = value;
+            }
         }
 
         public List<byte[]> ToByteR1(int rId)

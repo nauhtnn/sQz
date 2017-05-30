@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 
 /*
 CREATE TABLE IF NOT EXISTS `qs` (`dt` DATE,
-`id` SMALLINT, `lv` CHAR, `vquest` VARCHAR(1024),
+`id` SMALLINT UNSIGNED, `lv` CHAR, `vquest` VARCHAR(1024),
 PRIMARY KEY(`dt`,`id`), FOREIGN KEY(`dt`) REFERENCES `board`(`dt`));
 */
 
@@ -447,7 +447,7 @@ namespace sQzLib
             if (conn == null)
                 return true;
             int uid = DBConnect.MaxInt(conn, "qs", "id",
-                    "dt=" + dt.ToString(DtFmt._) + " AND lv='" + ExamLv.A.ToString() + "'");
+                    "dt='" + dt.ToString(DtFmt._) + "' AND lv='" + ExamLv.A.ToString() + "'");
             if (uid < 0)
             {
                 DBConnect.Close(ref conn);
@@ -456,7 +456,7 @@ namespace sQzLib
             guDBCurAId = uid;
 
             uid = DBConnect.MaxInt(conn, "qs", "id",
-                    "dt=" + dt.ToString(DtFmt._) + " AND lv='" + ExamLv.B.ToString() + "'");
+                    "dt='" + dt.ToString(DtFmt._) + "' AND lv='" + ExamLv.B.ToString() + "'");
             if (uid < 0)
             {
                 DBConnect.Close(ref conn);

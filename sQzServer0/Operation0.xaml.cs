@@ -285,7 +285,9 @@ namespace sQzServer0
                 return;
 
             ExamSlot sl = new ExamSlot();
-            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out sl.mDt);
+            DateTime dt;
+            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out dt);
+            sl.Dt = dt;
             sl.DBSelNee();
             Op0SlotView vw = new Op0SlotView();
             vw.ShallowCopy(refSl);
@@ -293,7 +295,7 @@ namespace sQzServer0
             vw.ShowExaminee();
             TabItem ti = new TabItem();
             ti.Name = "_" + (i.Content as string).Replace(':', '_');
-            ti.Header = sl.mDt.ToString(DtFmt.hh);
+            ti.Header = sl.Dt.ToString(DtFmt.hh);
             ti.Content = vw;
             tbcSl.Items.Add(ti);
             ti.Focus();
