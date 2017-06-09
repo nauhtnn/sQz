@@ -11,35 +11,38 @@
     <StackPanel x:Name="spMain" Loaded="Main_Loaded">
         <StackPanel Orientation="Horizontal">
             <StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-                    <TextBox x:Name="tbxBrd" Height="30" Width="110" />
+                <TextBlock Text="(yyyy-MM-dd)" Margin="18,0,0,0"/>
+                <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
+                    <TextBox x:Name="tbxBrd" Height="30" Width="90" />
                     <Button x:Name="btnInsBrd"  Content="+" Height="30" Width="30" Click="btnInsBrd_Click"/>
                 </StackPanel>
-                <ListBox x:Name="lbxBrd" Width="140" Height="200" SelectionChanged="lbxBrd_SelectionChanged"/>
+                <ListBox x:Name="lbxBrd" Width="120" Height="200" SelectionChanged="lbxBrd_SelectionChanged"/>
             </StackPanel>
             <StackPanel>
-                <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-                    <TextBox x:Name="tbxSl" Height="30" Width="60" />
+                <TextBlock Text="(hh:mm)" Margin="20,0,0,0"/>
+                <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
+                    <TextBox x:Name="tbxSl" Height="30" Width="50" />
                     <Button x:Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click"/>
                 </StackPanel>
-                <ListBox x:Name="lbxSl" Width="90" Height="200" SelectionMode="Multiple"/>
+                <ListBox x:Name="lbxSl" Width="80" Height="200" SelectionMode="Multiple"/>
             </StackPanel>
-            <TabControl x:Name="tbcNee" Width="920"/>
+            <TabControl x:Name="tbcNee" Width="1040"/>
             <StackPanel x:Name="refSl" Visibility="Collapsed">
                 <Grid Height="40">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
-                    <Button Name="x" Content="X" Height="40" Width="40"/>
-                    <Button Name="a" Content="+" Height="40" Width="40" Grid.Column="1"/>
-                    <Button Content="X" Height="40" Width="40" Grid.Column="2"/>
+                    <Button Content="X" Height="40" Width="40"/>
+                    <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center">
+                        <Button Name="a" Content="+" Height="40" Width="40"/>
+                        <Button Content="X" Height="40" Width="40" Margin="100,0,0,0"/>
+                    </StackPanel>
                 </Grid>
                 <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
-                    <ListBox Name="_1" Width="420" Height="200"/>
-                    <Button Content="&lt;&lt;" Height="30" Width="60" Margin="5,0,0,5"/>
-                    <ListBox Name="_2" Width="420" Height="200"/>
+                    <ListBox Name="_1" Width="475" Height="200"/>
+                    <Button Content="&lt;&lt;" Height="30" Width="60" Margin="5,0,5,0"/>
+                    <ListBox Name="_2" Width="475" Height="200"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>
