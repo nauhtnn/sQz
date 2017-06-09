@@ -10,7 +10,7 @@
 
     <StackPanel x:Name="spMain" Loaded="Main_Loaded">
         <StackPanel.Background>
-            <ImageBrush ImageSource="C:\Windows\Web\Wallpaper\Windows\img0.jpg" Stretch="None"/>
+            <ImageBrush ImageSource="tech.jpg" Stretch="None"/>
         </StackPanel.Background>
         <TextBlock Height="16" Background="#f3f3ee"/>
         <TextBlock x:Name="txtLalgitc" Height="80" Background="#a51c30" Foreground="#fff" TextAlignment="Center" VerticalAlignment="Center" FontSize="40" FontWeight="Bold" Padding="0,8,0,0"/>
