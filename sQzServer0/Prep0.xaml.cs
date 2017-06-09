@@ -90,7 +90,7 @@ namespace sQzServer0
                     WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_OK]);
                     spMain.Opacity = 1;
                     LoadSl();
-                    tbxBrd.Text = string.Empty;
+                    tbxSl.Text = string.Empty;
                 }
                 else
                 {
@@ -112,18 +112,11 @@ namespace sQzServer0
                 spMain.Opacity = 1;
                 return;
             }
-            //bool dark = true;
-            //Color c = new Color();
-            //c.A = 0xff;
-            //c.B = c.G = c.R = 0xf0;
             lbxBrd.Items.Clear();
             foreach(DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
                 it.Content = dt.ToString(DtFmt.__);
-                //dark = !dark;
-                //if (dark)
-                //    it.Background = new SolidColorBrush(c);
                 lbxBrd.Items.Add(it);
             }
         }

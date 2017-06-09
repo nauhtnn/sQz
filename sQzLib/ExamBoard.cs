@@ -5,10 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
-/*
-CREATE TABLE IF NOT EXISTS `board` (`dt` DATE PRIMARY KEY);
-*/
-
 namespace sQzLib
 {
     public class ExamBoard
@@ -25,14 +21,14 @@ namespace sQzLib
 
         public int DBIns(out string eMsg)
         {
-            string v = "('" + mDt.ToString(DtFmt.H) + "')";
+            string v = "('" + mDt.ToString(DtFmt._) + "')";
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return 0;
             }
-            int n = DBConnect.Ins(conn, "board", "dt", v, out eMsg);
+            int n = DBConnect.Ins(conn, "sqz_board", "dt", v, out eMsg);
             DBConnect.Close(ref conn);
             if (n == -1062)
                 eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.BOARD_EXIST];
@@ -48,7 +44,7 @@ namespace sQzLib
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return null;
             }
-            string qry = DBConnect.mkQrySelect("board", null, null, null);
+            string qry = DBConnect.mkQrySelect("sqz_board", null, null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if(reader == null)
             {
@@ -70,7 +66,7 @@ namespace sQzLib
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return null;
             }
-            string qry = DBConnect.mkQrySelect("slot", "t,open",
+            string qry = DBConnect.mkQrySelect("sqz_slot", "t,open",
                 "dt='" + mDt.ToString(DtFmt._) + "'", null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -105,7 +101,7 @@ namespace sQzLib
             }
             string v = "('" + mDt.ToString(DtFmt._) + "','"
                 + t.ToString(DtFmt.h) + "')";
-            int n = DBConnect.Ins(conn, "slot", "dt,t", v, out eMsg);
+            int n = DBConnect.Ins(conn, "sqz_slot", "dt,t", v, out eMsg);
             DBConnect.Close(ref conn);
             if (n == -1062)
                 eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.SLOT_EXIST];

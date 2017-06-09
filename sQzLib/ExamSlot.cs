@@ -54,7 +54,7 @@ namespace sQzLib
         //    MySqlConnection conn = DBConnect.Init();
         //    if (conn == null)
         //        return r;
-        //    string qry = DBConnect.mkQrySelect("slot", null, null, null);
+        //    string qry = DBConnect.mkQrySelect("sqz_slot", null, null, null);
         //    MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
         //    while (reader.Read())
         //        r.Add(reader.GetUInt32(0),
