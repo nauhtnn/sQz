@@ -2,52 +2,6 @@
 using System.Collections.Generic;
 using System.Text;
 
-/*
-CREATE TABLE IF NOT EXISTS `nee1`(`dt` DATE, `t` TIME,
-`id` INT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
-`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
-`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
-`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
-PRIMARY KEY(`dt`, `id`), FOREIGN KEY(`dt`, `t`) REFERENCES `slot`(`dt`, `t`));
-
-CREATE TABLE IF NOT EXISTS `nee2`(`dt` DATE, `t` TIME,
-`id` INT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
-`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
-`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
-`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
-PRIMARY KEY(`dt`, `id`), FOREIGN KEY(`dt`, `t`) REFERENCES `slot`(`dt`, `t`));
-
-CREATE TABLE IF NOT EXISTS `nee3`(`dt` DATE, `t` TIME,
-`id` INT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
-`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
-`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
-`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
-PRIMARY KEY(`dt`, `id`), FOREIGN KEY(`dt`, `t`) REFERENCES `slot`(`dt`, `t`));
-
-CREATE TABLE IF NOT EXISTS `nee4`(`dt` DATE, `t` TIME,
-`id` INT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
-`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
-`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
-`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
-PRIMARY KEY(`dt`, `id`), FOREIGN KEY(`dt`, `t`) REFERENCES `slot`(`dt`, `t`));
-
-CREATE TABLE IF NOT EXISTS `nee5`(`dt` DATE, `t` TIME,
-`id` INT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
-`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
-`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
-`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
-PRIMARY KEY(`dt`, `id`), FOREIGN KEY(`dt`, `t`) REFERENCES `slot`(`dt`, `t`));
-
-CREATE TABLE IF NOT EXISTS `nee6`(`dt` DATE, `t` TIME,
-`id` INT UNSIGNED, `name` VARCHAR(64) CHARACTER SET `utf8`,
-`birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
-`t1` TIME, `t2` TIME, `grd` TINYINT UNSIGNED, `comp` VARCHAR(32),
-`qId` SMALLINT UNSIGNED, `anssh` CHAR(120) CHARACTER SET `utf8`,
-PRIMARY KEY(`dt`, `id`), FOREIGN KEY(`dt`, `t`) REFERENCES `slot`(`dt`, `t`));
-
-FOREIGN KEY(`qId`) REFERENCES questsh(`id`));
-*/
-
 namespace sQzLib
 {
     public enum ExamLv
@@ -91,8 +45,6 @@ namespace sQzLib
 
         const string tLOG_DIR = "sQz\\";
         const string tLOG_PRE = "sav";
-
-        public const string tDBtbl = "nee";
 
         public bool bFromC;//used by NeeS1
         public bool bLog;//used by NeeS1 and NeeC

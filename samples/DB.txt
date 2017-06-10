@@ -38,13 +38,13 @@ CREATE TABLE IF NOT EXISTS `sqz_long_q_path`(`id` INT UNSIGNED AUTO_INCREMENT PR
 `path` VARCHAR(256));
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`modid` TINYINT, `del` TINYINT, `diff` TINYINT,
+`mid` TINYINT, `del` TINYINT, `diff` TINYINT,
 `lqid` INT UNSIGNED, `stmt` VARCHAR(512) CHARACTER SET `utf8`,
 `ans0` VARCHAR(512) CHARACTER SET `utf8`, `ans1` VARCHAR(512) CHARACTER SET `utf8`,
 `ans2` VARCHAR(512) CHARACTER SET `utf8`, `ans3` VARCHAR(512) CHARACTER SET `utf8`,
-`key` CHAR(4), FOREIGN KEY(`modid`) REFERENCES `sqz_module`(`id`),
+`key` CHAR(4), FOREIGN KEY(`mid`) REFERENCES `sqz_module`(`id`),
 FOREIGN KEY(`lqid`) REFERENCES `sqz_long_q_path`(`id`),
-INDEX(`modid`));
+INDEX(`mid`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATE,
 `qsid` SMALLINT UNSIGNED, `qid` INT UNSIGNED,
@@ -72,3 +72,7 @@ CREATE TABLE IF NOT EXISTS `sqz_ad_mod`(`aid` TINYINT,
 `mid` TINYINT, `n` TINYINT UNSIGNED,
 FOREIGN KEY(`aid`) REFERENCES `sqz_admin`(`id`),
 FOREIGN KEY(`mid`) REFERENCES `sqz_module`(`id`));
+
+INSERT INTO `sqz_room` VALUES (0),(1),(2),(3),(4),(5);
+INSERT INTO `sqz_level` VALUES ('A'),('B');
+INSERT INTO `sqz_module` VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14);

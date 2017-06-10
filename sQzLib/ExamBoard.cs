@@ -37,20 +37,20 @@ namespace sQzLib
 
         public static List<DateTime> DBSel(out string eMsg)
         {
-            List<DateTime> r = new List<DateTime>();
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return null;
             }
-            string qry = DBConnect.mkQrySelect("sqz_board", null, null, null);
+            string qry = DBConnect.mkQrySelect("sqz_board", null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if(reader == null)
             {
                 DBConnect.Close(ref conn);
                 return null;
             }
+            List<DateTime> r = new List<DateTime>();
             while (reader.Read())
                 r.Add(reader.GetDateTime(0));
             reader.Close();
@@ -66,8 +66,8 @@ namespace sQzLib
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return null;
             }
-            string qry = DBConnect.mkQrySelect("sqz_slot", "t,open",
-                "dt='" + mDt.ToString(DtFmt._) + "'", null);
+            string qry = DBConnect.mkQrySelect("sqz_slot", "t",
+                "dt='" + mDt.ToString(DtFmt._) + "'");
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
@@ -83,7 +83,7 @@ namespace sQzLib
                 DtFmt.ToDt(mDt.ToString(DtFmt._) + ' ' +
                     s, DtFmt.HS, out dt);
                 sl.Dt = dt;
-                sl.bOpen = reader.GetBoolean(1);
+                sl.bOpen = true;
                 r.Add(sl.Dt);
             }
             reader.Close();

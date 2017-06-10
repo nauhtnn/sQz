@@ -23,7 +23,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return null;
-            string qry = DBConnect.mkQrySelect("examinee", "lv,id,qId,anssh", "slId=" + slId, null);
+            string qry = DBConnect.mkQrySelect("sqz_examinee", "lv,id,qId,anssh", "slId=" + slId);
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             Dictionary<int, int> r = new Dictionary<int, int>();
@@ -56,21 +56,21 @@ namespace sQzLib
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return -1;
             }
-            string attbs = "dt,t,id,name,birdate,birthplace";
+            string attbs = "dt,id,t,rid,name,birdate,birthplace,lv";
             StringBuilder vals = new StringBuilder();
-            //int x = 0;
             foreach (ExamineeA e in vExaminee.Values)
             {
-                //++x;
                 vals.Append("('" + e.mDt.ToString(DtFmt._) + "',");
-                vals.Append("'" + e.mDt.ToString(DtFmt.hh) + "',");
                 vals.Append(e.uId + ",");
+                vals.Append("'" + e.mDt.ToString(DtFmt.hh) + "',");
+                vals.Append(uId + ",");
                 vals.Append("'" + e.tName + "',");
                 vals.Append("'" + DtFmt.ToDtMysql(e.tBirdate, DtFmt.RR) + "',");
-                vals.Append("'" + e.tBirthplace + "'),");
+                vals.Append("'" + e.tBirthplace + "',");
+                vals.Append("'" + e.eLv + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            int n = DBConnect.Ins(conn, ExamineeA.tDBtbl + uId,
+            int n = DBConnect.Ins(conn, "sqz_examinee",
                 attbs, vals.ToString(), out eMsg);
             DBConnect.Close(ref conn);
             return n;
@@ -250,6 +250,29 @@ namespace sQzLib
                     v.Add(e);
             }
             return false;
+        }
+
+        public static List<int> DBSel(out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return null;
+            }
+            string qry = DBConnect.mkQrySelect("sqz_room", null, null);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return null;
+            }
+            List<int> r = new List<int>();
+            while (reader.Read())
+                r.Add(reader.GetInt32(0));
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return r;
         }
     }
 }

@@ -230,7 +230,7 @@ namespace sQzLib
             if (conn == null)
                 return;
             string tbl = "q" + (int)eIU;
-            string qry = DBConnect.mkQrySelect(tbl, null, null, null);
+            string qry = DBConnect.mkQrySelect(tbl, null, null);
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             if (reader != null)
@@ -300,7 +300,7 @@ namespace sQzLib
             }
             Array.Sort(vSel);
             //
-            string qry = DBConnect.mkQrySelect(tbl, null, null, null);
+            string qry = DBConnect.mkQrySelect(tbl, null, null);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             i = 0;
@@ -376,7 +376,7 @@ namespace sQzLib
             cond.Append("dt='" + dt.ToString(DtFmt._) + "'");
             cond.Append(" AND lv=" + lv.ToString("d"));
             cond.Append(" AND id=" + id);
-            string qry = DBConnect.mkQrySelect("qs", "vquest", cond.ToString(), null);
+            string qry = DBConnect.mkQrySelect("qs", "vquest", cond.ToString());
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             string qIds = null;
@@ -398,7 +398,7 @@ namespace sQzLib
                 string[] iuid = qid.Split('_');
                 if(iuid.Length == 2)//todo handle error
                 {
-                    qry = DBConnect.mkQrySelect("q" + iuid[0], null, "id=" + iuid[1], null);
+                    qry = DBConnect.mkQrySelect("q" + iuid[0], null, "id=" + iuid[1]);
                     reader = null;//todo DBConnect.exeQrySelect(conn, qry);
                     if (reader != null)//todo handle error
                     {

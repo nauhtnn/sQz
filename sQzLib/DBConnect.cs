@@ -214,8 +214,7 @@ namespace sQzLib
         //    return n;
         //}
 
-        public static string mkQrySelect(string tb, string attbs, string cond,
-            string gpAttbs)
+        public static string mkQrySelect(string tb, string attbs, string cond)
         {
             string query = "SELECT ";
             if (attbs == null)
@@ -225,8 +224,6 @@ namespace sQzLib
             query += " FROM " + tb;
             if (cond != null)
                 query += " WHERE " + cond;
-            if (gpAttbs != null)
-                query += " GROUP BY " + gpAttbs;
 
             return query;
         }

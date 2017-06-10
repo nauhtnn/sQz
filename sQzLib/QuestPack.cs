@@ -97,7 +97,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return null;
-            string qry = DBConnect.mkQrySelect("qs", "lv,id", "dt=" + dt.ToString(DtFmt._), null);
+            string qry = DBConnect.mkQrySelect("qs", "lv,id", "dt=" + dt.ToString(DtFmt._));
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             List<int> r = new List<int>();

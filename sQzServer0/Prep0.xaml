@@ -19,7 +19,7 @@
                 <ListBox x:Name="lbxBrd" Width="120" Height="200" SelectionChanged="lbxBrd_SelectionChanged"/>
             </StackPanel>
             <StackPanel>
-                <TextBlock Text="(hh:mm)" Margin="20,0,0,0"/>
+                <TextBlock Text="(h:m)" Margin="20,0,0,0"/>
                 <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
                     <TextBox x:Name="tbxSl" Height="30" Width="50" />
                     <Button x:Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click"/>

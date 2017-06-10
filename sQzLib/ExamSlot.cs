@@ -30,11 +30,18 @@ namespace sQzLib
             mDt = DtFmt.INV_;
 
             vRoom = new Dictionary<int, ExamRoom>();
-            for (int i = 1; i < 7; ++i)//todo: read from db
+            string emsg;
+            List<int> rids = ExamRoom.DBSel(out emsg);
+            if (rids == null)
+                WPopup.s.ShowDialog(emsg);
+            else
             {
-                ExamRoom r = new ExamRoom();
-                r.uId = i;
-                vRoom.Add(i, r);
+                foreach(int i in rids)
+                {
+                    ExamRoom r = new ExamRoom();
+                    r.uId = i;
+                    vRoom.Add(i, r);
+                }
             }
             vQPack = new Dictionary<ExamLv, QuestPack>();
             QuestPack p = new QuestPack();
@@ -191,7 +198,7 @@ namespace sQzLib
             {
                 eline.Remove(eline.Length - 2, 2);//remove the last comma
                 r.Append("\n" + Txt.s._[(int)TxI.NEE_ELINE]);
-                r.Append(dup.ToString() + '.');
+                r.Append(eline.ToString() + '.');
             }
             if (r.Length == 0)
                 return null;
@@ -237,10 +244,10 @@ namespace sQzLib
             StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
             {
-                int n = DBConnect.Count(conn, ExamineeS0.tDBtbl + r.uId,
+                int n = DBConnect.Count(conn, "sqz_examinee",
                     "dt", "dt='" + mDt.ToString(DtFmt._) +
                     "' AND t='" + mDt.ToString(DtFmt.hh) +
-                    "' AND grd IS NOT NULL");
+                    "' AND grd IS NOT NULL AND rid=" + r.uId);
                 sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DEL], r.uId);
                 if (0 < n)
                     sb.Append(Txt.s._[(int)TxI.ROOM_DEL_GRD] + '\n');
@@ -248,8 +255,9 @@ namespace sQzLib
                     sb.Append(Txt.s._[(int)TxI.ROOM_DEL_ECPT] + '\n');
                 else
                 {
-                    n = DBConnect.Delete(conn, ExamineeS0.tDBtbl + r.uId,
-                        "dt='" + mDt.ToString(DtFmt._) + "' AND t='" + mDt.ToString(DtFmt.hh) + "'");
+                    n = DBConnect.Delete(conn, "sqz_examinee",
+                        "dt='" + mDt.ToString(DtFmt._) + "' AND t='" + mDt.ToString(DtFmt.hh) +
+                        "' AND rid=" + r.uId);
                     if (n < 0)
                         sb.Append(Txt.s._[(int)TxI.ROOM_DEL_ECPT] + '\n');
                     else
@@ -268,9 +276,9 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
             {
                 r.vExaminee.Clear();
-                string qry = DBConnect.mkQrySelect(ExamineeS0.tDBtbl + r.uId,
+                string qry = DBConnect.mkQrySelect("sqz_examinee",
                     "dt,t,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
-                    "dt='" + mDt.ToString(DtFmt._) + "' AND t='" + mDt.ToString(DtFmt.hh) + "'", null);
+                    "dt='" + mDt.ToString(DtFmt._) + "' AND t='" + mDt.ToString(DtFmt.hh) + "'");
                 string emsg;
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
                 if (reader != null)
