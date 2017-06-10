@@ -59,3 +59,16 @@ CREATE TABLE IF NOT EXISTS `sqz_quest_img`(`qid` INT UNSIGNED, `imgid` INT UNSIG
 `pos` INT, PRIMARY KEY(`qid`, `imgid`),
 FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`),
 FOREIGN KEY(`imgid`) REFERENCES `sqz_img_path`(`id`));
+
+CREATE TABLE IF NOT EXISTS `sqz_admin`(`id` TINYINT PRIMARY KEY,
+`name` VARCHAR(32), `pw` CHAR(8));
+
+CREATE TABLE IF NOT EXISTS `sqz_board_log`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`dt` DATE, `aid` TINYINT, `t1` TIME, `t2` TIME,
+FOREIGN KEY(`dt`) REFERENCES `sqz_board`(`dt`),
+FOREIGN KEY(`aid`) REFERENCES `sqz_admin`(`id`));
+
+CREATE TABLE IF NOT EXISTS `sqz_ad_mod`(`aid` TINYINT,
+`mid` TINYINT, `n` TINYINT UNSIGNED,
+FOREIGN KEY(`aid`) REFERENCES `sqz_admin`(`id`),
+FOREIGN KEY(`mid`) REFERENCES `sqz_module`(`id`));
