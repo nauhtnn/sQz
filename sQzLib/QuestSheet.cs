@@ -360,7 +360,7 @@ namespace sQzLib
 
         public void DBAppendInsQry(DateTime dt, ref StringBuilder vals)
         {
-            vals.Append("('" + dt.ToString(DtFmt._) + "','" + eLv.ToString() + "'," + uId + ",'");
+            vals.Append("('" + dt.ToString(DT._) + "','" + eLv.ToString() + "'," + uId + ",'");
             foreach(Question q in vQuest)
                 vals.Append(((int)q.mIU).ToString() + '_' + q.uId + '-');
             vals.Remove(vals.Length - 1, 1);//remove the last '-'
@@ -373,7 +373,7 @@ namespace sQzLib
             if (conn == null)
                 return true;
             StringBuilder cond = new StringBuilder();
-            cond.Append("dt='" + dt.ToString(DtFmt._) + "'");
+            cond.Append("dt='" + dt.ToString(DT._) + "'");
             cond.Append(" AND lv=" + lv.ToString("d"));
             cond.Append(" AND id=" + id);
             string qry = DBConnect.mkQrySelect("qs", "vquest", cond.ToString());
@@ -447,7 +447,7 @@ namespace sQzLib
             if (conn == null)
                 return true;
             int uid = DBConnect.MaxInt(conn, "qs", "id",
-                    "dt='" + dt.ToString(DtFmt._) + "' AND lv='" + ExamLv.A.ToString() + "'");
+                    "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.A.ToString() + "'");
             if (uid < 0)
             {
                 DBConnect.Close(ref conn);
@@ -456,7 +456,7 @@ namespace sQzLib
             guDBCurAId = uid;
 
             uid = DBConnect.MaxInt(conn, "qs", "id",
-                    "dt='" + dt.ToString(DtFmt._) + "' AND lv='" + ExamLv.B.ToString() + "'");
+                    "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.B.ToString() + "'");
             if (uid < 0)
             {
                 DBConnect.Close(ref conn);

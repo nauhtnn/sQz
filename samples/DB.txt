@@ -6,43 +6,42 @@ PRIMARY KEY(`dt`, `t`), FOREIGN KEY(`dt`) REFERENCES `sqz_board`(`dt`));
 CREATE TABLE IF NOT EXISTS `sqz_room`(`id` TINYINT PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_slot_room`(`dt` DATE, `t` TIME, `rid` TINYINT,
-`pw` CHAR(8), PRIMARY KEY(`dt`, `t`, `rid`),
+`pw` CHAR(8) CHARACTER SET `ascii`, PRIMARY KEY(`dt`, `t`, `rid`),
 FOREIGN KEY(`dt`, `t`) REFERENCES `sqz_slot`(`dt`, `t`),
 FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
 
-CREATE TABLE IF NOT EXISTS `sqz_level`(`id` CHAR PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS `sqz_level`(`id` CHAR CHARACTER SET `ascii` PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATE, `id` SMALLINT UNSIGNED,
-`t` TIME, `lv` CHAR, PRIMARY KEY(`dt`,`id`),
+`t` TIME, `lv` CHAR CHARACTER SET `ascii`, PRIMARY KEY(`dt`,`id`),
 FOREIGN KEY(`dt`, `t`) REFERENCES `sqz_slot`(`dt`, `t`),
 FOREIGN KEY(`lv`) REFERENCES `sqz_level`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_examinee`(`dt` DATE, `id` SMALLINT UNSIGNED,
 `t` TIME, `rid` TINYINT, `name` VARCHAR(64) CHARACTER SET `utf8`,
 `birdate` DATE, `birthplace` VARCHAR(96) CHARACTER SET `utf8`,
-`lv` CHAR(1) CHARACTER SET `utf8`,
-PRIMARY KEY(`dt`, `id`), FOREIGN KEY(`dt`, `t`) REFERENCES `sqz_slot_room`(`dt`, `t`),
-FOREIGN KEY(`rid`) REFERENCES `sqz_slot_room`(`rid`),
+`lv` CHAR CHARACTER SET `ascii`,
+PRIMARY KEY(`dt`, `id`), FOREIGN KEY(`dt`, `t`, `rid`) REFERENCES `sqz_slot_room`(`dt`, `t`, `rid`),
 FOREIGN KEY(`lv`) REFERENCES `sqz_level`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATE, `neeid` SMALLINT UNSIGNED,
 `qsid` SMALLINT UNSIGNED, `t1` TIME, `t2` TIME,
-`grade` TINYINT, `comp` VARCHAR(32),
-`ans` CHAR(120) CHARACTER SET `utf8`, PRIMARY KEY(`dt`, `neeid`, `qsid`),
+`grade` TINYINT, `comp` VARCHAR(32) CHARACTER SET `utf8`,
+`ans` CHAR(120) CHARACTER SET `ascii`, PRIMARY KEY(`dt`, `neeid`, `qsid`),
 FOREIGN KEY(`dt`, `neeid`) REFERENCES `sqz_examinee`(`dt`, `id`),
 FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_module`(`id` TINYINT PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_long_q_path`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`path` VARCHAR(256));
+`path` VARCHAR(256) CHARACTER SET `utf8`);
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `mid` TINYINT, `del` TINYINT, `diff` TINYINT,
 `lqid` INT UNSIGNED, `stmt` VARCHAR(512) CHARACTER SET `utf8`,
 `ans0` VARCHAR(512) CHARACTER SET `utf8`, `ans1` VARCHAR(512) CHARACTER SET `utf8`,
 `ans2` VARCHAR(512) CHARACTER SET `utf8`, `ans3` VARCHAR(512) CHARACTER SET `utf8`,
-`key` CHAR(4), FOREIGN KEY(`mid`) REFERENCES `sqz_module`(`id`),
+`key` CHAR(4) CHARACTER SET `ascii`, FOREIGN KEY(`mid`) REFERENCES `sqz_module`(`id`),
 FOREIGN KEY(`lqid`) REFERENCES `sqz_long_q_path`(`id`),
 INDEX(`mid`));
 
@@ -53,7 +52,7 @@ FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`),
 FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_img_path`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`path` VARCHAR(256));
+`path` VARCHAR(256) CHARACTER SET `utf8`);
 
 CREATE TABLE IF NOT EXISTS `sqz_quest_img`(`qid` INT UNSIGNED, `imgid` INT UNSIGNED,
 `pos` INT, PRIMARY KEY(`qid`, `imgid`),
@@ -61,7 +60,7 @@ FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`),
 FOREIGN KEY(`imgid`) REFERENCES `sqz_img_path`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_admin`(`id` TINYINT PRIMARY KEY,
-`name` VARCHAR(32), `pw` CHAR(8));
+`name` VARCHAR(32) CHARACTER SET `utf8`, `pw` CHAR(8) CHARACTER SET `ascii`);
 
 CREATE TABLE IF NOT EXISTS `sqz_board_log`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `dt` DATE, `aid` TINYINT, `t1` TIME, `t2` TIME,

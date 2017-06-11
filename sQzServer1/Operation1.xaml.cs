@@ -150,7 +150,7 @@ namespace sQzServer1
                 case NetCode.Dating:
                     outMsg = new byte[ExamBoard.BYTE_COUNT_DT];
                     offs = 0;
-                    ExamBoard.ToByteDt(outMsg, ref offs, mBrd.mDt);
+                    DT.ReadByte(outMsg, ref offs, out mBrd.mDt);
                     return true;
                 case NetCode.Authenticating:
                     e = new ExamineeS1();
@@ -180,7 +180,7 @@ namespace sQzServer1
                         
                         if (o != null)
                         {
-                            if (o.dtTim1.Hour == DtFmt.INV)
+                            if (o.dtTim1.Hour == DT.INV)
                                 o.dtTim1 = DateTime.Now;
                             Dispatcher.Invoke(() =>
                             {
@@ -420,7 +420,7 @@ namespace sQzServer1
                     //            Dispatcher.Invoke(() =>
                     //            {
                     //                foreach(TabItem ti in tbcSl.Items)
-                    //                    if(ti.Name == "_" + sl.Dt.ToString(DtFmt.hh).Replace(':', '_'))
+                    //                    if(ti.Name == "_" + sl.Dt.ToString(DT.hh).Replace(':', '_'))
                     //                    {
                     //                        Op1SlotView vw = ti.Content as Op1SlotView;
                     //                        if (vw != null)
@@ -529,7 +529,7 @@ namespace sQzServer1
             vfbLock.Add(vw.vbLock);
             TabItem ti = new TabItem();
             ti.Name = "_" + (i.Content as string).Replace(':', '_');
-            ti.Header = sl.Dt.ToString(DtFmt.hh);
+            ti.Header = sl.Dt.ToString(DT.hh);
             ti.Content = vw;
             tbcSl.Items.Add(ti);
             ti.Focus();
@@ -560,7 +560,7 @@ namespace sQzServer1
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DtFmt.hh);
+                it.Content = dt.ToString(DT.hh);
                 it.Selected += lbxSl_Selected;
                 it.Unselected += lbxSl_Unselected;
                 //dark = !dark;

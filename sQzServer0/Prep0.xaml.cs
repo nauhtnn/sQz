@@ -43,7 +43,7 @@ namespace sQzServer0
         private void btnInsBrd_Click(object sender, RoutedEventArgs e)
         {
             DateTime dt;
-            if (DtFmt.ToDt(tbxBrd.Text, DtFmt._, out dt))
+            if (DT.To_(tbxBrd.Text, DT._, out dt))
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.BOARD_NOK]);
@@ -75,7 +75,7 @@ namespace sQzServer0
         {
             DateTime dt;
             string t = tbxSl.Text;
-            if (DtFmt.ToDt(t, DtFmt.h, out dt))
+            if (DT.To_(t, DT.h, out dt))
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_NOK]);
@@ -116,7 +116,7 @@ namespace sQzServer0
             foreach(DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DtFmt.__);
+                it.Content = dt.ToString(DT.__);
                 lbxBrd.Items.Add(it);
             }
         }
@@ -139,7 +139,7 @@ namespace sQzServer0
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DtFmt.hh);
+                it.Content = dt.ToString(DT.hh);
                 it.Selected += lbxSl_Selected;
                 it.Unselected += lbxSl_Unselected;
                 //dark = !dark;
@@ -203,7 +203,7 @@ namespace sQzServer0
                 return;
             }
             DateTime dt;
-            if(!DtFmt.ToDt(i.Content as string, DtFmt._, out dt))
+            if(!DT.To_(i.Content as string, DT._, out dt))
             {
                 mBrd.mDt = dt;
                 lbxSl.IsEnabled = true;
@@ -339,7 +339,7 @@ namespace sQzServer0
             PrepNeeView pnv = new PrepNeeView();
             pnv.mSlDB = new ExamSlot();
             DateTime dt;
-            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out dt);
+            DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
             pnv.mSlDB.Dt = dt;
             pnv.mSlDB.DBSelNee();
             pnv.mSlFile = new ExamSlot();
@@ -348,7 +348,7 @@ namespace sQzServer0
             pnv.Show(true);
             TabItem ti = new TabItem();
             ti.Name = "_" + (i.Content as string).Replace(':', '_');
-            ti.Header = pnv.mSlDB.Dt.ToString(DtFmt.hh);
+            ti.Header = pnv.mSlDB.Dt.ToString(DT.hh);
             ti.Content = pnv;
             tbcNee.Items.Add(ti);
             ti.Focus();

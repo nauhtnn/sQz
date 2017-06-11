@@ -21,7 +21,7 @@ namespace sQzLib
 
         public int DBIns(out string eMsg)
         {
-            string v = "('" + mDt.ToString(DtFmt._) + "')";
+            string v = "('" + mDt.ToString(DT._) + "')";
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
@@ -67,7 +67,7 @@ namespace sQzLib
                 return null;
             }
             string qry = DBConnect.mkQrySelect("sqz_slot", "t",
-                "dt='" + mDt.ToString(DtFmt._) + "'");
+                "dt='" + mDt.ToString(DT._) + "'");
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
@@ -80,8 +80,8 @@ namespace sQzLib
                 ExamSlot sl = new ExamSlot();
                 string s = reader.GetString(0);
                 DateTime dt;
-                DtFmt.ToDt(mDt.ToString(DtFmt._) + ' ' +
-                    s, DtFmt.HS, out dt);
+                DT.To_(mDt.ToString(DT._) + ' ' +
+                    s, DT.HS, out dt);
                 sl.Dt = dt;
                 sl.bOpen = true;
                 r.Add(sl.Dt);
@@ -99,8 +99,8 @@ namespace sQzLib
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return 0;
             }
-            string v = "('" + mDt.ToString(DtFmt._) + "','"
-                + t.ToString(DtFmt.h) + "')";
+            string v = "('" + mDt.ToString(DT._) + "','"
+                + t.ToString(DT.h) + "')";
             int n = DBConnect.Ins(conn, "sqz_slot", "dt,t", v, out eMsg);
             DBConnect.Close(ref conn);
             if (n == -1062)
@@ -130,7 +130,7 @@ namespace sQzLib
         {
             if (buf.Length - offs < BYTE_COUNT_DT)
             {
-                dt = DtFmt.INV_;
+                dt = DT.INV_;
                 return true;
             }
             int y = BitConverter.ToInt32(buf, offs);
@@ -139,7 +139,7 @@ namespace sQzLib
             offs += 4;
             int d = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            if (DtFmt.ToDt(y.ToString("d4") + '-' + M.ToString("d2") + '-' + d.ToString("d2"), DtFmt._, out dt))
+            if (DT.To_(y.ToString("d4") + '-' + M.ToString("d2") + '-' + d.ToString("d2"), DT._, out dt))
                 return true;
             return false;
         }
@@ -192,7 +192,7 @@ namespace sQzLib
                 if (ExamSlot.ReadByteDt(buf, ref offs, out dt))
                     return true;
                 ExamSlot sl;
-                if(vSl.TryGetValue(dt.ToString(DtFmt.hh), out sl))
+                if(vSl.TryGetValue(dt.ToString(DT.hh), out sl))
                 {
                     if (sl.ReadByteR1(buf, ref offs))
                         return true;
@@ -203,7 +203,7 @@ namespace sQzLib
                     sl.Dt = dt;
                     if (sl.ReadByteR1(buf, ref offs))
                         return true;
-                    vSl.Add(sl.Dt.ToString(DtFmt.hh), sl);
+                    vSl.Add(sl.Dt.ToString(DT.hh), sl);
                 }
             }
             if (offs == buf.Length)
@@ -256,7 +256,7 @@ namespace sQzLib
                 if (ExamSlot.ReadByteDt(buf, ref offs, out dt))
                     return true;
                 ExamSlot sl;
-                if(!vSl.TryGetValue(dt.ToString(DtFmt.hh), out sl) ||
+                if(!vSl.TryGetValue(dt.ToString(DT.hh), out sl) ||
                     sl.ReadByteQPack(buf, ref offs))
                     return true;
             }
@@ -301,7 +301,7 @@ namespace sQzLib
                 if (ExamSlot.ReadByteDt(buf, ref offs, out dt))
                     return true;
                 ExamSlot sl;
-                if (!vSl.TryGetValue(dt.ToString(DtFmt.hh), out sl) ||
+                if (!vSl.TryGetValue(dt.ToString(DT.hh), out sl) ||
                     sl.ReadByteKey(buf, ref offs))
                     return true;
             }

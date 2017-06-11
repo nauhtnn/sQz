@@ -58,11 +58,11 @@ namespace sQzLib
             tBirdate = null;
             tBirthplace = null;
             tName = null;
-            mDt = DtFmt.INV_H;
+            mDt = DT.INV_H;
             uId = ushort.MaxValue;
             eStt = ExamStt.Signing;
             uGrade = ushort.MaxValue;
-            dtTim1 = dtTim2 = DtFmt.INV_;
+            dtTim1 = dtTim2 = DT.INV_;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
             kDtDuration = new TimeSpan(0, 30, 0);
@@ -207,10 +207,10 @@ namespace sQzLib
             {
                 h = r.ReadInt32();
                 m = r.ReadInt32();
-                DtFmt.ToDt(h.ToString() + ':' + m, DtFmt.h, out dtTim1);
+                DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim1);
                 h = r.ReadInt32();
                 m = r.ReadInt32();
-                DtFmt.ToDt(h.ToString() + ':' + m, DtFmt.h, out dtTim2);
+                DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim2);
             }
             else
             {

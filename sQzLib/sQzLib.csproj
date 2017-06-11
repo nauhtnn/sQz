@@ -50,7 +50,7 @@
     <Compile Include="AnsSheet.cs" />
     <Compile Include="Client2.cs" />
     <Compile Include="DBConnect.cs" />
-    <Compile Include="DtFmt.cs" />
+    <Compile Include="Dt.cs" />
     <Compile Include="ExamBoard.cs" />
     <Compile Include="ExamineeA.cs" />
     <Compile Include="ExamineeC.cs" />

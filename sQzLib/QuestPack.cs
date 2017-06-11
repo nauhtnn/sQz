@@ -16,7 +16,7 @@ namespace sQzLib
         int mMaxQSIdx;
         public QuestPack()
         {
-            mDt = DtFmt.INV_;
+            mDt = DT.INV_;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
             vSheet = new Dictionary<int, QuestSheet>();
@@ -97,7 +97,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return null;
-            string qry = DBConnect.mkQrySelect("qs", "lv,id", "dt=" + dt.ToString(DtFmt._));
+            string qry = DBConnect.mkQrySelect("qs", "lv,id", "dt=" + dt.ToString(DT._));
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             List<int> r = new List<int>();

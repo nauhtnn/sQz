@@ -90,7 +90,7 @@ namespace sQzServer0
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     vDt1.Add(e.mLv + e.uId, t);
-                    if (e.dtTim1.Year != DtFmt.INV)
+                    if (e.dtTim1.Year != DT.INV)
                         t.Text = e.dtTim1.ToString("HH:mm");
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 5);
@@ -99,7 +99,7 @@ namespace sQzServer0
                     if (dark)
                         t.Background = new SolidColorBrush(c);
                     vDt2.Add(e.mLv + e.uId, t);
-                    if (e.dtTim2.Year != DtFmt.INV)
+                    if (e.dtTim2.Year != DT.INV)
                         t.Text = e.dtTim2.ToString("HH:mm");
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 6);
@@ -125,9 +125,9 @@ namespace sQzServer0
                 {
                     if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.mLv + e.uId, out t))
                         t.Text = e.uGrade.ToString();
-                    if (e.dtTim1.Hour != DtFmt.INV && vDt1.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.mLv + e.uId, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");
-                    if (e.dtTim2.Hour != DtFmt.INV && vDt2.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.mLv + e.uId, out t))
                         t.Text = e.dtTim2.ToString("HH:mm");
                     if (e.tComp != null && vComp.TryGetValue(e.mLv + e.uId, out t))
                         t.Text = e.tComp;

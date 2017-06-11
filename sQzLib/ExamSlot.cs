@@ -6,11 +6,6 @@ using System.Windows.Media;
 using System.Windows;
 using System.Text;
 
-/*
-CREATE TABLE IF NOT EXISTS `slot` (`dt` DATE, `t` TIME, `open` TINYINT DEFAULT 0,
-PRIMARY KEY(`dt`, `t`), FOREIGN KEY(`dt`) REFERENCES `board`(`dt`));
-*/
-
 namespace sQzLib
 {
     public class ExamSlot
@@ -27,7 +22,7 @@ namespace sQzLib
 
         public ExamSlot()
         {
-            mDt = DtFmt.INV_;
+            mDt = DT.INV_;
 
             vRoom = new Dictionary<int, ExamRoom>();
             string emsg;
@@ -83,14 +78,14 @@ namespace sQzLib
         {
             if (buf.Length - offs < BYTE_COUNT_DT)
             {
-                dt = DtFmt.INV_;
+                dt = DT.INV_;
                 return true;
             }
             int H = BitConverter.ToInt32(buf, offs);
             offs += 4;
             int m = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            if (DtFmt.ToDt(H.ToString("d2") + ':' + m.ToString("d2"), DtFmt.hh, out dt))
+            if (DT.To_(H.ToString("d2") + ':' + m.ToString("d2"), DT.hh, out dt))
                 return true;
             return false;
         }
@@ -172,7 +167,7 @@ namespace sQzLib
                     e.mDt = mDt;
                     e.tName = v[2].Trim();
                     DateTime dt;
-                    if(!DtFmt.ToDt(v[3], DtFmt._, out dt))
+                    if(!DT.To_(v[3], DT._, out dt))
                     {
                         eline.Append(i.ToString() + ", ");
                         continue;
@@ -208,12 +203,38 @@ namespace sQzLib
 
         public int DBInsNee(out string eMsg)
         {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return -1;
+            }
             int v = 1;
             StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
             {
-                int n = r.DBIns(out eMsg);
+                string qry = DBConnect.mkQrySelect("sqz_slot_room",
+                    "dt = " + mDt.ToString(DT._) + " AND t = " + mDt.ToString(DT.h) +
+                    " AND rid = " + r.uId, null);
+                MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+                if(reader == null)
+                {
+                    DBConnect.Close(ref conn);
+                    return 0;
+                }
+                int n = 0;
+                if(!reader.Read())
+                    n = DBConnect.Ins(conn, "sqz_slot_room",
+                        "dt,t,rid", "(" + mDt.ToString(DT._) + "," + mDt.ToString(DT.h) +
+                        "," + r.uId + ")", out eMsg);
+                reader.Close();
                 if(n < 0)
+                {
+                    DBConnect.Close(ref conn);
+                    return n;
+                }
+                n = r.DBIns(conn, out eMsg);
+                if (n < 0)
                 {
                     string[] p = new string[2];
                     p[0] = r.uId.ToString();
@@ -226,6 +247,7 @@ namespace sQzLib
                 }
             }
             eMsg = sb.ToString();
+            DBConnect.Close(ref conn);
             return v;
         }
 
@@ -245,8 +267,8 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
             {
                 int n = DBConnect.Count(conn, "sqz_examinee",
-                    "dt", "dt='" + mDt.ToString(DtFmt._) +
-                    "' AND t='" + mDt.ToString(DtFmt.hh) +
+                    "dt", "dt='" + mDt.ToString(DT._) +
+                    "' AND t='" + mDt.ToString(DT.hh) +
                     "' AND grd IS NOT NULL AND rid=" + r.uId);
                 sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DEL], r.uId);
                 if (0 < n)
@@ -256,7 +278,7 @@ namespace sQzLib
                 else
                 {
                     n = DBConnect.Delete(conn, "sqz_examinee",
-                        "dt='" + mDt.ToString(DtFmt._) + "' AND t='" + mDt.ToString(DtFmt.hh) +
+                        "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) +
                         "' AND rid=" + r.uId);
                     if (n < 0)
                         sb.Append(Txt.s._[(int)TxI.ROOM_DEL_ECPT] + '\n');
@@ -278,7 +300,7 @@ namespace sQzLib
                 r.vExaminee.Clear();
                 string qry = DBConnect.mkQrySelect("sqz_examinee",
                     "dt,t,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
-                    "dt='" + mDt.ToString(DtFmt._) + "' AND t='" + mDt.ToString(DtFmt.hh) + "'");
+                    "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
                 string emsg;
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
                 if (reader != null)
@@ -288,18 +310,18 @@ namespace sQzLib
                         ExamineeS0 e = new ExamineeS0();
                         DateTime dt = reader.GetDateTime(0);
                         string t = reader.GetString(1);
-                        DtFmt.ToDt(dt.ToString(DtFmt.__) + ' ' + t, DtFmt.HS, out e.mDt);
+                        DT.To_(dt.ToString(DT.__) + ' ' + t, DT.HS, out e.mDt);
                         e.uId = (int) reader.GetUInt32(2);//todo no coerce
                         if (e.uId < (int)ExamLv.B)
                             e.eLv = ExamLv.A;
                         else
                             e.eLv = ExamLv.B;
                         e.tName = reader.GetString(3);
-                        e.tBirdate = reader.GetDateTime(4).ToString(DtFmt.RR);
+                        e.tBirdate = reader.GetDateTime(4).ToString(DT.RR);
                         e.tBirthplace = reader.GetString(5);
-                        e.dtTim1 = (reader.IsDBNull(6)) ? DtFmt.INV_ :
+                        e.dtTim1 = (reader.IsDBNull(6)) ? DT.INV_ :
                             DateTime.Parse(reader.GetString(6));
-                        e.dtTim2 = (reader.IsDBNull(7)) ? DtFmt.INV_ :
+                        e.dtTim2 = (reader.IsDBNull(7)) ? DT.INV_ :
                             DateTime.Parse(reader.GetString(7));
                         if (!reader.IsDBNull(8))
                         {

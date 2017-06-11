@@ -204,7 +204,7 @@ namespace sQzLib
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim1))
             {
-                dtTim1 = DtFmt.INV_;
+                dtTim1 = DT.INV_;
                 return true;
             }
 
@@ -218,7 +218,7 @@ namespace sQzLib
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim2))
             {
-                dtTim2 = DtFmt.INV_;
+                dtTim2 = DT.INV_;
                 return true;
             }
 

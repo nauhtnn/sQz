@@ -84,7 +84,7 @@ namespace sQzServer1
                     vLock.Add(lvid, cbx);
                     grdNee.Children.Add(cbx);
                     t = new TextBlock();
-                    if (e.dtTim1.Hour != DtFmt.INV)
+                    if (e.dtTim1.Hour != DT.INV)
                     {
                         t.Text = e.dtTim1.ToString("HH:mm");
                         vbLock.Add(lvid, true);
@@ -99,7 +99,7 @@ namespace sQzServer1
                     Grid.SetColumn(t, 4);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    if (e.dtTim2.Hour != DtFmt.INV)
+                    if (e.dtTim2.Hour != DT.INV)
                         t.Text = e.dtTim2.ToString("HH:mm");
                     vDt2.Add(lvid, t);
                     Grid.SetRow(t, rid);
@@ -126,9 +126,9 @@ namespace sQzServer1
                 {
                     if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.mLv + e.uId, out t))
                         t.Text = e.uGrade.ToString();
-                    if (e.dtTim1.Hour != DtFmt.INV && vDt1.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.mLv + e.uId, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");
-                    if (e.dtTim2.Hour != DtFmt.INV && vDt2.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.mLv + e.uId, out t))
                         t.Text = e.dtTim2.ToString("HH:mm");
                     if (e.tComp != null && vComp.TryGetValue(e.mLv + e.uId, out t))
                         t.Text = e.tComp;

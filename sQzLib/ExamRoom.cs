@@ -43,29 +43,23 @@ namespace sQzLib
             return r;
         }
 
-        public int DBIns(out string eMsg)
+        public int DBIns(MySqlConnection conn, out string eMsg)
         {
             if(vExaminee.Count == 0)
             {
                 eMsg = null;
                 return 0;
             }
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
-                return -1;
-            }
             string attbs = "dt,id,t,rid,name,birdate,birthplace,lv";
             StringBuilder vals = new StringBuilder();
             foreach (ExamineeA e in vExaminee.Values)
             {
-                vals.Append("('" + e.mDt.ToString(DtFmt._) + "',");
+                vals.Append("('" + e.mDt.ToString(DT._) + "',");
                 vals.Append(e.uId + ",");
-                vals.Append("'" + e.mDt.ToString(DtFmt.hh) + "',");
+                vals.Append("'" + e.mDt.ToString(DT.hh) + "',");
                 vals.Append(uId + ",");
                 vals.Append("'" + e.tName + "',");
-                vals.Append("'" + DtFmt.ToDtMysql(e.tBirdate, DtFmt.RR) + "',");
+                vals.Append("'" + DT.ToS(e.tBirdate, DT.RR) + "',");
                 vals.Append("'" + e.tBirthplace + "',");
                 vals.Append("'" + e.eLv + "'),");
             }
@@ -271,7 +265,6 @@ namespace sQzLib
             while (reader.Read())
                 r.Add(reader.GetInt32(0));
             reader.Close();
-            DBConnect.Close(ref conn);
             return r;
         }
     }

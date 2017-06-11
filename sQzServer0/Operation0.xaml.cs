@@ -65,7 +65,7 @@ namespace sQzServer0
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DtFmt.__);
+                it.Content = dt.ToString(DT.__);
                 //dark = !dark;
                 //if (dark)
                 //    it.Background = new SolidColorBrush(c);
@@ -253,7 +253,7 @@ namespace sQzServer0
                 return;
             }
             DateTime dt;
-            if (!DtFmt.ToDt(i.Content as string, DtFmt._, out dt))
+            if (!DT.To_(i.Content as string, DT._, out dt))
             {
                 mBrd.mDt = dt;
                 lbxSl.IsEnabled = true;
@@ -279,7 +279,7 @@ namespace sQzServer0
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DtFmt.hh);
+                it.Content = dt.ToString(DT.hh);
                 it.Selected += lbxSl_Selected;
                 it.Unselected += lbxSl_Unselected;
                 //dark = !dark;
@@ -299,7 +299,7 @@ namespace sQzServer0
 
             ExamSlot sl = new ExamSlot();
             DateTime dt;
-            DtFmt.ToDt(mBrd.mDt.ToString(DtFmt._) + ' ' + i.Content as string, DtFmt.H, out dt);
+            DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
             sl.Dt = dt;
             sl.DBSelNee();
             Op0SlotView vw = new Op0SlotView();
@@ -308,7 +308,7 @@ namespace sQzServer0
             vw.ShowExaminee();
             TabItem ti = new TabItem();
             ti.Name = "_" + (i.Content as string).Replace(':', '_');
-            ti.Header = sl.Dt.ToString(DtFmt.hh);
+            ti.Header = sl.Dt.ToString(DT.hh);
             ti.Content = vw;
             tbcSl.Items.Add(ti);
             ti.Focus();

@@ -33,7 +33,7 @@ namespace sQzClient
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            mDt = DtFmt.INV_;
+            mDt = DT.INV_;
             mNee = new ExamineeC();
 
             mNee.kDtDuration = new TimeSpan(1, 0, 0);
@@ -129,7 +129,7 @@ namespace sQzClient
                     if(!ExamBoard.ReadByteDt(buf, ref offs, out mDt) && bRunning)
                     {
                         Dispatcher.Invoke(() => {
-                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(DtFmt.RR);
+                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(DT.RR);
                             EnableControls();
                             btnReconn.IsEnabled = false;
                         });
