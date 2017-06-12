@@ -214,20 +214,15 @@ namespace sQzLib
                 int n = DBConnect.Count(conn, "sqz_slot_room", "dt",
                     "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) +
                     "' AND rid=" + r.uId, out eMsg);
-                if(n < 0)
+                if (n < 0)
                 {
                     DBConnect.Close(ref conn);
                     return n;
                 }
-                if(!reader.Read())
-                {
-                    reader.Close();
+                else if (n == 0)
                     n = DBConnect.Ins(conn, "sqz_slot_room",
                         "dt,t,rid", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
                         "'," + r.uId + ")", out eMsg);
-                }
-                else
-                    reader.Close();
                 if(n < 0)
                 {
                     DBConnect.Close(ref conn);
@@ -264,28 +259,30 @@ namespace sQzLib
             if (conn == null)
                 return Txt.s._[(int)TxI.DB_NOK];
             StringBuilder sb = new StringBuilder();
-            foreach (ExamRoom r in vRoom.Values)
+            string eMsg;
+            int n = DBConnect.Count(conn, "sqz_nee_qsheet AS a,sqz_examinee AS b",
+                "a.dt", "a.dt='" + mDt.ToString(DT._) +
+                "' AND t='" + mDt.ToString(DT.hh) + "' AND a.dt=b.dt AND a.neeid=b.id",
+                out eMsg);
+            sb.AppendFormat(Txt.s._[(int)TxI.SLOT], mDt.ToString(DT.hh));
+            if (0 < n)
             {
-                int n = DBConnect.Count(conn, "sqz_nee_sheet,sqz_examinee",
-                    "dt", "dt='" + mDt.ToString(DT._) +
-                    "' AND t='" + mDt.ToString(DT.hh) +
-                    "' AND grd IS NOT NULL AND rid=" + r.uId);
-                sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DEL], r.uId);
-                if (0 < n)
-                    sb.Append(Txt.s._[(int)TxI.ROOM_DEL_GRD] + '\n');
-                else if (n < 0)
-                    sb.Append(Txt.s._[(int)TxI.ROOM_DEL_ECPT] + '\n');
-                else
-                {
-                    n = DBConnect.Delete(conn, "sqz_examinee",
-                        "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) +
-                        "' AND rid=" + r.uId);
-                    if (n < 0)
-                        sb.Append(Txt.s._[(int)TxI.ROOM_DEL_ECPT] + '\n');
-                    else
-                        sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DEL_N] + '\n', n.ToString());
-                }
+                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_GRD] + '\n');
+                DBConnect.Close(ref conn);
+                return sb.ToString();
             }
+            else if (n < 0)
+            {
+                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_ECPT] + eMsg);
+                DBConnect.Close(ref conn);
+                return sb.ToString();
+            }
+            n = DBConnect.Delete(conn, "sqz_examinee",
+                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'", out eMsg);
+            if (n < 0)
+                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_ECPT] + eMsg);
+            else
+                sb.AppendFormat(Txt.s._[(int)TxI.SLOT_DEL_N], n.ToString());
             DBConnect.Close(ref conn);
             return sb.ToString();
         }
@@ -298,11 +295,10 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
             {
                 r.vExaminee.Clear();
-                string qry = DBConnect.mkQrySelect("sqz_slot_room,sqz_examinee",
-                    "id,name,birdate,birthplace,lv",
-                    "sqz_slot_room.dt='" + mDt.ToString(DT._) + "' AND sqz_slot_room.t='" + mDt.ToString(DT.hh) +
-                    "' AND sqz_slot_room.rid=" + r.uId + " AND sqz_slot_room.dt=sqz_examinee.dt" +
-                    " AND sqz_slot_room.t=sqz_examinee.t AND sqz_slot_room.rid=sqz_examinee.rid");
+                string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
+                    "id,name,birdate,birthplace,lv", "a.rid=" + r.uId +
+                    " AND a.dt='" + mDt.ToString(DT._) + "' AND a.t='" + mDt.ToString(DT.hh) +
+                    "' AND a.dt=b.dt AND a.t=b.t AND a.rid=b.rid");
                 string emsg;
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
                 if (reader != null)

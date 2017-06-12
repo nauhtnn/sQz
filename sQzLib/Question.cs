@@ -358,7 +358,8 @@ namespace sQzLib
             if (conn == null)
                 return;
             string tbl = "q" + (int)eIU;
-            DBConnect.Delete(conn, tbl, "id=" + id.ToString());
+            string eMsg;
+            DBConnect.Delete(conn, tbl, "id=" + id.ToString(), out eMsg);
         }
     }
 }

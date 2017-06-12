@@ -149,15 +149,21 @@ namespace sQzLib
         }
 
         //Delete statement
-        public static int Delete(MySqlConnection conn, string tb, string cond)
+        public static int Delete(MySqlConnection conn, string tb, string cond, out string eMsg)
         {
             string query = "DELETE FROM " + tb;
             if(cond != null)
                 query += " WHERE " + cond;
             MySqlCommand cmd = new MySqlCommand(query, conn);
             int n;
-            try { n = cmd.ExecuteNonQuery(); }
-            catch (MySqlException) { n = -1; }
+            try {
+                n = cmd.ExecuteNonQuery();
+                eMsg = null;
+            }
+            catch (MySqlException e) {
+                n = -1;
+                eMsg = e.ToString();
+            }
             return n;
         }
 
@@ -176,8 +182,13 @@ namespace sQzLib
             int n;
             MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn);
             try {
-                n = (int)cmd.ExecuteScalar();
-                eMsg = null;
+                if (int.TryParse(cmd.ExecuteScalar().ToString(), out n))
+                    eMsg = null;
+                else
+                {
+                    n = -1;
+                    eMsg = Txt.s._[(int)TxI.SLOT_COUNT_NOK];
+                }
             }
             catch (MySqlException e) {
                 eMsg = e.ToString();
