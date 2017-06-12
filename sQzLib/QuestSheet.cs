@@ -19,6 +19,7 @@ namespace sQzLib
         public static int guDBCurAId;
         public static int guDBCurBId;
         public int uId;
+        public int mDiff;
         public List<Question> vQuest;
         public byte[] aQuest;
 
@@ -30,6 +31,7 @@ namespace sQzLib
             vQuest = new List<Question>();
             aQuest = null;
             uId = 0;
+            mDiff = 0;
         }
 
         static IUx[] gaA = null;
@@ -229,8 +231,8 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string tbl = "q" + (int)eIU;
-            string qry = DBConnect.mkQrySelect(tbl, null, null);
+            string qry = DBConnect.mkQrySelect("sqz_question",
+                "id,stmt,ans0,ans1,ans2,ans3,`key`", "mid=" + (int)eIU + " AND del=0");
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             if (reader != null)
@@ -239,13 +241,12 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    string[] s = reader.GetString(1).Split('\n');
-                    q.mStmt = s[0];
+                    q.mStmt = reader.GetString(1);
                     q.nAns = 4;
                     q.vAns = new string[4];
                     for (int i = 0; i < 4; ++i)
-                        q.vAns[i] = s[i + 1];
-                    string x = reader.GetString(2);
+                        q.vAns[i] = reader.GetString(2 + i);
+                    string x = reader.GetString(6);
                     q.vKeys = new bool[4];
                     for (int i = 0; i < 4; ++i)
                         q.vKeys[i] = (x[i] == '1');
@@ -254,6 +255,8 @@ namespace sQzLib
                 }
                 reader.Close();
             }
+            else
+                WPopup.s.ShowDialog(emsg);
             DBConnect.Close(ref conn);
         }
 
@@ -340,10 +343,10 @@ namespace sQzLib
             StringBuilder vals = new StringBuilder();
             foreach (Question q in vQuest)
             {
-                vals.Append("('" + q.mStmt.Replace("'", "\\'") + '\n');
+                vals.Append("(" + (int)eIU + ",0," + mDiff + ",'");
+                vals.Append(q.mStmt.Replace("'", "\\'") + "','");
                 for (int i = 0; i < q.nAns; ++i)
-                    vals.Append(q.vAns[i].Replace("'", "\\'") + '\n');
-                vals.Append("','");
+                    vals.Append(q.vAns[i].Replace("'", "\\'") + "','");
                 for (int i = 0; i < q.nAns; ++i)
                     if (q.vKeys[i])
                         vals.Append('1');
@@ -352,9 +355,9 @@ namespace sQzLib
                 vals.Append("'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            string tbl = "q" + (int)eIU;
-            string emsg;
-            DBConnect.Ins(conn, tbl, "body,ansKeys", vals.ToString(), out emsg);
+            string eMsg;
+            DBConnect.Ins(conn, "sqz_question", "mid,del,diff,stmt,ans0,ans1,ans2,ans3,`key`",
+                vals.ToString(), out eMsg);
             DBConnect.Close(ref conn);
         }
 
