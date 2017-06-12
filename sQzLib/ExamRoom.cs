@@ -66,7 +66,6 @@ namespace sQzLib
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             int n = DBConnect.Ins(conn, "sqz_examinee",
                 attbs, vals.ToString(), out eMsg);
-            DBConnect.Close(ref conn);
             return n;
         }
 

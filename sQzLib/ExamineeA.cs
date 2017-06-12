@@ -6,8 +6,8 @@ namespace sQzLib
 {
     public enum ExamLv
     {
-        A = 0,
-        B = 10000
+        A = 'A',
+        B = 'B'
     }
 
     public enum ExamStt

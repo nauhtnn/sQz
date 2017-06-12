@@ -181,6 +181,8 @@ namespace sQzLib
                     }
                     o.vRoom[urid].vExaminee.Add(e.uId, e);
                 }
+                else
+                    eline.Append(i.ToString() + ", ");
             }
             StringBuilder r = new StringBuilder();
             if(0 < dup.Length)
@@ -213,9 +215,9 @@ namespace sQzLib
             StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
             {
-                string qry = DBConnect.mkQrySelect("sqz_slot_room",
-                    "dt = " + mDt.ToString(DT._) + " AND t = " + mDt.ToString(DT.h) +
-                    " AND rid = " + r.uId, null);
+                string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid",
+                    "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) +
+                    "' AND rid=" + r.uId);
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
                 if(reader == null)
                 {
@@ -224,10 +226,14 @@ namespace sQzLib
                 }
                 int n = 0;
                 if(!reader.Read())
+                {
+                    reader.Close();
                     n = DBConnect.Ins(conn, "sqz_slot_room",
-                        "dt,t,rid", "(" + mDt.ToString(DT._) + "," + mDt.ToString(DT.h) +
-                        "," + r.uId + ")", out eMsg);
-                reader.Close();
+                        "dt,t,rid", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
+                        "'," + r.uId + ")", out eMsg);
+                }
+                else
+                    reader.Close();
                 if(n < 0)
                 {
                     DBConnect.Close(ref conn);
@@ -298,9 +304,11 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
             {
                 r.vExaminee.Clear();
-                string qry = DBConnect.mkQrySelect("sqz_examinee",
-                    "dt,t,id,name,birdate,birthplace,t1,t2,grd,comp,qId,anssh",
-                    "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
+                string qry = DBConnect.mkQrySelect("sqz_slot_room,sqz_examinee",
+                    "id,name,birdate,birthplace,lv",
+                    "sqz_slot_room.dt='" + mDt.ToString(DT._) + "' AND sqz_slot_room.t='" + mDt.ToString(DT.hh) +
+                    "' AND sqz_slot_room.rid=" + r.uId + " AND sqz_slot_room.dt=sqz_examinee.dt" +
+                    " AND sqz_slot_room.t=sqz_examinee.t AND sqz_slot_room.rid=sqz_examinee.rid");
                 string emsg;
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
                 if (reader != null)
@@ -308,33 +316,13 @@ namespace sQzLib
                     while (reader.Read())
                     {
                         ExamineeS0 e = new ExamineeS0();
-                        DateTime dt = reader.GetDateTime(0);
-                        string t = reader.GetString(1);
-                        DT.To_(dt.ToString(DT.__) + ' ' + t, DT.HS, out e.mDt);
-                        e.uId = (int) reader.GetUInt32(2);//todo no coerce
-                        if (e.uId < (int)ExamLv.B)
-                            e.eLv = ExamLv.A;
-                        else
-                            e.eLv = ExamLv.B;
-                        e.tName = reader.GetString(3);
-                        e.tBirdate = reader.GetDateTime(4).ToString(DT.RR);
-                        e.tBirthplace = reader.GetString(5);
-                        e.dtTim1 = (reader.IsDBNull(6)) ? DT.INV_ :
-                            DateTime.Parse(reader.GetString(6));
-                        e.dtTim2 = (reader.IsDBNull(7)) ? DT.INV_ :
-                            DateTime.Parse(reader.GetString(7));
-                        if (!reader.IsDBNull(8))
-                        {
-                            e.eStt = ExamStt.Finished;
-                            e.uGrade = reader.GetInt32(8);
-                        }
-                        else
-                            e.eStt = ExamStt.Info;
-                        if (!reader.IsDBNull(9))
-                            e.tComp = reader.GetString(9);
-                        else
-                            e.tComp = "unknown";//todo
-                        r.vExaminee.Add(e.uId, e);
+                        e.mDt = Dt;
+                        e.uId = reader.GetUInt16(0);
+                        e.tName = reader.GetString(1);
+                        e.tBirdate = reader.GetDateTime(2).ToString(DT.RR);
+                        e.tBirthplace = reader.GetString(3);
+                        if (Enum.TryParse(reader.GetString(4), out e.eLv))
+                            r.vExaminee.Add(e.uId, e);
                     }
                     reader.Close();
                 }
