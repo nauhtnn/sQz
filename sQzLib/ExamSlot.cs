@@ -143,10 +143,7 @@ namespace sQzLib
                         continue;
                     }
                     v[0] = v[0].ToUpper();
-                    ExamLv x;
-                    if(Enum.TryParse(v[0].Substring(0, 1), out x))
-                        e.eLv = x;
-                    else
+                    if(!Enum.TryParse(v[0].Substring(0, 1), out e.eLv))
                     {
                         eline.Append(i.ToString() + ", ");
                         continue;
@@ -158,10 +155,9 @@ namespace sQzLib
                         eline.Append(i.ToString() + ", ");
                         continue;
                     }
-                    e.uId = e.uId + (int)e.eLv;
                     if(vRoom[urid].vExaminee.ContainsKey(e.uId) || o.vRoom[urid].vExaminee.ContainsKey(e.uId))
                     {
-                        dup.Append(e.eLv.ToString() + (e.uId - (int)e.eLv) + ", ");
+                        dup.Append(e.eLv.ToString() + e.uId + ", ");
                         continue;
                     }
                     e.mDt = mDt;
@@ -215,16 +211,14 @@ namespace sQzLib
             StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
             {
-                string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid",
+                int n = DBConnect.Count(conn, "sqz_slot_room", "dt",
                     "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) +
-                    "' AND rid=" + r.uId);
-                MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-                if(reader == null)
+                    "' AND rid=" + r.uId, out eMsg);
+                if(n < 0)
                 {
                     DBConnect.Close(ref conn);
-                    return 0;
+                    return n;
                 }
-                int n = 0;
                 if(!reader.Read())
                 {
                     reader.Close();
@@ -272,7 +266,7 @@ namespace sQzLib
             StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
             {
-                int n = DBConnect.Count(conn, "sqz_examinee",
+                int n = DBConnect.Count(conn, "sqz_nee_sheet,sqz_examinee",
                     "dt", "dt='" + mDt.ToString(DT._) +
                     "' AND t='" + mDt.ToString(DT.hh) +
                     "' AND grd IS NOT NULL AND rid=" + r.uId);

@@ -161,7 +161,8 @@ namespace sQzLib
             return n;
         }
 
-        public static int Count(MySqlConnection conn, string tb, string attbs, string cond)
+        public static int Count(MySqlConnection conn, string tb, string attbs,
+            string cond, out string eMsg)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("SELECT COUNT(");
@@ -174,8 +175,14 @@ namespace sQzLib
 
             int n;
             MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn);
-            try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
-            catch (MySqlException) { n = -1; }
+            try {
+                n = (int)cmd.ExecuteScalar();
+                eMsg = null;
+            }
+            catch (MySqlException e) {
+                eMsg = e.ToString();
+                n = -1;
+            }
 
             return n;
         }
