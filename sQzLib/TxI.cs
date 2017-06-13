@@ -105,5 +105,6 @@ namespace sQzLib {
 		RECV_DAT_ER,
 		RECV_QS_ER,
 		RECV_KEY_ER,
+		QS_ID_EXISTS,
 	}
 }

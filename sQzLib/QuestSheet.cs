@@ -443,7 +443,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return true;
-            int uid = DBConnect.MaxInt(conn, "qs", "id",
+            int uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
                     "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.A.ToString() + "'");
             if (uid < 0)
             {
@@ -452,7 +452,7 @@ namespace sQzLib
             }
             guDBCurAId = uid;
 
-            uid = DBConnect.MaxInt(conn, "qs", "id",
+            uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
                     "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.B.ToString() + "'");
             if (uid < 0)
             {

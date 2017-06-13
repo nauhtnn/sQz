@@ -160,6 +160,8 @@ namespace sQzLib
             if(DBConnect.Ins(conn, "sqz_qsheet", "dt,id,t,lv", vals.ToString(), out eMsg) < 0)
             {
                 DBConnect.Close(ref conn);
+                if (eMsg == null)
+                    eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.QS_ID_EXISTS];
                 return eMsg;
             }
             vals.Clear();

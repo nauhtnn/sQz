@@ -216,35 +216,16 @@ namespace sQzLib
         public static int MaxInt(MySqlConnection conn, string tb, string attb, string cond)
         {
             string query = "SELECT MAX(" + attb + ") FROM " + tb + " WHERE " + cond;
-            int x;
-
+            int n;
             MySqlCommand cmd = new MySqlCommand(query, conn);
             try {
-                var o = cmd.ExecuteScalar();
-                if (o == null)
-                    x = 0;
-                else if (o.ToString().Length == 0)
-                    x = 0;
-                else if (!int.TryParse(o.ToString(), out x))
-                    x = -1;
+                if (int.TryParse(cmd.ExecuteScalar().ToString(), out n))
+                    n = -1;
             }
-            catch (MySqlException) { x = -1; }
+            catch (MySqlException) { n = -1; }
 
-            return x;
+            return n;
         }
-
-        //Min statement
-        //public static int Min(MySqlConnection conn, string tb, string attb, string cond)
-        //{
-        //    string query = "SELECT MIN(" + attb + ") FROM " + tb + " WHERE " + cond;
-        //    int n;
-
-        //    MySqlCommand cmd = new MySqlCommand(query, conn);
-        //    try { if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n)) n = 0; }
-        //    catch (MySqlException) { n = 0; }
-
-        //    return n;
-        //}
 
         public static string mkQrySelect(string tb, string attbs, string cond)
         {
