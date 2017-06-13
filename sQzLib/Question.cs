@@ -353,13 +353,12 @@ namespace sQzLib
             siToken = 0;//safe to be 0
         }
         
-		public static void DBDelete(IUx eIU, int id) {
+		public static void DBDelete(IUx eIU, string ids) {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            string tbl = "q" + (int)eIU;
             string eMsg;
-            DBConnect.Delete(conn, tbl, "id=" + id.ToString(), out eMsg);
+            DBConnect.Update(conn, "sqz_question", "del=1", ids, out eMsg);
         }
     }
 }

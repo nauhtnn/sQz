@@ -252,7 +252,7 @@ namespace sQzServer0
                         i.Background = new SolidColorBrush(c);
                     g.Children.Add(i);
                     CheckBox chk = new CheckBox();
-                    chk.Name = "c" + x;
+                    chk.Name = "c" + q.uId;
 					Grid.SetColumn(chk, 1);
 					Grid.SetRow(chk, x);
 					RowDefinition rd = new RowDefinition();
@@ -305,17 +305,21 @@ namespace sQzServer0
 
         private void btnDel_Click(object sender, RoutedEventArgs e)
         {
-            bool toUpdate = false;
+            StringBuilder qids = new StringBuilder();
             foreach(CheckBox c in vChk)
                 if(c.IsChecked == true)
                 {
                     int uqid;
                     if (int.TryParse(c.Name.Substring(1), out uqid))
-                    {
-                        Question.DBDelete(mSelQCat, vQId[uqid]);
-                        toUpdate = true;
-                    }
+                        qids.Append("id=" + uqid + " OR ");
                 }
+            bool toUpdate = false;
+            if (0 < qids.Length)
+            {
+                qids.Remove(qids.Length - 4, 4);//remove the last " OR "
+                Question.DBDelete(mSelQCat, qids.ToString());
+                toUpdate = true;
+            }
             if (toUpdate)
             {
                 mDBQSh.DBSelect(mSelQCat);

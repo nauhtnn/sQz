@@ -139,22 +139,36 @@ namespace sQzLib
             return n;
         }
 
-        //Update statement
-        public static void Update(MySqlConnection conn, string qry)
+        public static int Update(MySqlConnection conn, string tb, string vals, string cond,
+            out string eMsg)
         {
-			MySqlCommand cmd = new MySqlCommand(qry, conn);
-
-            //Execute command
-            cmd.ExecuteNonQuery();
+            StringBuilder qry = new StringBuilder();
+            qry.Append("UPDATE " + tb + " SET " + vals);
+            if (cond != null)
+                qry.Append(" WHERE " + cond);
+            MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
+            int n;
+            try
+            {
+                n = cmd.ExecuteNonQuery();
+                eMsg = null;
+            }
+            catch (MySqlException e)
+            {
+                n = -1;
+                eMsg = e.ToString();
+            }
+            return n;
         }
 
         //Delete statement
         public static int Delete(MySqlConnection conn, string tb, string cond, out string eMsg)
         {
-            string query = "DELETE FROM " + tb;
+            StringBuilder qry = new StringBuilder();
+            qry.Append("DELETE FROM " + tb);
             if(cond != null)
-                query += " WHERE " + cond;
-            MySqlCommand cmd = new MySqlCommand(query, conn);
+                qry.Append(" WHERE " + cond);
+            MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
             int n;
             try {
                 n = cmd.ExecuteNonQuery();
