@@ -219,7 +219,7 @@ namespace sQzLib
             int n;
             MySqlCommand cmd = new MySqlCommand(query, conn);
             try {
-                if (int.TryParse(cmd.ExecuteScalar().ToString(), out n))
+                if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n))
                     n = -1;
             }
             catch (MySqlException) { n = -1; }
