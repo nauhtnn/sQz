@@ -113,40 +113,68 @@ namespace sQzLib
 
         public List<QuestSheet> GenQPack(int n, int[] vn)
         {
+            string emsg;
             List<QuestSheet> l = new List<QuestSheet>();
+            bool cont;
             while (0 < n)
             {
+                --n;
+                cont = false;
                 QuestSheet qs = new QuestSheet();
                 int j = -1;
                 foreach (IUx i in QuestSheet.GetIUs(eLv))
-                    qs.DBSelect(i, vn[++j]);
-                if (0 < qs.vQuest.Count)
-                {
-                    qs.eLv = eLv;
-                    if(!qs.UpdateCurQSId())//todo: better error handle
+                    if (qs.DBSelect(i, vn[++j], out emsg))
                     {
-                        vSheet.Add(qs.uId, qs);
-                        l.Add(qs);
+                        WPopup.s.ShowDialog(emsg);
+                        cont = true;
+                        break;
                     }
+                if (cont)
+                    continue;
+                qs.eLv = eLv;
+                if(!qs.UpdateCurQSId())//todo: better error handle
+                {
+                    vSheet.Add(qs.uId, qs);
+                    l.Add(qs);
                 }
-                --n;
             }
-            DBIns(mDt, l);
-            return l;
+            if(DBIns(mDt, l) == null)
+                return l;
+            return new List<QuestSheet>();
         }
 
-        public static void DBIns(DateTime dt, List<QuestSheet> l)
+        public static string DBIns(DateTime dt, List<QuestSheet> l)
         {
+            if (l.Count == 0)
+                return Txt.s._[(int)TxI.DB_DAT_NOK];
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return;
+                return Txt.s._[(int)TxI.DB_NOK];
             StringBuilder vals = new StringBuilder();
+            string prefx = "('" + dt.ToString(DT._) + "',";
+            string middl = ",'" + dt.ToString(DT.hh) + "','";
             foreach (QuestSheet qs in l)
-                qs.DBAppendInsQry(dt, ref vals);
+                vals.Append(prefx + qs.uId + middl + qs.eLv.ToString() + "'),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
-            DBConnect.Ins(conn, "qs", "dt,lv,id,vquest", vals.ToString(), out eMsg);//todo: catch exception
+            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,id,t,lv", vals.ToString(), out eMsg) < 0)
+            {
+                DBConnect.Close(ref conn);
+                return eMsg;
+            }
+            vals.Clear();
+            prefx = "('" + dt.ToString(DT._) + "',";
+            foreach(QuestSheet qs in l)
+                foreach (Question q in qs.vQuest)
+                    vals.Append(prefx + qs.uId + "," + q.uId + "),");
+            vals.Remove(vals.Length - 1, 1);//remove the last comma
+            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,qsid,qid", vals.ToString(), out eMsg) < 0)
+            {
+                DBConnect.Close(ref conn);
+                return eMsg;
+            }
             DBConnect.Close(ref conn);
+            return null;
         }
 
         public byte[] ToByteNextQS()

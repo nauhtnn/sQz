@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMA
 `ans2` VARCHAR(512) CHARACTER SET `utf8`, `ans3` VARCHAR(512) CHARACTER SET `utf8`,
 `key` CHAR(4) CHARACTER SET `ascii`, FOREIGN KEY(`mid`) REFERENCES `sqz_module`(`id`),
 FOREIGN KEY(`lqid`) REFERENCES `sqz_long_q_path`(`id`),
-INDEX(`mid`));
+INDEX(`mid`,`del`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATE,
 `qsid` SMALLINT UNSIGNED, `qid` INT UNSIGNED,

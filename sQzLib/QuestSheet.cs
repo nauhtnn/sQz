@@ -261,17 +261,19 @@ namespace sQzLib
         }
 
         //only Server0 uses this.
-        public void DBSelect(IUx eIU, int n)
+        public bool DBSelect(IUx iu, int n, out string eMsg)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return;
-            string tbl = "q" + (int)eIU;
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return true;
+            }
             //randomize
-            string eMsg;
-            int nn = DBConnect.Count(conn, tbl, "id", null, out eMsg);
+            int nn = DBConnect.Count(conn, "sqz_question", "id",
+                "mid=" + (int)iu + " AND del=0", out eMsg);
             if (nn < 1 || nn < n)
-                return;
+                return true;
             int[] vSel = new int[n];
             int i;
             for (i = 0; i < n; ++i)
@@ -304,7 +306,8 @@ namespace sQzLib
             }
             Array.Sort(vSel);
             //
-            string qry = DBConnect.mkQrySelect(tbl, null, null);
+            string qry = DBConnect.mkQrySelect("sqz_question",
+                "id,stmt,ans0,ans1,ans2,ans3,`key`", "mid=" + (int)iu + " AND del=0");
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             i = 0;
             int ii = -1;
@@ -317,22 +320,22 @@ namespace sQzLib
                     ++i;
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    string[] s = reader.GetString(1).Split('\n');
-                    q.mStmt = "(" + tbl + ')' + s[0];
+                    q.mStmt = reader.GetString(1);
                     q.nAns = 4;
                     q.vAns = new string[4];
-                    for (int k = 0; k < 4; ++k)
-                        q.vAns[k] = s[k + 1];
-                    string x = reader.GetString(2);
+                    for (int j = 0; j < 4; ++j)
+                        q.vAns[j] = reader.GetString(2 + j);
+                    string x = reader.GetString(6);
                     q.vKeys = new bool[4];
-                    for (int k = 0; k < 4; ++k)
-                        q.vKeys[k] = (x[k] == '1');
-                    q.mIU = eIU;
+                    for (int j = 0; j < 4; ++j)
+                        q.vKeys[j] = (x[j] == '1');
+                    q.mIU = iu;
                     vQuest.Add(q);
                 }
                 reader.Close();
             }
             DBConnect.Close(ref conn);
+            return false;
         }
 
         public void DBInsert(IUx eIU)
@@ -359,15 +362,6 @@ namespace sQzLib
             DBConnect.Ins(conn, "sqz_question", "mid,del,diff,stmt,ans0,ans1,ans2,ans3,`key`",
                 vals.ToString(), out eMsg);
             DBConnect.Close(ref conn);
-        }
-
-        public void DBAppendInsQry(DateTime dt, ref StringBuilder vals)
-        {
-            vals.Append("('" + dt.ToString(DT._) + "','" + eLv.ToString() + "'," + uId + ",'");
-            foreach(Question q in vQuest)
-                vals.Append(((int)q.mIU).ToString() + '_' + q.uId + '-');
-            vals.Remove(vals.Length - 1, 1);//remove the last '-'
-            vals.Append("'),");
         }
 
         public bool DBSelect(DateTime dt, ExamLv lv, int id)
