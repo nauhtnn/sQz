@@ -80,7 +80,8 @@ namespace sQzServer0
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
-                    vGrade.Add(e.mLv + e.uId, t);
+                    int lvid = e.LvId;
+                    vGrade.Add(lvid, t);
                     if (e.uGrade != ushort.MaxValue)
                         t.Text = e.uGrade.ToString();
                     Grid.SetRow(t, rid);
@@ -89,7 +90,7 @@ namespace sQzServer0
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
-                    vDt1.Add(e.mLv + e.uId, t);
+                    vDt1.Add(lvid, t);
                     if (e.dtTim1.Year != DT.INV)
                         t.Text = e.dtTim1.ToString("HH:mm");
                     Grid.SetRow(t, rid);
@@ -98,7 +99,7 @@ namespace sQzServer0
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
-                    vDt2.Add(e.mLv + e.uId, t);
+                    vDt2.Add(lvid, t);
                     if (e.dtTim2.Year != DT.INV)
                         t.Text = e.dtTim2.ToString("HH:mm");
                     Grid.SetRow(t, rid);
@@ -107,7 +108,7 @@ namespace sQzServer0
                     t = new TextBlock();
                     if (dark)
                         t.Background = new SolidColorBrush(c);
-                    vComp.Add(e.mLv + e.uId, t);
+                    vComp.Add(lvid, t);
                     if (e.tComp != null)
                         t.Text = e.tComp;
                     Grid.SetRow(t, rid);
@@ -123,13 +124,14 @@ namespace sQzServer0
             foreach (ExamRoom r in vRoom)
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
-                    if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.mLv + e.uId, out t))
+                    int lvid = e.LvId;
+                    if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(lvid, out t))
                         t.Text = e.uGrade.ToString();
-                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");
-                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))
                         t.Text = e.dtTim2.ToString("HH:mm");
-                    if (e.tComp != null && vComp.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.tComp != null && vComp.TryGetValue(lvid, out t))
                         t.Text = e.tComp;
                 }
         }

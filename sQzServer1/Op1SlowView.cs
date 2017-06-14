@@ -69,7 +69,7 @@ namespace sQzServer1
                     Grid.SetColumn(t, 2);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    int lvid = e.mLv + e.uId;
+                    int lvid = e.LvId;
                     vComp.Add(lvid, t);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
@@ -124,13 +124,14 @@ namespace sQzServer1
             foreach (ExamRoom r in vRoom)
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
-                    if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(e.mLv + e.uId, out t))
+                    int lvid = e.LvId;
+                    if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(lvid, out t))
                         t.Text = e.uGrade.ToString();
-                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");
-                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))
                         t.Text = e.dtTim2.ToString("HH:mm");
-                    if (e.tComp != null && vComp.TryGetValue(e.mLv + e.uId, out t))
+                    if (e.tComp != null && vComp.TryGetValue(lvid, out t))
                         t.Text = e.tComp;
                 }
         }

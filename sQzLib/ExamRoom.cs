@@ -50,18 +50,18 @@ namespace sQzLib
                 eMsg = null;
                 return 0;
             }
-            string attbs = "dt,id,t,rid,name,birdate,birthplace,lv";
+            string attbs = "dt,lv,id,t,rid,name,birdate,birthplace";
             StringBuilder vals = new StringBuilder();
             foreach (ExamineeA e in vExaminee.Values)
             {
-                vals.Append("('" + e.mDt.ToString(DT._) + "',");
+                vals.Append("('" + e.mDt.ToString(DT._) + "','");
+                vals.Append(e.eLv.ToString() + "',");
                 vals.Append(e.uId + ",");
                 vals.Append("'" + e.mDt.ToString(DT.hh) + "',");
                 vals.Append(uId + ",");
                 vals.Append("'" + e.tName + "',");
                 vals.Append("'" + DT.ToS(e.tBirdate, DT.RR) + "',");
-                vals.Append("'" + e.tBirthplace + "',");
-                vals.Append("'" + e.eLv + "'),");
+                vals.Append("'" + e.tBirthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             int n = DBConnect.Ins(conn, "sqz_examinee",
@@ -115,13 +115,13 @@ namespace sQzLib
                     else
                     {
                         ExamineeA o;
-                        if (vExaminee.TryGetValue(e.mLv + e.uId, out o))
+                        if (vExaminee.TryGetValue(e.uId, out o))
                         {
                             o.bFromC = false;
                             o.Merge(e);
                         }
                         else
-                            vExaminee.Add(e.mLv + e.uId, e);
+                            vExaminee.Add(e.uId, e);
                     }
                 }
             }
@@ -168,8 +168,7 @@ namespace sQzLib
         public ExamineeA Signin(ExamineeA e)
         {
             ExamineeA o;
-            int key = e.mLv + e.uId;
-            if (vExaminee.TryGetValue(key, out o) && o.tBirdate == e.tBirdate)
+            if (vExaminee.TryGetValue(e.uId, out o) && o.tBirdate == e.tBirdate)
             {
                 o.bFromC = true;
                 o.Merge(e);
@@ -234,7 +233,7 @@ namespace sQzLib
                 if (e.ReadByte(buf, ref offs))
                     return true;
                 ExamineeA o;
-                if (vExaminee.TryGetValue(e.mLv + e.uId, out o))
+                if (vExaminee.TryGetValue(e.uId, out o))
                 {
                     //o.bFromC = false;
                     o.Merge(e);

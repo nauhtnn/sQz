@@ -94,13 +94,13 @@ namespace sQzLib
                     byte[] a = i.ToByteS1();
                     if (3 < a.Length)
                     {
-                        l.Add(BitConverter.GetBytes(i.uId));//todo: optmz duplication
+                        l.Add(BitConverter.GetBytes(i.uId));
                         l.Add(a);
                     }
                 }
             else if (vRoom.TryGetValue(rId, out r))
             {
-                l.Add(BitConverter.GetBytes(rId));//todo: optmz duplication
+                l.Add(BitConverter.GetBytes(rId));
                 l.Add(r.ToByteS1());
             }
             return l;
@@ -281,7 +281,7 @@ namespace sQzLib
             {
                 r.vExaminee.Clear();
                 string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
-                    "id,name,birdate,birthplace,lv", "a.rid=" + r.uId +
+                    "lv,id,name,birdate,birthplace", "a.rid=" + r.uId +
                     " AND a.dt='" + mDt.ToString(DT._) + "' AND a.t='" + mDt.ToString(DT.hh) +
                     "' AND a.dt=b.dt AND a.t=b.t AND a.rid=b.rid");
                 string emsg;
@@ -292,12 +292,13 @@ namespace sQzLib
                     {
                         ExamineeS0 e = new ExamineeS0();
                         e.mDt = Dt;
-                        e.uId = reader.GetUInt16(0);
-                        e.tName = reader.GetString(1);
-                        e.tBirdate = reader.GetDateTime(2).ToString(DT.RR);
-                        e.tBirthplace = reader.GetString(3);
-                        if (Enum.TryParse(reader.GetString(4), out e.eLv))
-                            r.vExaminee.Add(e.uId, e);
+                        if (!Enum.TryParse(reader.GetString(0), out e.eLv))
+                            continue;
+                        e.uId = reader.GetUInt16(1);
+                        e.tName = reader.GetString(2);
+                        e.tBirdate = reader.GetDateTime(3).ToString(DT.RR);
+                        e.tBirthplace = reader.GetString(4);
+                        r.vExaminee.Add(e.uId, e);
                     }
                     reader.Close();
                 }
@@ -325,7 +326,7 @@ namespace sQzLib
                     ExamineeA o;
                     bool unfound = true;
                     foreach (ExamRoom i in vRoom.Values)
-                        if (i.uId != rId && i.vExaminee.TryGetValue(e.mLv + e.uId, out o))
+                        if (i.uId != rId && i.vExaminee.TryGetValue(e.uId, out o))
                         {
                             unfound = false;
                             //o.bFromC = false;

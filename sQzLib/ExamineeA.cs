@@ -22,13 +22,13 @@ namespace sQzLib
 
     public abstract class ExamineeA
     {
+        protected const int LV_CAP = 100000;
         public DateTime mDt;
         public ExamStt eStt;
-        public int mStt { get { return (int)eStt; } }
         public ExamLv eLv;
-        public int mLv { get { return (int)eLv; } }
         public int uId;
-        public string tId { get { return eLv.ToString() + uId.ToString("d3"); } }
+        public int LvId { get { return uId + ((eLv == ExamLv.A) ? 0 : LV_CAP); } }
+        public string tId { get { return eLv.ToString() + uId.ToString("d4"); } }
         public string tName;
         public string tBirdate;
         public string tBirthplace;
@@ -71,7 +71,7 @@ namespace sQzLib
         
         public bool ParseTxId(string s)
         {
-            if (s == null || s.Length != 4)
+            if (s == null || s.Length != 5)
                 return true;
             s = s.ToUpper();
             ExamLv lv;
@@ -83,7 +83,7 @@ namespace sQzLib
             if (eLv != lv || uId != uid)
                 Reset();
             eLv = lv;
-            uId = (int)eLv + uid;
+            uId = uid;
             return false;
         }
 
@@ -159,10 +159,9 @@ namespace sQzLib
             catch (UnauthorizedAccessException) { err = true; }
             if (err)
                 return true;
-            //w.Write(uSlId);
-            w.Write(mLv);
+            w.Write((int)eLv);
             w.Write(uId);
-            w.Write(mStt);
+            w.Write((int)eStt);
             w.Write(mAnsSh.uQSId);
             w.Write(mAnsSh.aAns, 0, AnsSheet.LEN);
             if (eStt == ExamStt.Finished)

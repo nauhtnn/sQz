@@ -260,7 +260,7 @@ namespace sQzClient
                 case NetCode.ExamRetrieving:
                     outBuf = new byte[12];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.uId), 0, outBuf, 4, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.LvId), 0, outBuf, 4, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 8, 4);
                     break;
                 default:

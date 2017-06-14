@@ -137,7 +137,6 @@ namespace sQzServer0
             switch (c)
             {
                 case NetCode.DateStudentRetriving:
-                    int sz = 0;
                     if (buf.Length - offs < 4)
                     {
                         outMsg = null;

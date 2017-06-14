@@ -50,8 +50,10 @@ namespace sQzServer1
 
             mBrd = new ExamBoard();
 
-            bAllR = true;//todo false;
-            uRId = 1;//todo
+            bAllR = false;
+            if(System.IO.File.Exists("Room.txt") &&
+                !int.TryParse(System.IO.File.ReadAllText("Room.txt"), out uRId))
+                uRId = 1;
             bStrtReqQSh = bQShReqting = false;
             uReqQSh = ushort.MaxValue;
 
@@ -157,7 +159,7 @@ namespace sQzServer1
                     e.bFromC = true;
                     e.ReadByte(buf, ref offs);
                     bool lck = false;
-                    lvid = e.mLv + e.uId;
+                    lvid = e.LvId;
                     bool found = false;
                     foreach (SortedList<int, bool> l in vfbLock)
                         if (l.TryGetValue(lvid, out lck))
@@ -190,7 +192,7 @@ namespace sQzServer1
                                     if(vw != null)
                                     {
                                         TextBlock t;
-                                        lvid = o.mLv + o.uId;
+                                        lvid = o.LvId;
                                         if (vw.vComp.TryGetValue(lvid, out t))
                                             t.Text = o.tComp;
                                         if (vw.vDt1.TryGetValue(lvid, out t))
@@ -255,11 +257,11 @@ namespace sQzServer1
                     return true;
                 case NetCode.ExamRetrieving:
                     outMsg = null;
-                    int uid = BitConverter.ToInt32(buf, offs);
+                    lvid = BitConverter.ToInt32(buf, offs);
                     ExamSlot slo = null;
                     foreach (ExamSlot s in mBrd.vSl.Values)
                         foreach(ExamRoom r in s.vRoom.Values)
-                            if(r.vExaminee.ContainsKey(uid))
+                            if(r.vExaminee.ContainsKey(lvid))
                             {
                                 slo = s;
                                 break;
@@ -270,7 +272,7 @@ namespace sQzServer1
                         Array.Copy(BitConverter.GetBytes((int)TxI.NEEID_NF), 0, outMsg, 0, 4);
                         break;
                     }
-                    ExamLv lv = (uid < (int)ExamLv.B) ? ExamLv.A : ExamLv.B;
+                    ExamLv lv = (lvid < (int)ExamLv.B) ? ExamLv.A : ExamLv.B;
                     offs += 4;
                     int qsid = BitConverter.ToInt32(buf, offs);
                     if (qsid == ushort.MaxValue)
@@ -321,7 +323,7 @@ namespace sQzServer1
                             break;
                         }
                         ExamineeA o = null;
-                        lvid = e.mLv + e.uId;
+                        lvid = e.LvId;
                         found = false;
                         foreach (ExamSlot sl in mBrd.vSl.Values)
                             if ((o = sl.Find(lvid)) != null)
@@ -496,7 +498,7 @@ namespace sQzServer1
             btnConnect.Content = s._[(int)TxI.CONN];
             btnStartSrvr.Content = s._[(int)TxI.STRT_SRVR];
             btnStopSrvr.Content = s._[(int)TxI.STOP_SRVR];
-            btnSubmit.Content = "Nộp bài";//s._[(int)TxI.SUBMIT];
+            btnSubmit.Content = s._[(int)TxI.SUBMIT];
         }
 
         private void ckbAllNee_Checked(object sender, RoutedEventArgs e)

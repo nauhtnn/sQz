@@ -27,7 +27,7 @@ namespace sQzLib
         public List<byte[]> ToByteC()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(mStt));
+            l.Add(BitConverter.GetBytes((int)eStt));
             if (eStt == ExamStt.Finished)
                 l.Add(BitConverter.GetBytes(uGrade));
 
@@ -54,29 +54,30 @@ namespace sQzLib
         public bool ReadByteC(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
-
-            if (l < 13)
+            //
+            if (l < 12)
                 return true;
-
-            int x;
-            //if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-            //    eLv = (ExamLv)x;
-            //l -= 4;
-            //offs += 4;
-
-            uId = BitConverter.ToInt32(buf, offs);
+            int x = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-
+            if (x < LV_CAP)
+            {
+                eLv = ExamLv.A;
+                uId = x;
+            }
+            else
+            {
+                eLv = ExamLv.B;
+                uId = x - LV_CAP;
+            }
             if (Enum.IsDefined(typeof(ExamStt), x = BitConverter.ToInt32(buf, offs)))
                 eStt = (ExamStt)x;
             l -= 4;
             offs += 4;
-
             bLog = BitConverter.ToBoolean(buf, offs);
             l -= 1;
             offs += 1;
-
+            //
             if (eStt < ExamStt.Examing || bLog)
             {
                 if (l < 4)
@@ -84,14 +85,11 @@ namespace sQzLib
                 int sz = BitConverter.ToInt32(buf, offs);
                 l -= 4;
                 offs += 4;
-                if (l < sz)
+                if (l < sz + 4)
                     return true;
                 tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
-
-                if (l < 4)
-                    return true;
                 sz = BitConverter.ToInt32(buf, offs);
                 l -= 4;
                 offs += 4;
@@ -114,12 +112,12 @@ namespace sQzLib
             if (eStt < ExamStt.Submitting)
                 return false;
 
-            if (l < 120)
+            if (l < AnsSheet.LEN)
                 return true;
-            mAnsSh.aAns = new byte[120];//hardcode
-            Buffer.BlockCopy(buf, offs, mAnsSh.aAns, 0, 120);
-            l -= 120;
-            offs += 120;
+            mAnsSh.aAns = new byte[AnsSheet.LEN];
+            Buffer.BlockCopy(buf, offs, mAnsSh.aAns, 0, AnsSheet.LEN);
+            l -= AnsSheet.LEN;
+            offs += AnsSheet.LEN;
 
             return false;
         }
@@ -127,12 +125,9 @@ namespace sQzLib
         public bool ReadByteS(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
-
-            //if (l < 12)
-            //    return true;
-            //uSlId = BitConverter.ToUInt32(buf, offs);
-            //l -= 4;
-            //offs += 4;
+            //
+            if (l < 20)
+                return true;
 
             int x;
             if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
@@ -149,12 +144,11 @@ namespace sQzLib
             l -= 4;
             offs += 4;
 
-            if (l < 4)
-                return true;
             int sz = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (l < sz)
+            //
+            if (l < sz + 4)
                 return true;
             if (0 < sz)
             {
@@ -162,13 +156,11 @@ namespace sQzLib
                 l -= sz;
                 offs += sz;
             }
-
-            if (l < 4)
-                return true;
             sz = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (l < sz)
+            //
+            if (l < sz + 4)
                 return true;
             if (0 < sz)
             {
@@ -176,12 +168,10 @@ namespace sQzLib
                 l -= sz;
                 offs += sz;
             }
-
-            if (l < 4)
-                return true;
             sz = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
+            //
             if (l < sz)
                 return true;
             if (0 < sz)
@@ -190,15 +180,14 @@ namespace sQzLib
                 l -= sz;
                 offs += sz;
             }
-
             if (eStt < ExamStt.Finished)
                 return false;
-
+            //
+            if (l < 20)
+                return true;
             int h = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (l < 4)
-                return true;
             int m = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
@@ -207,12 +196,9 @@ namespace sQzLib
                 dtTim1 = DT.INV_;
                 return true;
             }
-
             h = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (l < 4)
-                return true;
             m = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
@@ -221,13 +207,10 @@ namespace sQzLib
                 dtTim2 = DT.INV_;
                 return true;
             }
-
-            if (l < 4)
-                return true;
             uGrade = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-
+            //
             return false;
         }
 
@@ -235,8 +218,7 @@ namespace sQzLib
         {
             //suppose eStt == ExamStt.Finished
             List<byte[]> l = new List<byte[]>();
-            //l.Add(BitConverter.GetBytes(uSlId));
-            l.Add(BitConverter.GetBytes(mLv));
+            l.Add(BitConverter.GetBytes((int)eLv));
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
             l.Add(BitConverter.GetBytes(dtTim1.Minute));
@@ -263,13 +245,13 @@ namespace sQzLib
         {
             if (eStt == ExamStt.Finished)
                 return;
+            bLog = e.bLog;
+            if (eStt < ExamStt.Examing || bLog)
+                tComp = e.tComp;
             if (e.eStt < ExamStt.Examing)
                 eStt = ExamStt.Examing;
             else
                 eStt = e.eStt;
-            bLog = e.bLog;
-            if (eStt < ExamStt.Examing || bLog)
-                tComp = e.tComp;
             if (eStt < ExamStt.Examing)
                 return;
             mAnsSh = new AnsSheet();
