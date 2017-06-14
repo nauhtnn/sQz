@@ -152,12 +152,12 @@ namespace sQzLib
                 return Txt.s._[(int)TxI.DB_NOK];
             StringBuilder vals = new StringBuilder();
             string prefx = "('" + dt.ToString(DT._) + "',";
-            string middl = ",'" + dt.ToString(DT.hh) + "','";
             foreach (QuestSheet qs in l)
-                vals.Append(prefx + qs.uId + middl + qs.eLv.ToString() + "'),");
+                vals.Append(prefx + "'" + qs.eLv.ToString() + "'," + qs.uId +
+                    ",'" + dt.ToString(DT.hh) + "'),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
-            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,id,t,lv", vals.ToString(), out eMsg) < 0)
+            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,lv,id,t", vals.ToString(), out eMsg) < 0)
             {
                 DBConnect.Close(ref conn);
                 if (eMsg == null)
@@ -168,9 +168,10 @@ namespace sQzLib
             prefx = "('" + dt.ToString(DT._) + "',";
             foreach(QuestSheet qs in l)
                 foreach (Question q in qs.vQuest)
-                    vals.Append(prefx + qs.uId + "," + q.uId + "),");
+                    vals.Append(prefx + "'" + qs.eLv.ToString() + "'," +
+                        qs.uId + "," + q.uId + "),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,qsid,qid", vals.ToString(), out eMsg) < 0)
+            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid", vals.ToString(), out eMsg) < 0)
             {
                 DBConnect.Close(ref conn);
                 return eMsg;

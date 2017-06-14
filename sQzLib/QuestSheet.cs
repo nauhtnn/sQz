@@ -96,7 +96,6 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uId));
-            //optmz//l.Add(BitConverter.GetBytes((int)eLv));
             l.Add(BitConverter.GetBytes(vQuest.Count));
             foreach (Question q in vQuest)
             {
@@ -125,26 +124,16 @@ namespace sQzLib
                 return true;
             int offs0 = offs;
             int l = buf.Length - offs;
-            if (l < 4)
+            //
+            if (l < 8)
                 return true;
             uId = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
-            /*optmz
-             * if (l < 4)
-             *  return true;
-             * int x;
-             * if(Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-             *  eLv = (ExamLv)x;
-             * else
-             *  return true;
-             * offs += 4;
-             * l -= 4;*/
-            if (l < 4)
-                return true;
             int nq = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
+            //
             vQuest = new List<Question>();
             while (0 < nq)
             {
