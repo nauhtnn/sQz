@@ -18,26 +18,12 @@ namespace sQzLib
 
         public AnsPack mKeyPack;
 
-        public Dictionary<int, ExamRoom> vRoom;
+        public SortedList<int, ExamRoom> vRoom;
 
         public ExamSlot()
         {
             mDt = DT.INV_;
-
-            vRoom = new Dictionary<int, ExamRoom>();
-            string emsg;
-            List<int> rids = ExamRoom.DBSel(out emsg);
-            if (rids == null)
-                WPopup.s.ShowDialog(emsg);
-            else
-            {
-                foreach(int i in rids)
-                {
-                    ExamRoom r = new ExamRoom();
-                    r.uId = i;
-                    vRoom.Add(i, r);
-                }
-            }
+            vRoom = new SortedList<int, ExamRoom>();
             vQPack = new Dictionary<ExamLv, QuestPack>();
             QuestPack p = new QuestPack();
             p.eLv = ExamLv.A;
@@ -49,22 +35,21 @@ namespace sQzLib
             mKeyPack = new AnsPack();
         }
 
-        //public static Dictionary<uint, Tuple<DateTime, bool>> DBSelect()
-        //{
-        //    Dictionary<uint, Tuple<DateTime, bool>> r =
-        //        new Dictionary<uint, Tuple<DateTime, bool>>();
-        //    MySqlConnection conn = DBConnect.Init();
-        //    if (conn == null)
-        //        return r;
-        //    string qry = DBConnect.mkQrySelect("sqz_slot", null, null, null);
-        //    MySqlDataReader reader = null;//todo DBConnect.exeQrySelect(conn, qry);
-        //    while (reader.Read())
-        //        r.Add(reader.GetUInt32(0),
-        //            Tuple.Create(reader.GetDateTime(1), reader.GetBoolean(2)));
-        //    reader.Close();
-        //    DBConnect.Close(ref conn);
-        //    return r;
-        //}
+        public string DBSelRoom()
+        {
+            string emsg;
+            List<int> rids = ExamRoom.DBSel(out emsg);
+            if (rids == null)
+                return emsg;
+            foreach (int i in rids)
+            {
+                ExamRoom r = new ExamRoom();
+                r.uId = i;
+                if(!vRoom.ContainsKey(i))
+                    vRoom.Add(i, r);
+            }
+            return null;
+        }
 
         public static void ToByteDt(byte[] buf, ref int offs, DateTime dt)
         {

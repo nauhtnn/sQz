@@ -19,7 +19,7 @@
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <ListBox x:Name="lbxBrd" Width="140" Height="200" SelectionChanged="lbxBrd_SelectionChanged"/>
-                    <ListBox x:Name="lbxSl" Width="90" Height="200"/>
+                    <ListBox x:Name="lbxSl" Width="90" Height="200" SelectionMode="Multiple"/>
                 </StackPanel>
                 <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
                     <TextBlock x:Name="lblStatus" Width="400" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>

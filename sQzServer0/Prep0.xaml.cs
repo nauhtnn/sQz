@@ -345,9 +345,11 @@ namespace sQzServer0
             DateTime dt;
             DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
             pnv.mSlDB.Dt = dt;
+            pnv.mSlDB.DBSelRoom();
             pnv.mSlDB.DBSelNee();
             pnv.mSlFile = new ExamSlot();
             pnv.mSlFile.Dt = pnv.mSlDB.Dt;
+            pnv.mSlFile.DBSelRoom();
             pnv.ShallowCopy(refSl);
             pnv.Show(true);
             TabItem ti = new TabItem();

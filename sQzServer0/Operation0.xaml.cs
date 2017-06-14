@@ -298,9 +298,16 @@ namespace sQzServer0
                 return;
 
             ExamSlot sl = new ExamSlot();
+            string emsg;
+            if ((emsg = sl.DBSelRoom()) != null)
+            {
+                WPopup.s.ShowDialog(emsg);
+                return;
+            }
             DateTime dt;
             DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
             sl.Dt = dt;
+            sl.DBSelRoom();
             sl.DBSelNee();
             Op0SlotView vw = new Op0SlotView();
             vw.ShallowCopy(refSl);

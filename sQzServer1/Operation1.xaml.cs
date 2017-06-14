@@ -150,7 +150,7 @@ namespace sQzServer1
                 case NetCode.Dating:
                     outMsg = new byte[ExamBoard.BYTE_COUNT_DT];
                     offs = 0;
-                    DT.ReadByte(outMsg, ref offs, out mBrd.mDt);
+                    DT.ToByte(outMsg, ref offs, mBrd.mDt);
                     return true;
                 case NetCode.Authenticating:
                     e = new ExamineeS1();

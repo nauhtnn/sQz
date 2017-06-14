@@ -77,14 +77,11 @@ namespace sQzLib
             List<DateTime> r = new List<DateTime>();
             while (reader.Read())
             {
-                ExamSlot sl = new ExamSlot();
                 string s = reader.GetString(0);
                 DateTime dt;
                 DT.To_(mDt.ToString(DT._) + ' ' +
                     s, DT.HS, out dt);
-                sl.Dt = dt;
-                sl.bOpen = true;
-                r.Add(sl.Dt);
+                r.Add(dt);
             }
             reader.Close();
             DBConnect.Close(ref conn);
