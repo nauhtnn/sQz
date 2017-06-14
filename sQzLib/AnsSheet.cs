@@ -139,7 +139,7 @@ namespace sQzLib
         //only Operation0 uses this.
         public void ExtractKey(QuestSheet qs)
         {
-            uQSId = qs.uId + (int)qs.eLv;
+            uQSId = qs.uId + ((qs.eLv == ExamLv.A) ? 0 : ExamineeA.LV_CAP);
             if (qs.vQuest != null && qs.vQuest.First() != null && qs.vQuest.First().vKeys != null)
                 aAns = new byte[qs.vQuest.Count * 4];//hardcode, todo
             else

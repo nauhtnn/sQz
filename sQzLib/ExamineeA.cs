@@ -22,7 +22,7 @@ namespace sQzLib
 
     public abstract class ExamineeA
     {
-        protected const int LV_CAP = 100000;
+        public const int LV_CAP = 100000;
         public DateTime mDt;
         public ExamStt eStt;
         public ExamLv eLv;
