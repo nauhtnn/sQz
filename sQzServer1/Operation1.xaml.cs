@@ -150,7 +150,7 @@ namespace sQzServer1
             switch (c)
             {
                 case NetCode.Dating:
-                    outMsg = new byte[ExamBoard.BYTE_COUNT_DT];
+                    outMsg = new byte[DT.BYTE_COUNT];
                     offs = 0;
                     DT.ToByte(outMsg, ref offs, mBrd.mDt);
                     return true;
@@ -387,7 +387,7 @@ namespace sQzServer1
             switch (mState)
             {
                 case NetCode.DateStudentRetriving:
-                    if (mBrd.ReadByteR1(buf, ref offs))
+                    if (mBrd.ReadByteSl1(buf, ref offs))
                         break;//show err msg
                     Dispatcher.Invoke(() => LoadSl());
                     mState = NetCode.QuestRetrieving;
@@ -469,10 +469,7 @@ namespace sQzServer1
                     Array.Copy(BitConverter.GetBytes(uReqQSh), 0, outMsg, 4, 4);
                     break;
                 case NetCode.SrvrSubmitting:
-                    byte[] prefx = new byte[4];
-                    Array.Copy(BitConverter.GetBytes((int)mState), prefx, 4);
-                    foreach(ExamSlot sl in mBrd.vSl.Values)
-                        outMsg = sl.ToByteR0(prefx);
+                    outMsg = mBrd.ToByteSl0();
                     break;
             }
             return outMsg;

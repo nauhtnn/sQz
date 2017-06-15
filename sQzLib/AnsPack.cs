@@ -38,25 +38,13 @@ namespace sQzLib
             return false;
         }
 
-        public byte[] ToByte()
+        public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(vSheet.Values.Count));
             foreach (AnsSheet i in vSheet.Values)
                 l.Add(i.ToByte());
-            int sz = 0;
-            foreach (byte[] x in l)
-                sz += x.Length;
-            if (sz == 0)
-                return null;
-            byte[] buf = new byte[sz];
-            int offs = 0;
-            foreach(byte[] x in l)
-            {
-                Array.Copy(x, 0, buf, offs, x.Length);
-                offs += x.Length;
-            }
-            return buf;
+            return l;
         }
 
         //only Operation0 uses this.

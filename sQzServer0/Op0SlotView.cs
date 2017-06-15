@@ -118,10 +118,10 @@ namespace sQzServer0
                 }
         }
 
-        public void UpdateRsView(List<ExamRoom> vRoom)
+        public void UpdateRsView()
         {
             TextBlock t;
-            foreach (ExamRoom r in vRoom)
+            foreach (ExamRoom r in mSl.vRoom.Values)
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
                     int lvid = e.LvId;

@@ -14,8 +14,6 @@ namespace sQzLib
         public bool bOpen;
         public Dictionary<ExamLv, QuestPack> vQPack;
 
-        public const int BYTE_COUNT_DT = 8;
-
         public AnsPack mKeyPack;
 
         public SortedList<int, ExamRoom> vRoom;
@@ -58,25 +56,6 @@ namespace sQzLib
                 foreach (QuestPack p in vQPack.Values)
                     p.mDt = value;
             }
-        }
-
-        public List<byte[]> ToByteR1(int rId)
-        {
-            List<byte[]> l = new List<byte[]>();
-            ExamRoom r;
-            if (rId == 0)
-                foreach (ExamRoom i in vRoom.Values)
-                {
-                    byte[] a = i.ToByteS1();
-                    l.Add(BitConverter.GetBytes(i.uId));
-                    l.Add(a);
-                }
-            else if (vRoom.TryGetValue(rId, out r))
-            {
-                l.Add(BitConverter.GetBytes(rId));
-                l.Add(r.ToByteS1());
-            }
-            return l;
         }
 
         public string ReadF(string fp, ref ExamSlot o)
@@ -279,63 +258,86 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public void ReadByteR0(byte[] buf, ref int offs)
+        public bool ReadByteR0(byte[] buf, ref int offs)
         {
-            List<ExamineeA> v = new List<ExamineeA>();
-            List<ExamineeA> l = new List<ExamineeA>();
-            while (true)
+            if (buf.Length - offs < 4)
+                return true;
+            int n = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            while (0 < n)
             {
-                if (buf.Length - offs < 4)
-                    break;
+                --n;
                 int rId = BitConverter.ToInt32(buf, offs);
                 offs += 4;
                 ExamRoom r;
-                if (!vRoom.TryGetValue(rId, out r))
-                    break;
-                if (r.ReadByteS0(buf, ref offs, ref v))
-                    break;
-                foreach (ExamineeS0 e in v)
+                if (vRoom.TryGetValue(rId, out r))
                 {
-                    ExamineeA o;
-                    bool unfound = true;
-                    foreach (ExamRoom i in vRoom.Values)
-                        if (i.uId != rId && i.vExaminee.TryGetValue(e.uId, out o))
-                        {
-                            unfound = false;
-                            //o.bFromC = false;
-                            o.Merge(e);
-                            break;
-                        }
-                    if (unfound)
-                        l.Add(e);
+                    if (r.ReadByte0(buf, ref offs))
+                        return true;
                 }
-                v.Clear();
+                else
+                {
+                    r = new ExamRoom();
+                    r.uId = rId;
+                    if (r.ReadByte0(buf, ref offs))
+                        return true;
+                    vRoom.Add(rId, r);
+                }
             }
+            if (n == 0)
+                return false;
+            else
+                return true;
+        }
+
+        public List<byte[]> ToByteR1(int rId)
+        {
+            List<byte[]> l = new List<byte[]>();
+            l.Add(DT.ToByteh(mDt));
+            ExamRoom r;
+            if (rId == 0)
+            {
+                l.Add(BitConverter.GetBytes(vRoom.Count));
+                foreach (ExamRoom i in vRoom.Values)
+                    l.InsertRange(l.Count, i.ToByte1());
+            }
+            else if (vRoom.TryGetValue(rId, out r))
+            {
+                l.Add(BitConverter.GetBytes(1));
+                l.InsertRange(l.Count, r.ToByte1());
+            }
+            else
+                l.Add(BitConverter.GetBytes(0));
+            return l;
         }
 
         public bool ReadByteR1(byte[] buf, ref int offs)
         {
             if (buf.Length - offs < 4)
                 return true;
-            int l = BitConverter.ToInt32(buf, offs);
+            int n = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            l += offs;
-            while (offs < l)
+            while (0 < n)
             {
+                --n;
                 int rId = BitConverter.ToInt32(buf, offs);
                 offs += 4;
                 ExamRoom r;
                 if (vRoom.TryGetValue(rId, out r))
-                    r.ReadByteS1(buf, ref offs);
+                {
+                    if (r.ReadByte1(buf, ref offs))
+                        return true;
+                }
                 else
                 {
                     r = new ExamRoom();
                     r.uId = rId;
-                    r.ReadByteS1(buf, ref offs);
+                    if (r.ReadByte1(buf, ref offs))
+                        return true;
                     vRoom.Add(rId, r);
                 }
             }
-            if (offs == l)
+            if (n == 0)
                 return false;
             else
                 return true;
@@ -361,22 +363,13 @@ namespace sQzLib
         public List<byte[]> ToByteQPack()
         {
             List<byte[]> l = new List<byte[]>();
+            l.Add(DT.ToByteh(mDt));
+            l.Add(BitConverter.GetBytes(vQPack.Count));
             foreach (QuestPack p in vQPack.Values)
             {
                 l.Add(BitConverter.GetBytes((int)p.eLv));
                 l.Add(p.ToByte());
             }
-            //int sz = 0;
-            //foreach (byte[] x in l)
-            //    sz += x.Length;
-            //byte[] buf = new byte[sz];
-            //int offs = 0;
-            //foreach(byte[] x in l)
-            //{
-            //    Array.Copy(x, 0, buf, offs, x.Length);
-            //    offs += x.Length;
-            //}
-            //return buf;
             return l;
         }
 
@@ -384,11 +377,11 @@ namespace sQzLib
         {
             if (buf.Length - offs < 4)
                 return true;
-            int l = BitConverter.ToInt32(buf, offs);
+            int n = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            l += offs;
-            while (offs < l)
+            while (0 < n)
             {
+                --n;
                 int x;
                 ExamLv lv;
                 if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
@@ -399,7 +392,7 @@ namespace sQzLib
                 if (vQPack[lv].ReadByte(buf, ref offs))
                     return true;
             }
-            if (offs == l)
+            if (n == 0)
                 return false;
             else
                 return true;
@@ -412,9 +405,11 @@ namespace sQzLib
             return false;
         }
 
-        public byte[] ToByteKey()
+        public List<byte[]> ToByteKey()
         {
-            return mKeyPack.ToByte();
+            List<byte[]> l = mKeyPack.ToByte();
+            l.Insert(0, DT.ToByteh(mDt));
+            return l;
         }
 
         public bool ReadByteKey(byte[] buf, ref int offs)
@@ -448,7 +443,7 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
             {
                 l.Add(BitConverter.GetBytes(r.uId));
-                foreach (byte[] a in r.ToByteS0())
+                foreach (byte[] a in r.ToByte0())
                     l.Add(a);
             }
             return l;

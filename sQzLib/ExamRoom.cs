@@ -119,25 +119,23 @@ namespace sQzLib
             return null;
         }
 
-        public List<byte[]> ToByteS1()
+        public List<byte[]> ToByte1()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(vExaminee.Count));
             foreach (ExamineeS0 e in vExaminee.Values)
-                l.InsertRange(l.Count - 1, e.ToByte());
+                l.InsertRange(l.Count, e.ToByte());
             return l;
         }
 
-        public bool ReadByteS1(byte[] buf, ref int offs, ref List<ExamineeA> v)
+        public bool ReadByte1(byte[] buf, ref int offs)
         {
             if (buf == null)
                 return true;
-            int l = buf.Length - offs;
-            if (l < 4)
+            if (buf.Length - offs < 0)
                 return true;
             int n = BitConverter.ToInt32(buf, offs);
-            l -= 4;
             offs += 4;
             while (0 < n)
             {
@@ -149,11 +147,11 @@ namespace sQzLib
                 ExamineeA o;
                 if (vExaminee.TryGetValue(e.uId, out o))
                 {
-                    //o.bFromC = false;
+                    o.bFromC = false;
                     o.Merge(e);
                 }
                 else
-                    v.Add(e);
+                    vExaminee.Add(e.uId, e);
             }
             if (n == 0)
                 return false;
@@ -161,7 +159,7 @@ namespace sQzLib
                 return true;
         }
 
-        public List<byte[]> ToByteS0()
+        public List<byte[]> ToByte0()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uId));
@@ -180,7 +178,7 @@ namespace sQzLib
             return l;
         }
 
-        public bool ReadByte1(byte[] buf, ref int offs, ref List<ExamineeA> v)
+        public bool ReadByte0(byte[] buf, ref int offs)
         {
             if (buf == null)
                 return true;
@@ -200,11 +198,9 @@ namespace sQzLib
                 ExamineeA o;
                 if (vExaminee.TryGetValue(e.uId, out o))
                 {
-                    //o.bFromC = false;
+                    o.bFromC = false;
                     o.Merge(e);
                 }
-                else
-                    v.Add(e);
             }
             if (n == 0)
                 return false;

@@ -126,7 +126,7 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Dating:
-                    if(!ExamBoard.ReadByteDt(buf, ref offs, out mDt) && bRunning)
+                    if(!DT.ReadByte(buf, ref offs, out mDt) && bRunning)
                     {
                         Dispatcher.Invoke(() => {
                             txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(DT.RR);

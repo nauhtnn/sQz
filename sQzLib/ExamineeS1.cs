@@ -132,6 +132,8 @@ namespace sQzLib
             int x;
             if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
                 eLv = (ExamLv)x;
+            else
+                return true;
             l -= 4;
             offs += 4;
 
