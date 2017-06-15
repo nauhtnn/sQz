@@ -108,7 +108,7 @@ namespace sQzServer1
                     t = new TextBlock();
                     if (e.uGrade != ushort.MaxValue)
                     {
-                        t.Text = e.uGrade.ToString();
+                        t.Text = e.Grade;
                         cbx.IsEnabled = false;
                     }
                     vMark.Add(lvid, t);
@@ -126,7 +126,7 @@ namespace sQzServer1
                 {
                     int lvid = e.LvId;
                     if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(lvid, out t))
-                        t.Text = e.uGrade.ToString();
+                        t.Text = e.Grade;
                     if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");
                     if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))

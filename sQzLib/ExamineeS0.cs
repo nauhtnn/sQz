@@ -46,27 +46,37 @@ namespace sQzLib
         {
             //suppose eStt == ExamStt.Finished
             int l = buf.Length - offs;
-
+            //
             if (l < 12)
                 return true;
-
-            int lv;
-            if (Enum.IsDefined(typeof(ExamLv), lv = BitConverter.ToInt32(buf, offs)))
-                eLv = (ExamLv)lv;
+            int x;
+            if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
+                eLv = (ExamLv)x;
             else
                 return true;
             l -= 4;
             offs += 4;
-
             uId = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-
+            x = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            //
+            if (l < x)
+                return true;
+            if (0 < x)
+            {
+                tComp = Encoding.UTF8.GetString(buf, offs, x);
+                l -= x;
+                offs += x;
+            }
+            //
+            if (l < AnsSheet.LEN + 24)
+                return true;
             int h = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (l < 4)
-                return true;
             int m = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
@@ -75,9 +85,6 @@ namespace sQzLib
                 dtTim1 = DT.INV_;
                 return true;
             }
-
-            if (l < AnsSheet.LEN + 4)
-                return true;
             mAnsSh.uQSId = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
@@ -89,8 +96,6 @@ namespace sQzLib
             h = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (l < 4)
-                return true;
             m = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
@@ -99,13 +104,10 @@ namespace sQzLib
                 dtTim2 = DT.INV_;
                 return true;
             }
-
-            if (l < 4)
-                return true;
             uGrade = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-
+            //
             return false;
         }
 

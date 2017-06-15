@@ -226,6 +226,6 @@ namespace sQzLib
             tLog.Append(s);
         }
 
-        public double Grade { get { return Math.Round((float)uGrade * 0.333, 1); } }
+        public string Grade { get { return Math.Round((float)uGrade * 0.333, 1).ToString(); } }
     }
 }

@@ -431,11 +431,7 @@ namespace sQzLib
             l.Add(DT.ToByteh(mDt));
             l.Add(BitConverter.GetBytes(vRoom.Count));
             foreach (ExamRoom r in vRoom.Values)
-            {
-                l.Add(BitConverter.GetBytes(r.uId));
-                foreach (byte[] a in r.ToByte0())
-                    l.Add(a);
-            }
+                l.InsertRange(l.Count, r.ToByte0());
             return l;
         }
     }

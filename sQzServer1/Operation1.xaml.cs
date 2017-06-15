@@ -293,7 +293,7 @@ namespace sQzServer1
                     }
                     if (outMsg == null)
                     {
-                        mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + ((int)lv + qsid);
+                        mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + (qsid);
                         outMsg = new byte[8];
                         Array.Copy(BitConverter.GetBytes((int)TxI.QS_NFOUND), 0, outMsg, 0, 4);
                         Array.Copy(BitConverter.GetBytes(qsid), 0, outMsg, 4, 4);

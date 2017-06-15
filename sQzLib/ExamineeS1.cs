@@ -222,13 +222,18 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((int)eLv));
             l.Add(BitConverter.GetBytes(uId));
+            if (0 < tComp.Length)
+            {
+                byte[] x = Encoding.UTF8.GetBytes(tComp);
+                l.Add(BitConverter.GetBytes(x.Length));
+                l.Add(x);
+            }
+            else
+                l.Add(BitConverter.GetBytes(0));
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
             l.Add(BitConverter.GetBytes(dtTim1.Minute));
-
             l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
-
             l.Add(mAnsSh.aAns);
-
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
             l.Add(BitConverter.GetBytes(uGrade));

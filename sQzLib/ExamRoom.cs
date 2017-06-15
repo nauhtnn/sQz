@@ -168,6 +168,7 @@ namespace sQzLib
                 if (e.eStt == ExamStt.Finished)
                 {
                     ++n;
+                    e.bFromC = false;
                     l.InsertRange(l.Count, e.ToByte());
                 }
             l.Insert(1, BitConverter.GetBytes(n));

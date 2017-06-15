@@ -83,7 +83,7 @@ namespace sQzServer0
                     int lvid = e.LvId;
                     vGrade.Add(lvid, t);
                     if (e.uGrade != ushort.MaxValue)
-                        t.Text = e.uGrade.ToString();
+                        t.Text = e.Grade;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
                     grdNee.Children.Add(t);
@@ -126,7 +126,7 @@ namespace sQzServer0
                 {
                     int lvid = e.LvId;
                     if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(lvid, out t))
-                        t.Text = e.uGrade.ToString();
+                        t.Text = e.Grade;
                     if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");
                     if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))

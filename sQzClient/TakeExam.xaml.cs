@@ -349,7 +349,7 @@ namespace sQzClient
                         {
                             mNee.Merge(e);
                             btnSubmit.Content = mNee.Grade;
-                            msg = Txt.s._[(int)TxI.RESULT] + mNee.Grade.ToString();
+                            msg = Txt.s._[(int)TxI.RESULT] + mNee.Grade;
                         }
                         else
                             msg = Txt.s._[(int)TxI.RECV_DAT_ER];
