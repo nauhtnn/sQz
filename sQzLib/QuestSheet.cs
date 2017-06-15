@@ -213,13 +213,62 @@ namespace sQzLib
             q = null;
         }
 
+        public List<Question> ShallowCopy()
+        {
+            List<Question> l = new List<Question>();
+            foreach (Question q in vQuest)
+                l.Add(q);
+            return l;
+        }
+
+        public void Rearrange()
+        {
+            List<Question> qs = new List<Question>();
+            int n = vQuest.Count;
+            Random r = new Random(sSeed);
+            while (0 < n)
+            {
+                int sel = r.Next() % n;
+                qs.Add(vQuest[sel]);
+                vQuest.RemoveAt(sel);
+                --n;
+            }
+            vQuest = qs;
+        }
+
+        public int[] DBCount(out string eMsg)
+		{
+			MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+			{
+				eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return null;
+			}
+			IUx[] ius = GetAllIUs();
+			int[] nn = new int[ius.Length];
+			int i = -1;
+			StringBuilder emsg = new StringBuilder();
+			foreach(IUx iu in ius)
+			{
+				nn[++i] = DBConnect.Count(conn, "sqz_question", "id",
+					"mid=" + (int)iu + " AND del=0", out eMsg);
+				if(eMsg != null)
+					emsg.Append(iu.ToString() + '-' + eMsg);
+			}
+			DBConnect.Close(ref conn);
+			eMsg = emsg.ToString();
+			return nn;
+		}
+
         //only Server0 uses this.
         public void DBSelect(IUx eIU)
         {
             vQuest.Clear();
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
+			{
                 return;
+			}
             string qry = DBConnect.mkQrySelect("sqz_question",
                 "id,stmt,ans0,ans1,ans2,ans3,`key`", "mid=" + (int)eIU + " AND del=0");
             string emsg;

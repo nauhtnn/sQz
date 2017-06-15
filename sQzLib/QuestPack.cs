@@ -143,6 +143,50 @@ namespace sQzLib
             return new List<QuestSheet>();
         }
 
+        public List<QuestSheet> GenQPack2(int n, int[] vn)
+        {
+            List<QuestSheet> l = new List<QuestSheet>();
+            int i;
+            for (i = 0; i < n; ++i)
+                l.Add(new QuestSheet());
+            i = 0;
+            foreach(IUx iu in QuestSheet.GetIUs(eLv))
+            {
+                //
+                QuestSheet qs0 = new QuestSheet();
+                qs0.DBSelect(iu);
+                //
+                Random rand = new Random();
+                foreach (QuestSheet qs in l)
+                {
+                    List<Question> vq = qs0.ShallowCopy();
+                    int ni = vn[i];
+                    while(0 < ni)
+                    {
+                        int idx = rand.Next() % ni;
+                        qs.vQuest.Add(vq.ElementAt(idx));
+                        vq.RemoveAt(idx);
+                        --ni;
+                    }
+                }
+                ++i;
+            }
+            List<int> eidx = new List<int>();
+            i = -1;
+            foreach (QuestSheet qs in l)
+            {
+                qs.eLv = eLv;
+                if (!qs.UpdateCurQSId())//todo: better error handle
+                    vSheet.Add(qs.uId, qs);
+                else
+                    eidx.Add(++i);
+            }
+            foreach (int idx in eidx)
+                l.RemoveAt(idx);
+
+            return l;
+        }
+
         public static string DBIns(DateTime dt, List<QuestSheet> l)
         {
             if (l.Count == 0)
