@@ -471,12 +471,7 @@ namespace sQzServer1
                 case NetCode.SrvrSubmitting:
                     byte[] prefx = new byte[4];
                     Array.Copy(BitConverter.GetBytes((int)mState), prefx, 4);
-                    //Array.Copy(BitConverter.GetBytes(mRoom.uId), 0, prefx, 4, 4);//todo
-                    //mRoom.ToByteS0(prefx, out outMsg);
-                    ExamSlot sl = mBrd.vSl.First().Value;
-                    if (sl == null)
-                        outMsg = null;
-                    else
+                    foreach(ExamSlot sl in mBrd.vSl.Values)
                         outMsg = sl.ToByteR0(prefx);
                     break;
             }

@@ -5,14 +5,22 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
+//ToByte | [dt][nSl] | [siId][nR] | [riId][nNee] | [neeId][neeDat] |
+//ReadByte | [dt][nSl][siId] | [nR][ridId] | [nNee][neeId] | [neeDat] |
+//len vs n: len can verify len = offs, n cannot.
+//  n is more readable for human.
+//  Since every reading method has checked len before BitConverter.ToXX(buf, ref offs),
+//      the aggregation len is ok.
+//  The scheme in which containers check n, leaf nodes check len can assure both.
+//Because containers use dictionary to store items,
+//  the item's id is read by containers to locate the item.
+
 namespace sQzLib
 {
     public class ExamBoard
     {
         public DateTime mDt;
         public Dictionary<string, ExamSlot> vSl;
-
-        public const int BYTE_COUNT_DT = 12;
 
         public ExamBoard()
         {
@@ -113,79 +121,38 @@ namespace sQzLib
             return r;
         }
 
-        public static void ToByteDt(byte[] buf, ref int offs, DateTime dt)
-        {
-            Array.Copy(BitConverter.GetBytes(dt.Year), 0, buf, offs, 4);
-            offs += 4;
-            Array.Copy(BitConverter.GetBytes(dt.Month), 0, buf, offs, 4);
-            offs += 4;
-            Array.Copy(BitConverter.GetBytes(dt.Day), 0, buf, offs, 4);
-            offs += 4;
-        }
-
-        public static bool ReadByteDt(byte[] buf, ref int offs, out DateTime dt)
-        {
-            if (buf.Length - offs < BYTE_COUNT_DT)
-            {
-                dt = DT.INV_;
-                return true;
-            }
-            int y = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int M = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int d = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            if (DT.To_(y.ToString("d4") + '-' + M.ToString("d2") + '-' + d.ToString("d2"), DT._, out dt))
-                return true;
-            return false;
-        }
-
-        public byte[] ToByteR1(int rId)
+        public byte[] ToByteSl1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
-            byte[] b = new byte[BYTE_COUNT_DT];
-            int sz = 0;
-            ToByteDt(b, ref sz, mDt);
-            l.Add(b);
+            l.Add(BitConverter.GetBytes(vSl.Count));
             foreach (ExamSlot sl in vSl.Values)
-            {
-                List<byte[]> x = sl.ToByteR1(rId);
-                sz = ExamSlot.BYTE_COUNT_DT;
-                foreach (byte[] a in x)
-                    sz += a.Length;
-                b = new byte[sz + 4];
-                sz = 0;
-                ExamSlot.ToByteDt(b, ref sz, sl.Dt);
-                Array.Copy(BitConverter.GetBytes(b.Length - ExamSlot.BYTE_COUNT_DT - 4), 0, b, sz, 4);
-                sz += 4;
-                foreach (byte[] a in x)
-                {
-                    Array.Copy(a, 0, b, sz, a.Length);
-                    sz += a.Length;
-                }
-                l.Add(b);
-            }
+                l.InsertRange(l.Count, sl.ToByteR1(rId));
+            int sz = DT.BYTE_COUNT;
+            foreach (byte[] x in l)
+                sz += x.Length;
+            byte[] buf = new byte[sz];
             sz = 0;
-            foreach (byte[] a in l)
-                sz += a.Length;
-            b = new byte[sz];
-            sz = 0;
-            foreach (byte[] a in l)
+            DT.ToByte(buf, ref sz, mDt);
+            foreach (byte[] x in l)
             {
-                Buffer.BlockCopy(a, 0, b, sz, a.Length);
-                sz += a.Length;
+                Buffer.BlockCopy(x, 0, buf, sz, x.Length);
+                sz += x.Length;
             }
-            return b;
+            return buf;
         }
 
-        public bool ReadByteR1(byte[] buf, ref int offs)
+        public bool ReadByteSl1(byte[] buf, ref int offs)
         {
             DateTime dt;
-            if (ReadByteDt(buf, ref offs, out mDt))
+            if (DT.ReadByte(buf, ref offs, out mDt))
                 return true;
-            while(ExamSlot.BYTE_COUNT_DT < buf.Length - offs)
+            if (buf.Length - offs < 4)
+                return true;
+            int n = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            while(0 < n)
             {
+                --n;
                 if (ExamSlot.ReadByteDt(buf, ref offs, out dt))
                     return true;
                 ExamSlot sl;
@@ -203,10 +170,33 @@ namespace sQzLib
                     vSl.Add(sl.Dt.ToString(DT.hh), sl);
                 }
             }
-            if (offs == buf.Length)
+            if (n == 0)
                 return false;
             else
                 return true;
+        }
+
+        public byte[] ToByteSl0()
+        {
+            List<byte[]> l = new List<byte[]>();
+            byte[] b;
+            int sz;
+            foreach (ExamSlot sl in vSl.Values)
+                l.InsertRange(l.Count - 1, sl.ToByteR0());
+            sz = 0;
+            foreach (byte[] a in l)
+                sz += a.Length;
+            b = new byte[DT.BYTE_COUNT + 4 + sz];
+            sz = 0;
+            
+            Array.Copy(BitConverter.GetBytes(vSl.Count), 0, b, sz, 4);
+            sz += 4;
+            foreach (byte[] a in l)
+            {
+                Buffer.BlockCopy(a, 0, b, sz, a.Length);
+                sz += a.Length;
+            }
+            return b;
         }
 
         public byte[] ToByteQPack()

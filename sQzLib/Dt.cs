@@ -19,6 +19,8 @@ namespace sQzLib
         public const string _ = "yyyy-M-d";
         public const string __ = "yyyy-MM-dd";
         public const string RR = "dd-MM-yyyy";
+        public const int BYTE_COUNT = 12;
+        public const int BYTE_COUNT_h = 8;
 
         public static bool To_(string s, string form, out DateTime dt)
         {
@@ -86,6 +88,14 @@ namespace sQzLib
             Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, offs, 4);
             offs += 4;
             return false;
+        }
+
+        public static byte[] ToByteh(DateTime dt)
+        {
+            byte[] buf = new byte[8];
+            Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, 0, 4);
+            Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, 4, 4);
+            return buf;
         }
 
         public static bool ReadByteh(byte[] buf, ref int offs, out DateTime dt)

@@ -69,64 +69,6 @@ namespace sQzLib
             return n;
         }
 
-        public byte[] ToByteS1()
-        {
-            List<byte[]> l = new List<byte[]>();
-            byte[] b = BitConverter.GetBytes(vExaminee.Count);
-            l.Add(b);
-            foreach (ExamineeA e in vExaminee.Values)
-                foreach (byte[] i in e.ToByte())
-                    l.Add(i);
-            //join
-            int sz = 0;
-            foreach (byte[] i in l)
-                sz += i.Length;
-            b = new byte[sz];
-            int offs = 0;
-            foreach (byte[] i in l)
-            {
-                Buffer.BlockCopy(i, 0, b, offs, i.Length);
-                offs += i.Length;
-            }
-            return b;
-        }
-        public void ReadByteS1(byte[] buf, ref int offs)
-        {
-            vExaminee.Clear();
-            if (buf == null)
-                return;
-            int l = buf.Length - offs;
-            if (l < 4)
-                return;
-            int n = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            for (int i = 0; i < n; ++i)
-            {
-                ExamineeS1 e = new ExamineeS1();
-                //e.bFromC = false;
-                if (!e.ReadByte(buf, ref offs))
-                {
-                    if (e.eStt == ExamStt.Info)
-                    {
-                        if (!vExaminee.ContainsKey(e.uId))
-                            vExaminee.Add(e.uId, e);
-                    }
-                    else
-                    {
-                        ExamineeA o;
-                        if (vExaminee.TryGetValue(e.uId, out o))
-                        {
-                            o.bFromC = false;
-                            o.Merge(e);
-                        }
-                        else
-                            vExaminee.Add(e.uId, e);
-                    }
-                }
-            }
-        }
-
         public void DBUpdateRs(MySqlConnection conn)
         {
             //foreach (ExamineeA e in vExaminee.Values)
@@ -177,14 +119,52 @@ namespace sQzLib
             return null;
         }
 
-        public void ToByteS0(byte[] prefix, out byte[] buf)
+        public List<byte[]> ToByteS1()
         {
-            //if (vExaminee.Count == 0)
-            //{
-            //    buf = prefix;
-            //    return;
-            //}
             List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(uId));
+            l.Add(BitConverter.GetBytes(vExaminee.Count));
+            foreach (ExamineeS0 e in vExaminee.Values)
+                l.InsertRange(l.Count - 1, e.ToByte());
+            return l;
+        }
+
+        public bool ReadByteS1(byte[] buf, ref int offs, ref List<ExamineeA> v)
+        {
+            if (buf == null)
+                return true;
+            int l = buf.Length - offs;
+            if (l < 4)
+                return true;
+            int n = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            while (0 < n)
+            {
+                --n;
+                ExamineeS1 e = new ExamineeS1();
+                //e.bFromC = false;
+                if (e.ReadByte(buf, ref offs))
+                    return true;
+                ExamineeA o;
+                if (vExaminee.TryGetValue(e.uId, out o))
+                {
+                    //o.bFromC = false;
+                    o.Merge(e);
+                }
+                else
+                    v.Add(e);
+            }
+            if (n == 0)
+                return false;
+            else
+                return true;
+        }
+
+        public List<byte[]> ToByteS0()
+        {
+            List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(uId));
             int n = 0;
             foreach (ExamineeA e in vExaminee.Values)
                 if (e.eStt == ExamStt.Finished)
@@ -193,29 +173,14 @@ namespace sQzLib
                     foreach (byte[] b in e.ToByte())
                         l.Add(b);
                 }
-            //join
-            int sz = 4;//sizeof(n)
-            if (prefix != null)
-                sz += prefix.Length;
-            foreach (byte[] i in l)
-                sz += i.Length;
-            buf = new byte[sz];
-            int offs = 0;
-            if (prefix != null)
-            {
-                Buffer.BlockCopy(prefix, 0, buf, offs, prefix.Length);
-                offs += prefix.Length;
-            }
-            Array.Copy(BitConverter.GetBytes(n), 0, buf, offs, 4);
-            offs += 4;
-            foreach (byte[] i in l)
-            {
-                Buffer.BlockCopy(i, 0, buf, offs, i.Length);
-                offs += i.Length;
-            }
+            if (1 < l.Count)
+                l.Insert(1, BitConverter.GetBytes(n));
+            else
+                l.Add(BitConverter.GetBytes(n));
+            return l;
         }
 
-        public bool ReadByteS0(byte[] buf, ref int offs, ref List<ExamineeA> v)
+        public bool ReadByte1(byte[] buf, ref int offs, ref List<ExamineeA> v)
         {
             if (buf == null)
                 return true;
@@ -241,7 +206,10 @@ namespace sQzLib
                 else
                     v.Add(e);
             }
-            return false;
+            if (n == 0)
+                return false;
+            else
+                return true;
         }
 
         public static List<int> DBSel(out string eMsg)

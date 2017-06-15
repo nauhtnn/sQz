@@ -51,30 +51,6 @@ namespace sQzLib
             return null;
         }
 
-        public static void ToByteDt(byte[] buf, ref int offs, DateTime dt)
-        {
-            Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, offs, 4);
-            offs += 4;
-            Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, offs, 4);
-            offs += 4;
-        }
-
-        public static bool ReadByteDt(byte[] buf, ref int offs, out DateTime dt)
-        {
-            if (buf.Length - offs < BYTE_COUNT_DT)
-            {
-                dt = DT.INV_;
-                return true;
-            }
-            int H = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int m = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            if (DT.To_(H.ToString("d2") + ':' + m.ToString("d2"), DT.hh, out dt))
-                return true;
-            return false;
-        }
-
         public DateTime Dt {
             get { return mDt; }
             set {
@@ -92,11 +68,8 @@ namespace sQzLib
                 foreach (ExamRoom i in vRoom.Values)
                 {
                     byte[] a = i.ToByteS1();
-                    if (3 < a.Length)
-                    {
-                        l.Add(BitConverter.GetBytes(i.uId));
-                        l.Add(a);
-                    }
+                    l.Add(BitConverter.GetBytes(i.uId));
+                    l.Add(a);
                 }
             else if (vRoom.TryGetValue(rId, out r))
             {
@@ -467,31 +440,18 @@ namespace sQzLib
             return null;
         }
 
-        public byte[] ToByteR0(byte[] pre)
+        public List<byte[]> ToByteR0()
         {
             List<byte[]> l = new List<byte[]>();
+            l.Add(DT.ToByteh(mDt));
+            l.Add(BitConverter.GetBytes(vRoom.Count));
             foreach (ExamRoom r in vRoom.Values)
             {
-                byte[] prefx = BitConverter.GetBytes(r.uId);
-                byte[] b;
-                r.ToByteS0(prefx, out b);
-                l.Add(b);
+                l.Add(BitConverter.GetBytes(r.uId));
+                foreach (byte[] a in r.ToByteS0())
+                    l.Add(a);
             }
-            int sz = pre.Length;
-            foreach (byte[] b in l)
-                sz += b.Length;
-            //byte[] buf = new byte[sz + 4];
-            byte[] buf = new byte[sz];
-            sz = 0;
-            //Buffer.BlockCopy(BitConverter.GetBytes(vRoom.Count), 0, buf, sz, 4);
-            Buffer.BlockCopy(pre, 0, buf, sz, pre.Length);
-            sz += pre.Length;
-            foreach (byte[] i in l)
-            {
-                Buffer.BlockCopy(i, 0, buf, sz, i.Length);
-                sz += i.Length;
-            }
-            return buf;
+            return l;
         }
     }
 }
