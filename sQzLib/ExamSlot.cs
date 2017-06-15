@@ -229,7 +229,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            foreach (ExamRoom r in vRoom.Values)
+            foreach(ExamRoom r in vRoom.Values)
             {
                 r.vExaminee.Clear();
                 string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
@@ -253,6 +253,30 @@ namespace sQzLib
                         r.vExaminee.Add(e.uId, e);
                     }
                     reader.Close();
+                }
+            }
+            foreach(ExamRoom r in vRoom.Values)
+            {
+                foreach(ExamineeA e in r.vExaminee.Values)
+                {
+                    string qry = DBConnect.mkQrySelect("sqz_nee_qsheet",
+                        "t1,t2,grade,comp", "dt='" + mDt.ToString(DT._) + "' AND lv='" +
+                        e.eLv + "' AND neeid=" + e.uId);
+                    string emsg;
+                    MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
+                    if (reader != null)
+                    {
+                        if (reader.Read())
+                        {
+                            if (DT.Toh(reader.GetString(0), DT.hs, out e.dtTim1))
+                                break;
+                            if (DT.Toh(reader.GetString(1), DT.hs, out e.dtTim1))
+                                break;
+                            e.uGrade = reader.GetInt16(2);
+                            e.tComp = reader.GetString(3);
+                        }
+                        reader.Close();
+                    }
                 }
             }
             DBConnect.Close(ref conn);

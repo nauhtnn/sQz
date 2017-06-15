@@ -331,13 +331,16 @@ namespace sQzLib
             if (0 < vals.Length)
             {
                 vals.Remove(vals.Length - 1, 1);//remove the last comma
-                rval = DBConnect.Ins(conn, "sqz_nee_qsheet",
-                    "dt,lv,neeid,qsid,t1,t2,grade,comp,ans", vals.ToString(), out eMsg) < 0;
+                int rs;
+                rval = (rs = DBConnect.Ins(conn, "sqz_nee_qsheet",
+                    "dt,lv,neeid,qsid,t1,t2,grade,comp,ans", vals.ToString(), out eMsg)) < 0;
+                if (rs == DBConnect.PRI_KEY_EXISTS)
+                    eMsg = Txt.s._[(int)TxI.RS_UP_EXISTS];
             }
             else
             {
                 rval = true;
-                eMsg = "nothing to update DB";
+                eMsg = Txt.s._[(int)TxI.RS_UP_NOTHING];
             }
             DBConnect.Close(ref conn);
             return rval;

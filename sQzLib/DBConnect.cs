@@ -14,6 +14,7 @@ namespace sQzLib
         static string database = null;
         static string uid = null;
         static string password = null;
+        public const int PRI_KEY_EXISTS = -1062;
         //static bool bConnected;
 
         //Constructor
@@ -125,10 +126,10 @@ namespace sQzLib
                 n = cmd.ExecuteNonQuery();
                 eMsg = null;
             } catch(MySqlException e) {
-                if (e.Number == 1062)
+                if (e.Number == -PRI_KEY_EXISTS)
                 {
                     eMsg = null;
-                    n = -1062;
+                    n = PRI_KEY_EXISTS;
                 }
                 else
                 {
