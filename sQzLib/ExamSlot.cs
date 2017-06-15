@@ -270,19 +270,9 @@ namespace sQzLib
                 int rId = BitConverter.ToInt32(buf, offs);
                 offs += 4;
                 ExamRoom r;
-                if (vRoom.TryGetValue(rId, out r))
-                {
-                    if (r.ReadByte0(buf, ref offs))
+                if (vRoom.TryGetValue(rId, out r) &&
+                    r.ReadByte0(buf, ref offs))
                         return true;
-                }
-                else
-                {
-                    r = new ExamRoom();
-                    r.uId = rId;
-                    if (r.ReadByte0(buf, ref offs))
-                        return true;
-                    vRoom.Add(rId, r);
-                }
             }
             if (n == 0)
                 return false;

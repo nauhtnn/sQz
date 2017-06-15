@@ -195,7 +195,7 @@ namespace sQzServer0
                     outMsg = BitConverter.GetBytes(-1);
                     break;
                 case NetCode.SrvrSubmitting:
-                    if (mBrd.ReadByteSl0(buf, ref offs))
+                    if (!mBrd.ReadByteSl0(buf, ref offs))
                     {
                         foreach(ExamSlot sl in mBrd.vSl.Values)
                             sl.DBUpdateRs();

@@ -176,17 +176,22 @@ namespace sQzLib
                 return true;
         }
 
-        public byte[] ToByteSl0()
+        public byte[] ToByteSl0(byte[] prefx)
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(vSl.Count));
             foreach (ExamSlot sl in vSl.Values)
                 l.InsertRange(l.Count, sl.ToByteR0());
-            int sz = DT.BYTE_COUNT;
+            int sz = prefx.Length + DT.BYTE_COUNT;
             foreach (byte[] x in l)
                 sz += x.Length;
             byte[] buf = new byte[sz];
             sz = 0;
+            if(prefx != null)
+            {
+                Buffer.BlockCopy(prefx, 0, buf, sz, prefx.Length);
+                sz += prefx.Length;
+            }
             DT.ToByte(buf, ref sz, mDt);
             foreach (byte[] x in l)
             {
@@ -201,8 +206,6 @@ namespace sQzLib
             DateTime dt;
             if (DT.ReadByte(buf, ref offs, out dt) || dt != mDt)
                 return true;
-            if (dt != mDt)
-                return true;
             if (buf.Length - offs < 4)
                 return true;
             int n = BitConverter.ToInt32(buf, offs);
@@ -213,19 +216,9 @@ namespace sQzLib
                 if (DT.ReadByteh(buf, ref offs, out dt))
                     return true;
                 ExamSlot sl;
-                if (vSl.TryGetValue(dt.ToString(DT.hh), out sl))
-                {
-                    if (sl.ReadByteR0(buf, ref offs))
+                if (vSl.TryGetValue(dt.ToString(DT.hh), out sl) &&
+                    sl.ReadByteR0(buf, ref offs))
                         return true;
-                }
-                else
-                {
-                    sl = new ExamSlot();
-                    sl.Dt = dt;
-                    if (sl.ReadByteR0(buf, ref offs))
-                        return true;
-                    vSl.Add(sl.Dt.ToString(DT.hh), sl);
-                }
             }
             if (n == 0)
                 return false;

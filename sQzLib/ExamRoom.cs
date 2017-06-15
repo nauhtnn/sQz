@@ -168,13 +168,9 @@ namespace sQzLib
                 if (e.eStt == ExamStt.Finished)
                 {
                     ++n;
-                    foreach (byte[] b in e.ToByte())
-                        l.Add(b);
+                    l.InsertRange(l.Count, e.ToByte());
                 }
-            if (1 < l.Count)
-                l.Insert(1, BitConverter.GetBytes(n));
-            else
-                l.Add(BitConverter.GetBytes(n));
+            l.Insert(1, BitConverter.GetBytes(n));
             return l;
         }
 
@@ -182,11 +178,9 @@ namespace sQzLib
         {
             if (buf == null)
                 return true;
-            int l = buf.Length - offs;
-            if (l < 4)
+            if (buf.Length - offs < 4)
                 return true;
             int n = BitConverter.ToInt32(buf, offs);
-            l -= 4;
             offs += 4;
             while (0 < n)
             {

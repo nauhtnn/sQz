@@ -469,7 +469,7 @@ namespace sQzServer1
                     Array.Copy(BitConverter.GetBytes(uReqQSh), 0, outMsg, 4, 4);
                     break;
                 case NetCode.SrvrSubmitting:
-                    outMsg = mBrd.ToByteSl0();
+                    outMsg = mBrd.ToByteSl0(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
                     break;
             }
             return outMsg;
