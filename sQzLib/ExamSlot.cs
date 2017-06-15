@@ -333,14 +333,10 @@ namespace sQzLib
                 return true;
         }
 
-        public void DBUpdateRs()
+        public void DBUpdateRs(StringBuilder vals)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
             foreach (ExamRoom r in vRoom.Values)
-                r.DBUpdateRs(conn);
-            DBConnect.Close(ref conn);
+                r.DBUpdateRs(vals);
         }
 
         public bool GenQPack(int n, ExamLv lv, int[] vn)

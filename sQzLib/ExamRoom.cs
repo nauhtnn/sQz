@@ -69,42 +69,18 @@ namespace sQzLib
             return n;
         }
 
-        public void DBUpdateRs(MySqlConnection conn)
+        public void DBUpdateRs(StringBuilder vals)
         {
-            //foreach (ExamineeA e in vExaminee.Values)
-            //{
-            //    StringBuilder qry = new StringBuilder("UPDATE exnee" + uId + " SET ");
-            //    if (e.dtTim1.Hour != 0)
-            //    {
-            //        qry.Append("t1='" + e.dtTim1.ToString("HH:mm") + "'");
-            //        if (e.dtTim2.Hour != 0)
-            //        {
-            //            qry.Append(",t2='" + e.dtTim2.ToString("HH:mm") + "'");
-            //            if (e.uGrade != short.MaxValue)
-            //                qry.Append(",grd=" + e.uGrade);
-            //            if (e.tComp != null)
-            //            {
-            //                if (32 < e.tComp.Length)
-            //                    e.tComp = e.tComp.Substring(0, 32);//todo: more responsive
-            //                qry.Append(",comp='" + e.tComp + "'");
-            //            }
-            //            if (e.mAnsSh != null)
-            //            {
-            //                qry.Append(",qId=" + e.mAnsSh.uQSId);
-            //                if (e.mAnsSh.aAns != null)
-            //                {
-            //                    qry.Append(",anssh='");
-            //                    foreach (byte i in e.mAnsSh.aAns)
-            //                        qry.Append(i);
-            //                    qry.Append("'");
-            //                }
-            //            }
-            //        }
-            //        qry.Append(" WHERE slId=" + e.uSlId +
-            //            " AND lv=" + (int)e.mLv + " AND id=" + e.uId);
-            //        DBConnect.Update(conn, qry.ToString());
-            //    }
-            //}
+            foreach (ExamineeS0 e in vExaminee.Values)
+                if (e.bToDB)
+                {
+                    vals.Append("('" + e.mDt.ToString(DT._) + "','" + e.eLv.ToString() + "'," +
+                        e.uId + "," + (e.mAnsSh.uQSId - ((e.eLv == ExamLv.A) ? 0 : ExamineeA.LV_CAP))
+                        + ",'" + e.dtTim1.ToString(DT.hh) +
+                        "','" + e.dtTim2.ToString(DT.hh) + "'," + e.uGrade + ",'" +
+                        e.tComp + "','" + e.mAnsSh.tAns + "'),");
+                    e.bToDB = false;
+                }
         }
 
         public ExamineeA Signin(ExamineeA e)

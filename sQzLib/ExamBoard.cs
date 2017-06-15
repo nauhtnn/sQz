@@ -315,5 +315,32 @@ namespace sQzLib
             else
                 return true;
         }
+
+        public bool DBUpdateRs(out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if(conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return true;
+            }
+            StringBuilder vals = new StringBuilder();
+            foreach (ExamSlot sl in vSl.Values)
+                sl.DBUpdateRs(vals);
+            bool rval;
+            if (0 < vals.Length)
+            {
+                vals.Remove(vals.Length - 1, 1);//remove the last comma
+                rval = DBConnect.Ins(conn, "sqz_nee_qsheet",
+                    "dt,lv,neeid,qsid,t1,t2,grade,comp,ans", vals.ToString(), out eMsg) < 0;
+            }
+            else
+            {
+                rval = true;
+                eMsg = "nothing to update DB";
+            }
+            DBConnect.Close(ref conn);
+            return rval;
+        }
     }
 }

@@ -14,6 +14,14 @@ namespace sQzLib
         public ListBox[] vlbxAns;
         public AnsItem[][] vAnsItem;
         public byte[] aAns;
+        public string tAns {
+            get {
+                StringBuilder sb = new StringBuilder();
+                foreach (byte b in aAns)
+                    sb.Append((b == 0) ? '0' : '1');
+                return sb.ToString();
+            }
+        }
         public int uQSId;
         public bool bChanged;
         DgEvntCB dgSelChgCB;

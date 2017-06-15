@@ -8,7 +8,11 @@ namespace sQzLib
 {
     public sealed class ExamineeS0: ExamineeA
     {
-        public ExamineeS0() { }
+        public bool bToDB;
+        public ExamineeS0()
+        {
+            bToDB = false;
+        }
 
         public override List<byte[]> ToByte()
         {
@@ -116,6 +120,8 @@ namespace sQzLib
             if (eStt == ExamStt.Finished)
                 return;
             //suppose eStt = eINFO and e.eStt = ExamStt.Finished
+            eStt = ExamStt.Finished;
+            bToDB = true;
             tComp = e.tComp;
             mAnsSh = e.mAnsSh;
             dtTim1 = e.dtTim1;

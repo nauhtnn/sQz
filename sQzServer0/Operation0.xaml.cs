@@ -197,17 +197,22 @@ namespace sQzServer0
                 case NetCode.SrvrSubmitting:
                     if (!mBrd.ReadByteSl0(buf, ref offs))
                     {
-                        foreach(ExamSlot sl in mBrd.vSl.Values)
-                            sl.DBUpdateRs();
-                        Dispatcher.Invoke(() => {
-                            foreach (TabItem ti in tbcSl.Items)
+                        string emsg;
+                        if (mBrd.DBUpdateRs(out emsg))
+                            mCbMsg += emsg;
+                        else
+                        {
+                            mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
+                            Dispatcher.Invoke(() =>
                             {
-                                Op0SlotView vw = ti.Content as Op0SlotView;
-                                if (vw != null)
-                                    vw.UpdateRsView();
-                            }
-                        });
-                        mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
+                                foreach (TabItem ti in tbcSl.Items)
+                                {
+                                    Op0SlotView vw = ti.Content as Op0SlotView;
+                                    if (vw != null)
+                                        vw.UpdateRsView();
+                                }
+                            });
+                        }
                     }
                     outMsg = BitConverter.GetBytes(1);
                     break;
