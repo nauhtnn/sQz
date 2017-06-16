@@ -367,6 +367,47 @@ namespace sQzLib
             DBConnect.Update(conn, "sqz_question", "del=1", ids, out eMsg);
         }
 
+        public Question DeepCopy()
+        {
+            Question q = new Question();
+            q.uId = uId;
+            q.mStmt = mStmt;
+            q.nAns = nAns;
+            q.mIU = mIU;
+            q.vAns = new string[nAns];
+            for (int i = 0; i < nAns; ++i)
+                q.vAns[i] = vAns[i];
+            q.vKeys = new bool[nAns];
+            for (int i = 0; i < nAns; ++i)
+                q.vKeys[i] = vKeys[i];
+            //q.vAnsSort
+            return q;
+        }
+
+        public void Randomize(Random rand)
+        {
+            string[] anss = new string[nAns];
+            bool[] keys = new bool[nAns];
+            int[] asort = new int[nAns];
+            List<int> l = new List<int>();
+            int n = nAns;
+            for (int i = 0; i < n; ++i)
+                l.Add(i);
+            while (0 < n)
+            {
+                int lidx = rand.Next() % n;
+                int idx = l[lidx];
+                l.RemoveAt(lidx);
+                --n;
+                anss[n] = vAns[idx];
+                keys[n] = vKeys[idx];
+                asort[n] = idx;
+            }
+            vAns = anss;
+            vKeys = keys;
+            vAnsSort = asort;
+        }
+
         public Question RandomizeDeepCopy(Random rand)
         {
             Question q = new Question();

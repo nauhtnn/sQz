@@ -150,21 +150,21 @@ namespace sQzLib
             for (i = 0; i < n; ++i)
                 l.Add(new QuestSheet());
             i = 0;
-            foreach(IUx iu in QuestSheet.GetIUs(eLv))
+            Random rand = new Random();
+            foreach (IUx iu in QuestSheet.GetIUs(eLv))
             {
                 //
                 QuestSheet qs0 = new QuestSheet();
                 qs0.DBSelect(iu);
                 //
-                Random rand = new Random();
                 foreach (QuestSheet qs in l)
                 {
                     List<Question> vq = qs0.ShallowCopy();
                     int ni = vn[i];
-                    while(0 < ni)
+                    while (0 < ni)
                     {
                         int idx = rand.Next() % ni;
-                        qs.vQuest.Add(vq.ElementAt(idx));
+                        qs.vQuest.Add(vq.ElementAt(idx).DeepCopy());
                         vq.RemoveAt(idx);
                         --ni;
                     }
@@ -176,6 +176,7 @@ namespace sQzLib
             foreach (QuestSheet qs in l)
             {
                 qs.eLv = eLv;
+                qs.Randomize(rand);
                 if (!qs.UpdateCurQSId())//todo: better error handle
                     vSheet.Add(qs.uId, qs);
                 else

@@ -221,6 +221,33 @@ namespace sQzLib
             return l;
         }
 
+        public QuestSheet DeepCopy()
+        {
+            QuestSheet qs = new QuestSheet();
+            qs.eLv = eLv;
+            qs.uId = uId;
+            qs.mDiff = mDiff;
+            foreach (Question qi in vQuest)
+                qs.vQuest.Add(qi.DeepCopy());
+            return qs;
+        }
+
+        public void Randomize(Random rand)
+        {
+            List<Question> qs = new List<Question>();
+            int n = vQuest.Count;
+            while (0 < n)
+            {
+                int sel = rand.Next() % n;
+                qs.Add(vQuest[sel]);
+                vQuest.RemoveAt(sel);
+                --n;
+            }
+            vQuest = qs;
+            foreach (Question q in vQuest)
+                q.Randomize(rand);
+        }
+
         public QuestSheet RandomizeDeepCopy(Random rand)
         {
             QuestSheet qs = new QuestSheet();
@@ -246,21 +273,6 @@ namespace sQzLib
             qs.vQuest = lq;
 
             return qs;
-        }
-
-        public void Randomize()
-        {
-            List<Question> qs = new List<Question>();
-            int n = vQuest.Count;
-            Random r = new Random(sSeed);
-            while (0 < n)
-            {
-                int sel = r.Next() % n;
-                qs.Add(vQuest[sel]);
-                vQuest.RemoveAt(sel);
-                --n;
-            }
-            vQuest = qs;
         }
 
         public int[] DBCount(out string eMsg)

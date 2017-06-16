@@ -365,7 +365,18 @@ namespace sQzLib
 
         public bool GenQPack(int n, ExamLv lv, int[] vn)
         {
-            List<QuestSheet> l = vQPack[lv].GenQPack3(n, vn);
+            List<QuestSheet> l;
+            if(System.IO.File.Exists("Randomize.txt"))
+            {
+                int method;
+                if (int.TryParse(System.IO.File.ReadAllText("Randomize.txt"), out method)
+                    && method == 3)
+                    l = vQPack[lv].GenQPack3(n, vn);
+                else
+                    l = vQPack[lv].GenQPack2(n, vn);
+            }
+            else
+                l = vQPack[lv].GenQPack(n, vn);
             mKeyPack.ExtractKey(l);
             return false;
         }
