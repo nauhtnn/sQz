@@ -183,7 +183,7 @@ namespace sQzClient
                             l -= 8;
                             StringBuilder sb = new StringBuilder();
                             sb.AppendFormat(Txt.s._[(int)TxI.SIGNIN_AL], h.ToString() + ':' + m);
-                            sb.Append(mNee.tComp + '.');
+                            sb.Append(comp + '.');
                             msg = sb.ToString();
                         }
                         else if (errc == (int)TxI.SIGNIN_NOK)
