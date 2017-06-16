@@ -221,7 +221,34 @@ namespace sQzLib
             return l;
         }
 
-        public void Rearrange()
+        public QuestSheet RandomizeDeepCopy(Random rand)
+        {
+            QuestSheet qs = new QuestSheet();
+            qs.eLv = eLv;
+            qs.uId = uId;
+            qs.mDiff = mDiff;
+            foreach (Question qi in vQuest)
+                qs.vQuest.Add(qi.RandomizeDeepCopy(rand));
+            //aQuest
+            //randomize
+            List<Question> lq = new List<Question>();
+            List<int> l = new List<int>();
+            int n = qs.vQuest.Count;
+            for (int i = 0; i < n; ++i)
+                l.Add(i);
+            while (0 < n)
+            {
+                int idx = rand.Next() % n;
+                lq.Add(qs.vQuest.ElementAt(idx));
+                qs.vQuest.RemoveAt(idx);
+                --n;
+            }
+            qs.vQuest = lq;
+
+            return qs;
+        }
+
+        public void Randomize()
         {
             List<Question> qs = new List<Question>();
             int n = vQuest.Count;

@@ -49,10 +49,16 @@ FOREIGN KEY(`lqid`) REFERENCES `sqz_long_q_path`(`id`),
 INDEX(`mid`,`del`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATE, `lv` CHAR CHARACTER SET `ascii`,
-`qsid` SMALLINT UNSIGNED, `qid` INT UNSIGNED,
+`qsid` SMALLINT UNSIGNED, `qid` INT UNSIGNED, `asort` CHAR(4) CHARACTER SET `utf8`,
 PRIMARY KEY(`dt`, `lv`, `qsid`, `qid`),
 FOREIGN KEY(`dt`, `lv`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `lv`, `id`),
 FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`));
+
+-- CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATE, `lv` CHAR CHARACTER SET `ascii`,
+-- `qsid` SMALLINT UNSIGNED, `qid` INT UNSIGNED,
+-- PRIMARY KEY(`dt`, `lv`, `qsid`, `qid`),
+-- FOREIGN KEY(`dt`, `lv`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `lv`, `id`),
+-- FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_img_path`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `path` VARCHAR(256) CHARACTER SET `utf8`);

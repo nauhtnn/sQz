@@ -184,7 +184,38 @@ namespace sQzLib
             foreach (int idx in eidx)
                 l.RemoveAt(idx);
 
-            return l;
+            if (DBIns(mDt, l) == null)
+                return l;
+            return new List<QuestSheet>();
+        }
+
+        public List<QuestSheet> GenQPack3(int n, int[] vn)
+        {
+            string emsg;
+            List<QuestSheet> l = new List<QuestSheet>();
+            QuestSheet qs0 = new QuestSheet();
+            int j = -1;
+            foreach (IUx i in QuestSheet.GetIUs(eLv))
+                if (qs0.DBSelect(i, vn[++j], out emsg))
+                {
+                    WPopup.s.ShowDialog(emsg);
+                    return new List<QuestSheet>();
+                }
+            Random rand = new Random();
+            while (0 < n)
+            {
+                --n;
+                QuestSheet qs = qs0.RandomizeDeepCopy(rand);
+                qs.eLv = eLv;
+                if (!qs.UpdateCurQSId())//todo: better error handle
+                {
+                    vSheet.Add(qs.uId, qs);
+                    l.Add(qs);
+                }
+            }
+            if (DBIns(mDt, l) == null)
+                return l;
+            return new List<QuestSheet>();
         }
 
         public static string DBIns(DateTime dt, List<QuestSheet> l)
@@ -211,6 +242,48 @@ namespace sQzLib
             vals.Clear();
             prefx = "('" + dt.ToString(DT._) + "',";
             foreach(QuestSheet qs in l)
+                foreach (Question q in qs.vQuest)
+                {
+                    vals.Append(prefx + "'" + qs.eLv.ToString() + "'," +
+                        qs.uId + "," + q.uId + ",");
+                    foreach (int i in q.vAnsSort)
+                        vals.Append(i.ToString());
+                    vals.Append("),");
+                }
+            vals.Remove(vals.Length - 1, 1);//remove the last comma
+            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid,asort", vals.ToString(), out eMsg) < 0)
+            {
+                DBConnect.Close(ref conn);
+                return eMsg;
+            }
+            DBConnect.Close(ref conn);
+            return null;
+        }
+
+        public static string DBIns0(DateTime dt, List<QuestSheet> l)
+        {
+            if (l.Count == 0)
+                return Txt.s._[(int)TxI.DB_DAT_NOK];
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return Txt.s._[(int)TxI.DB_NOK];
+            StringBuilder vals = new StringBuilder();
+            string prefx = "('" + dt.ToString(DT._) + "',";
+            foreach (QuestSheet qs in l)
+                vals.Append(prefx + "'" + qs.eLv.ToString() + "'," + qs.uId +
+                    ",'" + dt.ToString(DT.hh) + "'),");
+            vals.Remove(vals.Length - 1, 1);//remove the last comma
+            string eMsg;
+            if (DBConnect.Ins(conn, "sqz_qsheet", "dt,lv,id,t", vals.ToString(), out eMsg) < 0)
+            {
+                DBConnect.Close(ref conn);
+                if (eMsg == null)
+                    eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.QS_ID_EXISTS];
+                return eMsg;
+            }
+            vals.Clear();
+            prefx = "('" + dt.ToString(DT._) + "',";
+            foreach (QuestSheet qs in l)
                 foreach (Question q in qs.vQuest)
                     vals.Append(prefx + "'" + qs.eLv.ToString() + "'," +
                         qs.uId + "," + q.uId + "),");

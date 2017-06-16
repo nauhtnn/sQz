@@ -365,7 +365,7 @@ namespace sQzLib
 
         public bool GenQPack(int n, ExamLv lv, int[] vn)
         {
-            List<QuestSheet> l = vQPack[lv].GenQPack2(n, vn);
+            List<QuestSheet> l = vQPack[lv].GenQPack3(n, vn);
             mKeyPack.ExtractKey(l);
             return false;
         }

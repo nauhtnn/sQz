@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MySql.Data.MySqlClient;
+using System.Text;
 
 /*
 CREATE TABLE IF NOT EXISTS `q0` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -74,6 +75,7 @@ namespace sQzLib
         public IUx mIU;
         public string[] vAns;
         public bool[] vKeys;
+        public int[] vAnsSort;
         bool bChoiceSort;
         public QuestType qType;
         ContentType cType;
@@ -81,7 +83,7 @@ namespace sQzLib
         static int siToken;
         //static Settings sSett;
         //static string[] qPattern = { "[a-zA-Z]+[0-9]+", "[0-9]+\\." };
-		static string[] qPattern = { "[0-9]+\\." };
+        static string[] qPattern = { "[0-9]+\\." };
         int qSubs;
         static string[] aPattern = { "\\([a-zA-Z]\\)", "[a-zA-Z]\\." };
         List<int> aSubs;
@@ -94,6 +96,9 @@ namespace sQzLib
             cType = ContentType.Raw;
             qSubs = -1;
             aSubs = new List<int>();
+            vAnsSort = new int[4];//hardcode, todo
+            for (int i = 0; i < 4; ++i)
+                vAnsSort[i] = i;
         }
 
         TokenType classify(string s) {
@@ -151,7 +156,7 @@ namespace sQzLib
         void searchAns()
         {
             List<int> v = new List<int>(3 * vAns.Length);
-            for(int k = 0; k < nAns; ++k)
+            for (int k = 0; k < nAns; ++k)
                 for (int i = 0; i < aPattern.Length; ++i)
                 {
                     System.Text.RegularExpressions.MatchCollection m =
@@ -199,7 +204,7 @@ namespace sQzLib
             int n = 0;
             while (n < nAns && (t == TokenType.Ans || t == TokenType.Both)) {
                 if (np < aSubs.Count) {
-                    vAns[n++] =  Utils.CleanFront(svToken[siToken++], aSubs[np]);
+                    vAns[n++] = Utils.CleanFront(svToken[siToken++], aSubs[np]);
                     np = aSubs.Count;
                 }
                 else
@@ -342,23 +347,51 @@ namespace sQzLib
 
         public override string ToString()
         {
-            string s = mStmt + '\n';
+            StringBuilder s = new StringBuilder();
+            s.Append('(' + (int)mIU +") " + mStmt + '\n');
             for (int i = 0; i < nAns; ++i)
-                s += vAns[i] + '\n';
-            return s;
+                s.Append(vAns[i] + '\n');
+            return s.ToString();
         }
 
         public static void Clear()
         {
             siToken = 0;//safe to be 0
         }
-        
-		public static void DBDelete(IUx eIU, string ids) {
+
+        public static void DBDelete(IUx eIU, string ids) {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
             string eMsg;
             DBConnect.Update(conn, "sqz_question", "del=1", ids, out eMsg);
+        }
+
+        public Question RandomizeDeepCopy(Random rand)
+        {
+            Question q = new Question();
+            q.uId = uId;
+            q.mStmt = mStmt;
+            q.nAns = nAns;
+            q.mIU = mIU;
+            //randomize
+            q.vAns = new string[nAns];
+            q.vKeys = new bool[nAns];
+            List<int> l = new List<int>();
+            int n = nAns;
+            for (int i = 0; i < n; ++i)
+                l.Add(i);
+            while(0 < n)
+            {
+                int lidx = rand.Next() % n;
+                int idx = l[lidx];
+                l.RemoveAt(lidx);
+                --n;
+                q.vAns[n] = vAns[idx];
+                q.vKeys[n] = vKeys[idx];
+                q.vAnsSort[n] = idx;
+            }
+            return q;
         }
     }
 }
