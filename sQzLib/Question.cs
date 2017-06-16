@@ -263,14 +263,14 @@ namespace sQzLib
                 return false;
             if (qType == QuestType.Single || qType == QuestType.Multiple)
                 readAns();
-            mStmt = Utils.HTML(mStmt, ref cType);
+            //mStmt = Utils.HTML(mStmt, ref cType);
             vKeys = new bool[nAns];
             for (int ki = 0; ki < nAns; ++ki)
                 vKeys[ki] = false;
             int ci = 0, keyC = 0;
             for (; ci < nAns; ++ci)
             {
-                vAns[ci] = Utils.HTML(vAns[ci], ref cType);
+                //vAns[ci] = Utils.HTML(vAns[ci], ref cType);
                 if (vAns[ci][0] == '\\')
                 {
                     vKeys[ci] = true;
