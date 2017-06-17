@@ -11,8 +11,13 @@ using sQzLib;
 
 namespace sQzServer0
 {
-    public class Op0SlotView: StackPanel
+    public class Op0SlotView: TabItem
     {
+        StackPanel spContent;
+        RadioButton rdoQ;
+        RadioButton rdoNee;
+        StackPanel spNee;
+        ScrollViewer svwrQ;
         public Dictionary<int, TextBlock> vGrade;
         public Dictionary<int, TextBlock> vDt1;
         public Dictionary<int, TextBlock> vDt2;
@@ -33,7 +38,18 @@ namespace sQzServer0
             vDt1 = new Dictionary<int, TextBlock>();
             vDt2 = new Dictionary<int, TextBlock>();
             vComp = new Dictionary<int, TextBlock>();
-            vTbx = new TextBox[15];//hardcode
+        }
+
+        public Op0SlotView(ExamSlot sl)
+        {
+            vGrade = new Dictionary<int, TextBlock>();
+            vDt1 = new Dictionary<int, TextBlock>();
+            vDt2 = new Dictionary<int, TextBlock>();
+            vComp = new Dictionary<int, TextBlock>();
+            //
+            mSl = sl;
+            Header = mSl.Dt.ToString(DT.hh);
+            Name = "_" + (Header as string).Replace(':', '_');
         }
 
         public void ShowExaminee()
@@ -136,18 +152,56 @@ namespace sQzServer0
                 }
         }
 
-        public void ShallowCopy(StackPanel refSp)
+        public void DeepCopy(TabItem refTbi)
         {
-            foreach(Grid refg in refSp.Children.OfType<Grid>())
+            spContent = new StackPanel();
+            StackPanel refsp = refTbi.Content as StackPanel;
+            foreach(Grid refg in refsp.Children.OfType<Grid>())
             {
                 Grid g = new Grid();
-                foreach(ColumnDefinition cd in refg.ColumnDefinitions)
+                foreach (ColumnDefinition cd in refg.ColumnDefinitions)
                 {
                     ColumnDefinition d = new ColumnDefinition();
                     d.Width = cd.Width;
                     g.ColumnDefinitions.Add(d);
                 }
-                foreach(TextBlock txt in refg.Children)
+                foreach (RowDefinition rd in refg.RowDefinitions)
+                {
+                    RowDefinition d = new RowDefinition();
+                    d.Height = rd.Height;
+                    g.RowDefinitions.Add(d);
+                }
+                foreach (RadioButton refrdo in refg.Children.OfType<RadioButton>())
+                {
+                    RadioButton rdo = new RadioButton();
+                    Grid.SetColumn(rdo, Grid.GetColumn(refrdo));
+                    rdo.Name = refrdo.Name;
+                    rdo.Checked += vwMode_Check;
+                    g.Children.Add(rdo);
+                }
+                spContent.Children.Add(g);
+            }
+            foreach (StackPanel refp in refsp.Children.OfType<StackPanel>())
+                DeepCopy(refp);
+            //foreach(ScrollViewer svwr in refsp.Children.OfType<ScrollViewer>())
+            //{ }
+            svwrQ = new ScrollViewer();
+            Content = spContent;
+        }
+
+        void DeepCopy(StackPanel refSp)
+        {
+            spNee = new StackPanel();
+            foreach (Grid refg in refSp.Children.OfType<Grid>())
+            {
+                Grid g = new Grid();
+                foreach (ColumnDefinition cd in refg.ColumnDefinitions)
+                {
+                    ColumnDefinition d = new ColumnDefinition();
+                    d.Width = cd.Width;
+                    g.ColumnDefinitions.Add(d);
+                }
+                foreach (TextBlock txt in refg.Children)
                 {
                     TextBlock t = new TextBlock();
                     t.Text = txt.Text;
@@ -157,7 +211,7 @@ namespace sQzServer0
                     Grid.SetRow(t, Grid.GetRow(txt));
                     g.Children.Add(t);
                 }
-                Children.Add(g);
+                spNee.Children.Add(g);
             }
 
             foreach (ScrollViewer refscrvwr in refSp.Children.OfType<ScrollViewer>())
@@ -177,98 +231,28 @@ namespace sQzServer0
                     grdNee.ColumnDefinitions.Add(d);
                 }
                 vwr.Content = grdNee;
-                Children.Add(vwr);
+                spNee.Children.Add(vwr);
             }
 
-            foreach(StackPanel refsp in refSp.Children.OfType<StackPanel>())
+            spContent.Children.Add(spNee);
+            //InitQPanel();
+        }
+
+        private void vwMode_Check(object sender, RoutedEventArgs e)
+        {
+            RadioButton rdo = sender as RadioButton;
+            if (rdo == null)
+                return;
+            if(rdo.Name == "Q")
             {
-                StackPanel sp = new StackPanel();
-                sp.Orientation = refsp.Orientation;
-
-                foreach (Grid refg in refsp.Children.OfType<Grid>())
-                {
-                    grdQCtrl = new Grid();
-                    foreach (ColumnDefinition cd in refg.ColumnDefinitions)
-                    {
-                        ColumnDefinition d = new ColumnDefinition();
-                        d.Width = cd.Width;
-                        grdQCtrl.ColumnDefinitions.Add(d);
-                    }
-                    foreach (RowDefinition rd in refg.RowDefinitions)
-                    {
-                        RowDefinition d = new RowDefinition();
-                        d.Height = rd.Height;
-                        grdQCtrl.RowDefinitions.Add(d);
-                    }
-                    foreach (TextBlock txt in refg.Children.OfType<TextBlock>())
-                    {
-                        TextBlock t = new TextBlock();
-                        if (txt.Name == "txtNq")
-                            txtNq = t;
-                        else if (txt.Name == "tbxNq")
-                            tbxNq = t;
-                        t.Text = txt.Text;
-                        Grid.SetColumn(t, Grid.GetColumn(txt));
-                        Grid.SetRow(t, Grid.GetRow(txt));
-                        t.Margin = txt.Margin;
-                        grdQCtrl.Children.Add(t);
-                    }
-                    foreach (TextBox tbx in refg.Children.OfType<TextBox>())
-                    {
-                        TextBox t = new TextBox();
-                        if (tbx.Name == "n")
-                            tbxNqs = t;
-                        else
-                            vTbx[int.Parse(tbx.Name.Substring(1))] = t;
-                        t.Width = tbx.Width;
-                        Grid.SetColumn(t, Grid.GetColumn(tbx));
-                        Grid.SetRow(t, Grid.GetRow(tbx));
-                        t.Margin = tbx.Margin;
-                        t.IsEnabled = tbx.IsEnabled;
-                        grdQCtrl.Children.Add(t);
-                    }
-                    foreach (RadioButton rdo in refg.Children.OfType<RadioButton>())
-                    {
-                        RadioButton b = new RadioButton();
-                        b.Content = rdo.Content;
-                        b.GroupName = rdo.GroupName;
-                        Grid.SetColumn(b, Grid.GetColumn(rdo));
-                        Grid.SetRow(b, Grid.GetRow(rdo));
-                        b.HorizontalAlignment = rdo.HorizontalAlignment;
-                        b.VerticalAlignment = rdo.VerticalAlignment;
-                        b.IsChecked = rdo.IsChecked;
-                        if (rdo.Name == "A")//hardcode, 2 cases
-                            rdoA = b;
-                        else
-                            rdoB = b;
-                        b.Checked += rdo_Checked;
-                        grdQCtrl.Children.Add(b);
-                    }
-                    foreach (Button b in refg.Children.OfType<Button>())
-                    {
-                        btnQSGen = new Button();
-                        btnQSGen.Content = b.Content;
-                        Grid.SetColumn(btnQSGen, Grid.GetColumn(b));
-                        Grid.SetRow(btnQSGen, Grid.GetRow(b));
-                        btnQSGen.IsEnabled = b.IsEnabled;
-                        btnQSGen.Click += btnQSGen_Click;
-                        grdQCtrl.Children.Add(btnQSGen);
-                    }
-                    sp.Children.Add(grdQCtrl);
-                }
-
-                foreach(TabControl tbc in refsp.Children.OfType<TabControl>())
-                {
-                    tbcQuest = new TabControl();
-                    tbcQuest.Width = tbc.Width;
-                    tbcQuest.Height = tbc.Height;
-                    sp.Children.Add(tbcQuest);
-                }
-
-                Children.Add(sp);
+                spNee.Visibility = Visibility.Collapsed;
+                svwrQ.Visibility = Visibility.Visible;
             }
-
-            InitQPanel();
+            else
+            {
+                svwrQ.Visibility = Visibility.Collapsed;
+                spNee.Visibility = Visibility.Visible;
+            }
         }
 
         private void btnQSGen_Click(object sender, RoutedEventArgs e)

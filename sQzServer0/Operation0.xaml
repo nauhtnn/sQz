@@ -8,124 +8,166 @@
       d:DesignHeight="720" d:DesignWidth="1280"
       Title="ExamList">
 
-    <StackPanel x:Name="spMain" Loaded="Main_Loaded">
-        <StackPanel Orientation="Horizontal">
-            <Button x:Name="btnStartSrvr" Width="100" Height="40" Content="Start server" Click="btnStartSrvr_Click"></Button>
-            <Button x:Name="btnStopSrvr" Width="100" Height="40" Content="Stop srvr" Click="btnStopSrvr_Click"></Button>
-            <Button x:Name="btnPrep" Width="100" Height="40" Content="Prepare" Click="btnPrep_Click"></Button>
-            <Button x:Name="btnExit" Content="Exit" Height="40" Width="100" Click="btnExit_Click"/>
-        </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="10">
+    <StackPanel x:Name="spMain" Loaded="Main_Loaded" Orientation="Horizontal" Margin="10">
+        <StackPanel Width="384">
+            <StackPanel Orientation="Horizontal">
+                <Button x:Name="btnStartSrvr" Width="100" Height="40" Content="Start server" Click="btnStartSrvr_Click"/>
+                <Button x:Name="btnStopSrvr" Width="100" Height="40" Content="Stop srvr" Click="btnStopSrvr_Click"/>
+                <Button x:Name="btnExit" Content="Exit" Height="40" Width="100" Click="btnExit_Click"/>
+            </StackPanel>
             <StackPanel>
                 <StackPanel Orientation="Horizontal">
                     <ListBox x:Name="lbxBrd" Width="140" Height="200" SelectionChanged="lbxBrd_SelectionChanged"/>
                     <ListBox x:Name="lbxSl" Width="90" Height="200" SelectionMode="Multiple"/>
                 </StackPanel>
-                <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
-                    <TextBlock x:Name="lblStatus" Width="400" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
-                </ScrollViewer>
             </StackPanel>
-            <TabControl x:Name="tbcSl" Width="800"/>
-            <StackPanel x:Name="refSl" Visibility="Collapsed">
-                <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="40"/>
-                        <ColumnDefinition Width="180"/>
-                        <ColumnDefinition Width="80"/>
-                        <ColumnDefinition Width="140"/>
-                        <ColumnDefinition Width="40"/>
-                        <ColumnDefinition Width="40"/>
-                        <ColumnDefinition Width="40"/>
-                        <ColumnDefinition Width="100"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock x:Name="txtId" Text="ID" Background="AliceBlue" TextAlignment="Center"/>
-                    <TextBlock x:Name="txtName" Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
-                    <TextBlock x:Name="txtBirdate" Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
-                    <TextBlock x:Name="txtBirpl" Grid.Column="3" Text="Birthplace" Background="Gold" TextAlignment="Center"/>
-                    <TextBlock x:Name="txtGrade" Grid.Column="4" Text="Grade" Background="Azure" TextAlignment="Center"/>
-                    <TextBlock x:Name="txtDt1" Grid.Column="5" Text="Dt1" Background="Azure" TextAlignment="Center"/>
-                    <TextBlock x:Name="txtDt2" Grid.Column="6" Text="Dt2" Background="Azure" TextAlignment="Center"/>
-                    <TextBlock x:Name="txtComp" Grid.Column="7" Text="Comp" Background="Azure" TextAlignment="Center"/>
-                </Grid>
-                <ScrollViewer Width="676" Height="290" VerticalScrollBarVisibility="Auto">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="180"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="140"/>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="100"/>
-                        </Grid.ColumnDefinitions>
-                    </Grid>
+            <Button Content="Generate" x:Name="btnQSGen" IsEnabled="False"/>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <RadioButton GroupName="IU" Name="A" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <RadioButton GroupName="IU" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                <TextBlock x:Name="txtNqs" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
+                <TextBox x:Name="n" Grid.Row="1" Width="30" Grid.Column="1" Margin="5" Text="0"/>
+                <TextBlock x:Name="txtNq" Grid.Row="2" Grid.Column="0" Margin="5" Height="25"/>
+                <TextBlock x:Name="tbxNq" Width="30" Grid.Row="2" Grid.Column="1" Margin="5"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="Module"/>
+                <TextBlock Text="nqs" Grid.Column="1"/>
+                <TextBlock Text="ndiff" Grid.Column="2"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="m1"/>
+                <TextBox Width="30" Grid.Column="1"/>
+                <TextBox Width="30" Grid.Column="2"/>
+                <TextBlock Text="m2" Grid.Row="1"/>
+                <TextBox Width="30" Grid.Row="1" Grid.Column="1"/>
+                <TextBox Width="30" Grid.Row="1" Grid.Column="2"/>
+                <TextBlock Text="m3" Grid.Row="2"/>
+                <TextBox Width="30" Grid.Row="2" Grid.Column="1"/>
+                <TextBox Width="30" Grid.Row="2" Grid.Column="2"/>
+                <TextBlock Text="m4" Grid.Row="3"/>
+                <TextBox Width="30" Grid.Row="3" Grid.Column="1"/>
+                <TextBox Width="30" Grid.Row="3" Grid.Column="2"/>
+                <TextBlock Text="m5" Grid.Row="4"/>
+                <TextBox Width="30" Grid.Row="4" Grid.Column="1"/>
+                <TextBox Width="30" Grid.Row="4" Grid.Column="2"/>
+                <TextBlock Text="m6" Grid.Row="5"/>
+                <TextBox Width="30" Grid.Row="5" Grid.Column="1"/>
+                <TextBox Width="30" Grid.Row="5" Grid.Column="2"/>
+            </Grid>
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                    <RowDefinition Height="30"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="m7"/>
+                <TextBox Width="30" Grid.Column="1"/>
+                <TextBox Width="30" Grid.Column="2"/>
+                <TextBlock Text="m8" Grid.Row="1"/>
+                <TextBox Width="30" Grid.Row="1" Grid.Column="1"/>
+                <TextBox Width="30" Grid.Row="1" Grid.Column="2"/>
+                <TextBlock Text="m10" Grid.Row="2"/>
+                <TextBox Width="30" Grid.Row="2" Grid.Column="1"/>
+                <TextBox Width="30" Grid.Row="2" Grid.Column="2"/>
+            </Grid>
+        </StackPanel>
+        <TabControl x:Name="tbcSl" Width="876">
+            <TabItem Header="_0">
+                <ScrollViewer x:Name="svwrStt" Height="320" VerticalScrollBarVisibility="Auto">
+                    <TextBlock x:Name="lblStatus" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"/>
                 </ScrollViewer>
-                <StackPanel Orientation="Horizontal">
+            </TabItem>
+            <TabItem x:Name="tbiSl">
+                <StackPanel>
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="40"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
-                            <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
-                        <TextBlock x:Name="txtNqs" Grid.Row="1" Grid.Column="0" Margin="5" Height="25"/>
-                        <TextBox x:Name="n" Grid.Row="1" Width="30" Grid.Column="1" Margin="5" Text="0"/>
-                        <Button x:Name="btnQSGen" Grid.Row="1" Grid.Column="2" IsEnabled="False"/>
-                        <TextBlock x:Name="txtNq" Grid.Row="2" Grid.Column="0" Margin="5" Height="25"/>
-                        <TextBlock x:Name="tbxNq" Width="30" Grid.Row="2" Grid.Column="1" Margin="5"/>
-                        <TextBlock Text="module 1" Grid.Row="2" Grid.Column="2" Margin="5" Height="25"/>
-                        <TextBox Name="_0" Width="30" Grid.Row="2" Grid.Column="3" Margin="5"/>
-                        <TextBlock Text="module 2" Grid.Row="3" Grid.Column="0" Margin="5" />
-                        <TextBox Name="_1" Width="30" Grid.Row="3" Grid.Column="1" Margin="5"/>
-                        <TextBlock Text="module 3" Grid.Row="3" Grid.Column="2" Margin="5" />
-                        <TextBox Name="_2" Width="30" Grid.Row="3" Grid.Column="3" Margin="5"/>
-                        <TextBlock Text="module 4" Grid.Row="4" Grid.Column="0" Margin="5" />
-                        <TextBox Name="_3" Width="30" Grid.Row="4" Grid.Column="1" Margin="5"/>
-                        <TextBlock Text="module 5" Grid.Row="4" Grid.Column="2" Margin="5" />
-                        <TextBox Name="_4" Width="30" Grid.Row="4" Grid.Column="3" Margin="5"/>
-                        <TextBlock Text="module 6" Grid.Row="5" Grid.Column="0" Margin="5" />
-                        <TextBox Name="_5" Width="30" Grid.Row="5" Grid.Column="1" Margin="5"/>
-                        <TextBlock Text="module 7" Grid.Row="5" Grid.Column="2" Margin="5" />
-                        <TextBox Name="_6" Width="30" Grid.Row="5" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                        <TextBlock Text="module 8" Grid.Row="6" Grid.Column="0" Margin="5" />
-                        <TextBox Name="_7" Width="30" Grid.Row="6" Grid.Column="1" Margin="5" IsEnabled="False"/>
-                        <TextBlock Text="module 9" Grid.Row="6" Grid.Column="2" Margin="5" />
-                        <TextBox Name="_8" Width="30" Grid.Row="6" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                        <TextBlock Text="module 10" Grid.Row="7" Grid.Column="0" Margin="5" />
-                        <TextBox Name="_9" Width="30" Grid.Row="7" Grid.Column="1" Margin="5" IsEnabled="False"/>
-                        <TextBlock Text="module 11" Grid.Row="7" Grid.Column="2" Margin="5" />
-                        <TextBox Name="_10" Width="30" Grid.Row="7" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                        <TextBlock Text="module 12" Grid.Row="8" Grid.Column="0" Margin="5" />
-                        <TextBox Name="_11" Width="30" Grid.Row="8" Grid.Column="1" Margin="5" IsEnabled="False"/>
-                        <TextBlock Text="module 13" Grid.Row="8" Grid.Column="2" Margin="5" />
-                        <TextBox Name="_12" Width="30" Grid.Row="8" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                        <TextBlock Text="module 14" Grid.Row="9" Grid.Column="0" Margin="5" />
-                        <TextBox Name="_13" Width="30" Grid.Row="9" Grid.Column="1" Margin="5" IsEnabled="False"/>
-                        <TextBlock Text="module 15" Grid.Row="9" Grid.Column="2" Margin="5" />
-                        <TextBox Name="_14" Width="30" Grid.Row="9" Grid.Column="3" Margin="5" IsEnabled="False"/>
-                        <RadioButton Content="Basic" GroupName="IU" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center" IsChecked="True"
-                             Name="A"/>
-                        <RadioButton Content="Advance" GroupName="IU" Grid.Column="2" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <RadioButton GroupName="slVw" Name="Q"/>
+                        <RadioButton GroupName="slVw" Grid.Column="1"/>
                     </Grid>
-                    <TabControl Width="436" Height="320"/>
+                    <StackPanel x:Name="nees">
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="180"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="140"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="40"/>
+                                <ColumnDefinition Width="100"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="30"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock x:Name="txtId" Text="ID" Background="AliceBlue" TextAlignment="Center"/>
+                            <TextBlock x:Name="txtName" Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
+                            <TextBlock x:Name="txtBirdate" Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
+                            <TextBlock x:Name="txtBirpl" Grid.Column="3" Text="Birthplace" Background="Gold" TextAlignment="Center"/>
+                            <TextBlock x:Name="txtGrade" Grid.Column="4" Text="Grade" Background="Azure" TextAlignment="Center"/>
+                            <TextBlock x:Name="txtDt1" Grid.Column="5" Text="Dt1" Background="Azure" TextAlignment="Center"/>
+                            <TextBlock x:Name="txtDt2" Grid.Column="6" Text="Dt2" Background="Azure" TextAlignment="Center"/>
+                            <TextBlock x:Name="txtComp" Grid.Column="7" Text="Comp" Background="Azure" TextAlignment="Center"/>
+                        </Grid>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="180"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="140"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="40"/>
+                                    <ColumnDefinition Width="100"/>
+                                </Grid.ColumnDefinitions>
+                            </Grid>
+                        </ScrollViewer>
+                    </StackPanel>
+                    <ScrollViewer Width="876"/>
                 </StackPanel>
-            </StackPanel>
-        </StackPanel>
+            </TabItem>
+        </TabControl>
     </StackPanel>
 </Page>

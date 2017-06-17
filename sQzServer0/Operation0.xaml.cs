@@ -203,15 +203,15 @@ namespace sQzServer0
                         else
                         {
                             mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
-                            Dispatcher.Invoke(() =>
-                            {
-                                foreach (TabItem ti in tbcSl.Items)
-                                {
-                                    Op0SlotView vw = ti.Content as Op0SlotView;
-                                    if (vw != null)
-                                        vw.UpdateRsView();
-                                }
-                            });
+                            //Dispatcher.Invoke(() =>
+                            //{
+                            //    foreach (TabItem ti in tbcSl.Items)
+                            //    {
+                            //        Op0SlotView vw = ti.Content as Op0SlotView;
+                            //        if (vw != null)
+                            //            vw.UpdateRsView();
+                            //    }
+                            //});
                         }
                     }
                     outMsg = BitConverter.GetBytes(1);
@@ -229,7 +229,6 @@ namespace sQzServer0
             btnExit.Content = t._[(int)TxI.EXIT];
             btnStartSrvr.Content = t._[(int)TxI.STRT_SRVR];
             btnStopSrvr.Content = t._[(int)TxI.STOP_SRVR];
-            btnPrep.Content = t._[(int)TxI.PREP];
             btnQSGen.Content = t._[(int)TxI.QS_GEN];
             btnExit.Content = t._[(int)TxI.EXIT];
             txtNqs.Text = t._[(int)TxI.QS_N];
@@ -243,7 +242,12 @@ namespace sQzServer0
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            tbcSl.Items.Clear();
+            List<TabItem> toRem = new List<TabItem>();
+            foreach (TabItem ti in tbcSl.Items)
+                if (ti.Header as string != "_0")
+                    toRem.Add(ti);
+            foreach (TabItem ti in toRem)
+                tbcSl.Items.Remove(ti);
             ListBox l = sender as ListBox;
             ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
@@ -308,19 +312,13 @@ namespace sQzServer0
             sl.Dt = dt;
             sl.DBSelRoom();
             sl.DBSelNee();
-            Op0SlotView vw = new Op0SlotView();
-            vw.ShallowCopy(refSl);
-            vw.mSl = sl;
-            vw.ShowExaminee();
-            TabItem ti = new TabItem();
-            ti.Name = "_" + (i.Content as string).Replace(':', '_');
-            ti.Header = sl.Dt.ToString(DT.hh);
-            ti.Content = vw;
-            tbcSl.Items.Add(ti);
-            ti.Focus();
+            Op0SlotView tbi = new Op0SlotView(sl);
+            tbi.DeepCopy(tbiSl);
+            tbi.ShowExaminee();
+            tbcSl.Items.Add(tbi);
+            tbi.Focus();
             QuestSheet.DBUpdateCurQSId(mBrd.mDt);
             mBrd.vSl.Add(i.Content as string, sl);
-            //vSlVw.Add(sl.uId, vw);
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)
