@@ -1,6 +1,0 @@
-A1	Huỳnh Văn A	01/01/1990	Long An
-A2	Huỳnh Văn B	01/01/1990	Long An
-A3	Huỳnh Văn C	02/01/1990	Tiền Giang
-B1	Huỳnh Thị B	05/01/1990	Vĩnh Long
-B2	Huỳnh Văn E	06/01/1990	Tiền Giang
-B3	Huỳnh Thị C	07/01/1990	Long An
