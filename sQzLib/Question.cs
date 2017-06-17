@@ -348,7 +348,7 @@ namespace sQzLib
         public override string ToString()
         {
             StringBuilder s = new StringBuilder();
-            s.Append('(' + (int)mIU +") " + mStmt + '\n');
+            s.Append(mStmt + '\n');
             for (int i = 0; i < nAns; ++i)
                 s.Append(vAns[i] + '\n');
             return s.ToString();

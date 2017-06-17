@@ -290,7 +290,7 @@ namespace sQzLib
 			foreach(IUx iu in ius)
 			{
 				nn[++i] = DBConnect.Count(conn, "sqz_question", "id",
-					"mid=" + (int)iu + " AND del=0", out eMsg);
+					"moid=" + (int)iu + " AND del=0", out eMsg);
 				if(eMsg != null)
 					emsg.Append(iu.ToString() + '-' + eMsg);
 			}
@@ -309,7 +309,7 @@ namespace sQzLib
                 return;
 			}
             string qry = DBConnect.mkQrySelect("sqz_question",
-                "id,stmt,ans0,ans1,ans2,ans3,`key`", "mid=" + (int)eIU + " AND del=0");
+                "id,stmt,ans0,ans1,ans2,ans3,`key`", "moid=" + (int)eIU + " AND del=0");
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             if (reader != null)
@@ -348,7 +348,7 @@ namespace sQzLib
             }
             //randomize
             int nn = DBConnect.Count(conn, "sqz_question", "id",
-                "mid=" + (int)iu + " AND del=0", out eMsg);
+                "moid=" + (int)iu + " AND del=0", out eMsg);
             if (nn < 1 || nn < n)
                 return true;
             int[] vSel = new int[n];
@@ -384,7 +384,7 @@ namespace sQzLib
             Array.Sort(vSel);
             //
             string qry = DBConnect.mkQrySelect("sqz_question",
-                "id,stmt,ans0,ans1,ans2,ans3,`key`", "mid=" + (int)iu + " AND del=0");
+                "id,stmt,ans0,ans1,ans2,ans3,`key`", "moid=" + (int)iu + " AND del=0");
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             i = 0;
             int ii = -1;
@@ -436,7 +436,7 @@ namespace sQzLib
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
-            DBConnect.Ins(conn, "sqz_question", "mid,del,diff,stmt,ans0,ans1,ans2,ans3,`key`",
+            DBConnect.Ins(conn, "sqz_question", "moid,del,diff,stmt,ans0,ans1,ans2,ans3,`key`",
                 vals.ToString(), out eMsg);
             DBConnect.Close(ref conn);
         }
