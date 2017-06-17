@@ -44,7 +44,7 @@ CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMA
 `lqid` INT UNSIGNED, `stmt` VARCHAR(512) CHARACTER SET `utf8`,
 `ans0` VARCHAR(512) CHARACTER SET `utf8`, `ans1` VARCHAR(512) CHARACTER SET `utf8`,
 `ans2` VARCHAR(512) CHARACTER SET `utf8`, `ans3` VARCHAR(512) CHARACTER SET `utf8`,
-`key` CHAR(4) CHARACTER SET `ascii`, FOREIGN KEY(`mid`) REFERENCES `sqz_module`(`id`),
+`key` CHAR(4) CHARACTER SET `ascii`, FOREIGN KEY(`moid`) REFERENCES `sqz_module`(`id`),
 FOREIGN KEY(`lqid`) REFERENCES `sqz_long_q_path`(`id`),
 INDEX(`moid`,`del`,`diff`));
 
