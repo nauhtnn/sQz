@@ -302,7 +302,7 @@ namespace sQzServer0
 
             ExamSlot sl = new ExamSlot();
             string emsg;
-            if ((emsg = sl.DBSelRoom()) != null)
+            if ((emsg = sl.DBSelRoomId()) != null)
             {
                 WPopup.s.ShowDialog(emsg);
                 return;
@@ -310,7 +310,7 @@ namespace sQzServer0
             DateTime dt;
             DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
             sl.Dt = dt;
-            sl.DBSelRoom();
+            sl.DBSelRoomId();
             sl.DBSelNee();
             Op0SlotView tbi = new Op0SlotView(sl);
             tbi.DeepCopy(tbiSl);

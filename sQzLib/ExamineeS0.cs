@@ -89,7 +89,7 @@ namespace sQzLib
                 dtTim1 = DT.INV_;
                 return true;
             }
-            mAnsSh.uQSId = BitConverter.ToInt32(buf, offs);
+            mAnsSh.uQSLvId = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
             mAnsSh.aAns = new byte[AnsSheet.LEN];

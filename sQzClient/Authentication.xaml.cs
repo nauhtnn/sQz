@@ -41,7 +41,7 @@ namespace sQzClient
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            if (mNee.ParseTxId(tbxId.Text))
+            if (mNee.ParseLvId(tbxId.Text))
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);

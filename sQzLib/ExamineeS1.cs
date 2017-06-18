@@ -97,7 +97,7 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-            mAnsSh.uQSId = BitConverter.ToInt32(buf, offs);
+            mAnsSh.uQSLvId = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
 
@@ -254,7 +254,7 @@ namespace sQzLib
             if (eStt < ExamStt.Examing)
                 return;
             mAnsSh = new AnsSheet();
-            mAnsSh.uQSId = e.mAnsSh.uQSId;
+            mAnsSh.uQSLvId = e.mAnsSh.uQSLvId;
 
             if (eStt < ExamStt.Submitting)
                 return;

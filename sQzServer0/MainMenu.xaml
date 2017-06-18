@@ -1,0 +1,19 @@
+﻿<Page x:Class="sQzServer0.MainMenu"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:sQzServer0"
+      mc:Ignorable="d" 
+      d:DesignHeight="720" d:DesignWidth="1280"
+      Title="MainMenu">
+
+    <StackPanel Loaded="Main_Loaded">
+        <TextBlock Height="16" Background="#f3f3ee"/>
+        <TextBlock x:Name="txtLalgitc" Height="80" Background="#a51c30" Foreground="#fff" TextAlignment="Center" VerticalAlignment="Center" FontSize="40" FontWeight="Bold" Padding="0,8,0,0"/>
+        <Button x:Name="btnPrep" Click="btnPrep_Click" Width="256" Height="64"/>
+        <Button x:Name="btnOp" Click="btnOp_Click" Width="256" Height="64"/>
+        <Button x:Name="btnArchv" Click="btnArchv_Click" Width="256" Height="64"/>
+        <Button x:Name="btnExit" Click="btnExit_Click" Width="256" Height="64"/>
+    </StackPanel>
+</Page>

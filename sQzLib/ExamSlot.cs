@@ -282,11 +282,6 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public List<int> DBSelQSId()
-        {
-            return QuestPack.DBSelectId(mDt);
-        }
-
         public bool ReadByteR0(byte[] buf, ref int offs)
         {
             if (buf.Length - offs < 4)
