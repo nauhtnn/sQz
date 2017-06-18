@@ -71,6 +71,7 @@ namespace sQzLib
     {
         public int uId;
         public string mStmt; //statement
+        public string Stmt { get { return mStmt; } }
         public int nAns;
         public IUx mIU;
         public string[] vAns;
@@ -352,6 +353,20 @@ namespace sQzLib
             for (int i = 0; i < nAns; ++i)
                 s.Append(vAns[i] + '\n');
             return s.ToString();
+        }
+
+        public bool Ans(int idx, out string ans)
+        {
+            if(0 < idx && idx < nAns)
+            {
+                ans = vAns[idx];
+                return vKeys[idx];
+            }
+            else
+            {
+                ans = string.Empty;
+                return false;
+            }
         }
 
         public static void Clear()

@@ -1,0 +1,102 @@
+Hãy chọn phương án ghép đúng nhất : Các bộ phận chính trong sơ đồ cấu trúc máy tính gồm: 
+\CPU ,bộ nhớ trong/ngoài, thiết bị vào/ra
+Bàn phím và con chuột 	
+Máy quét và ổ cứng 	
+Màn hình và máy in 
+
+Bộ nhớ chính của máy vi tính gồm:
+CPU và  Keyboard
+RAM và đĩa cứng 
+\RAM và ROM
+ROM và CD-ROM
+
+Trong máy tính, ROM có nghĩa là ?
+Bộ Điểu khiển.
+\Bộ nhớ chỉ đọc
+Bộ tính toán và xử lý 
+Bộ nhớ truy xuất ngẫu nhiên
+
+CPU có nghĩa là:
+Case Processing Unit
+Common Processing Unit
+Control Processing Unit
+\Central Processing Unit
+
+Khả năng xử lý của máy tính phụ thuộc vào:
+Tốc độ CPU, dung lượng bộ nhớ RAM, Dung lượng và tốc độ ổ cứng
+Yếu tố đa nhiệm
+Hiện tượng phân mảnh đĩa
+\Cả 3 phần trên
+
+Mọi tính toán trong máy tính đều được thực hiện tại:
+Bộ nhớ trong
+Bộ nhớ ngoài
+\Bộ xử lý trung tâm (CPU)
+Thiết bị vào
+
+Các bộ phận nào sau đây là thành phần của CPU?
+Đơn vị điều khiển (CU)
+Đơn vị số học ( ALU)
+RAM 
+\Câu A và câu B đúng
+
+Bộ nhớ RAM dùng để:
+Điều khiển hoạt động của máy tính
+\Lưu trữ tạm thời các dữ liệu và chương trình phục vụ cho quá trình xử lý của CPU
+Lưu trữ các chương trình để khởi động máy tính
+Lưu trữ, xử lý các dữ liệu và chương trình của người sử dụng
+
+Bộ xử lý trung tâm (CPU) là:
+Nơi nhập thông tin cho máy
+\Nơi xử lý, quyết định, điều khiển hoạt động của máy
+Nơi thông báo kết quả cho người sử dụng.
+Tất cả đều đúng
+
+Chọn phát biểu đúng trong các câu sau :   
+Bộ nhớ ngoài là các đĩa cứng , đĩa mềm, Ram, ROM,  .  	
+\Bộ nhớ ngoài là các đĩa cứng , đĩa mềm , đĩa CD, thiết bị Flash.  
+Bộ nhớ trong là các đĩa cứng , đĩa mềm .  	
+Bộ nhớ ngoài có  ROM  và  RAM .  	
+
+Chọn phát biểu sai trong các câu sau :
+Bộ nhớ ngoài dùng để lưu trữ  lâu dài các thông tin và hỗ trợ cho bộ nhớ trong .
+Các thông tin lưu trữ trong bộ nhớ ngoài sẽ không mất khi tắt máy.	
+Thanh ghi là vùng nhớ đặc biệt được  CPU  sử dụng để lưu trữ  tạm thời các lệnh và dữ liệu đang  xử  lý 
+\Bộ nhớ trong dùng để lưu trữ  lâu dài các thông tin và hỗ trợ cho bộ nhớ ngoài
+
+Hai thiết bị nào sau đây dùng để lưu trữ dữ liệu trong máy tính:
+\Đĩa cứng, đĩa USB.
+CDRom, bàn phím.
+Màn hình, máy in
+Tất  cả các câu đều đúng
+
+Thiết bị nhập trong máy tính bao gồm các thiết bị:
+\Bàn phím (KeyBoard); Chuột (Mouse)
+Đĩa cứng (HDD); Đĩa mềm (FDD)
+Màn hình (Monitor); Máy in (Printer)
+Bộ nhờ truy xuất ngẫu nhiên (Ram); Bộ nhớ chỉ đọc ( Rom)
+
+Màn hình (Monitor) thuộc loại:
+Thiết bị nhập
+Thiết bị lưu trữ dữ liệu
+\Thiết bị xuất
+Tất cả đều đúng
+
+Máy in (Printer) thuộc loại:
+Thiết bị nhập
+Thiết bị lưu trữ dữ liệu
+\Thiết bị xuất
+Tất cả đều đúng
+
+Trong máy tính, bàn phím là:
+\Thiết bị nhập
+Thiết bị xuất
+Thiết bị dùng lưu trữ dữ liệu
+Tất cả đều đúng
+
+Chọn phát biểu đúng trong các câu sau
+\Một byte có  8  bits
+RAM là bộ nhớ ngoài.	
+Dữ  liệu là thông tin .
+Đĩa cứng là bộ nhớ trong
+

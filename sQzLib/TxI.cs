@@ -108,5 +108,7 @@ namespace sQzLib {
 		QS_ID_EXISTS,
 		RS_UP_EXISTS,
 		RS_UP_NOTHING,
+		RDO_Q,
+		RDO_NEE,
 	}
 }

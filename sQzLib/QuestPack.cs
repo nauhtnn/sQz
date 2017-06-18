@@ -92,23 +92,29 @@ namespace sQzLib
             return false;
         }
 
-        public List<int> DBSelectId(DateTime dt)
+        public static List<string> DBSelectQStId(DateTime dt)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return null;
-            string qry = DBConnect.mkQrySelect("qs", "lv,id", "dt=" + dt.ToString(DT._));
+            string qry = DBConnect.mkQrySelect("sqz_qsheet", "lv,id",
+                "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            List<int> r = new List<int>();
+            List<string> l = new List<string>();
             if (reader != null)
             {
                 while (reader.Read())
-                    r.Add(reader.GetInt32(0) * reader.GetUInt16(1));
+                {
+                    ExamLv lv;
+                    if (Enum.TryParse(reader.GetString(0), out lv))
+                        break;
+                    l.Add(lv.ToString() + reader.GetUInt16(1).ToString("d3"));
+                }
                 reader.Close();
             }
             DBConnect.Close(ref conn);
-            return r;
+            return l;
         }
 
         public List<QuestSheet> GenQPack(int n, int[] vn)

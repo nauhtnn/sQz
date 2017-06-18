@@ -19,6 +19,8 @@ namespace sQzLib
         public static int guDBCurAId;
         public static int guDBCurBId;
         public int uId;
+        public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + ExamineeA.LV_CAP; } }
+        public string tId { get { return eLv.ToString() + uId.ToString("d3"); } }
         public int mDiff;
         public List<Question> vQuest;
         public byte[] aQuest;
@@ -88,6 +90,27 @@ namespace sQzLib
                 gaAll[14] = IUx._15;
             }
             return gaAll;
+        }
+
+        public static bool ParseLvId(string s, out ExamLv lv, out int id)
+        {
+            if (s == null || s.Length != 4)
+            {
+                lv = ExamLv.A;
+                id = ushort.MaxValue;
+                return true;
+            }
+            s = s.ToUpper();
+            if (!Enum.TryParse(s.Substring(0, 1), out lv))
+            {
+                id = ushort.MaxValue;
+                return true;
+            }
+            if (!int.TryParse(s.Substring(1), out id))
+                return true;
+            if (id < 1 || ExamineeA.LV_CAP < id)
+                return true;
+            return false;
         }
 
         //only Optimization0 uses this.

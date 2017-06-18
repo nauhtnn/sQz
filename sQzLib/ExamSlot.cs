@@ -10,7 +10,7 @@ namespace sQzLib
 {
     public class ExamSlot
     {
-        DateTime mDt;
+        public DateTime mDt;
         public bool bOpen;
         public Dictionary<ExamLv, QuestPack> vQPack;
 
@@ -33,7 +33,7 @@ namespace sQzLib
             mKeyPack = new AnsPack();
         }
 
-        public string DBSelRoom()
+        public string DBSelRoomId()
         {
             string emsg;
             List<int> rids = ExamRoom.DBSel(out emsg);
@@ -280,6 +280,11 @@ namespace sQzLib
                 }
             }
             DBConnect.Close(ref conn);
+        }
+
+        public List<int> DBSelQSId()
+        {
+            return QuestPack.DBSelectId(mDt);
         }
 
         public bool ReadByteR0(byte[] buf, ref int offs)

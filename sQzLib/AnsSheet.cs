@@ -13,29 +13,32 @@ namespace sQzLib
         public const int LEN = 120;
         public ListBox[] vlbxAns;
         public AnsItem[][] vAnsItem;
+        public int uQSLvId;
+        public int uQSId { get { return (uQSLvId < ExamineeA.LV_CAP) ? uQSLvId : uQSLvId - ExamineeA.LV_CAP; } }
+        public bool bChanged;
+        DgEvntCB dgSelChgCB;
         public byte[] aAns;
-        public string tAns {
-            get {
+        public string tAns
+        {
+            get
+            {
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in aAns)
                     sb.Append((b == 0) ? '0' : '1');
                 return sb.ToString();
             }
         }
-        public int uQSId;
-        public bool bChanged;
-        DgEvntCB dgSelChgCB;
 
         public AnsSheet() {
             bChanged = false;
             aAns = null;
-            uQSId = ushort.MaxValue;
+            uQSLvId = ushort.MaxValue;
             dgSelChgCB = null;
         }
 
-        public void Init(int uqsid)
+        public void Init(int uqslvid)
         {
-            uQSId = uqsid;
+            uQSLvId = uqslvid;
             if (aAns == null)
             {
                 aAns = new byte[LEN];
@@ -87,7 +90,7 @@ namespace sQzLib
 
         public void ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
         {
-            Buffer.BlockCopy(BitConverter.GetBytes(uQSId),
+            Buffer.BlockCopy(BitConverter.GetBytes(uQSLvId),
                         0, buf, offs, 4);
             offs += 4;
             Buffer.BlockCopy(aAns, 0, buf, offs, LEN);
@@ -98,7 +101,7 @@ namespace sQzLib
         {
             byte[] buf = new byte[4 + LEN];
             int offs = 0;
-            Buffer.BlockCopy(BitConverter.GetBytes(uQSId),
+            Buffer.BlockCopy(BitConverter.GetBytes(uQSLvId),
                         0, buf, offs, 4);
             offs += 4;
             Buffer.BlockCopy(aAns, 0, buf, offs, LEN);
@@ -110,7 +113,7 @@ namespace sQzLib
             int l = buf.Length - offs;
             if (l < 4)
                 return true;
-            uQSId = BitConverter.ToInt32(buf, offs);
+            uQSLvId = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
             if (l < LEN)
@@ -147,7 +150,7 @@ namespace sQzLib
         //only Operation0 uses this.
         public void ExtractKey(QuestSheet qs)
         {
-            uQSId = qs.uId + ((qs.eLv == ExamLv.A) ? 0 : ExamineeA.LV_CAP);
+            uQSLvId = qs.LvId;
             if (qs.vQuest != null && qs.vQuest.First() != null && qs.vQuest.First().vKeys != null)
                 aAns = new byte[qs.vQuest.Count * 4];//hardcode, todo
             else

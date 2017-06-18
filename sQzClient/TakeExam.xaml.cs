@@ -142,7 +142,7 @@ namespace sQzClient
             int nAns = 4;//hardcode
             int i = 0, n = mQSh.vQuest.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
-            mNee.mAnsSh.Init(mQSh.uId + ((mQSh.eLv == ExamLv.A) ? 0 : ExamineeA.LV_CAP));
+            mNee.mAnsSh.Init(mQSh.LvId);
             mNee.mAnsSh.InitView(mQSh, qaWh, null);
             mNee.mAnsSh.bChanged = false;
             //top line

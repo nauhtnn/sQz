@@ -17,15 +17,13 @@ namespace sQzServer0
         RadioButton rdoQ;
         RadioButton rdoNee;
         StackPanel spNee;
-        ScrollViewer svwrQ;
+        TabControl tbcQ;
         public Dictionary<int, TextBlock> vGrade;
         public Dictionary<int, TextBlock> vDt1;
         public Dictionary<int, TextBlock> vDt2;
         public Dictionary<int, TextBlock> vComp;
         Grid grdNee;
         Grid grdQCtrl;
-        TabControl tbcQuest;
-        RadioButton rdoA, rdoB;
         TextBox[] vTbx;
         TextBox tbxNqs;
         TextBlock txtNq, tbxNq;
@@ -177,15 +175,28 @@ namespace sQzServer0
                     Grid.SetColumn(rdo, Grid.GetColumn(refrdo));
                     rdo.Name = refrdo.Name;
                     rdo.Checked += vwMode_Check;
+                    if (rdo.Name == "Q")
+                    {
+                        rdo.IsChecked = true;
+                        rdo.Content = Txt.s._[(int)TxI.RDO_Q];
+                    }
+                    else
+                        rdo.Content = Txt.s._[(int)TxI.RDO_NEE];
                     g.Children.Add(rdo);
                 }
                 spContent.Children.Add(g);
             }
             foreach (StackPanel refp in refsp.Children.OfType<StackPanel>())
                 DeepCopy(refp);
-            //foreach(ScrollViewer svwr in refsp.Children.OfType<ScrollViewer>())
-            //{ }
-            svwrQ = new ScrollViewer();
+            tbcQ = new TabControl();
+            List<string> qstIds = QuestPack.DBSelectQStId(mSl.mDt);
+            foreach(string t in qstIds)
+            {
+                TabItem ti = new TabItem();
+                ti.Header = t;
+                tbcQ.Items.Add(ti);
+            }
+            spContent.Children.Add(tbcQ);
             Content = spContent;
         }
 
@@ -234,6 +245,7 @@ namespace sQzServer0
                 spNee.Children.Add(vwr);
             }
 
+            spNee.Visibility = Visibility.Collapsed;
             spContent.Children.Add(spNee);
             //InitQPanel();
         }
@@ -246,67 +258,101 @@ namespace sQzServer0
             if(rdo.Name == "Q")
             {
                 spNee.Visibility = Visibility.Collapsed;
-                svwrQ.Visibility = Visibility.Visible;
+                tbcQ.Visibility = Visibility.Visible;
             }
             else
             {
-                svwrQ.Visibility = Visibility.Collapsed;
+                tbcQ.Visibility = Visibility.Collapsed;
                 spNee.Visibility = Visibility.Visible;
             }
         }
 
+        private void InitQTabItem()
+        {
+            tbcQ.Items.Clear();
+            foreach(QuestSheet qs in mSl.vQPack[ExamLv.A].vSheet.Values)
+            {
+                TabItem i = new TabItem();
+                i.Header = qs.tId;
+                i.GotFocus += tbiQ_GotFocus;
+                tbcQ.Items.Add(i);
+            }
+        }
+
+        private void tbiQ_GotFocus(object sender, RoutedEventArgs e)
+        {
+            TabItem tbi = sender as TabItem;
+            if (tbi == null || tbi.Content != null)
+                return;
+            ExamLv lv;
+            int id;
+            if (QuestSheet.ParseLvId(tbi.Header as string, out lv, out id))
+                return;
+            QuestSheet qs = mSl.vQPack[lv].vSheet[id];
+            ScrollViewer svwr = new ScrollViewer();
+            svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            StackPanel sp = new StackPanel();
+            int x = 0;
+            bool dark = false;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            foreach (Question q in qs.vQuest)
+            {
+                TextBlock i = new TextBlock();
+                i.Text = ++x + ". " + q.Stmt;
+                dark = !dark;
+                i.Background = (dark) ? new SolidColorBrush(c) :
+                    Theme.s._[(int)BrushId.LeftPanel_BG];
+                sp.Children.Add(i);
+                for (int idx = 0; idx < q.nAns; ++idx)
+                {
+                    TextBlock j = new TextBlock();
+                    j.Text = ('A' + idx).ToString() + q.vAns[idx];
+                    if (q.vKeys[idx])
+                        j.FontWeight = FontWeights.Bold;
+                    sp.Children.Add(j);
+                }
+            }
+            svwr.Content = sp;
+            tbi.Content = svwr;
+        }
+
         private void btnQSGen_Click(object sender, RoutedEventArgs e)
         {
-            TextBox t = tbxNqs;
-            int n = int.Parse(t.Text);
-            ExamLv lv;
-            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-                lv = ExamLv.A;
-            else
-                lv = ExamLv.B;
-            List<int> vn = new List<int>();
-            foreach (IUx i in QuestSheet.GetIUs(lv))
-            {
-                t = vTbx[(int)i];
-                if (t != null)
-                    vn.Add(int.Parse(t.Text));
-            }
-            mSl.GenQPack(n, lv, vn.ToArray());
+            //TextBox t = tbxNqs;
+            //int n = int.Parse(t.Text);
+            //ExamLv lv;
+            //if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+            //    lv = ExamLv.A;
+            //else
+            //    lv = ExamLv.B;
+            //List<int> vn = new List<int>();
+            //foreach (IUx i in QuestSheet.GetIUs(lv))
+            //{
+            //    t = vTbx[(int)i];
+            //    if (t != null)
+            //        vn.Add(int.Parse(t.Text));
+            //}
+            //mSl.GenQPack(n, lv, vn.ToArray());
 
-            ShowQuest();
+            //ShowQuest();
         }
 
         private void ShowQuest()
         {
-            bool dark = true;
             Color c = new Color();
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
             Dispatcher.Invoke(() => {
-                tbcQuest.Items.Clear();
+                tbcQ.Items.Clear();
                 foreach (QuestPack p in mSl.vQPack.Values)
                     foreach (QuestSheet qs in p.vSheet.Values)
                     {
                         TabItem ti = new TabItem();
                         ti.Header = qs.eLv.ToString() + qs.uId;
-                        ScrollViewer svwr = new ScrollViewer();
-                        svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-                        StackPanel sp = new StackPanel();
-                        int x = 0;
-                        foreach (Question q in qs.vQuest)
-                        {
-                            TextBlock i = new TextBlock();
-                            i.Text = ++x + ") " + q.ToString();
-                            dark = !dark;
-                            if (dark)
-                                i.Background = new SolidColorBrush(c);
-                            else
-                                i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-                            sp.Children.Add(i);
-                        }
-                        svwr.Content = sp;
-                        ti.Content = svwr;
-                        tbcQuest.Items.Add(ti);
+                        
+                        tbcQ.Items.Add(ti);
                     }
             });
         }
@@ -339,75 +385,75 @@ namespace sQzServer0
 
         private void rdo_Checked(object sender, RoutedEventArgs e)
         {
-            TextBox t;
-            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-            {
-                foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
-                    if ((t = vTbx[(int)j]) != null)
-                        t.IsEnabled = true;
-                foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
-                    if ((t = vTbx[(int)j]) != null)
-                        t.IsEnabled = false;
-            }
-            else
-            {
-                foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
-                    if ((t = vTbx[(int)j]) != null)
-                        t.IsEnabled = true;
-                foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
-                    if ((t = vTbx[(int)j]) != null)
-                        t.IsEnabled = false;
-            }
-            tbxIU_TextChanged(null, null);
+            //TextBox t;
+            //if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+            //{
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
+            //        if ((t = vTbx[(int)j]) != null)
+            //            t.IsEnabled = true;
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
+            //        if ((t = vTbx[(int)j]) != null)
+            //            t.IsEnabled = false;
+            //}
+            //else
+            //{
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
+            //        if ((t = vTbx[(int)j]) != null)
+            //            t.IsEnabled = true;
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
+            //        if ((t = vTbx[(int)j]) != null)
+            //            t.IsEnabled = false;
+            //}
+            //tbxIU_TextChanged(null, null);
         }
 
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBox t = tbxNqs;
-            if (t == null || t.Text == null || t.Text.Length == 0 || int.Parse(t.Text) <= 0)
-            {
-                btnQSGen.IsEnabled = false;
-                return;
-            }
-            int n = 0, i;
-            bool bG = true;
-            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-            {
-                foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
-                    if ((t = vTbx[(int)j]) != null)
-                    {
-                        if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
-                            n += i;
-                        else
-                            bG = false;
-                    }
-                    else
-                        bG = false;
-                tbxNq.Text = n.ToString();
-                if (bG && n == 30)
-                    btnQSGen.IsEnabled = true;
-                else
-                    btnQSGen.IsEnabled = false;
-            }
-            else
-            {
-                foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
-                    if ((t = vTbx[(int)j]) != null)
-                    {
-                        t.IsEnabled = true;
-                        if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
-                            n += i;
-                        else
-                            bG = false;
-                    }
-                    else
-                        bG = false;
-                tbxNq.Text = n.ToString();
-                if (bG && n == 30)
-                    btnQSGen.IsEnabled = true;
-                else
-                    btnQSGen.IsEnabled = false;
-            }
+            //TextBox t = tbxNqs;
+            //if (t == null || t.Text == null || t.Text.Length == 0 || int.Parse(t.Text) <= 0)
+            //{
+            //    btnQSGen.IsEnabled = false;
+            //    return;
+            //}
+            //int n = 0, i;
+            //bool bG = true;
+            //if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+            //{
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
+            //        if ((t = vTbx[(int)j]) != null)
+            //        {
+            //            if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
+            //                n += i;
+            //            else
+            //                bG = false;
+            //        }
+            //        else
+            //            bG = false;
+            //    tbxNq.Text = n.ToString();
+            //    if (bG && n == 30)
+            //        btnQSGen.IsEnabled = true;
+            //    else
+            //        btnQSGen.IsEnabled = false;
+            //}
+            //else
+            //{
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
+            //        if ((t = vTbx[(int)j]) != null)
+            //        {
+            //            t.IsEnabled = true;
+            //            if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
+            //                n += i;
+            //            else
+            //                bG = false;
+            //        }
+            //        else
+            //            bG = false;
+            //    tbxNq.Text = n.ToString();
+            //    if (bG && n == 30)
+            //        btnQSGen.IsEnabled = true;
+            //    else
+            //        btnQSGen.IsEnabled = false;
+            //}
         }
     }
 }

@@ -60,16 +60,8 @@ namespace sQzLib
             int x = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (x < LV_CAP)
-            {
-                eLv = ExamLv.A;
-                uId = x;
-            }
-            else
-            {
-                eLv = ExamLv.B;
-                uId = x - LV_CAP;
-            }
+            if (ParseLvId(x))
+                return true;
             if (Enum.IsDefined(typeof(ExamStt), x = BitConverter.ToInt32(buf, offs)))
                 eStt = (ExamStt)x;
             l -= 4;

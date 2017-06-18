@@ -20,26 +20,26 @@ namespace sQzLib
         public Dictionary<int, int>  DBSelectId(uint slId, out Dictionary<int, string> vAns)
         {
             vAns = new Dictionary<int, string>();
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return null;
-            string qry = DBConnect.mkQrySelect("sqz_examinee", "lv,id,qId,anssh", "slId=" + slId);
-            string emsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
+            //MySqlConnection conn = DBConnect.Init();
+            //if (conn == null)
+            //    return null;
+            //string qry = DBConnect.mkQrySelect("sqz_examinee", "lv,id,qId,anssh", "slId=" + slId);
+            //string emsg;
+            //MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             Dictionary<int, int> r = new Dictionary<int, int>();
-            if (reader != null)
-            {
-                while (reader.Read())
-                {
-                    int id = reader.GetInt32(0) + reader.GetInt32(1);
-                    if(!reader.IsDBNull(2))
-                        r.Add(id, reader.GetInt32(2));
-                    if (!reader.IsDBNull(3))
-                        vAns.Add(id, reader.GetString(3));
-                }
-                reader.Close();
-            }
-            DBConnect.Close(ref conn);
+            //if (reader != null)
+            //{
+            //    while (reader.Read())
+            //    {
+            //        int id = reader.GetInt32(0) + reader.GetInt32(1);
+            //        if(!reader.IsDBNull(2))
+            //            r.Add(id, reader.GetInt32(2));
+            //        if (!reader.IsDBNull(3))
+            //            vAns.Add(id, reader.GetString(3));
+            //    }
+            //    reader.Close();
+            //}
+            //DBConnect.Close(ref conn);
             return r;
         }
 
@@ -75,7 +75,7 @@ namespace sQzLib
                 if (e.bToDB)
                 {
                     vals.Append("('" + e.mDt.ToString(DT._) + "','" + e.eLv.ToString() + "'," +
-                        e.uId + "," + (e.mAnsSh.uQSId - ((e.eLv == ExamLv.A) ? 0 : ExamineeA.LV_CAP))
+                        e.uId + "," + (e.mAnsSh.uQSId)
                         + ",'" + e.dtTim1.ToString(DT.hh) +
                         "','" + e.dtTim2.ToString(DT.hh) + "'," + e.uGrade + ",'" +
                         e.tComp + "','" + e.mAnsSh.tAns + "'),");

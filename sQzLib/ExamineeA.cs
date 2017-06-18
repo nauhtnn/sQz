@@ -22,7 +22,7 @@ namespace sQzLib
 
     public abstract class ExamineeA
     {
-        public const int LV_CAP = 100000;
+        public const int LV_CAP = 10000;//db sqz_examinee `id` SMALLINT UNSIGNED
         public DateTime mDt;
         public ExamStt eStt;
         public ExamLv eLv;
@@ -53,13 +53,15 @@ namespace sQzLib
             bFromC = bLog = false;
             Reset();
         }
+
         public void Reset()
         {
+            mDt = DT.INV_H;
+            eLv = ExamLv.A;
+            uId = ushort.MaxValue;
+            tName = null;
             tBirdate = null;
             tBirthplace = null;
-            tName = null;
-            mDt = DT.INV_H;
-            uId = ushort.MaxValue;
             eStt = ExamStt.Signing;
             uGrade = ushort.MaxValue;
             dtTim1 = dtTim2 = DT.INV_;
@@ -68,8 +70,25 @@ namespace sQzLib
             kDtDuration = new TimeSpan(0, 30, 0);
             tLog = new StringBuilder();
         }
-        
-        public bool ParseTxId(string s)
+
+        public bool ParseLvId(int lvid)
+        {
+            if (lvid < 1 || LV_CAP + LV_CAP < lvid)
+                return true;
+            if(lvid < LV_CAP)
+            {
+                eLv = ExamLv.A;
+                uId = lvid;
+            }
+            else
+            {
+                eLv = ExamLv.B;
+                uId = lvid - (int)eLv;
+            }
+            return false;
+        }
+
+        public bool ParseLvId(string s)
         {
             if (s == null || s.Length != 5)
                 return true;
@@ -79,6 +98,8 @@ namespace sQzLib
                 return true;
             int uid;
             if (!int.TryParse(s.Substring(1), out uid))
+                return true;
+            if (uid < 1 || LV_CAP < uid)
                 return true;
             if (eLv != lv || uId != uid)
                 Reset();
@@ -199,7 +220,7 @@ namespace sQzLib
             uId = r.ReadInt32();
             if (Enum.IsDefined(typeof(ExamStt), x = r.ReadInt32()))
                 eStt = (ExamStt)x;
-            mAnsSh.uQSId = r.ReadInt32();
+            mAnsSh.uQSLvId = r.ReadInt32();
             mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
             int h, m;
             if(eStt == ExamStt.Finished)

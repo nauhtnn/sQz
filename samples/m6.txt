@@ -1,0 +1,119 @@
+Hãy chọn phương án ghép đúng nhất: Máy tính trở thành công cụ lao động không thể thiếu được trong xã hội hiện đại vì : 
+\Máy tính cho ta khả năng lưu trữ và xử lý thông tin
+Máy tính giúp cho con người giải tất cả các bài toán khó 	
+Máy tính là công cụ soạn thảo văn bản và cho ta truy cập vào Internet để tìm kiếm thông tin.
+Máy tính tính toán cực kì nhanh và chính xác 	
+
+Hãy chọn phương án ghép đúng: Tin học là một ngành khoa học vì đó là ngành 
+nghiên cứu máy tính điện tử 	
+sử dụng máy tính điện tử 	
+được sinh ra trong nền văn minh thông tin 	
+\có nội dung, mục tiêu, phương pháp nghiên cứu riêng
+
+Mạng máy tính bao gồm những thành phần nào:
+Các máy tính, các ổ cứng di động, các modem, thiết bị nhớ flash
+Máy vi tính, các sợi cáp, modem, máy in
+Các máy tính, các thiết bị mạng, các phần mềm thực hiện giao tiếp giữa các máy tính.
+\Chỉ cần hai hay nhiều máy tính được kết nối với nhau.
+
+Khi sử dụng mạng máy tính ta sẽ được các lợi ích:
+Chia sẻ tài nguyên (ổ cứng, cơ sở dữ liệu, máy in, các phần mềm tiện ích,...)
+Quản lý tập trung.
+Tận dụng năng lực xử lý của các máy tính rỗi để làm các đề án lớn.
+\Tất cả đều đúng.
+
+Kỹ thuật dùng để nối kết nhiều máy tính với nhau trong phạm vi một văn phòng gọi là: 
+\LAN 
+MAN
+WAN
+Internet
+
+Khái niệm sau đây nói đến mô hình mạng nào:Tất cả các máy tính đều bình đẳng với nhau, mỗi máy tính có thể vừa cung cấp trực tiếp tài nguyên, vừa có thể sử dụng tài nguyên của máy tính khác.
+\Mô hình mạng ngang hàng
+Mô hình mạng khách chủ.
+Mô hình mạng Client/Server.
+Câu b và c đều đúng..
+
+Ưu điểm của mạng không dây là :
+Gọn nhẹ, sử dụng mọi lúc mọi nơi, không cần đăng ký dịch vụ
+\Có thể triển khai mọi lúc mọi nơi, mọi thời điểm, không cần sử dụng các thiết bị cồng kềnh, phức tạp như mạng có dây.
+Sử dụng sóng radio, song bức xạ, đường truyền nhanh, kết nối đơn giản
+Không cần card mạng, chỉ cần có laptop là có thể kết nối được internet.
+
+Việt Nam gia nhập mạng Internet chính thức năm nào?
+1995
+1996
+\1997
+1998
+
+Ai là chủ sở hữu mạng Internet:
+Mỹ
+Chủ tịch tập đoàn Intel
+Hội đồng về kiến trúc Internet
+\Không ai là chủ sở hữu.
+
+Trang chủ là gì?
+\Là một trang web đầu tiên của Website.
+Là tập hợp các trang web có liên quan đến nhau.
+Là địa chỉ của Website.
+Tất cả các câu trên đều đúng.
+
+Cách thức để mở 1 trang web sử dụng Internet Explorer:
+Nhập url của trang web vào ô Address rồi nhấn Enter.
+Chọn File/ Open rồi nhập url của trang web rồi nhấn Enter.
+\Cả 2 câu trên đều đúng.
+Cả 3 câu trên dều sai
+
+Hyperlink là gì?
+\Là một thành phần trong một trang Web liên kết đến vị trí khác trên cùng trang Web đó hoặc liên kết đến một trang Web khác.
+Là nội dụng được thể hiện trên Web Browser (văn bản, âm thanh, hình ảnh)
+Là địa chỉ của 1 trang Web.
+Tất cả các câu trên đều sai.
+
+Chọn phát biểu đúng về Email
+Là phương thức truyền tập tin từ máy này đến máy khác trên mạng.
+Là dịch vụ cho phép ta truy cập đến hệ thống máy tính khác trên mạng.
+\Là dịch vụ cho phép ta gởi và nhận thư điện tử
+Là hình thức hội thoại trực tiếp trên Internet.
+
+HTTP là gì?
+\Là giao thức truyền siêu văn bản.
+Là ngôn ngữ để soạn thảo nội dung các trang Web.
+Là tên của trang web.
+Là địa chỉ của trang Web.
+
+Có thể mở các file .html bằng:
+Trình duyệt web (Browser) Internet Explorer.
+Trình duyệt web (Browser) Mozila.
+Các trình duyệt mail như Outlook Express, Microsoft Outlook, …
+\Câu a và b đều đúng
+
+World Wide Web là gì?
+Là một hệ thống các máy chủ cung cấp thông tin đến bất kỳ các máy tính nào trên Internet có yêu cầu.
+Là máy dùng để đặt các trang Web trên Internet.
+\Là một dịch vụ của Internet.
+Câu a và c đúng.
+
+Trong khi soạn thảo email nếu muốn gởi kèm file chúng ta bấm vào nút
+Send
+Copy
+\Attachment
+File/Save
+
+Điều kiện để kết nối vào Internet qua đường dây điện thoại cố định là:
+Phải có máy tính.
+Phải có thuê bao điện thoại cố định.
+Phải có modem.
+\Cả 3 câu trên đều đúng.
+
+Web Server là gì?
+\Là máy chủ dùng để đặt các trang Web trên Internet.
+Là máy tính đang được sử dụng để xem nội dung các trang web.
+Là một dịch vụ của Internet.
+Tất cả các câu trên đều đúng.
+
+WWW là viết tắt của:
+World Wide Wed
+\World Wide Web
+World Wild Wed
+Word Wide Web

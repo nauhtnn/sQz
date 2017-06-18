@@ -126,7 +126,7 @@
                         <RadioButton GroupName="slVw" Name="Q"/>
                         <RadioButton GroupName="slVw" Grid.Column="1"/>
                     </Grid>
-                    <StackPanel x:Name="nees">
+                    <StackPanel Visibility="Collapsed">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="40"/>
@@ -165,7 +165,6 @@
                             </Grid>
                         </ScrollViewer>
                     </StackPanel>
-                    <ScrollViewer Width="876"/>
                 </StackPanel>
             </TabItem>
         </TabControl>
