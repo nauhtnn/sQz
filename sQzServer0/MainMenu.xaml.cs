@@ -21,7 +21,7 @@ namespace sQzServer0
     /// </summary>
     public partial class MainMenu : Page
     {
-        int uVer = 7;
+        int uVer = 6;
         public MainMenu()
         {
             InitializeComponent();
@@ -108,6 +108,7 @@ namespace sQzServer0
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            WPopup.s.Exit();
         }
 
         void DisableBtns()

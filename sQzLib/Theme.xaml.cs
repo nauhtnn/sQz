@@ -242,6 +242,12 @@ namespace sQzLib
             }
         }
 
+        public void Exit()
+        {
+            cncl = false;
+            mW.Close();
+        }
+
         public bool cncl { set { bCnclEvnt = value; } }
 
         public void ShowDialog(string msg)
