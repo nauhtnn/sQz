@@ -226,13 +226,14 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            btnExit.Content = t._[(int)TxI.EXIT];
             btnStartSrvr.Content = t._[(int)TxI.STRT_SRVR];
             btnStopSrvr.Content = t._[(int)TxI.STOP_SRVR];
             btnQSGen.Content = t._[(int)TxI.QS_GEN];
+            rdoA.Content = t._[(int)TxI.BASIC];
+            rdoB.Content = t._[(int)TxI.ADVAN];
             btnExit.Content = t._[(int)TxI.EXIT];
-            txtNqs.Text = t._[(int)TxI.QS_N];
-            txtNq.Text = t._[(int)TxI.Q_N];
+            txtnQs.Text = t._[(int)TxI.QS_N];
+            txtnQ.Text = t._[(int)TxI.Q_N];
             txtBirdate.Text = t._[(int)TxI.BIRDATE];
             txtBirpl.Text = t._[(int)TxI.BIRPL];
             txtName.Text = t._[(int)TxI.NEE_NAME];
@@ -333,6 +334,110 @@ namespace sQzServer0
                     tbcSl.Items.Remove(ti);
                     break;
                 }
+        }
+
+        private void Lv_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        public void InitQPanel()
+        {
+            foreach (IUx i in QuestSheet.GetAllIUs())
+            {
+                TextBox t = vTbx[(int)i];
+                if (t != null)
+                {
+                    t.MaxLength = 2;
+                    t.PreviewKeyDown += tbxIU_PrevwKeyDown;
+                    t.TextChanged += tbxIU_TextChanged;
+                }
+            }
+            tbxNqs.MaxLength = 2;
+            tbxNqs.PreviewKeyDown += tbxIU_PrevwKeyDown;
+            tbxNqs.TextChanged += tbxIU_TextChanged;
+            tbxNq.Text = "0";
+        }
+
+        private void tbxIU_PrevwKeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Delete && e.Key != Key.Back && e.Key != Key.Tab &&
+                ((int)e.Key < (int)Key.Left || (int)Key.Down < (int)e.Key) &&
+                ((int)e.Key < (int)Key.D0 || (int)Key.D9 < (int)e.Key))
+                e.Handled = true;
+        }
+
+        private void rdo_Checked(object sender, RoutedEventArgs e)
+        {
+            //TextBox t;
+            //if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+            //{
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
+            //        if ((t = vTbx[(int)j]) != null)
+            //            t.IsEnabled = true;
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
+            //        if ((t = vTbx[(int)j]) != null)
+            //            t.IsEnabled = false;
+            //}
+            //else
+            //{
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
+            //        if ((t = vTbx[(int)j]) != null)
+            //            t.IsEnabled = true;
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
+            //        if ((t = vTbx[(int)j]) != null)
+            //            t.IsEnabled = false;
+            //}
+            //tbxIU_TextChanged(null, null);
+        }
+
+        private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            //TextBox t = tbxNqs;
+            //if (t == null || t.Text == null || t.Text.Length == 0 || int.Parse(t.Text) <= 0)
+            //{
+            //    btnQSGen.IsEnabled = false;
+            //    return;
+            //}
+            //int n = 0, i;
+            //bool bG = true;
+            //if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+            //{
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
+            //        if ((t = vTbx[(int)j]) != null)
+            //        {
+            //            if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
+            //                n += i;
+            //            else
+            //                bG = false;
+            //        }
+            //        else
+            //            bG = false;
+            //    tbxNq.Text = n.ToString();
+            //    if (bG && n == 30)
+            //        btnQSGen.IsEnabled = true;
+            //    else
+            //        btnQSGen.IsEnabled = false;
+            //}
+            //else
+            //{
+            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
+            //        if ((t = vTbx[(int)j]) != null)
+            //        {
+            //            t.IsEnabled = true;
+            //            if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
+            //                n += i;
+            //            else
+            //                bG = false;
+            //        }
+            //        else
+            //            bG = false;
+            //    tbxNq.Text = n.ToString();
+            //    if (bG && n == 30)
+            //        btnQSGen.IsEnabled = true;
+            //    else
+            //        btnQSGen.IsEnabled = false;
+            //}
         }
     }
 }

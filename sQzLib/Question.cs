@@ -3,39 +3,6 @@ using System.Collections.Generic;
 using MySql.Data.MySqlClient;
 using System.Text;
 
-/*
-CREATE TABLE IF NOT EXISTS `q0` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q1` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q2` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q3` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q4` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q5` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q6` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q7` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q8` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q9` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q10` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q11` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q12` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q13` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-CREATE TABLE IF NOT EXISTS `q14` (`id` INT(4) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`body` VARCHAR(9192) CHARACTER SET `utf8`, `ansKeys` CHAR(4) CHARACTER SET `ascii`);
-*/
-
 namespace sQzLib
 {
     public enum QuestType
@@ -77,7 +44,7 @@ namespace sQzLib
         public string[] vAns;
         public bool[] vKeys;
         public int[] vAnsSort;
-        bool bChoiceSort;
+        public bool bDiff;
         public QuestType qType;
         ContentType cType;
         static string[] svToken;
@@ -92,7 +59,7 @@ namespace sQzLib
         public Question() {
             nAns = 0;
             vAns = null;
-            bChoiceSort = true;
+            bDiff = false;
             qType = QuestType.Single;
             cType = ContentType.Raw;
             qSubs = -1;
@@ -247,16 +214,14 @@ namespace sQzLib
             int x = svToken[siToken].IndexOf("\\c");
             if (-1 < x)
             {
-                bChoiceSort = false;
                 x += 2;
-                s = System.Math.Max(s, x);
+                s = Math.Max(s, x);
             }
             x = svToken[siToken].IndexOf("\\C");
             if (-1 < x)
             {
-                bChoiceSort = false;
                 x += 2;
-                s = System.Math.Max(s, x);
+                s = Math.Max(s, x);
             }
             svToken[siToken] = svToken[siToken].Substring(s);
             readStmt();

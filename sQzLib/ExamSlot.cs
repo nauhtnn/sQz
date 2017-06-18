@@ -282,6 +282,15 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
+        public int CountQSByRoom()
+        {
+            int n = 0;
+            foreach (ExamRoom r in vRoom.Values)
+                if (n < r.vExaminee.Count)
+                    n = r.vExaminee.Count;
+            return n + (n / 10) + 1;
+        }
+
         public bool ReadByteR0(byte[] buf, ref int offs)
         {
             if (buf.Length - offs < 4)
