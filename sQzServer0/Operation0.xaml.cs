@@ -349,7 +349,7 @@ namespace sQzServer0
             tbi.ShowExaminee();
             tbi.ShowQSHeader();
             tbcSl.Items.Add(tbi);
-            tbi.Focus();
+            tbi.GetFocus();
             QuestSheet.DBUpdateCurQSId(mBrd.mDt);
             mBrd.vSl.Add(i.Content as string, sl);
 

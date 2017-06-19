@@ -16,6 +16,7 @@ namespace sQzServer0
         StackPanel spContent;
         StackPanel spNee;
         TabControl tbcQ;
+        RadioButton rdoQ;
         public SortedList<int, TextBlock> vGrade;
         public SortedList<int, TextBlock> vDt1;
         public SortedList<int, TextBlock> vDt2;
@@ -197,6 +198,7 @@ namespace sQzServer0
                     {
                         rdo.IsChecked = true;
                         rdo.Content = Txt.s._[(int)TxI.RDO_Q];
+                        rdoQ = rdo;
                     }
                     else
                         rdo.Content = Txt.s._[(int)TxI.RDO_NEE];
@@ -356,7 +358,7 @@ namespace sQzServer0
 
             ShowQSHeader();
             if (0 < tbcQ.Items.Count)
-                (tbcQ.Items[0] as TabItem).Focus();
+                tbiQ_GotFocus(tbcQ.Items[0], null);
         }
 
         public void ShowQSHeader()
@@ -371,6 +373,17 @@ namespace sQzServer0
                         
                     tbcQ.Items.Add(ti);
                 }
+        }
+
+        public bool GetFocus()
+        {
+            if(rdoQ.IsChecked.HasValue ? rdoQ.IsChecked.Value : false)
+            {
+                if(0 < tbcQ.Items.Count && tbcQ.SelectedItem == null)
+                    tbiQ_GotFocus(tbcQ.Items[0], null);
+            }
+
+            return Focus();
         }
     }
 }
