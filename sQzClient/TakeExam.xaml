@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:sQzClient"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
+      ShowsNavigationUI="False"
       Title="TakeExam">
 
     <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10">

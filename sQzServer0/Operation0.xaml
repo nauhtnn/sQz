@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:sQzServer0"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
+      ShowsNavigationUI="False"
       Title="ExamList">
 
     <StackPanel x:Name="spMain" Loaded="Main_Loaded" Orientation="Horizontal" Margin="10">
@@ -49,10 +50,10 @@
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
                 <TextBlock x:Name="txtMod"/>
-                <TextBlock Text="txtNBoth" Grid.Column="1"/>
-                <TextBlock Text="txtNDiff" Grid.Column="2"/>
+                <TextBlock x:Name="txtNEsyDif" Grid.Column="1"/>
+                <TextBlock x:Name="txtNDiff" Grid.Column="2"/>
             </Grid>
-            <Grid x:Name="grdA">
+            <Grid x:Name="grdA" Visibility="Collapsed">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>
@@ -85,7 +86,7 @@
                 <TextBox Width="30" Grid.Row="5" Grid.Column="1"/>
                 <TextBox Width="30" Grid.Row="5" Grid.Column="2"/>
             </Grid>
-            <Grid x:Name="grdB">
+            <Grid x:Name="grdB" Visibility="Collapsed">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
                     <ColumnDefinition Width="*"/>

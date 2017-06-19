@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:sQzServer0"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
+      ShowsNavigationUI="False"
       Title="MainMenu">
 
     <StackPanel Loaded="Main_Loaded">

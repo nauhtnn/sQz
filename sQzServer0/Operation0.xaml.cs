@@ -26,11 +26,12 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         ExamBoard mBrd;
+        TextBox[] vNEsyDif;
+        TextBox[] vNDiff;
 
         public Operation0()
         {
             InitializeComponent();
-            ShowsNavigationUI = false;
             mServer = new Server2(SrvrBufHndl);
             mCbMsg = new UICbMsg();
 
@@ -57,18 +58,18 @@ namespace sQzServer0
                 spMain.Opacity = 1;
                 return;
             }
-            //bool dark = true;
-            //Color c = new Color();
-            //c.A = 0xff;
-            //c.B = c.G = c.R = 0xf0;
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
             lbxBrd.Items.Clear();
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
                 it.Content = dt.ToString(DT.__);
-                //dark = !dark;
-                //if (dark)
-                //    it.Background = new SolidColorBrush(c);
+                dark = !dark;
+                if (dark)
+                    it.Background = new SolidColorBrush(c);
                 lbxBrd.Items.Add(it);
             }
         }
@@ -84,7 +85,32 @@ namespace sQzServer0
 
             spMain.Background = Theme.s._[(int)BrushId.Ans_Highlight];
 
+            vNEsyDif = new TextBox[QuestSheet.GetIUr(2).Count()];
+            vNDiff = new TextBox[vNEsyDif.Length];
+            int i = -1, j = -1;
+            foreach (TextBox tbx in grdA.Children.OfType<TextBox>())
+            {
+                if (Grid.GetColumn(tbx) == 1)
+                    vNEsyDif[++i] = tbx;
+                else
+                {
+                    vNDiff[++j] = tbx;
+                    tbx.Name = "_" + j;
+                }
+            }
+            foreach (TextBox tbx in grdB.Children.OfType<TextBox>())
+            {
+                if (Grid.GetColumn(tbx) == 1)
+                    vNEsyDif[++i] = tbx;
+                else
+                {
+                    vNDiff[++j] = tbx;
+                    tbx.Name = "_" + j;
+                }
+            }
+
             LoadTxt();
+            InitQPanel();
 
             LoadBrd();
 
@@ -231,6 +257,9 @@ namespace sQzServer0
             btnQSGen.Content = t._[(int)TxI.QS_GEN];
             rdoA.Content = t._[(int)TxI.BASIC];
             rdoB.Content = t._[(int)TxI.ADVAN];
+            txtMod.Text = t._[(int)TxI.MODULE];
+            txtNEsyDif.Text = t._[(int)TxI.N_ESY_DIF];
+            txtNDiff.Text = t._[(int)TxI.N_DIFF];
             btnExit.Content = t._[(int)TxI.EXIT];
             txtnQs.Text = t._[(int)TxI.QS_N];
             txtnQ.Text = t._[(int)TxI.Q_N];
@@ -336,27 +365,25 @@ namespace sQzServer0
                 }
         }
 
-        private void Lv_Checked(object sender, RoutedEventArgs e)
-        {
-
-        }
-
         public void InitQPanel()
         {
-            foreach (IUx i in QuestSheet.GetAllIUs())
+            foreach (IUx i in QuestSheet.GetIUr(2))
             {
-                TextBox t = vTbx[(int)i];
+                TextBox t = vNEsyDif[(int)i];
                 if (t != null)
                 {
                     t.MaxLength = 2;
                     t.PreviewKeyDown += tbxIU_PrevwKeyDown;
                     t.TextChanged += tbxIU_TextChanged;
                 }
+                t = vNDiff[(int)i];
+                if (t != null)
+                {
+                    t.MaxLength = 2;
+                    t.PreviewKeyDown += tbxIU_PrevwKeyDown;
+                    t.TextChanged += tbxIUdif_TextChanged;
+                }
             }
-            tbxNqs.MaxLength = 2;
-            tbxNqs.PreviewKeyDown += tbxIU_PrevwKeyDown;
-            tbxNqs.TextChanged += tbxIU_TextChanged;
-            tbxNq.Text = "0";
         }
 
         private void tbxIU_PrevwKeyDown(object sender, KeyEventArgs e)
@@ -367,77 +394,72 @@ namespace sQzServer0
                 e.Handled = true;
         }
 
-        private void rdo_Checked(object sender, RoutedEventArgs e)
+        private void Lv_Checked(object sender, RoutedEventArgs e)
         {
-            //TextBox t;
-            //if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-            //{
-            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
-            //        if ((t = vTbx[(int)j]) != null)
-            //            t.IsEnabled = true;
-            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
-            //        if ((t = vTbx[(int)j]) != null)
-            //            t.IsEnabled = false;
-            //}
-            //else
-            //{
-            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
-            //        if ((t = vTbx[(int)j]) != null)
-            //            t.IsEnabled = true;
-            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
-            //        if ((t = vTbx[(int)j]) != null)
-            //            t.IsEnabled = false;
-            //}
-            //tbxIU_TextChanged(null, null);
+            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+            {
+                grdB.Visibility = Visibility.Collapsed;
+                grdA.Visibility = Visibility.Visible;
+            }
+            else
+            {
+                grdA.Visibility = Visibility.Collapsed;
+                grdB.Visibility = Visibility.Visible;
+            }
+            tbxIU_TextChanged(null, null);
         }
 
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
         {
-            //TextBox t = tbxNqs;
-            //if (t == null || t.Text == null || t.Text.Length == 0 || int.Parse(t.Text) <= 0)
-            //{
-            //    btnQSGen.IsEnabled = false;
-            //    return;
-            //}
-            //int n = 0, i;
-            //bool bG = true;
-            //if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-            //{
-            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.A))
-            //        if ((t = vTbx[(int)j]) != null)
-            //        {
-            //            if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
-            //                n += i;
-            //            else
-            //                bG = false;
-            //        }
-            //        else
-            //            bG = false;
-            //    tbxNq.Text = n.ToString();
-            //    if (bG && n == 30)
-            //        btnQSGen.IsEnabled = true;
-            //    else
-            //        btnQSGen.IsEnabled = false;
-            //}
-            //else
-            //{
-            //    foreach (IUx j in QuestSheet.GetIUs(ExamLv.B))
-            //        if ((t = vTbx[(int)j]) != null)
-            //        {
-            //            t.IsEnabled = true;
-            //            if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
-            //                n += i;
-            //            else
-            //                bG = false;
-            //        }
-            //        else
-            //            bG = false;
-            //    tbxNq.Text = n.ToString();
-            //    if (bG && n == 30)
-            //        btnQSGen.IsEnabled = true;
-            //    else
-            //        btnQSGen.IsEnabled = false;
-            //}
+            TextBox t;
+            int n = 0, i;
+            bool bG = true;
+            int lv;
+            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+                lv = (int)ExamLv.A;
+            else
+                lv = (int)ExamLv.B;
+            foreach (int j in QuestSheet.GetIUr(lv))
+                if ((t = vNEsyDif[j]) != null)
+                {
+                    if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
+                    {
+                        n += i;
+                        vNDiff[j].IsEnabled = true;
+                    }
+                    else
+                    {
+                        bG = false;
+                        vNDiff[j].IsEnabled = false;
+                    }
+                }
+                else
+                    bG = false;
+            tbxNq.Text = n.ToString();
+            if (bG && n == 30)
+                btnQSGen.IsEnabled = true;
+            else
+                btnQSGen.IsEnabled = false;
+        }
+
+        private void tbxIUdif_TextChanged(object sender, TextChangedEventArgs e)
+        {
+            TextBox t = sender as TextBox;
+            if (t == null)
+                return;
+            if (t.Text == null || t.Text.Length == 0)
+                return;
+            int i = int.Parse(t.Text);
+            int idx = int.Parse(t.Name.Substring(1));
+            TextBox tm = vNEsyDif[idx];
+            if(tm == null)
+            {
+                t.Text = string.Empty;
+                return;
+            }
+            int m = int.Parse(tm.Text);
+            if(m < i)
+                t.Text = string.Empty;
         }
     }
 }

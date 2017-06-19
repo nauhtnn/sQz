@@ -26,8 +26,6 @@ namespace sQzClient
         {
             InitializeComponent();
 
-            ShowsNavigationUI = false;
-
             mState = NetCode.Dating;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();

@@ -39,8 +39,6 @@ namespace sQzClient
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            ShowsNavigationUI = false;
-
             mQSh = new QuestSheet();
         }
 

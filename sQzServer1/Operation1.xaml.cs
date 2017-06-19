@@ -39,7 +39,6 @@ namespace sQzServer1
         public Operation1()
         {
             InitializeComponent();
-            ShowsNavigationUI = false;
 
             mState = NetCode.DateStudentRetriving;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, true);

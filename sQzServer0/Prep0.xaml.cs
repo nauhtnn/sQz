@@ -32,7 +32,6 @@ namespace sQzServer0
 
         public Prep0()
         {
-            ShowsNavigationUI = false;
             InitializeComponent();
             mSelQCat = IUx._0;
             mDBQSh = new QuestSheet();

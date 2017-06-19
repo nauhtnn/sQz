@@ -36,60 +36,52 @@ namespace sQzLib
             mDiff = 0;
         }
 
-        static IUx[] gaA = null;
-        static IUx[] gaB = null;
         public static IUx[] GetIUs(ExamLv lv)
         {
-            if(lv == ExamLv.A)
+            IUx[] x;
+            if (lv == ExamLv.A)
             {
-                if (gaA == null)
-                {
-                    gaA = new IUx[6];
-                    gaA[0] = IUx._1;
-                    gaA[1] = IUx._2;
-                    gaA[2] = IUx._3;
-                    gaA[3] = IUx._4;
-                    gaA[4] = IUx._5;
-                    gaA[5] = IUx._6;
-                }
-                return gaA;
+                x = new IUx[6];
+                x[0] = IUx._1;
+                x[1] = IUx._2;
+                x[2] = IUx._3;
+                x[3] = IUx._4;
+                x[4] = IUx._5;
+                x[5] = IUx._6;
             }
             else
             {
-                if (gaB == null)
-                {
-                    gaB = new IUx[3];
-                    gaB[0] = IUx._7;
-                    gaB[1] = IUx._8;
-                    gaB[2] = IUx._10;
-                }
-                return gaB;
+                x = new IUx[3];
+                x[0] = IUx._7;
+                x[1] = IUx._8;
+                x[2] = IUx._10;
             }
+            return x;
         }
 
-        static IUx[] gaAll = null;
-        public static IUx[] GetAllIUs()
+        public static int[] GetIUr(int lv)
         {
-            if(gaAll == null)
+            int[] x;
+            if(lv == (int)ExamLv.A)
             {
-                gaAll = new IUx[15];
-                gaAll[0] = IUx._1;
-                gaAll[1] = IUx._2;
-                gaAll[2] = IUx._3;
-                gaAll[3] = IUx._4;
-                gaAll[4] = IUx._5;
-                gaAll[5] = IUx._6;
-                gaAll[6] = IUx._7;
-                gaAll[7] = IUx._8;
-                gaAll[8] = IUx._9;
-                gaAll[9] = IUx._10;
-                gaAll[10] = IUx._11;
-                gaAll[11] = IUx._12;
-                gaAll[12] = IUx._13;
-                gaAll[13] = IUx._14;
-                gaAll[14] = IUx._15;
+                x = new int[6];
+                for (int i = 0; i < 6; ++i)
+                    x[i] = i;
             }
-            return gaAll;
+            else if(lv == (int)ExamLv.B)
+            {
+                x = new int[3];
+                x[0] = 6;
+                x[1] = 7;
+                x[2] = 8;
+            }
+            else
+            {
+                x = new int[9];
+                for (int i = 0; i < 9; ++i)
+                    x[i] = i;
+            }
+            return x;
         }
 
         public static bool ParseLvId(string s, out ExamLv lv, out int id)
@@ -306,9 +298,14 @@ namespace sQzLib
 				eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return null;
 			}
-			IUx[] ius = GetAllIUs();
+            IUx[] ius = new IUx[GetIUs(ExamLv.A).Count() + GetIUs(ExamLv.B).Count()];
+            int i = -1;
+            foreach (IUx iu in GetIUs(ExamLv.A))
+                ius[++i] = iu;
+            foreach (IUx iu in GetIUs(ExamLv.B))
+                ius[++i] = iu;
 			int[] nn = new int[ius.Length];
-			int i = -1;
+			i = -1;
 			StringBuilder emsg = new StringBuilder();
 			foreach(IUx iu in ius)
 			{

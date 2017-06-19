@@ -6,6 +6,7 @@
       xmlns:local="clr-namespace:sQzServer1"
       mc:Ignorable="d" 
       d:DesignHeight="720" d:DesignWidth="1280"
+      ShowsNavigationUI="False"
       Title="Operation1">
 
     <StackPanel x:Name="spMain" Loaded="spMain_Loaded" Margin="10,10">
