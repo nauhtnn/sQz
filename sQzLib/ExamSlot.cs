@@ -386,6 +386,12 @@ namespace sQzLib
             return false;
         }
 
+        public bool DBSelArchieve()
+        {
+
+            return false;
+        }
+
         public List<byte[]> ToByteQPack()
         {
             List<byte[]> l = new List<byte[]>();

@@ -25,8 +25,6 @@ namespace sQzLib
         public List<Question> vQuest;
         public byte[] aQuest;
 
-        static int sSeed = 1;
-
         public QuestSheet()
         {
             eLv = ExamLv.A;
@@ -333,7 +331,7 @@ namespace sQzLib
         }
 
         //only Server0 uses this.
-        public bool DBSelect(IUx iu, int n, out string eMsg)
+        public bool DBSelect(Random rand, IUx iu, int n, out string eMsg)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -346,35 +344,19 @@ namespace sQzLib
                 "moid=" + (int)iu + " AND del=0", out eMsg);
             if (nn < 1 || nn < n)
                 return true;
-            int[] vSel = new int[n];
+            List<int> vIds = new List<int>();
             int i;
-            for (i = 0; i < n; ++i)
-                vSel[i] = -1;
-            ++sSeed;
-            if (sSeed == int.MaxValue)
-                sSeed = 1;
-            Random r = new Random(sSeed);
+            for (i = 0; i < nn; ++i)
+                vIds.Add(i);
+            int[] vSel = new int[n];
             i = n;
             while (0 < i)
             {
-                int sel = r.Next() % nn;
-                int idx = Array.IndexOf(vSel, sel);
-                bool fw = sel % 2 == 0;
-                while (-1 < idx)
-                {
-                    if (fw)
-                        ++sel;
-                    else
-                        --sel;
-                    if (sel < 0 || sel == nn)
-                    {
-                        fw = sel < 0;
-                        continue;
-                    }
-                    idx = Array.IndexOf(vSel, sel);
-                }
                 --i;
-                vSel[i] = sel;
+                int idx = rand.Next() % nn;
+                --nn;
+                vSel[i] = vIds[idx];
+                vIds.RemoveAt(idx);
             }
             Array.Sort(vSel);
             //

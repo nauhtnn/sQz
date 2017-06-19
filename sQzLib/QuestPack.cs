@@ -199,16 +199,16 @@ namespace sQzLib
         public List<QuestSheet> GenQPack3(int n, int[] vn)
         {
             string emsg;
+            Random rand = new Random();
             List<QuestSheet> l = new List<QuestSheet>();
             QuestSheet qs0 = new QuestSheet();
             int j = -1;
             foreach (IUx i in QuestSheet.GetIUs(eLv))
-                if (qs0.DBSelect(i, vn[++j], out emsg))
+                if (qs0.DBSelect(rand, i, vn[++j], out emsg))
                 {
                     WPopup.s.ShowDialog(emsg);
                     return new List<QuestSheet>();
                 }
-            Random rand = new Random();
             while (0 < n)
             {
                 --n;
