@@ -163,7 +163,8 @@ namespace sQzServer0
                 DeepCopy(refp);
 
             tbcQ = new TabControl();
-            List<string> qstIds = QuestPack.DBSelectQStId(mSl.mDt);
+            List<string> qstIds = mSl.vQPack[ExamLv.A].SelectQStId();
+            qstIds.InsertRange(qstIds.Count, mSl.vQPack[ExamLv.A].SelectQStId());
             foreach(string t in qstIds)
             {
                 TabItem ti = new TabItem();

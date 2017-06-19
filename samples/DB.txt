@@ -16,7 +16,7 @@ FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
 CREATE TABLE IF NOT EXISTS `sqz_level`(`id` CHAR CHARACTER SET `ascii` PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATE, `lv` CHAR CHARACTER SET `ascii`,
-`id` SMALLINT UNSIGNED, `t` TIME,
+`t` TIME, `id` SMALLINT UNSIGNED,
 PRIMARY KEY(`dt`, `lv`,`id`),
 FOREIGN KEY(`dt`, `t`) REFERENCES `sqz_slot`(`dt`, `t`),
 FOREIGN KEY(`lv`) REFERENCES `sqz_level`(`id`),

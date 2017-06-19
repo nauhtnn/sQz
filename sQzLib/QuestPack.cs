@@ -92,61 +92,70 @@ namespace sQzLib
             return false;
         }
 
-        public static List<string> DBSelectQStId(DateTime dt)
+        //public static List<string> DBSelectQStId(DateTime dt)
+        //{
+        //    MySqlConnection conn = DBConnect.Init();
+        //    if (conn == null)
+        //        return null;
+        //    string qry = DBConnect.mkQrySelect("sqz_qsheet", "lv,id",
+        //        "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) + "'");
+        //    string eMsg;
+        //    MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+        //    List<string> l = new List<string>();
+        //    if (reader != null)
+        //    {
+        //        while (reader.Read())
+        //        {
+        //            ExamLv lv;
+        //            if (Enum.TryParse(reader.GetString(0), out lv))
+        //                break;
+        //            l.Add(lv.ToString() + reader.GetUInt16(1).ToString("d3"));
+        //        }
+        //        reader.Close();
+        //    }
+        //    DBConnect.Close(ref conn);
+        //    return l;
+        //}
+        public List<string> SelectQStId()
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return null;
-            string qry = DBConnect.mkQrySelect("sqz_qsheet", "lv,id",
-                "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) + "'");
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             List<string> l = new List<string>();
-            if (reader != null)
-            {
-                while (reader.Read())
-                {
-                    ExamLv lv;
-                    if (Enum.TryParse(reader.GetString(0), out lv))
-                        break;
-                    l.Add(lv.ToString() + reader.GetUInt16(1).ToString("d3"));
-                }
-                reader.Close();
-            }
-            DBConnect.Close(ref conn);
+            string tlv = eLv.ToString();
+            foreach (QuestSheet qs in vSheet.Values)
+                l.Add(tlv + qs.uId.ToString("d3"));
             return l;
         }
 
-        public List<QuestSheet> GenQPack(int n, int[] vn)
+        public bool DBSelectQS(DateTime dt, out string eMsg)
         {
-            string emsg;
-            List<QuestSheet> l = new List<QuestSheet>();
-            bool cont;
-            while (0 < n)
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
             {
-                --n;
-                cont = false;
-                QuestSheet qs = new QuestSheet();
-                int j = -1;
-                foreach (IUx i in QuestSheet.GetIUs(eLv))
-                    if (qs.DBSelect(i, vn[++j], out emsg))
-                    {
-                        WPopup.s.ShowDialog(emsg);
-                        cont = true;
-                        break;
-                    }
-                if (cont)
-                    continue;
-                qs.eLv = eLv;
-                if(!qs.UpdateCurQSId())//todo: better error handle
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return true;
+            }
+            string qry = DBConnect.mkQrySelect("sqz_qsheet",
+                "id", "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) +
+                "' AND lv='" + eLv.ToString() + "'");
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            List<int> qsids = new List<int>();
+            if (reader != null)
+            {
+                while (reader.Read())
+                    qsids.Add(reader.GetUInt16(0));
+                reader.Close();
+                foreach(int qsid in qsids)
                 {
+                    QuestSheet qs = new QuestSheet();
+                    if (qs.DBSelect(conn, dt, eLv, qsid, out eMsg))
+                    {
+                        DBConnect.Close(ref conn);
+                        return true;
+                    }
                     vSheet.Add(qs.uId, qs);
-                    l.Add(qs);
                 }
             }
-            if(DBIns(mDt, l) == null)
-                return l;
-            return new List<QuestSheet>();
+            DBConnect.Close(ref conn);
+            return false;
         }
 
         public List<QuestSheet> GenQPack2(int n, int[] vn)

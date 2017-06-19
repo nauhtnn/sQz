@@ -339,6 +339,11 @@ namespace sQzServer0
             sl.Dt = dt;
             sl.DBSelRoomId();
             sl.DBSelNee();
+            if(sl.DBSelArchieve(out emsg))
+            {
+                WPopup.s.ShowDialog(emsg);
+                return;
+            }
             Op0SlotView tbi = new Op0SlotView(sl);
             tbi.DeepCopy(tbiSl);
             tbi.ShowExaminee();

@@ -386,9 +386,12 @@ namespace sQzLib
             return false;
         }
 
-        public bool DBSelArchieve()
+        public bool DBSelArchieve(out string eMsg)
         {
-
+            if (vQPack[ExamLv.A].DBSelectQS(mDt, out eMsg))
+                return true;
+            if (vQPack[ExamLv.B].DBSelectQS(mDt, out eMsg))
+                return true;
             return false;
         }
 

@@ -418,61 +418,57 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public bool DBSelect(DateTime dt, ExamLv lv, int id)
+        public bool DBSelect(MySqlConnection conn, DateTime dt, ExamLv lv, int id, out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return true;
-            StringBuilder cond = new StringBuilder();
-            cond.Append("dt='" + dt.ToString(DT._) + "'");
-            cond.Append(" AND lv=" + lv.ToString("d"));
-            cond.Append(" AND id=" + id);
-            string qry = DBConnect.mkQrySelect("qs", "vquest", cond.ToString());
-            string eMsg;
+            string qry = DBConnect.mkQrySelect("sqz_qsheet_quest", "qid,asort",
+                "dt='" + dt.ToString(DT._) + "' AND lv='" + lv.ToString() +
+                "' AND qsid=" + id);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            string qIds = null;
-            if (reader != null && reader.Read())
-            {
-                qIds = reader.GetString(0);
-                reader.Close();
-            }
-            if (qIds == null)
-            {
-                DBConnect.Close(ref conn);
+            if (reader == null)
                 return true;
-            }
-            uId = id;
-            vQuest.Clear();
-            string[] vQId = qIds.Split('-');
-            foreach(string qid in vQId)
+            List<uint> qids = new List<uint>();
+            List<string> asorts = new List<string>();
+            while (reader.Read())
             {
-                string[] iuid = qid.Split('_');
-                if(iuid.Length == 2)//todo handle error
+                qids.Add(reader.GetUInt32(0));
+                asorts.Add(reader.GetString(1));
+            }
+            reader.Close();
+            int i = -1;
+            foreach(int qid in qids)
+            {
+                ++i;
+                qry = DBConnect.mkQrySelect("sqz_question",
+                    "id,stmt,ans0,ans1,ans2,ans3,`key`,moid", "id=" + qid);
+                reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+                if (reader == null)
+                    return true;
+                while (reader.Read())
                 {
-                    qry = DBConnect.mkQrySelect("q" + iuid[0], null, "id=" + iuid[1]);
-                    reader = null;//todo DBConnect.exeQrySelect(conn, qry);
-                    if (reader != null)//todo handle error
+                    Question q = new Question();
+                    q.uId = reader.GetInt32(0);
+                    q.mStmt = reader.GetString(1);
+                    q.nAns = 4;
+                    string[] anss = new string[4];
+                    for (int j = 0; j < 4; ++j)
+                        anss[j] = reader.GetString(2 + j);
+                    string x = reader.GetString(6);
+                    bool[] keys = new bool[4];
+                    for (int j = 0; j < 4; ++j)
+                        keys[j] = (x[j] == '1');
+                    q.vAns = new string[4];
+                    q.vKeys = new bool[4];
+                    for(int j = 0; j < 4; ++j)
                     {
-                        if(reader.Read())//todo handle error
-                        {
-                            Question q = new Question();
-                            q.uId = reader.GetInt32(0);
-                            string[] s = reader.GetString(1).Split('\n');
-                            q.mStmt = "(" + iuid[0] + ')' + s[0];
-                            q.nAns = 4;
-                            q.vAns = new string[4];
-                            for (int k = 0; k < 4; ++k)
-                                q.vAns[k] = s[k + 1];
-                            string x = reader.GetString(2);
-                            q.vKeys = new bool[4];
-                            for (int k = 0; k < 4; ++k)
-                                q.vKeys[k] = (x[k] == '1');
-                            q.mIU = (IUx)int.Parse(iuid[0]);
-                            vQuest.Add(q);
-                        }
-                        reader.Close();
+                        q.vAns[j] = anss[asorts[i][j] - '0'];
+                        q.vKeys[j] = keys[asorts[i][j] - '0'];
                     }
+                    int iu;
+                    if (Enum.IsDefined(typeof(ExamLv), iu = reader.GetInt32(6)))
+                        q.mIU = (IUx)iu;
+                    vQuest.Add(q);
                 }
+                reader.Close();
             }
             return false;
         }
