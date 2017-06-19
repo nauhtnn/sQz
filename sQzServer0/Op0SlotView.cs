@@ -301,28 +301,33 @@ namespace sQzServer0
             svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             StackPanel sp = new StackPanel();
             int x = 0;
-            bool dark = false;
             Color c = new Color();
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
+            SolidColorBrush lightbg = new SolidColorBrush(c);
+            SolidColorBrush bg = lightbg;
             foreach (Question q in qs.vQuest)
             {
                 TextBlock i = new TextBlock();
                 i.Text = ++x + ". " + q.Stmt;
-                dark = !dark;
-                i.Background = (dark) ? new SolidColorBrush(c) :
-                    Theme.s._[(int)BrushId.LeftPanel_BG];
+                if (bg == lightbg)
+                    bg = Theme.s._[(int)BrushId.LeftPanel_BG];
+                else
+                    bg = lightbg;
+                i.Background = bg;
                 sp.Children.Add(i);
                 for (int idx = 0; idx < q.nAns; ++idx)
                 {
                     TextBlock j = new TextBlock();
-                    j.Text = ('A' + idx).ToString() + q.vAns[idx];
+                    j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
+                    j.Background = bg;
                     if (q.vKeys[idx])
                         j.FontWeight = FontWeights.Bold;
                     sp.Children.Add(j);
                 }
             }
             svwr.Content = sp;
+            svwr.Height = 620;
             tbi.Content = svwr;
 
             InitNMod();
@@ -373,7 +378,8 @@ namespace sQzServer0
                 foreach (QuestSheet qs in p.vSheet.Values)
                 {
                     TabItem ti = new TabItem();
-                    ti.Header = qs.eLv.ToString() + qs.uId;
+                    ti.Header = qs.eLv.ToString() + qs.uId.ToString("d3");
+                    ti.GotFocus += tbiQ_GotFocus;
                         
                     tbcQ.Items.Add(ti);
                 }

@@ -110,7 +110,7 @@
         </StackPanel>
         <TabControl x:Name="tbcSl" Width="876">
             <TabItem Header="_0">
-                <ScrollViewer x:Name="svwrStt" Height="320" VerticalScrollBarVisibility="Auto">
+                <ScrollViewer x:Name="svwrStt" Height="700" VerticalScrollBarVisibility="Auto">
                     <TextBlock x:Name="lblStatus" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"/>
                 </ScrollViewer>
             </TabItem>
