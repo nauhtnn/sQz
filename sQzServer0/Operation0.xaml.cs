@@ -26,8 +26,8 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         ExamBoard mBrd;
-        TextBox[] vNEsyDif;
-        TextBox[] vNDiff;
+        Dictionary<ExamLv, TextBox[]> vNEsyDif;
+        Dictionary<ExamLv, TextBox[]> vNDiff;
 
         public Operation0()
         {
@@ -85,26 +85,31 @@ namespace sQzServer0
 
             spMain.Background = Theme.s._[(int)BrushId.Ans_Highlight];
 
-            vNEsyDif = new TextBox[QuestSheet.GetIUr(2).Count()];
-            vNDiff = new TextBox[vNEsyDif.Length];
+            vNEsyDif = new Dictionary<ExamLv, TextBox[]>();
+            vNEsyDif.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
+            vNEsyDif.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
+            vNDiff = new Dictionary<ExamLv, TextBox[]>();
+            vNDiff.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
+            vNDiff.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
             int i = -1, j = -1;
             foreach (TextBox tbx in grdA.Children.OfType<TextBox>())
             {
                 if (Grid.GetColumn(tbx) == 1)
-                    vNEsyDif[++i] = tbx;
+                    vNEsyDif[ExamLv.A][++i] = tbx;
                 else
                 {
-                    vNDiff[++j] = tbx;
+                    vNDiff[ExamLv.A][++j] = tbx;
                     tbx.Name = "_" + j;
                 }
             }
+            i = j = -1;
             foreach (TextBox tbx in grdB.Children.OfType<TextBox>())
             {
                 if (Grid.GetColumn(tbx) == 1)
-                    vNEsyDif[++i] = tbx;
+                    vNEsyDif[ExamLv.B][++i] = tbx;
                 else
                 {
-                    vNDiff[++j] = tbx;
+                    vNDiff[ExamLv.B][++j] = tbx;
                     tbx.Name = "_" + j;
                 }
             }
@@ -142,17 +147,9 @@ namespace sQzServer0
             mServer.Stop(ref mCbMsg);
         }
 
-        private void btnPrep_Click(object sender, RoutedEventArgs e)
+        private void btnMMenu_Click(object sender, RoutedEventArgs e)
         {
-            Dispatcher.Invoke(() =>
-            {
-                NavigationService.Navigate(new Uri("Prep0.xaml", UriKind.Relative));
-            });
-        }
-
-        private void btnExit_Click(object sender, RoutedEventArgs e)
-        {
-            Window.GetWindow(this).Close();
+            NavigationService.Navigate(new Uri("MainMenu.xaml", UriKind.Relative));
         }
 
         public bool SrvrBufHndl(byte[] buf, out byte[] outMsg)
@@ -254,13 +251,13 @@ namespace sQzServer0
             Txt t = Txt.s;
             btnStartSrvr.Content = t._[(int)TxI.STRT_SRVR];
             btnStopSrvr.Content = t._[(int)TxI.STOP_SRVR];
-            btnQSGen.Content = t._[(int)TxI.QS_GEN];
+            btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
+            btnQGen.Content = t._[(int)TxI.QS_GEN];
             rdoA.Content = t._[(int)TxI.BASIC];
             rdoB.Content = t._[(int)TxI.ADVAN];
             txtMod.Text = t._[(int)TxI.MODULE];
             txtNEsyDif.Text = t._[(int)TxI.N_ESY_DIF];
             txtNDiff.Text = t._[(int)TxI.N_DIFF];
-            btnExit.Content = t._[(int)TxI.EXIT];
             txtnQs.Text = t._[(int)TxI.QS_N];
             txtnQ.Text = t._[(int)TxI.Q_N];
             txtBirdate.Text = t._[(int)TxI.BIRDATE];
@@ -349,6 +346,8 @@ namespace sQzServer0
             tbi.Focus();
             QuestSheet.DBUpdateCurQSId(mBrd.mDt);
             mBrd.vSl.Add(i.Content as string, sl);
+
+            txtNqs.Text = sl.CountQSByRoom().ToString();
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)
@@ -367,21 +366,28 @@ namespace sQzServer0
 
         public void InitQPanel()
         {
-            foreach (IUx i in QuestSheet.GetIUr(2))
+            ExamLv[] l = new ExamLv[2];
+            l[0] = ExamLv.A;
+            l[1] = ExamLv.B;
+            foreach(ExamLv lv in l)
             {
-                TextBox t = vNEsyDif[(int)i];
-                if (t != null)
+                int n = QuestSheet.GetIUs(lv).Count();
+                for (int i = 0; i < n; ++i)
                 {
-                    t.MaxLength = 2;
-                    t.PreviewKeyDown += tbxIU_PrevwKeyDown;
-                    t.TextChanged += tbxIU_TextChanged;
-                }
-                t = vNDiff[(int)i];
-                if (t != null)
-                {
-                    t.MaxLength = 2;
-                    t.PreviewKeyDown += tbxIU_PrevwKeyDown;
-                    t.TextChanged += tbxIUdif_TextChanged;
+                    TextBox t = vNEsyDif[lv][i];
+                    if (t != null)
+                    {
+                        t.MaxLength = 2;
+                        t.PreviewKeyDown += tbxIU_PrevwKeyDown;
+                        t.TextChanged += tbxIU_TextChanged;
+                    }
+                    t = vNDiff[lv][i];
+                    if (t != null)
+                    {
+                        t.MaxLength = 2;
+                        t.PreviewKeyDown += tbxIU_PrevwKeyDown;
+                        t.TextChanged += tbxIUdif_TextChanged;
+                    }
                 }
             }
         }
@@ -412,34 +418,34 @@ namespace sQzServer0
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox t;
-            int n = 0, i;
             bool bG = true;
-            int lv;
+            ExamLv lv;
             if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-                lv = (int)ExamLv.A;
+                lv = ExamLv.A;
             else
-                lv = (int)ExamLv.B;
-            foreach (int j in QuestSheet.GetIUr(lv))
-                if ((t = vNEsyDif[j]) != null)
+                lv = ExamLv.B;
+            int n = 0, i;
+            for(int j = 0; j < vNEsyDif[lv].Length; ++j)
+                if ((t = vNEsyDif[lv][j]) != null)
                 {
                     if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
                     {
                         n += i;
-                        vNDiff[j].IsEnabled = true;
+                        vNDiff[lv][j].IsEnabled = true;
                     }
                     else
                     {
                         bG = false;
-                        vNDiff[j].IsEnabled = false;
+                        vNDiff[lv][j].IsEnabled = false;
                     }
                 }
                 else
                     bG = false;
             tbxNq.Text = n.ToString();
             if (bG && n == 30)
-                btnQSGen.IsEnabled = true;
+                btnQGen.IsEnabled = true;
             else
-                btnQSGen.IsEnabled = false;
+                btnQGen.IsEnabled = false;
         }
 
         private void tbxIUdif_TextChanged(object sender, TextChangedEventArgs e)
@@ -449,9 +455,14 @@ namespace sQzServer0
                 return;
             if (t.Text == null || t.Text.Length == 0)
                 return;
+            ExamLv lv;
+            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+                lv = ExamLv.A;
+            else
+                lv = ExamLv.B;
             int i = int.Parse(t.Text);
             int idx = int.Parse(t.Name.Substring(1));
-            TextBox tm = vNEsyDif[idx];
+            TextBox tm = vNEsyDif[lv][idx];
             if(tm == null)
             {
                 t.Text = string.Empty;
@@ -460,6 +471,27 @@ namespace sQzServer0
             int m = int.Parse(tm.Text);
             if(m < i)
                 t.Text = string.Empty;
+        }
+
+        private void btnQGen_Click(object sender, RoutedEventArgs e)
+        {
+            Op0SlotView vw = tbcSl.SelectedItem as Op0SlotView;
+            if (vw == null)
+                return;
+            ExamLv lv;
+            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+                lv = ExamLv.A;
+            else
+                lv = ExamLv.B;
+            int[] vnesydif = new int[vNEsyDif[lv].Length];
+            int[] vndiff = new int[vnesydif.Length];
+            for(int i = 0; i < vnesydif.Length; ++i)
+            {
+                vnesydif[i] = int.Parse(vNEsyDif[lv][i].Text);
+                if (!int.TryParse(vNDiff[lv][i].Text, out vndiff[i]))
+                    vndiff[i] = 0;
+            }
+            vw.GenQ(lv, vnesydif, vndiff);
         }
     }
 }

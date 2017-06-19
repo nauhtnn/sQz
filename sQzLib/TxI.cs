@@ -44,6 +44,7 @@ namespace sQzLib {
 		RESULT_CAUT,
 		STRT_SRVR,
 		STOP_SRVR,
+		BACK_MMENU,
 		PREP,
 		OPER,
 		ARCH,

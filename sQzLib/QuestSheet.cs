@@ -59,31 +59,6 @@ namespace sQzLib
             return x;
         }
 
-        public static int[] GetIUr(int lv)
-        {
-            int[] x;
-            if(lv == (int)ExamLv.A)
-            {
-                x = new int[6];
-                for (int i = 0; i < 6; ++i)
-                    x[i] = i;
-            }
-            else if(lv == (int)ExamLv.B)
-            {
-                x = new int[3];
-                x[0] = 6;
-                x[1] = 7;
-                x[2] = 8;
-            }
-            else
-            {
-                x = new int[9];
-                for (int i = 0; i < 9; ++i)
-                    x[i] = i;
-            }
-            return x;
-        }
-
         public static bool ParseLvId(string s, out ExamLv lv, out int id)
         {
             if (s == null || s.Length != 4)

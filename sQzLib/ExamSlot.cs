@@ -372,7 +372,7 @@ namespace sQzLib
                 r.DBUpdateRs(vals);
         }
 
-        public bool GenQPack(int n, ExamLv lv, int[] vn)
+        public bool GenQ(int n, ExamLv lv, int[] vn)
         {
             List<QuestSheet> l;
             if(System.IO.File.Exists("Randomize.txt"))

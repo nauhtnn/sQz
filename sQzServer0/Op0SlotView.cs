@@ -22,26 +22,36 @@ namespace sQzServer0
         public SortedList<int, TextBlock> vComp;
         Grid grdNee;
         public ExamSlot mSl;
-        int[][] vNBoth, vNDiff;
+        Dictionary<ExamLv, int[]> vNEsyDif, vNDiff;
+        bool bInitNMod;
 
         public Op0SlotView()
         {
-            vGrade = new SortedList<int, TextBlock>();
-            vDt1 = new SortedList<int, TextBlock>();
-            vDt2 = new SortedList<int, TextBlock>();
-            vComp = new SortedList<int, TextBlock>();
+            Init();
         }
 
         public Op0SlotView(ExamSlot sl)
         {
-            vGrade = new SortedList<int, TextBlock>();
-            vDt1 = new SortedList<int, TextBlock>();
-            vDt2 = new SortedList<int, TextBlock>();
-            vComp = new SortedList<int, TextBlock>();
+            Init();
             //
             mSl = sl;
             Header = mSl.Dt.ToString(DT.hh);
             Name = "_" + (Header as string).Replace(':', '_');
+        }
+
+        void Init()
+        {
+            vGrade = new SortedList<int, TextBlock>();
+            vDt1 = new SortedList<int, TextBlock>();
+            vDt2 = new SortedList<int, TextBlock>();
+            vComp = new SortedList<int, TextBlock>();
+            vNEsyDif = new Dictionary<ExamLv, int[]>();
+            vNDiff = new Dictionary<ExamLv, int[]>();
+            vNEsyDif.Add(ExamLv.A, new int[6]);
+            vNDiff.Add(ExamLv.A, new int[6]);
+            vNEsyDif.Add(ExamLv.B, new int[3]);
+            vNDiff.Add(ExamLv.B, new int[3]);
+            bInitNMod = false;
         }
 
         public void ShowExaminee()
@@ -314,73 +324,41 @@ namespace sQzServer0
             }
             svwr.Content = sp;
             tbi.Content = svwr;
+
+            InitNMod();
         }
 
-        public void SetNMod(bool basic)
+        public void InitNMod()
         {
-            vNBoth = new int[2][];
-            vNDiff = new int[2][];
-            vNBoth[0] = new int[6];
-            vNDiff[0] = new int[6];
-            vNBoth[1] = new int[3];
-            vNDiff[1] = new int[3];
-            if(0 < mSl.vQPack[ExamLv.A].vSheet.Count)
-            {
-                QuestSheet qs = mSl.vQPack[ExamLv.A].vSheet.Values.First();
-                foreach(Question q in qs.vQuest)
+            if (bInitNMod)
+                return;
+            bInitNMod = true;
+            foreach (KeyValuePair<ExamLv, QuestPack> p in mSl.vQPack)
+                if(0 < mSl.vQPack[p.Key].vSheet.Count)
                 {
-                    ++vNBoth[0][(int)q.mIU];
-                    if(q.bDiff)
-                        ++vNDiff[0][(int)q.mIU];
+                    QuestSheet qs = mSl.vQPack[p.Key].vSheet.Values.First();
+                    foreach(Question q in qs.vQuest)
+                    {
+                        ++vNEsyDif[p.Key][(int)q.mIU];
+                        if(q.bDiff)
+                            ++vNDiff[p.Key][(int)q.mIU];
+                    }
                 }
-            }
-            int[] vnboth = new int[4];
-            int[] vndiff = new int[4];
-            if (0 < mSl.vQPack[ExamLv.A].vSheet.Count)
-            {
-                QuestSheet qs = mSl.vQPack[ExamLv.A].vSheet.Values.First();
-                foreach (Question q in qs.vQuest)
-                {
-                    int idx = (int)q.mIU - (int)IUx._7;
-                    ++vnboth[idx];
-                    if (q.bDiff)
-                        ++vndiff[idx];
-                }
-            }
-            vNBoth[1][0] = vnboth[0];
-            vNBoth[1][1] = vnboth[1];
-            vNBoth[1][2] = vnboth[4];
-            vNDiff[1][0] = vndiff[0];
-            vNDiff[1][1] = vndiff[1];
-            vNDiff[1][2] = vndiff[4];
         }
 
-        public List<int[]> GetNMod(bool basic)
+        public List<int[]> GetNMod(ExamLv lv)
         {
-            int idx = (basic) ? 0 : 1;
             List<int[]> rv = new List<int[]>();
-            rv.Add(vNBoth[idx]);
-            rv.Add(vNDiff[idx]);
+            rv.Add(vNEsyDif[lv]);
+            rv.Add(vNDiff[lv]);
             return rv;
         }
 
-        private void GenQPack(bool basic, int[] vboth, int[] vdiff)
+        public void GenQ(ExamLv lv, int[] vnesydif, int[] vndiff)
         {
-            ExamLv lv;
-            int idx;
-            if (basic)
-            {
-                lv = ExamLv.A;
-                idx = 0;
-            }
-            else
-            {
-                lv = ExamLv.B;
-                idx = 1;
-            }
-            vNBoth[idx] = vboth;
-            vNDiff[idx] = vdiff;
-            mSl.GenQPack(mSl.CountQSByRoom(), lv, vboth);
+            vNEsyDif[lv] = vnesydif;
+            vNDiff[lv] = vndiff;
+            mSl.GenQ(mSl.CountQSByRoom(), lv, vnesydif);
 
             ShowQuest();
         }
@@ -390,17 +368,15 @@ namespace sQzServer0
             Color c = new Color();
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
-            Dispatcher.Invoke(() => {
-                tbcQ.Items.Clear();
-                foreach (QuestPack p in mSl.vQPack.Values)
-                    foreach (QuestSheet qs in p.vSheet.Values)
-                    {
-                        TabItem ti = new TabItem();
-                        ti.Header = qs.eLv.ToString() + qs.uId;
+            tbcQ.Items.Clear();
+            foreach (QuestPack p in mSl.vQPack.Values)
+                foreach (QuestSheet qs in p.vSheet.Values)
+                {
+                    TabItem ti = new TabItem();
+                    ti.Header = qs.eLv.ToString() + qs.uId;
                         
-                        tbcQ.Items.Add(ti);
-                    }
-            });
+                    tbcQ.Items.Add(ti);
+                }
         }
     }
 }
