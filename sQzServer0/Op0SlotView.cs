@@ -365,10 +365,12 @@ namespace sQzServer0
             vNDiff[lv] = vndiff;
             mSl.GenQ(mSl.CountQSByRoom(), lv, vnesydif);
 
-            ShowQuest();
+            ShowQSHeader();
+            if (0 < tbcQ.Items.Count)
+                (tbcQ.Items[0] as TabItem).Focus();
         }
 
-        private void ShowQuest()
+        private void ShowQSHeader()
         {
             Color c = new Color();
             c.A = 0xff;

@@ -9,10 +9,10 @@ namespace sQzLib
 {
     public class AnsPack
     {
-        public Dictionary<int, AnsSheet> vSheet;
+        public SortedList<int, AnsSheet> vSheet;
         public AnsPack()
         {
-            vSheet = new Dictionary<int, AnsSheet>();
+            vSheet = new SortedList<int, AnsSheet>();
         }
 
         public int GetByteCount()
@@ -54,8 +54,10 @@ namespace sQzLib
             {
                 AnsSheet i = new AnsSheet();
                 i.ExtractKey(qs);
-                if(!vSheet.ContainsKey(i.uQSId))
-                    vSheet.Add(i.uQSId, i);
+                if (!vSheet.ContainsKey(i.uQSLvId))
+                    vSheet.Add(i.uQSLvId, i);
+                else
+                    vSheet[i.uQSLvId] = i;
             }
         }
 

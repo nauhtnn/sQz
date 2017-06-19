@@ -374,6 +374,9 @@ namespace sQzLib
 
         public bool GenQ(int n, ExamLv lv, int[] vn)
         {
+            foreach(QuestSheet qs in vQPack[lv].vSheet.Values)
+                mKeyPack.vSheet.Remove(qs.LvId);
+            vQPack[lv].vSheet.Clear();
             List<QuestSheet> l;
             if(System.IO.File.Exists("Randomize.txt"))
                 l = vQPack[lv].GenQPack2(n, vn);
