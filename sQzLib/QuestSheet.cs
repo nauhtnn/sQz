@@ -244,7 +244,6 @@ namespace sQzLib
             qs.mDiff = mDiff;
             foreach (Question qi in vQuest)
                 qs.vQuest.Add(qi.RandomizeDeepCopy(rand));
-            //aQuest
             //randomize
             List<Question> lq = new List<Question>();
             List<int> l = new List<int>();
@@ -420,6 +419,8 @@ namespace sQzLib
 
         public bool DBSelect(MySqlConnection conn, DateTime dt, ExamLv lv, int id, out string eMsg)
         {
+            vQuest.Clear();
+            uId = id;
             string qry = DBConnect.mkQrySelect("sqz_qsheet_quest", "qid,asort",
                 "dt='" + dt.ToString(DT._) + "' AND lv='" + lv.ToString() +
                 "' AND qsid=" + id);
@@ -439,20 +440,20 @@ namespace sQzLib
             {
                 ++i;
                 qry = DBConnect.mkQrySelect("sqz_question",
-                    "id,stmt,ans0,ans1,ans2,ans3,`key`,moid", "id=" + qid);
+                    "stmt,ans0,ans1,ans2,ans3,`key`,moid", "id=" + qid);
                 reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
                 if (reader == null)
                     return true;
                 while (reader.Read())
                 {
                     Question q = new Question();
-                    q.uId = reader.GetInt32(0);
-                    q.mStmt = reader.GetString(1);
+                    q.uId = qid;
+                    q.mStmt = reader.GetString(0);
                     q.nAns = 4;
                     string[] anss = new string[4];
                     for (int j = 0; j < 4; ++j)
-                        anss[j] = reader.GetString(2 + j);
-                    string x = reader.GetString(6);
+                        anss[j] = reader.GetString(1 + j);
+                    string x = reader.GetString(5);
                     bool[] keys = new bool[4];
                     for (int j = 0; j < 4; ++j)
                         keys[j] = (x[j] == '1');

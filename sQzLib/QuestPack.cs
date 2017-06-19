@@ -116,6 +116,7 @@ namespace sQzLib
         //    DBConnect.Close(ref conn);
         //    return l;
         //}
+
         public List<string> SelectQStId()
         {
             List<string> l = new List<string>();
@@ -155,6 +156,27 @@ namespace sQzLib
                 }
             }
             DBConnect.Close(ref conn);
+            return false;
+        }
+
+        public bool DBDelete(out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return true;
+            }
+            eMsg = null;
+            foreach(QuestSheet qs in vSheet.Values)
+            {
+                if (DBConnect.Delete(conn, "sqz_qsheet_quest", "dt='" + mDt.ToString(DT._) +
+                    "' AND lv='" + eLv.ToString() + "' AND qsid=" + qs.uId, out eMsg) < 0)
+                    return true;
+                if (DBConnect.Delete(conn, "sqz_qsheet", "dt='" + mDt.ToString(DT._) +
+                    "' AND lv='" + eLv.ToString() + "' AND id=" + qs.uId, out eMsg) < 0)
+                    return true;
+            }
             return false;
         }
 
@@ -261,10 +283,10 @@ namespace sQzLib
                 foreach (Question q in qs.vQuest)
                 {
                     vals.Append(prefx + "'" + qs.eLv.ToString() + "'," +
-                        qs.uId + "," + q.uId + ",");
+                        qs.uId + "," + q.uId + ",'");
                     foreach (int i in q.vAnsSort)
                         vals.Append(i.ToString());
-                    vals.Append("),");
+                    vals.Append("'),");
                 }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid,asort", vals.ToString(), out eMsg) < 0)

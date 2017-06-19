@@ -347,6 +347,7 @@ namespace sQzServer0
             Op0SlotView tbi = new Op0SlotView(sl);
             tbi.DeepCopy(tbiSl);
             tbi.ShowExaminee();
+            tbi.ShowQSHeader();
             tbcSl.Items.Add(tbi);
             tbi.Focus();
             QuestSheet.DBUpdateCurQSId(mBrd.mDt);

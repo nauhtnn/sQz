@@ -374,7 +374,10 @@ namespace sQzLib
 
         public bool GenQ(int n, ExamLv lv, int[] vn)
         {
-            foreach(QuestSheet qs in vQPack[lv].vSheet.Values)
+            string emsg;
+            if (vQPack[lv].DBDelete(out emsg))
+                WPopup.s.ShowDialog(emsg);
+            foreach (QuestSheet qs in vQPack[lv].vSheet.Values)
                 mKeyPack.vSheet.Remove(qs.LvId);
             vQPack[lv].vSheet.Clear();
             List<QuestSheet> l;

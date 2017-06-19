@@ -164,7 +164,7 @@ namespace sQzServer0
 
             tbcQ = new TabControl();
             List<string> qstIds = mSl.vQPack[ExamLv.A].SelectQStId();
-            qstIds.InsertRange(qstIds.Count, mSl.vQPack[ExamLv.A].SelectQStId());
+            qstIds.InsertRange(qstIds.Count, mSl.vQPack[ExamLv.B].SelectQStId());
             foreach(string t in qstIds)
             {
                 TabItem ti = new TabItem();
@@ -276,18 +276,6 @@ namespace sQzServer0
             }
         }
 
-        private void InitQTabItem()
-        {
-            tbcQ.Items.Clear();
-            foreach(QuestSheet qs in mSl.vQPack[ExamLv.A].vSheet.Values)
-            {
-                TabItem i = new TabItem();
-                i.Header = qs.tId;
-                i.GotFocus += tbiQ_GotFocus;
-                tbcQ.Items.Add(i);
-            }
-        }
-
         private void tbiQ_GotFocus(object sender, RoutedEventArgs e)
         {
             TabItem tbi = sender as TabItem;
@@ -371,11 +359,8 @@ namespace sQzServer0
                 (tbcQ.Items[0] as TabItem).Focus();
         }
 
-        private void ShowQSHeader()
+        public void ShowQSHeader()
         {
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
             tbcQ.Items.Clear();
             foreach (QuestPack p in mSl.vQPack.Values)
                 foreach (QuestSheet qs in p.vSheet.Values)

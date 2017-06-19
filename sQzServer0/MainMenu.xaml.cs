@@ -21,7 +21,7 @@ namespace sQzServer0
     /// </summary>
     public partial class MainMenu : Page
     {
-        int uVer = 6;
+        int uVer = 7;
         public MainMenu()
         {
             InitializeComponent();
