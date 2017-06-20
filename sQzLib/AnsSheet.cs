@@ -14,7 +14,14 @@ namespace sQzLib
         public ListBox[] vlbxAns;
         public AnsItem[][] vAnsItem;
         public int uQSLvId;
-        public int uQSId { get { return (uQSLvId < ExamineeA.LV_CAP) ? uQSLvId : uQSLvId - ExamineeA.LV_CAP; } }
+        public int uQSId {
+            get {
+                if (uQSLvId == ushort.MaxValue)
+                    return ushort.MaxValue;
+                else
+                    return (uQSLvId < ExamineeA.LV_CAP) ? uQSLvId : uQSLvId - ExamineeA.LV_CAP;
+            }
+        }
         public bool bChanged;
         DgEvntCB dgSelChgCB;
         public byte[] aAns;

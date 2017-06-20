@@ -339,6 +339,7 @@ namespace sQzClient
                     }
                     else
                         rs = BitConverter.ToInt32(buf, offs);
+                    l -= 4;
                     offs += 4;
                     if(rs == 0)
                     {
