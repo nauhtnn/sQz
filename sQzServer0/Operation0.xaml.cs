@@ -26,8 +26,9 @@ namespace sQzServer0
         UICbMsg mCbMsg;
         bool bRunning;
         ExamBoard mBrd;
-        Dictionary<ExamLv, TextBox[]> vNEsyDif;
-        Dictionary<ExamLv, TextBox[]> vNDiff;
+        Dictionary<ExamLv, TextBox[]> vtxtNEsyDif;
+        Dictionary<ExamLv, TextBox[]> vtxtNDiff;
+        TabItem tbiSelected;
 
         public Operation0()
         {
@@ -38,6 +39,8 @@ namespace sQzServer0
             mBrd = new ExamBoard();
 
             bRunning = true;
+
+            tbiSelected = null;
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
@@ -85,20 +88,20 @@ namespace sQzServer0
 
             spMain.Background = Theme.s._[(int)BrushId.Ans_Highlight];
 
-            vNEsyDif = new Dictionary<ExamLv, TextBox[]>();
-            vNEsyDif.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
-            vNEsyDif.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
-            vNDiff = new Dictionary<ExamLv, TextBox[]>();
-            vNDiff.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
-            vNDiff.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
+            vtxtNEsyDif = new Dictionary<ExamLv, TextBox[]>();
+            vtxtNEsyDif.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
+            vtxtNEsyDif.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
+            vtxtNDiff = new Dictionary<ExamLv, TextBox[]>();
+            vtxtNDiff.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
+            vtxtNDiff.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
             int i = -1, j = -1;
             foreach (TextBox tbx in grdA.Children.OfType<TextBox>())
             {
                 if (Grid.GetColumn(tbx) == 1)
-                    vNEsyDif[ExamLv.A][++i] = tbx;
+                    vtxtNEsyDif[ExamLv.A][++i] = tbx;
                 else
                 {
-                    vNDiff[ExamLv.A][++j] = tbx;
+                    vtxtNDiff[ExamLv.A][++j] = tbx;
                     tbx.Name = "_" + j;
                 }
             }
@@ -106,10 +109,10 @@ namespace sQzServer0
             foreach (TextBox tbx in grdB.Children.OfType<TextBox>())
             {
                 if (Grid.GetColumn(tbx) == 1)
-                    vNEsyDif[ExamLv.B][++i] = tbx;
+                    vtxtNEsyDif[ExamLv.B][++i] = tbx;
                 else
                 {
-                    vNDiff[ExamLv.B][++j] = tbx;
+                    vtxtNDiff[ExamLv.B][++j] = tbx;
                     tbx.Name = "_" + j;
                 }
             }
@@ -349,11 +352,8 @@ namespace sQzServer0
             tbi.ShowExaminee();
             tbi.ShowQSHeader();
             tbcSl.Items.Add(tbi);
-            tbi.GetFocus();
             QuestSheet.DBUpdateCurQSId(mBrd.mDt);
             mBrd.vSl.Add(i.Content as string, sl);
-
-            txtNqs.Text = sl.CountQSByRoom().ToString();
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)
@@ -380,14 +380,14 @@ namespace sQzServer0
                 int n = QuestSheet.GetIUs(lv).Count();
                 for (int i = 0; i < n; ++i)
                 {
-                    TextBox t = vNEsyDif[lv][i];
+                    TextBox t = vtxtNEsyDif[lv][i];
                     if (t != null)
                     {
                         t.MaxLength = 2;
                         t.PreviewKeyDown += tbxIU_PrevwKeyDown;
                         t.TextChanged += tbxIU_TextChanged;
                     }
-                    t = vNDiff[lv][i];
+                    t = vtxtNDiff[lv][i];
                     if (t != null)
                     {
                         t.MaxLength = 2;
@@ -408,15 +408,18 @@ namespace sQzServer0
 
         private void Lv_Checked(object sender, RoutedEventArgs e)
         {
+            ExamSlot sl = (tbcSl.SelectedItem as Op0SlotView).mSl;
             if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
             {
                 grdB.Visibility = Visibility.Collapsed;
                 grdA.Visibility = Visibility.Visible;
+                txtNqs.Text = sl.CountQSByRoom(ExamLv.A).ToString();
             }
             else
             {
                 grdA.Visibility = Visibility.Collapsed;
                 grdB.Visibility = Visibility.Visible;
+                txtNqs.Text = sl.CountQSByRoom(ExamLv.A).ToString();
             }
             tbxIU_TextChanged(null, null);
         }
@@ -430,19 +433,19 @@ namespace sQzServer0
                 lv = ExamLv.A;
             else
                 lv = ExamLv.B;
-            int n = 0, i;
-            for(int j = 0; j < vNEsyDif[lv].Length; ++j)
-                if ((t = vNEsyDif[lv][j]) != null)
+            int n = 0;
+            for(int j = 0; j < vtxtNEsyDif[lv].Length; ++j)
+                if ((t = vtxtNEsyDif[lv][j]) != null)
                 {
-                    if (t.Text != null && 0 < t.Text.Length && 0 < (i = int.Parse(t.Text)))
+                    if (t.Text != null && 0 < t.Text.Length)
                     {
-                        n += i;
-                        vNDiff[lv][j].IsEnabled = true;
+                        n += int.Parse(t.Text);
+                        vtxtNDiff[lv][j].IsEnabled = true;
                     }
                     else
                     {
                         bG = false;
-                        vNDiff[lv][j].IsEnabled = false;
+                        vtxtNDiff[lv][j].IsEnabled = false;
                     }
                 }
                 else
@@ -468,7 +471,7 @@ namespace sQzServer0
                 lv = ExamLv.B;
             int i = int.Parse(t.Text);
             int idx = int.Parse(t.Name.Substring(1));
-            TextBox tm = vNEsyDif[lv][idx];
+            TextBox tm = vtxtNEsyDif[lv][idx];
             if(tm == null)
             {
                 t.Text = string.Empty;
@@ -489,15 +492,73 @@ namespace sQzServer0
                 lv = ExamLv.A;
             else
                 lv = ExamLv.B;
-            int[] vnesydif = new int[vNEsyDif[lv].Length];
+            int[] vnesydif = new int[vtxtNEsyDif[lv].Length];
             int[] vndiff = new int[vnesydif.Length];
             for(int i = 0; i < vnesydif.Length; ++i)
             {
-                vnesydif[i] = int.Parse(vNEsyDif[lv][i].Text);
-                if (!int.TryParse(vNDiff[lv][i].Text, out vndiff[i]))
+                vnesydif[i] = int.Parse(vtxtNEsyDif[lv][i].Text);
+                if (!int.TryParse(vtxtNDiff[lv][i].Text, out vndiff[i]))
                     vndiff[i] = 0;
             }
             vw.GenQ(lv, vnesydif, vndiff);
+        }
+
+        private void tbcSl_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            TabControl tbc = sender as TabControl;
+            if (tbc == null)
+                return;
+            TabItem tbi = tbc.SelectedItem as TabItem;
+            if (tbi == null || tbiSelected == tbi)
+                return;
+            tbiSelected = tbi;
+            Op0SlotView vw = tbi as Op0SlotView;
+            if (vw == null)
+            {
+                btnQGen.IsEnabled = rdoA.IsEnabled =
+                    rdoB.IsEnabled = grdA.IsEnabled =
+                    grdB.IsEnabled = false;
+                return;
+            }
+            rdoA.IsEnabled = rdoB.IsEnabled =
+                grdA.IsEnabled = grdB.IsEnabled = true;
+            rdoA.IsChecked = true;
+            ExamLv lv = ExamLv.A;
+            List<int[]> nmod = vw.GetNMod(lv);
+            if(nmod != null)
+            {
+                int i = -1;
+                foreach (TextBox t in vtxtNEsyDif[lv])
+                    t.Text = nmod[0][++i].ToString();
+                i = -1;
+                foreach (TextBox t in vtxtNDiff[lv])
+                    t.Text = nmod[1][++i].ToString();
+            }
+            else
+            {
+                foreach (TextBox t in vtxtNEsyDif[lv])
+                    t.Text = string.Empty;
+                foreach (TextBox t in vtxtNDiff[lv])
+                    t.Text = string.Empty;
+            }
+            lv = ExamLv.B;
+            nmod = vw.GetNMod(lv);
+            if (nmod != null)
+            {
+                int i = -1;
+                foreach (TextBox t in vtxtNEsyDif[lv])
+                    t.Text = nmod[0][++i].ToString();
+                i = -1;
+                foreach (TextBox t in vtxtNDiff[lv])
+                    t.Text = nmod[1][++i].ToString();
+            }
+            else
+            {
+                foreach (TextBox t in vtxtNEsyDif[lv])
+                    t.Text = string.Empty;
+                foreach (TextBox t in vtxtNDiff[lv])
+                    t.Text = string.Empty;
+            }
         }
     }
 }

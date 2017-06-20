@@ -11,10 +11,12 @@ namespace sQzLib
     {
         public int uId;
         public Dictionary<int, ExamineeA> vExaminee;
+        public Dictionary<ExamLv, int> nLv;
         public ExamRoom()
         {
             uId = ushort.MaxValue;
             vExaminee = new Dictionary<int, ExamineeA>();
+            nLv = new Dictionary<ExamLv, int>();
         }
 
         public Dictionary<int, int>  DBSelectId(uint slId, out Dictionary<int, string> vAns)

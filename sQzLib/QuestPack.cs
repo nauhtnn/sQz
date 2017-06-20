@@ -312,5 +312,25 @@ namespace sQzLib
             else
                 return null;
         }
+
+        public List<int[]> GetNMod()
+        {
+            if (vSheet.Values.Count == 0)
+                return null;
+            List<int[]> rv = new List<int[]>();
+            IUx[] viu = QuestSheet.GetIUs(eLv);
+            int[] vnesydif = new int[viu.Length];
+            int[] vndif = new int[viu.Length];
+            QuestSheet qs = vSheet.First().Value;
+            foreach(Question q in qs.vQuest)
+            {
+                ++vnesydif[(int)q.mIU];
+                if(q.bDiff)
+                    ++vndif[(int)q.mIU];
+            }
+            rv.Add(vnesydif);
+            rv.Add(vndif);
+            return rv;
+        }
     }
 }

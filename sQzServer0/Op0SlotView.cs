@@ -48,10 +48,10 @@ namespace sQzServer0
             vComp = new SortedList<int, TextBlock>();
             vNEsyDif = new Dictionary<ExamLv, int[]>();
             vNDiff = new Dictionary<ExamLv, int[]>();
-            vNEsyDif.Add(ExamLv.A, new int[6]);
-            vNDiff.Add(ExamLv.A, new int[6]);
-            vNEsyDif.Add(ExamLv.B, new int[3]);
-            vNDiff.Add(ExamLv.B, new int[3]);
+            vNEsyDif.Add(ExamLv.A, null);
+            vNDiff.Add(ExamLv.A, null);
+            vNEsyDif.Add(ExamLv.B, null);
+            vNDiff.Add(ExamLv.B, null);
             bInitNMod = false;
         }
 
@@ -196,12 +196,14 @@ namespace sQzServer0
                     rdo.Checked += vwMode_Check;
                     if (rdo.Name == "Q")
                     {
-                        rdo.IsChecked = true;
                         rdo.Content = Txt.s._[(int)TxI.RDO_Q];
                         rdoQ = rdo;
                     }
                     else
+                    {
                         rdo.Content = Txt.s._[(int)TxI.RDO_NEE];
+                        rdo.IsChecked = true;
+                    }
                     g.Children.Add(rdo);
                 }
                 spContent.Children.Add(g);
@@ -329,21 +331,21 @@ namespace sQzServer0
             if (bInitNMod)
                 return;
             bInitNMod = true;
-            foreach (KeyValuePair<ExamLv, QuestPack> p in mSl.vQPack)
-                if(0 < mSl.vQPack[p.Key].vSheet.Count)
+            foreach (QuestPack p in mSl.vQPack.Values)
+            {
+                List<int[]> l = p.GetNMod();
+                if(l != null)
                 {
-                    QuestSheet qs = mSl.vQPack[p.Key].vSheet.Values.First();
-                    foreach(Question q in qs.vQuest)
-                    {
-                        ++vNEsyDif[p.Key][(int)q.mIU];
-                        if(q.bDiff)
-                            ++vNDiff[p.Key][(int)q.mIU];
-                    }
+                    vNEsyDif[p.eLv] = l[0];
+                    vNDiff[p.eLv] = l[1];
                 }
+            }
         }
 
         public List<int[]> GetNMod(ExamLv lv)
         {
+            if (vNEsyDif[lv] == null)
+                return null;
             List<int[]> rv = new List<int[]>();
             rv.Add(vNEsyDif[lv]);
             rv.Add(vNDiff[lv]);
@@ -354,11 +356,9 @@ namespace sQzServer0
         {
             vNEsyDif[lv] = vnesydif;
             vNDiff[lv] = vndiff;
-            mSl.GenQ(mSl.CountQSByRoom(), lv, vnesydif);
+            mSl.GenQ(mSl.CountQSByRoom(lv), lv, vnesydif);
 
             ShowQSHeader();
-            if (0 < tbcQ.Items.Count)
-                tbiQ_GotFocus(tbcQ.Items[0], null);
         }
 
         public void ShowQSHeader()
@@ -373,17 +373,8 @@ namespace sQzServer0
                         
                     tbcQ.Items.Add(ti);
                 }
-        }
-
-        public bool GetFocus()
-        {
-            if(rdoQ.IsChecked.HasValue ? rdoQ.IsChecked.Value : false)
-            {
-                if(0 < tbcQ.Items.Count && tbcQ.SelectedItem == null)
-                    tbiQ_GotFocus(tbcQ.Items[0], null);
-            }
-
-            return Focus();
+            if (0 < tbcQ.Items.Count)
+                tbiQ_GotFocus(tbcQ.Items[0], null);
         }
     }
 }

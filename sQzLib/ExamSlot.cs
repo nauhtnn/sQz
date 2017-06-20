@@ -187,7 +187,10 @@ namespace sQzLib
         {
             StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
+            {
                 r.vExaminee.Clear();
+                r.nLv[ExamLv.A] = r.nLv[ExamLv.B] = 0;
+            }
         }
 
         public string DBDelNee()
@@ -232,6 +235,7 @@ namespace sQzLib
             foreach(ExamRoom r in vRoom.Values)
             {
                 r.vExaminee.Clear();
+                r.nLv[ExamLv.A] = r.nLv[ExamLv.B] = 0;
                 string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
                     "lv,id,name,birdate,birthplace", "a.rid=" + r.uId +
                     " AND a.dt='" + mDt.ToString(DT._) + "' AND a.t='" + mDt.ToString(DT.hh) +
@@ -251,6 +255,7 @@ namespace sQzLib
                         e.tBirdate = reader.GetDateTime(3).ToString(DT.RR);
                         e.tBirthplace = reader.GetString(4);
                         r.vExaminee.Add(e.uId, e);
+                        ++r.nLv[e.eLv];
                     }
                     reader.Close();
                 }
@@ -282,12 +287,12 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public int CountQSByRoom()
+        public int CountQSByRoom(ExamLv lv)
         {
             int n = 0;
             foreach (ExamRoom r in vRoom.Values)
-                if (n < r.vExaminee.Count)
-                    n = r.vExaminee.Count;
+                if (n < r.nLv[lv])
+                    n = r.nLv[lv];
             return n + (n / 10) + 1;
         }
 

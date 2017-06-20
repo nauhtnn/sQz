@@ -468,7 +468,7 @@ namespace sQzLib
                         q.vKeys[j] = keys[asorts[i][j] - '0'];
                     }
                     int iu;
-                    if (Enum.IsDefined(typeof(ExamLv), iu = reader.GetInt32(6)))
+                    if (Enum.IsDefined(typeof(IUx), iu = reader.GetInt32(6)))
                         q.mIU = (IUx)iu;
                     vQuest.Add(q);
                 }
