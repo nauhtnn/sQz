@@ -22,8 +22,10 @@ namespace sQzLib
         public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + ExamineeA.LV_CAP; } }
         public string tId { get { return eLv.ToString() + uId.ToString("d3"); } }
         public int mDiff;
-        public List<Question> vQuest;
+        List<Question> vQuest;
         public byte[] aQuest;
+        public int Count { get { return vQuest.Count; } }
+        public List<Question> vQ { get { return vQuest; } }
 
         public QuestSheet()
         {
@@ -78,8 +80,14 @@ namespace sQzLib
             return false;
         }
 
-        //only Optimization0 uses this.
-        //optimization: return List<byte[]> instead of byte[]
+        public Question Q(int idx)
+        {
+            if (0 < idx && idx < vQuest.Count)
+                return vQuest[idx];
+            else
+                return null;
+        }
+
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
@@ -246,10 +254,7 @@ namespace sQzLib
                 qs.vQuest.Add(qi.RandomizeDeepCopy(rand));
             //randomize
             List<Question> lq = new List<Question>();
-            List<int> l = new List<int>();
             int n = qs.vQuest.Count;
-            for (int i = 0; i < n; ++i)
-                l.Add(i);
             while (0 < n)
             {
                 int idx = rand.Next() % n;

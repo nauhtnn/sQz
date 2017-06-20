@@ -59,12 +59,12 @@ namespace sQzLib
             if (cb != null)
                 dgSelChgCB = cb;
 
-            vlbxAns = new ListBox[qs.vQuest.Count];
-            vAnsItem = new AnsItem[qs.vQuest.Count][];
+            vlbxAns = new ListBox[qs.Count];
+            vAnsItem = new AnsItem[qs.Count][];
             
             int idx = -1;
             int j = -1;
-            foreach (Question q in qs.vQuest)
+            foreach (Question q in qs.vQ)
             {
                 ++idx;
                 ListBox lbxAns = new ListBox();
@@ -158,8 +158,8 @@ namespace sQzLib
         public void ExtractKey(QuestSheet qs)
         {
             uQSLvId = qs.LvId;
-            if (qs.vQuest != null && qs.vQuest.First() != null && qs.vQuest.First().vKeys != null)
-                aAns = new byte[qs.vQuest.Count * 4];//hardcode, todo
+            if (0 < qs.Count && qs.Q(0) != null && qs.Q(0).vKeys != null)
+                aAns = new byte[qs.Count * 4];//hardcode, todo
             else
                 return;
             int i = -1;

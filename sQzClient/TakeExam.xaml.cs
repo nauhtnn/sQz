@@ -138,7 +138,7 @@ namespace sQzClient
             Label l = new Label();
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             int nAns = 4;//hardcode
-            int i = 0, n = mQSh.vQuest.Count;
+            int i = 0, n = mQSh.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
             mNee.mAnsSh.Init(mQSh.LvId);
             mNee.mAnsSh.InitView(mQSh, qaWh, null);
@@ -242,7 +242,7 @@ namespace sQzClient
         void InitQuestPanel()
         {
             gQuest.Background = Theme.s._[(int)BrushId.Q_BG];
-            int n = mQSh.vQuest.Count;
+            int n = mQSh.Count;
             for (int i = 1, j = 0; i <= n; i += 2, ++j)
             {
                 gQuest.RowDefinitions.Add(new RowDefinition());
@@ -280,7 +280,7 @@ namespace sQzClient
             q.Children.Add(l);
             StackPanel con = new StackPanel();
             TextBlock stmt = new TextBlock();
-            Question quest = mQSh.vQuest[idx - 1];
+            Question quest = mQSh.Q(idx - 1);
             stmt.Text = quest.mStmt;
             stmt.TextWrapping = TextWrapping.Wrap;
             stmt.Width = qaWh;
