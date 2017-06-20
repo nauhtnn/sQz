@@ -400,6 +400,10 @@ namespace sQzLib
                 return true;
             if (vQPack[ExamLv.B].DBSelectQS(mDt, out eMsg))
                 return true;
+            List<QuestSheet> qss = new List<QuestSheet>();
+            foreach (QuestPack p in vQPack.Values)
+                foreach (QuestSheet qs in p.vSheet.Values)
+                    mKeyPack.ExtractKey(qs);
             return false;
         }
 
