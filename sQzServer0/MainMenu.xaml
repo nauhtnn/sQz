@@ -10,6 +10,9 @@
       Title="MainMenu">
 
     <StackPanel Loaded="Main_Loaded">
+        <StackPanel.Background>
+            <ImageBrush ImageSource="techwall.jpg" Stretch="None"/>
+        </StackPanel.Background>
         <TextBlock Height="16" Background="#f3f3ee"/>
         <TextBlock x:Name="txtLalgitc" Height="80" Background="#a51c30" Foreground="#fff" TextAlignment="Center" VerticalAlignment="Center" FontSize="40" FontWeight="Bold" Padding="0,8,0,0"/>
         <Button x:Name="btnPrep" Click="btnPrep_Click" Width="256" Height="64"/>
