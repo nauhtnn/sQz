@@ -53,6 +53,7 @@ INDEX(`moid`,`del`,`diff`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATE, `lv` CHAR CHARACTER SET `ascii`,
 `qsid` SMALLINT UNSIGNED, `qid` INT UNSIGNED, `asort` CHAR(4) CHARACTER SET `ascii`,
+`idx` TINYINT,
 PRIMARY KEY(`dt`, `lv`, `qsid`, `qid`),
 FOREIGN KEY(`dt`, `lv`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `lv`, `id`),
 FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`));

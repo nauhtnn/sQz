@@ -421,7 +421,7 @@ namespace sQzLib
         {
             vQuest.Clear();
             uId = id;
-            string qry = DBConnect.mkQrySelect("sqz_qsheet_quest", "qid,asort",
+            string qry = DBConnect.mkQrySelect("sqz_qsheet_quest", "qid,asort,idx",
                 "dt='" + dt.ToString(DT._) + "' AND lv='" + lv.ToString() +
                 "' AND qsid=" + id);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -429,10 +429,13 @@ namespace sQzLib
                 return true;
             List<uint> qids = new List<uint>();
             List<string> asorts = new List<string>();
+            QIdxComparer<Question> qComparer = new QIdxComparer<Question>();
             while (reader.Read())
             {
-                qids.Add(reader.GetUInt32(0));
+                uint qid = reader.GetUInt32(0);
+                qids.Add(qid);
                 asorts.Add(reader.GetString(1));
+                qComparer.Add((int)qid, reader.GetInt16(2));
             }
             reader.Close();
             int i = -1;
@@ -471,6 +474,7 @@ namespace sQzLib
                 }
                 reader.Close();
             }
+            vQuest.Sort(qComparer);
             return false;
         }
 
@@ -513,6 +517,37 @@ namespace sQzLib
             guDBCurBId = uid;
 
             return false;
+        }
+    }
+
+    public class QIdxComparer<T> : Comparer<T>
+    {
+        SortedList<int, int> vIdx;
+
+        public QIdxComparer()
+        {
+            vIdx = new SortedList<int, int>();
+        }
+
+        public void Add(int qid, int idx)
+        {
+            vIdx.Add(qid, idx);
+        }
+
+        public override int Compare(T x, T y)
+        {
+            Question qx = x as Question;
+            if (qx == null)
+                return 0;
+            Question qy = y as Question;
+            if (qy == null)
+                return 0;
+            if (vIdx[qx.uId] == vIdx[qy.uId])
+                return 0;
+            else if (vIdx[qx.uId] < vIdx[qy.uId])
+                return -1;
+            return 1;
+
         }
     }
 }

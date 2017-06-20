@@ -280,53 +280,19 @@ namespace sQzLib
             vals.Clear();
             prefx = "('" + dt.ToString(DT._) + "',";
             foreach(QuestSheet qs in l)
+            {
+                int idx = -1;
                 foreach (Question q in qs.vQuest)
                 {
                     vals.Append(prefx + "'" + qs.eLv.ToString() + "'," +
                         qs.uId + "," + q.uId + ",'");
                     foreach (int i in q.vAnsSort)
                         vals.Append(i.ToString());
-                    vals.Append("'),");
+                    vals.Append("'," + ++idx + "),");
                 }
-            vals.Remove(vals.Length - 1, 1);//remove the last comma
-            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid,asort", vals.ToString(), out eMsg) < 0)
-            {
-                DBConnect.Close(ref conn);
-                return eMsg;
             }
-            DBConnect.Close(ref conn);
-            return null;
-        }
-
-        public static string DBIns0(DateTime dt, List<QuestSheet> l)
-        {
-            if (l.Count == 0)
-                return Txt.s._[(int)TxI.DB_DAT_NOK];
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
-            StringBuilder vals = new StringBuilder();
-            string prefx = "('" + dt.ToString(DT._) + "',";
-            foreach (QuestSheet qs in l)
-                vals.Append(prefx + "'" + qs.eLv.ToString() + "'," + qs.uId +
-                    ",'" + dt.ToString(DT.hh) + "'),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            string eMsg;
-            if (DBConnect.Ins(conn, "sqz_qsheet", "dt,lv,id,t", vals.ToString(), out eMsg) < 0)
-            {
-                DBConnect.Close(ref conn);
-                if (eMsg == null)
-                    eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.QS_ID_EXISTS];
-                return eMsg;
-            }
-            vals.Clear();
-            prefx = "('" + dt.ToString(DT._) + "',";
-            foreach (QuestSheet qs in l)
-                foreach (Question q in qs.vQuest)
-                    vals.Append(prefx + "'" + qs.eLv.ToString() + "'," +
-                        qs.uId + "," + q.uId + "),");
-            vals.Remove(vals.Length - 1, 1);//remove the last comma
-            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid", vals.ToString(), out eMsg) < 0)
+            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid,asort,idx", vals.ToString(), out eMsg) < 0)
             {
                 DBConnect.Close(ref conn);
                 return eMsg;
