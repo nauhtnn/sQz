@@ -80,13 +80,8 @@ namespace sQzServer0
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Window w = Window.GetWindow(this);
-            w.WindowStyle = WindowStyle.None;
-            w.WindowState = WindowState.Maximized;
-            w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
-            w.FontSize = 13;
-
-            spMain.Background = Theme.s._[(int)BrushId.Ans_Highlight];
+            w.FontSize = 16;
 
             vtxtNEsyDif = new Dictionary<ExamLv, TextBox[]>();
             vtxtNEsyDif.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);

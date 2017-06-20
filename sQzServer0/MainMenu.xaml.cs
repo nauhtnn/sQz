@@ -31,6 +31,7 @@ namespace sQzServer0
         {
             Txt t = Txt.s;
             txtLalgitc.Text = t._[(int)TxI.LALGITC];
+            txtsQz.Text = t._[(int)TxI.SQZ];
             btnPrep.Content = t._[(int)TxI.PREP];
             btnOp.Content = t._[(int)TxI.OPER];
             btnArchv.Content = t._[(int)TxI.ARCH];
@@ -64,6 +65,7 @@ namespace sQzServer0
             w.WindowState = WindowState.Maximized;
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
+            w.FontSize = 28;
 
             LoadTxt();
 

@@ -1,6 +1,7 @@
 namespace sQzLib {
 	public enum TxI {
 		LALGITC,
+		SQZ,
 		WELCOME,
 		DATE,
 		NEEID,
