@@ -1,4 +1,4 @@
-Tên tập tin trong Microsoft Word 2010 có phần mở rộng là:
+﻿Tên tập tin trong Microsoft Word 2010 có phần mở rộng là:
 PPTX
 \DOCX
 XLSX
@@ -15,89 +15,105 @@ Word.exe
 MSWord.exe
 Word.com
 \WinWord.exe
+
 Phát biểu nào sau đây là đúng?
 Tập tin được tạo ra bởi Microsoft Word 2010 khi lưu sẽ có phần mở rộng mặc định là XLSX
 Trong Microsoft Word 2010 ta không thể gõ tiếng Việt
 Microsoft Word 2010 là một phần mềm tính toán
 \Mặc định mỗi khi khởi động Microsoft Word 2010 đã có một văn bản trống
+
 Một văn bản được soạn thảo trong chương trình Microsoft Word gọi là gì?
 WorkBook
 Wordsheet
 \Document
 Text Document
+
 Phát biểu nào sau đây là sai?
 Canh lề mặc định trong văn bản mỗi khi tạo tập tin mới là canh trái.
 Khi soạn thảo trong Word, nếu hết trang thì tự động nhảy sang trang mới.
 \Chỉ được phép mở một văn bản trong phiên làm việc.
 Mặc định mỗi khi khởi động Microsoft Word 2010 đã có một văn bản trống
+
 Trong Microsoft Word 2010, để lưu tập tin văn bản ta thực hiện:
 Vào File, chọn lệnh Save and Send
 \Vào File, chọn lệnh Save
 Vào File, chọn lệnh Open
 Vào File, chọn lệnh Save As
+
 Trong Microsoft Word 2010, tổ hợp phím được dùng để lưu văn bản?
 Ctrl + O
 Ctrl + P
 Ctrl + N
 \Ctrl + S
+
 Trong Microsoft Word, để lưu tập tin đang làm việc với tên mới (khác với tên cũ) ta chọn lệnh nào trong thẻ File: 
 Open
 Save
 \Save As…
 Print
+
 Trong Microsoft Word, Khi nào dùng lệnh Save As thay cho lệnh Save?
 Để chỉ định Word luôn luôn tạo bản sao dự phòng cho tài liệu .
 Để gửi tài liệu cho ai đó qua thư điện tử.
 Để thay đổi tần số thực hiện chức năng phục hồi tự động (AutoRecovery) .
 \Để lưu một tài liệu dưới một tên khác hoặc tại vị trí khác.
+
 Trong Microsoft Word, phím nào sau đây cho phép ta lưu tập tin cũ đang được mở với tên khác: 
 F9
 F10
 F11
 \F12
+
 Khi thao tác trong Microsoft Word 2010, thông báo " Do you want to save changes to..." xuất hiện khi nào?
 Khi chọn một phông chữ (font) không tồn tại trong hệ thống.
 Không đặt tên file khi lưu văn bản.
 \Khi đóng văn bản nhưng văn bản chưa được lưu
 Khi lưu văn bản với tên file trùng với một file đã có trong thư mục lựa chọn
+
 Chức năng Save AutoRecover information every trong hộp thoại Word Options có tác dụng gì?
 \Giảm thiểu khả năng mất dữ liệu khi chương trình bị đóng bất ngờ
 Tính năng sao lưu tự động theo chu kỳ
 Tự động lưu theo thời gian mặc định
 Tất cả đều đúng
+
 Khi thao tác trong Microsoft Word 2010, thông báo " The file....already exist" xuất hiện khi nào?
 Không đặt tên file khi lưu văn bản
 Khi chọn một phông chữ (font) không tồn tại trong hệ thống
 \Khi lưu văn bản với tên file trùng với một file đã có trong thư mục lựa chọn
 Khi đóng văn bản nhưng văn bản chưa được lưu
+
 Trong Microsoft Word, công dụng của tổ hợp phím Ctrl + S là:
 Mở tập tin mới.
 Mở một tập tin đã có lưu trên đĩa.
 \Lưu tập tin vào đĩa
 Đóng tập tin đang mở (hiện hành)
+
 Trong Microsoft Word, công dụng của tổ hợp phím Ctrl + O là:
 Mở tập tin mới.
 \Mở một tập tin đã có lưu trên đĩa.
 Lưu tập tin vào đĩa
 Đóng tập tin đang mở (hiện hành)
+
 Trong Microsoft Word, công dụng của tổ hợp phím Ctrl + N là:
 \Mở tập tin mới.
 Lưu tập tin vào đĩa
 Mở một tập tin đã có lưu trên đĩa.
 Đóng tập tin đang mở (hiện hành)
+
 Trong Microsoft Word 2010, tổ hợp phím được dùng để đóng tài liệu đang mở?
 Ctrl + O
 Ctrl + N
 Ctrl + P
 \Ctrl + W
+
 Trong khi làm việc với Microsoft Office Word, để đóng cửa sổ tập tin đang làm việc ta sử dụng tổ hợp phím tắt nào sau đây:
 \Ctrl + F4
 Shift + F4
 Alt + F4
 Tab + F4
+
 Để thoát khỏi chương trình ứng dụng đang làm việc (hiện hành), ta dùng tổ hợp phím:
 \Alt + F4
 Ctrl + F4
 Shift + F4
 Tab + F4
-

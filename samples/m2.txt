@@ -1,4 +1,4 @@
-Bộ xử lý trung tâm (CPU) là:
+﻿Bộ xử lý trung tâm (CPU) là:
 Nơi nhập thông tin cho máy
 \Nơi xử lý, quyết định, điều khiển hoạt động của máy
 Nơi thông báo kết quả cho người sử dụng.

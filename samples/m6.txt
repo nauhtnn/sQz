@@ -1,4 +1,4 @@
-Hãy chọn phương án ghép đúng nhất: Máy tính trở thành công cụ lao động không thể thiếu được trong xã hội hiện đại vì : 
+﻿Hãy chọn phương án ghép đúng nhất: Máy tính trở thành công cụ lao động không thể thiếu được trong xã hội hiện đại vì
 \Máy tính cho ta khả năng lưu trữ và xử lý thông tin
 Máy tính giúp cho con người giải tất cả các bài toán khó 	
 Máy tính là công cụ soạn thảo văn bản và cho ta truy cập vào Internet để tìm kiếm thông tin.
@@ -28,12 +28,6 @@ MAN
 WAN
 Internet
 
-Khái niệm sau đây nói đến mô hình mạng nào:Tất cả các máy tính đều bình đẳng với nhau, mỗi máy tính có thể vừa cung cấp trực tiếp tài nguyên, vừa có thể sử dụng tài nguyên của máy tính khác.
-\Mô hình mạng ngang hàng
-Mô hình mạng khách chủ.
-Mô hình mạng Client/Server.
-Câu b và c đều đúng..
-
 Ưu điểm của mạng không dây là :
 Gọn nhẹ, sử dụng mọi lúc mọi nơi, không cần đăng ký dịch vụ
 \Có thể triển khai mọi lúc mọi nơi, mọi thời điểm, không cần sử dụng các thiết bị cồng kềnh, phức tạp như mạng có dây.
@@ -58,12 +52,6 @@ Là tập hợp các trang web có liên quan đến nhau.
 Là địa chỉ của Website.
 Tất cả các câu trên đều đúng.
 
-Cách thức để mở 1 trang web sử dụng Internet Explorer:
-Nhập url của trang web vào ô Address rồi nhấn Enter.
-Chọn File/ Open rồi nhập url của trang web rồi nhấn Enter.
-\Cả 2 câu trên đều đúng.
-Cả 3 câu trên dều sai
-
 Hyperlink là gì?
 \Là một thành phần trong một trang Web liên kết đến vị trí khác trên cùng trang Web đó hoặc liên kết đến một trang Web khác.
 Là nội dụng được thể hiện trên Web Browser (văn bản, âm thanh, hình ảnh)
@@ -84,15 +72,15 @@ Là địa chỉ của trang Web.
 
 Có thể mở các file .html bằng:
 Trình duyệt web (Browser) Internet Explorer.
-Trình duyệt web (Browser) Mozila.
+Trình duyệt web (Browser) Mozila Firefox.
 Các trình duyệt mail như Outlook Express, Microsoft Outlook, …
-\Câu a và b đều đúng
+\Internet Explorer và Mozilla Firefox.
 
 World Wide Web là gì?
 Là một hệ thống các máy chủ cung cấp thông tin đến bất kỳ các máy tính nào trên Internet có yêu cầu.
 Là máy dùng để đặt các trang Web trên Internet.
 \Là một dịch vụ của Internet.
-Câu a và c đúng.
+Tất cả đều đúng.
 
 Trong khi soạn thảo email nếu muốn gởi kèm file chúng ta bấm vào nút
 Send
@@ -104,7 +92,7 @@ File/Save
 Phải có máy tính.
 Phải có thuê bao điện thoại cố định.
 Phải có modem.
-\Cả 3 câu trên đều đúng.
+\Tất cả đều đúng.
 
 Web Server là gì?
 \Là máy chủ dùng để đặt các trang Web trên Internet.
