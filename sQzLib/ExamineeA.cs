@@ -27,7 +27,7 @@ namespace sQzLib
         public ExamStt eStt;
         public ExamLv eLv;
         public int uId;
-        public int LvId { get { return uId + ((eLv == ExamLv.A) ? 0 : LV_CAP); } }
+        public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + LV_CAP; } }
         public string tId { get { return eLv.ToString() + uId.ToString("d4"); } }
         public string tName;
         public string tBirdate;

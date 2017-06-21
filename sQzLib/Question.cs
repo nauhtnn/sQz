@@ -37,15 +37,16 @@ namespace sQzLib
     public class Question
     {
         public const int N_ANS = 4;
+        public const char C0 = '0';
+        public const char C1 = '1';
         public int uId;
         public string tStmt; //statement
-        public string Stmt { get { return tStmt; } }
-        public IUx mIU;
+        public string Stmt { get { return tStmt; } set { tStmt = value; } }
+        public IUx eIU;
         public string[] vAns;
         public bool[] vKeys;
         public int[] vAnsSort;
         public bool bDiff;
-        public QuestType qType;
         static string[] svToken;
         static int siToken;
         //static string[] vSTMT_PATT = { "[a-zA-Z]+[0-9]+", "[0-9]+\\." };
@@ -55,7 +56,6 @@ namespace sQzLib
         public Question() {
             vAns = null;
             bDiff = false;
-            qType = QuestType.Single;
             vAnsSort = new int[N_ANS];
             for (int i = 0; i < N_ANS; ++i)
                 vAnsSort[i] = i;
@@ -109,7 +109,9 @@ namespace sQzLib
                 bDiff = true;
                 tStmt = tStmt.Substring(1);
             }
-            int nKey = 0;
+            else if (tStmt[0] == '\\' && 1 < tStmt.Length
+                && (tStmt[1] == '*' || tStmt[1] == '\\'))
+                tStmt = tStmt.Substring(1);
             for (int i = 0; i < N_ANS; ++i)
             {
                 if (vAns[i][0] == '\\' && 1 < vAns[i].Length)
@@ -117,15 +119,12 @@ namespace sQzLib
                     if (vAns[i][1] != '\\')
                     {
                         vKeys[i] = true;
-                        ++nKey;
                         vAns[i] = Utils.CleanFront(vAns[i], 1);
                     }
                     else
                         vAns[i] = vAns[i].Substring(1);
                 }
             }
-            if (1 < nKey && qType == QuestType.Single)
-                qType = QuestType.Multiple;
             return false;
         }
 
@@ -138,19 +137,19 @@ namespace sQzLib
         //    return s.ToString();
         //}
 
-        public bool Ans(int idx, out string ans)
-        {
-            if (0 < idx && idx < N_ANS)
-            {
-                ans = vAns[idx];
-                return vKeys[idx];
-            }
-            else
-            {
-                ans = string.Empty;
-                return false;
-            }
-        }
+        //public bool Ans(int idx, out string ans)
+        //{
+        //    if (0 < idx && idx < N_ANS)
+        //    {
+        //        ans = vAns[idx];
+        //        return vKeys[idx];
+        //    }
+        //    else
+        //    {
+        //        ans = string.Empty;
+        //        return false;
+        //    }
+        //}
 
         public static void Clear()
         {
@@ -170,7 +169,7 @@ namespace sQzLib
             Question q = new Question();
             q.uId = uId;
             q.tStmt = tStmt;
-            q.mIU = mIU;
+            q.eIU = eIU;
             q.vAns = new string[N_ANS];
             for (int i = 0; i < N_ANS; ++i)
                 q.vAns[i] = vAns[i];
@@ -212,7 +211,7 @@ namespace sQzLib
             Question q = new Question();
             q.uId = uId;
             q.tStmt = tStmt;
-            q.mIU = mIU;
+            q.eIU = eIU;
             //randomize
             q.vAns = new string[N_ANS];
             q.vKeys = new bool[N_ANS];

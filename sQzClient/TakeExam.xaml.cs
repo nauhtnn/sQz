@@ -281,7 +281,7 @@ namespace sQzClient
             StackPanel con = new StackPanel();
             TextBlock stmt = new TextBlock();
             Question quest = mQSh.Q(idx - 1);
-            stmt.Text = quest.mStmt;
+            stmt.Text = quest.tStmt;
             stmt.TextWrapping = TextWrapping.Wrap;
             stmt.Width = qaWh;
             stmt.Background = Theme.s._[(int)BrushId.Q_BG];

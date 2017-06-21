@@ -299,7 +299,7 @@ namespace sQzServer0
             c.B = c.G = c.R = 0xf0;
             SolidColorBrush lightbg = new SolidColorBrush(c);
             SolidColorBrush bg = lightbg;
-            foreach (Question q in qs.vQuest)
+            foreach (Question q in qs.ShallowCopy())
             {
                 TextBlock i = new TextBlock();
                 i.Text = ++x + ". " + q.Stmt;
@@ -309,7 +309,7 @@ namespace sQzServer0
                     bg = lightbg;
                 i.Background = bg;
                 sp.Children.Add(i);
-                for (int idx = 0; idx < q.nAns; ++idx)
+                for (int idx = 0; idx < Question.N_ANS; ++idx)
                 {
                     TextBlock j = new TextBlock();
                     j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];

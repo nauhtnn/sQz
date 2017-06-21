@@ -14,14 +14,7 @@ namespace sQzLib
         public ListBox[] vlbxAns;
         public AnsItem[][] vAnsItem;
         public int uQSLvId;
-        public int uQSId {
-            get {
-                if (uQSLvId == ushort.MaxValue)
-                    return ushort.MaxValue;
-                else
-                    return (uQSLvId < ExamineeA.LV_CAP) ? uQSLvId : uQSLvId - ExamineeA.LV_CAP;
-            }
-        }
+        public int uQSId { get { return (ExamineeA.LV_CAP < uQSLvId) ? uQSLvId - ExamineeA.LV_CAP : uQSLvId; } }
         public bool bChanged;
         DgEvntCB dgSelChgCB;
         public byte[] aAns;
@@ -31,7 +24,7 @@ namespace sQzLib
             {
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in aAns)
-                    sb.Append((b == 0) ? '0' : '1');
+                    sb.Append((b == 0) ? Question.C0 : Question.C1);
                 return sb.ToString();
             }
         }
@@ -64,7 +57,7 @@ namespace sQzLib
             
             int idx = -1;
             int j = -1;
-            foreach (Question q in qs.vQ)
+            foreach (Question q in qs.ShallowCopy())
             {
                 ++idx;
                 ListBox lbxAns = new ListBox();
@@ -152,20 +145,6 @@ namespace sQzLib
                 offs = offs4;
             }
             return grade;
-        }
-
-        //only Operation0 uses this.
-        public void ExtractKey(QuestSheet qs)
-        {
-            uQSLvId = qs.LvId;
-            if (0 < qs.Count && qs.Q(0) != null && qs.Q(0).vKeys != null)
-                aAns = new byte[qs.Count * 4];//hardcode, todo
-            else
-                return;
-            int i = -1;
-            foreach (Question q in qs.vQuest)
-                foreach (bool x in q.vKeys)
-                    aAns[++i] = Convert.ToByte(x);
         }
 
         public void Disable()

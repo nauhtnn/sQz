@@ -241,7 +241,7 @@ namespace sQzServer0
                 QuestSheet qs = db ? mDBQSh : mQSh;
                 vChk = new List<CheckBox>();
                 vQId = new List<int>();
-                foreach (Question q in qs.vQuest)
+                foreach (Question q in qs.ShallowCopy())
                 {
                     TextBlock i = new TextBlock();
 					Grid.SetRow(i, ++x);
@@ -265,12 +265,12 @@ namespace sQzServer0
 
         private void btnInsQuest_Click(object sender, RoutedEventArgs e)
         {
-            if (mSelQCat != IUx._0 && 0 < mQSh.vQuest.Count)
+            if (mSelQCat != IUx._0 && 0 < mQSh.Count)
             {
                 gDBQuest.Children.Clear();
                 gQuest.Children.Clear();
-                mQSh.DBInsert(mSelQCat);
-                mQSh.vQuest.Clear();
+                mQSh.DBIns(mSelQCat);
+                mQSh.Clear();
                 mDBQSh.DBSelect(mSelQCat);
                 ShowQuest(true);
             }

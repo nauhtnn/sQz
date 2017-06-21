@@ -11,7 +11,7 @@ namespace sQzLib
     {
         public DateTime mDt;
         public ExamLv eLv;
-        public Dictionary<int, QuestSheet> vSheet;
+        public SortedList<int, QuestSheet> vSheet;
         int mNextQSIdx;
         int mMaxQSIdx;
         public QuestPack()
@@ -19,7 +19,7 @@ namespace sQzLib
             mDt = DT.INV_;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
-            vSheet = new Dictionary<int, QuestSheet>();
+            vSheet = new SortedList<int, QuestSheet>();
         }
 
         //only Operation0 uses this.
@@ -201,7 +201,7 @@ namespace sQzLib
                     while (0 < ni)
                     {
                         int idx = rand.Next() % ni;
-                        qs.vQuest.Add(vq.ElementAt(idx).DeepCopy());
+                        qs.Add(vq.ElementAt(idx).DeepCopy());
                         vq.RemoveAt(idx);
                         --ni;
                     }
@@ -279,18 +279,8 @@ namespace sQzLib
             }
             vals.Clear();
             prefx = "('" + dt.ToString(DT._) + "',";
-            foreach(QuestSheet qs in l)
-            {
-                int idx = -1;
-                foreach (Question q in qs.vQuest)
-                {
-                    vals.Append(prefx + "'" + qs.eLv.ToString() + "'," +
-                        qs.uId + "," + q.uId + ",'");
-                    foreach (int i in q.vAnsSort)
-                        vals.Append(i.ToString());
-                    vals.Append("'," + ++idx + "),");
-                }
-            }
+            foreach (QuestSheet qs in l)
+                qs.DBAppendQryIns(prefx, vals);
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid,asort,idx", vals.ToString(), out eMsg) < 0)
             {
@@ -317,20 +307,7 @@ namespace sQzLib
         {
             if (vSheet.Values.Count == 0)
                 return null;
-            List<int[]> rv = new List<int[]>();
-            IUx[] viu = QuestSheet.GetIUs(eLv);
-            int[] vnesydif = new int[viu.Length];
-            int[] vndif = new int[viu.Length];
-            QuestSheet qs = vSheet.First().Value;
-            foreach(Question q in qs.vQuest)
-            {
-                ++vnesydif[(int)q.mIU];
-                if(q.bDiff)
-                    ++vndif[(int)q.mIU];
-            }
-            rv.Add(vnesydif);
-            rv.Add(vndif);
-            return rv;
+            return vSheet.First().Value.GetNMod();
         }
     }
 }

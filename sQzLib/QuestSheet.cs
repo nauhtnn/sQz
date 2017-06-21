@@ -5,12 +5,6 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
-/*
-CREATE TABLE IF NOT EXISTS `qs` (`dt` DATE,
-`id` SMALLINT UNSIGNED, `lv` CHAR, `vquest` VARCHAR(1024),
-PRIMARY KEY(`dt`,`id`), FOREIGN KEY(`dt`) REFERENCES `board`(`dt`));
-*/
-
 namespace sQzLib
 {
     public class QuestSheet
@@ -25,14 +19,13 @@ namespace sQzLib
         List<Question> vQuest;
         public byte[] aQuest;
         public int Count { get { return vQuest.Count; } }
-        public List<Question> vQ { get { return vQuest; } }
 
         public QuestSheet()
         {
             eLv = ExamLv.A;
             vQuest = new List<Question>();
             aQuest = null;
-            uId = 0;
+            uId = ExamineeA.LV_CAP;
             mDiff = 0;
         }
 
@@ -64,13 +57,13 @@ namespace sQzLib
             if (s == null || s.Length != 4)
             {
                 lv = ExamLv.A;
-                id = ushort.MaxValue;
+                id = ExamineeA.LV_CAP;
                 return true;
             }
             s = s.ToUpper();
             if (!Enum.TryParse(s.Substring(0, 1), out lv))
             {
-                id = ushort.MaxValue;
+                id = ExamineeA.LV_CAP;
                 return true;
             }
             if (!int.TryParse(s.Substring(1), out id))
@@ -82,10 +75,61 @@ namespace sQzLib
 
         public Question Q(int idx)
         {
-            if (0 < idx && idx < vQuest.Count)
-                return vQuest[idx];
+            return vQuest[idx];
+        }
+
+        public void Add(Question q)
+        {
+            vQuest.Add(q);
+        }
+
+        public void Clear()
+        {
+            vQuest.Clear();
+        }
+
+        public List<int[]> GetNMod()
+        {
+            List<int[]> rv = new List<int[]>();
+            IUx[] viu = GetIUs(eLv);
+            int[] vnesydif = new int[viu.Length];
+            int[] vndif = new int[viu.Length];
+            foreach (Question q in vQuest)
+            {
+                ++vnesydif[(int)q.eIU];
+                if (q.bDiff)
+                    ++vndif[(int)q.eIU];
+            }
+            rv.Add(vnesydif);
+            rv.Add(vndif);
+            return rv;
+        }
+
+        public void DBAppendQryIns(string prefx, StringBuilder vals)
+        {
+            int idx = -1;
+            foreach (Question q in vQuest)
+            {
+                vals.Append(prefx + "'" + eLv.ToString() + "'," +
+                    uId + "," + q.uId + ",'");
+                foreach (int i in q.vAnsSort)
+                    vals.Append(i.ToString());
+                vals.Append("'," + ++idx + "),");
+            }
+        }
+
+        //only Operation0 uses this.
+        public void ExtractKey(AnsSheet anssh)
+        {
+            anssh.uQSLvId = LvId;
+            if (0 < vQuest.Count)
+                anssh.aAns = new byte[vQuest.Count * Question.N_ANS];
             else
-                return null;
+                return;
+            int i = -1;
+            foreach (Question q in vQuest)
+                foreach (bool x in q.vKeys)
+                    anssh.aAns[++i] = Convert.ToByte(x);
         }
 
         public List<byte[]> ToByte()
@@ -95,15 +139,12 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(vQuest.Count));
             foreach (Question q in vQuest)
             {
-                //qType
-                //l.Add(BitConverter.GetBytes((int)q.qType));
                 //stmt
-                byte[] b = Encoding.UTF8.GetBytes(q.mStmt);
+                byte[] b = Encoding.UTF8.GetBytes(q.Stmt);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
                 //ans
-                //l.Add(BitConverter.GetBytes(q.nAns));
-                for (int j = 0; j < q.nAns; ++j)
+                for (int j = 0; j < Question.N_ANS; ++j)
                 {
                     //each ans
                     b = Encoding.UTF8.GetBytes(q.vAns[j]);
@@ -134,12 +175,6 @@ namespace sQzLib
             while (0 < nq)
             {
                 Question q = new Question();
-                //qType
-                //if (l < 4)
-                //    break;
-                //q.qType = (QuestType)BitConverter.ToInt32(buf, offs);
-                //l -= 4;
-                //offs += 4;
                 //stmt
                 if (l < 4)
                     return true;
@@ -148,21 +183,12 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     return true;
-                q.mStmt = Encoding.UTF8.GetString(buf, offs, sz);
+                q.Stmt = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
                 //ans
-                //if (l < 4)
-                //{
-                //    err = true;
-                //    break;
-                //}
-                //q.nAns = BitConverter.ToInt32(buf, offs);
-                q.nAns = 4;//todo
-                //l -= 4;
-                //offs += 4;
-                q.vAns = new string[q.nAns];
-                for (int j = 0; j < q.nAns; ++j)
+                q.vAns = new string[Question.N_ANS];
+                for (int j = 0; j < Question.N_ANS; ++j)
                 {
                     //each ans
                     if (l < 4)
@@ -315,16 +341,15 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    q.mStmt = reader.GetString(1);
-                    q.nAns = 4;
+                    q.Stmt = reader.GetString(1);
                     q.vAns = new string[4];
                     for (int i = 0; i < 4; ++i)
                         q.vAns[i] = reader.GetString(2 + i);
                     string x = reader.GetString(6);
                     q.vKeys = new bool[4];
                     for (int i = 0; i < 4; ++i)
-                        q.vKeys[i] = (x[i] == '1');
-                    q.mIU = eIU;
+                        q.vKeys[i] = (x[i] == Question.C1);
+                    q.eIU = eIU;
                     vQuest.Add(q);
                 }
                 reader.Close();
@@ -378,16 +403,15 @@ namespace sQzLib
                     ++i;
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    q.mStmt = reader.GetString(1);
-                    q.nAns = 4;
-                    q.vAns = new string[4];
-                    for (int j = 0; j < 4; ++j)
+                    q.Stmt = reader.GetString(1);
+                    q.vAns = new string[Question.N_ANS];
+                    for (int j = 0; j < Question.N_ANS; ++j)
                         q.vAns[j] = reader.GetString(2 + j);
                     string x = reader.GetString(6);
-                    q.vKeys = new bool[4];
-                    for (int j = 0; j < 4; ++j)
+                    q.vKeys = new bool[Question.N_ANS];
+                    for (int j = 0; j < Question.N_ANS; ++j)
                         q.vKeys[j] = (x[j] == '1');
-                    q.mIU = iu;
+                    q.eIU = iu;
                     vQuest.Add(q);
                 }
                 reader.Close();
@@ -396,7 +420,7 @@ namespace sQzLib
             return false;
         }
 
-        public void DBInsert(IUx eIU)
+        public void DBIns(IUx eIU)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -405,14 +429,14 @@ namespace sQzLib
             foreach (Question q in vQuest)
             {
                 vals.Append("(" + (int)eIU + ",0," + mDiff + ",'");
-                vals.Append(q.mStmt.Replace("'", "\\'") + "','");
-                for (int i = 0; i < q.nAns; ++i)
+                vals.Append(q.Stmt.Replace("'", "\\'") + "','");
+                for (int i = 0; i < Question.N_ANS; ++i)
                     vals.Append(q.vAns[i].Replace("'", "\\'") + "','");
-                for (int i = 0; i < q.nAns; ++i)
+                for (int i = 0; i < Question.N_ANS; ++i)
                     if (q.vKeys[i])
-                        vals.Append('1');
+                        vals.Append(Question.C1);
                     else
-                        vals.Append('0');
+                        vals.Append(Question.C0);
                 vals.Append("'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
@@ -456,25 +480,24 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = qid;
-                    q.mStmt = reader.GetString(0);
-                    q.nAns = 4;
-                    string[] anss = new string[4];
-                    for (int j = 0; j < 4; ++j)
+                    q.Stmt = reader.GetString(0);
+                    string[] anss = new string[Question.N_ANS];
+                    for (int j = 0; j < Question.N_ANS; ++j)
                         anss[j] = reader.GetString(1 + j);
                     string x = reader.GetString(5);
-                    bool[] keys = new bool[4];
-                    for (int j = 0; j < 4; ++j)
-                        keys[j] = (x[j] == '1');
+                    bool[] keys = new bool[Question.N_ANS];
+                    for (int j = 0; j < Question.N_ANS; ++j)
+                        keys[j] = (x[j] == Question.C1);
                     q.vAns = new string[4];
                     q.vKeys = new bool[4];
                     for(int j = 0; j < 4; ++j)
                     {
-                        q.vAns[j] = anss[asorts[i][j] - '0'];
-                        q.vKeys[j] = keys[asorts[i][j] - '0'];
+                        q.vAns[j] = anss[asorts[i][j] - Question.C0];
+                        q.vKeys[j] = keys[asorts[i][j] - Question.C0];
                     }
                     int iu;
                     if (Enum.IsDefined(typeof(IUx), iu = reader.GetInt32(6)))
-                        q.mIU = (IUx)iu;
+                        q.eIU = (IUx)iu;
                     vQuest.Add(q);
                 }
                 reader.Close();

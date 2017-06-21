@@ -53,7 +53,7 @@ namespace sQzLib
             foreach(QuestSheet qs in l)
             {
                 AnsSheet i = new AnsSheet();
-                i.ExtractKey(qs);
+                qs.ExtractKey(i);
                 if (!vSheet.ContainsKey(i.uQSLvId))
                     vSheet.Add(i.uQSLvId, i);
                 else
@@ -64,7 +64,7 @@ namespace sQzLib
         public AnsSheet ExtractKey(QuestSheet qs)
         {
             AnsSheet i = new AnsSheet();
-            i.ExtractKey(qs);
+            qs.ExtractKey(i);
             if (!vSheet.ContainsKey(i.uQSId))
             {
                 vSheet.Add(i.uQSId, i);

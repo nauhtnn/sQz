@@ -191,39 +191,39 @@ namespace sQzServer1
 
         public void ShowQuest()
         {
-            if (bQShowed)
-                return;
-            bQShowed = true;
+            //if (bQShowed)
+            //    return;
+            //bQShowed = true;
 
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            tbcQuest.Items.Clear();
-            foreach (QuestPack p in mSl.vQPack.Values)
-                foreach (QuestSheet qs in p.vSheet.Values)
-                {
-                    TabItem ti = new TabItem();
-                    ti.Header = qs.eLv.ToString() + qs.uId;
-                    ScrollViewer svwr = new ScrollViewer();
-                    svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-                    StackPanel sp = new StackPanel();
-                    int x = 0;
-                    foreach (Question q in qs.vQuest)
-                    {
-                        TextBlock i = new TextBlock();
-                        i.Text = ++x + ") " + q.ToString();
-                        dark = !dark;
-                        if (dark)
-                            i.Background = new SolidColorBrush(c);
-                        else
-                            i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-                        sp.Children.Add(i);
-                    }
-                    svwr.Content = sp;
-                    ti.Content = svwr;
-                    tbcQuest.Items.Add(ti);
-                }
+            //bool dark = true;
+            //Color c = new Color();
+            //c.A = 0xff;
+            //c.B = c.G = c.R = 0xf0;
+            //tbcQuest.Items.Clear();
+            //foreach (QuestPack p in mSl.vQPack.Values)
+            //    foreach (QuestSheet qs in p.vSheet.Values)
+            //    {
+            //        TabItem ti = new TabItem();
+            //        ti.Header = qs.eLv.ToString() + qs.uId;
+            //        ScrollViewer svwr = new ScrollViewer();
+            //        svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            //        StackPanel sp = new StackPanel();
+            //        int x = 0;
+            //        foreach (Question q in qs.vQuest)
+            //        {
+            //            TextBlock i = new TextBlock();
+            //            i.Text = ++x + ") " + q.ToString();
+            //            dark = !dark;
+            //            if (dark)
+            //                i.Background = new SolidColorBrush(c);
+            //            else
+            //                i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
+            //            sp.Children.Add(i);
+            //        }
+            //        svwr.Content = sp;
+            //        ti.Content = svwr;
+            //        tbcQuest.Items.Add(ti);
+            //    }
         }
 
         private void cbxLock_Unchecked(object sender, RoutedEventArgs e)
