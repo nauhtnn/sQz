@@ -54,7 +54,7 @@ namespace sQzServer1
                 !int.TryParse(System.IO.File.ReadAllText("Room.txt"), out uRId))
                 uRId = 1;
             bStrtReqQSh = bQShReqting = false;
-            uReqQSh = ushort.MaxValue;
+            uReqQSh = ExamineeA.LV_CAP;
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -274,7 +274,7 @@ namespace sQzServer1
                     ExamLv lv = (lvid < (int)ExamLv.B) ? ExamLv.A : ExamLv.B;
                     offs += 4;
                     int qsid = BitConverter.ToInt32(buf, offs);
-                    if (qsid == ushort.MaxValue)
+                    if (qsid == ExamineeA.LV_CAP)
                     {
                         byte[] a = slo.vQPack[lv].ToByteNextQS();
                         if (a != null)

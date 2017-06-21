@@ -68,7 +68,7 @@ namespace sQzLib
             }
             if (!int.TryParse(s.Substring(1), out id))
                 return true;
-            if (id < 1 || ExamineeA.LV_CAP < id)
+            if (id < 1 || ExamineeA.LV_CAP <= id)
                 return true;
             return false;
         }

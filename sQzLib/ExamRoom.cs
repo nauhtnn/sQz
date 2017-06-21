@@ -14,7 +14,7 @@ namespace sQzLib
         public Dictionary<ExamLv, int> nLv;
         public ExamRoom()
         {
-            uId = ushort.MaxValue;
+            uId = ExamineeA.LV_CAP;
             vExaminee = new Dictionary<int, ExamineeA>();
             nLv = new Dictionary<ExamLv, int>();
         }

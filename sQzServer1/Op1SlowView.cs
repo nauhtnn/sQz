@@ -106,7 +106,7 @@ namespace sQzServer1
                     Grid.SetColumn(t, 5);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    if (e.uGrade != ushort.MaxValue)
+                    if (e.uGrade != ExamineeA.LV_CAP)
                     {
                         t.Text = e.Grade;
                         cbx.IsEnabled = false;
@@ -125,7 +125,7 @@ namespace sQzServer1
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
                     int lvid = e.LvId;
-                    if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(lvid, out t))
+                    if (e.uGrade != ExamineeA.LV_CAP && vGrade.TryGetValue(lvid, out t))
                         t.Text = e.Grade;
                     if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");

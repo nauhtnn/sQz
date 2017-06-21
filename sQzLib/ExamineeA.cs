@@ -58,12 +58,12 @@ namespace sQzLib
         {
             mDt = DT.INV_H;
             eLv = ExamLv.A;
-            uId = ushort.MaxValue;
+            uId = ExamineeA.LV_CAP;
             tName = null;
             tBirdate = null;
             tBirthplace = null;
             eStt = ExamStt.Signing;
-            uGrade = ushort.MaxValue;
+            uGrade = ExamineeA.LV_CAP;
             dtTim1 = dtTim2 = DT.INV_;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
@@ -73,7 +73,7 @@ namespace sQzLib
 
         public bool ParseLvId(int lvid)
         {
-            if (lvid < 1 || LV_CAP + LV_CAP < lvid)
+            if (lvid != LV_CAP &&(lvid < 1 || LV_CAP + LV_CAP <= lvid))
                 return true;
             if(lvid < LV_CAP)
             {
@@ -99,7 +99,7 @@ namespace sQzLib
             int uid;
             if (!int.TryParse(s.Substring(1), out uid))
                 return true;
-            if (uid < 1 || LV_CAP < uid)
+            if (uid < 1 || LV_CAP <= uid)
                 return true;
             if (eLv != lv || uId != uid)
                 Reset();

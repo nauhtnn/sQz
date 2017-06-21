@@ -32,7 +32,7 @@ namespace sQzLib
         public AnsSheet() {
             bChanged = false;
             aAns = null;
-            uQSLvId = ushort.MaxValue;
+            uQSLvId = ExamineeA.LV_CAP;
             dgSelChgCB = null;
         }
 

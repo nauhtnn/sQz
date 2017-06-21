@@ -101,7 +101,7 @@ namespace sQzServer0
                         t.Background = new SolidColorBrush(c);
                     int lvid = e.LvId;
                     vGrade.Add(lvid, t);
-                    if (e.uGrade != ushort.MaxValue)
+                    if (e.uGrade != ExamineeA.LV_CAP)
                         t.Text = e.Grade;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
@@ -144,7 +144,7 @@ namespace sQzServer0
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
                     int lvid = e.LvId;
-                    if (e.uGrade != ushort.MaxValue && vGrade.TryGetValue(lvid, out t))
+                    if (e.uGrade != ExamineeA.LV_CAP && vGrade.TryGetValue(lvid, out t))
                         t.Text = e.Grade;
                     if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");
