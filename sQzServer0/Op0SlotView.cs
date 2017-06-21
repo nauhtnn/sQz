@@ -141,18 +141,20 @@ namespace sQzServer0
         {
             TextBlock t;
             foreach (ExamRoom r in mSl.vRoom.Values)
-                foreach (ExamineeA e in r.vExaminee.Values)
-                {
-                    int lvid = e.LvId;
-                    if (e.uGrade != ExamineeA.LV_CAP && vGrade.TryGetValue(lvid, out t))
-                        t.Text = e.Grade;
-                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
-                        t.Text = e.dtTim1.ToString("HH:mm");
-                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))
-                        t.Text = e.dtTim2.ToString("HH:mm");
-                    if (e.tComp != null && vComp.TryGetValue(lvid, out t))
-                        t.Text = e.tComp;
-                }
+                foreach (ExamineeS0 e in r.vExaminee.Values)
+                    if(e.bToVw)
+                    {
+                        e.bToVw = false;
+                        int lvid = e.LvId;
+                        if (e.uGrade != ExamineeA.LV_CAP && vGrade.TryGetValue(lvid, out t))
+                            t.Text = e.Grade;
+                        if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
+                            t.Text = e.dtTim1.ToString("HH:mm");
+                        if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))
+                            t.Text = e.dtTim2.ToString("HH:mm");
+                        if (e.tComp != null && vComp.TryGetValue(lvid, out t))
+                            t.Text = e.tComp;
+                    }
         }
 
         public void DeepCopy(TabItem refTbi)

@@ -224,15 +224,11 @@ namespace sQzServer0
                         else
                         {
                             mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
-                            //Dispatcher.Invoke(() =>
-                            //{
-                            //    foreach (TabItem ti in tbcSl.Items)
-                            //    {
-                            //        Op0SlotView vw = ti.Content as Op0SlotView;
-                            //        if (vw != null)
-                            //            vw.UpdateRsView();
-                            //    }
-                            //});
+                            Dispatcher.Invoke(() =>
+                            {
+                                foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
+                                    vw.UpdateRsView();
+                            });
                         }
                     }
                     outMsg = BitConverter.GetBytes(1);

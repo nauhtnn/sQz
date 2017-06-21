@@ -76,12 +76,12 @@ namespace sQzLib
             foreach (ExamineeS0 e in vExaminee.Values)
                 if (e.bToDB)
                 {
+                    e.bToDB = false;
                     vals.Append("('" + e.mDt.ToString(DT._) + "','" + e.eLv.ToString() + "'," +
                         e.uId + "," + (e.mAnsSh.uQSId)
                         + ",'" + e.dtTim1.ToString(DT.hh) +
                         "','" + e.dtTim2.ToString(DT.hh) + "'," + e.uGrade + ",'" +
                         e.tComp + "','" + e.mAnsSh.tAns + "'),");
-                    e.bToDB = false;
                 }
         }
 
