@@ -140,8 +140,9 @@
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="60"/>
                                 <ColumnDefinition Width="80"/>
@@ -149,14 +150,15 @@
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="30"/>
                             </Grid.RowDefinitions>
-                            <TextBlock x:Name="txtId" Text="ID" Background="AliceBlue" TextAlignment="Center"/>
-                            <TextBlock x:Name="txtName" Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
-                            <TextBlock x:Name="txtBirdate" Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
-                            <TextBlock x:Name="txtBirpl" Grid.Column="3" Text="Birthplace" Background="Gold" TextAlignment="Center"/>
-                            <TextBlock x:Name="txtGrade" Grid.Column="4" Text="Grade" Background="Azure" TextAlignment="Center"/>
-                            <TextBlock x:Name="txtDt1" Grid.Column="5" Text="Dt1" Background="Azure" TextAlignment="Center"/>
-                            <TextBlock x:Name="txtDt2" Grid.Column="6" Text="Dt2" Background="Azure" TextAlignment="Center"/>
-                            <TextBlock x:Name="txtComp" Grid.Column="7" Text="Comp" Background="Azure" TextAlignment="Center"/>
+                            <TextBlock Name="txtId" Background="Coral" TextAlignment="Center"/>
+                            <TextBlock Name="txtName" Grid.Column="1" Background="Brown" TextAlignment="Center"/>
+                            <TextBlock Name="txtBirdate" Grid.Column="2" Background="Cyan" TextAlignment="Center"/>
+                            <TextBlock Name="txtBirpl" Grid.Column="3" Background="Gold" TextAlignment="Center"/>
+                            <TextBlock Name="txtRoom" Grid.Column="4" Background="Blue" TextAlignment="Center"/>
+                            <TextBlock Name="txtGrade" Grid.Column="5" Background="Violet" TextAlignment="Center"/>
+                            <TextBlock Name="txtDt1" Grid.Column="6" Background="Pink" TextAlignment="Center"/>
+                            <TextBlock Name="txtDt2" Grid.Column="7" Background="Maroon" TextAlignment="Center"/>
+                            <TextBlock Name="txtComp" Grid.Column="8" Background="GreenYellow" TextAlignment="Center"/>
                         </Grid>
                         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="600">
                             <Grid>
@@ -164,11 +166,12 @@
                                     <ColumnDefinition Width="60"/>
                                     <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="120"/>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="60"/>
                                     <ColumnDefinition Width="80"/>
-                                    <ColumnDefinition Width="60"/>
-                                    <ColumnDefinition Width="60"/>
-                                    <ColumnDefinition Width="60"/>
                                 </Grid.ColumnDefinitions>
                             </Grid>
                         </ScrollViewer>

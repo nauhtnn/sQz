@@ -60,78 +60,87 @@ namespace sQzServer0
             Color c = new Color();
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
+            SolidColorBrush br = new SolidColorBrush(c);
             bool dark = false;
             int rid = -1;
+            GridLength rh = new GridLength(26);
             foreach (ExamRoom r in mSl.vRoom.Values)
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
                     rid++;
                     RowDefinition rd = new RowDefinition();
-                    rd.Height = new GridLength(20);
+                    rd.Height = rh;
                     grdNee.RowDefinitions.Add(rd);
                     TextBlock t = new TextBlock();
                     t.Text = e.tId;
                     if (dark)
-                        t.Background = new SolidColorBrush(c);
+                        t.Background = br;
                     Grid.SetRow(t, rid);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tName;
                     if (dark)
-                        t.Background = new SolidColorBrush(c);
+                        t.Background = br;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tBirdate;
                     if (dark)
-                        t.Background = new SolidColorBrush(c);
+                        t.Background = br;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 2);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tBirthplace;
                     if (dark)
-                        t.Background = new SolidColorBrush(c);
+                        t.Background = br;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    int lvid = e.LvId;
-                    vGrade.Add(lvid, t);
-                    if (e.uGrade != ExamineeA.LV_CAP)
-                        t.Text = e.Grade;
+                        t.Background = br;
+                    t.Text = (r.uId + 1).ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    vDt1.Add(lvid, t);
-                    if (e.dtTim1.Year != DT.INV)
-                        t.Text = e.dtTim1.ToString("HH:mm");
+                        t.Background = br;
+                    int lvid = e.LvId;
+                    vGrade.Add(lvid, t);
+                    if (e.uGrade != ExamineeA.LV_CAP)
+                        t.Text = e.Grade;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 5);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     if (dark)
-                        t.Background = new SolidColorBrush(c);
-                    vDt2.Add(lvid, t);
-                    if (e.dtTim2.Year != DT.INV)
-                        t.Text = e.dtTim2.ToString("HH:mm");
+                        t.Background = br;
+                    vDt1.Add(lvid, t);
+                    if (e.dtTim1.Year != DT.INV)
+                        t.Text = e.dtTim1.ToString("HH:mm");
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 6);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     if (dark)
-                        t.Background = new SolidColorBrush(c);
+                        t.Background = br;
+                    vDt2.Add(lvid, t);
+                    if (e.dtTim2.Year != DT.INV)
+                        t.Text = e.dtTim2.ToString("HH:mm");
+                    Grid.SetRow(t, rid);
+                    Grid.SetColumn(t, 7);
+                    grdNee.Children.Add(t);
+                    t = new TextBlock();
+                    if (dark)
+                        t.Background = br;
                     vComp.Add(lvid, t);
                     if (e.tComp != null)
                         t.Text = e.tComp;
                     Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 7);
+                    Grid.SetColumn(t, 8);
                     grdNee.Children.Add(t);
                     dark = !dark;
                 }
