@@ -9,46 +9,48 @@
       ShowsNavigationUI="False"
       Title="Prep0">
 
-    <StackPanel x:Name="spMain" Loaded="Main_Loaded">
-        <StackPanel Orientation="Horizontal">
-            <StackPanel>
-                <TextBlock Text="(yyyy-M-d)" Margin="28,0,0,0"/>
-                <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
-                    <TextBox x:Name="tbxBrd" Height="30" Width="90" />
-                    <Button x:Name="btnInsBrd"  Content="+" Height="30" Width="30" Click="btnInsBrd_Click"/>
-                </StackPanel>
-                <ListBox x:Name="lbxBrd" Width="120" Height="200" SelectionChanged="lbxBrd_SelectionChanged"/>
-            </StackPanel>
-            <StackPanel>
-                <TextBlock Text="(h:m)" Margin="20,0,0,0"/>
-                <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
-                    <TextBox x:Name="tbxSl" Height="30" Width="50" />
-                    <Button x:Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click"/>
-                </StackPanel>
-                <ListBox x:Name="lbxSl" Width="80" Height="200" SelectionMode="Multiple"/>
-            </StackPanel>
-            <TabControl x:Name="tbcNee" Width="1040"/>
-            <StackPanel x:Name="refSl" Visibility="Collapsed">
-                <Grid Height="40">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Button Content="X" Height="40" Width="40"/>
-                    <StackPanel Orientation="Horizontal" Grid.Column="1" HorizontalAlignment="Center">
-                        <Button Name="a" Content="+" Height="40" Width="40"/>
-                        <Button Content="X" Height="40" Width="40" Margin="100,0,0,0"/>
+    <StackPanel x:Name="spMain" Loaded="Main_Loaded" Orientation="Horizontal" Margin="10" Background="#f0f0f0">
+        <StackPanel Width="240">
+            <Button x:Name="btnMMenu"  Width="120" Height="40" Click="btnMMenu_Click" Background="#f15a23" Foreground="#fff"
+                        Margin="10,20,10,10"/>
+            <StackPanel Orientation="Horizontal">
+                <StackPanel>
+                    <TextBlock Text="(yyyy-M-d)" Margin="28,0,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
+                        <TextBox x:Name="tbxBrd" Height="30" Width="90" />
+                        <Button x:Name="btnInsBrd"  Content="+" Height="30" Width="30" Click="btnInsBrd_Click"/>
                     </StackPanel>
-                </Grid>
-                <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
-                    <ListBox Name="_1" Width="475" Height="200"/>
-                    <Button Content="&lt;&lt;" Height="30" Width="60" Margin="5,0,5,0"/>
-                    <ListBox Name="_2" Width="475" Height="200"/>
+                    <ListBox x:Name="lbxBrd" Width="120" Height="120" SelectionChanged="lbxBrd_SelectionChanged"/>
                 </StackPanel>
+                <StackPanel>
+                    <TextBlock Text="(h:m)" Margin="20,0,0,0"/>
+                    <StackPanel Orientation="Horizontal" Margin="10,0,10,0">
+                        <TextBox x:Name="tbxSl" Height="30" Width="50" />
+                        <Button x:Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click"/>
+                    </StackPanel>
+                    <ListBox x:Name="lbxSl" Width="80" Height="120" SelectionMode="Multiple"/>
+                </StackPanel>
+            </StackPanel>
+            <ListBox x:Name="lbxQCatgry" Width="160" Height="410" SelectionChanged="lbxQCatgry_SelectionChanged"/>
+        </StackPanel>
+        <StackPanel Orientation="Horizontal">
+            <TabControl x:Name="tbcNee" Width="1040" Visibility="Collapsed"/>
+            <StackPanel x:Name="refSl">
+                <StackPanel Name="sp1" Orientation="Horizontal">
+                    <TextBlock x:Name="txtNeeDB" Width="240"/>
+                    <Button x:Name="btnDBDel" Height="40" Width="40" Margin="160,0,0,0"/>
+                </StackPanel>
+                <ListBox Name="_1" Width="475" Height="240"/>
+                <StackPanel Name="sp2" Orientation="Horizontal">
+                    <TextBlock x:Name="txtNeeTmp" Width="240"/>
+                    <Button Content="&lt;&lt;" Height="40" Width="40" Margin="5,0,5,0"/>
+                    <Button Name="a" Content="+" Height="40" Width="40"/>
+                    <Button Content="X" Height="40" Width="40" Grid.Column="1"/>
+                </StackPanel>
+                <ListBox Name="_2" Width="475" Height="240"/>
             </StackPanel>
         </StackPanel>
-        <StackPanel Orientation="Horizontal" Margin="10,10,10,0">
-            <ListBox x:Name="lbxQCatgry" Width="160" Height="410" SelectionChanged="lbxQCatgry_SelectionChanged"/>
+        <StackPanel x:Name="spQ" Orientation="Horizontal" Visibility="Collapsed">
             <StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions>

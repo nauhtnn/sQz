@@ -39,6 +39,11 @@ namespace sQzServer0
             mBrd = new ExamBoard();
         }
 
+        private void btnMMenu_Click(object sender, RoutedEventArgs e)
+        {
+            NavigationService.Navigate(new Uri("MainMenu.xaml", UriKind.Relative));
+        }
+
         private void btnInsBrd_Click(object sender, RoutedEventArgs e)
         {
             DateTime dt;
@@ -291,6 +296,8 @@ namespace sQzServer0
         {
             Txt t = Txt.s;
             //btnNeeBrowse.Content = t._[(int)TxI.NEE_ADD];
+            txtNeeDB.Text = t._[(int)TxI.NEE_LS_DB];
+            txtNeeTmp.Text = t._[(int)TxI.NEE_LS_TMP];
             btnQBrowse.Content = t._[(int)TxI.Q_ADD];
             btnDel.Content = t._[(int)TxI.DEL];
             btnSelAll.Content = t._[(int)TxI.SEL_ALL];
