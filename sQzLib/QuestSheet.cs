@@ -227,7 +227,7 @@ namespace sQzLib
                 return;
             Question.StartRead(Utils.Split(buf, '\n'), null);
             Question q = new Question();
-            while (q.Read())
+            while (!q.Read())
             {
                 vQuest.Add(q);
                 q = new Question();
