@@ -159,7 +159,10 @@ namespace sQzServer0
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Application.Current.MainWindow.FontSize = 16;
+            //double wd = SystemParameters.PrimaryScreenWidth;
+            //Application.Current.MainWindow.Width = wd;
             //double rt = spMain.RenderSize.Width / 1280; //d:DesignWidth
+            //double rt = w / 1280;
             //ScaleTransform st = new ScaleTransform(rt, rt);
             //spMain.RenderTransform = st;
 
@@ -325,14 +328,17 @@ namespace sQzServer0
             txtNeeTmp.Text = t._[(int)TxI.NEE_LS_TMP];
             txtDt.Text = t._[(int)TxI.DATE_L];
             txtHm.Text = t._[(int)TxI.TIME_L];
+            txtIU.Text = t._[(int)TxI.IUS];
+            tbi1.Header = t._[(int)TxI.PREP_DT_T];
+            tbi2.Header = t._[(int)TxI.PREP_Q];
             btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
-            btnFileQ.Content = t._[(int)TxI.Q_ADD];
+            btnFileQ.Content = "+";// t._[(int)TxI.Q_ADD];
             btnDelQ.Content = t._[(int)TxI.DEL];
             btnImpDBQ.Content = t._[(int)TxI.PREP_IMP];
             btnAllQ.Content = t._[(int)TxI.SEL_ALL];
             btnDBDelNee.Content = t._[(int)TxI.PREP_DEL];
             btnImpDBNee.Content = t._[(int)TxI.PREP_IMP];
-            btnFileNee.Content = t._[(int)TxI.PREP_LD_FL];
+            btnFileNee.Content = "+";// t._[(int)TxI.PREP_LD_FL];
             btnTmpDelNee.Content = t._[(int)TxI.PREP_DEL];
         }
 

@@ -79,6 +79,7 @@ namespace sQzLib {
 		DB,
 		SEL_ALL,
 		DEL,
+		IUS,
 		IU01,
 		IU02,
 		IU03,
@@ -127,5 +128,7 @@ namespace sQzLib {
 		PREP_DEL,
 		PREP_IMP,
 		PREP_LD_FL,
+		PREP_DT_T,
+		PREP_Q,
 	}
 }

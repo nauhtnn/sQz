@@ -60,7 +60,7 @@ namespace sQzServer0
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
-            Window w = Window.GetWindow(this);
+            Window w = Application.Current.MainWindow;
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
             w.ResizeMode = ResizeMode.NoResize;
