@@ -241,10 +241,11 @@ namespace sQzServer0
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
             SolidColorBrush evenbg = new SolidColorBrush(Colors.Wheat);
+            SolidColorBrush oddbg = new SolidColorBrush(Colors.White);
             SolidColorBrush bg = evenbg;
             bool even = false;
             Dispatcher.Invoke(() => {
-                int x = 0;
+                int x = -1;
                 Grid g = db ? gDBQuest : gQuest;
                 g.Children.Clear();
                 g.RowDefinitions.Clear();
@@ -255,7 +256,7 @@ namespace sQzServer0
                 foreach (Question q in qs.ShallowCopy())
                 {
                     TextBlock i = new TextBlock();
-                    i.Text = ++x + ". " + q.Stmt;
+                    i.Text = (++x + 1) + ". " + q.Stmt;
                     i.Width = w;
                     i.TextWrapping = TextWrapping.Wrap;
                     StackPanel sp = new StackPanel();
@@ -273,7 +274,7 @@ namespace sQzServer0
                     if (even)
                         bg = evenbg;
                     else
-                        bg = null;
+                        bg = oddbg;
                     even = !even;
                     sp.Background = bg;
                     RowDefinition rd = new RowDefinition();
@@ -334,7 +335,7 @@ namespace sQzServer0
             btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
             btnFileQ.Content = "+";// t._[(int)TxI.Q_ADD];
             btnDelQ.Content = t._[(int)TxI.DEL];
-            btnImpDBQ.Content = t._[(int)TxI.PREP_IMP];
+            btnImpDBQ.Content = "<<";// t._[(int)TxI.PREP_IMP];
             btnAllQ.Content = t._[(int)TxI.SEL_ALL];
             btnDBDelNee.Content = t._[(int)TxI.PREP_DEL];
             btnImpDBNee.Content = t._[(int)TxI.PREP_IMP];
