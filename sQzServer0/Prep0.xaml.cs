@@ -215,7 +215,7 @@ namespace sQzServer0
             }
         }
 
-        private void btnQBrowse_Click(object sender, RoutedEventArgs e)
+        private void btnFileQ_Click(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
 
@@ -234,33 +234,54 @@ namespace sQzServer0
 
         private void ShowQuest(bool db) //same as Operation0.xaml
         {
-            bool dark = true;
             Color c = new Color();
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
+            SolidColorBrush evenbg = new SolidColorBrush(Colors.Wheat);
+            SolidColorBrush bg = evenbg;
+            bool even = false;
             Dispatcher.Invoke(() => {
-                int x = -1;
+                int x = 0;
                 Grid g = db ? gDBQuest : gQuest;
                 g.Children.Clear();
-				g.RowDefinitions.Clear();
+                g.RowDefinitions.Clear();
                 QuestSheet qs = db ? mDBQSh : mQSh;
                 vChk = new List<CheckBox>();
                 vQId = new List<int>();
+                double w = g.ColumnDefinitions.First().Width.Value;
                 foreach (Question q in qs.ShallowCopy())
                 {
                     TextBlock i = new TextBlock();
-					Grid.SetRow(i, ++x);
-                    i.Text = x + ") " + q.ToString();
-                    dark = !dark;
-                    if (dark)
-                        i.Background = new SolidColorBrush(c);
-                    g.Children.Add(i);
+                    i.Text = ++x + ". " + q.Stmt;
+                    i.Width = w;
+                    i.TextWrapping = TextWrapping.Wrap;
+                    StackPanel sp = new StackPanel();
+                    sp.Children.Add(i);
+                    for (int idx = 0; idx < Question.N_ANS; ++idx)
+                    {
+                        TextBlock j = new TextBlock();
+                        j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
+                        j.Width = w;
+                        j.TextWrapping = TextWrapping.Wrap;
+                        if (q.vKeys[idx])
+                            j.FontWeight = FontWeights.Bold;
+                        sp.Children.Add(j);
+                    }
+                    if (even)
+                        bg = evenbg;
+                    else
+                        bg = null;
+                    even = !even;
+                    sp.Background = bg;
+                    RowDefinition rd = new RowDefinition();
+                    g.RowDefinitions.Add(rd);
+                    Grid.SetRow(sp, x);
+                    g.Children.Add(sp);
                     CheckBox chk = new CheckBox();
                     chk.Name = "c" + q.uId;
-					Grid.SetColumn(chk, 1);
-					Grid.SetRow(chk, x);
-					RowDefinition rd = new RowDefinition();
-					g.RowDefinitions.Add(rd);
+                    chk.VerticalAlignment = VerticalAlignment.Center;
+                    Grid.SetColumn(chk, 1);
+                    Grid.SetRow(chk, x);
                     g.Children.Add(chk);
                     vQId.Add(q.uId);
                     vChk.Add(chk);
@@ -268,7 +289,7 @@ namespace sQzServer0
             });
         }
 
-        private void btnInsQuest_Click(object sender, RoutedEventArgs e)
+        private void btnImpDBQ_Click(object sender, RoutedEventArgs e)
         {
             if (mSelQCat != IUx._0 && 0 < mQSh.Count)
             {
@@ -295,21 +316,33 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            //btnNeeBrowse.Content = t._[(int)TxI.NEE_ADD];
+            txtId.Text = t._[(int)TxI.NEEID_S];
+            txtName.Text = t._[(int)TxI.NEE_NAME];
+            txtBirdate.Text = t._[(int)TxI.BIRDATE];
+            txtBirpl.Text = t._[(int)TxI.BIRPL];
+            txtRoom.Text = t._[(int)TxI.ROOM];
             txtNeeDB.Text = t._[(int)TxI.NEE_LS_DB];
             txtNeeTmp.Text = t._[(int)TxI.NEE_LS_TMP];
-            btnQBrowse.Content = t._[(int)TxI.Q_ADD];
-            btnDel.Content = t._[(int)TxI.DEL];
-            btnSelAll.Content = t._[(int)TxI.SEL_ALL];
+            txtDt.Text = t._[(int)TxI.DATE_L];
+            txtHm.Text = t._[(int)TxI.TIME_L];
+            btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
+            btnFileQ.Content = t._[(int)TxI.Q_ADD];
+            btnDelQ.Content = t._[(int)TxI.DEL];
+            btnImpDBQ.Content = t._[(int)TxI.PREP_IMP];
+            btnAllQ.Content = t._[(int)TxI.SEL_ALL];
+            btnDBDelNee.Content = t._[(int)TxI.PREP_DEL];
+            btnImpDBNee.Content = t._[(int)TxI.PREP_IMP];
+            btnFileNee.Content = t._[(int)TxI.PREP_LD_FL];
+            btnTmpDelNee.Content = t._[(int)TxI.PREP_DEL];
         }
 
-        private void btnSelAll_Click(object sender, RoutedEventArgs e)
+        private void btnAllQ_Click(object sender, RoutedEventArgs e)
         {
             foreach (CheckBox c in vChk)
                 c.IsChecked = true;
         }
 
-        private void btnDel_Click(object sender, RoutedEventArgs e)
+        private void btnDelQ_Click(object sender, RoutedEventArgs e)
         {
             StringBuilder qids = new StringBuilder();
             foreach(CheckBox c in vChk)
@@ -346,24 +379,16 @@ namespace sQzServer0
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
-            PrepNeeView pnv = new PrepNeeView();
-            pnv.mSlDB = new ExamSlot();
+            ExamSlot sl = new ExamSlot();
             DateTime dt;
             DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
-            pnv.mSlDB.Dt = dt;
-            pnv.mSlDB.DBSelRoomId();
-            pnv.mSlDB.DBSelNee();
-            pnv.mSlFile = new ExamSlot();
-            pnv.mSlFile.Dt = pnv.mSlDB.Dt;
-            pnv.mSlFile.DBSelRoomId();
-            pnv.ShallowCopy(refSl);
+            sl.Dt = dt;
+            sl.DBSelRoomId();
+            sl.DBSelNee();
+            PrepNeeView pnv = new PrepNeeView(sl);
+            pnv.DeepCopy(refSl);
             pnv.Show(true);
-            TabItem ti = new TabItem();
-            ti.Name = "_" + (i.Content as string).Replace(':', '_');
-            ti.Header = pnv.mSlDB.Dt.ToString(DT.hh);
-            ti.Content = pnv;
-            tbcNee.Items.Add(ti);
-            ti.Focus();
+            tbcNee.Items.Add(pnv);
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)

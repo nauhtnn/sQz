@@ -16,12 +16,12 @@ namespace sQzLib
 
         public AnsPack mKeyPack;
 
-        public SortedList<int, ExamRoom> vRoom;
+        public Dictionary<int, ExamRoom> vRoom;
 
         public ExamSlot()
         {
             mDt = DT.INV_;
-            vRoom = new SortedList<int, ExamRoom>();
+            vRoom = new Dictionary<int, ExamRoom>();
             vQPack = new Dictionary<ExamLv, QuestPack>();
             QuestPack p = new QuestPack();
             p.eLv = ExamLv.A;

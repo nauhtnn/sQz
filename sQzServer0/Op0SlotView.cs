@@ -308,16 +308,18 @@ namespace sQzServer0
             Color c = new Color();
             c.A = 0xff;
             c.B = c.G = c.R = 0xf0;
-            SolidColorBrush lightbg = new SolidColorBrush(c);
-            SolidColorBrush bg = lightbg;
+            SolidColorBrush evenbg = new SolidColorBrush(c);
+            SolidColorBrush bg;
+            bool even = false;
             foreach (Question q in qs.ShallowCopy())
             {
+                if (even)
+                    bg = evenbg;
+                else
+                    bg = null;
+                even = !even;
                 TextBlock i = new TextBlock();
                 i.Text = ++x + ". " + q.Stmt;
-                if (bg == lightbg)
-                    bg = Theme.s._[(int)BrushId.LeftPanel_BG];
-                else
-                    bg = lightbg;
                 i.Background = bg;
                 sp.Children.Add(i);
                 for (int idx = 0; idx < Question.N_ANS; ++idx)

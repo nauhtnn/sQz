@@ -156,8 +156,8 @@
                             <TextBlock Name="txtBirpl" Grid.Column="3" Background="Gold" TextAlignment="Center"/>
                             <TextBlock Name="txtRoom" Grid.Column="4" Background="Blue" TextAlignment="Center"/>
                             <TextBlock Name="txtGrade" Grid.Column="5" Background="Violet" TextAlignment="Center"/>
-                            <TextBlock Name="txtDt1" Grid.Column="6" Background="Pink" TextAlignment="Center"/>
-                            <TextBlock Name="txtDt2" Grid.Column="7" Background="Maroon" TextAlignment="Center"/>
+                            <TextBlock Name="txtT1" Grid.Column="6" Background="Pink" TextAlignment="Center"/>
+                            <TextBlock Name="txtT2" Grid.Column="7" Background="Maroon" TextAlignment="Center"/>
                             <TextBlock Name="txtComp" Grid.Column="8" Background="GreenYellow" TextAlignment="Center"/>
                         </Grid>
                         <ScrollViewer VerticalScrollBarVisibility="Auto" Height="600">

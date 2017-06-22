@@ -259,6 +259,10 @@ namespace sQzServer0
             txtName.Text = t._[(int)TxI.NEE_NAME];
             txtId.Text = t._[(int)TxI.NEEID_S];
             txtGrade.Text = t._[(int)TxI.MARK];
+            txtRoom.Text = t._[(int)TxI.ROOM];
+            txtT1.Text = t._[(int)TxI.T1];
+            txtT2.Text = t._[(int)TxI.T2];
+            txtComp.Text = t._[(int)TxI.COMP];
         }
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)

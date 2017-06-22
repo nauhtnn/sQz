@@ -4,6 +4,8 @@ namespace sQzLib {
 		SQZ,
 		WELCOME,
 		DATE,
+		DATE_L,
+		TIME_L,
 		NEEID,
 		NEEID_S,
 		POPUP_TIT,
@@ -66,7 +68,10 @@ namespace sQzLib {
 		NEE_NAME,
 		BIRPL,
 		COMP,
+		T1,
+		T2,
 		MARK,
+		ROOM,
 		NOK,
 		DATE_ADD,
 		NEE_ADD,
@@ -119,5 +124,8 @@ namespace sQzLib {
 		RS_UP_NOTHING,
 		RDO_Q,
 		RDO_NEE,
+		PREP_DEL,
+		PREP_IMP,
+		PREP_LD_FL,
 	}
 }
