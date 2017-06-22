@@ -56,12 +56,38 @@ namespace sQzLib
         public static string[] ReadDocx(string fpath)
         {
             List<string> l = new List<string>();
-            using (WordprocessingDocument doc =
-                WordprocessingDocument.Open(fpath, true))
+            WordprocessingDocument doc = null;
+            try
             {
-                Body body = doc.MainDocumentPart.Document.Body;
-                foreach (Paragraph p in body.ChildElements.OfType<Paragraph>())
-                    l.Add(p.InnerText);
+                doc = WordprocessingDocument.Open(fpath, false);
+            }
+            catch(OpenXmlPackageException)
+            {
+                return l.ToArray();
+            }
+            string s;
+            Body body = doc.MainDocumentPart.Document.Body;
+            int idx = -1;
+            foreach (Paragraph p in body.ChildElements.OfType<Paragraph>())
+            {
+                DocumentFormat.OpenXml.Drawing.Blip bl =
+                    p.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
+                if (bl == null)
+                {
+                    if (0 < (s = CleanSpace(p.InnerText)).Length)
+                        l.Add(s);
+                }
+                else
+                {
+                    //string id = bl.Embed.Value;
+                    //ImagePart ip = doc.MainDocumentPart.GetPartById(id) as ImagePart;
+                    //System.IO.Stream st = ip.GetStream();
+                    //byte[] img = new byte[st.Length];
+                    //st.Read(img, 0, (int)st.Length);
+                    //System.IO.FileStream fs = new System.IO.FileStream("img" + ++idx, System.IO.FileMode.OpenOrCreate);
+                    //fs.Write(img, 0, (int)st.Length);
+                    //fs.Close();
+                }
             }
             return l.ToArray();
         }
@@ -78,7 +104,7 @@ namespace sQzLib
             char[] pack = { '{', '}' };//simple KeyValuePair
             int packing = 0;
             int i = s;
-            string str = null;
+            StringBuilder str = new StringBuilder();
             while (i < e)
             {
                 if (buf[i] == pack[0])
@@ -95,17 +121,20 @@ namespace sQzLib
                     while (s < j && sWhSp.Contains(buf[j]))
                         --j;//clean end
                     if (s <= j) //sure sWhSp doesnt contain buf[s]
-                        str += buf.Substring(s, j - s + 1);
+                        str.Append(buf.Substring(s, j - s + 1));
                     if (str[str.Length - 1] == '\\') //concatenate
-                        str = str.Substring(0, str.Length - 1) + '\n';
+                    {
+                        str.Remove(str.Length - 1, 1);
+                        str.Append('\n');
+                    }
                     else if (str[str.Length - 1] == '+') //concatenate
-                        str = str.Substring(0, str.Length - 1);
+                        str.Remove(str.Length - 1, 1);
                     else if (0 < packing)
-                        str += '\n';
+                        str.Append('\n');
                     else
                     {
-                        v.Add(str);
-                        str = null;
+                        v.Add(str.ToString());
+                        str.Clear();
                     }
                     while (i < e && sWhSp.Contains(buf[i]))
                         ++i;
@@ -117,16 +146,17 @@ namespace sQzLib
                 v.Add(buf.Substring(s, e - s));
             return v.ToArray();
         }
-        public static void CleanSpace(ref string buf)
+
+        public static string CleanSpace(string buf)
         {
             int i = 0, e = buf.Length;
             while (i < e && sWhSp.Contains(buf[i]))
                 ++i;//truncate front
-            string s = null;
+            StringBuilder s = new StringBuilder();
             while (i < e)
             {
                 do
-                    s += buf[i++];
+                    s.Append(buf[i++]);
                 while (i < e && !sWhSp.Contains(buf[i]));
                 if (i < e)
                 {
@@ -140,14 +170,15 @@ namespace sQzLib
                             if (buf[h++] == '\n')
                                 nl = true;
                         if (nl)
-                            s += '\n';
+                            s.Append('\n');
                         else
-                            s += ' ';
+                            s.Append(' ');
                     }
                 }
             }
-            buf = s;
+            return s.ToString();
         }
+
         public static string CleanFront(string buf, int s)
         {
             int i = s, e = buf.Length;
@@ -157,6 +188,7 @@ namespace sQzLib
                 return null;
             return buf.Substring(i);
         }
+
         public static string CleanFrontBack(string buf, int s, int e)
         {
             int i = s;
