@@ -110,9 +110,12 @@ namespace sQzServer0
                 b.Width = btn.Width;
                 b.Margin = btn.Margin;
                 b.Content = btn.Content;
+                b.Background = btn.Background;
+                b.Foreground = btn.Foreground;
+                b.FontWeight = btn.FontWeight;
                 if (btn.Name == "btnImpDB")
                     b.Click += btnIns_Click;
-                else if (btn.Name == "btnLoadFl")
+                else if (btn.Name == "btnFileNee")
                     b.Click += btnBrowse_Click;
                 else
                     b.Click += btnXdb_Click;

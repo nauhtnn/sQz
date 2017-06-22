@@ -64,6 +64,8 @@ namespace sQzLib {
 		DATE_SEL,
 		NEE_LS_DB,
 		NEE_LS_TMP,
+		Q_DB,
+		Q_TMP,
 		IDX,
 		NEE_NAME,
 		BIRPL,
@@ -127,7 +129,6 @@ namespace sQzLib {
 		RDO_NEE,
 		PREP_DEL,
 		PREP_IMP,
-		PREP_LD_FL,
 		PREP_DT_T,
 		PREP_Q,
 	}
