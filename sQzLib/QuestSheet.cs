@@ -15,7 +15,6 @@ namespace sQzLib
         public int uId;
         public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + ExamineeA.LV_CAP; } }
         public string tId { get { return eLv.ToString() + uId.ToString("d3"); } }
-        public int mDiff;
         List<Question> vQuest;
         public byte[] aQuest;
         public int Count { get { return vQuest.Count; } }
@@ -26,7 +25,6 @@ namespace sQzLib
             vQuest = new List<Question>();
             aQuest = null;
             uId = ExamineeA.LV_CAP;
-            mDiff = 0;
         }
 
         public static IUx[] GetIUs(ExamLv lv)
@@ -248,7 +246,6 @@ namespace sQzLib
             QuestSheet qs = new QuestSheet();
             qs.eLv = eLv;
             qs.uId = uId;
-            qs.mDiff = mDiff;
             foreach (Question qi in vQuest)
                 qs.vQuest.Add(qi.DeepCopy());
             return qs;
@@ -275,7 +272,6 @@ namespace sQzLib
             QuestSheet qs = new QuestSheet();
             qs.eLv = eLv;
             qs.uId = uId;
-            qs.mDiff = mDiff;
             foreach (Question qi in vQuest)
                 qs.vQuest.Add(qi.RandomizeDeepCopy(rand));
             //randomize
@@ -323,7 +319,7 @@ namespace sQzLib
 		}
 
         //only Server0 uses this.
-        public void DBSelect(IUx eIU)
+        public void DBSelect(IUx eIU, QuestDiff d)
         {
             vQuest.Clear();
             MySqlConnection conn = DBConnect.Init();
@@ -332,7 +328,11 @@ namespace sQzLib
                 return;
 			}
             string qry = DBConnect.mkQrySelect("sqz_question",
-                "id,stmt,ans0,ans1,ans2,ans3,`key`", "moid=" + (int)eIU + " AND del=0");
+                "id,diff,stmt,ans0,ans1,ans2,ans3,`key`", "moid=" + (int)eIU + " AND del=0");
+            if (d == QuestDiff.Easy)
+                qry = qry + " AND diff=0";
+            else if (d == QuestDiff.Diff)
+                qry = qry + " AND diff=1";
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             if (reader != null)
@@ -341,11 +341,12 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    q.Stmt = reader.GetString(1);
+                    q.bDiff = reader.GetInt16(1) != 0;
+                    q.Stmt = reader.GetString(2);
                     q.vAns = new string[4];
                     for (int i = 0; i < 4; ++i)
-                        q.vAns[i] = reader.GetString(2 + i);
-                    string x = reader.GetString(6);
+                        q.vAns[i] = reader.GetString(3 + i);
+                    string x = reader.GetString(7);
                     q.vKeys = new bool[4];
                     for (int i = 0; i < 4; ++i)
                         q.vKeys[i] = (x[i] == Question.C1);
@@ -360,8 +361,13 @@ namespace sQzLib
         }
 
         //only Server0 uses this.
-        public bool DBSelect(Random rand, IUx iu, int n, out string eMsg)
+        public bool DBSelect(Random rand, IUx iu, int n, QuestDiff d, out string eMsg)
         {
+            if (n < 1)
+            {
+                eMsg = string.Empty;
+                return false;
+            }
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
@@ -369,8 +375,12 @@ namespace sQzLib
                 return true;
             }
             //randomize
-            int nn = DBConnect.Count(conn, "sqz_question", "id",
-                "moid=" + (int)iu + " AND del=0", out eMsg);
+            string qry = "moid=" + (int)iu + " AND del=0";
+            if (d == QuestDiff.Easy)
+                qry = qry + " AND diff=0";
+            else if (d == QuestDiff.Diff)
+                qry = qry + " AND diff=1";
+            int nn = DBConnect.Count(conn, "sqz_question", "id", qry, out eMsg);
             if (nn < 1 || nn < n)
                 return true;
             List<int> vIds = new List<int>();
@@ -389,8 +399,12 @@ namespace sQzLib
             }
             Array.Sort(vSel);
             //
-            string qry = DBConnect.mkQrySelect("sqz_question",
-                "id,stmt,ans0,ans1,ans2,ans3,`key`", "moid=" + (int)iu + " AND del=0");
+            qry = DBConnect.mkQrySelect("sqz_question",
+                "id,diff,stmt,ans0,ans1,ans2,ans3,`key`", "moid=" + (int)iu + " AND del=0");
+            if (d == QuestDiff.Easy)
+                qry = qry + " AND diff=0";
+            else if (d == QuestDiff.Diff)
+                qry = qry + " AND diff=1";
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             i = 0;
             int ii = -1;
@@ -403,14 +417,15 @@ namespace sQzLib
                     ++i;
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    q.Stmt = reader.GetString(1);
+                    q.bDiff = reader.GetInt16(1) != 0;
+                    q.Stmt = reader.GetString(2);
                     q.vAns = new string[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
-                        q.vAns[j] = reader.GetString(2 + j);
-                    string x = reader.GetString(6);
+                        q.vAns[j] = reader.GetString(3 + j);
+                    string x = reader.GetString(7);
                     q.vKeys = new bool[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
-                        q.vKeys[j] = (x[j] == '1');
+                        q.vKeys[j] = (x[j] == Question.C1);
                     q.eIU = iu;
                     vQuest.Add(q);
                 }
@@ -428,7 +443,7 @@ namespace sQzLib
             StringBuilder vals = new StringBuilder();
             foreach (Question q in vQuest)
             {
-                vals.Append("(" + (int)eIU + ",0," + mDiff + ",'");
+                vals.Append("(" + (int)eIU + ",0," + (q.bDiff ? 1 : 0) + ",'");
                 vals.Append(q.Stmt.Replace("'", "\\'") + "','");
                 for (int i = 0; i < Question.N_ANS; ++i)
                     vals.Append(q.vAns[i].Replace("'", "\\'") + "','");
@@ -472,7 +487,7 @@ namespace sQzLib
             {
                 ++i;
                 qry = DBConnect.mkQrySelect("sqz_question",
-                    "stmt,ans0,ans1,ans2,ans3,`key`,moid", "id=" + qid);
+                    "diff,stmt,ans0,ans1,ans2,ans3,`key`,moid", "id=" + qid);
                 reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
                 if (reader == null)
                     return true;
@@ -480,11 +495,12 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = qid;
-                    q.Stmt = reader.GetString(0);
+                    q.bDiff = reader.GetInt16(0) != 0;
+                    q.Stmt = reader.GetString(1);
                     string[] anss = new string[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
-                        anss[j] = reader.GetString(1 + j);
-                    string x = reader.GetString(5);
+                        anss[j] = reader.GetString(2 + j);
+                    string x = reader.GetString(6);
                     bool[] keys = new bool[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
                         keys[j] = (x[j] == Question.C1);
@@ -496,7 +512,7 @@ namespace sQzLib
                         q.vKeys[j] = keys[asorts[i][j] - Question.C0];
                     }
                     int iu;
-                    if (Enum.IsDefined(typeof(IUx), iu = reader.GetInt32(6)))
+                    if (Enum.IsDefined(typeof(IUx), iu = reader.GetInt32(7)))
                         q.eIU = (IUx)iu;
                     vQuest.Add(q);
                 }
@@ -570,12 +586,19 @@ namespace sQzLib
             Question qy = y as Question;
             if (qy == null)
                 return 0;
-            if (vIdx[qx.uId] == vIdx[qy.uId])
-                return 0;
-            else if (vIdx[qx.uId] < vIdx[qy.uId])
+            if (vIdx[qx.uId] < vIdx[qy.uId])
                 return -1;
+            else if (vIdx[qx.uId] == vIdx[qy.uId])
+                return 0;
             return 1;
 
         }
+    }
+
+    public enum QuestDiff
+    {
+        Easy,
+        Diff,
+        Both
     }
 }

@@ -335,7 +335,7 @@ namespace sQzServer0
                 svwrTmpQ.Content = null;
                 mTmpQS.DBIns(mSelQCat);
                 mTmpQS.Clear();
-                mDBQS.DBSelect(mSelQCat);
+                mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
                 ShowDBQ();
             }
         }
@@ -346,7 +346,7 @@ namespace sQzServer0
             if (Enum.IsDefined(typeof(IUx), l.SelectedIndex))
             {
                 mSelQCat = (IUx)l.SelectedIndex;
-                mDBQS.DBSelect(mSelQCat);
+                mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
                 ShowDBQ();
             }
         }
@@ -404,7 +404,7 @@ namespace sQzServer0
             }
             if (toUpdate)
             {
-                mDBQS.DBSelect(mSelQCat);
+                mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
                 ShowDBQ();
             }
         }

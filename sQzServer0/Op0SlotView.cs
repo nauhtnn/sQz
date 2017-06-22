@@ -174,7 +174,8 @@ namespace sQzServer0
             foreach (StackPanel refp in refsp.Children.OfType<StackPanel>())
                 DeepCopy(refp);
 
-            foreach(Grid refg in refsp.Children.OfType<Grid>())
+            tbcQ = new TabControl();
+            foreach (Grid refg in refsp.Children.OfType<Grid>())
             {
                 Grid g = new Grid();
                 foreach (ColumnDefinition cd in refg.ColumnDefinitions)
@@ -210,7 +211,6 @@ namespace sQzServer0
                 spContent.Children.Add(g);
             }
 
-            tbcQ = new TabControl();
             spContent.Children.Add(tbcQ);
             spContent.Children.Add(spNee);
             Content = spContent;
@@ -359,7 +359,7 @@ namespace sQzServer0
         {
             vNEsyDif[lv] = vnesydif;
             vNDiff[lv] = vndiff;
-            mSl.GenQ(mSl.CountQSByRoom(lv), lv, vnesydif);
+            mSl.GenQ(mSl.CountQSByRoom(lv), lv, vnesydif, vndiff);
 
             ShowQSHeader();
         }

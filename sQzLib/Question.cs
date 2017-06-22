@@ -212,6 +212,7 @@ namespace sQzLib
             q.uId = uId;
             q.tStmt = tStmt;
             q.eIU = eIU;
+            q.bDiff = bDiff;
             //randomize
             q.vAns = new string[N_ANS];
             q.vKeys = new bool[N_ANS];

@@ -180,7 +180,7 @@ namespace sQzLib
             return false;
         }
 
-        public List<QuestSheet> GenQPack2(int n, int[] vn)
+        public List<QuestSheet> GenQPack2(int n, int[] vn, int[] vndiff)
         {
             List<QuestSheet> l = new List<QuestSheet>();
             int i;
@@ -192,12 +192,12 @@ namespace sQzLib
             {
                 //
                 QuestSheet qs0 = new QuestSheet();
-                qs0.DBSelect(iu);
+                qs0.DBSelect(iu, QuestDiff.Easy);
                 //
                 foreach (QuestSheet qs in l)
                 {
                     List<Question> vq = qs0.ShallowCopy();
-                    int ni = vn[i];
+                    int ni = vn[i] - vndiff[i];
                     while (0 < ni)
                     {
                         int idx = rand.Next() % ni;
@@ -206,6 +206,23 @@ namespace sQzLib
                         --ni;
                     }
                 }
+                //
+                qs0 = new QuestSheet();
+                qs0.DBSelect(iu, QuestDiff.Diff);
+                //
+                foreach (QuestSheet qs in l)
+                {
+                    List<Question> vq = qs0.ShallowCopy();
+                    int ni = vndiff[i];
+                    while (0 < ni)
+                    {
+                        int idx = rand.Next() % ni;
+                        qs.Add(vq.ElementAt(idx).DeepCopy());
+                        vq.RemoveAt(idx);
+                        --ni;
+                    }
+                }
+                //
                 ++i;
             }
             List<int> eidx = new List<int>();
@@ -227,7 +244,7 @@ namespace sQzLib
             return new List<QuestSheet>();
         }
 
-        public List<QuestSheet> GenQPack3(int n, int[] vn)
+        public List<QuestSheet> GenQPack3(int n, int[] vn, int[] vndiff)
         {
             string emsg;
             Random rand = new Random();
@@ -235,11 +252,19 @@ namespace sQzLib
             QuestSheet qs0 = new QuestSheet();
             int j = -1;
             foreach (IUx i in QuestSheet.GetIUs(eLv))
-                if (qs0.DBSelect(rand, i, vn[++j], out emsg))
+            {
+                ++j;
+                if (qs0.DBSelect(rand, i, vn[j] - vndiff[j], QuestDiff.Easy, out emsg))
                 {
                     WPopup.s.ShowDialog(emsg);
                     return new List<QuestSheet>();
                 }
+                if (qs0.DBSelect(rand, i, vndiff[j], QuestDiff.Diff, out emsg))
+                {
+                    WPopup.s.ShowDialog(emsg);
+                    return new List<QuestSheet>();
+                }
+            }
             while (0 < n)
             {
                 --n;

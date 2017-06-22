@@ -377,19 +377,19 @@ namespace sQzLib
                 r.DBUpdateRs(vals);
         }
 
-        public bool GenQ(int n, ExamLv lv, int[] vn)
+        public bool GenQ(int n, ExamLv lv, int[] vn, int[] vndiff)
         {
             string emsg;
-            if (vQPack[lv].DBDelete(out emsg))
+            if (vQPack[lv].DBDelete(out emsg))//todo: only mark del, not del from db
                 WPopup.s.ShowDialog(emsg);
             foreach (QuestSheet qs in vQPack[lv].vSheet.Values)
                 mKeyPack.vSheet.Remove(qs.LvId);
             vQPack[lv].vSheet.Clear();
             List<QuestSheet> l;
             if(System.IO.File.Exists("Randomize.txt"))
-                l = vQPack[lv].GenQPack2(n, vn);
+                l = vQPack[lv].GenQPack2(n, vn, vndiff);
             else
-                l = vQPack[lv].GenQPack3(n, vn);
+                l = vQPack[lv].GenQPack3(n, vn, vndiff);
             mKeyPack.ExtractKey(l);
             return false;
         }
