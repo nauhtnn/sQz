@@ -218,9 +218,10 @@ namespace sQzLib
         }
 
         //only Prep0 uses this.
-        public void ReadTxt(string buf)
+        public void ReadTxt(string fpath)
         {
             vQuest.Clear();
+            string buf = Utils.ReadFile(fpath);
             if (buf == null)
                 return;
             Question.StartRead(Utils.Split(buf, '\n'), null);
@@ -230,7 +231,18 @@ namespace sQzLib
                 vQuest.Add(q);
                 q = new Question();
             }
-            q = null;
+        }
+
+        public void ReadDocx(string fpath)
+        {
+            vQuest.Clear();
+            Question.StartRead(Utils.ReadDocx(fpath), null);
+            Question q = new Question();
+            while (!q.Read())
+            {
+                vQuest.Add(q);
+                q = new Question();
+            }
         }
 
         public List<Question> ShallowCopy()

@@ -220,15 +220,17 @@ namespace sQzServer0
             OpenFileDialog dlg = new OpenFileDialog();
 
             // set filter for file extension and default file extension 
-            dlg.DefaultExt = ".txt";
-            dlg.Filter = "text documents (.txt)|*.txt";
+            dlg.DefaultExt = ".docx";
+            dlg.Filter = "text documents (.docx;.txt)|*.docx;*.txt";
             bool? result = dlg.ShowDialog();
 
-            // get the selected file name and display in a textbox
-            string filePath = null;
+            string fpath = null;
             if (result == true)
-                filePath = dlg.FileName;
-            mTmpQS.ReadTxt(Utils.ReadFile(filePath));
+                fpath = dlg.FileName;
+            if (fpath.EndsWith(".docx"))
+                mTmpQS.ReadDocx(fpath);
+            else
+                mTmpQS.ReadTxt(fpath);
             ShowTmpQ();
         }
 

@@ -2,7 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-//using System.Threading.Tasks;
+using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Packaging;
 
 namespace sQzLib
 {
@@ -20,7 +21,6 @@ namespace sQzLib
                 }
                 return string.Empty;
             }
-            //set { sb.Append(value); bUp = true; }
         }
         public bool ToUp() { return bUp; }
         public static UICbMsg operator +(UICbMsg a, string s)
@@ -38,6 +38,7 @@ namespace sQzLib
     public class Utils
     {
         public static char[] sWhSp = { ' ', '\t', '\n', '\r' };
+
         public static string ReadFile(string fileName)
         {
             try
@@ -46,12 +47,25 @@ namespace sQzLib
                     return null;
                 return System.IO.File.ReadAllText(fileName);
             }
-            catch (System.Exception)
+            catch (Exception)
             {
-                System.Console.WriteLine("Cannot read file '{0}'", fileName);
                 return null;
             }
         }
+
+        public static string[] ReadDocx(string fpath)
+        {
+            List<string> l = new List<string>();
+            using (WordprocessingDocument doc =
+                WordprocessingDocument.Open(fpath, true))
+            {
+                Body body = doc.MainDocumentPart.Document.Body;
+                foreach (Paragraph p in body.ChildElements.OfType<Paragraph>())
+                    l.Add(p.InnerText);
+            }
+            return l.ToArray();
+        }
+
         public static string[] Split(string buf, char c)
         {
             char[] sWhSp = { ' ', '\t', '\n', '\r' };
