@@ -174,16 +174,6 @@ namespace sQzServer0
             foreach (StackPanel refp in refsp.Children.OfType<StackPanel>())
                 DeepCopy(refp);
 
-            tbcQ = new TabControl();
-            List<string> qstIds = mSl.vQPack[ExamLv.A].SelectQStId();
-            qstIds.InsertRange(qstIds.Count, mSl.vQPack[ExamLv.B].SelectQStId());
-            foreach(string t in qstIds)
-            {
-                TabItem ti = new TabItem();
-                ti.Header = t;
-                tbcQ.Items.Add(ti);
-            }
-
             foreach(Grid refg in refsp.Children.OfType<Grid>())
             {
                 Grid g = new Grid();
@@ -220,6 +210,7 @@ namespace sQzServer0
                 spContent.Children.Add(g);
             }
 
+            tbcQ = new TabControl();
             spContent.Children.Add(tbcQ);
             spContent.Children.Add(spNee);
             Content = spContent;
@@ -271,7 +262,6 @@ namespace sQzServer0
             }
 
             spNee.Visibility = Visibility.Collapsed;
-            //InitQPanel();
         }
 
         private void vwMode_Check(object sender, RoutedEventArgs e)
@@ -298,7 +288,7 @@ namespace sQzServer0
                 return;
             ExamLv lv;
             int id;
-            if (QuestSheet.ParseLvId(tbi.Header as string, out lv, out id))
+            if (QuestSheet.ParseLvId((tbi.Header as TextBlock).Text, out lv, out id))
                 return;
             QuestSheet qs = mSl.vQPack[lv].vSheet[id];
             ScrollViewer svwr = new ScrollViewer();
@@ -333,7 +323,7 @@ namespace sQzServer0
                 }
             }
             svwr.Content = sp;
-            svwr.Height = 620;
+            svwr.Height = 560;
             tbi.Content = svwr;
 
             InitNMod();
@@ -381,7 +371,10 @@ namespace sQzServer0
                 foreach (QuestSheet qs in p.vSheet.Values)
                 {
                     TabItem ti = new TabItem();
-                    ti.Header = qs.eLv.ToString() + qs.uId.ToString("d3");
+                    TextBlock t = new TextBlock();
+                    t.Text = qs.eLv.ToString() + qs.uId.ToString("d3");
+                    t.FontSize = 12;
+                    ti.Header = t;
                     ti.GotFocus += tbiQ_GotFocus;
                         
                     tbcQ.Items.Add(ti);

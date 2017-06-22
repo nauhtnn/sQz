@@ -79,7 +79,7 @@ namespace sQzServer0
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
-            Window w = Window.GetWindow(this);
+            Window w = Application.Current.MainWindow;
             w.Closing += W_Closing;
             w.FontSize = 16;
 

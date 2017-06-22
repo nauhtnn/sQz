@@ -113,7 +113,7 @@ namespace sQzServer0
                 b.Background = btn.Background;
                 b.Foreground = btn.Foreground;
                 b.FontWeight = btn.FontWeight;
-                if (btn.Name == "btnImpDB")
+                if (btn.Name == "btnImpDBNee")
                     b.Click += btnIns_Click;
                 else if (btn.Name == "btnFileNee")
                     b.Click += btnBrowse_Click;
