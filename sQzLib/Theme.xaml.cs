@@ -123,6 +123,7 @@ namespace sQzLib
         TextBlock mT;
         TextBox mC;
         WPopupCb _wpCb;
+        WPopupCb _wpCbCncl;
         static WPopup _s;
         Button mBtnOk;
         Button mBtnCncl;
@@ -225,6 +226,11 @@ namespace sQzLib
             set { _wpCb = value; }
         }
 
+        public WPopupCb wpCbCncl
+        {
+            set { _wpCbCncl = value; }
+        }
+
         public Window owner
         {
             set {
@@ -291,6 +297,8 @@ namespace sQzLib
                 _wpCb?.Invoke();
                 bOk = false;
             }
+            else
+                _wpCbCncl?.Invoke();
             if (bCollapse)
             {
                 Window s = sender as Window;

@@ -21,6 +21,9 @@ namespace sQzClient
         UICbMsg mCbMsg;
         System.Timers.Timer mTimer;
 
+        const int SMT_OK_M = 30;
+        const int SMT_OK_S = 50;
+
         public QuestSheet mQSh;
 
         Client2 mClnt;
@@ -76,6 +79,7 @@ namespace sQzClient
             spMain.RenderTransform = new ScaleTransform(rt, rt);
 
             WPopup.nwIns(w);
+            WPopup.s.wpCbCncl = WPCancel;
 
             int m = -1, s = -1;
             if (mNee.eStt < ExamStt.Submitting)
@@ -413,8 +417,8 @@ namespace sQzClient
                     Dispatcher.Invoke(() =>
                     {
                         txtRTime.Text = dtRemn.Minutes.ToString() + " : " + dtRemn.Seconds;
-                        if (!btnSubmit.IsEnabled && dtRemn.Minutes < 30
-                                && dtRemn.Seconds < 50)//hardcode
+                        if (!btnSubmit.IsEnabled && dtRemn.Minutes < SMT_OK_M
+                                && dtRemn.Seconds < SMT_OK_S)
                             btnSubmit.IsEnabled = true;
                     });
                 }
@@ -450,6 +454,11 @@ namespace sQzClient
             if (mNee.mAnsSh.bChanged)
                 mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             Window.GetWindow(this).Close();
+        }
+
+        void WPCancel()
+        {
+            bBtnBusy = false;
         }
 
         private void btnExit_Click(object sender, RoutedEventArgs e)
