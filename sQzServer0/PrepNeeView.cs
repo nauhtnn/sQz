@@ -141,7 +141,7 @@ namespace sQzServer0
                 {
                     b.Content = Txt.s._[(int)TxI.PREP_DEL];
                     if(bTmp)
-                        b.Click += btnXtmp_Click;
+                        b.Click += btnXTmp_Click;
                     else
                         b.Click += btnXdb_Click;
                 }
@@ -219,7 +219,7 @@ namespace sQzServer0
             Show(true);
         }
 
-        private void btnXtmp_Click(object sender, RoutedEventArgs e)
+        private void btnXTmp_Click(object sender, RoutedEventArgs e)
         {
             mSlTmp.DelNee();
             Show(false);
@@ -311,13 +311,14 @@ namespace sQzServer0
 
         private void btnImp_Click(object sender, RoutedEventArgs e)
         {
+            string emsg;
+            if (mSlTmp.DBInsNee(out emsg) <= 0)
+                WPopup.s.ShowDialog(emsg);
+            mSlTmp.DelNee();
             grdTmp.Children.Clear();
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_TMP], 0);
             tbiTmp.Header = sb.ToString();
-            string emsg;
-            if (mSlTmp.DBInsNee(out emsg) <= 0)
-                WPopup.s.ShowDialog(emsg);
             mSlDB.DBSelNee();
             Show(true);
         }

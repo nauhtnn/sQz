@@ -175,13 +175,8 @@ namespace sQzLib
                 n = r.DBIns(conn, out eMsg);
                 if (n < 0)
                 {
-                    string[] p = new string[2];
-                    p[0] = r.uId.ToString();
-                    if (n == -1062)
-                        p[1] = Txt.s._[(int)TxI.NEE_EXIST];
-                    else
-                        p[1] = eMsg;
-                    sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DB_NOK] + '\n', p);
+                    sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DB_NOK] + '\n', r.uId + 1,
+                        Txt.s._[(int)TxI.NEE_EXIST]);
                     v = 0;
                 }
             }
