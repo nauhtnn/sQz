@@ -119,7 +119,7 @@ namespace sQzLib
                     e.mDt = mDt;
                     e.tName = v[2].Trim();
                     DateTime dt;
-                    if(!DT.To_(v[3], DT._, out dt))
+                    if(DT.To_(v[3], DT.RR, out dt))
                     {
                         eline.Append(i.ToString() + ", ");
                         continue;
