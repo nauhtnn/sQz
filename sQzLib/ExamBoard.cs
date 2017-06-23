@@ -105,8 +105,8 @@ namespace sQzLib
                 return 0;
             }
             string v = "('" + mDt.ToString(DT._) + "','"
-                + t.ToString(DT.h) + "')";
-            int n = DBConnect.Ins(conn, "sqz_slot", "dt,t", v, out eMsg);
+                + t.ToString(DT.h) + "'," + (int)ExamStt.Prep + ")";
+            int n = DBConnect.Ins(conn, "sqz_slot", "dt,t,stt", v, out eMsg);
             DBConnect.Close(ref conn);
             if (n == -1062)
                 eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.SLOT_EXIST];

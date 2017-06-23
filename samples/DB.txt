@@ -2,9 +2,13 @@ CREATE TABLE IF NOT EXISTS `sqz_ver`(`id` INT UNSIGNED PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_board`(`dt` DATE PRIMARY KEY);
 
-CREATE TABLE IF NOT EXISTS `sqz_slot`(`dt` DATE, `t` TIME, `lck` TINYINT,
+CREATE TABLE IF NOT EXISTS `sqz_status`(`id` TINYINT PRIMARY KEY);
+
+CREATE TABLE IF NOT EXISTS `sqz_slot`(`dt` DATE, `t` TIME, `stt` TINYINT NOT NULL,
 PRIMARY KEY(`dt`, `t`),
-FOREIGN KEY(`dt`) REFERENCES `sqz_board`(`dt`));
+FOREIGN KEY(`dt`) REFERENCES `sqz_board`(`dt`),
+FOREIGN KEY(`stt`) REFERENCES `sqz_status`(`id`),
+INDEX(`stt`));
 
 CREATE TABLE IF NOT EXISTS `sqz_room`(`id` TINYINT PRIMARY KEY);
 
@@ -72,5 +76,6 @@ CREATE TABLE IF NOT EXISTS `sqz_admin`(`id` TINYINT PRIMARY KEY,
 INSERT INTO `sqz_room` VALUES (0),(1),(2),(3),(4),(5);
 INSERT INTO `sqz_level` VALUES ('A'),('B');
 INSERT INTO `sqz_module` VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14);
+INSERT INTO `sqz_status` VALUES (0),(1),(2);
 DELETE FROM `sqz_ver`;
 INSERT INTO `sqz_ver` VALUES (7);

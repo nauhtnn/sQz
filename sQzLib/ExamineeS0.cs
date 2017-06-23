@@ -34,7 +34,7 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
 
-            if (eStt < ExamStt.Finished)
+            if (eStt < NeeStt.Finished)
                 return l;
 
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
@@ -49,7 +49,7 @@ namespace sQzLib
 
         public override bool ReadByte(byte[] buf, ref int offs)
         {
-            //suppose eStt == ExamStt.Finished
+            //suppose eStt == NeeStt.Finished
             int l = buf.Length - offs;
             //
             if (l < 12)
@@ -118,10 +118,10 @@ namespace sQzLib
 
         public override void Merge(ExamineeA e)
         {
-            if (eStt == ExamStt.Finished)
+            if (eStt == NeeStt.Finished)
                 return;
-            //suppose eStt = eINFO and e.eStt = ExamStt.Finished
-            eStt = ExamStt.Finished;
+            //suppose eStt = eINFO and e.eStt = NeeStt.Finished
+            eStt = NeeStt.Finished;
             bToVw = bToDB = true;
             tComp = e.tComp;
             mAnsSh = e.mAnsSh;

@@ -82,7 +82,7 @@ namespace sQzClient
             WPopup.s.wpCbCncl = WPCancel;
 
             int m = -1, s = -1;
-            if (mNee.eStt < ExamStt.Submitting)
+            if (mNee.eStt < NeeStt.Submitting)
             {
                 string t = Utils.ReadFile("Duration.txt");
                 if (t != null)
@@ -113,9 +113,9 @@ namespace sQzClient
             spMain.Opacity = 0.5;
             WPopup.s.ShowDialog(msg.ToString());
             spMain.Opacity = 1;
-            if (mNee.eStt < ExamStt.Examing)
-                mNee.eStt = ExamStt.Examing;
-            else if (mNee.eStt == ExamStt.Submitting)
+            if (mNee.eStt < NeeStt.Examing)
+                mNee.eStt = NeeStt.Examing;
+            else if (mNee.eStt == NeeStt.Submitting)
                 Submit();
         }
 
@@ -310,7 +310,7 @@ namespace sQzClient
             bRunning = false;
             DisableAll();
             mState = NetCode.Submiting;
-            mNee.eStt = ExamStt.Submitting;
+            mNee.eStt = NeeStt.Submitting;
             mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             mClnt.ConnectWR(ref mCbMsg);
         }

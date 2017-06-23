@@ -17,7 +17,7 @@ namespace sQzLib
 			l.Add(BitConverter.GetBytes(bLog));
             byte[] b;
 
-            if (eStt < ExamStt.Examing || bLog)
+            if (eStt < NeeStt.Examing || bLog)
             {
                 b = Encoding.UTF8.GetBytes(tBirdate);
                 l.Add(BitConverter.GetBytes(b.Length));
@@ -28,12 +28,12 @@ namespace sQzLib
                 l.Add(b);
             }
 
-            if (eStt < ExamStt.Examing)
+            if (eStt < NeeStt.Examing)
                 return l;
 
             l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
 
-            if (eStt < ExamStt.Submitting)
+            if (eStt < NeeStt.Submitting)
                 return l;
 
             l.Add(mAnsSh.aAns);
@@ -48,19 +48,19 @@ namespace sQzLib
             if (l < 4)
                 return true;
             int x;
-            if (Enum.IsDefined(typeof(ExamStt), x = BitConverter.ToInt32(buf, offs)))
-                eStt = (ExamStt)x;
+            if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
+                eStt = (NeeStt)x;
             l -= 4;
             offs += 4;
 
-            if (eStt == ExamStt.Finished)
+            if (eStt == NeeStt.Finished)
             {
                 uGrade = BitConverter.ToInt32(buf, offs);
                 l -= 4;
                 offs += 4;
             }
 
-			if(eStt < ExamStt.Submitting || bLog)
+			if(eStt < NeeStt.Submitting || bLog)
 			{
 				if (l < 4)
 					return true;
@@ -104,9 +104,9 @@ namespace sQzLib
         public override void Merge(ExamineeA e)
         {
             eStt = e.eStt;
-            if (eStt == ExamStt.Finished)
+            if (eStt == NeeStt.Finished)
                 uGrade = e.uGrade;
-            if (eStt < ExamStt.Finished || bLog)
+            if (eStt < NeeStt.Finished || bLog)
             {
                 tBirdate = e.tBirdate;
                 tName = e.tName;

@@ -28,10 +28,10 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((int)eStt));
-            if (eStt == ExamStt.Finished)
+            if (eStt == NeeStt.Finished)
                 l.Add(BitConverter.GetBytes(uGrade));
 
-            if (eStt < ExamStt.Finished || bLog)
+            if (eStt < NeeStt.Finished || bLog)
             {
                 byte[] b = Encoding.UTF8.GetBytes(tBirdate);
                 l.Add(BitConverter.GetBytes(b.Length));
@@ -62,15 +62,15 @@ namespace sQzLib
             offs += 4;
             if (ParseLvId(x))
                 return true;
-            if (Enum.IsDefined(typeof(ExamStt), x = BitConverter.ToInt32(buf, offs)))
-                eStt = (ExamStt)x;
+            if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
+                eStt = (NeeStt)x;
             l -= 4;
             offs += 4;
             bLog = BitConverter.ToBoolean(buf, offs);
             l -= 1;
             offs += 1;
             //
-            if (eStt < ExamStt.Examing || bLog)
+            if (eStt < NeeStt.Examing || bLog)
             {
                 if (l < 4)
                     return true;
@@ -92,7 +92,7 @@ namespace sQzLib
                 offs += sz;
             }
 
-            if (eStt < ExamStt.Examing)
+            if (eStt < NeeStt.Examing)
                 return false;
 
             if (l < 4)
@@ -101,7 +101,7 @@ namespace sQzLib
             l -= 4;
             offs += 4;
 
-            if (eStt < ExamStt.Submitting)
+            if (eStt < NeeStt.Submitting)
                 return false;
 
             if (l < AnsSheet.LEN)
@@ -133,8 +133,8 @@ namespace sQzLib
             l -= 4;
             offs += 4;
 
-            if (Enum.IsDefined(typeof(ExamStt), x = BitConverter.ToInt32(buf, offs)))
-                eStt = (ExamStt)x;
+            if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
+                eStt = (NeeStt)x;
             l -= 4;
             offs += 4;
 
@@ -174,7 +174,7 @@ namespace sQzLib
                 l -= sz;
                 offs += sz;
             }
-            if (eStt < ExamStt.Finished)
+            if (eStt < NeeStt.Finished)
                 return false;
             //
             if (l < 20)
@@ -210,7 +210,7 @@ namespace sQzLib
 
         public List<byte[]> ToByteS()
         {
-            //suppose eStt == ExamStt.Finished
+            //suppose eStt == NeeStt.Finished
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((int)eLv));
             l.Add(BitConverter.GetBytes(uId));
@@ -242,28 +242,28 @@ namespace sQzLib
 
         public void MergeC(ExamineeA e)
         {
-            if (eStt == ExamStt.Finished)
+            if (eStt == NeeStt.Finished)
                 return;
             bLog = e.bLog;
-            if (eStt < ExamStt.Examing || bLog)
+            if (eStt < NeeStt.Examing || bLog)
                 tComp = e.tComp;
-            if (e.eStt < ExamStt.Examing)
-                eStt = ExamStt.Examing;
+            if (e.eStt < NeeStt.Examing)
+                eStt = NeeStt.Examing;
             else
                 eStt = e.eStt;
-            if (eStt < ExamStt.Examing)
+            if (eStt < NeeStt.Examing)
                 return;
             mAnsSh = new AnsSheet();
             mAnsSh.uQSLvId = e.mAnsSh.uQSLvId;
 
-            if (eStt < ExamStt.Submitting)
+            if (eStt < NeeStt.Submitting)
                 return;
             mAnsSh.aAns = e.mAnsSh.aAns;
         }
 
         public void MergeS(ExamineeA e)
         {
-            //suppose e.eStt = ExamStt.Finished
+            //suppose e.eStt = NeeStt.Finished
             eStt = e.eStt;
             dtTim1 = e.dtTim1;
             dtTim2 = e.dtTim2;

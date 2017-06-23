@@ -8,6 +8,13 @@ using System.Text;
 
 namespace sQzLib
 {
+    public enum ExamStt
+    {
+        Prep = 0,
+        Oper,
+        Arch
+    }
+
     public class ExamSlot
     {
         public DateTime mDt;

@@ -143,7 +143,7 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(uId));
             int n = 0;
             foreach (ExamineeA e in vExaminee.Values)
-                if (e.eStt == ExamStt.Finished)
+                if (e.eStt == NeeStt.Finished)
                 {
                     ++n;
                     e.bFromC = false;

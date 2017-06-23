@@ -329,7 +329,7 @@ namespace sQzServer1
                                 break;
                         if (o != null)
                         {
-                            o.eStt = ExamStt.Finished;
+                            o.eStt = NeeStt.Finished;
                             o.mAnsSh = e.mAnsSh;
                             o.uGrade = keySh.Grade(e.mAnsSh.aAns);
                             o.dtTim2 = DateTime.Now;

@@ -1,0 +1,90 @@
+A1	0	Ngô Hứa Phương Anh	01-01-2006	Việt Nam
+A2	0	Trương Nguyễn Phú Anh	01-01-1999	Việt Nam
+A3	0	Phan Thành Đạt	01-01-2002	Việt Nam
+A4	0	Nguyễn Khánh Hưng	01-01-2005	Việt Nam
+A5	0	Nguyễn Thị Kim Huyền	01-01-1996	Việt Nam
+A6	0	Đặng Hoàng Kim	01-01-2001	Việt Nam
+A7	0	Phạm Tấn Long	01-01-2007	Việt Nam
+A8	0	Phan Nhật Long	01-01-2006	Việt Nam
+A9	0	Hồ Thị Bảo Ngân	01-01-1997	Việt Nam
+A10	0	Hà Kim Ngân	01-01-1991	Việt Nam
+A11	0	Võ Thị Kim Ngọc	01-01-1994	Việt Nam
+A12	0	Trần Phương Nguyên	01-01-1971	Việt Nam
+A13	0	Trần Đức Nhã	01-01-1982	Việt Nam
+A14	0	Phan Hoàng Nhật	01-01-2006	Việt Nam
+A15	0	Phan Thái Thùy Nhiên	01-01-1993	Việt Nam
+A16	0	Nguyễn Thị Quỳnh Như	01-01-1997	Việt Nam
+A17	0	Phạm Minh Nhựt	01-01-2007	Việt Nam
+A18	0	Nguyễn An Phú	01-01-2005	Việt Nam
+A19	0	Nguyễn Xuân Phục	01-01-2003	Việt Nam
+A20	0	Trương Minh Phụng	01-01-1982	Việt Nam
+A21	0	Bùi Thị Linh Phương	01-01-1996	Việt Nam
+A22	0	Trương Phú Tài	01-01-2005	Việt Nam
+A23	0	Nguyễn Hồng  Thi	01-01-2000	Việt Nam
+A24	0	Huỳnh Thu	01-01-1982	Việt Nam
+A25	0	Nguyễn Ngọc Anh Thư	01-01-2005	Việt Nam
+A26	0	Nguyễn Ngọc Phương Thy	01-01-2004	Việt Nam
+A27	0	Phan Minh Trang	01-01-1997	Việt Nam
+A28	0	Phạm Kim Tuyền	01-01-2006	Việt Nam
+A29	0	Lê Thị Thanh Vy	01-01-1997	Việt Nam
+A30	0	Lê Thị Ngọc Yến	01-01-1987	Việt Nam
+A31	0	Hà Thị Phương Dạ Thảo	01-01-1991	Việt Nam
+A32	1	Trang Thị Diễm	01-01-1994	Việt Nam
+A33	1	Phạm Bửu Đức	01-01-1997	Việt Nam
+A34	1	Lê Trường Giang	01-01-1987	Việt Nam
+A35	1	Lê Ngọc Lan	01-01-1979	Việt Nam
+A36	1	Dương Thị Thùy Linh	01-01-1998	Việt Nam
+A37	1	Lê Văn Thơ	01-01-1966	Việt Nam
+A38	1	Bùi Minh Thông	01-01-1986	Việt Nam
+A39	1	Trần Thị Hạnh Tiên	01-01-2004	Việt Nam
+A40	1	Huỳnh Thị Bích Trâm	01-01-1997	Việt Nam
+A41	1	Lê Minh Trí	01-01-1996	Việt Nam
+A42	1	Võ Thị Thu Trinh	01-01-1997	Việt Nam
+A43	1	Tạ Thị Thanh Trúc	01-01-1982	Việt Nam
+A44	2	Bùi Tuấn Anh	01-01-1992	Việt Nam
+A45	2	Nguyễn Thị Kim Đào	01-01-1997	Việt Nam
+A46	2	Nguyễn Thị Hạnh Dung	01-01-1997	Việt Nam
+A47	2	Trần Thị Hồng Gấm	01-01-1996	Việt Nam
+A48	2	Trịnh Thị Thúy Hằng	01-01-1988	Việt Nam
+A49	2	Nguyễn Thị Thu Hồng	01-01-1997	Việt Nam
+A50	2	Trương Thị Mỹ Hương	01-01-1997	Việt Nam
+A51	2	Đào Lê Uyên Khánh	01-01-2005	Việt Nam
+A52	2	Võ Thị Hồng Mận	01-01-1994	Việt Nam
+A53	2	Chu Thị Thanh Nhã	01-01-1997	Việt Nam
+A54	2	Nguyễn Huỳnh Nhi	01-01-2004	Việt Nam
+A55	2	Nguyễn Ngọc Phương Nhi	01-01-2006	Việt Nam
+A56	2	Huỳnh Ngọc Pary	01-01-1984	Việt Nam
+A57	2	Trần Diễm Phúc	01-01-1997	Việt Nam
+A58	2	Võ Thị Mỹ Phụng	01-01-1997	Việt Nam
+A59	2	Nguyễn Thị Bích Phương	01-01-1997	Việt Nam
+A60	2	Nguyễn Thị Kim Quyên	01-01-1997	Việt Nam
+A61	2	Đỗ Tuấn Thanh	01-01-1991	Việt Nam
+A62	2	Trần Trung Thành	01-01-1985	Việt Nam
+A63	2	Phạm Thị Phương Thảo	01-01-1997	Việt Nam
+A64	2	Nguyễn Thị Cẩm Tiên	01-01-1996	Việt Nam
+A65	2	Nguyễn Thị Cẩm Tiên	01-01-1996	Việt Nam
+A66	2	Lê Thị Cẩm Tiên	01-01-1996	Việt Nam
+A67	2	Huỳnh Thị Bích Trâm	01-01-1997	Việt Nam
+A68	2	Nguyễn Trần Thiên Trang	01-01-1999	Việt Nam
+A69	2	Nguyễn Thị Lệ  Trinh	01-01-1997	Việt Nam
+A70	2	Phan Minh Trung	01-01-1997	Việt Nam
+A71	2	Nguyễn Anh Tuấn	01-01-2006	Việt Nam
+A72	2	Phan Thụy Mỹ Tuyền	01-01-1995	Việt Nam
+A73	2	Trần Thị Hoàng Uyên	01-01-1998	Việt Nam
+A74	5	Lê Ngọc Kim  Ánh	01-01-2005	Việt Nam
+A75	5	Phạm Thị Thúy Đào	01-01-1995	Việt Nam
+A76	5	Phạm Duy	01-01-1987	Việt Nam
+A77	5	Châu Gia Hòa	01-01-2005	Việt Nam
+A78	5	Trần Thị Cẩm Hồng	01-01-1990	Việt Nam
+A79	5	Phan Nguyễn Quang Huy	01-01-2004	Việt Nam
+A80	5	Nguyễn Trần Kim Khánh	01-01-1990	Việt Nam
+A81	5	Lê Thị Kim Ngân	01-01-1979	Việt Nam
+A82	5	Trần Đức Nhã	01-01-1982	Việt Nam
+A83	5	Phạm Hoàng Yến Nhi	01-01-2005	Việt Nam
+A84	5	Nguyễn Thị Huyền Phương	01-01-1994	Việt Nam
+A85	5	Phạm Lệ  Quyền	01-01-1980	Việt Nam
+A86	5	Nguyễn Ngọc Duy Tân	01-01-2004	Việt Nam
+A87	5	Dương Thị Kim Thủy	01-01-1995	Việt Nam
+A88	5	Lê Ngọc Trâm	01-01-1996	Việt Nam
+A89	5	Huỳnh Thị Tường Vy	01-01-1996	Việt Nam
+A90	5	Phạm Hoàng Tường Vy	01-01-2004	Việt Nam

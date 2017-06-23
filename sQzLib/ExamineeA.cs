@@ -10,7 +10,7 @@ namespace sQzLib
         B = 'B'
     }
 
-    public enum ExamStt
+    public enum NeeStt
     {
          Signing = 0,
          Info,
@@ -24,7 +24,7 @@ namespace sQzLib
     {
         public const int LV_CAP = 10000;//db sqz_examinee `id` SMALLINT UNSIGNED
         public DateTime mDt;
-        public ExamStt eStt;
+        public NeeStt eStt;
         public ExamLv eLv;
         public int uId;
         public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + LV_CAP; } }
@@ -62,7 +62,7 @@ namespace sQzLib
             tName = null;
             tBirdate = null;
             tBirthplace = null;
-            eStt = ExamStt.Signing;
+            eStt = NeeStt.Signing;
             uGrade = ExamineeA.LV_CAP;
             dtTim1 = dtTim2 = DT.INV_;
             tComp = string.Empty;
@@ -185,7 +185,7 @@ namespace sQzLib
             w.Write((int)eStt);
             w.Write(mAnsSh.uQSId);
             w.Write(mAnsSh.aAns, 0, AnsSheet.LEN);
-            if (eStt == ExamStt.Finished)
+            if (eStt == NeeStt.Finished)
             {
                 w.Write(dtTim1.Hour);
                 w.Write(dtTim1.Minute);
@@ -218,12 +218,12 @@ namespace sQzLib
             if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
                 eLv = (ExamLv)x;
             uId = r.ReadInt32();
-            if (Enum.IsDefined(typeof(ExamStt), x = r.ReadInt32()))
-                eStt = (ExamStt)x;
+            if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
+                eStt = (NeeStt)x;
             mAnsSh.uQSLvId = r.ReadInt32();
             mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
             int h, m;
-            if(eStt == ExamStt.Finished)
+            if(eStt == NeeStt.Finished)
             {
                 h = r.ReadInt32();
                 m = r.ReadInt32();

@@ -362,17 +362,14 @@ namespace sQzServer0
             txtIU.Text = t._[(int)TxI.IUS];
             tbi1.Header = t._[(int)TxI.PREP_DT_T];
             tbi2.Header = t._[(int)TxI.PREP_Q];
-            txtNeeDB.Text = t._[(int)TxI.NEE_LS_DB];
-            btnDBDelNee.Content = t._[(int)TxI.PREP_DEL];
             txtId.Text = t._[(int)TxI.NEEID_S];
             txtName.Text = t._[(int)TxI.NEE_NAME];
             txtBirdate.Text = t._[(int)TxI.BIRDATE];
             txtBirpl.Text = t._[(int)TxI.BIRPL];
             txtRoom.Text = t._[(int)TxI.ROOM];
-            txtNeeTmp.Text = t._[(int)TxI.NEE_LS_TMP];
-            btnImpDBNee.Content = t._[(int)TxI.PREP_IMP];
-            btnFileNee.Content = "+";// t._[(int)TxI.PREP_LD_FL];
-            btnTmpDelNee.Content = t._[(int)TxI.PREP_DEL];
+            btnImp.Content = t._[(int)TxI.PREP_IMP];
+            btnFile.Content = "+";// t._[(int)TxI.PREP_LD_FL];
+            btnDel.Content = t._[(int)TxI.PREP_DEL];
             txtDBQ.Text = t._[(int)TxI.Q_DB];
             btnAllQ.Content = t._[(int)TxI.SEL_ALL];
             btnDelQ.Content = t._[(int)TxI.DEL];
@@ -434,6 +431,7 @@ namespace sQzServer0
             pnv.DeepCopy(refSl);
             pnv.Show(true);
             tbcNee.Items.Add(pnv);
+            pnv.Focus();
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)
