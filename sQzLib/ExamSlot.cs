@@ -99,11 +99,23 @@ namespace sQzLib
                         eline.Append(i.ToString() + ", ");
                         continue;
                     }
-                    if(vRoom[urid].vExaminee.ContainsKey(e.uId) || o.vRoom[urid].vExaminee.ContainsKey(e.uId))
-                    {
-                        dup.Append(e.eLv.ToString() + e.uId + ", ");
+                    bool bCont = false;
+                    foreach(ExamRoom ro in vRoom.Values)
+                        if(ro.vExaminee.ContainsKey(e.uId))
+                        {
+                            dup.Append(e.eLv.ToString() + e.uId + ", ");
+                            bCont = true;
+                        }
+                    if (bCont)
                         continue;
-                    }
+                    foreach (ExamRoom ro in o.vRoom.Values)
+                        if (ro.vExaminee.ContainsKey(e.uId))
+                        {
+                            dup.Append(e.eLv.ToString() + e.uId + ", ");
+                            bCont = true;
+                        }
+                    if (bCont)
+                        continue;
                     e.mDt = mDt;
                     e.tName = v[2].Trim();
                     DateTime dt;
