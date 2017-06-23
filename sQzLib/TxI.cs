@@ -79,8 +79,6 @@ namespace sQzLib {
 		NEE_ADD,
 		Q_ADD,
 		DB,
-		SEL_ALL,
-		DEL,
 		IUS,
 		IU01,
 		IU02,
@@ -129,6 +127,8 @@ namespace sQzLib {
 		RDO_NEE,
 		PREP_DEL,
 		PREP_IMP,
+		SEL_ALL,
+		PREP_DEL_SEL,
 		PREP_DT_T,
 		PREP_Q,
 	}

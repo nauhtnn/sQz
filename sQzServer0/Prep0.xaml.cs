@@ -24,7 +24,6 @@ namespace sQzServer0
     public partial class Prep0 : Page
     {
         List<CheckBox> vChk;
-        List<int> vQId;
         IUx mSelQCat;
         QuestSheet mDBQS;
         QuestSheet mTmpQS;
@@ -37,6 +36,7 @@ namespace sQzServer0
             mDBQS = new QuestSheet();
             mTmpQS = new QuestSheet();
             mBrd = new ExamBoard();
+            vChk = new List<CheckBox>();
         }
 
         private void btnMMenu_Click(object sender, RoutedEventArgs e)
@@ -227,6 +227,8 @@ namespace sQzServer0
             string fpath = null;
             if (result == true)
                 fpath = dlg.FileName;
+            else
+                return;
             if (fpath.EndsWith(".docx"))
                 mTmpQS.ReadDocx(fpath);
             else
@@ -246,8 +248,7 @@ namespace sQzServer0
             int x = -1;
             gDBQuest.Children.Clear();
             gDBQuest.RowDefinitions.Clear();
-            vChk = new List<CheckBox>();
-            vQId = new List<int>();
+            vChk.Clear();
             double w = gDBQuest.ColumnDefinitions.First().Width.Value;
             foreach (Question q in mDBQS.ShallowCopy())
             {
@@ -283,9 +284,11 @@ namespace sQzServer0
                 Grid.SetColumn(chk, 1);
                 Grid.SetRow(chk, x);
                 gDBQuest.Children.Add(chk);
-                vQId.Add(q.uId);
                 vChk.Add(chk);
             }
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], mDBQS.Count);
+            tbiDBQ.Header = sb.ToString();
         }
 
         private void ShowTmpQ()
@@ -327,9 +330,12 @@ namespace sQzServer0
                 }
             }
             svwrTmpQ.Content = sp;
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], mTmpQS.Count);
+            tbiTmpQ.Header = sb.ToString();
         }
 
-        private void btnImpDBQ_Click(object sender, RoutedEventArgs e)
+        private void btnImpQ_Click(object sender, RoutedEventArgs e)
         {
             if (mSelQCat != IUx._0 && 0 < mTmpQS.Count)
             {
@@ -337,6 +343,9 @@ namespace sQzServer0
                 svwrTmpQ.Content = null;
                 mTmpQS.DBIns(mSelQCat);
                 mTmpQS.Clear();
+                StringBuilder sb = new StringBuilder();
+                sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], 0);
+                tbiTmpQ.Header = sb.ToString();
                 mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
                 ShowDBQ();
             }
@@ -368,20 +377,15 @@ namespace sQzServer0
             txtBirpl.Text = t._[(int)TxI.BIRPL];
             txtRoom.Text = t._[(int)TxI.ROOM];
             btnImp.Content = t._[(int)TxI.PREP_IMP];
-            btnFile.Content = "+";// t._[(int)TxI.PREP_LD_FL];
             btnDel.Content = t._[(int)TxI.PREP_DEL];
-            txtDBQ.Text = t._[(int)TxI.Q_DB];
-            btnAllQ.Content = t._[(int)TxI.SEL_ALL];
-            btnDelQ.Content = t._[(int)TxI.DEL];
-            btnImpDBQ.Content = "<<";// t._[(int)TxI.PREP_IMP];
-            txtTmpQ.Text = t._[(int)TxI.Q_TMP];
-            btnFileQ.Content = "+";// t._[(int)TxI.Q_ADD];
-        }
-
-        private void btnAllQ_Click(object sender, RoutedEventArgs e)
-        {
-            foreach (CheckBox c in vChk)
-                c.IsChecked = true;
+            btnDelQ.Content = t._[(int)TxI.PREP_DEL_SEL];
+            btnImpQ.Content = t._[(int)TxI.PREP_IMP];
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], 0);
+            tbiDBQ.Header = sb.ToString();
+            sb.Clear();
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0);
+            tbiTmpQ.Header = sb.ToString();
         }
 
         private void btnDelQ_Click(object sender, RoutedEventArgs e)
@@ -406,14 +410,6 @@ namespace sQzServer0
                 mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
                 ShowDBQ();
             }
-        }
-
-        private void btnHistory_Click(object sender, RoutedEventArgs e)
-        {
-            Dispatcher.Invoke(() =>
-            {
-                NavigationService.Navigate(new Uri("ExamHistory.xaml", UriKind.Relative));
-            });
         }
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
@@ -445,6 +441,18 @@ namespace sQzServer0
                     tbcNee.Items.Remove(ti);
                     break;
                 }
+        }
+
+        private void CheckBox_Checked(object sender, RoutedEventArgs e)
+        {
+            foreach (CheckBox c in vChk)
+                c.IsChecked = true;
+        }
+
+        private void CheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            foreach (CheckBox c in vChk)
+                c.IsChecked = false;
         }
     }
 }

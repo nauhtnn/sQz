@@ -27,7 +27,7 @@
                     <TextBlock Name="txtHm" TextAlignment="Center"/>
                     <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
                         <TextBox x:Name="tbxSl" Height="30" Width="50" />
-                        <Button x:Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click" Background="#1c64e7" Foreground="#fff"/>
+                        <Button Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click" Background="#1c64e7" Foreground="#fff"/>
                     </StackPanel>
                     <ListBox x:Name="lbxSl" Width="80" Height="120" SelectionMode="Multiple"/>
                 </StackPanel>
@@ -41,34 +41,48 @@
                 <TabControl x:Name="tbcNee" Width="1010"/>
             </TabItem>
             <TabItem Name="tbi2">
-                <StackPanel x:Name="spQ" Orientation="Horizontal">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Name="txtDBQ" Width="250"/>
-                            <Button Name="btnAllQ" Click="btnAllQ_Click" Width="120" Height="40" Margin="65,0,0,0" HorizontalAlignment="Right"/>
-                            <Button x:Name="btnDelQ" Grid.Column="1" Click="btnDelQ_Click"  Width="40" Height="40" Background="#f15a23" Foreground="#fff"/>
-                        </StackPanel>
-                        <ScrollViewer Width="495" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
-                            <Grid x:Name="gDBQuest">
+                <TabControl>
+                    <TabItem Name="tbiDBQ">
+                        <StackPanel>
+                            <Grid>
                                 <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="455"/>
+                                    <ColumnDefinition Width="960"/>
                                     <ColumnDefinition Width="40"/>
                                 </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                </Grid.RowDefinitions>
+                                <Button Name="btnDelQ" Click="btnDelQ_Click" Width="160" Background="#f15a23" Foreground="#fff"/>
+                                <CheckBox Grid.Column="1" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
                             </Grid>
-                        </ScrollViewer>
-                    </StackPanel>
-                    <StackPanel>
-                        <Button x:Name="btnFileQ" Height="40" Width="40" Click="btnFileQ_Click" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
-                        <Button x:Name="btnImpDBQ" Height="40" Width="40" Click="btnImpDBQ_Click" Background="#80cc28" Foreground="#fff" FontWeight="Bold" Margin="5,0,5,0"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Name="txtTmpQ" Width="250"/>
+                            <ScrollViewer Width="1000" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
+                                <Grid Name="gDBQuest">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="960"/>
+                                        <ColumnDefinition Width="40"/>
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                            </ScrollViewer>
                         </StackPanel>
-                        <ScrollViewer Name="svwrTmpQ" Width="455" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
-                        </ScrollViewer>
-                    </StackPanel>
-                </StackPanel>
+                    </TabItem>
+                    <TabItem Name="tbiTmpQ">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="40"/>
+                                </Grid.RowDefinitions>
+                                <Button Content="+" Width="40" Click="btnFileQ_Click" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
+                                <Button x:Name="btnImpQ" Width="120" Click="btnImpQ_Click" Background="#80cc28" Foreground="#fff" Grid.Column="1"/>
+                            </Grid>
+                            <ScrollViewer Name="svwrTmpQ" Width="1000" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
+                            </ScrollViewer>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
             </TabItem>
         </TabControl>
         <StackPanel x:Name="refSl" Visibility="Collapsed">
