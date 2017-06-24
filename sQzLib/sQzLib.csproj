@@ -67,12 +67,11 @@
     <Compile Include="Question.cs" />
     <Compile Include="Server2.cs" />
     <Compile Include="Settings.cs" />
-    <Compile Include="Theme.xaml.cs">
-      <DependentUpon>Theme.xaml</DependentUpon>
-    </Compile>
+    <Compile Include="Theme.xaml.cs" />
     <Compile Include="TxI.cs" />
     <Compile Include="Txt.cs" />
     <Compile Include="Utils.cs" />
+    <Compile Include="WPopup.cs" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="NetFwTypeLib">
@@ -84,12 +83,6 @@
       <Isolated>False</Isolated>
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
-  </ItemGroup>
-  <ItemGroup>
-    <Page Include="Theme.xaml">
-      <SubType>Designer</SubType>
-      <Generator>MSBuild:Compile</Generator>
-    </Page>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

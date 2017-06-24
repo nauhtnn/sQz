@@ -57,57 +57,55 @@ namespace sQzServer0
 
         public void ShowExaminee()
         {
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            SolidColorBrush br = new SolidColorBrush(c);
-            bool dark = false;
+            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
+            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
+            SolidColorBrush bg;
+            bool even = false;
             int rid = -1;
             GridLength rh = new GridLength(26);
             foreach (ExamRoom r in mSl.vRoom.Values)
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
                     rid++;
+                    if (even)
+                        bg = evenbg;
+                    else
+                        bg = oddbg;
+                    even = !even;
                     RowDefinition rd = new RowDefinition();
                     rd.Height = rh;
                     grdNee.RowDefinitions.Add(rd);
                     TextBlock t = new TextBlock();
                     t.Text = e.tId;
-                    if (dark)
-                        t.Background = br;
+                    t.Background = bg;
                     Grid.SetRow(t, rid);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tName;
-                    if (dark)
-                        t.Background = br;
+                    t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tBirdate;
-                    if (dark)
-                        t.Background = br;
+                    t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 2);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tBirthplace;
-                    if (dark)
-                        t.Background = br;
+                    t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    if (dark)
-                        t.Background = br;
+                    t.Background = bg;
                     t.Text = (r.uId + 1).ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    if (dark)
-                        t.Background = br;
+                    t.Background = bg;
                     int lvid = e.LvId;
                     vGrade.Add(lvid, t);
                     if (e.uGrade != ExamineeA.LV_CAP)
@@ -116,8 +114,7 @@ namespace sQzServer0
                     Grid.SetColumn(t, 5);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    if (dark)
-                        t.Background = br;
+                    t.Background = bg;
                     vDt1.Add(lvid, t);
                     if (e.dtTim1.Year != DT.INV)
                         t.Text = e.dtTim1.ToString("HH:mm");
@@ -125,8 +122,7 @@ namespace sQzServer0
                     Grid.SetColumn(t, 6);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    if (dark)
-                        t.Background = br;
+                    t.Background = bg;
                     vDt2.Add(lvid, t);
                     if (e.dtTim2.Year != DT.INV)
                         t.Text = e.dtTim2.ToString("HH:mm");
@@ -134,15 +130,13 @@ namespace sQzServer0
                     Grid.SetColumn(t, 7);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    if (dark)
-                        t.Background = br;
+                    t.Background = bg;
                     vComp.Add(lvid, t);
                     if (e.tComp != null)
                         t.Text = e.tComp;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 8);
                     grdNee.Children.Add(t);
-                    dark = !dark;
                 }
         }
 
@@ -175,6 +169,7 @@ namespace sQzServer0
                 DeepCopy(refp);
 
             tbcQ = new TabControl();
+            tbcQ.Width = refTbi.Width;
             foreach (Grid refg in refsp.Children.OfType<Grid>())
             {
                 Grid g = new Grid();
@@ -295,26 +290,32 @@ namespace sQzServer0
             svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             StackPanel sp = new StackPanel();
             int x = 0;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            SolidColorBrush evenbg = new SolidColorBrush(c);
+            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
+            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
+            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
             SolidColorBrush bg;
             bool even = false;
+
             foreach (Question q in qs.ShallowCopy())
             {
-                if (even)
+                if (q.bDiff)
+                    bg = difbg;
+                else if (even)
                     bg = evenbg;
                 else
-                    bg = null;
+                    bg = oddbg;
                 even = !even;
                 TextBlock i = new TextBlock();
+                i.Width = tbcQ.Width - SystemParameters.ScrollWidth;
+                i.TextWrapping = TextWrapping.Wrap;
                 i.Text = ++x + ". " + q.Stmt;
                 i.Background = bg;
                 sp.Children.Add(i);
                 for (int idx = 0; idx < Question.N_ANS; ++idx)
                 {
                     TextBlock j = new TextBlock();
+                    j.Width = tbcQ.Width - SystemParameters.ScrollWidth;
+                    j.TextWrapping = TextWrapping.Wrap;
                     j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
                     j.Background = bg;
                     if (q.vKeys[idx])

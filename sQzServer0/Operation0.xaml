@@ -123,7 +123,7 @@
                     <TextBlock x:Name="lblStatus" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"/>
                 </ScrollViewer>
             </TabItem>
-            <TabItem x:Name="tbiSl" Visibility="Collapsed">
+            <TabItem x:Name="tbiSl" Visibility="Collapsed" Width="876">
                 <StackPanel>
                     <Grid>
                         <Grid.ColumnDefinitions>

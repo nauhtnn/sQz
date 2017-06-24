@@ -238,12 +238,10 @@ namespace sQzServer0
 
         private void ShowDBQ()
         {
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            SolidColorBrush evenbg = new SolidColorBrush(Colors.Wheat);
-            SolidColorBrush oddbg = new SolidColorBrush(Colors.White);
-            SolidColorBrush bg = evenbg;
+            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
+            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
+            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
+            SolidColorBrush bg;
             bool even = false;
             int x = -1;
             gDBQuest.Children.Clear();
@@ -268,7 +266,9 @@ namespace sQzServer0
                         j.FontWeight = FontWeights.Bold;
                     sp.Children.Add(j);
                 }
-                if (even)
+                if (q.bDiff)
+                    bg = difbg;
+                else if (even)
                     bg = evenbg;
                 else
                     bg = oddbg;
@@ -293,12 +293,10 @@ namespace sQzServer0
 
         private void ShowTmpQ()
         {
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            SolidColorBrush evenbg = new SolidColorBrush(Colors.Wheat);
-            SolidColorBrush oddbg = new SolidColorBrush(Colors.White);
-            SolidColorBrush bg = evenbg;
+            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
+            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
+            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
+            SolidColorBrush bg;
             bool even = false;
             int x = -1;
             double w = svwrTmpQ.Width;
@@ -310,7 +308,9 @@ namespace sQzServer0
                 i.Text = (++x + 1) + ". " + q.Stmt;
                 i.Width = w;
                 i.TextWrapping = TextWrapping.Wrap;
-                if (even)
+                if (q.bDiff)
+                    bg = difbg;
+                else if (even)
                     bg = evenbg;
                 else
                     bg = oddbg;
