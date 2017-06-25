@@ -160,9 +160,6 @@ namespace sQzServer0
         {
             Application.Current.MainWindow.FontSize = 16;
 
-            double rt = spMain.RenderSize.Width / 1280;
-            spMain.RenderTransform = new ScaleTransform(rt, rt);
-
             LoadTxt();
 
             InitLbxQCatgry();

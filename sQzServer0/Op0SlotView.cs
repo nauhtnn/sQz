@@ -23,7 +23,7 @@ namespace sQzServer0
         public SortedList<int, TextBlock> vComp;
         Grid grdNee;
         public ExamSlot mSl;
-        Dictionary<ExamLv, int[]> vNEsyDif, vNDiff;
+        Dictionary<ExamLv, int[]> vNEsyDif, vNDiff, vN, vND;
         bool bInitNMod;
 
         public Op0SlotView()
@@ -52,6 +52,12 @@ namespace sQzServer0
             vNDiff.Add(ExamLv.A, null);
             vNEsyDif.Add(ExamLv.B, null);
             vNDiff.Add(ExamLv.B, null);
+            vN = new Dictionary<ExamLv, int[]>();
+            vND = new Dictionary<ExamLv, int[]>();
+            vN.Add(ExamLv.A, null);
+            vND.Add(ExamLv.A, null);
+            vN.Add(ExamLv.B, null);
+            vND.Add(ExamLv.B, null);
             bInitNMod = false;
         }
 
@@ -338,10 +344,12 @@ namespace sQzServer0
             foreach (QuestPack p in mSl.vQPack.Values)
             {
                 List<int[]> l = p.GetNMod();
-                if(l != null)
+                if(l != null && l.Count == 4)
                 {
                     vNEsyDif[p.eLv] = l[0];
                     vNDiff[p.eLv] = l[1];
+                    vN[p.eLv] = l[2];
+                    vND[p.eLv] = l[3];
                 }
             }
         }
@@ -353,6 +361,8 @@ namespace sQzServer0
             List<int[]> rv = new List<int[]>();
             rv.Add(vNEsyDif[lv]);
             rv.Add(vNDiff[lv]);
+            rv.Add(vN[lv]);
+            rv.Add(vND[lv]);
             return rv;
         }
 

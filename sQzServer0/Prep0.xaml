@@ -9,114 +9,116 @@
       ShowsNavigationUI="False"
       Title="Prep0">
 
-    <StackPanel x:Name="spMain" Loaded="Main_Loaded" Orientation="Horizontal" Margin="10" Background="#f0f0f0">
-        <StackPanel Width="240">
-            <Button x:Name="btnMMenu"  Width="120" Height="40" Click="btnMMenu_Click" Background="#f15a23" Foreground="#fff"
+    <Viewbox>
+        <StackPanel x:Name="spMain" Loaded="Main_Loaded" Orientation="Horizontal" Margin="10" Background="#f0f0f0" Height="720" Width="1280">
+            <StackPanel Width="240">
+                <Button x:Name="btnMMenu"  Width="120" Height="40" Click="btnMMenu_Click" Background="#f15a23" Foreground="#fff"
                         Margin="0,10,0,0"/>
-            <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
-            <StackPanel Orientation="Horizontal">
-                <StackPanel>
-                    <TextBlock Name="txtDt" TextAlignment="Center"/>
-                    <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
-                        <TextBox Name="tbxBrd" Height="30" Width="90" />
-                        <Button Name="btnInsBrd"  Content="+" Height="30" Width="30" Click="btnInsBrd_Click" Background="#1c64e7" Foreground="#fff"/>
+                <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
+                <StackPanel Orientation="Horizontal">
+                    <StackPanel>
+                        <TextBlock Name="txtDt" TextAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
+                            <TextBox Name="tbxBrd" Height="30" Width="90" />
+                            <Button Name="btnInsBrd"  Content="+" Height="30" Width="30" Click="btnInsBrd_Click" Background="#1c64e7" Foreground="#fff"/>
+                        </StackPanel>
+                        <ListBox x:Name="lbxBrd" Width="120" Height="120" SelectionChanged="lbxBrd_SelectionChanged"/>
                     </StackPanel>
-                    <ListBox x:Name="lbxBrd" Width="120" Height="120" SelectionChanged="lbxBrd_SelectionChanged"/>
-                </StackPanel>
-                <StackPanel>
-                    <TextBlock Name="txtHm" TextAlignment="Center"/>
-                    <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
-                        <TextBox x:Name="tbxSl" Height="30" Width="50" />
-                        <Button Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click" Background="#1c64e7" Foreground="#fff"/>
+                    <StackPanel>
+                        <TextBlock Name="txtHm" TextAlignment="Center"/>
+                        <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
+                            <TextBox x:Name="tbxSl" Height="30" Width="50" />
+                            <Button Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click" Background="#1c64e7" Foreground="#fff"/>
+                        </StackPanel>
+                        <ListBox x:Name="lbxSl" Width="80" Height="120" SelectionMode="Multiple"/>
                     </StackPanel>
-                    <ListBox x:Name="lbxSl" Width="80" Height="120" SelectionMode="Multiple"/>
                 </StackPanel>
+                <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
+                <TextBlock Name="txtIU" Margin="0,0,0,10" HorizontalAlignment="Center"/>
+                <ListBox x:Name="lbxQCatgry" Width="200" Height="410" SelectionChanged="lbxQCatgry_SelectionChanged"/>
             </StackPanel>
-            <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
-            <TextBlock Name="txtIU" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-            <ListBox x:Name="lbxQCatgry" Width="200" Height="410" SelectionChanged="lbxQCatgry_SelectionChanged"/>
-        </StackPanel>
-        <TabControl Margin="10,0,0,0">
-            <TabItem Name="tbi1">
-                <TabControl x:Name="tbcNee" Width="1010"/>
-            </TabItem>
-            <TabItem Name="tbi2">
-                <TabControl>
-                    <TabItem Name="tbiDBQ">
-                        <StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="960"/>
-                                    <ColumnDefinition Width="40"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="40"/>
-                                </Grid.RowDefinitions>
-                                <Button Name="btnDelQ" Click="btnDelQ_Click" Width="160" Background="#f15a23" Foreground="#fff"/>
-                                <CheckBox Grid.Column="1" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
-                            </Grid>
-                            <ScrollViewer Width="1000" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
-                                <Grid Name="gDBQuest">
+            <TabControl Margin="10,0,0,0">
+                <TabItem Name="tbi1">
+                    <TabControl x:Name="tbcNee" Width="1010"/>
+                </TabItem>
+                <TabItem Name="tbi2">
+                    <TabControl>
+                        <TabItem Name="tbiDBQ">
+                            <StackPanel>
+                                <Grid>
                                     <Grid.ColumnDefinitions>
                                         <ColumnDefinition Width="960"/>
                                         <ColumnDefinition Width="40"/>
                                     </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="40"/>
+                                    </Grid.RowDefinitions>
+                                    <Button Name="btnDelQ" Click="btnDelQ_Click" Width="160" Background="#f15a23" Foreground="#fff"/>
+                                    <CheckBox Grid.Column="1" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
                                 </Grid>
-                            </ScrollViewer>
-                        </StackPanel>
-                    </TabItem>
-                    <TabItem Name="tbiTmpQ">
-                        <StackPanel>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="*"/>
-                                </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="40"/>
-                                </Grid.RowDefinitions>
-                                <Button Content="+" Width="40" Click="btnFileQ_Click" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
-                                <Button x:Name="btnImpQ" Width="120" Click="btnImpQ_Click" Background="#80cc28" Foreground="#fff" Grid.Column="1"/>
-                            </Grid>
-                            <ScrollViewer Name="svwrTmpQ" Width="1000" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
-                            </ScrollViewer>
-                        </StackPanel>
-                    </TabItem>
-                </TabControl>
-            </TabItem>
-        </TabControl>
-        <StackPanel x:Name="refSl" Visibility="Collapsed">
-            <Grid Name="grdTit" Margin="0,10,0,10">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                    <ColumnDefinition Width="*"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="40"/>
-                </Grid.RowDefinitions>
-                <Button Name="btnFile" Width="40" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
-                <Button Name="btnImp" Width="120" Grid.Column="1" Background="#80cc28" Foreground="#fff"/>
-                <Button Name="btnDel" Width="120" Grid.Column="2" Background="#f15a23" Foreground="#fff"/>
-            </Grid>
-            <Grid Name="grdNee">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="80"/>
-                    <ColumnDefinition Width="300"/>
-                    <ColumnDefinition Width="120"/>
-                    <ColumnDefinition Width="300"/>
-                    <ColumnDefinition Width="80"/>
-                </Grid.ColumnDefinitions>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="50"/>
-                </Grid.RowDefinitions>
-                <TextBlock Name="txtId" Background="Coral" TextAlignment="Center"/>
-                <TextBlock Name="txtName" Grid.Column="1" Background="Brown" TextAlignment="Center"/>
-                <TextBlock Name="txtBirdate" Grid.Column="2" Background="Cyan" TextAlignment="Center"/>
-                <TextBlock Name="txtBirpl" Grid.Column="3" Background="Gold" TextAlignment="Center"/>
-                <TextBlock Name="txtRoom" Grid.Column="4" Background="Blue" TextAlignment="Center"/>
-            </Grid>
-            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="540"/>
+                                <ScrollViewer Width="1000" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
+                                    <Grid Name="gDBQuest">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="960"/>
+                                            <ColumnDefinition Width="40"/>
+                                        </Grid.ColumnDefinitions>
+                                    </Grid>
+                                </ScrollViewer>
+                            </StackPanel>
+                        </TabItem>
+                        <TabItem Name="tbiTmpQ">
+                            <StackPanel>
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="*"/>
+                                    </Grid.ColumnDefinitions>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="40"/>
+                                    </Grid.RowDefinitions>
+                                    <Button Content="+" Width="40" Click="btnFileQ_Click" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
+                                    <Button x:Name="btnImpQ" Width="120" Click="btnImpQ_Click" Background="#80cc28" Foreground="#fff" Grid.Column="1"/>
+                                </Grid>
+                                <ScrollViewer Name="svwrTmpQ" Width="1000" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
+                                </ScrollViewer>
+                            </StackPanel>
+                        </TabItem>
+                    </TabControl>
+                </TabItem>
+            </TabControl>
+            <StackPanel x:Name="refSl" Visibility="Collapsed">
+                <Grid Name="grdTit" Margin="0,10,0,10">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="40"/>
+                    </Grid.RowDefinitions>
+                    <Button Name="btnFile" Width="40" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
+                    <Button Name="btnImp" Width="120" Grid.Column="1" Background="#80cc28" Foreground="#fff"/>
+                    <Button Name="btnDel" Width="120" Grid.Column="2" Background="#f15a23" Foreground="#fff"/>
+                </Grid>
+                <Grid Name="grdNee">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="80"/>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="120"/>
+                        <ColumnDefinition Width="300"/>
+                        <ColumnDefinition Width="80"/>
+                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="50"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Name="txtId" Background="Coral" TextAlignment="Center"/>
+                    <TextBlock Name="txtName" Grid.Column="1" Background="Brown" TextAlignment="Center"/>
+                    <TextBlock Name="txtBirdate" Grid.Column="2" Background="Cyan" TextAlignment="Center"/>
+                    <TextBlock Name="txtBirpl" Grid.Column="3" Background="Gold" TextAlignment="Center"/>
+                    <TextBlock Name="txtRoom" Grid.Column="4" Background="Blue" TextAlignment="Center"/>
+                </Grid>
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Height="540"/>
+            </StackPanel>
         </StackPanel>
-    </StackPanel>
+    </Viewbox>
 </Page>

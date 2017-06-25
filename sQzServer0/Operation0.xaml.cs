@@ -27,7 +27,9 @@ namespace sQzServer0
         bool bRunning;
         ExamBoard mBrd;
         Dictionary<ExamLv, TextBox[]> vtxtNEsyDif;
+        Dictionary<ExamLv, TextBlock[]> vtxtN;
         Dictionary<ExamLv, TextBox[]> vtxtNDiff;
+        Dictionary<ExamLv, TextBlock[]> vtxtND;
         TabItem tbiSelected;
 
         public Operation0()
@@ -86,29 +88,69 @@ namespace sQzServer0
             vtxtNEsyDif = new Dictionary<ExamLv, TextBox[]>();
             vtxtNEsyDif.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
             vtxtNEsyDif.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
+            vtxtN = new Dictionary<ExamLv, TextBlock[]>();
+            vtxtN.Add(ExamLv.A, new TextBlock[QuestSheet.GetIUs(ExamLv.A).Count()]);
+            vtxtN.Add(ExamLv.B, new TextBlock[QuestSheet.GetIUs(ExamLv.B).Count()]);
             vtxtNDiff = new Dictionary<ExamLv, TextBox[]>();
             vtxtNDiff.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
             vtxtNDiff.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
+            vtxtND = new Dictionary<ExamLv, TextBlock[]>();
+            vtxtND.Add(ExamLv.A, new TextBlock[QuestSheet.GetIUs(ExamLv.A).Count()]);
+            vtxtND.Add(ExamLv.B, new TextBlock[QuestSheet.GetIUs(ExamLv.B).Count()]);
             int i = -1, j = -1;
             foreach (TextBox tbx in grdA.Children.OfType<TextBox>())
             {
                 if (Grid.GetColumn(tbx) == 1)
+                {
                     vtxtNEsyDif[ExamLv.A][++i] = tbx;
+                    tbx.Name = "n" + i;
+                }
                 else
                 {
                     vtxtNDiff[ExamLv.A][++j] = tbx;
-                    tbx.Name = "_" + j;
+                    tbx.Name = "d" + j;
                 }
             }
             i = j = -1;
             foreach (TextBox tbx in grdB.Children.OfType<TextBox>())
             {
                 if (Grid.GetColumn(tbx) == 1)
+                {
                     vtxtNEsyDif[ExamLv.B][++i] = tbx;
+                    tbx.Name = "n" + i;
+                }
                 else
                 {
                     vtxtNDiff[ExamLv.B][++j] = tbx;
-                    tbx.Name = "_" + j;
+                    tbx.Name = "d" + j;
+                }
+            }
+            i = j = -1;
+            foreach (TextBlock txt in grdA.Children.OfType<TextBlock>())
+            {
+                if (Grid.GetColumn(txt) == 2)
+                {
+                    vtxtN[ExamLv.A][++i] = txt;
+                    txt.Name = "g" + i;
+                }
+                else if (Grid.GetColumn(txt) == 4)
+                {
+                    vtxtND[ExamLv.A][++j] = txt;
+                    txt.Name = "h" + j;
+                }
+            }
+            i = j = -1;
+            foreach (TextBlock txt in grdB.Children.OfType<TextBlock>())
+            {
+                if (Grid.GetColumn(txt) == 2)
+                {
+                    vtxtN[ExamLv.B][++i] = txt;
+                    txt.Name = "g" + i;
+                }
+                else if (Grid.GetColumn(txt) == 4)
+                {
+                    vtxtND[ExamLv.B][++j] = txt;
+                    txt.Name = "h" + j;
                 }
             }
 
@@ -116,9 +158,6 @@ namespace sQzServer0
             InitQPanel();
 
             LoadBrd();
-
-            double rt = spMain.RenderSize.Width / 1280;
-            spMain.RenderTransform = new ScaleTransform(rt, rt);
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -520,7 +559,7 @@ namespace sQzServer0
             rdoA.IsChecked = true;
             ExamLv lv = ExamLv.A;
             List<int[]> nmod = vw.GetNMod(lv);
-            if(nmod != null)
+            if(nmod != null && nmod.Count == 4)
             {
                 int i = -1;
                 foreach (TextBox t in vtxtNEsyDif[lv])
@@ -528,17 +567,27 @@ namespace sQzServer0
                 i = -1;
                 foreach (TextBox t in vtxtNDiff[lv])
                     t.Text = nmod[1][++i].ToString();
+                i = -1;
+                foreach (TextBlock t in vtxtN[lv])
+                    t.Text = "/" + nmod[2][++i].ToString();
+                i = -1;
+                foreach (TextBlock t in vtxtND[lv])
+                    t.Text = "/" + nmod[3][++i].ToString();
             }
             else
             {
                 foreach (TextBox t in vtxtNEsyDif[lv])
                     t.Text = string.Empty;
                 foreach (TextBox t in vtxtNDiff[lv])
+                    t.Text = string.Empty;
+                foreach (TextBlock t in vtxtN[lv])
+                    t.Text = string.Empty;
+                foreach (TextBlock t in vtxtND[lv])
                     t.Text = string.Empty;
             }
             lv = ExamLv.B;
             nmod = vw.GetNMod(lv);
-            if (nmod != null)
+            if (nmod != null && nmod.Count == 4)
             {
                 int i = -1;
                 foreach (TextBox t in vtxtNEsyDif[lv])
@@ -546,12 +595,22 @@ namespace sQzServer0
                 i = -1;
                 foreach (TextBox t in vtxtNDiff[lv])
                     t.Text = nmod[1][++i].ToString();
+                i = -1;
+                foreach (TextBlock t in vtxtN[lv])
+                    t.Text = "/" + nmod[2][++i].ToString();
+                i = -1;
+                foreach (TextBlock t in vtxtND[lv])
+                    t.Text = "/" + nmod[3][++i].ToString();
             }
             else
             {
                 foreach (TextBox t in vtxtNEsyDif[lv])
                     t.Text = string.Empty;
                 foreach (TextBox t in vtxtNDiff[lv])
+                    t.Text = string.Empty;
+                foreach (TextBlock t in vtxtN[lv])
+                    t.Text = string.Empty;
+                foreach (TextBlock t in vtxtND[lv])
                     t.Text = string.Empty;
             }
         }

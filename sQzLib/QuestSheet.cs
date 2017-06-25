@@ -100,6 +100,36 @@ namespace sQzLib
             }
             rv.Add(vnesydif);
             rv.Add(vndif);
+            //
+            int[] vn = new int[viu.Length];
+            int[] vnd = new int[viu.Length];
+            MySqlConnection conn = DBConnect.Init();
+            if(conn == null)
+            {
+                for(int i = 0; i < viu.Length; ++i)
+                    vn[i] = 0;
+                rv.Add(vn);
+                rv.Add(vn);
+                return rv;
+            }
+            int j = -1;
+            foreach(IUx i in viu)
+            {
+                string emsg;
+                int n = DBConnect.Count(conn, "sqz_question", "id",
+                    "moid=" + (int)i + " AND del=0", out emsg);
+                if (n < 0)
+                    n = 0;
+                vn[++j] = n;
+                n = DBConnect.Count(conn, "sqz_question", "id",
+                    "moid=" + (int)i + " AND diff=1 AND del=0", out emsg);
+                if (n < 0)
+                    n = 0;
+                vnd[j] = n;
+            }
+            rv.Add(vn);
+            rv.Add(vnd);
+            //
             return rv;
         }
 
