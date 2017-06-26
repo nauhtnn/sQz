@@ -125,6 +125,7 @@ namespace sQzServer0
                     tbx.Name = "d" + j;
                 }
             }
+            List<int[]> vn = QuestSheet.DBGetNMod(ExamLv.A);
             i = j = -1;
             foreach (TextBlock txt in grdA.Children.OfType<TextBlock>())
             {
@@ -132,13 +133,16 @@ namespace sQzServer0
                 {
                     vtxtN[ExamLv.A][++i] = txt;
                     txt.Name = "g" + i;
+                    txt.Text = "/ " + vn[0][i];
                 }
                 else if (Grid.GetColumn(txt) == 4)
                 {
                     vtxtND[ExamLv.A][++j] = txt;
                     txt.Name = "h" + j;
+                    txt.Text = "/ " + vn[1][j];
                 }
             }
+            vn = QuestSheet.DBGetNMod(ExamLv.B);
             i = j = -1;
             foreach (TextBlock txt in grdB.Children.OfType<TextBlock>())
             {
@@ -146,11 +150,13 @@ namespace sQzServer0
                 {
                     vtxtN[ExamLv.B][++i] = txt;
                     txt.Name = "g" + i;
+                    txt.Text = "/ " + vn[0][i];
                 }
                 else if (Grid.GetColumn(txt) == 4)
                 {
                     vtxtND[ExamLv.B][++j] = txt;
                     txt.Name = "h" + j;
+                    txt.Text = "/ " + vn[1][j];
                 }
             }
 
@@ -460,18 +466,34 @@ namespace sQzServer0
 
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
         {
-            TextBox t;
+            TextBox t = sender as TextBox;
+            if (t == null)
+                return;
             bool bG = true;
             ExamLv lv;
             if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
                 lv = ExamLv.A;
             else
                 lv = ExamLv.B;
+            if(0 < t.Text.Length)
+            {
+                int idx = int.Parse(t.Name.Substring(1));
+                TextBlock tb = vtxtN[lv][idx];
+                if (tb.Text.Length < 3)
+                    t.Text = string.Empty;
+                else
+                {
+                    int i = int.Parse(t.Text);
+                    int m = int.Parse(tb.Text.Substring(2));
+                    if (m < i)
+                        t.Text = string.Empty;
+                }
+            }
             int n = 0;
             for(int j = 0; j < vtxtNEsyDif[lv].Length; ++j)
                 if ((t = vtxtNEsyDif[lv][j]) != null)
                 {
-                    if (t.Text != null && 0 < t.Text.Length)
+                    if (0 < t.Text.Length)
                     {
                         n += int.Parse(t.Text);
                         vtxtNDiff[lv][j].IsEnabled = true;
@@ -494,9 +516,7 @@ namespace sQzServer0
         private void tbxIUdif_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox t = sender as TextBox;
-            if (t == null)
-                return;
-            if (t.Text == null || t.Text.Length == 0)
+            if (t.Text.Length == 0)
                 return;
             ExamLv lv;
             if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
@@ -506,13 +526,22 @@ namespace sQzServer0
             int i = int.Parse(t.Text);
             int idx = int.Parse(t.Name.Substring(1));
             TextBox tm = vtxtNEsyDif[lv][idx];
-            if(tm == null)
+            if(tm.Text.Length == 0)
             {
                 t.Text = string.Empty;
                 return;
             }
             int m = int.Parse(tm.Text);
             if(m < i)
+                t.Text = string.Empty;
+            TextBlock tb = vtxtND[lv][idx];
+            if (tb.Text.Length < 3)
+            {
+                t.Text = string.Empty;
+                return;
+            }
+            m = int.Parse(tb.Text.Substring(2));
+            if (m < i)
                 t.Text = string.Empty;
         }
 
@@ -554,12 +583,13 @@ namespace sQzServer0
                     grdB.IsEnabled = false;
                 return;
             }
+            vw.InitNMod();
             rdoA.IsEnabled = rdoB.IsEnabled =
                 grdA.IsEnabled = grdB.IsEnabled = true;
             rdoA.IsChecked = true;
             ExamLv lv = ExamLv.A;
             List<int[]> nmod = vw.GetNMod(lv);
-            if(nmod != null && nmod.Count == 4)
+            if(nmod != null && nmod.Count == 2)
             {
                 int i = -1;
                 foreach (TextBox t in vtxtNEsyDif[lv])
@@ -567,22 +597,12 @@ namespace sQzServer0
                 i = -1;
                 foreach (TextBox t in vtxtNDiff[lv])
                     t.Text = nmod[1][++i].ToString();
-                i = -1;
-                foreach (TextBlock t in vtxtN[lv])
-                    t.Text = "/" + nmod[2][++i].ToString();
-                i = -1;
-                foreach (TextBlock t in vtxtND[lv])
-                    t.Text = "/" + nmod[3][++i].ToString();
             }
             else
             {
                 foreach (TextBox t in vtxtNEsyDif[lv])
                     t.Text = string.Empty;
                 foreach (TextBox t in vtxtNDiff[lv])
-                    t.Text = string.Empty;
-                foreach (TextBlock t in vtxtN[lv])
-                    t.Text = string.Empty;
-                foreach (TextBlock t in vtxtND[lv])
                     t.Text = string.Empty;
             }
             lv = ExamLv.B;
@@ -595,22 +615,12 @@ namespace sQzServer0
                 i = -1;
                 foreach (TextBox t in vtxtNDiff[lv])
                     t.Text = nmod[1][++i].ToString();
-                i = -1;
-                foreach (TextBlock t in vtxtN[lv])
-                    t.Text = "/" + nmod[2][++i].ToString();
-                i = -1;
-                foreach (TextBlock t in vtxtND[lv])
-                    t.Text = "/" + nmod[3][++i].ToString();
             }
             else
             {
                 foreach (TextBox t in vtxtNEsyDif[lv])
                     t.Text = string.Empty;
                 foreach (TextBox t in vtxtNDiff[lv])
-                    t.Text = string.Empty;
-                foreach (TextBlock t in vtxtN[lv])
-                    t.Text = string.Empty;
-                foreach (TextBlock t in vtxtND[lv])
                     t.Text = string.Empty;
             }
         }

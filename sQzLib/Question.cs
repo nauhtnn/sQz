@@ -5,35 +5,6 @@ using System.Text;
 
 namespace sQzLib
 {
-    public enum QuestType
-    {
-        Single = 1,
-        Multiple = 2,
-        Insertion = 4,
-        Selection = 8,
-        Matching = 16
-    }
-
-    public enum ContentType
-    {
-        Raw = 1,
-        Image = 2,
-        Audio = 4,
-        Video = 8
-    }
-
-    public enum TokenType {
-        Requirement = 0,
-        Stmt = 1,
-        Ans = 2,
-        Both = 3
-    }
-
-    public enum IUx
-    {
-        _1 = 0, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _0
-    }
-
     public class Question
     {
         public const int N_ANS = 4;
@@ -112,6 +83,7 @@ namespace sQzLib
             else if (tStmt[0] == '\\' && 1 < tStmt.Length
                 && (tStmt[1] == '*' || tStmt[1] == '\\'))
                 tStmt = tStmt.Substring(1);
+            bool na = true;
             for (int i = 0; i < N_ANS; ++i)
             {
                 if (vAns[i][0] == '\\' && 1 < vAns[i].Length)
@@ -120,11 +92,14 @@ namespace sQzLib
                     {
                         vKeys[i] = true;
                         vAns[i] = Utils.CleanFront(vAns[i], 1);
+                        na = false;
                     }
                     else
                         vAns[i] = vAns[i].Substring(1);
                 }
             }
+            if (na)
+                return true;
             return false;
         }
 
@@ -232,5 +207,35 @@ namespace sQzLib
             }
             return q;
         }
+    }
+
+    public enum QuestType
+    {
+        Single = 1,
+        Multiple = 2,
+        Insertion = 4,
+        Selection = 8,
+        Matching = 16
+    }
+
+    public enum ContentType
+    {
+        Raw = 1,
+        Image = 2,
+        Audio = 4,
+        Video = 8
+    }
+
+    public enum TokenType
+    {
+        Requirement = 0,
+        Stmt = 1,
+        Ans = 2,
+        Both = 3
+    }
+
+    public enum IUx
+    {
+        _1 = 0, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _0
     }
 }

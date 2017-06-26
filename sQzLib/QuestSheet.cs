@@ -100,7 +100,13 @@ namespace sQzLib
             }
             rv.Add(vnesydif);
             rv.Add(vndif);
-            //
+            return rv;
+        }
+
+        public static List<int[]> DBGetNMod(ExamLv lv)
+        {
+            List<int[]> rv = new List<int[]>();
+            IUx[] viu = GetIUs(lv);
             int[] vn = new int[viu.Length];
             int[] vnd = new int[viu.Length];
             MySqlConnection conn = DBConnect.Init();
@@ -129,7 +135,6 @@ namespace sQzLib
             }
             rv.Add(vn);
             rv.Add(vnd);
-            //
             return rv;
         }
 

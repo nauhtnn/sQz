@@ -328,7 +328,7 @@ namespace sQzServer0
             }
             svwrTmpQ.Content = sp;
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], mTmpQS.Count);
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], mTmpQS.Count);
             tbiTmpQ.Header = sb.ToString();
         }
 
@@ -341,7 +341,7 @@ namespace sQzServer0
                 mTmpQS.DBIns(mSelQCat);
                 mTmpQS.Clear();
                 StringBuilder sb = new StringBuilder();
-                sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], 0);
+                sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0);
                 tbiTmpQ.Header = sb.ToString();
                 mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
                 ShowDBQ();
