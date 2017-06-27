@@ -289,5 +289,44 @@ namespace sQzLib
             }
             return buf;
         }
+
+        static WordprocessingDocument gDoc = null;
+        public static bool DocxBeginW(string fpath)
+        {
+            if (gDoc != null)
+                return true;
+            try
+            {
+                gDoc = WordprocessingDocument.Create(fpath,
+                    DocumentFormat.OpenXml.WordprocessingDocumentType.Document);
+                {
+                    // Add a main document part. 
+                    MainDocumentPart mainPart = gDoc.AddMainDocumentPart();
+
+                    // Create the document structure and add some text.
+                    mainPart.Document = new Document();
+                    Body body = mainPart.Document.AppendChild(new Body());
+                    mainPart.Document.Save();
+                }
+
+            }
+            catch (OpenXmlPackageException)
+            {
+                return true;
+            }
+            return false;
+        }
+
+        public static void DocxW(string s)
+        {
+            gDoc.MainDocumentPart.Document.Body.AppendChild(
+                new Paragraph(new Run(new Text(s))));
+        }
+
+        public static void DocxEndW()
+        {
+            gDoc.Close();
+            gDoc = null;
+        }
     }
 }
