@@ -30,7 +30,7 @@
                 </StackPanel>
             </StackPanel>
             <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,20,0,20"/>
-            <Button x:Name="btnQGen" IsEnabled="False" Click="btnQGen_Click" Width="120" Height="40" Background="#80cc28" Foreground="#fff" Margin="0,00,0,10"/>
+            <Button Name="btnQGen" IsEnabled="False" Click="btnQGen_Click" Width="120" Height="40" Background="#80cc28" Foreground="#fff" Margin="0,00,0,10"/>
             <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*"/>
@@ -81,35 +81,36 @@
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="1" FontWeight="Bold" HorizontalAlignment="Center"/>
-                <TextBox Width="30" Grid.Column="1" TextAlignment="Center"/>
-                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center"/>
-                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" IsEnabled="False"/>
-                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center"/>
+                <Border BorderBrush="Black" BorderThickness="0,1,0,0" Grid.ColumnSpan="5"/>
+                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" IsEnabled="False" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" HorizontalAlignment="Left"/>
                 <TextBlock Text="2" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="1"/>
-                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="1"/>
-                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="1"/>
-                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="1" IsEnabled="False"/>
-                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="1"/>
+                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="1" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="1" HorizontalAlignment="Left"/>
+                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="1" IsEnabled="False" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="1" HorizontalAlignment="Left"/>
                 <TextBlock Text="3" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="2"/>
-                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="2"/>
-                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="2"/>
-                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="2" IsEnabled="False"/>
-                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="2"/>
+                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Left"/>
+                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="2" IsEnabled="False" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Left"/>
                 <TextBlock Text="4" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="3"/>
-                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="3"/>
-                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="3"/>
-                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="3" IsEnabled="False"/>
-                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="3"/>
+                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="3" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="3" HorizontalAlignment="Left"/>
+                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="3" IsEnabled="False" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="3" HorizontalAlignment="Left"/>
                 <TextBlock Text="5" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="4"/>
-                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="4"/>
-                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="4"/>
-                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="4" IsEnabled="False"/>
-                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="4"/>
+                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="4" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="4" HorizontalAlignment="Left"/>
+                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="4" IsEnabled="False" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="4" HorizontalAlignment="Left"/>
                 <TextBlock Text="6" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="5"/>
-                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="5"/>
-                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="5"/>
-                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="5" IsEnabled="False"/>
-                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="5"/>
+                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="5" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="5" HorizontalAlignment="Left"/>
+                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="5" IsEnabled="False" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="5" HorizontalAlignment="Left"/>
             </Grid>
             <Grid x:Name="grdB" Visibility="Collapsed">
                 <Grid.ColumnDefinitions>
@@ -125,21 +126,22 @@
                     <RowDefinition Height="30"/>
                 </Grid.RowDefinitions>
                 <TextBlock Text="7" FontWeight="Bold" HorizontalAlignment="Center" />
-                <TextBox Width="30" Grid.Column="1" TextAlignment="Center"/>
-                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center"/>
-                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" IsEnabled="False"/>
-                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center"/>
+                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" HorizontalAlignment="Left"/>
+                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" IsEnabled="False" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" HorizontalAlignment="Left"/>
                 <TextBlock Text="8" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="1"/>
-                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="1"/>
-                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="1"/>
-                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="1" IsEnabled="False"/>
-                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="1"/>
+                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="1" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="1" HorizontalAlignment="Left"/>
+                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="1" IsEnabled="False" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="1" HorizontalAlignment="Left"/>
                 <TextBlock Text="10" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="2"/>
-                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="2"/>
-                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="2"/>
-                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="2" IsEnabled="False"/>
-                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="2"/>
+                <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Left"/>
+                <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="2" IsEnabled="False" HorizontalAlignment="Right"/>
+                <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Left"/>
             </Grid>
+            <Button Name="btnQSav" IsEnabled="False" Click="btnQGen_Click" Width="120" Height="40" Background="#fbbc09" Foreground="#fff" Margin="0,00,0,10"/>
         </StackPanel>
         <TabControl x:Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged">
             <TabItem Header="_0">
