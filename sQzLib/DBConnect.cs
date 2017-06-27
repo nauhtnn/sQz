@@ -202,7 +202,7 @@ namespace sQzLib
                 else
                 {
                     n = -1;
-                    eMsg = Txt.s._[(int)TxI.SLOT_COUNT_NOK];
+                    eMsg = Txt.s._[(int)TxI.DB_COUNT_NOK];
                 }
             }
             catch (MySqlException e) {
@@ -211,6 +211,36 @@ namespace sQzLib
             }
 
             return n;
+        }
+
+        public static bool NExist(MySqlConnection conn, string tb, string cond, out string eMsg)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Append("SELECT COUNT(*) FROM(SELECT 1 FROM " + tb);
+            if (cond != null)
+                sb.Append(" WHERE " + cond);
+            sb.Append(" LIMIT 1) as tb");
+            int n;
+            MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn);
+            try
+            {
+                if (int.TryParse(cmd.ExecuteScalar().ToString(), out n))
+                    eMsg = null;
+                else
+                {
+                    n = -1;
+                    eMsg = Txt.s._[(int)TxI.DB_COUNT_NOK];
+                }
+            }
+            catch (MySqlException e)
+            {
+                eMsg = e.ToString();
+                n = -1;
+            }
+
+            if (0 < n)
+                return false;
+            return true;
         }
 
         //Max statement

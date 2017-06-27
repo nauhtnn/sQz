@@ -167,15 +167,16 @@ namespace sQzLib
             StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
             {
-                int n = DBConnect.Count(conn, "sqz_slot_room", "dt",
+                int n = 0;
+                bool bNExist = DBConnect.NExist(conn, "sqz_slot_room",
                     "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) +
                     "' AND rid=" + r.uId, out eMsg);
-                if (n < 0)
+                if (eMsg != null)
                 {
                     DBConnect.Close(ref conn);
-                    return n;
+                    return -1;
                 }
-                else if (n == 0)
+                else if (bNExist)
                     n = DBConnect.Ins(conn, "sqz_slot_room",
                         "dt,t,rid", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
                         "'," + r.uId + ")", out eMsg);
