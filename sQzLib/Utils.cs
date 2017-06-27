@@ -67,7 +67,7 @@ namespace sQzLib
             }
             string s;
             Body body = doc.MainDocumentPart.Document.Body;
-            int idx = -1;
+            //int idx = -1;
             foreach (Paragraph p in body.ChildElements.OfType<Paragraph>())
             {
                 DocumentFormat.OpenXml.Drawing.Blip bl =

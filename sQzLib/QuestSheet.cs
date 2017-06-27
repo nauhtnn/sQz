@@ -18,6 +18,17 @@ namespace sQzLib
         List<Question> vQuest;
         public byte[] aQuest;
         public int Count { get { return vQuest.Count; } }
+        public int CountD
+        {
+            get
+            {
+                int n = 0;
+                foreach (Question q in vQuest)
+                    if (q.bDiff)
+                        ++n;
+                return n;
+            }
+        }
 
         public QuestSheet()
         {
@@ -136,6 +147,19 @@ namespace sQzLib
             rv.Add(vn);
             rv.Add(vnd);
             return rv;
+        }
+
+        public static int DBGetND(IUx iu)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return 0;
+            string emsg;
+            int n = DBConnect.Count(conn, "sqz_question", "id",
+                    "moid=" + (int)iu + " AND diff=1 AND del=0", out emsg);
+            if (n < 0)
+                n = 0;
+            return n;
         }
 
         public void DBAppendQryIns(string prefx, StringBuilder vals)

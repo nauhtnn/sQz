@@ -284,7 +284,7 @@ namespace sQzServer0
                 vChk.Add(chk);
             }
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], mDBQS.Count);
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], mDBQS.Count, QuestSheet.DBGetND(mSelQCat));
             tbiDBQ.Header = sb.ToString();
         }
 
@@ -328,24 +328,28 @@ namespace sQzServer0
             }
             svwrTmpQ.Content = sp;
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], mTmpQS.Count);
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], mTmpQS.Count, mTmpQS.CountD);
             tbiTmpQ.Header = sb.ToString();
         }
 
         private void btnImpQ_Click(object sender, RoutedEventArgs e)
         {
-            if (mSelQCat != IUx._0 && 0 < mTmpQS.Count)
+            if (mSelQCat == IUx._0)
             {
-                gDBQuest.Children.Clear();
-                svwrTmpQ.Content = null;
-                mTmpQS.DBIns(mSelQCat);
-                mTmpQS.Clear();
-                StringBuilder sb = new StringBuilder();
-                sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0);
-                tbiTmpQ.Header = sb.ToString();
-                mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
-                ShowDBQ();
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.PREP_IU15]);
+                return;
             }
+            if (mTmpQS.Count == 0)
+                return;
+            gDBQuest.Children.Clear();
+            svwrTmpQ.Content = null;
+            mTmpQS.DBIns(mSelQCat);
+            mTmpQS.Clear();
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0, mTmpQS.CountD);
+            tbiTmpQ.Header = sb.ToString();
+            mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
+            ShowDBQ();
         }
 
         private void lbxQCatgry_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -378,10 +382,10 @@ namespace sQzServer0
             btnDelQ.Content = t._[(int)TxI.PREP_DEL_SEL];
             btnImpQ.Content = t._[(int)TxI.PREP_IMP];
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], 0);
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], 0, QuestSheet.DBGetND(mSelQCat));
             tbiDBQ.Header = sb.ToString();
             sb.Clear();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0);
+            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0, mTmpQS.CountD);
             tbiTmpQ.Header = sb.ToString();
         }
 
@@ -407,6 +411,7 @@ namespace sQzServer0
                 mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
                 ShowDBQ();
             }
+            chkAll.IsChecked = false;
         }
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)

@@ -35,7 +35,7 @@
                 </StackPanel>
                 <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
                 <TextBlock Name="txtIU" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                <ListBox x:Name="lbxQCatgry" Width="200" Height="410" SelectionChanged="lbxQCatgry_SelectionChanged"/>
+                <ListBox x:Name="lbxQCatgry" Width="220" Height="390" SelectionChanged="lbxQCatgry_SelectionChanged"/>
             </StackPanel>
             <TabControl Margin="10,0,0,0">
                 <TabItem Name="tbi1">
@@ -54,7 +54,7 @@
                                         <RowDefinition Height="40"/>
                                     </Grid.RowDefinitions>
                                     <Button Name="btnDelQ" Click="btnDelQ_Click" Width="160" Background="#f15a23" Foreground="#fff"/>
-                                    <CheckBox Grid.Column="1" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
+                                    <CheckBox Name="chkAll" Grid.Column="1" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
                                 </Grid>
                                 <ScrollViewer Width="1000" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
                                     <Grid Name="gDBQuest">

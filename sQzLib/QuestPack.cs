@@ -168,13 +168,18 @@ namespace sQzLib
                 return true;
             }
             eMsg = null;
-            foreach(QuestSheet qs in vSheet.Values)
+            string cond1 = "dt='" + mDt.ToString(DT._) +
+                    "' AND lv='" + eLv.ToString() + "' AND qsid=";
+            string cond2 = "dt='" + mDt.ToString(DT._) +
+                    "' AND lv='" + eLv.ToString() + "' AND id=";
+            foreach (QuestSheet qs in vSheet.Values)
             {
-                if (DBConnect.Delete(conn, "sqz_qsheet_quest", "dt='" + mDt.ToString(DT._) +
-                    "' AND lv='" + eLv.ToString() + "' AND qsid=" + qs.uId, out eMsg) < 0)
+                //int n = DBConnect.Count(conn, "sqz_nee_qsheet", "qsid", cond1 + qs.uId, out eMsg);
+                //if (0 < n)
+                //    continue;
+                if (DBConnect.Delete(conn, "sqz_qsheet_quest", cond1 + qs.uId, out eMsg) < 0)
                     return true;
-                if (DBConnect.Delete(conn, "sqz_qsheet", "dt='" + mDt.ToString(DT._) +
-                    "' AND lv='" + eLv.ToString() + "' AND id=" + qs.uId, out eMsg) < 0)
+                if (DBConnect.Delete(conn, "sqz_qsheet", cond2 + qs.uId, out eMsg) < 0)
                     return true;
             }
             return false;

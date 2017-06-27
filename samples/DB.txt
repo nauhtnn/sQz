@@ -37,7 +37,7 @@ FOREIGN KEY(`lv`) REFERENCES `sqz_level`(`id`));
 CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATE, `lv` CHAR CHARACTER SET `ascii`,
 `neeid` SMALLINT UNSIGNED, `qsid` SMALLINT UNSIGNED, `t1` TIME, `t2` TIME,
 `grade` TINYINT, `comp` VARCHAR(32) CHARACTER SET `utf8`,
-`ans` CHAR(120) CHARACTER SET `ascii`, PRIMARY KEY(`dt`, `lv`, `neeid`, `qsid`),
+`ans` CHAR(120) CHARACTER SET `ascii`, PRIMARY KEY(`dt`, `lv`, `neeid`),
 FOREIGN KEY(`dt`, `lv`, `neeid`) REFERENCES `sqz_examinee`(`dt`, `lv`, `id`),
 FOREIGN KEY(`dt`, `lv`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `lv`, `id`));
 
@@ -78,4 +78,4 @@ INSERT INTO `sqz_level` VALUES ('A'),('B');
 INSERT INTO `sqz_module` VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14);
 INSERT INTO `sqz_status` VALUES (0),(1),(2);
 DELETE FROM `sqz_ver`;
-INSERT INTO `sqz_ver` VALUES (7);
+INSERT INTO `sqz_ver` VALUES (8);
