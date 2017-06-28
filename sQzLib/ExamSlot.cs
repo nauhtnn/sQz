@@ -18,17 +18,18 @@ namespace sQzLib
     public class ExamSlot
     {
         public DateTime mDt;
-        public bool bOpen;
         public Dictionary<ExamLv, QuestPack> vQPack;
 
         public AnsPack mKeyPack;
 
         public Dictionary<int, ExamRoom> vRoom;
+        public ExamStt eStt;
 
         public ExamSlot()
         {
             mDt = DT.INV_;
             vRoom = new Dictionary<int, ExamRoom>();
+            eStt = ExamStt.Prep;
             vQPack = new Dictionary<ExamLv, QuestPack>();
             QuestPack p = new QuestPack();
             p.eLv = ExamLv.A;
@@ -54,6 +55,43 @@ namespace sQzLib
                     vRoom.Add(i, r);
             }
             return null;
+        }
+
+        public string DBSelStt()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return Txt.s._[(int)TxI.DB_NOK];
+            string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
+                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return eMsg;
+            }
+            int x;
+            if (reader.Read())
+                if (Enum.IsDefined(typeof(ExamStt), x = reader.GetInt16(0)))
+                    eStt = (ExamStt)x;
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return null;
+        }
+
+        public string DBUpStt()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return Txt.s._[(int)TxI.DB_NOK];
+            string emsg;
+            int n = DBConnect.Update(conn, "sqz_slot", "stt=" + (int)eStt,
+                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'",
+                out emsg);
+            if(0 < n)
+                return null;
+            return emsg;
         }
 
         public DateTime Dt {
@@ -200,7 +238,6 @@ namespace sQzLib
 
         public void DelNee()
         {
-            StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
             {
                 r.vExaminee.Clear();

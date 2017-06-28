@@ -174,6 +174,17 @@ namespace sQzServer0
 
         private void btnStartSrvr_Click(object sender, RoutedEventArgs e)
         {
+            foreach(TabItem i in tbcSl.Items)
+            {
+                Op0SlotView vw = i as Op0SlotView;
+                if (vw == null)
+                    continue;
+                if (vw.mSl.eStt == ExamStt.Prep)
+                {
+                    vw.mSl.eStt = ExamStt.Oper;
+                    vw.mSl.DBUpStt();
+                }
+            }
             Thread th = new Thread(() => {mServer.Start(ref mCbMsg);});
             th.Start();
         }
@@ -346,7 +357,7 @@ namespace sQzServer0
         private void LoadSl()
         {
             string emsg;
-            List<DateTime> v = mBrd.DBSelSl(out emsg);
+            List<DateTime> v = mBrd.DBSelSl(false, out emsg);
             if (v == null)
             {
                 spMain.Opacity = 0.5;
@@ -389,7 +400,7 @@ namespace sQzServer0
             DateTime dt;
             DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
             sl.Dt = dt;
-            sl.DBSelRoomId();
+            sl.DBSelStt();
             sl.DBSelNee();
             if(sl.DBSelArchieve(out emsg))
             {

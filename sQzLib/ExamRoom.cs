@@ -174,6 +174,7 @@ namespace sQzLib
             while (reader.Read())
                 r.Add(reader.GetInt32(0));
             reader.Close();
+            DBConnect.Close(ref conn);
             return r;
         }
     }

@@ -39,15 +39,25 @@ namespace sQzServer0
         {
             TabControl tbc = new TabControl();
             StackPanel sp = new StackPanel();
-            Grid gTit = null, gNee = null;
+            Grid gNee = null;
             foreach (Grid refg in refSp.Children.OfType<Grid>())
             {
-                if (refg.Name == "grdTit")
-                    gTit = DeepCopyTit(refg, false);
-                else
+                if (refg.Name != "grdTit")
                     gNee = DeepCopyNee(refg);
             }
-            sp.Children.Add(gTit);
+            Button btnDel = new Button();
+            btnDel.Click += btnDel_Click;
+            btnDel.Width = 120;
+            btnDel.Height = 40;
+            btnDel.Margin = new Thickness(0, 10, 0, 10);
+            btnDel.Content = Txt.s._[(int)TxI.PREP_DEL];
+            btnDel.Foreground = Theme.s._[(int)BrushId.QID_Color];
+            btnDel.Background = Theme.s._[(int)BrushId.Button_Hover];
+            if (mSlDB.eStt == ExamStt.Prep)
+                btnDel.IsEnabled = true;
+            else
+                btnDel.IsEnabled = false;
+            sp.Children.Add(btnDel);
             sp.Children.Add(gNee);
             grdDB = DeepCopyNee(gNee);
             grdDB.Children.Clear();
@@ -64,10 +74,11 @@ namespace sQzServer0
             tbc.Items.Add(tbiDB);
             //
             sp = new StackPanel();
+            Grid gTit = null;
             foreach (Grid refg in refSp.Children.OfType<Grid>())
             {
                 if (refg.Name == "grdTit")
-                    gTit = DeepCopyTit(refg, true);
+                    gTit = DeepCopyTit(refg);
                 else
                     gNee = DeepCopyNee(refg);
             }
@@ -89,7 +100,7 @@ namespace sQzServer0
             Content = tbc;
         }
 
-        Grid DeepCopyTit(Grid refg, bool bTmp)
+        Grid DeepCopyTit(Grid refg)
         {
             Grid g = new Grid();
             foreach (ColumnDefinition cd in refg.ColumnDefinitions)
@@ -116,9 +127,8 @@ namespace sQzServer0
             }
             foreach(Button btn in refg.Children.OfType<Button>())
             {
-                if (!bTmp && (btn.Name == "btnImp" || btn.Name == "btnFile"))
-                    continue;
                 Button b = new Button();
+                b.IsEnabled = btn.IsEnabled;
                 b.Height = btn.Height;
                 b.Width = btn.Width;
                 b.Margin = btn.Margin;
@@ -127,23 +137,15 @@ namespace sQzServer0
                 b.Foreground = btn.Foreground;
                 b.FontWeight = btn.FontWeight;
                 Grid.SetColumn(b, Grid.GetColumn(btn));
-                if (bTmp && btn.Name == "btnImp")
+                if (btn.Name == "btnImp")
                 {
                     b.Content = Txt.s._[(int)TxI.PREP_IMP];
                     b.Click += btnImp_Click;
                 }
-                else if (bTmp && btn.Name == "btnFile")
+                else if (btn.Name == "btnFile")
                 {
                     b.Content = "+";
                     b.Click += btnFile_Click;
-                }
-                else
-                {
-                    b.Content = Txt.s._[(int)TxI.PREP_DEL];
-                    if(bTmp)
-                        b.Click += btnXTmp_Click;
-                    else
-                        b.Click += btnXdb_Click;
                 }
                 g.Children.Add(b);
             }
@@ -197,7 +199,7 @@ namespace sQzServer0
                 return;
 
             string fp = dlg.FileName;
-
+            mSlTmp.DelNee();
             string emsg = mSlDB.ReadF(fp, ref mSlTmp);
             if(emsg != null)
             {
@@ -212,17 +214,11 @@ namespace sQzServer0
             Show(false);
         }
 
-        private void btnXdb_Click(object sender, RoutedEventArgs e)
+        private void btnDel_Click(object sender, RoutedEventArgs e)
         {
             WPopup.s.ShowDialog(mSlDB.DBDelNee());
             mSlDB.DBSelNee();
             Show(true);
-        }
-
-        private void btnXTmp_Click(object sender, RoutedEventArgs e)
-        {
-            mSlTmp.DelNee();
-            Show(false);
         }
 
         public void Show(bool db)

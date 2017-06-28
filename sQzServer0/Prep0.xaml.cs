@@ -128,12 +128,13 @@ namespace sQzServer0
         private void LoadSl()
         {
             string emsg;
-            List<DateTime> v = mBrd.DBSelSl(out emsg);
+            List<DateTime> v = mBrd.DBSelSl(false, out emsg);
             if(v == null)
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(emsg);
                 spMain.Opacity = 1;
+                return;
             }
             //bool dark = true;
             //Color c = new Color();
@@ -378,7 +379,6 @@ namespace sQzServer0
             txtBirpl.Text = t._[(int)TxI.BIRPL];
             txtRoom.Text = t._[(int)TxI.ROOM];
             btnImp.Content = t._[(int)TxI.PREP_IMP];
-            btnDel.Content = t._[(int)TxI.PREP_DEL];
             btnDelQ.Content = t._[(int)TxI.PREP_DEL_SEL];
             btnImpQ.Content = t._[(int)TxI.PREP_IMP];
             StringBuilder sb = new StringBuilder();
@@ -424,6 +424,7 @@ namespace sQzServer0
             DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
             sl.Dt = dt;
             sl.DBSelRoomId();
+            sl.DBSelStt();
             sl.DBSelNee();
             PrepNeeView pnv = new PrepNeeView(sl);
             pnv.DeepCopy(refSl);

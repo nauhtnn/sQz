@@ -91,16 +91,14 @@
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
                     <Button Name="btnFile" Width="40" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
                     <Button Name="btnImp" Width="120" Grid.Column="1" Background="#80cc28" Foreground="#fff"/>
-                    <Button Name="btnDel" Width="120" Grid.Column="2" Background="#f15a23" Foreground="#fff"/>
                 </Grid>
-                <Grid Name="grdNee">
+                <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="80"/>
                         <ColumnDefinition Width="300"/>
