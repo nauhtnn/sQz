@@ -9,49 +9,51 @@
       ShowsNavigationUI="False"
       Title="TakeExam">
 
-    <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10">
-        <Grid x:Name="gQSheet">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="240"/>
-                <ColumnDefinition Width="1020"/>
-            </Grid.ColumnDefinitions>
-            <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="652" Width="240">
-                <TextBlock x:Name="txtAnsSh" Height="30" FontSize="20" HorizontalAlignment="Center"/>
-                <ScrollViewer x:Name="svwrASh" Height="622" Width="240" VerticalScrollBarVisibility="Auto" FontSize="14">
-                    <Grid x:Name="gAnsSh">
+    <Viewbox>
+        <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
+            <Grid x:Name="gQSheet">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="240"/>
+                    <ColumnDefinition Width="1020"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="652" Width="240">
+                    <TextBlock x:Name="txtAnsSh" Height="30" FontSize="20" HorizontalAlignment="Center"/>
+                    <ScrollViewer x:Name="svwrASh" Height="622" Width="240" VerticalScrollBarVisibility="Auto" FontSize="14">
+                        <Grid x:Name="gAnsSh">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                        </Grid>
+                    </ScrollViewer>
+                </StackPanel>
+                <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1020" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
+                    <Grid x:Name="gQuest" Width="1000">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="500"/>
+                            <ColumnDefinition Width="500"/>
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ScrollViewer>
-            </StackPanel>
-            <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1020" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
-                <Grid x:Name="gQuest" Width="1000">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="500"/>
-                        <ColumnDefinition Width="500"/>
-                    </Grid.ColumnDefinitions>
-                </Grid>
-            </ScrollViewer>
-        </Grid>
-        <Grid Height="48">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="630"/>
-                <ColumnDefinition Width="126"/>
-                <ColumnDefinition Width="378"/>
-                <ColumnDefinition Width="126"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="48"/>
-            </Grid.RowDefinitions>
-            <TextBlock x:Name="txtWelcome" Background="#ffffbb" Foreground="#00356b" FontSize="22" TextAlignment="Center" Padding="0,6,0,0"/>
-            <Button x:Name="btnSubmit" Grid.Column="1" FontSize="20" Click="btnSubmit_Click" Background="#1c64e7" Foreground="White" BorderThickness="0" IsEnabled="False"/>
-            <TextBlock x:Name="txtRTime" Background="#ffffbb" Foreground="#00356b" Grid.Column="2" FontSize="28" TextAlignment="Center" Text="0:0" Padding="0,4,0,0"/>
-            <Button x:Name="btnExit" Background="#f15a23" Foreground="White" Grid.Column="3" Content="Close" Click="btnExit_Click" FontSize="20" BorderThickness="0" />
-        </Grid>
-    </StackPanel>
+            </Grid>
+            <Grid Height="48">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="630"/>
+                    <ColumnDefinition Width="126"/>
+                    <ColumnDefinition Width="378"/>
+                    <ColumnDefinition Width="126"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="48"/>
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="txtWelcome" Background="#ffffbb" Foreground="#00356b" FontSize="22" TextAlignment="Center" Padding="0,6,0,0"/>
+                <Button x:Name="btnSubmit" Grid.Column="1" FontSize="20" Click="btnSubmit_Click" Background="#1c64e7" Foreground="White" BorderThickness="0" IsEnabled="False"/>
+                <TextBlock x:Name="txtRTime" Background="#ffffbb" Foreground="#00356b" Grid.Column="2" FontSize="28" TextAlignment="Center" Text="0:0" Padding="0,4,0,0"/>
+                <Button x:Name="btnExit" Background="#f15a23" Foreground="White" Grid.Column="3" Content="Close" Click="btnExit_Click" FontSize="20" BorderThickness="0" />
+            </Grid>
+        </StackPanel>
+    </Viewbox>
 </Page>

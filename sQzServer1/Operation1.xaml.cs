@@ -76,13 +76,6 @@ namespace sQzServer1
 
             spMain.Background = Theme.s._[(int)BrushId.BG];
 
-            double rt = spMain.RenderSize.Width / 1280;
-            spMain.RenderTransform = new ScaleTransform(rt, rt);
-
-            //FirewallHandler fwHndl = new FirewallHandler(1);
-            //string msg = fwHndl.OpenFirewall();
-            //lblStatus.Text = msg;
-
             LoadTxt();
         }
 

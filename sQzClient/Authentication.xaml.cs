@@ -93,9 +93,6 @@ namespace sQzClient
 
             LoadTxt();
 
-            //double rt = w.RenderSize.Width / 1280; //design size
-            //ScaleTransform st = new ScaleTransform(rt, rt);
-            //spMain.RenderTransform = st;
             WPopup.s.owner = w;
 
             //FirewallHandler fwHndl = new FirewallHandler(3);

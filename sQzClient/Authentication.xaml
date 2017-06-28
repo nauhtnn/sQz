@@ -9,44 +9,43 @@
       ShowsNavigationUI="False"
       Title="Authentication">
 
-    <StackPanel x:Name="spMain" Loaded="Main_Loaded">
-        <StackPanel.Background>
-            <ImageBrush ImageSource="tech.jpg" Stretch="None"/>
-        </StackPanel.Background>
-        <TextBlock Height="16" Background="#f3f3ee"/>
-        <TextBlock x:Name="txtLalgitc" Height="80" Background="#a51c30" Foreground="#fff" TextAlignment="Center" VerticalAlignment="Center" FontSize="40" FontWeight="Bold" Padding="0,8,0,0"/>
-        <TextBlock x:Name="txtWelcome" Background="#fff" Foreground="#8c1515" Height="60" VerticalAlignment="Center" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
-        <TextBlock x:Name="txtDate" Height="60" Background="#fff" Foreground="#8c1515" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
-        <Grid HorizontalAlignment="Center" Margin="0,30,0,0">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400"/>
-                <ColumnDefinition Width="400"/>
-            </Grid.ColumnDefinitions>
-            <Grid.RowDefinitions>
-                <RowDefinition Height="60"/>
-                <RowDefinition Height="40"/>
-                <RowDefinition Height="64"/>
-                <RowDefinition Height="80"/>
-                <RowDefinition Height="64"/>
-                <RowDefinition Height="80"/>
-            </Grid.RowDefinitions>
-            <TextBlock x:Name="txtId" TextAlignment="Center" Foreground="#00356b"/>
-            <TextBox x:Name="tbxId" Grid.Row="1" Width="96" MaxLength="5" TextAlignment="Center" IsEnabled="False"/>
-            <TextBlock x:Name="txtBirdate" Grid.Column="1" TextAlignment="Center" Foreground="#00356b"/>
-            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
-                <TextBox x:Name="tbxD" Width="60" MaxLength="2" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
-                <TextBlock Text="/" Width="16" TextAlignment="Center"/>
-                <TextBox x:Name="tbxM" Width="60" MaxLength="2" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
-                <TextBlock Text="/" Width="16" TextAlignment="Center"/>
-                <TextBox x:Name="tbxY" Width="112" MaxLength="4" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
-            </StackPanel>
-            <Button x:Name="btnSignIn" Grid.Row="3" Width="256" Click="btnSignIn_Click" BorderThickness="0" IsEnabled="False" Background="#1c64e7" Foreground="#fff"/>
-            <Button x:Name="btnOpenLog" Grid.Row="3" Grid.Column="1" Width="256" Click="btnOpenLog_Click" IsEnabled="False" Background="#80cc28" Foreground="#fff"/>
-            <Button x:Name="btnReconn" Grid.Row="5" Width="256" Click="btnReconn_Click" Background="#fbbc09" Foreground="#fff"/>
-            <Button x:Name="btnExit" Grid.Row="5" Grid.Column="1" Width="256" Click="btnExit_Click" Background="#f15a23" Foreground="#fff"/>
-        </Grid>
-        <!--<ScrollViewer Width="1200" Height="256" VerticalScrollBarVisibility="Auto">
-            <TextBox x:Name="lblStatus" TextWrapping="Wrap" Text="TextBox" Width="600"/>
-        </ScrollViewer>-->
-    </StackPanel>
+    <Viewbox>
+        <StackPanel x:Name="spMain" Loaded="Main_Loaded" Height="720" Width="1280">
+            <StackPanel.Background>
+                <ImageBrush ImageSource="tech.jpg" Stretch="None"/>
+            </StackPanel.Background>
+            <TextBlock Height="16" Background="#f3f3ee"/>
+            <TextBlock x:Name="txtLalgitc" Height="80" Background="#a51c30" Foreground="#fff" TextAlignment="Center" VerticalAlignment="Center" FontSize="40" FontWeight="Bold" Padding="0,8,0,0"/>
+            <TextBlock x:Name="txtWelcome" Background="#fff" Foreground="#8c1515" Height="60" VerticalAlignment="Center" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
+            <TextBlock x:Name="txtDate" Height="60" Background="#fff" Foreground="#8c1515" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
+            <Grid HorizontalAlignment="Center" Margin="0,30,0,0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="400"/>
+                    <ColumnDefinition Width="400"/>
+                </Grid.ColumnDefinitions>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="60"/>
+                    <RowDefinition Height="40"/>
+                    <RowDefinition Height="64"/>
+                    <RowDefinition Height="80"/>
+                    <RowDefinition Height="64"/>
+                    <RowDefinition Height="80"/>
+                </Grid.RowDefinitions>
+                <TextBlock x:Name="txtId" TextAlignment="Center" Foreground="#00356b"/>
+                <TextBox x:Name="tbxId" Grid.Row="1" Width="96" MaxLength="5" TextAlignment="Center" IsEnabled="False"/>
+                <TextBlock x:Name="txtBirdate" Grid.Column="1" TextAlignment="Center" Foreground="#00356b"/>
+                <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
+                    <TextBox x:Name="tbxD" Width="60" MaxLength="2" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
+                    <TextBlock Text="/" Width="16" TextAlignment="Center"/>
+                    <TextBox x:Name="tbxM" Width="60" MaxLength="2" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
+                    <TextBlock Text="/" Width="16" TextAlignment="Center"/>
+                    <TextBox x:Name="tbxY" Width="112" MaxLength="4" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
+                </StackPanel>
+                <Button x:Name="btnSignIn" Grid.Row="3" Width="256" Click="btnSignIn_Click" BorderThickness="0" IsEnabled="False" Background="#1c64e7" Foreground="#fff"/>
+                <Button x:Name="btnOpenLog" Grid.Row="3" Grid.Column="1" Width="256" Click="btnOpenLog_Click" IsEnabled="False" Background="#80cc28" Foreground="#fff"/>
+                <Button x:Name="btnReconn" Grid.Row="5" Width="256" Click="btnReconn_Click" Background="#fbbc09" Foreground="#fff"/>
+                <Button x:Name="btnExit" Grid.Row="5" Grid.Column="1" Width="256" Click="btnExit_Click" Background="#f15a23" Foreground="#fff"/>
+            </Grid>
+        </StackPanel>
+    </Viewbox>
 </Page>

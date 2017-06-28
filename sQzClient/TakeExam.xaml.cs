@@ -75,9 +75,6 @@ namespace sQzClient
 
             LoadTxt();
 
-            double rt = spMain.RenderSize.Width / 1280;
-            spMain.RenderTransform = new ScaleTransform(rt, rt);
-
             WPopup.nwIns(w);
             WPopup.s.wpCbCncl = WPCancel;
 
