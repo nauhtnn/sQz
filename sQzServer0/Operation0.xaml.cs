@@ -459,7 +459,7 @@ namespace sQzServer0
             {
                 grdA.Visibility = Visibility.Collapsed;
                 grdB.Visibility = Visibility.Visible;
-                txtNqs.Text = sl.CountQSByRoom(ExamLv.A).ToString();
+                txtNqs.Text = sl.CountQSByRoom(ExamLv.B).ToString();
             }
             tbxIU_TextChanged(null, null);
         }
@@ -467,15 +467,13 @@ namespace sQzServer0
         private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
         {
             TextBox t = sender as TextBox;
-            if (t == null)
-                return;
             bool bG = true;
             ExamLv lv;
             if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
                 lv = ExamLv.A;
             else
                 lv = ExamLv.B;
-            if(0 < t.Text.Length)
+            if(t != null && 0 < t.Text.Length)
             {
                 int idx = int.Parse(t.Name.Substring(1));
                 TextBlock tb = vtxtN[lv][idx];
