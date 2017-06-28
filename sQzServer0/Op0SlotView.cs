@@ -13,10 +13,7 @@ namespace sQzServer0
 {
     public class Op0SlotView: TabItem
     {
-        StackPanel spContent;
-        StackPanel spNee;
         TabControl tbcQ;
-        RadioButton rdoQ;
         public SortedList<int, TextBlock> vGrade;
         public SortedList<int, TextBlock> vDt1;
         public SortedList<int, TextBlock> vDt2;
@@ -160,60 +157,59 @@ namespace sQzServer0
                     }
         }
 
-        public void DeepCopy(TabItem refTbi)
+        public void DeepCopy(TabControl refTbc)
         {
-            spContent = new StackPanel();
-            StackPanel refsp = refTbi.Content as StackPanel;
-
-            foreach (StackPanel refp in refsp.Children.OfType<StackPanel>())
-                DeepCopy(refp);
-
-            tbcQ = new TabControl();
-            tbcQ.Width = refTbi.Width;
-            foreach (Grid refg in refsp.Children.OfType<Grid>())
+            TabControl tbc = new TabControl();
+            foreach(TabItem tbi in refTbc.Items)
             {
-                Grid g = new Grid();
-                foreach (ColumnDefinition cd in refg.ColumnDefinitions)
-                {
-                    ColumnDefinition d = new ColumnDefinition();
-                    d.Width = cd.Width;
-                    g.ColumnDefinitions.Add(d);
-                }
-                foreach (RowDefinition rd in refg.RowDefinitions)
-                {
-                    RowDefinition d = new RowDefinition();
-                    d.Height = rd.Height;
-                    g.RowDefinitions.Add(d);
-                }
-                foreach (RadioButton refrdo in refg.Children.OfType<RadioButton>())
-                {
-                    RadioButton rdo = new RadioButton();
-                    Grid.SetColumn(rdo, Grid.GetColumn(refrdo));
-                    rdo.Name = refrdo.Name;
-                    rdo.Checked += vwMode_Check;
-                    if (rdo.Name == "Q")
-                    {
-                        rdo.Content = Txt.s._[(int)TxI.RDO_Q];
-                        rdoQ = rdo;
-                    }
-                    else
-                    {
-                        rdo.Content = Txt.s._[(int)TxI.RDO_NEE];
-                        rdo.IsChecked = true;
-                    }
-                    g.Children.Add(rdo);
-                }
-                spContent.Children.Add(g);
+                if (tbi.Name == "tbiStat")
+                    tbc.Items.Add(DeepCopyStat(tbi));
+                else
+                    tbc.Items.Add(DeepCopyNee(tbi));
             }
-
-            spContent.Children.Add(tbcQ);
-            spContent.Children.Add(spNee);
-            Content = spContent;
+            tbcQ = new TabControl();
+            tbcQ.Width = refTbc.Width;
+            TabItem i = new TabItem();
+            i.Header = Txt.s._[(int)TxI.OP_Q];
+            i.Content = tbcQ;
+            tbc.Items.Add(i);
+            Content = tbc;
         }
 
-        void DeepCopy(StackPanel refSp)
+        TabItem DeepCopyStat(TabItem refTbi)
         {
-            spNee = new StackPanel();
+            Grid refg = refTbi.Content as Grid;
+            if (refg == null)
+                return new TabItem();
+            Grid g = new Grid();
+            foreach (ColumnDefinition cd in refg.ColumnDefinitions)
+            {
+                ColumnDefinition d = new ColumnDefinition();
+                d.Width = cd.Width;
+                g.ColumnDefinitions.Add(d);
+            }
+            foreach (TextBlock txt in refg.Children)
+            {
+                TextBlock t = new TextBlock();
+                t.Text = txt.Text;
+                t.Background = txt.Background;
+                t.Foreground = txt.Foreground;
+                Grid.SetColumn(t, Grid.GetColumn(txt));
+                Grid.SetRow(t, Grid.GetRow(txt));
+                g.Children.Add(t);
+            }
+            TabItem tbi = new TabItem();
+            tbi.Content = refg;
+            tbi.Header = Txt.s._[(int)TxI.OP_STT];
+            return tbi;
+        }
+
+        TabItem DeepCopyNee(TabItem refTbi)
+        {
+            StackPanel refSp = refTbi.Content as StackPanel;
+            if (refSp == null)
+                return new TabItem();
+            StackPanel sp = new StackPanel();
             foreach (Grid refg in refSp.Children.OfType<Grid>())
             {
                 Grid g = new Grid();
@@ -233,7 +229,7 @@ namespace sQzServer0
                     Grid.SetRow(t, Grid.GetRow(txt));
                     g.Children.Add(t);
                 }
-                spNee.Children.Add(g);
+                sp.Children.Add(g);
             }
 
             foreach (ScrollViewer refscrvwr in refSp.Children.OfType<ScrollViewer>())
@@ -253,27 +249,12 @@ namespace sQzServer0
                     grdNee.ColumnDefinitions.Add(d);
                 }
                 vwr.Content = grdNee;
-                spNee.Children.Add(vwr);
+                sp.Children.Add(vwr);
             }
-
-            spNee.Visibility = Visibility.Collapsed;
-        }
-
-        private void vwMode_Check(object sender, RoutedEventArgs e)
-        {
-            RadioButton rdo = sender as RadioButton;
-            if (rdo == null)
-                return;
-            if(rdo.Name == "Q")
-            {
-                spNee.Visibility = Visibility.Collapsed;
-                tbcQ.Visibility = Visibility.Visible;
-            }
-            else
-            {
-                tbcQ.Visibility = Visibility.Collapsed;
-                spNee.Visibility = Visibility.Visible;
-            }
+            TabItem tbi = new TabItem();
+            tbi.Content = sp;
+            tbi.Header = Txt.s._[(int)TxI.OP_NEE];
+            return tbi;
         }
 
         private void tbiQ_GotFocus(object sender, RoutedEventArgs e)

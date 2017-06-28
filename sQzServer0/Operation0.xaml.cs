@@ -180,9 +180,9 @@ namespace sQzServer0
 
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
-            if (bRunning && mCbMsg.ToUp())
-                Dispatcher.Invoke(() => {
-                    lblStatus.Text += mCbMsg.txt; });
+            //if (bRunning && mCbMsg.ToUp())
+            //    Dispatcher.Invoke(() => {
+            //        lblStatus.Text += mCbMsg.txt; });
         }
 
         private void btnStopSrvr_Click(object sender, RoutedEventArgs e)
@@ -308,6 +308,13 @@ namespace sQzServer0
             txtT1.Text = t._[(int)TxI.T1];
             txtT2.Text = t._[(int)TxI.T2];
             txtComp.Text = t._[(int)TxI.COMP];
+
+            txtRIdx.Text = t._[(int)TxI.IDX];
+            txtRId.Text = t._[(int)TxI.ROOM];
+            txtRN.Text = t._[(int)TxI.OP_N_NEE];
+            txtRT1.Text = t._[(int)TxI.T1];
+            txtRT2.Text = t._[(int)TxI.T2];
+            txtRQPack.Text = t._[(int)TxI.OP_Q];
         }
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -388,7 +395,7 @@ namespace sQzServer0
                 return;
             }
             Op0SlotView tbi = new Op0SlotView(sl);
-            tbi.DeepCopy(tbiSl);
+            tbi.DeepCopy(tbcRefSl);
             tbi.ShowExaminee();
             tbi.ShowQSHeader();
             tbcSl.Items.Add(tbi);

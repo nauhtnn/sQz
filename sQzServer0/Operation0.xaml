@@ -143,26 +143,55 @@
                 </Grid>
                 <Button Name="btnQSav" IsEnabled="False" Click="btnQGen_Click" Width="120" Height="40" Background="#fbbc09" Foreground="#fff" Margin="0,00,0,10"/>
             </StackPanel>
-            <TabControl x:Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged">
-                <TabItem Header="_0">
-                    <ScrollViewer x:Name="svwrStt" Height="600" VerticalScrollBarVisibility="Auto">
-                        <TextBlock x:Name="lblStatus" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"/>
-                    </ScrollViewer>
+            <TabControl Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged"/>
+            <TabControl Name="tbcRefSl" Width="876" Visibility="Collapsed">
+                <TabItem Name="tbiStat" Width="876">
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="30"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="60"/>
+                        </Grid.ColumnDefinitions>
+                        <TextBlock Name="txtRIdx"/>
+                        <TextBlock Name="txtRId" Grid.Column="1"/>
+                        <TextBlock Name="txtRN" Grid.Column="2"/>
+                        <TextBlock Name="txtRT1" Grid.Column="3"/>
+                        <TextBlock Name="txtRT2" Grid.Column="4"/>
+                        <TextBlock Name="txtRQPack" Grid.Column="5" Grid.ColumnSpan="2"/>
+                    </Grid>
                 </TabItem>
-                <TabItem x:Name="tbiSl" Visibility="Collapsed" Width="876">
+                <TabItem Width="876">
                     <StackPanel>
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="120"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="80"/>
                             </Grid.ColumnDefinitions>
                             <Grid.RowDefinitions>
                                 <RowDefinition Height="30"/>
                             </Grid.RowDefinitions>
-                            <RadioButton GroupName="slVw" HorizontalAlignment="Center"/>
-                            <RadioButton GroupName="slVw" Name="Q" Grid.Column="1" HorizontalAlignment="Center"/>
+                            <TextBlock Name="txtId" Background="Coral" TextAlignment="Center"/>
+                            <TextBlock Name="txtName" Grid.Column="1" Background="Brown" TextAlignment="Center"/>
+                            <TextBlock Name="txtBirdate" Grid.Column="2" Background="Cyan" TextAlignment="Center"/>
+                            <TextBlock Name="txtBirpl" Grid.Column="3" Background="Gold" TextAlignment="Center"/>
+                            <TextBlock Name="txtRoom" Grid.Column="4" Background="Blue" TextAlignment="Center"/>
+                            <TextBlock Name="txtGrade" Grid.Column="5" Background="Violet" TextAlignment="Center"/>
+                            <TextBlock Name="txtT1" Grid.Column="6" Background="Pink" TextAlignment="Center"/>
+                            <TextBlock Name="txtT2" Grid.Column="7" Background="Maroon" TextAlignment="Center"/>
+                            <TextBlock Name="txtComp" Grid.Column="8" Background="GreenYellow" TextAlignment="Center"/>
                         </Grid>
-                        <StackPanel>
+                        <ScrollViewer VerticalScrollBarVisibility="Auto" Height="600">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="60"/>
@@ -175,35 +204,8 @@
                                     <ColumnDefinition Width="60"/>
                                     <ColumnDefinition Width="80"/>
                                 </Grid.ColumnDefinitions>
-                                <Grid.RowDefinitions>
-                                    <RowDefinition Height="30"/>
-                                </Grid.RowDefinitions>
-                                <TextBlock Name="txtId" Background="Coral" TextAlignment="Center"/>
-                                <TextBlock Name="txtName" Grid.Column="1" Background="Brown" TextAlignment="Center"/>
-                                <TextBlock Name="txtBirdate" Grid.Column="2" Background="Cyan" TextAlignment="Center"/>
-                                <TextBlock Name="txtBirpl" Grid.Column="3" Background="Gold" TextAlignment="Center"/>
-                                <TextBlock Name="txtRoom" Grid.Column="4" Background="Blue" TextAlignment="Center"/>
-                                <TextBlock Name="txtGrade" Grid.Column="5" Background="Violet" TextAlignment="Center"/>
-                                <TextBlock Name="txtT1" Grid.Column="6" Background="Pink" TextAlignment="Center"/>
-                                <TextBlock Name="txtT2" Grid.Column="7" Background="Maroon" TextAlignment="Center"/>
-                                <TextBlock Name="txtComp" Grid.Column="8" Background="GreenYellow" TextAlignment="Center"/>
                             </Grid>
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" Height="600">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="200"/>
-                                        <ColumnDefinition Width="100"/>
-                                        <ColumnDefinition Width="120"/>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="80"/>
-                                    </Grid.ColumnDefinitions>
-                                </Grid>
-                            </ScrollViewer>
-                        </StackPanel>
+                        </ScrollViewer>
                     </StackPanel>
                 </TabItem>
             </TabControl>
