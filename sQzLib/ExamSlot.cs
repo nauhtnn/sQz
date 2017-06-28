@@ -19,18 +19,22 @@ namespace sQzLib
     {
         public DateTime mDt;
         public Dictionary<ExamLv, QuestPack> vQPack;
+        public Dictionary<ExamLv, QuestPack> vQPackR;
 
         public AnsPack mKeyPack;
 
         public Dictionary<int, ExamRoom> vRoom;
+        public Dictionary<int, bool> vbQPkR;
         public ExamStt eStt;
 
         public ExamSlot()
         {
             mDt = DT.INV_;
             vRoom = new Dictionary<int, ExamRoom>();
+            vbQPkR = new Dictionary<int, bool>();
             eStt = ExamStt.Prep;
             vQPack = new Dictionary<ExamLv, QuestPack>();
+            vQPackR = new Dictionary<ExamLv, QuestPack>();
             QuestPack p = new QuestPack();
             p.eLv = ExamLv.A;
             vQPack.Add(p.eLv, p);
@@ -55,6 +59,47 @@ namespace sQzLib
                     vRoom.Add(i, r);
             }
             return null;
+        }
+
+        public string DBSelQPkR()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return Txt.s._[(int)TxI.DB_NOK];
+            string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid,qpkr",
+                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return eMsg;
+            }
+            while (reader.Read())
+            {
+                int rid = reader.GetInt16(0);
+                if (vbQPkR.ContainsKey(rid))
+                    vbQPkR[rid] = reader.GetInt16(1) != 0;
+                else
+                    vbQPkR.Add(rid, reader.GetInt16(1) != 0);
+            }
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return null;
+        }
+
+        public string DBUpQPkR()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return Txt.s._[(int)TxI.DB_NOK];
+            string emsg;
+            int n = DBConnect.Update(conn, "sqz_slot_room", "qpkr=1", "dt='" +
+                mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'", out emsg);
+            DBConnect.Close(ref conn);
+            if(0 < n)
+                return null;
+            return emsg;
         }
 
         public string DBSelStt()
@@ -345,7 +390,7 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
                 if (n < r.nLv[lv])
                     n = r.nLv[lv];
-            return n + (n / 10) + 1;
+            return n;
         }
 
         public bool ReadByteR0(byte[] buf, ref int offs)
@@ -439,9 +484,15 @@ namespace sQzLib
             vQPack[lv].vSheet.Clear();
             List<QuestSheet> l;
             if(System.IO.File.Exists("Randomize.txt"))
+            {
                 l = vQPack[lv].GenQPack2(n, vn, vndiff);
+                l.InsertRange(l.Count, vQPackR[lv].GenQPack2(n, vn, vndiff));
+            }
             else
+            {
                 l = vQPack[lv].GenQPack3(n, vn, vndiff);
+                l.InsertRange(l.Count, vQPackR[lv].GenQPack2(n, vn, vndiff));
+            }
             mKeyPack.ExtractKey(l);
             return false;
         }

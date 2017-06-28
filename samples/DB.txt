@@ -13,7 +13,8 @@ INDEX(`stt`));
 CREATE TABLE IF NOT EXISTS `sqz_room`(`id` TINYINT PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_slot_room`(`dt` DATE, `t` TIME, `rid` TINYINT,
-`pw` CHAR(8) CHARACTER SET `ascii`, PRIMARY KEY(`dt`, `t`, `rid`),
+`pw` CHAR(8) CHARACTER SET `ascii`, `qpkr` TINYINT,
+PRIMARY KEY(`dt`, `t`, `rid`),
 FOREIGN KEY(`dt`, `t`) REFERENCES `sqz_slot`(`dt`, `t`),
 FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
 
