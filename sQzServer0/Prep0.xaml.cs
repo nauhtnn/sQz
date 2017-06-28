@@ -370,7 +370,7 @@ namespace sQzServer0
             txtDt.Text = t._[(int)TxI.DATE_L];
             txtHm.Text = t._[(int)TxI.TIME_L];
             txtIU.Text = t._[(int)TxI.IUS];
-            tbi1.Header = t._[(int)TxI.PREP_DT_T];
+            tbi1.Header = t._[(int)TxI.PREP_NEE];
             tbi2.Header = t._[(int)TxI.PREP_Q];
             txtId.Text = t._[(int)TxI.NEEID_S];
             txtName.Text = t._[(int)TxI.NEE_NAME];

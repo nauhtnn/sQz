@@ -130,7 +130,7 @@ namespace sQzLib {
 		PREP_IU15,
 		SEL_ALL,
 		PREP_DEL_SEL,
-		PREP_DT_T,
+		PREP_NEE,
 		PREP_Q,
 	}
 }
