@@ -188,18 +188,82 @@ namespace sQzServer0
                 d.Width = cd.Width;
                 g.ColumnDefinitions.Add(d);
             }
+            foreach (RowDefinition rd in refg.RowDefinitions)
+            {
+                RowDefinition d = new RowDefinition();
+                d.Height = rd.Height;
+                g.RowDefinitions.Add(d);
+            }
             foreach (TextBlock txt in refg.Children)
             {
                 TextBlock t = new TextBlock();
                 t.Text = txt.Text;
                 t.Background = txt.Background;
                 t.Foreground = txt.Foreground;
+                t.TextAlignment = txt.TextAlignment;
                 Grid.SetColumn(t, Grid.GetColumn(txt));
+                Grid.SetColumnSpan(t, Grid.GetColumnSpan(txt));
                 Grid.SetRow(t, Grid.GetRow(txt));
                 g.Children.Add(t);
             }
+            //
+            GridLength h = new GridLength(40);
+            int i = 1;
+            SolidColorBrush br = new SolidColorBrush(Colors.Black);
+            Thickness th = new Thickness(0, 0, 0, 1);
+            foreach (ExamRoom r in mSl.vRoom.Values)
+            {
+                RowDefinition rd = new RowDefinition();
+                rd.Height = h;
+                g.RowDefinitions.Add(rd);
+                Border bor = new Border();
+                bor.BorderBrush = br;
+                bor.BorderThickness = th;
+                Grid.SetColumnSpan(bor, g.ColumnDefinitions.Count);
+                Grid.SetRow(bor, i);
+                g.Children.Add(bor);
+                TextBlock t = new TextBlock();
+                t.TextAlignment = TextAlignment.Center;
+                t.Text = i.ToString();
+                Grid.SetRow(t, ++i);
+                Grid.SetColumn(t, 0);
+                g.Children.Add(t);
+                t = new TextBlock();
+                t.TextAlignment = TextAlignment.Center;
+                t.Text = (r.uId + 1).ToString();
+                Grid.SetRow(t, i);
+                Grid.SetColumn(t, 1);
+                g.Children.Add(t);
+                t = new TextBlock();
+                t.TextAlignment = TextAlignment.Center;
+                t.Text = r.vExaminee.Count.ToString();
+                Grid.SetRow(t, i);
+                Grid.SetColumn(t, 2);
+                g.Children.Add(t);
+                RadioButton rdo = new RadioButton();
+                rdo.GroupName = "_" + i;
+                rdo.IsChecked = true;
+                Grid.SetRow(rdo, i);
+                Grid.SetColumn(rdo, 5);
+                rdo.HorizontalAlignment = HorizontalAlignment.Center;
+                g.Children.Add(rdo);
+                rdo = new RadioButton();
+                rdo.GroupName = "_" + i;
+                Grid.SetRow(rdo, i);
+                Grid.SetColumn(rdo, 6);
+                rdo.HorizontalAlignment = HorizontalAlignment.Center;
+                g.Children.Add(rdo);
+                Button btn = new Button();
+                btn.Content = Txt.s._[(int)TxI.SUBMIT];
+                btn.Background = Theme.s._[(int)BrushId.Button_Hover];
+                btn.Foreground = Theme.s._[(int)BrushId.QID_Color];
+                Grid.SetRow(btn, i);
+                Grid.SetColumn(btn, 7);
+                g.Children.Add(btn);
+            }
+            //
             TabItem tbi = new TabItem();
-            tbi.Content = refg;
+            tbi.Content = g;
             tbi.Header = Txt.s._[(int)TxI.OP_STT];
             return tbi;
         }

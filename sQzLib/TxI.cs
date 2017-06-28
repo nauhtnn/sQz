@@ -127,6 +127,8 @@ namespace sQzLib {
 		OP_Q,
 		OP_NEE,
 		OP_N_NEE,
+		OP_QPR_0,
+		OP_QPR_1,
 		PREP_DEL,
 		PREP_IMP,
 		PREP_IU15,

@@ -146,22 +146,29 @@
             <TabControl Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged"/>
             <TabControl Name="tbcRefSl" Width="876" Visibility="Collapsed">
                 <TabItem Name="tbiStat" Width="876">
-                    <Grid>
+                    <Grid ShowGridLines="True">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="30"/>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="120"/>
+                            <ColumnDefinition Width="100"/>
                         </Grid.ColumnDefinitions>
-                        <TextBlock Name="txtRIdx"/>
-                        <TextBlock Name="txtRId" Grid.Column="1"/>
-                        <TextBlock Name="txtRN" Grid.Column="2"/>
-                        <TextBlock Name="txtRT1" Grid.Column="3"/>
-                        <TextBlock Name="txtRT2" Grid.Column="4"/>
-                        <TextBlock Name="txtRQPack" Grid.Column="5" Grid.ColumnSpan="2"/>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="40"/>
+                            <RowDefinition Height="40"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Name="txtRIdx" TextAlignment="Center"/>
+                        <TextBlock Name="txtRId" Grid.Column="1" TextAlignment="Center"/>
+                        <TextBlock Name="txtRN" Grid.Column="2" TextAlignment="Center"/>
+                        <TextBlock Name="txtRT1" Grid.Column="3" TextAlignment="Center"/>
+                        <TextBlock Name="txtRT2" Grid.Column="4" TextAlignment="Center"/>
+                        <TextBlock Name="txtRQPack" Grid.Column="5" Grid.ColumnSpan="2" TextAlignment="Center"/>
+                        <TextBlock Name="txtQPackR0" Grid.Row="1" Grid.Column="5" TextAlignment="Center"/>
+                        <TextBlock Name="txtQPackR1" Grid.Row="1" Grid.Column="6" TextAlignment="Center"/>
                     </Grid>
                 </TabItem>
                 <TabItem Width="876">

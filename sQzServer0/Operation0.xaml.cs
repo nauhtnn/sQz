@@ -315,6 +315,8 @@ namespace sQzServer0
             txtRT1.Text = t._[(int)TxI.T1];
             txtRT2.Text = t._[(int)TxI.T2];
             txtRQPack.Text = t._[(int)TxI.OP_Q];
+            txtQPackR0.Text = t._[(int)TxI.OP_QPR_0];
+            txtQPackR1.Text = t._[(int)TxI.OP_QPR_1];
         }
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
