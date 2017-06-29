@@ -34,13 +34,20 @@ namespace sQzLib
             vbQPkR = new Dictionary<int, bool>();
             eStt = ExamStt.Prep;
             vQPack = new Dictionary<ExamLv, QuestPack>();
-            vQPackR = new Dictionary<ExamLv, QuestPack>();
             QuestPack p = new QuestPack();
             p.eLv = ExamLv.A;
             vQPack.Add(p.eLv, p);
             p = new QuestPack();
             p.eLv = ExamLv.B;
             vQPack.Add(p.eLv, p);
+
+            vQPackR = new Dictionary<ExamLv, QuestPack>();
+            p = new QuestPack();
+            p.eLv = ExamLv.A;
+            vQPackR.Add(p.eLv, p);
+            p = new QuestPack();
+            p.eLv = ExamLv.B;
+            vQPackR.Add(p.eLv, p);
 
             mKeyPack = new AnsPack();
         }
@@ -88,14 +95,14 @@ namespace sQzLib
             return null;
         }
 
-        public string DBUpQPkR()
+        public string DBUpQPkR(int rid)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return Txt.s._[(int)TxI.DB_NOK];
             string emsg;
             int n = DBConnect.Update(conn, "sqz_slot_room", "qpkr=1", "dt='" +
-                mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'", out emsg);
+                mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "' AND rid=" + rid, out emsg);
             DBConnect.Close(ref conn);
             if(0 < n)
                 return null;
@@ -261,8 +268,8 @@ namespace sQzLib
                 }
                 else if (bNExist)
                     n = DBConnect.Ins(conn, "sqz_slot_room",
-                        "dt,t,rid", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
-                        "'," + r.uId + ")", out eMsg);
+                        "dt,t,rid,qpkr", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
+                        "'," + r.uId + ",0)", out eMsg);
                 if(n < 0)
                 {
                     DBConnect.Close(ref conn);

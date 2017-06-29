@@ -125,6 +125,7 @@ namespace sQzLib {
 		RS_UP_NOTHING,
 		OP_STT,
 		OP_Q,
+		OP_QR,
 		OP_NEE,
 		OP_N_NEE,
 		OP_QPR_0,

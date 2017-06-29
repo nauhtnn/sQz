@@ -14,6 +14,7 @@ namespace sQzServer0
     public class Op0SlotView: TabItem
     {
         TabControl tbcQ;
+        TabControl tbcQR;
         public SortedList<int, TextBlock> vGrade;
         public SortedList<int, TextBlock> vDt1;
         public SortedList<int, TextBlock> vDt2;
@@ -173,6 +174,12 @@ namespace sQzServer0
             i.Header = Txt.s._[(int)TxI.OP_Q];
             i.Content = tbcQ;
             tbc.Items.Add(i);
+            tbcQR = new TabControl();
+            tbcQR.Width = refTbc.Width;
+            i = new TabItem();
+            i.Header = Txt.s._[(int)TxI.OP_QR];
+            i.Content = tbcQR;
+            tbc.Items.Add(i);
             Content = tbc;
         }
 
@@ -241,14 +248,17 @@ namespace sQzServer0
                 Grid.SetColumn(t, 2);
                 g.Children.Add(t);
                 RadioButton rdo = new RadioButton();
-                rdo.GroupName = "_" + i;
+                rdo.GroupName = "_" + r.uId;
                 rdo.IsChecked = true;
                 Grid.SetRow(rdo, i);
                 Grid.SetColumn(rdo, 5);
                 rdo.HorizontalAlignment = HorizontalAlignment.Center;
                 g.Children.Add(rdo);
                 rdo = new RadioButton();
-                rdo.GroupName = "_" + i;
+                rdo.GroupName = "_" + r.uId;
+                if (mSl.vbQPkR.ContainsKey(r.uId) && mSl.vbQPkR[r.uId])
+                    rdo.IsChecked = true;
+                rdo.Checked += Rdo_Checked;
                 Grid.SetRow(rdo, i);
                 Grid.SetColumn(rdo, 6);
                 rdo.HorizontalAlignment = HorizontalAlignment.Center;
@@ -266,6 +276,19 @@ namespace sQzServer0
             tbi.Content = g;
             tbi.Header = Txt.s._[(int)TxI.OP_STT];
             return tbi;
+        }
+
+        private void Rdo_Checked(object sender, RoutedEventArgs e)
+        {
+            RadioButton rdo = sender as RadioButton;
+            if (rdo == null)
+                return;
+            int rid = int.Parse(rdo.GroupName.Substring(1));
+            if (mSl.vbQPkR.ContainsKey(rid) && !mSl.vbQPkR[rid])
+            {
+                mSl.vbQPkR[rid] = true;
+                mSl.DBUpQPkR(rid);
+            }
         }
 
         TabItem DeepCopyNee(TabItem refTbi)
@@ -326,6 +349,9 @@ namespace sQzServer0
             TabItem tbi = sender as TabItem;
             if (tbi == null || tbi.Content != null)
                 return;
+            TabControl tbc = tbi.Parent as TabControl;
+            if (tbc == null)
+                return;
             ExamLv lv;
             int id;
             if (QuestSheet.ParseLvId((tbi.Header as TextBlock).Text, out lv, out id))
@@ -351,7 +377,7 @@ namespace sQzServer0
                     bg = oddbg;
                 even = !even;
                 TextBlock i = new TextBlock();
-                i.Width = tbcQ.Width - SystemParameters.ScrollWidth;
+                i.Width = tbc.Width - SystemParameters.ScrollWidth;
                 i.TextWrapping = TextWrapping.Wrap;
                 i.Text = ++x + ". " + q.Stmt;
                 i.Background = bg;
@@ -359,7 +385,7 @@ namespace sQzServer0
                 for (int idx = 0; idx < Question.N_ANS; ++idx)
                 {
                     TextBlock j = new TextBlock();
-                    j.Width = tbcQ.Width - SystemParameters.ScrollWidth;
+                    j.Width = tbc.Width - SystemParameters.ScrollWidth;
                     j.TextWrapping = TextWrapping.Wrap;
                     j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
                     j.Background = bg;
@@ -423,8 +449,18 @@ namespace sQzServer0
                         
                     tbcQ.Items.Add(ti);
                 }
-            if (0 < tbcQ.Items.Count)
-                tbiQ_GotFocus(tbcQ.Items[0], null);
+            foreach (QuestPack p in mSl.vQPackR.Values)
+                foreach (QuestSheet qs in p.vSheet.Values)
+                {
+                    TabItem ti = new TabItem();
+                    TextBlock t = new TextBlock();
+                    t.Text = qs.eLv.ToString() + qs.uId.ToString("d3");
+                    t.FontSize = 12;
+                    ti.Header = t;
+                    ti.GotFocus += tbiQ_GotFocus;
+
+                    tbcQR.Items.Add(ti);
+                }
         }
     }
 }

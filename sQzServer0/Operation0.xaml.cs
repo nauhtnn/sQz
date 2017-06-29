@@ -401,6 +401,7 @@ namespace sQzServer0
             DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
             sl.Dt = dt;
             sl.DBSelStt();
+            sl.DBSelQPkR();
             sl.DBSelNee();
             if(sl.DBSelArchieve(out emsg))
             {
