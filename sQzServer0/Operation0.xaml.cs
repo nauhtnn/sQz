@@ -185,6 +185,7 @@ namespace sQzServer0
                     vw.mSl.DBUpStt();
                 }
             }
+            DisableQSGen();
             Thread th = new Thread(() => {mServer.Start(ref mCbMsg);});
             th.Start();
         }
@@ -397,6 +398,24 @@ namespace sQzServer0
             }
         }
 
+        void DisableQSGen()
+        {
+            foreach (TextBox[] vt in vtxtNEsyDif.Values)
+                foreach(TextBox t in vt)
+                    t.IsEnabled = false;
+            foreach (TextBox[] vt in vtxtNDiff.Values)
+                foreach (TextBox t in vt)
+                    t.IsEnabled = false;
+            btnQGen.IsEnabled = false;
+        }
+
+        void EnableQSGen()
+        {
+            foreach (TextBox[] vt in vtxtNEsyDif.Values)
+                foreach (TextBox t in vt)
+                    t.IsEnabled = true;
+        }
+
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
         {
             ListBoxItem i = sender as ListBoxItem;
@@ -430,6 +449,11 @@ namespace sQzServer0
             tbcSl.Items.Add(tbi);
             QuestSheet.DBUpdateCurQSId(mBrd.mDt);
             mBrd.vSl.Add(i.Content as string, sl);
+            if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
+                    tbi.mSl.eStt == ExamStt.Prep)
+                EnableQSGen();
+            else
+                DisableQSGen();
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)
@@ -657,6 +681,11 @@ namespace sQzServer0
                 foreach (TextBox t in vtxtNDiff[lv])
                     t.Text = string.Empty;
             }
+            if ((vw = tbcSl.SelectedItem as Op0SlotView) != null &&
+                    vw.mSl.eStt == ExamStt.Prep)
+                EnableQSGen();
+            else
+                DisableQSGen();
         }
     }
 }
