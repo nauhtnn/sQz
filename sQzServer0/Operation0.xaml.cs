@@ -223,6 +223,12 @@ namespace sQzServer0
                     x = BitConverter.ToInt32(buf, offs);
                     offs += 4;
                     outMsg = mBrd.ToByteSl1(x);
+                    Dispatcher.InvokeAsync(() =>
+                    {
+                        DateTime now = DateTime.Now;
+                        foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
+                            vw.UpRT1(x, now);
+                    });
                     return true;
                 case NetCode.QuestRetrieving:
                     if(buf.Length - offs < 4)
@@ -280,7 +286,8 @@ namespace sQzServer0
                     outMsg = BitConverter.GetBytes(-1);
                     break;
                 case NetCode.SrvrSubmitting:
-                    if (!mBrd.ReadByteSl0(buf, ref offs))
+                    int rid;
+                    if (-1 < (rid = mBrd.ReadByteSl0(buf, ref offs)))
                     {
                         string emsg;
                         if (mBrd.DBUpdateRs(out emsg))
@@ -288,10 +295,10 @@ namespace sQzServer0
                         else
                         {
                             mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
-                            Dispatcher.Invoke(() =>
+                            Dispatcher.InvokeAsync(() =>
                             {
                                 foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
-                                    vw.UpdateRsView();
+                                    vw.UpdateRsView(rid);
                             });
                         }
                     }

@@ -140,24 +140,28 @@ namespace sQzServer0
                 }
         }
 
-        public void UpdateRsView()
+        public void UpdateRsView(int rid)
         {
-            TextBlock t;
-            foreach (ExamRoom r in mSl.vRoom.Values)
-                foreach (ExamineeS0 e in r.vExaminee.Values)
-                    if(e.bToVw)
-                    {
-                        e.bToVw = false;
-                        int lvid = e.LvId;
-                        if (e.uGrade != ExamineeA.LV_CAP && vGrade.TryGetValue(lvid, out t))
-                            t.Text = e.Grade;
-                        if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
-                            t.Text = e.dtTim1.ToString("HH:mm");
-                        if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))
-                            t.Text = e.dtTim2.ToString("HH:mm");
-                        if (e.tComp != null && vComp.TryGetValue(lvid, out t))
-                            t.Text = e.tComp;
-                    }
+            ExamRoom r;
+            if (!mSl.vRoom.TryGetValue(rid, out r))
+                return;
+            if (vRT2.ContainsKey(rid))
+                vRT2[rid].Text = DateTime.Now.ToString(DT.hh);
+            foreach (ExamineeS0 e in r.vExaminee.Values)
+                if(e.bToVw)
+                {
+                    e.bToVw = false;
+                    int lvid = e.LvId;
+                    TextBlock t;
+                    if (e.uGrade != ExamineeA.LV_CAP && vGrade.TryGetValue(lvid, out t))
+                        t.Text = e.Grade;
+                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
+                        t.Text = e.dtTim1.ToString("HH:mm");
+                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))
+                        t.Text = e.dtTim2.ToString("HH:mm");
+                    if (e.tComp != null && vComp.TryGetValue(lvid, out t))
+                        t.Text = e.tComp;
+                }
         }
 
         public void DeepCopy(TabControl refTbc)
@@ -275,7 +279,7 @@ namespace sQzServer0
                 rdo.GroupName = "_" + r.uId;
                 if (mSl.vbQPkAlt.ContainsKey(r.uId) && mSl.vbQPkAlt[r.uId])
                     rdo.IsChecked = true;
-                rdo.Checked += Rdo_Checked;
+                rdo.Checked += Alt_Checked;
                 Grid.SetRow(rdo, i);
                 Grid.SetColumn(rdo, 6);
                 rdo.HorizontalAlignment = HorizontalAlignment.Center;
@@ -295,7 +299,7 @@ namespace sQzServer0
             return tbi;
         }
 
-        private void Rdo_Checked(object sender, RoutedEventArgs e)
+        private void Alt_Checked(object sender, RoutedEventArgs e)
         {
             RadioButton rdo = sender as RadioButton;
             if (rdo == null)
@@ -489,6 +493,12 @@ namespace sQzServer0
                 }
             if (0 < tbcQAlt.Items.Count)
                 tbiQ_GotFocus(tbcQAlt.Items[0], null);
+        }
+
+        public void UpRT1(int rid, DateTime dt)
+        {
+            if (vRT1.ContainsKey(rid))
+                vRT1[rid].Text = dt.ToString(DT.hh);
         }
     }
 }

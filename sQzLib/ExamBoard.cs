@@ -205,29 +205,30 @@ namespace sQzLib
             return buf;
         }
 
-        public bool ReadByteSl0(byte[] buf, ref int offs)
+        public int ReadByteSl0(byte[] buf, ref int offs)
         {
             DateTime dt;
             if (DT.ReadByte(buf, ref offs, out dt) || dt != mDt)
-                return true;
+                return -1;
             if (buf.Length - offs < 4)
-                return true;
+                return -1;
             int n = BitConverter.ToInt32(buf, offs);
             offs += 4;
+            int rid = -1;
             while (0 < n)
             {
                 --n;
                 if (DT.ReadByteh(buf, ref offs, out dt))
-                    return true;
+                    return -1;
                 ExamSlot sl;
                 if (vSl.TryGetValue(dt.ToString(DT.hh), out sl) &&
-                    sl.ReadByteR0(buf, ref offs))
-                        return true;
+                    (rid = sl.ReadByteR0(buf, ref offs)) < 0)
+                        return -1;
             }
             if (n == 0)
-                return false;
+                return rid;
             else
-                return true;
+                return -1;
         }
 
         public byte[] ToByteQPack(int rid)

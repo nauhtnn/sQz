@@ -406,26 +406,17 @@ namespace sQzLib
             return n;
         }
 
-        public bool ReadByteR0(byte[] buf, ref int offs)
+        public int ReadByteR0(byte[] buf, ref int offs)
         {
             if (buf.Length - offs < 4)
-                return true;
-            int n = BitConverter.ToInt32(buf, offs);
+                return -1;
+            int rid = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            while (0 < n)
-            {
-                --n;
-                int rId = BitConverter.ToInt32(buf, offs);
-                offs += 4;
-                ExamRoom r;
-                if (vRoom.TryGetValue(rId, out r) &&
-                    r.ReadByte0(buf, ref offs))
-                        return true;
-            }
-            if (n == 0)
-                return false;
-            else
-                return true;
+            ExamRoom r;
+            if (!vRoom.TryGetValue(rid, out r) ||
+                r.ReadByte0(buf, ref offs))
+                return -1;
+            return rid;
         }
 
         public List<byte[]> ToByteR1(int rId)
@@ -433,19 +424,10 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.ToByteh(mDt));
             ExamRoom r;
-            if (rId == 0)
-            {
-                l.Add(BitConverter.GetBytes(vRoom.Count));
-                foreach (ExamRoom i in vRoom.Values)
-                    l.InsertRange(l.Count, i.ToByte1());
-            }
-            else if (vRoom.TryGetValue(rId, out r))
-            {
-                l.Add(BitConverter.GetBytes(1));
+            if (vRoom.TryGetValue(rId, out r))
                 l.InsertRange(l.Count, r.ToByte1());
-            }
             else
-                l.Add(BitConverter.GetBytes(0));
+                l.Add(BitConverter.GetBytes(-1));
             return l;
         }
 
@@ -453,32 +435,25 @@ namespace sQzLib
         {
             if (buf.Length - offs < 4)
                 return true;
-            int n = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            while (0 < n)
-            {
-                --n;
-                int rId = BitConverter.ToInt32(buf, offs);
-                offs += 4;
-                ExamRoom r;
-                if (vRoom.TryGetValue(rId, out r))
-                {
-                    if (r.ReadByte1(buf, ref offs))
-                        return true;
-                }
-                else
-                {
-                    r = new ExamRoom();
-                    r.uId = rId;
-                    if (r.ReadByte1(buf, ref offs))
-                        return true;
-                    vRoom.Add(rId, r);
-                }
-            }
-            if (n == 0)
-                return false;
-            else
+            int rId;
+            if ((rId = BitConverter.ToInt32(buf, offs)) < 0)
                 return true;
+            offs += 4;
+            ExamRoom r;
+            if (vRoom.TryGetValue(rId, out r))
+            {
+                if (r.ReadByte1(buf, ref offs))
+                    return true;
+            }
+            else
+            {
+                r = new ExamRoom();
+                r.uId = rId;
+                if (r.ReadByte1(buf, ref offs))
+                    return true;
+                vRoom.Add(rId, r);
+            }
+            return false;
         }
 
         public void DBUpdateRs(StringBuilder vals)
@@ -651,9 +626,11 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.ToByteh(mDt));
-            l.Add(BitConverter.GetBytes(vRoom.Count));
-            foreach (ExamRoom r in vRoom.Values)
-                l.InsertRange(l.Count, r.ToByte0());
+            if(vRoom.Values.Count == 1)//either 0 or 1
+            {
+                foreach(ExamRoom r in vRoom.Values)
+                    l.InsertRange(l.Count, r.ToByte0());
+            }
             return l;
         }
     }

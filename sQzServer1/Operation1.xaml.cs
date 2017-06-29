@@ -30,7 +30,6 @@ namespace sQzServer1
         bool bRunning;
         ExamBoard mBrd;
         int uRId;//todo change to enum
-        bool bAllR;
         bool bStrtReqQSh;
         bool bQShReqting;
         int uReqQSh;
@@ -49,10 +48,9 @@ namespace sQzServer1
 
             mBrd = new ExamBoard();
 
-            bAllR = false;
-            if(System.IO.File.Exists("Room.txt") &&
+            if(!System.IO.File.Exists("Room.txt") ||
                 !int.TryParse(System.IO.File.ReadAllText("Room.txt"), out uRId))
-                uRId = 1;
+                uRId = 0;
             bStrtReqQSh = bQShReqting = false;
             uReqQSh = ExamineeA.LV_CAP;
 
@@ -444,10 +442,7 @@ namespace sQzServer1
                 case NetCode.DateStudentRetriving:
                     outMsg = new byte[8];
                     Array.Copy(BitConverter.GetBytes((int)mState), 0, outMsg, 0, 4);
-                    if(bAllR)
-                        Array.Copy(BitConverter.GetBytes(0), 0, outMsg, 4, 4);
-                    else
-                        Array.Copy(BitConverter.GetBytes(uRId), 0, outMsg, 4, 4);
+                    Array.Copy(BitConverter.GetBytes(uRId), 0, outMsg, 4, 4);
                     break;
                 case NetCode.QuestRetrieving:
                     outMsg = new byte[8];
@@ -485,16 +480,6 @@ namespace sQzServer1
             btnStartSrvr.Content = s._[(int)TxI.STRT_SRVR];
             btnStopSrvr.Content = s._[(int)TxI.STOP_SRVR];
             btnSubmit.Content = s._[(int)TxI.SUBMIT];
-        }
-
-        private void ckbAllNee_Checked(object sender, RoutedEventArgs e)
-        {
-            bAllR = true;
-        }
-
-        private void ckbAllNee_Unchecked(object sender, RoutedEventArgs e)
-        {
-            bAllR = false;
         }
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)

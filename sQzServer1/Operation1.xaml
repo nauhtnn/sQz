@@ -17,8 +17,6 @@
                 <Button x:Name="btnStopSrvr" Content="Stop srvr" Click="btnStopSrvr_Click" Width="80"/>
                 <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Width="80"/>
                 <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click"  Width="80"/>
-                <!--<TextBlock Text="all examinees"/>-->
-                <!--<CheckBox x:Name="ckbAllNee" IsChecked="False" Checked="ckbAllNee_Checked" Unchecked="ckbAllNee_Unchecked"/>-->
             </StackPanel>
             <StackPanel Orientation="Horizontal" Margin="10">
                 <StackPanel>
