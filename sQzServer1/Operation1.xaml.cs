@@ -450,7 +450,9 @@ namespace sQzServer1
                         Array.Copy(BitConverter.GetBytes(uRId), 0, outMsg, 4, 4);
                     break;
                 case NetCode.QuestRetrieving:
-                    outMsg = BitConverter.GetBytes((int)mState);
+                    outMsg = new byte[8];
+                    Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outMsg, 0, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(uRId), 0, outMsg, 4, 4);
                     break;
                 case NetCode.AnsKeyRetrieving:
                     outMsg = BitConverter.GetBytes((int)mState);

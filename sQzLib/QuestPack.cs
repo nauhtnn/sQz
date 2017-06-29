@@ -35,25 +35,15 @@ namespace sQzLib
 
         //only Operation0 uses this.
         //optimization: return byte[] instead of List<byte[]>.
-        public byte[] ToByte()
+        public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(vSheet.Values.Count));//opt?
+            l.Add(BitConverter.GetBytes((int)eLv));
+            l.Add(BitConverter.GetBytes(vSheet.Values.Count));
             foreach (QuestSheet qs in vSheet.Values)
                 foreach (byte[] i in qs.ToByte())
                     l.Add(i);
-            //join
-            int sz = 0;
-            foreach (byte[] i in l)
-                sz += i.Length;
-            byte[] r = new byte[sz];
-            int offs = 0;
-            foreach (byte[] i in l)
-            {
-                Buffer.BlockCopy(i, 0, r, offs, i.Length);
-                offs += i.Length;
-            }
-            return r;
+            return l;
         }
 
         //only Operation1 uses this.

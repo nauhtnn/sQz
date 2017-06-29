@@ -230,7 +230,7 @@ namespace sQzLib
                 return true;
         }
 
-        public byte[] ToByteQPack()
+        public byte[] ToByteQPack(int rid)
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(vSl.Count));

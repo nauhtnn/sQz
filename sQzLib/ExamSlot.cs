@@ -535,10 +535,10 @@ namespace sQzLib
             l.Add(DT.ToByteh(mDt));
             l.Add(BitConverter.GetBytes(vQPack.Count));
             foreach (QuestPack p in vQPack.Values)
-            {
-                l.Add(BitConverter.GetBytes((int)p.eLv));
-                l.Add(p.ToByte());
-            }
+                l.InsertRange(l.Count, p.ToByte());
+            l.Add(BitConverter.GetBytes(vQPackAlt.Count));
+            foreach (QuestPack p in vQPackAlt.Values)
+                l.InsertRange(l.Count, p.ToByte());
             return l;
         }
 
@@ -561,10 +561,27 @@ namespace sQzLib
                 if (vQPack[lv].ReadByte(buf, ref offs))
                     return true;
             }
-            if (n == 0)
-                return false;
-            else
+            if (n != 0)
                 return true;
+            //
+            n = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            while (0 < n)
+            {
+                --n;
+                int x;
+                ExamLv lv;
+                if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
+                    lv = (ExamLv)x;
+                else
+                    return true;
+                offs += 4;
+                if (vQPackAlt[lv].ReadByte(buf, ref offs))
+                    return true;
+            }
+            if (n != 0)
+                return true;
+            return false;
         }
 
         public bool ReadByteQPack1(ExamLv lv, byte[] buf, ref int offs)

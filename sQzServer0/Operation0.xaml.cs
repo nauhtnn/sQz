@@ -211,6 +211,7 @@ namespace sQzServer0
             int offs = 0;
             NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
             offs += 4;
+            int x;
             switch (c)
             {
                 case NetCode.DateStudentRetriving:
@@ -219,12 +220,19 @@ namespace sQzServer0
                         outMsg = null;
                         break;
                     }
-                    int rId = BitConverter.ToInt32(buf, offs);
+                    x = BitConverter.ToInt32(buf, offs);
                     offs += 4;
-                    outMsg = mBrd.ToByteSl1(rId);
+                    outMsg = mBrd.ToByteSl1(x);
                     return true;
                 case NetCode.QuestRetrieving:
-                    outMsg = mBrd.ToByteQPack();
+                    if(buf.Length - offs < 4)
+                    {
+                        outMsg = null;
+                        break;
+                    }
+                    x = BitConverter.ToInt32(buf, offs);
+                    offs += 4;
+                    outMsg = mBrd.ToByteQPack(x);
                     return true;
                 case NetCode.AnsKeyRetrieving:
                     outMsg = mBrd.ToByteKey();
