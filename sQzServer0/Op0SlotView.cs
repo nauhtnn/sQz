@@ -19,6 +19,8 @@ namespace sQzServer0
         public SortedList<int, TextBlock> vDt1;
         public SortedList<int, TextBlock> vDt2;
         public SortedList<int, TextBlock> vComp;
+        public Dictionary<int, TextBlock> vRT1;
+        public Dictionary<int, TextBlock> vRT2;
         Grid grdNee;
         public ExamSlot mSl;
         Dictionary<ExamLv, int[]> vNEsyDif, vNDiff;
@@ -214,6 +216,8 @@ namespace sQzServer0
                 g.Children.Add(t);
             }
             //
+            vRT1 = new Dictionary<int, TextBlock>();
+            vRT2 = new Dictionary<int, TextBlock>();
             GridLength h = new GridLength(40);
             int i = 1;
             SolidColorBrush br = new SolidColorBrush(Colors.Black);
@@ -246,6 +250,18 @@ namespace sQzServer0
                 t.Text = r.vExaminee.Count.ToString();
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 2);
+                g.Children.Add(t);
+                t = new TextBlock();
+                vRT1[r.uId] = t;
+                t.TextAlignment = TextAlignment.Center;
+                Grid.SetRow(t, i);
+                Grid.SetColumn(t, 3);
+                g.Children.Add(t);
+                t = new TextBlock();
+                vRT2[r.uId] = t;
+                t.TextAlignment = TextAlignment.Center;
+                Grid.SetRow(t, i);
+                Grid.SetColumn(t, 4);
                 g.Children.Add(t);
                 RadioButton rdo = new RadioButton();
                 rdo.GroupName = "_" + r.uId;

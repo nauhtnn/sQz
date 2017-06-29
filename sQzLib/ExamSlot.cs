@@ -24,6 +24,8 @@ namespace sQzLib
         public AnsPack mKeyPack;
 
         public Dictionary<int, ExamRoom> vRoom;
+        public Dictionary<int, DateTime> vT1;
+        public Dictionary<int, DateTime> vT2;
         public Dictionary<int, bool> vbQPkAlt;
         public bool bQPkAlt;
         public ExamStt eStt;
