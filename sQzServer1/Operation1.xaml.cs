@@ -269,7 +269,7 @@ namespace sQzServer1
                     int qsid = BitConverter.ToInt32(buf, offs);
                     if (qsid == ExamineeA.LV_CAP)
                     {
-                        byte[] a = slo.vQPack[lv].ToByteNextQS();
+                        byte[] a = slo.ToByteNextQS(lv);
                         if (a != null)
                         {
                             outMsg = new byte[a.Length + 4];

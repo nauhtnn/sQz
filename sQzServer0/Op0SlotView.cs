@@ -171,13 +171,13 @@ namespace sQzServer0
             tbcQ = new TabControl();
             tbcQ.Width = refTbc.Width;
             TabItem i = new TabItem();
-            i.Header = Txt.s._[(int)TxI.OP_Q];
+            i.Header = Txt.s._[(int)TxI.OP_Q_PRI];
             i.Content = tbcQ;
             tbc.Items.Add(i);
             tbcQAlt = new TabControl();
             tbcQAlt.Width = refTbc.Width;
             i = new TabItem();
-            i.Header = Txt.s._[(int)TxI.OP_QR];
+            i.Header = Txt.s._[(int)TxI.OP_Q_ALT];
             i.Content = tbcQAlt;
             tbc.Items.Add(i);
             Content = tbc;
@@ -250,13 +250,14 @@ namespace sQzServer0
                 RadioButton rdo = new RadioButton();
                 rdo.GroupName = "_" + r.uId;
                 rdo.IsChecked = true;
+                rdo.IsEnabled = false;
                 Grid.SetRow(rdo, i);
                 Grid.SetColumn(rdo, 5);
                 rdo.HorizontalAlignment = HorizontalAlignment.Center;
                 g.Children.Add(rdo);
                 rdo = new RadioButton();
                 rdo.GroupName = "_" + r.uId;
-                if (mSl.vbQPkR.ContainsKey(r.uId) && mSl.vbQPkR[r.uId])
+                if (mSl.vbQPkAlt.ContainsKey(r.uId) && mSl.vbQPkAlt[r.uId])
                     rdo.IsChecked = true;
                 rdo.Checked += Rdo_Checked;
                 Grid.SetRow(rdo, i);
@@ -284,9 +285,9 @@ namespace sQzServer0
             if (rdo == null)
                 return;
             int rid = int.Parse(rdo.GroupName.Substring(1));
-            if (mSl.vbQPkR.ContainsKey(rid) && !mSl.vbQPkR[rid])
+            if (mSl.vbQPkAlt.ContainsKey(rid) && !mSl.vbQPkAlt[rid])
             {
-                mSl.vbQPkR[rid] = true;
+                mSl.vbQPkAlt[rid] = true;
                 mSl.DBUpQPkR(rid);
             }
         }

@@ -235,7 +235,7 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(vSl.Count));
             foreach (ExamSlot sl in vSl.Values)
-                l.InsertRange(l.Count, sl.ToByteQPack());
+                l.InsertRange(l.Count, sl.ToByteQPack(rid));
             int sz = DT.BYTE_COUNT;
             foreach (byte[] x in l)
                 sz += x.Length;

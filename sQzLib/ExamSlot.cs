@@ -24,14 +24,16 @@ namespace sQzLib
         public AnsPack mKeyPack;
 
         public Dictionary<int, ExamRoom> vRoom;
-        public Dictionary<int, bool> vbQPkR;
+        public Dictionary<int, bool> vbQPkAlt;
+        public bool bQPkAlt;
         public ExamStt eStt;
 
         public ExamSlot()
         {
             mDt = DT.INV_;
             vRoom = new Dictionary<int, ExamRoom>();
-            vbQPkR = new Dictionary<int, bool>();
+            vbQPkAlt = new Dictionary<int, bool>();
+            bQPkAlt = false;
             eStt = ExamStt.Prep;
             vQPack = new Dictionary<ExamLv, QuestPack>();
             QuestPack p = new QuestPack(false);
@@ -85,10 +87,10 @@ namespace sQzLib
             while (reader.Read())
             {
                 int rid = reader.GetInt16(0);
-                if (vbQPkR.ContainsKey(rid))
-                    vbQPkR[rid] = reader.GetInt16(1) != 0;
+                if (vbQPkAlt.ContainsKey(rid))
+                    vbQPkAlt[rid] = reader.GetInt16(1) != 0;
                 else
-                    vbQPkR.Add(rid, reader.GetInt16(1) != 0);
+                    vbQPkAlt.Add(rid, reader.GetInt16(1) != 0);
             }
             reader.Close();
             DBConnect.Close(ref conn);
@@ -529,10 +531,14 @@ namespace sQzLib
             return false;
         }
 
-        public List<byte[]> ToByteQPack()
+        public List<byte[]> ToByteQPack(int rid)
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.ToByteh(mDt));
+            if (vbQPkAlt.ContainsKey(rid))
+                l.Add(BitConverter.GetBytes(vbQPkAlt[rid]));
+            else
+                l.Add(BitConverter.GetBytes(false));
             l.Add(BitConverter.GetBytes(vQPack.Count));
             foreach (QuestPack p in vQPack.Values)
                 l.InsertRange(l.Count, p.ToByte());
@@ -544,12 +550,17 @@ namespace sQzLib
 
         public bool ReadByteQPack(byte[] buf, ref int offs)
         {
-            if (buf.Length - offs < 4)
+            if (buf.Length - offs < 5)
                 return true;
+            bQPkAlt = BitConverter.ToBoolean(buf, offs);
+            ++offs;
             int n = BitConverter.ToInt32(buf, offs);
             offs += 4;
+            int l = buf.Length - offs;
             while (0 < n)
             {
+                if (l < 4)
+                    return true;
                 --n;
                 int x;
                 ExamLv lv;
@@ -557,6 +568,7 @@ namespace sQzLib
                     lv = (ExamLv)x;
                 else
                     return true;
+                l -= 4;
                 offs += 4;
                 if (vQPack[lv].ReadByte(buf, ref offs))
                     return true;
@@ -564,10 +576,15 @@ namespace sQzLib
             if (n != 0)
                 return true;
             //
+            if (buf.Length - offs < 4)
+                return true;
             n = BitConverter.ToInt32(buf, offs);
             offs += 4;
+            l = buf.Length - offs;
             while (0 < n)
             {
+                if (l < 4)
+                    return true;
                 --n;
                 int x;
                 ExamLv lv;
@@ -582,6 +599,13 @@ namespace sQzLib
             if (n != 0)
                 return true;
             return false;
+        }
+
+        public byte[] ToByteNextQS(ExamLv lv)
+        {
+            if (bQPkAlt)
+                return vQPackAlt[lv].ToByteNextQS();
+            return vQPack[lv].ToByteNextQS();
         }
 
         public bool ReadByteQPack1(ExamLv lv, byte[] buf, ref int offs)
