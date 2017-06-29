@@ -257,12 +257,16 @@ namespace sQzServer0
                 g.Children.Add(t);
                 t = new TextBlock();
                 vRT1[r.uId] = t;
+                if (r.t1.Hour != DT.INV)
+                    t.Text = r.t1.ToString(DT.hh);
                 t.TextAlignment = TextAlignment.Center;
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 3);
                 g.Children.Add(t);
                 t = new TextBlock();
                 vRT2[r.uId] = t;
+                if (r.t2.Hour != DT.INV)
+                    t.Text = r.t2.ToString(DT.hh);
                 t.TextAlignment = TextAlignment.Center;
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 4);

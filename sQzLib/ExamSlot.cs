@@ -17,7 +17,7 @@ namespace sQzLib
 
     public class ExamSlot
     {
-        DateTime mDt;
+        public DateTime mDt;
         public Dictionary<ExamLv, QuestPack> vQPack;
         public Dictionary<ExamLv, QuestPack> vQPackAlt;
 
@@ -66,6 +66,7 @@ namespace sQzLib
             {
                 ExamRoom r = new ExamRoom();
                 r.uId = i;
+                r.DBSelTime(mDt, out emsg);
                 if(!vRoom.ContainsKey(i))
                     vRoom.Add(i, r);
             }

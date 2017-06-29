@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS `sqz_room`(`id` TINYINT PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_slot_room`(`dt` DATE, `t` TIME, `rid` TINYINT,
 `pw` CHAR(8) CHARACTER SET `ascii`, `qpkalt` TINYINT NOT NULL,
+`t1` TIME, `t2` TIME,
 PRIMARY KEY(`dt`, `t`, `rid`),
 FOREIGN KEY(`dt`, `t`) REFERENCES `sqz_slot`(`dt`, `t`),
 FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));

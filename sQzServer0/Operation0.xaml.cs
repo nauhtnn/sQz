@@ -295,12 +295,20 @@ namespace sQzServer0
                             mCbMsg += emsg;
                         else
                         {
-                            mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
-                            Dispatcher.InvokeAsync(() =>
+                            foreach (ExamSlot sl in mBrd.vSl.Values)
+                                if (sl.vRoom[rid].DBUpTime(sl.mDt, out emsg))
+                                    break;
+                            if (emsg == null)
                             {
-                                foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
-                                    vw.UpdateRsView(rid);
-                            });
+                                mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
+                                Dispatcher.InvokeAsync(() =>
+                                {
+                                    foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
+                                        vw.UpdateRsView(rid);
+                                });
+                            }
+                            //else
+                            //    WPopup.s.ShowDialog(emsg);
                         }
                     }
                     outMsg = BitConverter.GetBytes(1);

@@ -11,6 +11,7 @@ namespace sQzLib
     {
         public int uId;
         public SortedList<int, ExamineeA> vExaminee;
+        public DateTime t1, t2;
         public Dictionary<ExamLv, int> nLv;
         public ExamRoom()
         {
@@ -153,6 +154,51 @@ namespace sQzLib
                 return false;
             else
                 return true;
+        }
+
+        public bool DBSelTime(DateTime dt, out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return true;
+            }
+            string qry = DBConnect.mkQrySelect("sqz_slot_room", "t1,t2",
+                "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) +
+                "' AND rid=" + uId + " LIMIT 1");
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return true;
+            }
+            if(reader.Read())
+            {
+                if (reader.IsDBNull(0) || DT.Toh(reader.GetString(0), DT.hh, out t1))
+                    t1 = DT.INV_;
+                if (reader.IsDBNull(1) || DT.Toh(reader.GetString(1), DT.hh, out t1))
+                    t2 = DT.INV_;
+            }
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return false;
+        }
+
+        public bool DBUpTime(DateTime dt, out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return true;
+            }
+            string cond = "dt='" + dt.ToString(DT._) + "' AND t='" +
+                dt.ToString(DT.hh) + "' AND rid=" + uId;
+            DBConnect.Update(conn, "sqz_slot_room", "(t1='" + t1.ToString(DT.hh) +
+                "',t2='" + t2.ToString(DT.hh) + "'", cond, out eMsg);
+            DBConnect.Close(ref conn);
+            return false;
         }
 
         public static List<int> DBSel(out string eMsg)
