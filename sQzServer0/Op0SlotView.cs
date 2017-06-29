@@ -455,6 +455,8 @@ namespace sQzServer0
                         
                     tbcQ.Items.Add(ti);
                 }
+            if (0 < tbcQ.Items.Count)
+                tbiQ_GotFocus(tbcQ.Items[0], null);
             tbcQAlt.Items.Clear();
             foreach (QuestPack p in mSl.vQPackAlt.Values)
                 foreach (QuestSheet qs in p.vSheet.Values)
@@ -468,6 +470,8 @@ namespace sQzServer0
 
                     tbcQAlt.Items.Add(ti);
                 }
+            if (0 < tbcQAlt.Items.Count)
+                tbiQ_GotFocus(tbcQAlt.Items[0], null);
         }
     }
 }
