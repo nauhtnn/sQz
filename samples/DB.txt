@@ -13,7 +13,7 @@ INDEX(`stt`));
 CREATE TABLE IF NOT EXISTS `sqz_room`(`id` TINYINT PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_slot_room`(`dt` DATE, `t` TIME, `rid` TINYINT,
-`pw` CHAR(8) CHARACTER SET `ascii`, `qpkr` TINYINT NOT NULL,
+`pw` CHAR(8) CHARACTER SET `ascii`, `qpkalt` TINYINT NOT NULL,
 PRIMARY KEY(`dt`, `t`, `rid`),
 FOREIGN KEY(`dt`, `t`) REFERENCES `sqz_slot`(`dt`, `t`),
 FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
@@ -21,7 +21,7 @@ FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
 CREATE TABLE IF NOT EXISTS `sqz_level`(`id` CHAR CHARACTER SET `ascii` PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATE, `lv` CHAR CHARACTER SET `ascii`,
-`t` TIME, `id` SMALLINT UNSIGNED,
+`t` TIME, `id` SMALLINT UNSIGNED, `alt` TINYINT NOT NULL,
 PRIMARY KEY(`dt`, `lv`,`id`),
 FOREIGN KEY(`dt`, `t`) REFERENCES `sqz_slot`(`dt`, `t`),
 FOREIGN KEY(`lv`) REFERENCES `sqz_level`(`id`),
@@ -79,4 +79,4 @@ INSERT INTO `sqz_level` VALUES ('A'),('B');
 INSERT INTO `sqz_module` VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14);
 INSERT INTO `sqz_status` VALUES (0),(1),(2);
 DELETE FROM `sqz_ver`;
-INSERT INTO `sqz_ver` VALUES (8);
+INSERT INTO `sqz_ver` VALUES (9);

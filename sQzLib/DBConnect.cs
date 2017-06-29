@@ -250,7 +250,10 @@ namespace sQzLib
             int n;
             MySqlCommand cmd = new MySqlCommand(query, conn);
             try {
-                if (!int.TryParse(cmd.ExecuteScalar().ToString(), out n))
+                object i = cmd.ExecuteScalar();
+                if (i is DBNull)
+                    n = 0;
+                else if (!int.TryParse(i.ToString(), out n))
                     n = -1;
             }
             catch (MySqlException) { n = -1; }

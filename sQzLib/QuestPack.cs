@@ -11,14 +11,25 @@ namespace sQzLib
     {
         public DateTime mDt;
         public ExamLv eLv;
+        public bool bAlt;
         public SortedList<int, QuestSheet> vSheet;
         int mNextQSIdx;
         int mMaxQSIdx;
-        public QuestPack()
+        protected QuestPack()
         {
             mDt = DT.INV_;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
+            bAlt = false;
+            vSheet = new SortedList<int, QuestSheet>();
+        }
+
+        public QuestPack(bool alt)
+        {
+            mDt = DT.INV_;
+            mNextQSIdx = 0;
+            mMaxQSIdx = -1;
+            bAlt = alt;
             vSheet = new SortedList<int, QuestSheet>();
         }
 
@@ -136,7 +147,8 @@ namespace sQzLib
             }
             string qry = DBConnect.mkQrySelect("sqz_qsheet",
                 "id", "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) +
-                "' AND lv='" + eLv.ToString() + "'");
+                "' AND lv='" + eLv.ToString() + "' AND alt=" +
+                (bAlt ? '1' : '0'));
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             List<int> qsids = new List<int>();
             if (reader != null)
@@ -191,12 +203,15 @@ namespace sQzLib
             int i;
             for (i = 0; i < n; ++i)
                 l.Add(new QuestSheet());
+            foreach (QuestSheet qs in l)
+                qs.bAlt = bAlt;
             i = 0;
             Random rand = new Random();
             foreach (IUx iu in QuestSheet.GetIUs(eLv))
             {
                 //
                 QuestSheet qs0 = new QuestSheet();
+                //qs0.bAlt = bAlt;
                 qs0.DBSelect(iu, QuestDiff.Easy);
                 //
                 foreach (QuestSheet qs in l)
@@ -213,6 +228,7 @@ namespace sQzLib
                 }
                 //
                 qs0 = new QuestSheet();
+                //qs0.bAlt = bAlt;
                 qs0.DBSelect(iu, QuestDiff.Diff);
                 //
                 foreach (QuestSheet qs in l)
@@ -255,6 +271,7 @@ namespace sQzLib
             Random rand = new Random();
             List<QuestSheet> l = new List<QuestSheet>();
             QuestSheet qs0 = new QuestSheet();
+            qs0.bAlt = bAlt;
             int j = -1;
             foreach (IUx i in QuestSheet.GetIUs(eLv))
             {
@@ -297,10 +314,11 @@ namespace sQzLib
             string prefx = "('" + dt.ToString(DT._) + "',";
             foreach (QuestSheet qs in l)
                 vals.Append(prefx + "'" + qs.eLv.ToString() + "'," + qs.uId +
-                    ",'" + dt.ToString(DT.hh) + "'),");
+                    ",'" + dt.ToString(DT.hh) + "'," +
+                    (qs.bAlt ? '1' : '0') + "),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
-            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,lv,id,t", vals.ToString(), out eMsg) < 0)
+            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,lv,id,t,alt", vals.ToString(), out eMsg) < 0)
             {
                 DBConnect.Close(ref conn);
                 if (eMsg == null)

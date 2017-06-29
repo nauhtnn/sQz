@@ -17,9 +17,9 @@ namespace sQzLib
 
     public class ExamSlot
     {
-        public DateTime mDt;
+        DateTime mDt;
         public Dictionary<ExamLv, QuestPack> vQPack;
-        public Dictionary<ExamLv, QuestPack> vQPackR;
+        public Dictionary<ExamLv, QuestPack> vQPackAlt;
 
         public AnsPack mKeyPack;
 
@@ -34,20 +34,20 @@ namespace sQzLib
             vbQPkR = new Dictionary<int, bool>();
             eStt = ExamStt.Prep;
             vQPack = new Dictionary<ExamLv, QuestPack>();
-            QuestPack p = new QuestPack();
+            QuestPack p = new QuestPack(false);
             p.eLv = ExamLv.A;
             vQPack.Add(p.eLv, p);
-            p = new QuestPack();
+            p = new QuestPack(false);
             p.eLv = ExamLv.B;
             vQPack.Add(p.eLv, p);
 
-            vQPackR = new Dictionary<ExamLv, QuestPack>();
-            p = new QuestPack();
+            vQPackAlt = new Dictionary<ExamLv, QuestPack>();
+            p = new QuestPack(true);
             p.eLv = ExamLv.A;
-            vQPackR.Add(p.eLv, p);
-            p = new QuestPack();
+            vQPackAlt.Add(p.eLv, p);
+            p = new QuestPack(true);
             p.eLv = ExamLv.B;
-            vQPackR.Add(p.eLv, p);
+            vQPackAlt.Add(p.eLv, p);
 
             mKeyPack = new AnsPack();
         }
@@ -73,7 +73,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return Txt.s._[(int)TxI.DB_NOK];
-            string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid,qpkr",
+            string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid,qpkalt",
                 "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -101,7 +101,7 @@ namespace sQzLib
             if (conn == null)
                 return Txt.s._[(int)TxI.DB_NOK];
             string emsg;
-            int n = DBConnect.Update(conn, "sqz_slot_room", "qpkr=1", "dt='" +
+            int n = DBConnect.Update(conn, "sqz_slot_room", "qpkalt=1", "dt='" +
                 mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "' AND rid=" + rid, out emsg);
             DBConnect.Close(ref conn);
             if(0 < n)
@@ -151,6 +151,8 @@ namespace sQzLib
             set {
                 mDt = value;
                 foreach (QuestPack p in vQPack.Values)
+                    p.mDt = value;
+                foreach (QuestPack p in vQPackAlt.Values)
                     p.mDt = value;
             }
         }
@@ -268,7 +270,7 @@ namespace sQzLib
                 }
                 else if (bNExist)
                     n = DBConnect.Ins(conn, "sqz_slot_room",
-                        "dt,t,rid,qpkr", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
+                        "dt,t,rid,qpkalt", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
                         "'," + r.uId + ",0)", out eMsg);
                 if(n < 0)
                 {
@@ -484,21 +486,25 @@ namespace sQzLib
         public bool GenQ(int n, ExamLv lv, int[] vn, int[] vndiff)
         {
             string emsg;
-            if (vQPack[lv].DBDelete(out emsg))//todo: only mark del, not del from db
+            if (vQPack[lv].DBDelete(out emsg))
                 WPopup.s.ShowDialog(emsg);
+            vQPack[lv].vSheet.Clear();
+            if (vQPackAlt[lv].DBDelete(out emsg))
+                WPopup.s.ShowDialog(emsg);
+            vQPackAlt[lv].vSheet.Clear();
+            QuestSheet.DBUpdateCurQSId(mDt);
             foreach (QuestSheet qs in vQPack[lv].vSheet.Values)
                 mKeyPack.vSheet.Remove(qs.LvId);
-            vQPack[lv].vSheet.Clear();
             List<QuestSheet> l;
             if(System.IO.File.Exists("Randomize.txt"))
             {
                 l = vQPack[lv].GenQPack2(n, vn, vndiff);
-                l.InsertRange(l.Count, vQPackR[lv].GenQPack2(n, vn, vndiff));
+                l.InsertRange(l.Count, vQPackAlt[lv].GenQPack2(n, vn, vndiff));
             }
             else
             {
                 l = vQPack[lv].GenQPack3(n, vn, vndiff);
-                l.InsertRange(l.Count, vQPackR[lv].GenQPack2(n, vn, vndiff));
+                l.InsertRange(l.Count, vQPackAlt[lv].GenQPack3(n, vn, vndiff));
             }
             mKeyPack.ExtractKey(l);
             return false;
@@ -510,8 +516,14 @@ namespace sQzLib
                 return true;
             if (vQPack[ExamLv.B].DBSelectQS(mDt, out eMsg))
                 return true;
-            List<QuestSheet> qss = new List<QuestSheet>();
+            if (vQPackAlt[ExamLv.A].DBSelectQS(mDt, out eMsg))
+                return true;
+            if (vQPackAlt[ExamLv.B].DBSelectQS(mDt, out eMsg))
+                return true;
             foreach (QuestPack p in vQPack.Values)
+                foreach (QuestSheet qs in p.vSheet.Values)
+                    mKeyPack.ExtractKey(qs);
+            foreach (QuestPack p in vQPackAlt.Values)
                 foreach (QuestSheet qs in p.vSheet.Values)
                     mKeyPack.ExtractKey(qs);
             return false;

@@ -15,6 +15,7 @@ namespace sQzLib
         public int uId;
         public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + ExamineeA.LV_CAP; } }
         public string tId { get { return eLv.ToString() + uId.ToString("d3"); } }
+        public bool bAlt;
         List<Question> vQuest;
         public byte[] aQuest;
         public int Count { get { return vQuest.Count; } }
@@ -36,6 +37,7 @@ namespace sQzLib
             vQuest = new List<Question>();
             aQuest = null;
             uId = ExamineeA.LV_CAP;
+            bAlt = false;
         }
 
         public static IUx[] GetIUs(ExamLv lv)
@@ -317,6 +319,7 @@ namespace sQzLib
             QuestSheet qs = new QuestSheet();
             qs.eLv = eLv;
             qs.uId = uId;
+            qs.bAlt = bAlt;
             foreach (Question qi in vQuest)
                 qs.vQuest.Add(qi.DeepCopy());
             return qs;
@@ -343,6 +346,7 @@ namespace sQzLib
             QuestSheet qs = new QuestSheet();
             qs.eLv = eLv;
             qs.uId = uId;
+            qs.bAlt = bAlt;
             foreach (Question qi in vQuest)
                 qs.vQuest.Add(qi.RandomizeDeepCopy(rand));
             //randomize

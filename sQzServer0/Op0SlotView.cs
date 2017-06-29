@@ -14,7 +14,7 @@ namespace sQzServer0
     public class Op0SlotView: TabItem
     {
         TabControl tbcQ;
-        TabControl tbcQR;
+        TabControl tbcQAlt;
         public SortedList<int, TextBlock> vGrade;
         public SortedList<int, TextBlock> vDt1;
         public SortedList<int, TextBlock> vDt2;
@@ -174,11 +174,11 @@ namespace sQzServer0
             i.Header = Txt.s._[(int)TxI.OP_Q];
             i.Content = tbcQ;
             tbc.Items.Add(i);
-            tbcQR = new TabControl();
-            tbcQR.Width = refTbc.Width;
+            tbcQAlt = new TabControl();
+            tbcQAlt.Width = refTbc.Width;
             i = new TabItem();
             i.Header = Txt.s._[(int)TxI.OP_QR];
-            i.Content = tbcQR;
+            i.Content = tbcQAlt;
             tbc.Items.Add(i);
             Content = tbc;
         }
@@ -356,7 +356,13 @@ namespace sQzServer0
             int id;
             if (QuestSheet.ParseLvId((tbi.Header as TextBlock).Text, out lv, out id))
                 return;
-            QuestSheet qs = mSl.vQPack[lv].vSheet[id];
+            QuestSheet qs = null;
+            if (mSl.vQPack[lv].vSheet.ContainsKey(id))
+                qs = mSl.vQPack[lv].vSheet[id];
+            else if (mSl.vQPackAlt[lv].vSheet.ContainsKey(id))
+                qs = mSl.vQPackAlt[lv].vSheet[id];
+            if (qs == null)
+                return;
             ScrollViewer svwr = new ScrollViewer();
             svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             StackPanel sp = new StackPanel();
@@ -449,7 +455,8 @@ namespace sQzServer0
                         
                     tbcQ.Items.Add(ti);
                 }
-            foreach (QuestPack p in mSl.vQPackR.Values)
+            tbcQAlt.Items.Clear();
+            foreach (QuestPack p in mSl.vQPackAlt.Values)
                 foreach (QuestSheet qs in p.vSheet.Values)
                 {
                     TabItem ti = new TabItem();
@@ -459,7 +466,7 @@ namespace sQzServer0
                     ti.Header = t;
                     ti.GotFocus += tbiQ_GotFocus;
 
-                    tbcQR.Items.Add(ti);
+                    tbcQAlt.Items.Add(ti);
                 }
         }
     }
