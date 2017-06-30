@@ -43,6 +43,14 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
             l.Add(BitConverter.GetBytes(uGrade));
+            if(0 < tComp.Length)
+            {
+                byte[] x = Encoding.UTF8.GetBytes(tComp);
+                l.Add(BitConverter.GetBytes(x.Length));
+                l.Add(x);
+            }
+            else
+                l.Add(BitConverter.GetBytes(0));
 
             return l;
         }

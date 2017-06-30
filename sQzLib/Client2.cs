@@ -9,7 +9,6 @@ namespace sQzLib
         DateStudentRetriving = 0,
         QuestRetrieving,
         AnsKeyRetrieving,
-        RequestQuestSheet,
         SrvrSubmitting,
         Dating,
         Authenticating,

@@ -243,48 +243,6 @@ namespace sQzServer0
                 case NetCode.AnsKeyRetrieving:
                     outMsg = mBrd.ToByteKey();
                     break;
-                case NetCode.RequestQuestSheet:
-                    //if (buf.Length - offs == 4)
-                    //{
-                    //    int qsId = BitConverter.ToInt32(buf, offs);
-                    //    offs += 4;
-                    //    QuestSheet qs = new QuestSheet();
-                    //    ExamLv lv;
-                    //    if (qsId < (int)ExamLv.B)
-                    //        lv = ExamLv.A;
-                    //    else
-                    //        lv = ExamLv.B;
-                    //    bool found = false;
-
-                    //    if (qs.DBSelect(curSl.uId, lv, qsId))
-                    //        outMsg = BitConverter.GetBytes(-1);
-                    //    else
-                    //    {
-                    //        curSl.vQPack[lv].vSheet.Add(qs.uId, qs);
-                    //        AnsSheet a = curSl.mKeyPack.ExtractKey(qs);
-                    //        List<byte[]> bs = qs.ToByte();
-                    //        sz = 4;
-                    //        if (a != null)
-                    //            sz += a.GetByteCount();
-                    //        foreach (byte[] b in bs)
-                    //            sz += b.Length;
-                    //        outMsg = new byte[sz];
-                    //        Array.Copy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
-                    //        offs = 4;
-                    //        foreach (byte[] b in bs)
-                    //        {
-                    //            Array.Copy(b, 0, outMsg, offs, b.Length);
-                    //            offs += b.Length;
-                    //        }
-                    //        if (a != null)
-                    //            a.ToByte(ref outMsg, ref offs);
-                    //        Dispatcher.Invoke(() => ShowQuest());
-                    //    }
-                    //}
-                    //else
-                    //    outMsg = BitConverter.GetBytes(-1);
-                    outMsg = BitConverter.GetBytes(-1);
-                    break;
                 case NetCode.SrvrSubmitting:
                     int rid;
                     if (-1 < (rid = mBrd.ReadByteSl0(buf, ref offs)))

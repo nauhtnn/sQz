@@ -355,5 +355,24 @@ namespace sQzLib
             DBConnect.Close(ref conn);
             return rval;
         }
+
+        public void DBUpStt()
+        {
+            foreach(ExamSlot sl in vSl.Values)
+            {
+                bool bArch = true;
+                foreach (ExamRoom r in sl.vRoom.Values)
+                    if (0 < r.vExaminee.Count && r.t2.Hour == DT.INV)
+                    {
+                        bArch = false;
+                        break;
+                    }
+                if (bArch)
+                {
+                    sl.eStt = ExamStt.Arch;
+                    sl.DBUpStt();
+                }
+            }
+        }
     }
 }

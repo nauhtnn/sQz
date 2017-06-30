@@ -312,7 +312,7 @@ namespace sQzServer0
             if (mSl.vbQPkAlt.ContainsKey(rid) && !mSl.vbQPkAlt[rid])
             {
                 mSl.vbQPkAlt[rid] = true;
-                mSl.DBUpQPkR(rid);
+                mSl.DBUpQPAlt(rid);
             }
         }
 

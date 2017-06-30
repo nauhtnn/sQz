@@ -177,7 +177,7 @@ namespace sQzLib
             if (eStt < NeeStt.Finished)
                 return false;
             //
-            if (l < 20)
+            if (l < 24)
                 return true;
             int h = BitConverter.ToInt32(buf, offs);
             l -= 4;
@@ -204,6 +204,15 @@ namespace sQzLib
             uGrade = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
+            sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if(0 < sz)
+            {
+                tComp = Encoding.UTF8.GetString(buf, offs, sz);
+                l -= sz;
+                offs += sz;
+            }
             //
             return false;
         }

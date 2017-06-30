@@ -100,7 +100,7 @@ namespace sQzLib
             return null;
         }
 
-        public string DBUpQPkR(int rid)
+        public string DBUpQPAlt(int rid)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -112,6 +112,41 @@ namespace sQzLib
             if(0 < n)
                 return null;
             return emsg;
+        }
+
+        public static List<bool> IsSttOper(List<DateTime> l)
+        {
+            List<bool> v = new List<bool>();
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                int n = l.Count;
+                while(0 < n)
+                {
+                    --n;
+                    v.Add(false);
+                }
+                return v;
+            }
+            foreach (DateTime dt in l)
+            {
+                string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
+                    "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) + "'");
+                string eMsg;
+                MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+                if (reader == null)
+                {
+                    v.Add(false);
+                    continue;
+                }
+                int x;
+                if (reader.Read())
+                    if (Enum.IsDefined(typeof(ExamStt), x = reader.GetInt16(0)))
+                        v.Add((ExamStt)x == ExamStt.Oper);
+                reader.Close();
+            }
+            DBConnect.Close(ref conn);
+            return v;
         }
 
         public string DBSelStt()
