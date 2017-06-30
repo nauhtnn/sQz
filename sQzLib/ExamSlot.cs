@@ -464,6 +464,40 @@ namespace sQzLib
                 r.DBUpdateRs(vals);
         }
 
+        public bool DBUpT1(int rid,
+            out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if(conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return true;
+            }
+            ExamRoom r;
+            if (vRoom.TryGetValue(rid, out r))
+            {
+                r.t1 = DateTime.Now;
+                bool rv = r.DBUpT1(conn, mDt, out eMsg);
+                DBConnect.Close(ref conn);
+                return rv;
+            }
+            eMsg = "Room id " + rid + " is not found";
+            return true;
+        }
+
+        public bool DBUpT2(MySqlConnection conn, int rid,
+            out string eMsg)
+        {
+            ExamRoom r;
+            if (vRoom.TryGetValue(rid, out r))
+            {
+                r.t2 = DateTime.Now;
+                return r.DBUpT2(conn, mDt, out eMsg);
+            }
+            eMsg = "Room id " + rid + " is not found";
+            return true;
+        }
+
         public bool GenQ(int n, ExamLv lv, int[] vn, int[] vndiff)
         {
             string emsg;

@@ -350,7 +350,7 @@ namespace sQzLib
             if(!rval)
             {
                 foreach (ExamSlot sl in vSl.Values)
-                    sl.DBUpTime2(conn, rid, out eMsg);
+                    sl.DBUpT2(conn, rid, out eMsg);
             }
             DBConnect.Close(ref conn);
             return rval;

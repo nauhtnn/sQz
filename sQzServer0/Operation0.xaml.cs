@@ -226,9 +226,8 @@ namespace sQzServer0
                     outMsg = mBrd.ToByteSl1(x);
                     Dispatcher.InvokeAsync(() =>
                     {
-                        DateTime now = DateTime.Now;
                         foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
-                            vw.UpRT1(x, now);
+                            vw.UpRT1(x);
                     });
                     return true;
                 case NetCode.QuestRetrieving:
@@ -293,22 +292,14 @@ namespace sQzServer0
                         string emsg;
                         if (mBrd.DBUpdateRs(rid, out emsg))
                             mCbMsg += emsg;
-                        else
+                        else if (emsg == null)
                         {
-                            foreach (ExamSlot sl in mBrd.vSl.Values)
-                                if (sl.vRoom[rid].DBUpTime(sl.mDt, out emsg))
-                                    break;
-                            if (emsg == null)
+                            mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
+                            Dispatcher.InvokeAsync(() =>
                             {
-                                mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
-                                Dispatcher.InvokeAsync(() =>
-                                {
-                                    foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
-                                        vw.UpdateRsView(rid);
-                                });
-                            }
-                            //else
-                            //    WPopup.s.ShowDialog(emsg);
+                                foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
+                                    vw.UpdateRsView(rid);
+                            });
                         }
                     }
                     outMsg = BitConverter.GetBytes(1);
@@ -433,15 +424,15 @@ namespace sQzServer0
                 return;
 
             ExamSlot sl = new ExamSlot();
+            DateTime dt;
+            DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
+            sl.Dt = dt;
             string emsg;
             if ((emsg = sl.DBSelRoomId()) != null)
             {
                 WPopup.s.ShowDialog(emsg);
                 return;
             }
-            DateTime dt;
-            DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
-            sl.Dt = dt;
             sl.DBSelStt();
             sl.DBSelQPkR();
             sl.DBSelNee();

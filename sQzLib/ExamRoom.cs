@@ -175,9 +175,9 @@ namespace sQzLib
             }
             if(reader.Read())
             {
-                if (reader.IsDBNull(0) || DT.Toh(reader.GetString(0), DT.hh, out t1))
+                if (reader.IsDBNull(0) || DT.Toh(reader.GetString(0), DT.hs, out t1))
                     t1 = DT.INV_;
-                if (reader.IsDBNull(1) || DT.Toh(reader.GetString(1), DT.hh, out t1))
+                if (reader.IsDBNull(1) || DT.Toh(reader.GetString(1), DT.hs, out t2))
                     t2 = DT.INV_;
             }
             reader.Close();
@@ -185,29 +185,24 @@ namespace sQzLib
             return false;
         }
 
-        public bool DBUpTime1(DateTime dt, out string eMsg)
+        public bool DBUpT1(MySqlConnection conn, DateTime dt, out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
-                return true;
-            }
             string cond = "dt='" + dt.ToString(DT._) + "' AND t='" +
                 dt.ToString(DT.hh) + "' AND rid=" + uId;
             string val = "t1='" + t1.ToString(DT.hh) + "'";
-            DBConnect.Update(conn, "sqz_slot_room", val, cond, out eMsg);
-            DBConnect.Close(ref conn);
+            if (DBConnect.Update(conn, "sqz_slot_room", val, cond, out eMsg) < 1)
+                return true;
             return false;
         }
 
-        public bool DBUpTime2(MySqlConnection conn, DateTime dt,
+        public bool DBUpT2(MySqlConnection conn, DateTime dt,
             out string eMsg)
         {
             string cond = "dt='" + dt.ToString(DT._) + "' AND t='" +
                 dt.ToString(DT.hh) + "' AND rid=" + uId;
             string val = "t2='" + t2.ToString(DT.hh) + "'";
-            DBConnect.Update(conn, "sqz_slot_room", val, cond, out eMsg);
+            if (DBConnect.Update(conn, "sqz_slot_room", val, cond, out eMsg) < 1)
+                return true;
             return false;
         }
 
