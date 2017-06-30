@@ -386,7 +386,7 @@ namespace sQzLib
                         {
                             if (DT.Toh(reader.GetString(0), DT.hs, out e.dtTim1))
                                 break;
-                            if (DT.Toh(reader.GetString(1), DT.hs, out e.dtTim1))
+                            if (DT.Toh(reader.GetString(1), DT.hs, out e.dtTim2))
                                 break;
                             e.uGrade = reader.GetInt16(2);
                             e.tComp = reader.GetString(3);
