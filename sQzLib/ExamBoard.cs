@@ -321,7 +321,7 @@ namespace sQzLib
                 return true;
         }
 
-        public bool DBUpdateRs(out string eMsg)
+        public bool DBUpdateRs(int rid, out string eMsg)
         {
             MySqlConnection conn = DBConnect.Init();
             if(conn == null)
@@ -331,7 +331,7 @@ namespace sQzLib
             }
             StringBuilder vals = new StringBuilder();
             foreach (ExamSlot sl in vSl.Values)
-                sl.DBUpdateRs(vals);
+                sl.DBUpdateRs(rid, vals);
             bool rval;
             if (0 < vals.Length)
             {
@@ -346,6 +346,11 @@ namespace sQzLib
             {
                 rval = true;
                 eMsg = Txt.s._[(int)TxI.RS_UP_NOTHING];
+            }
+            if(!rval)
+            {
+                foreach (ExamSlot sl in vSl.Values)
+                    sl.DBUpTime2(conn, rid, out eMsg);
             }
             DBConnect.Close(ref conn);
             return rval;

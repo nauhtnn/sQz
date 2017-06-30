@@ -291,7 +291,7 @@ namespace sQzServer0
                     if (-1 < (rid = mBrd.ReadByteSl0(buf, ref offs)))
                     {
                         string emsg;
-                        if (mBrd.DBUpdateRs(out emsg))
+                        if (mBrd.DBUpdateRs(rid, out emsg))
                             mCbMsg += emsg;
                         else
                         {

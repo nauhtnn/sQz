@@ -457,9 +457,10 @@ namespace sQzLib
             return false;
         }
 
-        public void DBUpdateRs(StringBuilder vals)
+        public void DBUpdateRs(int rid, StringBuilder vals)
         {
-            foreach (ExamRoom r in vRoom.Values)
+            ExamRoom r;
+            if(vRoom.TryGetValue(rid, out r))
                 r.DBUpdateRs(vals);
         }
 
