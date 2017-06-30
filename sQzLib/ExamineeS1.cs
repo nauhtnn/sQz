@@ -8,7 +8,11 @@ namespace sQzLib
 {
     public sealed class ExamineeS1: ExamineeA
     {
-        public ExamineeS1() { }
+        bool bNRecd;
+        public bool NRecd { get { return bNRecd; } }
+        public ExamineeS1() {
+            bNRecd = true;
+        }
 
         public override List<byte[]> ToByte()
         {
@@ -176,6 +180,7 @@ namespace sQzLib
             }
             if (eStt < NeeStt.Finished)
                 return false;
+            bNRecd = false;
             //
             if (l < 24)
                 return true;

@@ -167,8 +167,8 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uId));
             int n = 0;
-            foreach (ExamineeA e in vExaminee.Values)
-                if (e.eStt == NeeStt.Finished)
+            foreach (ExamineeS1 e in vExaminee.Values)
+                if (e.eStt == NeeStt.Finished && e.NRecd)
                 {
                     ++n;
                     e.bFromC = false;
