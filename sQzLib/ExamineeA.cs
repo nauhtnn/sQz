@@ -58,12 +58,12 @@ namespace sQzLib
         {
             mDt = DT.INV_H;
             eLv = ExamLv.A;
-            uId = ExamineeA.LV_CAP;
+            uId = LV_CAP;
             tName = null;
             tBirdate = null;
             tBirthplace = null;
             eStt = NeeStt.Signing;
-            uGrade = ExamineeA.LV_CAP;
+            uGrade = LV_CAP;
             dtTim1 = dtTim2 = DT.INV_;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();

@@ -343,58 +343,8 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            foreach(ExamRoom r in vRoom.Values)
-            {
-                r.vExaminee.Clear();
-                r.nLv[ExamLv.A] = r.nLv[ExamLv.B] = 0;
-                string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
-                    "lv,id,name,birdate,birthplace", "a.rid=" + r.uId +
-                    " AND a.dt='" + mDt.ToString(DT._) + "' AND a.t='" + mDt.ToString(DT.hh) +
-                    "' AND a.dt=b.dt AND a.t=b.t AND a.rid=b.rid");
-                string emsg;
-                MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
-                if (reader != null)
-                {
-                    while (reader.Read())
-                    {
-                        ExamineeS0 e = new ExamineeS0();
-                        e.mDt = Dt;
-                        if (!Enum.TryParse(reader.GetString(0), out e.eLv))
-                            continue;
-                        e.uId = reader.GetUInt16(1);
-                        e.tName = reader.GetString(2);
-                        e.tBirdate = reader.GetDateTime(3).ToString(DT.RR);
-                        e.tBirthplace = reader.GetString(4);
-                        r.vExaminee.Add(e.uId, e);
-                        ++r.nLv[e.eLv];
-                    }
-                    reader.Close();
-                }
-            }
-            foreach(ExamRoom r in vRoom.Values)
-            {
-                foreach(ExamineeA e in r.vExaminee.Values)
-                {
-                    string qry = DBConnect.mkQrySelect("sqz_nee_qsheet",
-                        "t1,t2,grade,comp", "dt='" + mDt.ToString(DT._) + "' AND lv='" +
-                        e.eLv + "' AND neeid=" + e.uId);
-                    string emsg;
-                    MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
-                    if (reader != null)
-                    {
-                        if (reader.Read())
-                        {
-                            if (DT.Toh(reader.GetString(0), DT.hs, out e.dtTim1))
-                                break;
-                            if (DT.Toh(reader.GetString(1), DT.hs, out e.dtTim2))
-                                break;
-                            e.uGrade = reader.GetInt16(2);
-                            e.tComp = reader.GetString(3);
-                        }
-                        reader.Close();
-                    }
-                }
-            }
+            foreach (ExamRoom r in vRoom.Values)
+                r.DBSelNee(conn, mDt);
             DBConnect.Close(ref conn);
         }
 

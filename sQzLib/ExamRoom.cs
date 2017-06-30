@@ -46,6 +46,56 @@ namespace sQzLib
             return n;
         }
 
+        public void DBSelNee(MySqlConnection conn, DateTime dt)
+        {
+            vExaminee.Clear();
+            nLv[ExamLv.A] = nLv[ExamLv.B] = 0;
+            string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
+                "lv,id,name,birdate,birthplace", "a.rid=" + uId +
+                " AND a.dt='" + dt.ToString(DT._) + "' AND a.t='" + dt.ToString(DT.hh) +
+                "' AND a.dt=b.dt AND a.t=b.t AND a.rid=b.rid");
+            string emsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
+            if (reader == null)
+                return;
+            while (reader.Read())
+            {
+                ExamineeS0 e = new ExamineeS0();
+                e.mDt = dt;
+                if (!Enum.TryParse(reader.GetString(0), out e.eLv))
+                    continue;
+                e.uId = reader.GetUInt16(1);
+                e.tName = reader.GetString(2);
+                e.tBirdate = reader.GetDateTime(3).ToString(DT.RR);
+                e.tBirthplace = reader.GetString(4);
+                vExaminee.Add(e.uId, e);
+                ++nLv[e.eLv];
+            }
+            reader.Close();
+
+            foreach (ExamineeA e in vExaminee.Values)
+            {
+                qry = DBConnect.mkQrySelect("sqz_nee_qsheet",
+                    "t1,t2,grade,comp", "dt='" + e.mDt.ToString(DT._) + "' AND lv='" +
+                    e.eLv + "' AND neeid=" + e.uId);
+                reader = DBConnect.exeQrySelect(conn, qry, out emsg);
+                if (reader != null)
+                {
+                    if (reader.Read())
+                    {
+                        if (DT.Toh(reader.GetString(0), DT.hs, out e.dtTim1))
+                            break;
+                        if (DT.Toh(reader.GetString(1), DT.hs, out e.dtTim2))
+                            break;
+                        e.uGrade = reader.GetInt16(2);
+                        e.tComp = reader.GetString(3);
+                        e.eStt = NeeStt.Finished;
+                    }
+                    reader.Close();
+                }
+            }
+        }
+
         public void DBUpdateRs(StringBuilder vals)
         {
             foreach (ExamineeS0 e in vExaminee.Values)

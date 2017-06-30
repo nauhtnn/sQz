@@ -88,6 +88,7 @@ namespace sQzServer1
                     {
                         t.Text = e.dtTim1.ToString("HH:mm");
                         vbLock.Add(lvid, true);
+                        vLock[lvid].IsChecked = true;
                     }
                     else
                     {
