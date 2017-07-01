@@ -5,8 +5,8 @@ using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
 
-//ToByte | [dt][nSl] | [siId][nR] | [riId][nNee] | [neeId][neeDat] |
-//ReadByte | [dt][nSl][siId] | [nR][ridId] | [nNee][neeId] | [neeDat] |
+//ToByte | [dt][nSl] | [siId][nR = 1] | [riId][nNee] | [neeId][neeDat] |
+//ReadByte | [dt][nSl][siId] | [nR = 1][ridId] | [nNee][neeId] | [neeDat] |
 //len vs n: len can verify len = offs, n cannot.
 //  n is more readable for human.
 //  Since every reading method has checked len before BitConverter.ToXX(buf, ref offs),

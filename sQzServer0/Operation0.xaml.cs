@@ -259,6 +259,7 @@ namespace sQzServer0
                                     vw.UpdateRsView(rid);
                             });
                         }
+                        mBrd.DBUpStt();
                     }
                     outMsg = BitConverter.GetBytes(1);
                     break;
@@ -305,12 +306,7 @@ namespace sQzServer0
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            List<TabItem> toRem = new List<TabItem>();
-            foreach (TabItem ti in tbcSl.Items)
-                if (ti.Header as string != "_0")
-                    toRem.Add(ti);
-            foreach (TabItem ti in toRem)
-                tbcSl.Items.Remove(ti);
+            tbcSl.Items.Clear();
             ListBox l = sender as ListBox;
             ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
