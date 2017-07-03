@@ -483,31 +483,37 @@ namespace sQzServer0
             }
             if (qs == null)
             {
-                List<DateTime> v = nee.DBGetT();
-                string eMsg;
-                foreach (DateTime dt in v)
-                    if (!mBrd.vSl.ContainsKey(dt.ToString(DT.hh)))
+                string t = nee.DBGetT();
+                if (!mBrd.vSl.ContainsKey(t))
+                {
+                    ExamSlot sl = new ExamSlot();
+                    DateTime dati;
+                    DT.To_(mBrd.mDt.ToString(DT._) + ' ' + t, DT.HS, out dati);
+                    sl.Dt = dati;
+                    string emsg;
+                    if ((emsg = sl.DBSelRoomId()) != null)
                     {
-                        ExamSlot sl = new ExamSlot();
-                        DateTime dati;
-                        dati.Hour = nee.mDt.h
-                        sl.Dt = dt;
-                        string emsg;
-                        if ((emsg = sl.DBSelRoomId()) != null)
-                        {
-                            WPopup.s.ShowDialog(emsg);
-                            return;
-                        }
-                        sl.DBSelStt();
-                        sl.DBSelQPkR();
-                        sl.DBSelNee();
-                        if (sl.DBSelArchieve(out emsg))
-                        {
-                            WPopup.s.ShowDialog(emsg);
-                            return;
-                        }
+                        WPopup.s.ShowDialog(emsg);
+                        return;
                     }
+                    sl.DBSelStt();
+                    sl.DBSelQPkR();
+                    sl.DBSelNee();
+                    if (sl.DBSelArchieve(out emsg))
+                    {
+                        WPopup.s.ShowDialog(emsg);
+                        return;
+                    }
+                    mBrd.vSl.Add(t.Substring(0, 5), sl);
+                    //
+                    if (sl.vQPack[nee.eLv].vSheet.ContainsKey(qsid))
+                        qs = sl.vQPack[nee.eLv].vSheet[qsid];
+                    else if (sl.vQPackAlt[nee.eLv].vSheet.ContainsKey(qsid))
+                        qs = sl.vQPackAlt[nee.eLv].vSheet[qsid];
+                }
             }
+            if (qs == null)
+                return;
             ScrollViewer svwr = new ScrollViewer();
             svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             StackPanel sp = new StackPanel();
@@ -517,7 +523,8 @@ namespace sQzServer0
             SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
             SolidColorBrush bg;
             bool even = false;
-
+            char[] ans = nee.DBGetAns();
+            int k = -1;
             foreach (Question q in qs.ShallowCopy())
             {
                 if (q.bDiff)
@@ -542,6 +549,8 @@ namespace sQzServer0
                     j.Background = bg;
                     if (q.vKeys[idx])
                         j.FontWeight = FontWeights.Bold;
+                    if (ans[++k] == Question.C1)
+                        j.Background = Theme.s._[(int)BrushId.Ans_Highlight];
                     sp.Children.Add(j);
                 }
             }

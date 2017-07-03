@@ -124,7 +124,8 @@ namespace sQzLib
             if (conn == null)
                 return -1;
             string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "qsid",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() + "'");
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+                "' AND neeid=" + uId);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -140,32 +141,55 @@ namespace sQzLib
             return qsid;
         }
 
-        public List<DateTime> DBGetT()
+        public char[] DBGetAns()
         {
+            char[] noans = new char[AnsSheet.LEN];
+            for (int i = 0; i < AnsSheet.LEN; ++i)
+                noans[i] = Question.C0;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return new List<DateTime>();
-            string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
-                "t", "a.dt='" + mDt.ToString(DT._) + "' AND b.lv='" + eLv.ToString() +
-                "' AND b.id=" + uId +
-                " AND a.dt=b.dt AND a.rid=b.rid");
+                return noans;
+            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "ans",
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+                "' AND neeid=" + uId);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
                 DBConnect.Close(ref conn);
-                return new List<DateTime>();
+                return noans;
             }
-            List<DateTime> l = new List<DateTime>();
-            while (reader.Read())
+            string ans = noans.ToString();
+            if (reader.Read())
+                ans = reader.GetString(0);
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return ans.ToCharArray();
+        }
+
+        public string DBGetT()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            string t = DT.INV_H.ToString(DT.hh);
+            if (conn == null)
+                return t;
+            string qry = DBConnect.mkQrySelect("sqz_examinee",
+                "t", "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+                "' AND id=" + uId);
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
             {
-                DateTime dt;
-                if (!DT.To_(reader.GetString(0), DT.h, out dt))
-                    l.Add(dt);
+                DBConnect.Close(ref conn);
+                return t;
+            }
+            if (reader.Read())
+            {
+                t = reader.GetString(0);
             }
             reader.Close();
             DBConnect.Close(ref conn);
-            return l;
+            return t;
         }
 
         public abstract List<byte[]> ToByte();
