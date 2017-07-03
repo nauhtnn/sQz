@@ -514,6 +514,14 @@ namespace sQzServer0
             }
             if (qs == null)
                 return;
+            nee.DBSelGrade();
+            StackPanel spl = new StackPanel();
+            TextBlock tx = new TextBlock();
+            tx.Text = Txt.s._[(int)TxI.QS_ID] + ' ' + qs.tId + ", ";
+            spl.Children.Add(tx);
+            tx = new TextBlock();
+            tx.Text = Txt.s._[(int)TxI.MARK] + ' ' + nee.Grade;
+            spl.Children.Add(tx);
             ScrollViewer svwr = new ScrollViewer();
             svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
             StackPanel sp = new StackPanel();
@@ -556,7 +564,8 @@ namespace sQzServer0
             }
             svwr.Content = sp;
             svwr.Height = 560;
-            tbi.Content = svwr;
+            spl.Children.Add(svwr);
+            tbi.Content = spl;
             //
             tbcSl.Items.Add(tbi);
         }

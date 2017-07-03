@@ -167,6 +167,28 @@ namespace sQzLib
             return ans.ToCharArray();
         }
 
+        public bool DBSelGrade()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return true;
+            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "grade",
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+                "' AND neeid=" + uId);
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return true;
+            }
+            if (reader.Read())
+                uGrade = reader.GetInt16(0);
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return false;
+        }
+
         public string DBGetT()
         {
             MySqlConnection conn = DBConnect.Init();
