@@ -172,7 +172,7 @@ namespace sQzServer0
             aTimer.Enabled = true;
         }
 
-        private void btnStartSrvr_Click(object sender, RoutedEventArgs e)
+        private void btnStart_Click(object sender, RoutedEventArgs e)
         {
             foreach(TabItem i in tbcSl.Items)
             {
@@ -197,7 +197,7 @@ namespace sQzServer0
             //        lblStatus.Text += mCbMsg.txt; });
         }
 
-        private void btnStopSrvr_Click(object sender, RoutedEventArgs e)
+        private void btnStop_Click(object sender, RoutedEventArgs e)
         {
             mServer.Stop(ref mCbMsg);
         }
@@ -273,10 +273,15 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            btnStartSrvr.Content = t._[(int)TxI.STRT_SRVR];
-            btnStopSrvr.Content = t._[(int)TxI.STOP_SRVR];
+
+            btnStart.Content = t._[(int)TxI.STRT_SRVR];
+            btnStop.Content = t._[(int)TxI.STOP_SRVR];
             btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
             btnQGen.Content = t._[(int)TxI.QS_GEN];
+
+            txtDate.Text = t._[(int)TxI.DATE_L];
+            txtTime.Text = t._[(int)TxI.TIME_L];
+
             rdoA.Content = t._[(int)TxI.BASIC];
             rdoB.Content = t._[(int)TxI.ADVAN];
             txtMod.Text = t._[(int)TxI.MODULE];
@@ -301,6 +306,7 @@ namespace sQzServer0
             txtRQPack.Text = t._[(int)TxI.OP_Q];
             txtQPackR0.Text = t._[(int)TxI.OP_PRI];
             txtQPackR1.Text = t._[(int)TxI.OP_ALT];
+            txtGenPw.Text = t._[(int)TxI.OP_GEN_PW];
         }
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)

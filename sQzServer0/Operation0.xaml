@@ -13,24 +13,27 @@
             <StackPanel Width="400">
                 <StackPanel Orientation="Horizontal">
                     <StackPanel>
-                        <Button x:Name="btnMMenu"  Width="120" Height="40" Click="btnMMenu_Click" Background="#f15a23" Foreground="#fff"
+                        <Button x:Name="btnStart" Width="120" Height="40" Click="btnStart_Click" Background="#1c64e7" Foreground="#fff"
                         Margin="10,20,10,10"/>
-                        <Button x:Name="btnStopSrvr" Width="120" Height="40" Click="btnStopSrvr_Click" Background="#fbbc09" Foreground="#fff"
+                        <Button x:Name="btnStop" Width="120" Height="40" Click="btnStop_Click" Background="#fbbc09" Foreground="#fff"
                         Margin="10,10,10,10"/>
-                        <Button x:Name="btnStartSrvr" Width="120" Height="40" Click="btnStartSrvr_Click" Background="#1c64e7" Foreground="#fff"
+                        <Button x:Name="btnMMenu"  Width="120" Height="40" Click="btnMMenu_Click" Background="#f15a23" Foreground="#fff"
                         Margin="10,10,10,20"/>
                     </StackPanel>
                     <StackPanel>
-                        <TextBlock x:Name="txtDate" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="txtDate" HorizontalAlignment="Center" FontSize="14"/>
                         <ListBox x:Name="lbxBrd" Width="120" Height="200" SelectionChanged="lbxBrd_SelectionChanged" Margin="20,0,20,0"/>
                     </StackPanel>
                     <StackPanel>
-                        <TextBlock x:Name="txtTime" HorizontalAlignment="Center"/>
+                        <TextBlock x:Name="txtTime" HorizontalAlignment="Center" FontSize="14"/>
                         <ListBox x:Name="lbxSl" Width="60" Height="200" SelectionMode="Multiple" Margin="20,0,20,0"/>
                     </StackPanel>
                 </StackPanel>
                 <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,20,0,20"/>
-                <Button Name="btnQGen" IsEnabled="False" Click="btnQGen_Click" Width="120" Height="40" Background="#80cc28" Foreground="#fff" Margin="0,00,0,10"/>
+                <StackPanel Orientation="Horizontal">
+                    <Button Name="btnQGen" IsEnabled="False" Click="btnQGen_Click" Width="120" Height="40" Background="#80cc28" Foreground="#fff" Margin="50,0,0,10"/>
+                    <Button Name="btnQSav" IsEnabled="False" Click="btnQGen_Click" Width="120" Height="40" Background="#fbbc09" Foreground="#fff" Margin="60,0,0,10"/>
+                </StackPanel>
                 <Grid>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
@@ -141,7 +144,6 @@
                     <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="2" IsEnabled="False" HorizontalAlignment="Right"/>
                     <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Left"/>
                 </Grid>
-                <Button Name="btnQSav" IsEnabled="False" Click="btnQGen_Click" Width="120" Height="40" Background="#fbbc09" Foreground="#fff" Margin="0,00,0,10"/>
             </StackPanel>
             <TabControl Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged"/>
             <TabControl Name="tbcRefSl" Width="876" Visibility="Collapsed">
@@ -168,6 +170,7 @@
                         <TextBlock Name="txtRQPack" Grid.Column="4" Grid.ColumnSpan="2" TextAlignment="Center" Background="Chartreuse"/>
                         <TextBlock Name="txtQPackR0" Grid.Row="1" Grid.Column="4" TextAlignment="Center"/>
                         <TextBlock Name="txtQPackR1" Grid.Row="1" Grid.Column="5" TextAlignment="Center"/>
+                        <TextBlock Name="txtGenPw" Grid.Column="6" TextAlignment="Center"/>
                     </Grid>
                 </TabItem>
                 <TabItem Width="876">

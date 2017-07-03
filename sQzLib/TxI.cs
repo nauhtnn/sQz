@@ -132,6 +132,8 @@ namespace sQzLib {
 		OP_N_NEE,
 		OP_PRI,
 		OP_ALT,
+		OP_PW,
+		OP_GEN_PW,
 		OP_LCK,
 		OP_ABSENT,
 		PREP_DEL,

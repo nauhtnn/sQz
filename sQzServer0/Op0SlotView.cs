@@ -75,6 +75,7 @@ namespace sQzServer0
                     RowDefinition rd = new RowDefinition();
                     rd.Height = rh;
                     grdNee.RowDefinitions.Add(rd);
+                    //
                     TextBlock t = new TextBlock();
                     t.Text = e.tId;
                     t.Background = bg;
@@ -86,6 +87,7 @@ namespace sQzServer0
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
                     grdNee.Children.Add(t);
+                    //
                     t = new TextBlock();
                     t.Text = e.tBirdate;
                     t.Background = bg;
@@ -98,12 +100,14 @@ namespace sQzServer0
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
                     grdNee.Children.Add(t);
+                    //
                     t = new TextBlock();
                     t.Background = bg;
                     t.Text = (r.uId + 1).ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
                     grdNee.Children.Add(t);
+                    //
                     t = new TextBlock();
                     t.Background = bg;
                     int lvid = e.LvId;
@@ -113,6 +117,7 @@ namespace sQzServer0
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 5);
                     grdNee.Children.Add(t);
+                    //
                     t = new TextBlock();
                     t.Background = bg;
                     vDt1.Add(lvid, t);
@@ -121,6 +126,7 @@ namespace sQzServer0
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 6);
                     grdNee.Children.Add(t);
+                    //
                     t = new TextBlock();
                     t.Background = bg;
                     vDt2.Add(lvid, t);
@@ -129,6 +135,7 @@ namespace sQzServer0
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 7);
                     grdNee.Children.Add(t);
+                    //
                     t = new TextBlock();
                     t.Background = bg;
                     vComp.Add(lvid, t);
@@ -238,18 +245,21 @@ namespace sQzServer0
                 Grid.SetColumnSpan(bor, g.ColumnDefinitions.Count);
                 Grid.SetRow(bor, i);
                 g.Children.Add(bor);
+
                 TextBlock t = new TextBlock();
                 t.TextAlignment = TextAlignment.Center;
                 t.Text = (r.uId + 1).ToString();
                 Grid.SetRow(t, ++i);
                 Grid.SetColumn(t, 0);
                 g.Children.Add(t);
+
                 t = new TextBlock();
                 t.TextAlignment = TextAlignment.Center;
                 t.Text = r.vExaminee.Count.ToString();
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 1);
                 g.Children.Add(t);
+
                 t = new TextBlock();
                 vRT1[r.uId] = t;
                 if (r.t1.Hour != DT.INV)
@@ -258,6 +268,7 @@ namespace sQzServer0
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 2);
                 g.Children.Add(t);
+
                 t = new TextBlock();
                 vRT2[r.uId] = t;
                 if (r.t2.Hour != DT.INV)
@@ -266,6 +277,7 @@ namespace sQzServer0
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 3);
                 g.Children.Add(t);
+
                 RadioButton rdo = new RadioButton();
                 rdo.GroupName = "_" + r.uId;
                 rdo.IsChecked = true;
@@ -274,6 +286,7 @@ namespace sQzServer0
                 Grid.SetColumn(rdo, 4);
                 rdo.HorizontalAlignment = HorizontalAlignment.Center;
                 g.Children.Add(rdo);
+
                 rdo = new RadioButton();
                 rdo.GroupName = "_" + r.uId;
                 if (mSl.vbQPkAlt.ContainsKey(r.uId) && mSl.vbQPkAlt[r.uId])
@@ -283,18 +296,20 @@ namespace sQzServer0
                 Grid.SetColumn(rdo, 5);
                 rdo.HorizontalAlignment = HorizontalAlignment.Center;
                 g.Children.Add(rdo);
+
+                t = new TextBlock();
+                t.Text = r.tPw;
+                Grid.SetRow(t, i);
+                Grid.SetColumn(t, 6);
+                g.Children.Add(t);
+
                 Button btn = new Button();
                 btn.Content = Txt.s._[(int)TxI.SUBMIT];
                 btn.Background = Theme.s._[(int)BrushId.Button_Hover];
                 btn.Foreground = Theme.s._[(int)BrushId.QID_Color];
                 Grid.SetRow(btn, i);
-                Grid.SetColumn(btn, 6);
+                Grid.SetColumn(btn, 7);
                 g.Children.Add(btn);
-                t = new TextBlock();
-                t.Text = r.tPw;
-                Grid.SetRow(t, i);
-                Grid.SetColumn(t, 7);
-                g.Children.Add(t);
             }
             //
             TabItem tbi = new TabItem();
