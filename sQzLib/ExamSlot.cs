@@ -66,7 +66,7 @@ namespace sQzLib
             {
                 ExamRoom r = new ExamRoom();
                 r.uId = i;
-                r.DBSelTime(mDt, out emsg);
+                r.DBSelTimeAndPw(mDt, out emsg);
                 if(!vRoom.ContainsKey(i))
                     vRoom.Add(i, r);
             }
@@ -295,6 +295,8 @@ namespace sQzLib
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return -1;
             }
+            string vch = ExamRoom.PwChars();
+            Random rand = new Random();
             int v = 1;
             StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
@@ -310,8 +312,8 @@ namespace sQzLib
                 }
                 else if (bNExist)
                     n = DBConnect.Ins(conn, "sqz_slot_room",
-                        "dt,t,rid,qpkalt", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
-                        "'," + r.uId + ",0)", out eMsg);
+                        "dt,t,rid,pw,qpkalt", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
+                        "'," + r.uId + ",'" + ExamRoom.GenPw(vch, rand) + "',0)", out eMsg);
                 if(n < 0)
                 {
                     DBConnect.Close(ref conn);

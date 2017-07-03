@@ -29,6 +29,7 @@ namespace sQzLib
         public int uId;
         public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + LV_CAP; } }
         public string tId { get { return eLv.ToString() + uId.ToString("d4"); } }
+        public static string gId(ExamLv lv, int id) { return lv.ToString() + id.ToString("d4"); }
         public string tName;
         public string tBirdate;
         public string tBirthplace;

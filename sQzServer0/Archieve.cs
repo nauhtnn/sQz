@@ -20,7 +20,7 @@ namespace sQzServer0
     /// <summary>
     /// Interaction logic for Operation.xaml
     /// </summary>
-    public partial class Operation0 : Page
+    public partial class Archieve : Page
     {
         Server2 mServer;
         UICbMsg mCbMsg;
@@ -32,7 +32,7 @@ namespace sQzServer0
         Dictionary<ExamLv, TextBlock[]> vtxtND;
         TabItem tbiSelected;
 
-        public Operation0()
+        public Archieve()
         {
             InitializeComponent();
             mServer = new Server2(SrvrBufHndl);
@@ -273,10 +273,7 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            btnStartSrvr.Content = t._[(int)TxI.STRT_SRVR];
-            btnStopSrvr.Content = t._[(int)TxI.STOP_SRVR];
             btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
-            btnQGen.Content = t._[(int)TxI.QS_GEN];
             rdoA.Content = t._[(int)TxI.BASIC];
             rdoB.Content = t._[(int)TxI.ADVAN];
             txtMod.Text = t._[(int)TxI.MODULE];
@@ -310,22 +307,23 @@ namespace sQzServer0
             ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
             {
-                lbxSl.IsEnabled = false;
+                lbxSl.IsEnabled = lbxNee.IsEnabled = false;
                 return;
             }
             DateTime dt;
             if (!DT.To_(i.Content as string, DT._, out dt))
             {
                 mBrd.mDt = dt;
-                lbxSl.IsEnabled = true;
+                lbxSl.IsEnabled = lbxNee.IsEnabled = true;
                 LoadSl();
+                LoadNee();
             }
         }
 
         private void LoadSl()
         {
             string emsg;
-            List<DateTime> v = mBrd.DBSelSl(false, out emsg);
+            List<DateTime> v = mBrd.DBSelSl(true, out emsg);
             if (v == null)
             {
                 spMain.Opacity = 0.5;
@@ -350,6 +348,33 @@ namespace sQzServer0
             }
         }
 
+        private void LoadNee()
+        {
+            string emsg;
+            List<string> v = mBrd.DBSelNee(out emsg);
+            if (v == null)
+            {
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(emsg);
+                spMain.Opacity = 1;
+            }
+            //bool dark = true;
+            //Color c = new Color();
+            //c.A = 0xff;
+            //c.B = c.G = c.R = 0xf0;
+            lbxNee.Items.Clear();
+            foreach (string tid in v)
+            {
+                ListBoxItem it = new ListBoxItem();
+                it.Content = tid;
+                it.Selected += lbxNee_Selected;
+                //dark = !dark;
+                //if (dark)
+                //    it.Background = new SolidColorBrush(c);
+                lbxNee.Items.Add(it);
+            }
+        }
+
         void DisableQSGen()
         {
             foreach (TextBox[] vt in vtxtNEsyDif.Values)
@@ -358,7 +383,6 @@ namespace sQzServer0
             foreach (TextBox[] vt in vtxtNDiff.Values)
                 foreach (TextBox t in vt)
                     t.IsEnabled = false;
-            btnQGen.IsEnabled = false;
         }
 
         void EnableQSGen()
@@ -422,6 +446,27 @@ namespace sQzServer0
                 }
         }
 
+        private void lbxNee_Selected(object sender, RoutedEventArgs e)
+        {
+            ListBoxItem i = sender as ListBoxItem;
+            if (i == null)
+                return;
+            ExamineeS0 nee = new ExamineeS0();
+            if (nee.ParseLvId(i.Content as string))
+                return;
+
+            ExamineeS0 dum = new ExamineeS0();
+            List<TabItem> l = new List<TabItem>();
+            foreach (TabItem ti in tbcSl.Items)
+                if (!dum.ParseLvId(ti.Header as string))
+                    l.Add(ti);
+            foreach (TabItem ti in l)
+                tbcSl.Items.Remove(ti);
+            TabItem tbi = new TabItem();
+            tbi.Header = i.Content;
+            tbcSl.Items.Add(tbi);
+        }
+
         public void InitQPanel()
         {
             ExamLv[] l = new ExamLv[2];
@@ -434,28 +479,12 @@ namespace sQzServer0
                 {
                     TextBox t = vtxtNEsyDif[lv][i];
                     if (t != null)
-                    {
                         t.MaxLength = 2;
-                        t.PreviewKeyDown += tbxIU_PrevwKeyDown;
-                        t.TextChanged += tbxIU_TextChanged;
-                    }
                     t = vtxtNDiff[lv][i];
                     if (t != null)
-                    {
                         t.MaxLength = 2;
-                        t.PreviewKeyDown += tbxIU_PrevwKeyDown;
-                        t.TextChanged += tbxIUdif_TextChanged;
-                    }
                 }
             }
-        }
-
-        private void tbxIU_PrevwKeyDown(object sender, KeyEventArgs e)
-        {
-            if (e.Key != Key.Delete && e.Key != Key.Back && e.Key != Key.Tab &&
-                ((int)e.Key < (int)Key.Left || (int)Key.Down < (int)e.Key) &&
-                ((int)e.Key < (int)Key.D0 || (int)Key.D9 < (int)e.Key))
-                e.Handled = true;
         }
 
         private void Lv_Checked(object sender, RoutedEventArgs e)
@@ -473,107 +502,6 @@ namespace sQzServer0
                 grdB.Visibility = Visibility.Visible;
                 txtNqs.Text = sl.CountQSByRoom(ExamLv.B).ToString();
             }
-            tbxIU_TextChanged(null, null);
-        }
-
-        private void tbxIU_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            TextBox t = sender as TextBox;
-            bool bG = true;
-            ExamLv lv;
-            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-                lv = ExamLv.A;
-            else
-                lv = ExamLv.B;
-            if(t != null && 0 < t.Text.Length)
-            {
-                int idx = int.Parse(t.Name.Substring(1));
-                TextBlock tb = vtxtN[lv][idx];
-                if (tb.Text.Length < 3)
-                    t.Text = string.Empty;
-                else
-                {
-                    int i = int.Parse(t.Text);
-                    int m = int.Parse(tb.Text.Substring(2));
-                    if (m < i)
-                        t.Text = string.Empty;
-                }
-            }
-            int n = 0;
-            for(int j = 0; j < vtxtNEsyDif[lv].Length; ++j)
-                if ((t = vtxtNEsyDif[lv][j]) != null)
-                {
-                    if (0 < t.Text.Length)
-                    {
-                        n += int.Parse(t.Text);
-                        vtxtNDiff[lv][j].IsEnabled = true;
-                    }
-                    else
-                    {
-                        bG = false;
-                        vtxtNDiff[lv][j].IsEnabled = false;
-                    }
-                }
-                else
-                    bG = false;
-            tbxNq.Text = n.ToString();
-            if (bG && n == 30)
-                btnQGen.IsEnabled = true;
-            else
-                btnQGen.IsEnabled = false;
-        }
-
-        private void tbxIUdif_TextChanged(object sender, TextChangedEventArgs e)
-        {
-            TextBox t = sender as TextBox;
-            if (t.Text.Length == 0)
-                return;
-            ExamLv lv;
-            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-                lv = ExamLv.A;
-            else
-                lv = ExamLv.B;
-            int i = int.Parse(t.Text);
-            int idx = int.Parse(t.Name.Substring(1));
-            TextBox tm = vtxtNEsyDif[lv][idx];
-            if(tm.Text.Length == 0)
-            {
-                t.Text = string.Empty;
-                return;
-            }
-            int m = int.Parse(tm.Text);
-            if(m < i)
-                t.Text = string.Empty;
-            TextBlock tb = vtxtND[lv][idx];
-            if (tb.Text.Length < 3)
-            {
-                t.Text = string.Empty;
-                return;
-            }
-            m = int.Parse(tb.Text.Substring(2));
-            if (m < i)
-                t.Text = string.Empty;
-        }
-
-        private void btnQGen_Click(object sender, RoutedEventArgs e)
-        {
-            Op0SlotView vw = tbcSl.SelectedItem as Op0SlotView;
-            if (vw == null)
-                return;
-            ExamLv lv;
-            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-                lv = ExamLv.A;
-            else
-                lv = ExamLv.B;
-            int[] vnesydif = new int[vtxtNEsyDif[lv].Length];
-            int[] vndiff = new int[vnesydif.Length];
-            for(int i = 0; i < vnesydif.Length; ++i)
-            {
-                vnesydif[i] = int.Parse(vtxtNEsyDif[lv][i].Text);
-                if (!int.TryParse(vtxtNDiff[lv][i].Text, out vndiff[i]))
-                    vndiff[i] = 0;
-            }
-            vw.GenQ(lv, vnesydif, vndiff);
         }
 
         private void tbcSl_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -588,7 +516,7 @@ namespace sQzServer0
             Op0SlotView vw = tbi as Op0SlotView;
             if (vw == null)
             {
-                btnQGen.IsEnabled = rdoA.IsEnabled =
+                rdoA.IsEnabled =
                     rdoB.IsEnabled = grdA.IsEnabled =
                     grdB.IsEnabled = false;
                 return;

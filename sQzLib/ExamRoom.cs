@@ -13,11 +13,13 @@ namespace sQzLib
         public SortedList<int, ExamineeA> vExaminee;
         public DateTime t1, t2;
         public Dictionary<ExamLv, int> nLv;
+        public string tPw;
         public ExamRoom()
         {
             uId = ExamineeA.LV_CAP;
             vExaminee = new SortedList<int, ExamineeA>();
             nLv = new Dictionary<ExamLv, int>();
+            tPw = null;
         }
 
         public int DBIns(MySqlConnection conn, out string eMsg)
@@ -206,7 +208,7 @@ namespace sQzLib
                 return true;
         }
 
-        public bool DBSelTime(DateTime dt, out string eMsg)
+        public bool DBSelTimeAndPw(DateTime dt, out string eMsg)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -214,7 +216,7 @@ namespace sQzLib
                 eMsg = Txt.s._[(int)TxI.DB_NOK];
                 return true;
             }
-            string qry = DBConnect.mkQrySelect("sqz_slot_room", "t1,t2",
+            string qry = DBConnect.mkQrySelect("sqz_slot_room", "pw,t1,t2",
                 "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) +
                 "' AND rid=" + uId + " LIMIT 1");
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -225,9 +227,10 @@ namespace sQzLib
             }
             if(reader.Read())
             {
-                if (reader.IsDBNull(0) || DT.Toh(reader.GetString(0), DT.hs, out t1))
+                tPw = reader.IsDBNull(0) ? null : reader.GetString(0);
+                if (reader.IsDBNull(1) || DT.Toh(reader.GetString(1), DT.hs, out t1))
                     t1 = DT.INV_;
-                if (reader.IsDBNull(1) || DT.Toh(reader.GetString(1), DT.hs, out t2))
+                if (reader.IsDBNull(2) || DT.Toh(reader.GetString(2), DT.hs, out t2))
                     t2 = DT.INV_;
             }
             reader.Close();
@@ -277,6 +280,39 @@ namespace sQzLib
             reader.Close();
             DBConnect.Close(ref conn);
             return r;
+        }
+
+        public static string PwChars()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (char i = '0'; i <= '9'; ++i)
+                sb.Append(i);
+            for (char i = 'A'; i <= 'Z'; ++i)
+                sb.Append(i);
+            for (char i = 'a'; i <= 'z'; ++i)
+                sb.Append(i);
+            sb.Append('!');
+            sb.Append('@');
+            sb.Append('#');
+            sb.Append('$');
+            sb.Append('%');
+            sb.Append('^');
+            sb.Append('&');
+            sb.Append('*');
+            sb.Append('(');
+            sb.Append(')');
+            sb.Append('-');
+            sb.Append('_');
+            return sb.ToString();
+        }
+
+        public static string GenPw(string vch, Random r)
+        {
+            int n = vch.Length;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 8; ++i)
+                sb.Append(vch[r.Next() % n]);
+            return sb.ToString();
         }
     }
 }

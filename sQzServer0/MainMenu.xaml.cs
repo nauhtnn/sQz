@@ -45,7 +45,7 @@ namespace sQzServer0
 
         private void btnArchv_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new Uri("Archv.xaml", UriKind.Relative));
+            NavigationService.Navigate(new Uri("Archieve.xaml", UriKind.Relative));
         }
 
         private void btnOp_Click(object sender, RoutedEventArgs e)

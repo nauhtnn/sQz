@@ -59,10 +59,10 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <None Include="ExamHistory.xaml">
-      <SubType>Designer</SubType>
+    <Page Include="Archieve.xaml">
       <Generator>MSBuild:Compile</Generator>
-    </None>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="MainMenu.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -71,9 +71,7 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <None Include="ExamHistory.xaml.cs">
-      <DependentUpon>ExamHistory.xaml</DependentUpon>
-    </None>
+    <Compile Include="Archieve.cs" />
     <Compile Include="MainMenu.xaml.cs">
       <DependentUpon>MainMenu.xaml</DependentUpon>
     </Compile>

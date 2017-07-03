@@ -195,6 +195,7 @@ namespace sQzServer0
             if (refg == null)
                 return new TabItem();
             Grid g = new Grid();
+            g.ShowGridLines = true;
             foreach (ColumnDefinition cd in refg.ColumnDefinitions)
             {
                 ColumnDefinition d = new ColumnDefinition();
@@ -239,21 +240,15 @@ namespace sQzServer0
                 g.Children.Add(bor);
                 TextBlock t = new TextBlock();
                 t.TextAlignment = TextAlignment.Center;
-                t.Text = i.ToString();
+                t.Text = (r.uId + 1).ToString();
                 Grid.SetRow(t, ++i);
                 Grid.SetColumn(t, 0);
                 g.Children.Add(t);
                 t = new TextBlock();
                 t.TextAlignment = TextAlignment.Center;
-                t.Text = (r.uId + 1).ToString();
-                Grid.SetRow(t, i);
-                Grid.SetColumn(t, 1);
-                g.Children.Add(t);
-                t = new TextBlock();
-                t.TextAlignment = TextAlignment.Center;
                 t.Text = r.vExaminee.Count.ToString();
                 Grid.SetRow(t, i);
-                Grid.SetColumn(t, 2);
+                Grid.SetColumn(t, 1);
                 g.Children.Add(t);
                 t = new TextBlock();
                 vRT1[r.uId] = t;
@@ -261,7 +256,7 @@ namespace sQzServer0
                     t.Text = r.t1.ToString(DT.hh);
                 t.TextAlignment = TextAlignment.Center;
                 Grid.SetRow(t, i);
-                Grid.SetColumn(t, 3);
+                Grid.SetColumn(t, 2);
                 g.Children.Add(t);
                 t = new TextBlock();
                 vRT2[r.uId] = t;
@@ -269,14 +264,14 @@ namespace sQzServer0
                     t.Text = r.t2.ToString(DT.hh);
                 t.TextAlignment = TextAlignment.Center;
                 Grid.SetRow(t, i);
-                Grid.SetColumn(t, 4);
+                Grid.SetColumn(t, 3);
                 g.Children.Add(t);
                 RadioButton rdo = new RadioButton();
                 rdo.GroupName = "_" + r.uId;
                 rdo.IsChecked = true;
                 rdo.IsEnabled = false;
                 Grid.SetRow(rdo, i);
-                Grid.SetColumn(rdo, 5);
+                Grid.SetColumn(rdo, 4);
                 rdo.HorizontalAlignment = HorizontalAlignment.Center;
                 g.Children.Add(rdo);
                 rdo = new RadioButton();
@@ -285,7 +280,7 @@ namespace sQzServer0
                     rdo.IsChecked = true;
                 rdo.Checked += Alt_Checked;
                 Grid.SetRow(rdo, i);
-                Grid.SetColumn(rdo, 6);
+                Grid.SetColumn(rdo, 5);
                 rdo.HorizontalAlignment = HorizontalAlignment.Center;
                 g.Children.Add(rdo);
                 Button btn = new Button();
@@ -293,8 +288,13 @@ namespace sQzServer0
                 btn.Background = Theme.s._[(int)BrushId.Button_Hover];
                 btn.Foreground = Theme.s._[(int)BrushId.QID_Color];
                 Grid.SetRow(btn, i);
-                Grid.SetColumn(btn, 7);
+                Grid.SetColumn(btn, 6);
                 g.Children.Add(btn);
+                t = new TextBlock();
+                t.Text = r.tPw;
+                Grid.SetRow(t, i);
+                Grid.SetColumn(t, 7);
+                g.Children.Add(t);
             }
             //
             TabItem tbi = new TabItem();

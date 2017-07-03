@@ -125,6 +125,30 @@ namespace sQzLib
             return r;
         }
 
+        public List<string> DBSelNee(out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                return null;
+            }
+            string qry = "dt='" + mDt.ToString(DT._) + "'";
+            qry = DBConnect.mkQrySelect("sqz_examinee", "lv,id", qry);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return null;
+            }
+            List<string> r = new List<string>();
+            while (reader.Read())
+                r.Add(reader.GetChar(0).ToString() + reader.GetUInt16(1).ToString("d4"));
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return r;
+        }
+
         public byte[] ToByteSl1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
