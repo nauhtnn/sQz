@@ -278,6 +278,7 @@ namespace sQzServer0
             btnStop.Content = t._[(int)TxI.STOP_SRVR];
             btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
             btnQGen.Content = t._[(int)TxI.QS_GEN];
+            btnQSav.Content = t._[(int)TxI.OP_Q_SAV];
 
             txtDate.Text = t._[(int)TxI.DATE_L];
             txtTime.Text = t._[(int)TxI.TIME_L];
@@ -306,7 +307,7 @@ namespace sQzServer0
             txtRQPack.Text = t._[(int)TxI.OP_Q];
             txtQPackR0.Text = t._[(int)TxI.OP_PRI];
             txtQPackR1.Text = t._[(int)TxI.OP_ALT];
-            txtGenPw.Text = t._[(int)TxI.OP_GEN_PW];
+            txtPw.Text = t._[(int)TxI.OP_PW];
         }
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)

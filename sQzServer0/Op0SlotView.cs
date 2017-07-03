@@ -304,7 +304,7 @@ namespace sQzServer0
                 g.Children.Add(t);
 
                 Button btn = new Button();
-                btn.Content = Txt.s._[(int)TxI.SUBMIT];
+                btn.Content = Txt.s._[(int)TxI.OP_GEN_PW];
                 btn.Background = Theme.s._[(int)BrushId.Button_Hover];
                 btn.Foreground = Theme.s._[(int)BrushId.QID_Color];
                 Grid.SetRow(btn, i);

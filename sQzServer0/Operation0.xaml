@@ -170,7 +170,7 @@
                         <TextBlock Name="txtRQPack" Grid.Column="4" Grid.ColumnSpan="2" TextAlignment="Center" Background="Chartreuse"/>
                         <TextBlock Name="txtQPackR0" Grid.Row="1" Grid.Column="4" TextAlignment="Center"/>
                         <TextBlock Name="txtQPackR1" Grid.Row="1" Grid.Column="5" TextAlignment="Center"/>
-                        <TextBlock Name="txtGenPw" Grid.Column="6" TextAlignment="Center"/>
+                        <TextBlock Name="txtPw" Grid.Column="6" TextAlignment="Center"/>
                     </Grid>
                 </TabItem>
                 <TabItem Width="876">
