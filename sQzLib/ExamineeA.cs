@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
@@ -115,6 +116,56 @@ namespace sQzLib
             s.AppendFormat("{0}, {1}, {2}, {3}",
                 tId, tName, tBirdate, tBirthplace);
             return s.ToString();
+        }
+
+        public int DBGetQSId()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return -1;
+            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "qsid",
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() + "'");
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return -1;
+            }
+            int qsid = -1;
+            if (reader.Read())
+                qsid = reader.GetInt32(0);
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return qsid;
+        }
+
+        public List<DateTime> DBGetT()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return new List<DateTime>();
+            string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
+                "t", "a.dt='" + mDt.ToString(DT._) + "' AND b.lv='" + eLv.ToString() +
+                "' AND b.id=" + uId +
+                " AND a.dt=b.dt AND a.rid=b.rid");
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return new List<DateTime>();
+            }
+            List<DateTime> l = new List<DateTime>();
+            while (reader.Read())
+            {
+                DateTime dt;
+                if (!DT.To_(reader.GetString(0), DT.h, out dt))
+                    l.Add(dt);
+            }
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return l;
         }
 
         public abstract List<byte[]> ToByte();

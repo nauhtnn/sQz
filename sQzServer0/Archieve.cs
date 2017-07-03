@@ -452,18 +452,103 @@ namespace sQzServer0
             if (i == null)
                 return;
             ExamineeS0 nee = new ExamineeS0();
-            if (nee.ParseLvId(i.Content as string))
-                return;
-
-            ExamineeS0 dum = new ExamineeS0();
             List<TabItem> l = new List<TabItem>();
             foreach (TabItem ti in tbcSl.Items)
-                if (!dum.ParseLvId(ti.Header as string))
+                if (!nee.ParseLvId(ti.Header as string))
                     l.Add(ti);
             foreach (TabItem ti in l)
                 tbcSl.Items.Remove(ti);
+            if (nee.ParseLvId(i.Content as string))
+                return;
             TabItem tbi = new TabItem();
             tbi.Header = i.Content;
+            //
+            nee.mDt = mBrd.mDt;
+            int qsid = nee.DBGetQSId();
+            if (qsid < 0)
+                return;
+            QuestSheet qs = null;
+            foreach(ExamSlot sl in mBrd.vSl.Values)
+            {
+                if (sl.vQPack[nee.eLv].vSheet.ContainsKey(qsid))
+                {
+                    qs = sl.vQPack[nee.eLv].vSheet[qsid];
+                    break;
+                }
+                else if (sl.vQPackAlt[nee.eLv].vSheet.ContainsKey(qsid))
+                {
+                    qs = sl.vQPackAlt[nee.eLv].vSheet[qsid];
+                    break;
+                }
+            }
+            if (qs == null)
+            {
+                List<DateTime> v = nee.DBGetT();
+                string eMsg;
+                foreach (DateTime dt in v)
+                    if (!mBrd.vSl.ContainsKey(dt.ToString(DT.hh)))
+                    {
+                        ExamSlot sl = new ExamSlot();
+                        DateTime dati;
+                        dati.Hour = nee.mDt.h
+                        sl.Dt = dt;
+                        string emsg;
+                        if ((emsg = sl.DBSelRoomId()) != null)
+                        {
+                            WPopup.s.ShowDialog(emsg);
+                            return;
+                        }
+                        sl.DBSelStt();
+                        sl.DBSelQPkR();
+                        sl.DBSelNee();
+                        if (sl.DBSelArchieve(out emsg))
+                        {
+                            WPopup.s.ShowDialog(emsg);
+                            return;
+                        }
+                    }
+            }
+            ScrollViewer svwr = new ScrollViewer();
+            svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            StackPanel sp = new StackPanel();
+            int x = 0;
+            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
+            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
+            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
+            SolidColorBrush bg;
+            bool even = false;
+
+            foreach (Question q in qs.ShallowCopy())
+            {
+                if (q.bDiff)
+                    bg = difbg;
+                else if (even)
+                    bg = evenbg;
+                else
+                    bg = oddbg;
+                even = !even;
+                TextBlock j = new TextBlock();
+                j.Width = tbcSl.Width - SystemParameters.ScrollWidth;
+                j.TextWrapping = TextWrapping.Wrap;
+                j.Text = ++x + ". " + q.Stmt;
+                j.Background = bg;
+                sp.Children.Add(j);
+                for (int idx = 0; idx < Question.N_ANS; ++idx)
+                {
+                    j = new TextBlock();
+                    j.Width = tbcSl.Width - SystemParameters.ScrollWidth;
+                    j.TextWrapping = TextWrapping.Wrap;
+                    j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
+                    j.Background = bg;
+                    if (q.vKeys[idx])
+                        j.FontWeight = FontWeights.Bold;
+                    sp.Children.Add(j);
+                }
+            }
+            svwr.Content = sp;
+            svwr.Height = 560;
+            tbi.Content = svwr;
+            //
             tbcSl.Items.Add(tbi);
         }
 
