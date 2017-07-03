@@ -12,62 +12,64 @@
     <Viewbox>
         <StackPanel x:Name="spMain" Loaded="spMain_Loaded" Margin="10" Height="720" Width="1280">
             <StackPanel Orientation="Horizontal">
-                <Button x:Name="btnConnect" Content="Connect srvr" Click="btnConnect_Click"  Width="80"/>
-                <Button x:Name="btnStartSrvr" Content="Start srvr" Click="btnStartSrvr_Click" Width="80"/>
-                <Button x:Name="btnStopSrvr" Content="Stop srvr" Click="btnStopSrvr_Click" Width="80"/>
-                <Button x:Name="btnClose" Content="Close" Click="btnClose_Click" Width="80"/>
-                <Button x:Name="btnSubmit" Content="Submit" Click="btnSubmit_Click"  Width="80"/>
-            </StackPanel>
-            <StackPanel Orientation="Horizontal" Margin="10">
                 <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <!--<TextBlock x:Name="txtBrd" Text="2017-05-31"/>-->
-                        <ListBox x:Name="lbxSl" Width="90" Height="200"/>
-                    </StackPanel>
-                    <ScrollViewer x:Name="svwrStt" Height="320" Width="400" VerticalScrollBarVisibility="Auto">
-                        <TextBlock x:Name="lblStatus" Width="400" HorizontalAlignment="Left" VerticalAlignment="Stretch" TextWrapping="Wrap"></TextBlock>
-                    </ScrollViewer>
+                    <Button x:Name="btnConn" Width="120" Height="40" Click="btnConn_Click" Background="#80cc28" Foreground="#fff"
+                            Margin="10,20,10,10"/>
+                    <ListBox x:Name="lbxSl" Width="60" Height="200"  Margin="20,0,20,0"/>
+                    <Button x:Name="btnStrt" Width="120" Height="40" Click="btnStart_Click" Background="#1c64e7" Foreground="#fff"
+                        Margin="10,10,10,10"/>
+                    <Button x:Name="btnStop" Width="120" Height="40" Click="btnStop_Click" Background="#fbbc09" Foreground="#fff"
+                        Margin="10,10,10,50"/>
+                    <Button x:Name="btnSubmit" Width="120" Height="40" Click="btnSubmit_Click" Background="#f15a23" Foreground="#fff"
+                            Margin="10,10,10,50"/>
+                    <Button x:Name="btnClose" Width="120" Height="40" Click="btnClose_Click" Background="#a51c30" Foreground="#fff"
+                        Margin="10,10,10,10"/>
                 </StackPanel>
-                <TabControl x:Name="tbcSl" Width="840"/>
+                <TabControl x:Name="tbcSl" Width="1140" Height="700"/>
                 <StackPanel x:Name="refSl" Visibility="Collapsed">
                     <Grid>
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="40"/>
-                            <ColumnDefinition Width="150"/>
+                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="200"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="200"/>
                             <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="60"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="80"/>
+                            <ColumnDefinition Width="80"/>
                         </Grid.ColumnDefinitions>
                         <Grid.RowDefinitions>
                             <RowDefinition Height="30"/>
                         </Grid.RowDefinitions>
-                        <TextBlock Text="ID" Background="AliceBlue" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="1" Text="Name" Background="Beige" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="2" Text="Birthdate" Background="AliceBlue" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="3" Text="Computer" Background="Gold" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="4" Text="dt 1" Background="Azure" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="5" Text="dt 2" Background="Azure" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="6" Text="Mark" Background="Azure" TextAlignment="Center"/>
-                        <TextBlock Grid.Column="7" Text="Lock" Background="Azure" TextAlignment="Center"/>
+                        <TextBlock Name="txtId" TextAlignment="Center"/>
+                        <TextBlock Name="txtName" Grid.Column="1" HorizontalAlignment="Center"/>
+                        <TextBlock Name="txtBirdate" Grid.Column="2" HorizontalAlignment="Center"/>
+                        <TextBlock Name="txtBirpl" Grid.Column="3" HorizontalAlignment="Center"/>
+                        <TextBlock Name="txtComp" Grid.Column="4" HorizontalAlignment="Center"/>
+                        <TextBlock Name="txtT1" Grid.Column="5" HorizontalAlignment="Center"/>
+                        <TextBlock Name="txtT2" Grid.Column="6" HorizontalAlignment="Center"/>
+                        <TextBlock Name="txtGrade" Grid.Column="7" HorizontalAlignment="Center"/>
+                        <TextBlock Name="txtLock" Grid.Column="8" HorizontalAlignment="Center"/>
+                        <TextBlock Name="txtAbsent" Grid.Column="9" HorizontalAlignment="Center"/>
                     </Grid>
-                    <ScrollViewer Width="710" Height="290" VerticalScrollBarVisibility="Auto">
+                    <ScrollViewer Width="1140" VerticalScrollBarVisibility="Auto">
                         <Grid>
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="40"/>
-                                <ColumnDefinition Width="150"/>
+                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="200"/>
+                                <ColumnDefinition Width="100"/>
+                                <ColumnDefinition Width="200"/>
                                 <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="60"/>
-                                <ColumnDefinition Width="60"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="80"/>
+                                <ColumnDefinition Width="80"/>
                             </Grid.ColumnDefinitions>
                         </Grid>
                     </ScrollViewer>
-                    <TabControl Width="710" Height="320"/>
                 </StackPanel>
             </StackPanel>
         </StackPanel>

@@ -72,15 +72,15 @@ namespace sQzServer1
             LoadTxt();
         }
 
-        private void btnConnect_Click(object sender, RoutedEventArgs e)
+        private void btnConn_Click(object sender, RoutedEventArgs e)
         {
-            btnStopSrvr_Click(null, null);
+            btnStop_Click(null, null);
             //todo: check th state to return
             Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
             th.Start();
         }
 
-        private void btnStartSrvr_Click(object sender, RoutedEventArgs e)
+        private void btnStart_Click(object sender, RoutedEventArgs e)
         {
             Thread th = new Thread(() => { mServer.Start(ref mCbMsg); });
             th.Start();
@@ -88,14 +88,9 @@ namespace sQzServer1
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
         {
-            if (bRunning && mCbMsg.ToUp())
-                    Dispatcher.Invoke(() =>
-                    {
-                        lblStatus.Text += mCbMsg.txt;
-                    });
         }
 
-        private void btnStopSrvr_Click(object sender, RoutedEventArgs e)
+        private void btnStop_Click(object sender, RoutedEventArgs e)
         {
             mServer.Stop(ref mCbMsg);
         }
@@ -416,10 +411,21 @@ namespace sQzServer1
         {
             Txt s = Txt.s;
             btnClose.Content = s._[(int)TxI.EXIT];
-            btnConnect.Content = s._[(int)TxI.CONN];
-            btnStartSrvr.Content = s._[(int)TxI.STRT_SRVR];
-            btnStopSrvr.Content = s._[(int)TxI.STOP_SRVR];
+            btnConn.Content = s._[(int)TxI.CONN];
+            btnStrt.Content = s._[(int)TxI.STRT_SRVR];
+            btnStop.Content = s._[(int)TxI.STOP_SRVR];
             btnSubmit.Content = s._[(int)TxI.SUBMIT];
+
+            txtId.Text = s._[(int)TxI.NEEID_S];
+            txtName.Text = s._[(int)TxI.NEE_NAME];
+            txtBirdate.Text = s._[(int)TxI.BIRDATE];
+            txtBirpl.Text = s._[(int)TxI.BIRPL];
+            txtComp.Text = s._[(int)TxI.COMP];
+            txtT1.Text = s._[(int)TxI.T1];
+            txtT2.Text = s._[(int)TxI.T2];
+            txtGrade.Text = s._[(int)TxI.MARK];
+            txtLock.Text = s._[(int)TxI.OP_LCK];
+            txtAbsent.Text = s._[(int)TxI.OP_ABSENT];
         }
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
@@ -438,7 +444,6 @@ namespace sQzServer1
             vw.ShallowCopy(refSl);
             vw.mSl = sl;
             vw.ShowExaminee();
-            vw.ShowQuest();
             vfbLock.Add(vw.vbLock);
             TabItem ti = new TabItem();
             ti.Name = "_" + (i.Content as string).Replace(':', '_');

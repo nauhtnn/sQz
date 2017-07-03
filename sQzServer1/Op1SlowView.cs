@@ -56,6 +56,7 @@ namespace sQzServer1
                     grdNee.RowDefinitions.Add(rd);
                     TextBlock t = new TextBlock();
                     t.Text = e.tId;
+                    t.HorizontalAlignment = HorizontalAlignment.Center;
                     Grid.SetRow(t, ++rid);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
@@ -65,25 +66,37 @@ namespace sQzServer1
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.Text = e.tBirdate;
+                    t.HorizontalAlignment = HorizontalAlignment.Center;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 2);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    int lvid = e.LvId;
-                    vComp.Add(lvid, t);
+                    t.Text = e.tBirthplace;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
                     grdNee.Children.Add(t);
+                    t = new TextBlock();
+                    t.HorizontalAlignment = HorizontalAlignment.Center;
+                    if (e.tComp != null)
+                        t.Text = e.tComp;
+                    int lvid = e.LvId;
+                    vComp.Add(lvid, t);
+                    Grid.SetRow(t, rid);
+                    Grid.SetColumn(t, 4);
+                    grdNee.Children.Add(t);
                     CheckBox cbx = new CheckBox();
+                    cbx.HorizontalAlignment = HorizontalAlignment.Center;
                     cbx.Name = "_" + lvid;
+                    cbx.HorizontalAlignment = HorizontalAlignment.Center;
                     cbx.Unchecked += cbxLock_Unchecked;
                     cbx.Checked += cbxLock_Checked;
                     cbx.IsEnabled = true;//default value empowers supervisors
                     Grid.SetRow(cbx, rid);
-                    Grid.SetColumn(cbx, 7);
+                    Grid.SetColumn(cbx, 8);
                     vLock.Add(lvid, cbx);
                     grdNee.Children.Add(cbx);
                     t = new TextBlock();
+                    t.HorizontalAlignment = HorizontalAlignment.Center;
                     if (e.dtTim1.Hour != DT.INV)
                     {
                         t.Text = e.dtTim1.ToString("HH:mm");
@@ -97,16 +110,18 @@ namespace sQzServer1
                     }
                     vDt1.Add(lvid, t);
                     Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 4);
+                    Grid.SetColumn(t, 5);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
+                    t.HorizontalAlignment = HorizontalAlignment.Center;
                     if (e.dtTim2.Hour != DT.INV)
                         t.Text = e.dtTim2.ToString("HH:mm");
                     vDt2.Add(lvid, t);
                     Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 5);
+                    Grid.SetColumn(t, 6);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
+                    t.HorizontalAlignment = HorizontalAlignment.Center;
                     if (e.uGrade != ExamineeA.LV_CAP)
                     {
                         t.Text = e.Grade;
@@ -114,8 +129,19 @@ namespace sQzServer1
                     }
                     vMark.Add(lvid, t);
                     Grid.SetRow(t, rid);
-                    Grid.SetColumn(t, 6);
+                    Grid.SetColumn(t, 7);
                     grdNee.Children.Add(t);
+                    //
+                    cbx = new CheckBox();
+                    cbx.HorizontalAlignment = HorizontalAlignment.Center;
+                    cbx.Name = "b" + lvid;
+                    cbx.HorizontalAlignment = HorizontalAlignment.Center;
+                    //cbx.Unchecked += cbxLock_Unchecked;
+                    //cbx.Checked += cbxLock_Checked;
+                    cbx.IsEnabled = false;
+                    Grid.SetRow(cbx, rid);
+                    Grid.SetColumn(cbx, 9);
+                    grdNee.Children.Add(cbx);
                 }
         }
 
@@ -142,18 +168,22 @@ namespace sQzServer1
             foreach (Grid refg in refSp.Children.OfType<Grid>())
             {
                 Grid g = new Grid();
+                g.ShowGridLines = true;
                 foreach (ColumnDefinition cd in refg.ColumnDefinitions)
                 {
                     ColumnDefinition d = new ColumnDefinition();
                     d.Width = cd.Width;
                     g.ColumnDefinitions.Add(d);
                 }
+                g.Width = refg.Width;
+                g.HorizontalAlignment = refg.HorizontalAlignment;
                 foreach (TextBlock txt in refg.Children)
                 {
                     TextBlock t = new TextBlock();
                     t.Text = txt.Text;
                     t.Background = txt.Background;
                     t.Foreground = txt.Foreground;
+                    t.HorizontalAlignment = txt.HorizontalAlignment;
                     Grid.SetColumn(t, Grid.GetColumn(txt));
                     Grid.SetRow(t, Grid.GetRow(txt));
                     g.Children.Add(t);
@@ -171,6 +201,7 @@ namespace sQzServer1
                 vwr.Height = refscrvwr.Height;
                 vwr.HorizontalAlignment = HorizontalAlignment.Left;
                 grdNee = new Grid();
+                grdNee.ShowGridLines = true;
                 foreach (ColumnDefinition cd in refg.ColumnDefinitions)
                 {
                     ColumnDefinition d = new ColumnDefinition();
@@ -178,53 +209,10 @@ namespace sQzServer1
                     grdNee.ColumnDefinitions.Add(d);
                 }
                 grdNee.Name = refg.Name;
+                grdNee.HorizontalAlignment = refg.HorizontalAlignment;
                 vwr.Content = grdNee;
                 Children.Add(vwr);
             }
-            foreach (TabControl tbc in refSp.Children.OfType<TabControl>())
-            {
-                tbcQuest = new TabControl();
-                tbcQuest.Width = tbc.Width;
-                tbcQuest.Height = tbc.Height;
-                Children.Add(tbcQuest);
-            }
-        }
-
-        public void ShowQuest()
-        {
-            //if (bQShowed)
-            //    return;
-            //bQShowed = true;
-
-            //bool dark = true;
-            //Color c = new Color();
-            //c.A = 0xff;
-            //c.B = c.G = c.R = 0xf0;
-            //tbcQuest.Items.Clear();
-            //foreach (QuestPack p in mSl.vQPack.Values)
-            //    foreach (QuestSheet qs in p.vSheet.Values)
-            //    {
-            //        TabItem ti = new TabItem();
-            //        ti.Header = qs.eLv.ToString() + qs.uId;
-            //        ScrollViewer svwr = new ScrollViewer();
-            //        svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            //        StackPanel sp = new StackPanel();
-            //        int x = 0;
-            //        foreach (Question q in qs.vQuest)
-            //        {
-            //            TextBlock i = new TextBlock();
-            //            i.Text = ++x + ") " + q.ToString();
-            //            dark = !dark;
-            //            if (dark)
-            //                i.Background = new SolidColorBrush(c);
-            //            else
-            //                i.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-            //            sp.Children.Add(i);
-            //        }
-            //        svwr.Content = sp;
-            //        ti.Content = svwr;
-            //        tbcQuest.Items.Add(ti);
-            //    }
         }
 
         private void cbxLock_Unchecked(object sender, RoutedEventArgs e)
