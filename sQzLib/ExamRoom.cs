@@ -314,5 +314,27 @@ namespace sQzLib
                 sb.Append(vch[r.Next() % n]);
             return sb.ToString();
         }
+
+        public bool RegenPw()
+        {
+            if (vExaminee.Count == 0)
+                return true;
+            string vch = PwChars();
+            Random r = new Random();
+            ExamineeA x = vExaminee.Values.First();
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return true;
+            string otPw = tPw;
+            tPw = GenPw(vch, r);
+            string emsg;
+            int n = DBConnect.Update(conn, "sqz_slot_room", "pw='" + tPw + "'",
+                "dt='" + x.mDt.ToString(DT._) + "' AND t='" +
+                x.mDt.ToString(DT.hh) + "' AND rid=" + uId, out emsg);
+            if(0 < n)
+                return false;
+            tPw = otPw;
+            return true;
+        }
     }
 }

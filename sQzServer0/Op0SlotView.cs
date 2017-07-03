@@ -21,6 +21,7 @@ namespace sQzServer0
         public SortedList<int, TextBlock> vComp;
         public Dictionary<int, TextBlock> vRT1;
         public Dictionary<int, TextBlock> vRT2;
+        Dictionary<int, TextBlock> vRPw;
         Grid grdNee;
         public ExamSlot mSl;
         Dictionary<ExamLv, int[]> vNEsyDif, vNDiff;
@@ -230,6 +231,7 @@ namespace sQzServer0
             //
             vRT1 = new Dictionary<int, TextBlock>();
             vRT2 = new Dictionary<int, TextBlock>();
+            vRPw = new Dictionary<int, TextBlock>();
             GridLength h = new GridLength(40);
             int i = 1;
             SolidColorBrush br = new SolidColorBrush(Colors.Black);
@@ -261,7 +263,7 @@ namespace sQzServer0
                 g.Children.Add(t);
 
                 t = new TextBlock();
-                vRT1[r.uId] = t;
+                vRT1.Add(r.uId, t);
                 if (r.t1.Hour != DT.INV)
                     t.Text = r.t1.ToString(DT.hh);
                 t.TextAlignment = TextAlignment.Center;
@@ -270,7 +272,7 @@ namespace sQzServer0
                 g.Children.Add(t);
 
                 t = new TextBlock();
-                vRT2[r.uId] = t;
+                vRT2.Add(r.uId, t);
                 if (r.t2.Hour != DT.INV)
                     t.Text = r.t2.ToString(DT.hh);
                 t.TextAlignment = TextAlignment.Center;
@@ -298,6 +300,7 @@ namespace sQzServer0
                 g.Children.Add(rdo);
 
                 t = new TextBlock();
+                vRPw.Add(r.uId, t);
                 t.Text = r.tPw;
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 6);
@@ -305,6 +308,8 @@ namespace sQzServer0
 
                 Button btn = new Button();
                 btn.Content = Txt.s._[(int)TxI.OP_GEN_PW];
+                btn.Name = "b" + r.uId;
+                btn.Click += btnGenPw_Click;
                 btn.Background = Theme.s._[(int)BrushId.Button_Hover];
                 btn.Foreground = Theme.s._[(int)BrushId.QID_Color];
                 Grid.SetRow(btn, i);
@@ -316,6 +321,15 @@ namespace sQzServer0
             tbi.Content = g;
             tbi.Header = Txt.s._[(int)TxI.OP_STT];
             return tbi;
+        }
+
+        private void btnGenPw_Click(object sender, RoutedEventArgs e)
+        {
+            Button btn = sender as Button;
+            int rid = int.Parse(btn.Name.Substring(1));
+            if(mSl.vRoom.ContainsKey(rid) && vRPw.ContainsKey(rid)
+                && !mSl.vRoom[rid].RegenPw())
+                    vRPw[rid].Text = mSl.vRoom[rid].tPw;
         }
 
         private void Alt_Checked(object sender, RoutedEventArgs e)
