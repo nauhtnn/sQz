@@ -21,7 +21,6 @@ namespace sQzServer1
         public SortedList<int, CheckBox> vLock;
         public SortedList<int, bool> vbLock;
         Grid grdNee;
-        public TabControl tbcQuest;
         public ExamSlot mSl;
         bool bQShowed;
         bool bNeeShowed;
@@ -220,6 +219,9 @@ namespace sQzServer1
             TabItem tbi = new TabItem();
             tbi.Content = sp;
             tbi.Header = Txt.s._[(int)TxI.OP_NEE];
+            TabControl tbc = new TabControl();
+            tbc.Items.Add(tbi);
+            Content = tbc;
             return tbi;
         }
 
