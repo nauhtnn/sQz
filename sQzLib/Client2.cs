@@ -6,7 +6,8 @@ namespace sQzLib
 {
     public enum NetCode
     {
-        DateStudentRetriving = 0,
+        Srvr1Auth = 0,
+        Srvr1DatRetriving,
         QuestRetrieving,
         AnsKeyRetrieving,
         SrvrSubmitting,

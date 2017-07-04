@@ -22,7 +22,6 @@ namespace sQzServer0
     /// </summary>
     public partial class Archieve : Page
     {
-        Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
         ExamBoard mBrd;
@@ -35,7 +34,6 @@ namespace sQzServer0
         public Archieve()
         {
             InitializeComponent();
-            mServer = new Server2(SrvrBufHndl);
             mCbMsg = new UICbMsg();
 
             mBrd = new ExamBoard();
@@ -48,8 +46,6 @@ namespace sQzServer0
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bRunning = false;
-            UICbMsg dummy = new UICbMsg();
-            mServer.Stop(ref dummy);
         }
 
         private void LoadBrd()
@@ -172,24 +168,6 @@ namespace sQzServer0
             aTimer.Enabled = true;
         }
 
-        private void btnStartSrvr_Click(object sender, RoutedEventArgs e)
-        {
-            foreach(TabItem i in tbcSl.Items)
-            {
-                Op0SlotView vw = i as Op0SlotView;
-                if (vw == null)
-                    continue;
-                if (vw.mSl.eStt == ExamStt.Prep)
-                {
-                    vw.mSl.eStt = ExamStt.Oper;
-                    vw.mSl.DBUpStt();
-                }
-            }
-            DisableQSGen();
-            Thread th = new Thread(() => {mServer.Start(ref mCbMsg);});
-            th.Start();
-        }
-
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
         {
             //if (bRunning && mCbMsg.ToUp())
@@ -197,77 +175,9 @@ namespace sQzServer0
             //        lblStatus.Text += mCbMsg.txt; });
         }
 
-        private void btnStopSrvr_Click(object sender, RoutedEventArgs e)
-        {
-            mServer.Stop(ref mCbMsg);
-        }
-
         private void btnMMenu_Click(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new Uri("MainMenu.xaml", UriKind.Relative));
-        }
-
-        public bool SrvrBufHndl(byte[] buf, out byte[] outMsg)
-        {
-            int offs = 0;
-            NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int x;
-            switch (c)
-            {
-                case NetCode.DateStudentRetriving:
-                    if (buf.Length - offs < 4)
-                    {
-                        outMsg = null;
-                        break;
-                    }
-                    x = BitConverter.ToInt32(buf, offs);
-                    offs += 4;
-                    outMsg = mBrd.ToByteSl1(x);
-                    Dispatcher.InvokeAsync(() =>
-                    {
-                        foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
-                            vw.UpRT1(x);
-                    });
-                    return true;
-                case NetCode.QuestRetrieving:
-                    if(buf.Length - offs < 4)
-                    {
-                        outMsg = null;
-                        break;
-                    }
-                    x = BitConverter.ToInt32(buf, offs);
-                    offs += 4;
-                    outMsg = mBrd.ToByteQPack(x);
-                    return true;
-                case NetCode.AnsKeyRetrieving:
-                    outMsg = mBrd.ToByteKey();
-                    break;
-                case NetCode.SrvrSubmitting:
-                    int rid;
-                    if (-1 < (rid = mBrd.ReadByteSl0(buf, ref offs)))
-                    {
-                        string emsg;
-                        if (mBrd.DBUpdateRs(rid, out emsg))
-                            mCbMsg += emsg;
-                        else if (emsg == null)
-                        {
-                            mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
-                            Dispatcher.InvokeAsync(() =>
-                            {
-                                foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
-                                    vw.UpdateRsView(rid);
-                            });
-                        }
-                        mBrd.DBUpStt();
-                    }
-                    outMsg = BitConverter.GetBytes(1);
-                    break;
-                default:
-                    outMsg = null;
-                    break;
-            }
-            return false;
         }
 
         private void LoadTxt()

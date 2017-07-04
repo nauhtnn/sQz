@@ -1,0 +1,26 @@
+﻿<Page x:Class="sQzServer1.MainMenu"
+      xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+      xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+      xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
+      xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+      xmlns:local="clr-namespace:sQzServer1"
+      mc:Ignorable="d" 
+      d:DesignHeight="720" d:DesignWidth="1280"
+      ShowsNavigationUI="False"
+      Title="MainMenu">
+
+    <Viewbox>
+        <StackPanel Loaded="Main_Loaded" Height="720" Width="1280">
+            <StackPanel.Background>
+                <ImageBrush ImageSource="techwall.jpg" Stretch="None"/>
+            </StackPanel.Background>
+            <TextBlock Height="16" Background="#f3f3ee"/>
+            <TextBlock Name="txtLalgitc" Height="80" Background="#a51c30" Foreground="#fff" TextAlignment="Center" VerticalAlignment="Center" FontSize="40" FontWeight="Bold" Padding="0,8,0,0"/>
+            <TextBlock Name="txtsQz" Background="#fff" Foreground="#8c1515" VerticalAlignment="Center" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
+            <TextBlock Name="txtPw" TextAlignment="Center" Margin="0,40,0,10" Foreground="#00356b" FontWeight="Bold"/>
+            <TextBox Name="tbxPw" Height="60" Width="256" MaxLength="8" TextAlignment="Center" Padding="0,10,0,0"/>
+            <Button Name="btnAuth" Click="btnAuth_Click" Width="256" Height="80" Margin="0,40,0,20" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
+            <Button Name="btnExit" Click="btnExit_Click" Width="256" Height="80" Margin="0,40,0,20" Background="#f15a23" Foreground="#fff" FontWeight="Bold"/>
+        </StackPanel>
+    </Viewbox>
+</Page>

@@ -36,7 +36,7 @@ namespace sQzServer1
         {
             InitializeComponent();
 
-            mState = NetCode.DateStudentRetriving;
+            mState = NetCode.Srvr1DatRetriving;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, true);
             mServer = new Server2(SrvrBufHndl);
             mServer.SrvrPort = 23821;
@@ -49,16 +49,16 @@ namespace sQzServer1
                 !int.TryParse(System.IO.File.ReadAllText("Room.txt"), out uRId))
                 uRId = 0;
 
+            vfbLock = new List<SortedList<int, bool>>();
+
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
             aTimer.Elapsed += UpdateSrvrMsg;
             aTimer.AutoReset = true;
             aTimer.Enabled = true;
-
-            vfbLock = new List<SortedList<int, bool>>();
         }
 
-        private void spMain_Loaded(object sender, RoutedEventArgs e)
+        private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             Window w = Window.GetWindow(this);
             w.WindowStyle = WindowStyle.None;
@@ -66,6 +66,8 @@ namespace sQzServer1
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
             w.FontSize = 13;
+
+            WPopup.nwIns(w);
 
             spMain.Background = Theme.s._[(int)BrushId.BG];
 
@@ -351,7 +353,20 @@ namespace sQzServer1
             int offs = 0;
             switch (mState)
             {
-                case NetCode.DateStudentRetriving:
+                case NetCode.Srvr1Auth:
+                    if (buf.Length - offs < 4)
+                        break;
+                    int rs = BitConverter.ToInt32(buf, offs);
+                    offs += 4;
+                    if (rs == (int)TxI.OP_AUTH_OK)
+                    {
+                        mState = NetCode.Srvr1DatRetriving;
+                        return true;
+                    }
+                    else
+                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP_AUTH_NOK]);
+                    break;
+                case NetCode.Srvr1DatRetriving:
                     if (mBrd.ReadByteSl1(buf, ref offs))
                         break;//show err msg
                     Dispatcher.Invoke(() => LoadSl());
@@ -379,7 +394,7 @@ namespace sQzServer1
             byte[] outMsg = null;
             switch (mState)
             {
-                case NetCode.DateStudentRetriving:
+                case NetCode.Srvr1DatRetriving:
                     outMsg = new byte[8];
                     Array.Copy(BitConverter.GetBytes((int)mState), 0, outMsg, 0, 4);
                     Array.Copy(BitConverter.GetBytes(uRId), 0, outMsg, 4, 4);
@@ -441,16 +456,14 @@ namespace sQzServer1
                 return;
 
             Op1SlotView vw = new Op1SlotView();
-            vw.ShallowCopy(refSl);
             vw.mSl = sl;
+            vw.DeepCopyNee(tbiRefNee);
             vw.ShowExaminee();
             vfbLock.Add(vw.vbLock);
-            TabItem ti = new TabItem();
-            ti.Name = "_" + (i.Content as string).Replace(':', '_');
-            ti.Header = sl.Dt.ToString(DT.hh);
-            ti.Content = vw;
-            tbcSl.Items.Add(ti);
-            ti.Focus();
+            vw.Name = "_" + (i.Content as string).Replace(':', '_');
+            vw.Header = sl.Dt.ToString(DT.hh);
+            tbcSl.Items.Add(vw);
+            vw.Focus();
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)

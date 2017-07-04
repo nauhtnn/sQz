@@ -11,7 +11,7 @@ using sQzLib;
 
 namespace sQzServer1
 {
-    public class Op1SlotView : StackPanel
+    public class Op1SlotView : TabItem
     {
         public Dictionary<int, TextBlock> vGrade;
         public Dictionary<int, TextBlock> vDt1;
@@ -35,6 +35,8 @@ namespace sQzServer1
             vLock = new SortedList<int, CheckBox>();
             vbLock = new SortedList<int, bool>();
             bQShowed = bNeeShowed = false;
+            TabControl tbc = new TabControl();
+            Content = tbc;
         }
 
         public void ShowExaminee()
@@ -163,9 +165,11 @@ namespace sQzServer1
                 }
         }
 
-        public void ShallowCopy(StackPanel refSp)
+        public TabItem DeepCopyNee(TabItem reftbi)
         {
-            foreach (Grid refg in refSp.Children.OfType<Grid>())
+            StackPanel refsp = reftbi.Content as StackPanel;
+            StackPanel sp = new StackPanel();
+            foreach (Grid refg in refsp.Children.OfType<Grid>())
             {
                 Grid g = new Grid();
                 g.ShowGridLines = true;
@@ -188,10 +192,10 @@ namespace sQzServer1
                     Grid.SetRow(t, Grid.GetRow(txt));
                     g.Children.Add(t);
                 }
-                Children.Add(g);
+                sp.Children.Add(g);
             }
 
-            foreach (ScrollViewer refscrvwr in refSp.Children.OfType<ScrollViewer>())
+            foreach (ScrollViewer refscrvwr in refsp.Children.OfType<ScrollViewer>())
             {
                 ScrollViewer vwr = new ScrollViewer();
                 Grid refg = refscrvwr.Content as Grid;
@@ -211,8 +215,12 @@ namespace sQzServer1
                 grdNee.Name = refg.Name;
                 grdNee.HorizontalAlignment = refg.HorizontalAlignment;
                 vwr.Content = grdNee;
-                Children.Add(vwr);
+                sp.Children.Add(vwr);
             }
+            TabItem tbi = new TabItem();
+            tbi.Content = sp;
+            tbi.Header = Txt.s._[(int)TxI.OP_NEE];
+            return tbi;
         }
 
         private void cbxLock_Unchecked(object sender, RoutedEventArgs e)

@@ -215,7 +215,27 @@ namespace sQzServer0
             int x;
             switch (c)
             {
-                case NetCode.DateStudentRetriving:
+                case NetCode.Srvr1Auth:
+                    outMsg = BitConverter.GetBytes((int)TxI.OP_AUTH_NOK);
+                    if (buf.Length - offs < 12)
+                        break;
+                    x = BitConverter.ToInt32(buf, offs);
+                    offs += 4;
+                    string pw = Encoding.ASCII.GetString(buf, offs, 8);
+                    offs += 8;
+                    foreach (ExamSlot sl in mBrd.vSl.Values)
+                    {
+                        if(sl.vRoom.ContainsKey(x))
+                        {
+                            if(pw == sl.vRoom[x].tPw)
+                            {
+                                outMsg = BitConverter.GetBytes((int)TxI.OP_AUTH_OK);
+                                break;
+                            }
+                        }
+                    }
+                    break;
+                case NetCode.Srvr1DatRetriving:
                     if (buf.Length - offs < 4)
                     {
                         outMsg = null;

@@ -10,7 +10,7 @@
       Title="Operation1">
 
     <Viewbox>
-        <StackPanel x:Name="spMain" Loaded="spMain_Loaded" Margin="10" Height="720" Width="1280">
+        <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
             <StackPanel Orientation="Horizontal">
                 <StackPanel>
                     <Button x:Name="btnConn" Width="120" Height="40" Click="btnConn_Click" Background="#80cc28" Foreground="#fff"
@@ -25,52 +25,55 @@
                     <Button x:Name="btnClose" Width="120" Height="40" Click="btnClose_Click" Background="#a51c30" Foreground="#fff"
                         Margin="10,10,10,10"/>
                 </StackPanel>
-                <TabControl x:Name="tbcSl" Width="1140" Height="700"/>
-                <StackPanel x:Name="refSl" Visibility="Collapsed">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="60"/>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="100"/>
-                            <ColumnDefinition Width="200"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="80"/>
-                            <ColumnDefinition Width="80"/>
-                        </Grid.ColumnDefinitions>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="30"/>
-                        </Grid.RowDefinitions>
-                        <TextBlock Name="txtId" TextAlignment="Center"/>
-                        <TextBlock Name="txtName" Grid.Column="1" HorizontalAlignment="Center"/>
-                        <TextBlock Name="txtBirdate" Grid.Column="2" HorizontalAlignment="Center"/>
-                        <TextBlock Name="txtBirpl" Grid.Column="3" HorizontalAlignment="Center"/>
-                        <TextBlock Name="txtComp" Grid.Column="4" HorizontalAlignment="Center"/>
-                        <TextBlock Name="txtT1" Grid.Column="5" HorizontalAlignment="Center"/>
-                        <TextBlock Name="txtT2" Grid.Column="6" HorizontalAlignment="Center"/>
-                        <TextBlock Name="txtGrade" Grid.Column="7" HorizontalAlignment="Center"/>
-                        <TextBlock Name="txtLock" Grid.Column="8" HorizontalAlignment="Center"/>
-                        <TextBlock Name="txtAbsent" Grid.Column="9" HorizontalAlignment="Center"/>
-                    </Grid>
-                    <ScrollViewer Width="1140" VerticalScrollBarVisibility="Auto">
-                        <Grid>
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="60"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="100"/>
-                                <ColumnDefinition Width="200"/>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="80"/>
-                                <ColumnDefinition Width="80"/>
-                            </Grid.ColumnDefinitions>
-                        </Grid>
-                    </ScrollViewer>
-                </StackPanel>
+                <TabControl Name="tbcSl" Width="1140" Height="700">
+                    <TabItem Name="tbiRefNee" Visibility="Collapsed">
+                        <StackPanel>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="60"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="100"/>
+                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="80"/>
+                                    <ColumnDefinition Width="80"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="30"/>
+                                </Grid.RowDefinitions>
+                                <TextBlock Name="txtId" TextAlignment="Center"/>
+                                <TextBlock Name="txtName" Grid.Column="1" HorizontalAlignment="Center"/>
+                                <TextBlock Name="txtBirdate" Grid.Column="2" HorizontalAlignment="Center"/>
+                                <TextBlock Name="txtBirpl" Grid.Column="3" HorizontalAlignment="Center"/>
+                                <TextBlock Name="txtComp" Grid.Column="4" HorizontalAlignment="Center"/>
+                                <TextBlock Name="txtT1" Grid.Column="5" HorizontalAlignment="Center"/>
+                                <TextBlock Name="txtT2" Grid.Column="6" HorizontalAlignment="Center"/>
+                                <TextBlock Name="txtGrade" Grid.Column="7" HorizontalAlignment="Center"/>
+                                <TextBlock Name="txtLock" Grid.Column="8" HorizontalAlignment="Center"/>
+                                <TextBlock Name="txtAbsent" Grid.Column="9" HorizontalAlignment="Center"/>
+                            </Grid>
+                            <ScrollViewer Width="1140" VerticalScrollBarVisibility="Auto">
+                                <Grid>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="60"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="200"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="80"/>
+                                        <ColumnDefinition Width="80"/>
+                                    </Grid.ColumnDefinitions>
+                                </Grid>
+                            </ScrollViewer>
+                        </StackPanel>
+                    </TabItem>
+                </TabControl>
             </StackPanel>
         </StackPanel>
     </Viewbox>
