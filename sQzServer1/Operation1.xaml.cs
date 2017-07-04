@@ -84,6 +84,8 @@ namespace sQzServer1
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
             Task.Run(() => { mServer.Start(ref mCbMsg); });
+            btnStrt.IsEnabled = false;
+            btnStop.IsEnabled = true;
         }
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
@@ -93,6 +95,8 @@ namespace sQzServer1
         private void btnStop_Click(object sender, RoutedEventArgs e)
         {
             mServer.Stop(ref mCbMsg);
+            btnStop.IsEnabled = false;
+            btnStrt.IsEnabled = true;
         }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
@@ -314,6 +318,18 @@ namespace sQzServer1
                                         cbx.IsEnabled = false;
                                     }
                                 }
+                                bool toSubmit = true;
+                                foreach (ExamSlot sl in mBrd.vSl.Values)
+                                    foreach(ExamRoom r in sl.vRoom.Values)
+                                        foreach(ExamineeA nee in r.vExaminee.Values)
+                                            if(nee.eStt != NeeStt.Finished)
+                                            {
+                                                toSubmit = false;
+                                                break;
+                                            }
+                                if (toSubmit)
+                                    btnSubmit.IsEnabled = true;
+                                btnSubmit.IsEnabled = true;
                             });
                             o.ToByte(out outMsg, 0);
                         }
@@ -368,6 +384,10 @@ namespace sQzServer1
                 case NetCode.AnsKeyRetrieving:
                     if (mBrd.ReadByteKey(buf, ref offs))
                         offs = 0;//todo handle error
+                    else
+                        Dispatcher.InvokeAsync(()=> {
+                            btnStrt.IsEnabled = true;
+                        });
                     break;
                 case NetCode.SrvrSubmitting:
                     if (buf.Length - offs == 4 && BitConverter.ToInt32(buf, offs) == 1)

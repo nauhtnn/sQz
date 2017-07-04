@@ -188,6 +188,8 @@ namespace sQzServer0
             DisableQSGen();
             Thread th = new Thread(() => {mServer.Start(ref mCbMsg);});
             th.Start();
+            btnStop.IsEnabled = true;
+            btnStart.IsEnabled = false;
         }
 
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
@@ -200,6 +202,8 @@ namespace sQzServer0
         private void btnStop_Click(object sender, RoutedEventArgs e)
         {
             mServer.Stop(ref mCbMsg);
+            btnStop.IsEnabled = false;
+            btnStart.IsEnabled = true;
         }
 
         private void btnMMenu_Click(object sender, RoutedEventArgs e)
