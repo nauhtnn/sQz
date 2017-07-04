@@ -21,8 +21,8 @@ namespace sQzClient
         UICbMsg mCbMsg;
         System.Timers.Timer mTimer;
 
-        const int SMT_OK_M = 30;
-        const int SMT_OK_S = 50;
+        const int SMT_OK_M = 20;
+        const int SMT_OK_S = 60;
 
         public QuestSheet mQSh;
 
@@ -465,7 +465,7 @@ namespace sQzClient
             bBtnBusy = true;
             WPopup.s.wpCb = Exit;
             spMain.Opacity = 0.5;
-            if (btnSubmit.IsEnabled)
+            if (mNee.eStt < NeeStt.Submitting)
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_1],
                     Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], "exit");
             else

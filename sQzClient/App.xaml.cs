@@ -89,26 +89,26 @@ namespace sQzClient
                 /// <returns></returns>
         private static int AltTabProcessor(int code, IntPtr wParam, IntPtr lParam)
         {
-            //if (code >= 0)
-            //{
-            //    var hookStruct = (KBLLHOOKSTRUCT)Marshal.PtrToStructure(
-            //    lParam, typeof(KBLLHOOKSTRUCT));
+            if (code >= 0)
+            {
+                var hookStruct = (KBLLHOOKSTRUCT)Marshal.PtrToStructure(
+                lParam, typeof(KBLLHOOKSTRUCT));
 
-            //    bool bAlt = GetKeyState(0x12) == KEYSTATE_PRESSED_NOT_TOGGLED ||
-            //        GetKeyState(0x12) == KEYSTATE_PRESSED_TOGGLED;
-            //    if (bAlt && (hookStruct.KeyCode == 0x09 || hookStruct.KeyCode == 0x73))
-            //        return 1;
-            //    if (hookStruct.KeyCode == 0x1b)
-            //        return 1;
-            //    if (hookStruct.KeyCode == 0x5b || hookStruct.KeyCode == 0x5c)
-            //        return 1;
-            //    bool bWind = GetKeyState(0x5b) == KEYSTATE_PRESSED_NOT_TOGGLED ||
-            //        GetKeyState(0x5b) == KEYSTATE_PRESSED_TOGGLED ||
-            //        GetKeyState(0x5c) == KEYSTATE_PRESSED_NOT_TOGGLED ||
-            //        GetKeyState(0x5c) == KEYSTATE_PRESSED_TOGGLED;
-            //    if (bWind && hookStruct.KeyCode == 0x4c)
-            //        return 1;
-            //}
+                bool bAlt = GetKeyState(0x12) == KEYSTATE_PRESSED_NOT_TOGGLED ||
+                    GetKeyState(0x12) == KEYSTATE_PRESSED_TOGGLED;
+                if (bAlt && (hookStruct.KeyCode == 0x09 || hookStruct.KeyCode == 0x73))
+                    return 1;
+                if (hookStruct.KeyCode == 0x1b)
+                    return 1;
+                if (hookStruct.KeyCode == 0x5b || hookStruct.KeyCode == 0x5c)
+                    return 1;
+                bool bWind = GetKeyState(0x5b) == KEYSTATE_PRESSED_NOT_TOGGLED ||
+                    GetKeyState(0x5b) == KEYSTATE_PRESSED_TOGGLED ||
+                    GetKeyState(0x5c) == KEYSTATE_PRESSED_NOT_TOGGLED ||
+                    GetKeyState(0x5c) == KEYSTATE_PRESSED_TOGGLED;
+                if (bWind && hookStruct.KeyCode == 0x4c)
+                    return 1;
+            }
 
             // Pass to other keyboard handlers. This allows other applications with hooks to 
             // get the notification.
@@ -202,7 +202,7 @@ namespace sQzClient
 
         protected override void OnDeactivated(EventArgs e)
         {
-            //MainWindow.Topmost = true;
+            MainWindow.Topmost = true;
             base.OnDeactivated(e);
         }
     }

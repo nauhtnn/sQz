@@ -291,18 +291,18 @@ namespace sQzLib
                 sb.Append(i);
             for (char i = 'a'; i <= 'z'; ++i)
                 sb.Append(i);
-            sb.Append('!');
-            sb.Append('@');
-            sb.Append('#');
-            sb.Append('$');
-            sb.Append('%');
-            sb.Append('^');
-            sb.Append('&');
-            sb.Append('*');
-            sb.Append('(');
-            sb.Append(')');
-            sb.Append('-');
-            sb.Append('_');
+            //sb.Append('!');
+            //sb.Append('@');
+            //sb.Append('#');
+            //sb.Append('$');
+            //sb.Append('%');
+            //sb.Append('^');
+            //sb.Append('&');
+            //sb.Append('*');
+            //sb.Append('(');
+            //sb.Append(')');
+            //sb.Append('-');
+            //sb.Append('_');
             return sb.ToString();
         }
 
