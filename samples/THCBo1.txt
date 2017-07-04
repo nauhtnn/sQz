@@ -1,0 +1,12 @@
+A0001	1	Nguyễn Thị Ngọc Ánh	10-10-1996	Việt Nam
+A0002	1	Lê Quang Cang	08-12-1983	Việt Nam
+A0003	1	Nguyễn Đức Cường	07-01-1995	Việt Nam
+A0004	1	Bùi Thị Ngọc Hằng	16-07-1992	Việt Nam
+A0005	1	Trần Thị Ninh Huệ	07-07-1993	Việt Nam
+A0006	1	Nguyễn Thị Liên Hương	10-02-1996	Việt Nam
+A0007	1	Huỳnh Thị Mỹ Liên	28-07-1995	Việt Nam
+A0008	1	Lê Thị Ngọc Linh	01-01-1994	Việt Nam
+A0009	1	Nguyễn Khánh Linh	24-12-1996	Việt Nam
+A0010	1	Phùng Thị Thùy Linh	26-04-1996	Việt Nam
+A0011	1	Lê Thị Cam Ly	22-10-1998	Việt Nam
+A0012	1	Quan Tuyết My	29-03-1995	Việt Nam

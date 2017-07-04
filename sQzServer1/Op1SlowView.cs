@@ -164,7 +164,7 @@ namespace sQzServer1
                 }
         }
 
-        public TabItem DeepCopyNee(TabItem reftbi)
+        public void DeepCopyNee(TabItem reftbi)
         {
             StackPanel refsp = reftbi.Content as StackPanel;
             StackPanel sp = new StackPanel();
@@ -216,13 +216,7 @@ namespace sQzServer1
                 vwr.Content = grdNee;
                 sp.Children.Add(vwr);
             }
-            TabItem tbi = new TabItem();
-            tbi.Content = sp;
-            tbi.Header = Txt.s._[(int)TxI.OP_NEE];
-            TabControl tbc = new TabControl();
-            tbc.Items.Add(tbi);
-            Content = tbc;
-            return tbi;
+            Content = sp;
         }
 
         private void cbxLock_Unchecked(object sender, RoutedEventArgs e)

@@ -78,14 +78,12 @@ namespace sQzServer1
         {
             btnStop_Click(null, null);
             //todo: check th state to return
-            Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
-            th.Start();
+            Task.Run(() => { mClnt.ConnectWR(ref mCbMsg); });
         }
 
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            Thread th = new Thread(() => { mServer.Start(ref mCbMsg); });
-            th.Start();
+            Task.Run(() => { mServer.Start(ref mCbMsg); });
         }
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
@@ -156,28 +154,24 @@ namespace sQzServer1
                         {
                             if (o.dtTim1.Hour == DT.INV)
                                 o.dtTim1 = DateTime.Now;
-                            Dispatcher.Invoke(() =>
+                            Dispatcher.InvokeAsync(() =>
                             {
-                                foreach(TabItem ti in tbcSl.Items)
+                                foreach(Op1SlotView vw in tbcSl.Items.OfType<Op1SlotView>())
                                 {
-                                    Op1SlotView vw = ti.Content as Op1SlotView;
-                                    if(vw != null)
+                                    TextBlock t;
+                                    lvid = o.LvId;
+                                    if (vw.vComp.TryGetValue(lvid, out t))
+                                        t.Text = o.tComp;
+                                    if (vw.vDt1.TryGetValue(lvid, out t))
+                                        t.Text = o.dtTim1.ToString("HH:mm");
+                                    CheckBox cbx;
+                                    if (vw.vLock.TryGetValue(lvid, out cbx))
                                     {
-                                        TextBlock t;
-                                        lvid = o.LvId;
-                                        if (vw.vComp.TryGetValue(lvid, out t))
-                                            t.Text = o.tComp;
-                                        if (vw.vDt1.TryGetValue(lvid, out t))
-                                            t.Text = o.dtTim1.ToString("HH:mm");
-                                        CheckBox cbx;
-                                        if (vw.vLock.TryGetValue(lvid, out cbx))
-                                        {
-                                            cbx.IsChecked = true;
-                                            cbx.IsEnabled = true;
-                                        }
-                                        if (vw.vbLock.Keys.Contains(lvid))
-                                            vw.vbLock[lvid] = true;
+                                        cbx.IsChecked = true;
+                                        cbx.IsEnabled = true;
                                     }
+                                    if (vw.vbLock.Keys.Contains(lvid))
+                                        vw.vbLock[lvid] = true;
                                 }
                             });
                             byte[] a;
@@ -304,29 +298,23 @@ namespace sQzServer1
                             foreach (SortedList<int, bool> sl in vfbLock)
                                 if (sl.ContainsKey(lvid))
                                     sl[lvid] = true;
-                            Thread th = new Thread(() =>
-                                Dispatcher.Invoke(() =>
+                            Dispatcher.InvokeAsync(() =>
+                            {
+                                foreach (Op1SlotView vw in tbcSl.Items.OfType<Op1SlotView>())
                                 {
-                                    foreach (TabItem ti in tbcSl.Items)
+                                    TextBlock t = null;
+                                    if (vw.vDt2.TryGetValue(lvid, out t))
+                                        t.Text = o.dtTim2.ToString("HH:mm");
+                                    if (vw.vMark.TryGetValue(lvid, out t))
+                                        t.Text = o.Grade.ToString();
+                                    CheckBox cbx;
+                                    if (vw.vLock.TryGetValue(lvid, out cbx))
                                     {
-                                        Op1SlotView vw = ti.Content as Op1SlotView;
-                                        if (vw != null)
-                                        {
-                                            TextBlock t = null;
-                                            if (vw.vDt2.TryGetValue(lvid, out t))
-                                                t.Text = o.dtTim2.ToString("HH:mm");
-                                            if (vw.vMark.TryGetValue(lvid, out t))
-                                                t.Text = o.Grade.ToString();
-                                            CheckBox cbx;
-                                            if (vw.vLock.TryGetValue(lvid, out cbx))
-                                            {
-                                                cbx.IsChecked = true;
-                                                cbx.IsEnabled = false;
-                                            }
-                                        }
+                                        cbx.IsChecked = true;
+                                        cbx.IsEnabled = false;
                                     }
-                                }));
-                            th.Start();
+                                }
+                            });
                             o.ToByte(out outMsg, 0);
                         }
                         else
@@ -369,7 +357,7 @@ namespace sQzServer1
                 case NetCode.Srvr1DatRetriving:
                     if (mBrd.ReadByteSl1(buf, ref offs))
                         break;//show err msg
-                    Dispatcher.Invoke(() => LoadSl());
+                    Dispatcher.InvokeAsync(() => LoadSl());
                     mState = NetCode.QuestRetrieving;
                     return true;
                 case NetCode.QuestRetrieving:
@@ -418,8 +406,7 @@ namespace sQzServer1
         {
             //todo: check th state to return
             mState = NetCode.SrvrSubmitting;
-            Thread th = new Thread(() => { mClnt.ConnectWR(ref mCbMsg); });
-            th.Start();
+            Task.Run(() => { mClnt.ConnectWR(ref mCbMsg); });
         }
 
         void LoadTxt()
