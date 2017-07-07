@@ -1,9 +1,0 @@
-﻿A1	2	Nguyễn Thị Thu Hà	01-01-1994	Việt Nam
-A2	2	Doãn Chí Hào	01-01-1988	Việt Nam
-A3	2	Lê Trung Hiếu	01-01-1990	Việt Nam
-A4	2	Kiều Đăng Huy	01-01-1993	Việt Nam
-A5	2	Hồ Duy Linh	01-01-1988	Việt Nam
-A6	2	Huỳnh Thị Tài Linh	01-01-1990	Việt Nam
-A7	2	Nguyễn Thị Kim Loan	01-01-1990	Việt Nam
-A8	2	Trần Thị Kim Loan	01-01-1979	Việt Nam
-A9	2	Dương Thị Hồng Nhung	01-01-1995	Việt Nam

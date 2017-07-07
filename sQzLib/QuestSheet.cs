@@ -107,9 +107,14 @@ namespace sQzLib
             int[] vndif = new int[viu.Length];
             foreach (Question q in vQuest)
             {
-                ++vnesydif[(int)q.eIU];
+                int idx = (int)q.eIU;//mod on 0705
+                if (idx == 6 || idx == 7)
+                    idx = idx - 6;
+                else if (idx == 9)
+                    idx = 2;
+                ++vnesydif[idx];
                 if (q.bDiff)
-                    ++vndif[(int)q.eIU];
+                    ++vndif[idx];
             }
             rv.Add(vnesydif);
             rv.Add(vndif);
@@ -194,6 +199,7 @@ namespace sQzLib
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes((int)eLv));
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(vQuest.Count));
             foreach (Question q in vQuest)
@@ -221,8 +227,15 @@ namespace sQzLib
             int offs0 = offs;
             int l = buf.Length - offs;
             //
-            if (l < 8)
+            if (l < 12)
                 return true;
+            int x;
+            if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
+                eLv = (ExamLv)x;
+            else
+                return true;
+            offs += 4;
+            l -= 4;
             uId = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
@@ -540,6 +553,7 @@ namespace sQzLib
         {
             vQuest.Clear();
             uId = id;
+            eLv = lv;
             string qry = DBConnect.mkQrySelect("sqz_qsheet_quest", "qid,asort,idx",
                 "dt='" + dt.ToString(DT._) + "' AND lv='" + lv.ToString() +
                 "' AND qsid=" + id);

@@ -133,10 +133,9 @@ namespace sQzServer1
                     e.bFromC = true;
                     e.ReadByte(buf, ref offs);
                     bool lck = false;
-                    lvid = e.LvId;
                     bool found = false;
                     foreach (SortedList<int, bool> l in vfbLock)
-                        if (l.TryGetValue(lvid, out lck))
+                        if (l.TryGetValue(e.LvId, out lck))
                         {
                             found = true;
                             break;
@@ -196,7 +195,7 @@ namespace sQzServer1
                     {
                         ExamineeA o = null;
                         foreach (ExamSlot sl in mBrd.vSl.Values)
-                            if ((o = sl.Find(lvid)) != null)
+                            if ((o = sl.Find(e.LvId)) != null)
                                 break;
                         if (o == null)
                             o = new ExamineeC();
@@ -242,7 +241,7 @@ namespace sQzServer1
                         Array.Copy(BitConverter.GetBytes((int)TxI.NEEID_NF), 0, outMsg, 0, 4);
                         break;
                     }
-                    ExamLv lv = (lvid < (int)ExamLv.B) ? ExamLv.A : ExamLv.B;
+                    ExamLv lv = (lvid < ExamineeA.LV_CAP) ? ExamLv.A : ExamLv.B;
                     offs += 4;
                     int qsid = BitConverter.ToInt32(buf, offs);
                     if (qsid == ExamineeA.LV_CAP)
@@ -277,7 +276,7 @@ namespace sQzServer1
                         AnsSheet keySh = null;
                         found = false;
                         foreach(ExamSlot sl in mBrd.vSl.Values)
-                            if(sl.mKeyPack.vSheet.TryGetValue(e.mAnsSh.uQSId, out keySh))
+                            if(sl.mKeyPack.vSheet.TryGetValue(e.mAnsSh.uQSLvId, out keySh))
                             {
                                 found = true;
                                 break;

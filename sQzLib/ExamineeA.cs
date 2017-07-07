@@ -85,7 +85,7 @@ namespace sQzLib
             else
             {
                 eLv = ExamLv.B;
-                uId = lvid - (int)eLv;
+                uId = lvid - LV_CAP;
             }
             return false;
         }

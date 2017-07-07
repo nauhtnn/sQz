@@ -65,9 +65,9 @@ namespace sQzLib
         {
             AnsSheet i = new AnsSheet();
             qs.ExtractKey(i);
-            if (!vSheet.ContainsKey(i.uQSId))
+            if (!vSheet.ContainsKey(i.uQSLvId))
             {
-                vSheet.Add(i.uQSId, i);
+                vSheet.Add(i.uQSLvId, i);
                 return i;
             }
             return null;
@@ -90,22 +90,11 @@ namespace sQzLib
             while (0 < nSh)
             {
                 AnsSheet i = new AnsSheet();
-                if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.uQSId))
+                if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.uQSLvId))
                     return true;
-                vSheet.Add(i.uQSId, i);
+                vSheet.Add(i.uQSLvId, i);
                 --nSh;
             }
-            return false;
-        }
-
-        public bool ReadByte1(byte[] buf, ref int offs)
-        {
-            if (buf == null)
-                return true;
-            AnsSheet i = new AnsSheet();
-            if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.uQSId))
-                return true;
-            vSheet.Add(i.uQSId, i);
             return false;
         }
     }

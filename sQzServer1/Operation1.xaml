@@ -20,9 +20,9 @@
                         Margin="10,10,10,10" IsEnabled="False"/>
                     <Button x:Name="btnStop" Width="120" Height="40" Click="btnStop_Click" Background="#fbbc09" Foreground="#fff"
                         Margin="10,10,10,50" IsEnabled="False"/>
-                    <Button x:Name="btnSubmit" Width="120" Height="40" Click="btnSubmit_Click" Background="#f15a23" Foreground="#fff"
+                    <Button x:Name="btnSubmit" Width="120" Height="40" Click="btnSubmit_Click" Background="#a51c30" Foreground="#fff"
                             Margin="10,10,10,50" IsEnabled="False"/>
-                    <Button x:Name="btnClose" Width="120" Height="40" Click="btnClose_Click" Background="#a51c30" Foreground="#fff"
+                    <Button x:Name="btnClose" Width="120" Height="40" Click="btnClose_Click" Background="#f15a23" Foreground="#fff"
                         Margin="10,10,10,10"/>
                 </StackPanel>
                 <TabControl Name="tbcSl" Width="1140" Height="700">

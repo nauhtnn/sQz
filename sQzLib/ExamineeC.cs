@@ -31,7 +31,7 @@ namespace sQzLib
             if (eStt < NeeStt.Examing)
                 return l;
 
-            l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
+            l.Add(BitConverter.GetBytes(mAnsSh.uQSLvId));
 
             if (eStt < NeeStt.Submitting)
                 return l;

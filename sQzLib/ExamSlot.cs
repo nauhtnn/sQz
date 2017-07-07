@@ -233,7 +233,7 @@ namespace sQzLib
                     }
                     bool bCont = false;
                     foreach(ExamRoom ro in vRoom.Values)
-                        if(ro.vExaminee.ContainsKey(e.uId))
+                        if(ro.vExaminee.ContainsKey(e.LvId))
                         {
                             dup.Append(e.eLv.ToString() + e.uId + ", ");
                             bCont = true;
@@ -241,7 +241,7 @@ namespace sQzLib
                     if (bCont)
                         continue;
                     foreach (ExamRoom ro in o.vRoom.Values)
-                        if (ro.vExaminee.ContainsKey(e.uId))
+                        if (ro.vExaminee.ContainsKey(e.LvId))
                         {
                             dup.Append(e.eLv.ToString() + e.uId + ", ");
                             bCont = true;
@@ -263,7 +263,7 @@ namespace sQzLib
                         eline.Append(i.ToString() + ", ");
                         continue;
                     }
-                    o.vRoom[urid].vExaminee.Add(e.uId, e);
+                    o.vRoom[urid].vExaminee.Add(e.LvId, e);
                 }
                 else
                     eline.Append(i.ToString() + ", ");
@@ -606,13 +606,6 @@ namespace sQzLib
             if (bQPkAlt)
                 return vQPackAlt[lv].ToByteNextQS();
             return vQPack[lv].ToByteNextQS();
-        }
-
-        public bool ReadByteQPack1(ExamLv lv, byte[] buf, ref int offs)
-        {
-            if (vQPack[lv].ReadByte1(buf, ref offs))
-                return true;
-            return false;
         }
 
         public List<byte[]> ToByteKey()

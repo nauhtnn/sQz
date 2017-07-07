@@ -70,7 +70,7 @@ namespace sQzLib
                 e.tName = reader.GetString(2);
                 e.tBirdate = reader.GetDateTime(3).ToString(DT.RR);
                 e.tBirthplace = reader.GetString(4);
-                vExaminee.Add(e.uId, e);
+                vExaminee.Add(e.LvId, e);
                 ++nLv[e.eLv];
             }
             reader.Close();
@@ -115,7 +115,7 @@ namespace sQzLib
         public ExamineeA Signin(ExamineeA e)
         {
             ExamineeA o;
-            if (vExaminee.TryGetValue(e.uId, out o) && o.tBirdate == e.tBirdate)
+            if (vExaminee.TryGetValue(e.LvId, out o) && o.tBirdate == e.tBirdate)
             {
                 o.bFromC = true;
                 o.Merge(e);
@@ -150,13 +150,13 @@ namespace sQzLib
                 if (e.ReadByte(buf, ref offs))
                     return true;
                 ExamineeA o;
-                if (vExaminee.TryGetValue(e.uId, out o))
+                if (vExaminee.TryGetValue(e.LvId, out o))
                 {
                     o.bFromC = false;
                     o.Merge(e);
                 }
                 else
-                    vExaminee.Add(e.uId, e);
+                    vExaminee.Add(e.LvId, e);
             }
             if (n == 0)
                 return false;
@@ -196,7 +196,7 @@ namespace sQzLib
                 if (e.ReadByte(buf, ref offs))
                     return true;
                 ExamineeA o;
-                if (vExaminee.TryGetValue(e.uId, out o))
+                if (vExaminee.TryGetValue(e.LvId, out o))
                 {
                     o.bFromC = false;
                     o.Merge(e);
@@ -287,10 +287,14 @@ namespace sQzLib
             StringBuilder sb = new StringBuilder();
             for (char i = '0'; i <= '9'; ++i)
                 sb.Append(i);
-            for (char i = 'A'; i <= 'Z'; ++i)
-                sb.Append(i);
-            for (char i = 'a'; i <= 'z'; ++i)
-                sb.Append(i);
+            //for (char i = 'A'; i < 'I'; ++i)
+            //    sb.Append(i);
+            //for (char i = 'J'; i <= 'Z'; ++i)
+            //    sb.Append(i);
+            //for (char i = 'a'; i < 'l'; ++i)
+            //    sb.Append(i);
+            //for (char i = 'm'; i <= 'z'; ++i)
+            //    sb.Append(i);
             //sb.Append('!');
             //sb.Append('@');
             //sb.Append('#');
