@@ -140,7 +140,7 @@ namespace sQzLib {
 		OP_AUTH_OK,
 		OP_AUTH_NOK,
 		OP_LCK,
-		OP_ABSENT,
+		OP_ABSENCE,
 		PREP_DEL,
 		PREP_IMP,
 		PREP_IU15,

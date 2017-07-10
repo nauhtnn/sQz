@@ -53,24 +53,9 @@
                                 <TextBlock Name="txtT2" Grid.Column="6" HorizontalAlignment="Center"/>
                                 <TextBlock Name="txtGrade" Grid.Column="7" HorizontalAlignment="Center"/>
                                 <TextBlock Name="txtLock" Grid.Column="8" HorizontalAlignment="Center"/>
-                                <TextBlock Name="txtAbsent" Grid.Column="9" HorizontalAlignment="Center"/>
+                                <TextBlock Name="txtAbsence" Grid.Column="9" HorizontalAlignment="Center"/>
                             </Grid>
-                            <ScrollViewer Width="1140" VerticalScrollBarVisibility="Auto">
-                                <Grid>
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="60"/>
-                                        <ColumnDefinition Width="200"/>
-                                        <ColumnDefinition Width="100"/>
-                                        <ColumnDefinition Width="200"/>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="80"/>
-                                        <ColumnDefinition Width="80"/>
-                                    </Grid.ColumnDefinitions>
-                                </Grid>
-                            </ScrollViewer>
+                            <ScrollViewer Width="1140" VerticalScrollBarVisibility="Auto"/>
                         </StackPanel>
                     </TabItem>
                 </TabControl>

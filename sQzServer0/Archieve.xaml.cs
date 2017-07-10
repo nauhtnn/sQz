@@ -26,9 +26,7 @@ namespace sQzServer0
         bool bRunning;
         ExamBoard mBrd;
         Dictionary<ExamLv, TextBox[]> vtxtNEsyDif;
-        Dictionary<ExamLv, TextBlock[]> vtxtN;
         Dictionary<ExamLv, TextBox[]> vtxtNDiff;
-        Dictionary<ExamLv, TextBlock[]> vtxtND;
         TabItem tbiSelected;
 
         public Archieve()
@@ -84,15 +82,9 @@ namespace sQzServer0
             vtxtNEsyDif = new Dictionary<ExamLv, TextBox[]>();
             vtxtNEsyDif.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
             vtxtNEsyDif.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
-            vtxtN = new Dictionary<ExamLv, TextBlock[]>();
-            vtxtN.Add(ExamLv.A, new TextBlock[QuestSheet.GetIUs(ExamLv.A).Count()]);
-            vtxtN.Add(ExamLv.B, new TextBlock[QuestSheet.GetIUs(ExamLv.B).Count()]);
             vtxtNDiff = new Dictionary<ExamLv, TextBox[]>();
             vtxtNDiff.Add(ExamLv.A, new TextBox[QuestSheet.GetIUs(ExamLv.A).Count()]);
             vtxtNDiff.Add(ExamLv.B, new TextBox[QuestSheet.GetIUs(ExamLv.B).Count()]);
-            vtxtND = new Dictionary<ExamLv, TextBlock[]>();
-            vtxtND.Add(ExamLv.A, new TextBlock[QuestSheet.GetIUs(ExamLv.A).Count()]);
-            vtxtND.Add(ExamLv.B, new TextBlock[QuestSheet.GetIUs(ExamLv.B).Count()]);
             int i = -1, j = -1;
             foreach (TextBox tbx in grdA.Children.OfType<TextBox>())
             {
@@ -119,40 +111,6 @@ namespace sQzServer0
                 {
                     vtxtNDiff[ExamLv.B][++j] = tbx;
                     tbx.Name = "d" + j;
-                }
-            }
-            List<int[]> vn = QuestSheet.DBGetNMod(ExamLv.A);
-            i = j = -1;
-            foreach (TextBlock txt in grdA.Children.OfType<TextBlock>())
-            {
-                if (Grid.GetColumn(txt) == 2)
-                {
-                    vtxtN[ExamLv.A][++i] = txt;
-                    txt.Name = "g" + i;
-                    txt.Text = "/ " + vn[0][i];
-                }
-                else if (Grid.GetColumn(txt) == 4)
-                {
-                    vtxtND[ExamLv.A][++j] = txt;
-                    txt.Name = "h" + j;
-                    txt.Text = "/ " + vn[1][j];
-                }
-            }
-            vn = QuestSheet.DBGetNMod(ExamLv.B);
-            i = j = -1;
-            foreach (TextBlock txt in grdB.Children.OfType<TextBlock>())
-            {
-                if (Grid.GetColumn(txt) == 2)
-                {
-                    vtxtN[ExamLv.B][++i] = txt;
-                    txt.Name = "g" + i;
-                    txt.Text = "/ " + vn[0][i];
-                }
-                else if (Grid.GetColumn(txt) == 4)
-                {
-                    vtxtND[ExamLv.B][++j] = txt;
-                    txt.Name = "h" + j;
-                    txt.Text = "/ " + vn[1][j];
                 }
             }
 

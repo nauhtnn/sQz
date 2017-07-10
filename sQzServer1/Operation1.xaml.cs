@@ -446,7 +446,7 @@ namespace sQzServer1
             txtT2.Text = s._[(int)TxI.T2];
             txtGrade.Text = s._[(int)TxI.MARK];
             txtLock.Text = s._[(int)TxI.OP_LCK];
-            txtAbsent.Text = s._[(int)TxI.OP_ABSENT];
+            txtAbsence.Text = s._[(int)TxI.OP_ABSENCE];
         }
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)

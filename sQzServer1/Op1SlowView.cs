@@ -168,9 +168,10 @@ namespace sQzServer1
         {
             StackPanel refsp = reftbi.Content as StackPanel;
             StackPanel sp = new StackPanel();
+            Grid g = null;
             foreach (Grid refg in refsp.Children.OfType<Grid>())
             {
-                Grid g = new Grid();
+                g = new Grid();
                 g.ShowGridLines = true;
                 foreach (ColumnDefinition cd in refg.ColumnDefinitions)
                 {
@@ -194,25 +195,24 @@ namespace sQzServer1
                 sp.Children.Add(g);
             }
 
+            if (g == null)
+                return;
+
             foreach (ScrollViewer refscrvwr in refsp.Children.OfType<ScrollViewer>())
             {
                 ScrollViewer vwr = new ScrollViewer();
-                Grid refg = refscrvwr.Content as Grid;
-                if (refg == null)
-                    continue;
                 vwr.Width = refscrvwr.Width;
                 vwr.Height = refscrvwr.Height;
                 vwr.HorizontalAlignment = HorizontalAlignment.Left;
                 grdNee = new Grid();
                 grdNee.ShowGridLines = true;
-                foreach (ColumnDefinition cd in refg.ColumnDefinitions)
+                foreach (ColumnDefinition cd in g.ColumnDefinitions)
                 {
                     ColumnDefinition d = new ColumnDefinition();
                     d.Width = cd.Width;
                     grdNee.ColumnDefinitions.Add(d);
                 }
-                grdNee.Name = refg.Name;
-                grdNee.HorizontalAlignment = refg.HorizontalAlignment;
+                grdNee.HorizontalAlignment = g.HorizontalAlignment;
                 vwr.Content = grdNee;
                 sp.Children.Add(vwr);
             }
