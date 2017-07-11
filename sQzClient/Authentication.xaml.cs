@@ -48,7 +48,7 @@ namespace sQzClient
             }
             mNee.tBirdate = tbxD.Text + "-" + tbxM.Text + "-" + tbxY.Text;
             DateTime dum;
-            if (!DateTime.TryParse(mNee.tBirdate, out dum))
+            if (DT.To_(mNee.tBirdate, DT.R, out dum))
             {
                 mNee.tBirdate = null;
                 spMain.Opacity = 0.5;

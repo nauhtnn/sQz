@@ -65,6 +65,10 @@ namespace sQzLib
             {
                 return l.ToArray();
             }
+            catch (System.IO.IOException)
+            {
+                return l.ToArray();
+            }
             string s;
             Body body = doc.MainDocumentPart.Document.Body;
             //int idx = -1;
@@ -89,6 +93,7 @@ namespace sQzLib
                     //fs.Close();
                 }
             }
+            doc.Close();
             return l.ToArray();
         }
 

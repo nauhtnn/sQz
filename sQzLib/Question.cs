@@ -66,8 +66,6 @@ namespace sQzLib
 
         public bool Read()
         {
-            if (svToken.Length == siToken)
-                return true;
             if (readStmt())
                 return true;
             if (readAns())
