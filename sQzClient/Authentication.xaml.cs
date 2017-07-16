@@ -5,6 +5,7 @@ using System.Windows.Controls;
 using System.Windows.Navigation;
 using System.Windows.Media;
 using System.Threading;
+using System.Windows.Input;
 using sQzLib;
 
 namespace sQzClient
@@ -46,9 +47,19 @@ namespace sQzClient
                 spMain.Opacity = 1;
                 return;
             }
-            mNee.tBirdate = tbxD.Text + "-" + tbxM.Text + "-" + tbxY.Text;
+            int x, y, z;
+            if(!int.TryParse(tbxD.Text, out x) || !int.TryParse(tbxM.Text, out y)
+                || !int.TryParse(tbxY.Text, out z))
+            {
+                mNee.tBirdate = null;
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
+                spMain.Opacity = 1;
+                return;
+            }
+            mNee.tBirdate = x.ToString("d2") + "-" + y.ToString("d2") + "-" + z.ToString("d2");
             DateTime dum;
-            if (DT.To_(mNee.tBirdate, DT.R, out dum))
+            if (DT.To_(mNee.tBirdate, DT.RR, out dum))
             {
                 mNee.tBirdate = null;
                 spMain.Opacity = 0.5;
@@ -317,6 +328,14 @@ namespace sQzClient
             tbxY.IsEnabled =
             btnOpenLog.IsEnabled =
             btnSignIn.IsEnabled = false;
+        }
+
+        private void tbx_PrevwNumberOnly(object sender, KeyEventArgs e)
+        {
+            if (e.Key != Key.Delete && e.Key != Key.Back && e.Key != Key.Tab &&
+                ((int)e.Key < (int)Key.Left || (int)Key.Down < (int)e.Key) &&
+                ((int)e.Key < (int)Key.D0 || (int)Key.D9 < (int)e.Key))
+                e.Handled = true;
         }
 
         private void btnReconn_Click(object sender, RoutedEventArgs e)

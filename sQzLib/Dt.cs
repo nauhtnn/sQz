@@ -19,7 +19,6 @@ namespace sQzLib
         public const string HS = "yyyy-M-d H:m:s";
         public const string _ = "yyyy-M-d";
         public const string __ = "yyyy-MM-dd";
-        public const string R = "d-M-yyyy";
         public const string RR = "dd-MM-yyyy";
         public const int BYTE_COUNT = 12;
         public const int BYTE_COUNT_h = 8;
