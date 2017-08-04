@@ -55,7 +55,7 @@
                                 <TextBlock Name="txtLock" Grid.Column="8" HorizontalAlignment="Center"/>
                                 <TextBlock Name="txtAbsence" Grid.Column="9" HorizontalAlignment="Center"/>
                             </Grid>
-                            <ScrollViewer Width="1140" VerticalScrollBarVisibility="Auto"/>
+                            <ScrollViewer Width="1140" Height="640" VerticalScrollBarVisibility="Auto"/>
                         </StackPanel>
                     </TabItem>
                 </TabControl>
