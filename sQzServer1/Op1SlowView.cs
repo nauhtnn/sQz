@@ -11,6 +11,7 @@ using sQzLib;
 
 namespace sQzServer1
 {
+    public delegate void ToSubmitCb(bool bEnable);
     public class Op1SlotView : TabItem
     {
         public Dictionary<int, TextBlock> vGrade;
@@ -20,10 +21,12 @@ namespace sQzServer1
         public Dictionary<int, TextBlock> vComp;
         public SortedList<int, CheckBox> vLock;
         public SortedList<int, bool> vbLock;
+        public SortedList<int, CheckBox> vAbsen;
         Grid grdNee;
         public ExamSlot mSl;
         bool bQShowed;
         bool bNeeShowed;
+        public ToSubmitCb toSubmCb;
 
         public Op1SlotView()
         {
@@ -33,9 +36,11 @@ namespace sQzServer1
             vMark = new Dictionary<int, TextBlock>();
             vLock = new SortedList<int, CheckBox>();
             vbLock = new SortedList<int, bool>();
+            vAbsen = new SortedList<int, CheckBox>();
             bQShowed = bNeeShowed = false;
             TabControl tbc = new TabControl();
             Content = tbc;
+            toSubmCb = null;
         }
 
         public void ShowExaminee()
@@ -102,7 +107,7 @@ namespace sQzServer1
                     {
                         t.Text = e.dtTim1.ToString("HH:mm");
                         vbLock.Add(lvid, true);
-                        vLock[lvid].IsChecked = true;
+                        cbx.IsChecked = true;
                     }
                     else
                     {
@@ -137,11 +142,11 @@ namespace sQzServer1
                     cbx.HorizontalAlignment = HorizontalAlignment.Center;
                     cbx.Name = "b" + lvid;
                     cbx.HorizontalAlignment = HorizontalAlignment.Center;
-                    //cbx.Unchecked += cbxLock_Unchecked;
-                    //cbx.Checked += cbxLock_Checked;
-                    cbx.IsEnabled = false;
+                    cbx.Unchecked += cbxAbsen_Unchecked;
+                    cbx.Checked += cbxAbsen_Checked;
                     Grid.SetRow(cbx, rid);
                     Grid.SetColumn(cbx, 9);
+                    vAbsen.Add(lvid, cbx);
                     grdNee.Children.Add(cbx);
                 }
         }
@@ -233,6 +238,41 @@ namespace sQzServer1
             int key;
             if (int.TryParse(cbx.Name.Substring(1), out key))
                 vbLock[key] = false;
+        }
+
+        private void cbxAbsen_Unchecked(object sender, RoutedEventArgs e)
+        {
+            CheckBox cbx = sender as CheckBox;
+            int key;
+            if (int.TryParse(cbx.Name.Substring(1), out key))
+            {
+                ExamineeA nee;
+                foreach (ExamRoom r in mSl.vRoom.Values)
+                    if(r.vExaminee.TryGetValue(key, out nee) &&
+                        nee.eStt != NeeStt.Finished)
+                    {
+                        toSubmCb?.Invoke(false);
+                        return;
+                    }
+            }
+            toSubmCb?.Invoke(ToSubmit());
+        }
+
+        private void cbxAbsen_Checked(object sender, RoutedEventArgs e)
+        {
+            toSubmCb?.Invoke(ToSubmit());
+        }
+
+        public bool ToSubmit()
+        {
+            CheckBox cbx;
+            foreach (ExamRoom r in mSl.vRoom.Values)
+                foreach (ExamineeA nee in r.vExaminee.Values)
+                    if (nee.eStt != NeeStt.Finished &&
+                        (!vAbsen.TryGetValue(nee.LvId, out cbx) ||
+                        !cbx.IsChecked.HasValue || !cbx.IsChecked.Value))
+                        return false;
+            return true;
         }
     }
 }

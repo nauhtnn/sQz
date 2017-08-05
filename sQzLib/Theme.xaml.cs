@@ -63,6 +63,14 @@ namespace sQzLib
         QID_Color,
         Ans_TopLine,
         Ans_Highlight,
+        FG_Gray,
+        BG_Gray,
+        FG,
+        mConn,
+        mBackup,
+        mReconn,
+        mExit,
+        mSubmit,
         Count
     }
 

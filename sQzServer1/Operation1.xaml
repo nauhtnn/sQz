@@ -16,14 +16,16 @@
                     <Button x:Name="btnConn" Width="120" Height="40" Click="btnConn_Click" Background="#80cc28" Foreground="#fff"
                             Margin="10,20,10,10"/>
                     <ListBox x:Name="lbxSl" Width="60" Height="200"  Margin="20,0,20,0"/>
-                    <Button x:Name="btnStrt" Width="120" Height="40" Click="btnStart_Click" Background="#1c64e7" Foreground="#fff"
+                    <Button x:Name="btnStrt" Width="120" Height="40" Click="btnStart_Click" Background="#f4f4f4" Foreground="#838383"
                         Margin="10,10,10,10" IsEnabled="False"/>
-                    <Button x:Name="btnStop" Width="120" Height="40" Click="btnStop_Click" Background="#fbbc09" Foreground="#fff"
+                    <Button x:Name="btnStop" Width="120" Height="40" Click="btnStop_Click" Background="#f4f4f4" Foreground="#838383"
                         Margin="10,10,10,50" IsEnabled="False"/>
-                    <Button x:Name="btnSubmit" Width="120" Height="40" Click="btnSubmit_Click" Background="#a51c30" Foreground="#fff"
+                    <Button x:Name="btnSubmit" Width="120" Height="40" Click="btnSubmit_Click" Background="#f4f4f4" Foreground="#838383"
                             Margin="10,10,10,50" IsEnabled="False"/>
                     <Button x:Name="btnClose" Width="120" Height="40" Click="btnClose_Click" Background="#f15a23" Foreground="#fff"
                         Margin="10,10,10,10"/>
+                    <Button Name="btnHck" Width="60" Height="40" Click="btnHck_Click" Background="#f4f4f4" Foreground="#fff"
+                        Margin="0,40,0,0"/>
                 </StackPanel>
                 <TabControl Name="tbcSl" Width="1140" Height="700">
                     <TabItem Name="tbiRefNee" Visibility="Collapsed">

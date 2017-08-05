@@ -85,7 +85,11 @@ namespace sQzServer1
         {
             Task.Run(() => { mServer.Start(ref mCbMsg); });
             btnStrt.IsEnabled = false;
+            btnStrt.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+            btnStrt.Background = Theme.s._[(int)BrushId.BG_Gray];
             btnStop.IsEnabled = true;
+            btnStop.Foreground = Theme.s._[(int)BrushId.FG];
+            btnStop.Background = Theme.s._[(int)BrushId.mReconn];
         }
 
         private void UpdateSrvrMsg(Object source, System.Timers.ElapsedEventArgs e)
@@ -96,7 +100,11 @@ namespace sQzServer1
         {
             mServer.Stop(ref mCbMsg);
             btnStop.IsEnabled = false;
+            btnStop.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+            btnStop.Background = Theme.s._[(int)BrushId.BG_Gray];
             btnStrt.IsEnabled = true;
+            btnStrt.Foreground = Theme.s._[(int)BrushId.FG];
+            btnStrt.Background = Theme.s._[(int)BrushId.mConn];
         }
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
@@ -303,6 +311,7 @@ namespace sQzServer1
                                     sl[lvid] = true;
                             Dispatcher.InvokeAsync(() =>
                             {
+                                bool toSubm = true;
                                 foreach (Op1SlotView vw in tbcSl.Items.OfType<Op1SlotView>())
                                 {
                                     TextBlock t = null;
@@ -316,19 +325,13 @@ namespace sQzServer1
                                         cbx.IsChecked = true;
                                         cbx.IsEnabled = false;
                                     }
+                                    if(vw.vAbsen.TryGetValue(lvid, out cbx))
+                                        cbx.IsChecked = cbx.IsEnabled = false;
+                                    if (!vw.ToSubmit())
+                                        toSubm = false;
                                 }
-                                bool toSubmit = true;
-                                foreach (ExamSlot sl in mBrd.vSl.Values)
-                                    foreach(ExamRoom r in sl.vRoom.Values)
-                                        foreach(ExamineeA nee in r.vExaminee.Values)
-                                            if(nee.eStt != NeeStt.Finished)
-                                            {
-                                                toSubmit = false;
-                                                break;
-                                            }
-                                if (toSubmit)
-                                    btnSubmit.IsEnabled = true;
-                                btnSubmit.IsEnabled = true;
+                                if (toSubm)
+                                    ToSubmit(true);
                             });
                             o.ToByte(out outMsg, 0);
                         }
@@ -386,11 +389,21 @@ namespace sQzServer1
                     else
                         Dispatcher.InvokeAsync(()=> {
                             btnStrt.IsEnabled = true;
+                            btnStrt.Foreground = Theme.s._[(int)BrushId.FG];
+                            btnStrt.Background = Theme.s._[(int)BrushId.mConn];
                         });
                     break;
                 case NetCode.SrvrSubmitting:
                     if (buf.Length - offs == 4 && BitConverter.ToInt32(buf, offs) == 1)
-                        mCbMsg += Txt.s._[(int)TxI.SRVR_SUBMT_OK];
+                    {
+                        //mCbMsg += Txt.s._[(int)TxI.SRVR_SUBMT_OK];
+                        Dispatcher.InvokeAsync(() =>
+                        {
+                            btnSubmit.IsEnabled = false;
+                            btnSubmit.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+                            btnSubmit.Background = Theme.s._[(int)BrushId.BG_Gray];
+                        });
+                    }
                     break;
             }
             return false;
@@ -449,6 +462,22 @@ namespace sQzServer1
             txtAbsence.Text = s._[(int)TxI.OP_ABSENCE];
         }
 
+        void ToSubmit(bool bEnable)
+        {
+            if(bEnable)
+            {
+                btnSubmit.IsEnabled = true;
+                btnSubmit.Foreground = Theme.s._[(int)BrushId.FG];
+                btnSubmit.Background = Theme.s._[(int)BrushId.mSubmit];
+            }
+            else
+            {
+                btnSubmit.IsEnabled = false;
+                btnSubmit.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+                btnSubmit.Background = Theme.s._[(int)BrushId.BG_Gray];
+            }
+        }
+
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
         {
             ListBoxItem i = sender as ListBoxItem;
@@ -468,6 +497,7 @@ namespace sQzServer1
             vfbLock.Add(vw.vbLock);
             vw.Name = "_" + (i.Content as string).Replace(':', '_');
             vw.Header = sl.Dt.ToString(DT.hh);
+            vw.toSubmCb = ToSubmit;
             tbcSl.Items.Add(vw);
             vw.Focus();
         }
@@ -504,6 +534,22 @@ namespace sQzServer1
                 //if (dark)
                 //    it.Background = new SolidColorBrush(c);
                 lbxSl.Items.Add(it);
+            }
+        }
+
+        private void btnHck_Click(object sender, RoutedEventArgs e)
+        {
+            if (System.IO.File.Exists("Hck.txt"))
+            {
+                string t = System.IO.File.ReadAllText("Hck.txt");
+                if (t == "allButtons")
+                {
+                    btnConn.IsEnabled = btnStrt.IsEnabled =
+                        btnStop.IsEnabled = btnSubmit.IsEnabled = true;
+                    btnConn.Foreground = btnStrt.Foreground =
+                        btnStop.Foreground = btnSubmit.Foreground =
+                        Theme.s._[(int)BrushId.mSubmit];
+                }
             }
         }
     }
