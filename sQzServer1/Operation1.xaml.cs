@@ -109,6 +109,13 @@ namespace sQzServer1
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
+            WPopup.s.wpCb = Exit;
+            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_EXIT_CAUT],
+                Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+        }
+
+        private void Exit()
+        {
             Window.GetWindow(this).Close();
         }
 
@@ -117,6 +124,7 @@ namespace sQzServer1
             bRunning = false;
             UICbMsg dummy = new UICbMsg();
             mServer.Stop(ref dummy);
+            WPopup.s.Exit();
         }
 
         public bool SrvrBufHndl(byte[] buf, out byte[] outMsg)
@@ -359,33 +367,32 @@ namespace sQzServer1
             int offs = 0;
             switch (mState)
             {
-                case NetCode.Srvr1Auth:
-                    if (buf.Length - offs < 4)
-                        break;
-                    int rs = BitConverter.ToInt32(buf, offs);
-                    offs += 4;
-                    if (rs == (int)TxI.OP_AUTH_OK)
-                    {
-                        mState = NetCode.Srvr1DatRetriving;
-                        return true;
-                    }
-                    else
-                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP_AUTH_NOK]);
-                    break;
                 case NetCode.Srvr1DatRetriving:
                     if (mBrd.ReadByteSl1(buf, ref offs))
-                        break;//show err msg
+                    {
+                        Dispatcher.InvokeAsync(() =>
+                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_DT_NOK]));
+                        break;
+                    }
                     Dispatcher.InvokeAsync(() => LoadSl());
                     mState = NetCode.QuestRetrieving;
                     return true;
                 case NetCode.QuestRetrieving:
                     if (mBrd.ReadByteQPack(buf, ref offs))
-                        break;//show err msg
+                    {
+                        Dispatcher.InvokeAsync(() => 
+                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_Q_NOK]));
+                        break;
+                    }
                     mState = NetCode.AnsKeyRetrieving;
                     return true;
                 case NetCode.AnsKeyRetrieving:
                     if (mBrd.ReadByteKey(buf, ref offs))
-                        offs = 0;//todo handle error
+                    {
+                        Dispatcher.InvokeAsync(() =>
+                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_KEY_NOK]));
+                        break;
+                    }
                     else
                         Dispatcher.InvokeAsync(()=> {
                             btnStrt.IsEnabled = true;

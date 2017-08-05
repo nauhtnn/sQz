@@ -148,5 +148,9 @@ namespace sQzLib {
 		PREP_DEL_SEL,
 		PREP_NEE,
 		PREP_Q,
+		OP1_DT_NOK,
+		OP1_Q_NOK,
+		OP1_KEY_NOK,
+		OP1_EXIT_CAUT,
 	}
 }

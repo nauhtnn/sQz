@@ -478,8 +478,8 @@ namespace sQzClient
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bRunning = false;
-            WPopup.s.cncl = false;
             mClnt.Close();
+            WPopup.s.Exit();
         }
     }
 }

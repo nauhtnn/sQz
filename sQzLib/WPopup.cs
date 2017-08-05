@@ -148,7 +148,8 @@ namespace sQzLib
         public void Exit()
         {
             cncl = false;
-            mW.Close();
+            wpCb = wpCbCncl = null;
+            //crash mW.Close();
         }
 
         public bool cncl { set { bCnclEvnt = value; } }
