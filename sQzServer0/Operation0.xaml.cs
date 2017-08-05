@@ -189,7 +189,11 @@ namespace sQzServer0
             Thread th = new Thread(() => {mServer.Start(ref mCbMsg);});
             th.Start();
             btnStop.IsEnabled = true;
+            btnStop.Foreground = Theme.s._[(int)BrushId.FG];
+            btnStop.Background = Theme.s._[(int)BrushId.mReconn];
             btnStart.IsEnabled = false;
+            btnStart.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+            btnStart.Background = Theme.s._[(int)BrushId.BG_Gray];
         }
 
         private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
@@ -203,7 +207,11 @@ namespace sQzServer0
         {
             mServer.Stop(ref mCbMsg);
             btnStop.IsEnabled = false;
+            btnStop.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+            btnStop.Background = Theme.s._[(int)BrushId.BG_Gray];
             btnStart.IsEnabled = true;
+            btnStart.Foreground = Theme.s._[(int)BrushId.FG];
+            btnStart.Background = Theme.s._[(int)BrushId.mConn];
         }
 
         private void btnMMenu_Click(object sender, RoutedEventArgs e)
@@ -385,18 +393,32 @@ namespace sQzServer0
         {
             foreach (TextBox[] vt in vtxtNEsyDif.Values)
                 foreach(TextBox t in vt)
+                {
                     t.IsEnabled = false;
+                    t.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+                    t.Background = Theme.s._[(int)BrushId.BG_Gray];
+                }
             foreach (TextBox[] vt in vtxtNDiff.Values)
                 foreach (TextBox t in vt)
+                {
                     t.IsEnabled = false;
+                    t.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+                    t.Background = Theme.s._[(int)BrushId.BG_Gray];
+                }
             btnQGen.IsEnabled = false;
+            btnQGen.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+            btnQGen.Background = Theme.s._[(int)BrushId.BG_Gray];
         }
 
         void EnableQSGen()
         {
             foreach (TextBox[] vt in vtxtNEsyDif.Values)
                 foreach (TextBox t in vt)
+                {
                     t.IsEnabled = true;
+                    t.Background = Theme.s._[(int)BrushId.FG];
+                    t.Foreground = Theme.s._[(int)BrushId.mBlack];
+                }
         }
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
@@ -538,20 +560,32 @@ namespace sQzServer0
                     {
                         n += int.Parse(t.Text);
                         vtxtNDiff[lv][j].IsEnabled = true;
+                        vtxtNDiff[lv][j].Background = Theme.s._[(int)BrushId.FG];
+                        vtxtNDiff[lv][j].Foreground = Theme.s._[(int)BrushId.mBlack];
                     }
                     else
                     {
                         bG = false;
                         vtxtNDiff[lv][j].IsEnabled = false;
+                        vtxtNDiff[lv][j].Background = Theme.s._[(int)BrushId.BG_Gray];
+                        vtxtNDiff[lv][j].Foreground = Theme.s._[(int)BrushId.FG_Gray];
                     }
                 }
                 else
                     bG = false;
             tbxNq.Text = n.ToString();
             if (bG && n == 30)
+            {
                 btnQGen.IsEnabled = true;
+                btnQGen.Foreground = Theme.s._[(int)BrushId.FG];
+                btnQGen.Background = Theme.s._[(int)BrushId.mBackup];
+            }
             else
+            {
                 btnQGen.IsEnabled = false;
+                btnQGen.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+                btnQGen.Background = Theme.s._[(int)BrushId.BG_Gray];
+            }
         }
 
         private void tbxIUdif_TextChanged(object sender, TextChangedEventArgs e)
@@ -622,6 +656,8 @@ namespace sQzServer0
                 btnQGen.IsEnabled = rdoA.IsEnabled =
                     rdoB.IsEnabled = grdA.IsEnabled =
                     grdB.IsEnabled = false;
+                btnQGen.Background = Theme.s._[(int)BrushId.BG_Gray];
+                btnQGen.Foreground = Theme.s._[(int)BrushId.FG_Gray];
                 return;
             }
             vw.InitNMod();

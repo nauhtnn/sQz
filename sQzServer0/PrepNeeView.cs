@@ -51,12 +51,18 @@ namespace sQzServer0
             btnDel.Height = 40;
             btnDel.Margin = new Thickness(0, 10, 0, 10);
             btnDel.Content = Txt.s._[(int)TxI.PREP_DEL];
-            btnDel.Foreground = Theme.s._[(int)BrushId.QID_Color];
-            btnDel.Background = Theme.s._[(int)BrushId.Button_Hover];
             if (mSlDB.eStt == ExamStt.Prep)
+            {
                 btnDel.IsEnabled = true;
+                btnDel.Foreground = Theme.s._[(int)BrushId.FG];
+                btnDel.Background = Theme.s._[(int)BrushId.Button_Hover];
+            }
             else
+            {
                 btnDel.IsEnabled = false;
+                btnDel.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+                btnDel.Background = Theme.s._[(int)BrushId.BG_Gray];
+            }
             sp.Children.Add(btnDel);
             sp.Children.Add(gNee);
             grdDB = DeepCopyNee(gNee);
@@ -133,8 +139,16 @@ namespace sQzServer0
                 b.Width = btn.Width;
                 b.Margin = btn.Margin;
                 b.Content = btn.Content;
-                b.Background = btn.Background;
-                b.Foreground = btn.Foreground;
+                if(b.IsEnabled)
+                {
+                    b.Background = btn.Background;
+                    b.Foreground = btn.Foreground;
+                }
+                else
+                {
+                    b.Background = Theme.s._[(int)BrushId.BG_Gray];
+                    b.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+                }
                 b.FontWeight = btn.FontWeight;
                 Grid.SetColumn(b, Grid.GetColumn(btn));
                 if (btn.Name == "btnImp")

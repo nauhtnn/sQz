@@ -140,7 +140,7 @@ namespace sQzServer1
                     e = new ExamineeS1();
                     e.bFromC = true;
                     e.ReadByte(buf, ref offs);
-                    bool lck = false;
+                    bool lck = true;
                     bool found = false;
                     foreach (SortedList<int, bool> l in vfbLock)
                         if (l.TryGetValue(e.LvId, out lck))
@@ -391,6 +391,9 @@ namespace sQzServer1
                             btnStrt.IsEnabled = true;
                             btnStrt.Foreground = Theme.s._[(int)BrushId.FG];
                             btnStrt.Background = Theme.s._[(int)BrushId.mConn];
+                            btnConn.IsEnabled = false;
+                            btnConn.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+                            btnConn.Background = Theme.s._[(int)BrushId.BG_Gray];
                         });
                     break;
                 case NetCode.SrvrSubmitting:
@@ -512,6 +515,9 @@ namespace sQzServer1
                 if (ti.Name == "_" + (i.Content as string).Replace(':', '_'))
                 {
                     tbcSl.Items.Remove(ti);
+                    Op1SlotView vw = ti as Op1SlotView;
+                    if (vw != null)
+                        vfbLock.Remove(vw.vbLock);
                     break;
                 }
         }

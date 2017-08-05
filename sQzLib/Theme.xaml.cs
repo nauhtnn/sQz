@@ -71,6 +71,7 @@ namespace sQzLib
         mReconn,
         mExit,
         mSubmit,
+        mBlack,
         Count
     }
 

@@ -144,6 +144,8 @@ namespace sQzServer1
                     cbx.HorizontalAlignment = HorizontalAlignment.Center;
                     cbx.Unchecked += cbxAbsen_Unchecked;
                     cbx.Checked += cbxAbsen_Checked;
+                    if (e.eStt == NeeStt.Finished)
+                        cbx.IsEnabled = false;
                     Grid.SetRow(cbx, rid);
                     Grid.SetColumn(cbx, 9);
                     vAbsen.Add(lvid, cbx);
@@ -228,7 +230,8 @@ namespace sQzServer1
         {
             CheckBox cbx = sender as CheckBox;
             int key;
-            if (int.TryParse(cbx.Name.Substring(1), out key))
+            if (int.TryParse(cbx.Name.Substring(1), out key) &&
+                vbLock.ContainsKey(key))
                 vbLock[key] = false;
         }
 
@@ -236,8 +239,9 @@ namespace sQzServer1
         {
             CheckBox cbx = sender as CheckBox;
             int key;
-            if (int.TryParse(cbx.Name.Substring(1), out key))
-                vbLock[key] = false;
+            if (int.TryParse(cbx.Name.Substring(1), out key) &&
+                vbLock.ContainsKey(key))
+                vbLock[key] = true;
         }
 
         private void cbxAbsen_Unchecked(object sender, RoutedEventArgs e)

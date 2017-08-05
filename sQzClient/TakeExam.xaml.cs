@@ -309,7 +309,8 @@ namespace sQzClient
             mState = NetCode.Submiting;
             mNee.eStt = NeeStt.Submitting;
             mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
-            mClnt.ConnectWR(ref mCbMsg);
+            if (mClnt.ConnectWR(ref mCbMsg))
+                bBtnBusy = false;
         }
 
         private void btnSubmit_Click(object sender, RoutedEventArgs e)
