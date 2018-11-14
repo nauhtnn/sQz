@@ -649,5 +649,18 @@ namespace sQzLib
             }
             return l;
         }
+
+        public void WriteTxt()
+        {
+            string folderToStore = mDt.ToString(DT.__);
+            if (!System.IO.Directory.Exists(folderToStore))
+                System.IO.Directory.CreateDirectory(folderToStore);
+            System.IO.Directory.SetCurrentDirectory(System.IO.Directory.GetCurrentDirectory() + "\\" +
+                folderToStore);
+            foreach (QuestPack p in vQPack.Values)
+                p.WriteTxt();
+            System.IO.Directory.SetCurrentDirectory(System.IO.Directory.GetParent(
+                System.IO.Directory.GetCurrentDirectory()).ToString());
+        }
     }
 }

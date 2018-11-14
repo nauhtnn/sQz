@@ -319,6 +319,19 @@ namespace sQzLib
             }
         }
 
+        public void WriteTxt(string fpath)
+        {
+            System.IO.File.WriteAllText(fpath, ToString());
+        }
+
+        override public string ToString()
+        {
+            StringBuilder s = new StringBuilder();
+            foreach (Question q in vQuest)
+                s.Append(q.ToString());
+            return s.ToString();
+        }
+
         public List<Question> ShallowCopy()
         {
             List<Question> l = new List<Question>();

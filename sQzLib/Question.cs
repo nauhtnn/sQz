@@ -101,14 +101,14 @@ namespace sQzLib
             return false;
         }
 
-        //public override string ToString()
-        //{
-        //    StringBuilder s = new StringBuilder();
-        //    s.Append(tStmt + '\n');
-        //    foreach (string i in vAns)
-        //        s.Append(i + '\n');
-        //    return s.ToString();
-        //}
+        override public string ToString()
+        {
+            StringBuilder s = new StringBuilder();
+            s.Append(tStmt + '\n');
+            foreach (string i in vAns)
+                s.Append(i + '\n');
+            return s.ToString();
+        }
 
         //public bool Ans(int idx, out string ans)
         //{

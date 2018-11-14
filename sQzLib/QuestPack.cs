@@ -332,5 +332,12 @@ namespace sQzLib
                 return null;
             return vSheet.First().Value.GetNMod();
         }
+
+        public void WriteTxt()
+        {
+            string extension = ".txt";
+            foreach (QuestSheet qs in vSheet.Values)
+                qs.WriteTxt(qs.eLv.ToString() + qs.uId + extension);
+        }
     }
 }
