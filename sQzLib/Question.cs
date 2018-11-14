@@ -101,13 +101,13 @@ namespace sQzLib
             return false;
         }
 
-        override public string ToString()
+        public IEnumerable<string> ToListOfStrings()
         {
-            StringBuilder s = new StringBuilder();
-            s.Append(tStmt + '\n');
+            LinkedList<string> s = new LinkedList<string>();
+            s.AddLast(tStmt);
             foreach (string i in vAns)
-                s.Append(i + '\n');
-            return s.ToString();
+                s.AddLast(i);
+            return s;
         }
 
         //public bool Ans(int idx, out string ans)

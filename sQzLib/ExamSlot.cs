@@ -658,7 +658,7 @@ namespace sQzLib
             System.IO.Directory.SetCurrentDirectory(System.IO.Directory.GetCurrentDirectory() + "\\" +
                 folderToStore);
             foreach (QuestPack p in vQPack.Values)
-                p.WriteTxt();
+                p.WriteDocx();
             System.IO.Directory.SetCurrentDirectory(System.IO.Directory.GetParent(
                 System.IO.Directory.GetCurrentDirectory()).ToString());
         }

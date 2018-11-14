@@ -324,12 +324,12 @@ namespace sQzLib
             System.IO.File.WriteAllText(fpath, ToString());
         }
 
-        override public string ToString()
+        public IEnumerable<string> ToListOfStrings()
         {
-            StringBuilder s = new StringBuilder();
+            IEnumerable<string> s = new LinkedList<string>();
             foreach (Question q in vQuest)
-                s.Append(q.ToString());
-            return s.ToString();
+                s = s.Concat(q.ToListOfStrings()) as IEnumerable<string>;
+            return s;
         }
 
         public List<Question> ShallowCopy()

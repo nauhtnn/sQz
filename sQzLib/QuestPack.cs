@@ -335,9 +335,20 @@ namespace sQzLib
 
         public void WriteTxt()
         {
-            string extension = ".txt";
+            //string extension = ".txt";
+            //foreach (QuestSheet qs in vSheet.Values)
+            //    qs.WriteTxt(qs.eLv.ToString() + qs.uId + extension);
+        }
+
+        public void WriteDocx()
+        {
+            string extension = ".docx";
             foreach (QuestSheet qs in vSheet.Values)
-                qs.WriteTxt(qs.eLv.ToString() + qs.uId + extension);
+            {
+                Utils.WriteQuestionSheetToDocx(qs.eLv.ToString() + qs.uId + extension,
+                    qs.ToListOfStrings(), 4);
+                break;
+            }
         }
     }
 }

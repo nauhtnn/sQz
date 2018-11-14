@@ -97,6 +97,34 @@ namespace sQzLib
             return l.ToArray();
         }
 
+        public static void WriteQuestionSheetToDocx(string name, IEnumerable<string> data, int nAns)
+        {
+            WordprocessingDocument doc = null;
+            try
+            {
+                doc = WordprocessingDocument.Create(name, DocumentFormat.OpenXml.WordprocessingDocumentType.Document);
+            }
+            catch (OpenXmlPackageException)
+            {
+                return;
+            }
+            catch (System.IO.IOException)
+            {
+                return;
+            }
+            doc.AddMainDocumentPart().Document = new Document();
+            Body body = doc.MainDocumentPart.Document.AppendChild(new Body());
+            //int idx = -1;
+            foreach(string s in data)
+            {
+                Paragraph p = new Paragraph(new Run(new Text(s)));
+                //Paragraph r = new Paragraph(p);
+                body.AppendChild(p);
+            }
+            doc.MainDocumentPart.Document.Save();
+            doc.Close();
+        }
+
         public static string[] Split(string buf, char c)
         {
             char[] sWhSp = { ' ', '\t', '\n', '\r' };
