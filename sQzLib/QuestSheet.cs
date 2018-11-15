@@ -329,6 +329,7 @@ namespace sQzLib
             IEnumerable<string> s = new LinkedList<string>();
             foreach (Question q in vQuest)
                 s = s.Concat(q.ToListOfStrings()) as IEnumerable<string>;
+                
             return s;
         }
 
