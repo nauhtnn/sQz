@@ -344,8 +344,8 @@ namespace sQzLib
         {
             string extension = ".docx";
             foreach (QuestSheet qs in vSheet.Values)
-                Utils.WriteQuestionSheetToDocx(qs.eLv.ToString() + qs.uId + extension,
-                    qs.ToListOfStrings(), 4);
+                QuestSheetDocxPrinter.GetInstance().Print(qs.eLv.ToString() + qs.uId + extension,
+                    qs.ToListOfStrings(), mDt.ToString(DT.RR), qs.tId);
         }
     }
 }

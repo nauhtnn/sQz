@@ -4,8 +4,6 @@ using System.Linq;
 using System.Text;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Packaging;
-using Ap = DocumentFormat.OpenXml.ExtendedProperties;
-
 namespace sQzLib
 {
     public class UICbMsg
@@ -96,73 +94,6 @@ namespace sQzLib
             }
             doc.Close();
             return l.ToArray();
-        }
-
-        public static void WriteQuestionSheetToDocx(string name, IEnumerable<string> data, int nAns)
-        {
-            WordprocessingDocument doc = null;
-            try
-            {
-                doc = WordprocessingDocument.Create(name, DocumentFormat.OpenXml.WordprocessingDocumentType.Document);
-            }
-            catch (OpenXmlPackageException)
-            {
-                return;
-            }
-            catch (System.IO.IOException)
-            {
-                return;
-            }
-            MainDocumentPart mainPart = doc.AddMainDocumentPart();
-            NumberingDefinitionsPart numberingDefinitionsPart = mainPart.AddNewPart<NumberingDefinitionsPart>("rId1");
-            GenerateNumberingDefinitionsPartContent(numberingDefinitionsPart);
-
-            mainPart.Document = new Document();
-            Body body = doc.MainDocumentPart.Document.AppendChild(new Body());
-            int i = 3;
-            foreach (string s in data)
-            {
-                ++i;
-                if(i < 4)
-                    body.AppendChild(CreateParagraph(s, 1));
-                else
-                {
-                    body.AppendChild(CreateParagraph(s, 0));
-                    i = -1;
-                }
-            }
-            doc.Close();
-        }
-
-        public static Paragraph CreateParagraph(string s, int indent)
-        {
-            Paragraph paragraph1 = new Paragraph();
-
-            paragraph1.Append(CreateParagraphProperties(indent));
-            paragraph1.Append(new Run(new Text(s)));
-
-            return paragraph1;
-        }
-
-        public static ParagraphProperties CreateParagraphProperties(int lvReference)
-        {
-            ParagraphProperties paragraphProperties1 = new ParagraphProperties();
-            ParagraphStyleId paragraphStyleId1 = new ParagraphStyleId() { Val = "ListParagraph" };
-
-            NumberingProperties numberingProperties1 = new NumberingProperties();
-            NumberingLevelReference numberingLevelReference1 = new NumberingLevelReference() { Val = lvReference };
-            NumberingId numberingId1 = new NumberingId() { Val = 1 };//hardcode
-
-            numberingProperties1.Append(numberingLevelReference1);
-            numberingProperties1.Append(numberingId1);
-
-            paragraphProperties1.Append(paragraphStyleId1);
-            paragraphProperties1.Append(numberingProperties1);
-            paragraphProperties1.SpacingBetweenLines = new SpacingBetweenLines();
-            paragraphProperties1.SpacingBetweenLines.Before = "1";
-            paragraphProperties1.SpacingBetweenLines.After = "1";
-
-            return paragraphProperties1;
         }
 
         public static string[] Split(string buf, char c)
@@ -361,63 +292,6 @@ namespace sQzLib
                 buf = s;
             }
             return buf;
-        }
-
-        // Generates content of numberingDefinitionsPart.
-        private static void GenerateNumberingDefinitionsPartContent(NumberingDefinitionsPart numberingDefinitionsPart)
-        {
-            Numbering numbering = new Numbering();
-
-            AbstractNum abstractNum = new AbstractNum() { AbstractNumberId = 0 };
-            MultiLevelType multiLevelType1 = new MultiLevelType() { Val = MultiLevelValues.HybridMultilevel };
-
-            Level level1 = new Level() { LevelIndex = 0 };
-            StartNumberingValue startNumberingValue1 = new StartNumberingValue() { Val = 1 };
-            NumberingFormat numberingFormat1 = new NumberingFormat() { Val = NumberFormatValues.Decimal };
-            LevelText levelText1 = new LevelText() { Val = "%1." };
-            LevelJustification levelJustification1 = new LevelJustification() { Val = LevelJustificationValues.Left };
-
-            PreviousParagraphProperties previousParagraphProperties1 = new PreviousParagraphProperties();
-            Indentation indentation1 = new Indentation() { Left = "0", Hanging = "360" };
-
-            previousParagraphProperties1.Append(indentation1);
-
-            level1.Append(startNumberingValue1);
-            level1.Append(numberingFormat1);
-            level1.Append(levelText1);
-            level1.Append(levelJustification1);
-            level1.Append(previousParagraphProperties1);
-
-            Level level2 = new Level() { LevelIndex = 1 };
-            StartNumberingValue startNumberingValue2 = new StartNumberingValue() { Val = 1 };
-            NumberingFormat numberingFormat2 = new NumberingFormat() { Val = NumberFormatValues.LowerLetter };
-            LevelText levelText2 = new LevelText() { Val = "(%2)" };
-            LevelJustification levelJustification2 = new LevelJustification() { Val = LevelJustificationValues.Left };
-
-            PreviousParagraphProperties previousParagraphProperties2 = new PreviousParagraphProperties();
-            Indentation indentation2 = new Indentation() { Left = "360", Hanging = "360" };
-
-            previousParagraphProperties2.Append(indentation2);
-
-            level2.Append(startNumberingValue2);
-            level2.Append(numberingFormat2);
-            level2.Append(levelText2);
-            level2.Append(levelJustification2);
-            level2.Append(previousParagraphProperties2);
-
-            abstractNum.Append(multiLevelType1);
-            abstractNum.Append(level1);
-            abstractNum.Append(level2);
-
-            NumberingInstance numberingInstance1 = new NumberingInstance() { NumberID = 1 };
-            AbstractNumId abstractNumId1 = new AbstractNumId() { Val = 0 };
-
-            numberingInstance1.Append(abstractNumId1);
-
-            numbering.Append(abstractNum);
-            numbering.Append(numberingInstance1);
-
-            numberingDefinitionsPart.Numbering = numbering;
         }
     }
 }
