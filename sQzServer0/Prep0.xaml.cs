@@ -264,9 +264,9 @@ namespace sQzServer0
                         j.FontWeight = FontWeights.Bold;
                     sp.Children.Add(j);
                 }
-                if (q.bDiff)
+                /*if (q.bDiff)
                     bg = difbg;
-                else if (even)
+                else*/ if (even)
                     bg = evenbg;
                 else
                     bg = oddbg;
@@ -306,9 +306,9 @@ namespace sQzServer0
                 i.Text = (++x + 1) + ". " + q.Stmt;
                 i.Width = w;
                 i.TextWrapping = TextWrapping.Wrap;
-                if (q.bDiff)
+                /*if (q.bDiff)
                     bg = difbg;
-                else if (even)
+                else*/ if (even)
                     bg = evenbg;
                 else
                     bg = oddbg;
