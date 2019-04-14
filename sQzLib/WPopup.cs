@@ -16,17 +16,17 @@ namespace sQzLib
     {
         Window mW;
         TextBlock mT;
-        TextBox mC;
-        WPopupCb _wpCb;
-        WPopupCb _wpCbCncl;
+        TextBox UserCode;
+        public WPopupCb CbOK;
+        public WPopupCb CbNOK;
         static WPopup _s;
-        Button mBtnOk;
-        Button mBtnCncl;
+        Button OK;
+        Button NOK;
         Grid mG;
-        bool bOk;
-        bool bShowing;
-        bool bCollapse;
-        bool bCnclEvnt;
+        bool IsOK;
+        bool IsShowed;
+        //bool IsCollapse;
+        bool DoNotClose;
         string mCode;
         WPopup()
         {
@@ -60,44 +60,47 @@ namespace sQzLib
             Grid.SetColumnSpan(mT, 2);
             mG.Children.Add(mT);
 
-            mC = new TextBox();
-            mC.TextAlignment = TextAlignment.Center;
-            Grid.SetRow(mC, 1);
-            Grid.SetColumnSpan(mC, 2);
-            mG.Children.Add(mC);
+            UserCode = new TextBox();
+            UserCode.TextAlignment = TextAlignment.Center;
+            Grid.SetRow(UserCode, 1);
+            Grid.SetColumnSpan(UserCode, 2);
+            mG.Children.Add(UserCode);
 
-            mBtnOk = new Button();
-            mBtnOk.Click += BtnOk_Click;
-            Grid.SetRow(mBtnOk, 2);
-            mG.Children.Add(mBtnOk);
+            OK = new Button();
+            OK.Click += BtnOk_Click;
+            Grid.SetRow(OK, 2);
+            mG.Children.Add(OK);
 
-            mBtnCncl = new Button();
-            mBtnCncl.Click += BtnCncl_Click;
-            Grid.SetRow(mBtnCncl, 2);
-            Grid.SetColumn(mBtnCncl, 1);
-            mG.Children.Add(mBtnCncl);
+            NOK = new Button();
+            NOK.Click += BtnCncl_Click;
+            Grid.SetRow(NOK, 2);
+            Grid.SetColumn(NOK, 1);
+            mG.Children.Add(NOK);
 
             mW.Content = mG;
 
-            bOk = false;
-            bShowing = false;
-            bCollapse = true;
-            bCnclEvnt = true;
+            //IsOK = false;
+            IsShowed = false;
+            //IsCollapse = true;
+            DoNotClose = true;
             mCode = null;
         }
 
         private void BtnCncl_Click(object sender, RoutedEventArgs e)
         {
-            mW.Close();
+            CbNOK?.Invoke();
+            mW.Visibility = Visibility.Collapsed;
+            //IsCollapse = true;
+            IsShowed = false;
         }
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            if (mCode == null || mCode == mC.Text)
+            if (mCode == null || mCode == UserCode.Text)
             {
-                mC.Text = string.Empty;
-                bOk = true;
-                mW.Close();
+                UserCode.Text = string.Empty;
+                //IsOK = true;
+                CbOK?.Invoke();
             }
         }
 
@@ -115,16 +118,6 @@ namespace sQzLib
         {
             _s = new WPopup();
             _s.owner = oner;
-        }
-
-        public WPopupCb wpCb
-        {
-            set { _wpCb = value; }
-        }
-
-        public WPopupCb wpCbCncl
-        {
-            set { _wpCbCncl = value; }
         }
 
         public Window owner
@@ -147,64 +140,49 @@ namespace sQzLib
 
         public void Exit()
         {
-            cncl = false;
-            wpCb = wpCbCncl = null;
+            DoNotClose = false;
+            CbOK = CbNOK = null;
             mW.Close();
         }
-
-        public bool cncl { set { bCnclEvnt = value; } }
 
         public void ShowDialog(string msg)
         {
             mT.Text = msg;
-            mBtnOk.Visibility = Visibility.Collapsed;
-            mBtnCncl.Visibility = Visibility.Collapsed;
-            bOk = true;
-            if (bShowing)
-            {
-                bCollapse = false;
-                return;
-            }
-            bShowing = true;
+            OK.Visibility = Visibility.Collapsed;
+            NOK.Visibility = Visibility.Collapsed;
+            //if (IsShowed)
+            //{
+            //    IsCollapse = false;
+            //    return;
+            //}
+            //IsShowed = true;
             mW.ShowDialog();
         }
 
         public void ShowDialog(string msg, string ok, string cncl, string code)
         {
             mT.Text = msg;
-            mBtnOk.Content = ok;
-            mBtnOk.Visibility = Visibility.Visible;
-            mBtnCncl.Content = cncl;
-            mBtnCncl.Visibility = Visibility.Visible;
+            OK.Content = ok;
+            OK.Visibility = Visibility.Visible;
+            NOK.Content = cncl;
+            NOK.Visibility = Visibility.Visible;
             mCode = code;
-            if (bShowing)
-            {
-                bCollapse = false;
-                return;
-            }
-            bShowing = true;
+            //if (IsShowed)
+            //{
+            //    IsCollapse = false;
+            //    return;
+            //}
+            //IsShowed = true;
             mW.ShowDialog();
         }
 
         private void wPopup_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (bCnclEvnt)
+            if (DoNotClose)
+            {
                 e.Cancel = true;
-            if (bOk)
-            {
-                _wpCb?.Invoke();
-                bOk = false;
+                BtnCncl_Click(null, null);
             }
-            else
-                _wpCbCncl?.Invoke();
-            if (bCollapse)
-            {
-                Window s = sender as Window;
-                s.Visibility = Visibility.Collapsed;
-                bShowing = false;
-            }
-            else
-                bCollapse = true;
         }
     }
 }

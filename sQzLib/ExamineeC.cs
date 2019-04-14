@@ -8,7 +8,10 @@ namespace sQzLib
 {
     public sealed class ExamineeC : ExamineeA
     {
-        public ExamineeC() { }
+        public ExamineeC(string id)
+        {
+            ParseLvID(id);
+        }
         public override List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();

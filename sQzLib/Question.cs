@@ -81,7 +81,7 @@ namespace sQzLib
             else if (tStmt[0] == '\\' && 1 < tStmt.Length
                 && (tStmt[1] == '*' || tStmt[1] == '\\'))
                 tStmt = tStmt.Substring(1);
-            bool na = true;
+            bool hasAnswer = false;
             for (int i = 0; i < N_ANS; ++i)
             {
                 if (vAns[i][0] == '\\' && 1 < vAns[i].Length)
@@ -90,13 +90,13 @@ namespace sQzLib
                     {
                         vKeys[i] = true;
                         vAns[i] = Utils.CleanFront(vAns[i], 1);
-                        na = false;
+                        hasAnswer = true;
                     }
                     else
                         vAns[i] = vAns[i].Substring(1);
                 }
             }
-            if (na)
+            if (!hasAnswer)
                 return true;
             return false;
         }

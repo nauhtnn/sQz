@@ -7,8 +7,8 @@ namespace sQzLib
 {
     public enum ExamLv
     {
-        A = 'A',
-        B = 'B'
+        A,
+        B
     }
 
     public enum NeeStt
@@ -53,10 +53,9 @@ namespace sQzLib
 
         public ExamineeA() {
             bFromC = bLog = false;
-            Reset();
         }
 
-        public void Reset()
+        void Reset()
         {
             mDt = DT.INV_H;
             eLv = ExamLv.A;
@@ -73,41 +72,39 @@ namespace sQzLib
             tLog = new StringBuilder();
         }
 
-        public bool ParseLvId(int lvid)
+        protected void ParseLvID(int lvid)
         {
-            if (lvid != LV_CAP &&(lvid < 1 || LV_CAP + LV_CAP <= lvid))
-                return true;
-            if(lvid < LV_CAP)
-            {
-                eLv = ExamLv.A;
-                uId = lvid;
-            }
-            else
-            {
-                eLv = ExamLv.B;
-                uId = lvid - LV_CAP;
-            }
-            return false;
+            //if (lvid != LV_CAP &&(lvid < 1 || LV_CAP + LV_CAP <= lvid))
+            //    return true;
+            //if(lvid < LV_CAP)
+            //{
+            //    eLv = ExamLv.A;
+            //    uId = lvid;
+            //}
+            //else
+            //{
+            //    eLv = ExamLv.B;
+            //    uId = lvid - LV_CAP;
+            //}
+            //return false;
         }
 
-        public bool ParseLvId(string s)
+        protected void ParseLvID(string s)
         {
             if (s == null || s.Length != 5)
-                return true;
+                throw new ArgumentException();
             s = s.ToUpper();
             ExamLv lv;
             if (!Enum.TryParse(s.Substring(0, 1), out lv))
-                return true;
+                throw new ArgumentException();
             int uid;
             if (!int.TryParse(s.Substring(1), out uid))
-                return true;
+                throw new ArgumentException();
             if (uid < 1 || LV_CAP <= uid)
-                return true;
-            if (eLv != lv || uId != uid)
-                Reset();
+                throw new ArgumentException();
+            Reset();
             eLv = lv;
             uId = uid;
-            return false;
         }
 
         public override string ToString()

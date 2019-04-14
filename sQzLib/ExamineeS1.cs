@@ -57,65 +57,66 @@ namespace sQzLib
 
         public bool ReadByteC(byte[] buf, ref int offs)
         {
-            int l = buf.Length - offs;
-            //
-            if (l < 12)
-                return true;
-            int x = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (ParseLvId(x))
-                return true;
-            if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
-                eStt = (NeeStt)x;
-            l -= 4;
-            offs += 4;
-            bLog = BitConverter.ToBoolean(buf, offs);
-            l -= 1;
-            offs += 1;
-            //
-            if (eStt < NeeStt.Examing || bLog)
-            {
-                if (l < 4)
-                    return true;
-                int sz = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                if (l < sz + 4)
-                    return true;
-                tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-                sz = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                if (l < sz)
-                    return true;
-                tComp = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-            }
-
-            if (eStt < NeeStt.Examing)
-                return false;
-
-            if (l < 4)
-                return true;
-            mAnsSh.uQSLvId = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-
-            if (eStt < NeeStt.Submitting)
-                return false;
-
-            if (l < AnsSheet.LEN)
-                return true;
-            mAnsSh.aAns = new byte[AnsSheet.LEN];
-            Buffer.BlockCopy(buf, offs, mAnsSh.aAns, 0, AnsSheet.LEN);
-            l -= AnsSheet.LEN;
-            offs += AnsSheet.LEN;
-
             return false;
+            //int l = buf.Length - offs;
+            ////
+            //if (l < 12)
+            //    return true;
+            //int x = BitConverter.ToInt32(buf, offs);
+            //l -= 4;
+            //offs += 4;
+            //if (ParseLvId(x))
+            //    return true;
+            //if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
+            //    eStt = (NeeStt)x;
+            //l -= 4;
+            //offs += 4;
+            //bLog = BitConverter.ToBoolean(buf, offs);
+            //l -= 1;
+            //offs += 1;
+            ////
+            //if (eStt < NeeStt.Examing || bLog)
+            //{
+            //    if (l < 4)
+            //        return true;
+            //    int sz = BitConverter.ToInt32(buf, offs);
+            //    l -= 4;
+            //    offs += 4;
+            //    if (l < sz + 4)
+            //        return true;
+            //    tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
+            //    l -= sz;
+            //    offs += sz;
+            //    sz = BitConverter.ToInt32(buf, offs);
+            //    l -= 4;
+            //    offs += 4;
+            //    if (l < sz)
+            //        return true;
+            //    tComp = Encoding.UTF8.GetString(buf, offs, sz);
+            //    l -= sz;
+            //    offs += sz;
+            //}
+
+            //if (eStt < NeeStt.Examing)
+            //    return false;
+
+            //if (l < 4)
+            //    return true;
+            //mAnsSh.uQSLvId = BitConverter.ToInt32(buf, offs);
+            //l -= 4;
+            //offs += 4;
+
+            //if (eStt < NeeStt.Submitting)
+            //    return false;
+
+            //if (l < AnsSheet.LEN)
+            //    return true;
+            //mAnsSh.aAns = new byte[AnsSheet.LEN];
+            //Buffer.BlockCopy(buf, offs, mAnsSh.aAns, 0, AnsSheet.LEN);
+            //l -= AnsSheet.LEN;
+            //offs += AnsSheet.LEN;
+
+            //return false;
         }
 
         public bool ReadByteS(byte[] buf, ref int offs)
