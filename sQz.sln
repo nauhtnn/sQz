@@ -3,17 +3,17 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzClient", "..\sQzClient\sQzClient.csproj", "{C276D8A9-E00E-4873-A7DF-62904C65490C}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzClient", "sQzClient\sQzClient.csproj", "{C276D8A9-E00E-4873-A7DF-62904C65490C}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzLib", "..\sQzLib\sQzLib.csproj", "{13F1CA36-923D-4787-AEF3-54C12092B462}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzLib", "sQzLib\sQzLib.csproj", "{13F1CA36-923D-4787-AEF3-54C12092B462}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzServer0", "..\sQzServer0\sQzServer0.csproj", "{A80878BA-E65D-4435-8206-2BE3640D8C20}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzServer0", "sQzServer0\sQzServer0.csproj", "{A80878BA-E65D-4435-8206-2BE3640D8C20}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzServer1", "..\sQzServer1\sQzServer1.csproj", "{0EF4361D-1E78-48F0-9849-BA572D2D2684}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzServer1", "sQzServer1\sQzServer1.csproj", "{0EF4361D-1E78-48F0-9849-BA572D2D2684}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleUtils", "..\ConsoleUtils\ConsoleUtils.csproj", "{C04B5D98-E922-4894-BE3E-384073E87A27}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleUtils", "ConsoleUtils\ConsoleUtils.csproj", "{C04B5D98-E922-4894-BE3E-384073E87A27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzServer0_print", "..\sQzServer0_print\sQzServer0_print.csproj", "{66ECDF62-4192-4085-B5B8-21E1E03391F1}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "sQzServer0_print", "sQzServer0_print\sQzServer0_print.csproj", "{66ECDF62-4192-4085-B5B8-21E1E03391F1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
