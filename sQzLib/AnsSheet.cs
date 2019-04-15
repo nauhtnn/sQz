@@ -52,8 +52,8 @@ namespace sQzLib
             if (cb != null)
                 dgSelChgCB = cb;
 
-            vlbxAns = new ListBox[qs.Count];
-            vAnsItem = new AnsItem[qs.Count][];
+            vlbxAns = new ListBox[qs.Items.Count];
+            vAnsItem = new AnsItem[qs.Items.Count][];
             
             int idx = -1;
             int j = -1;
@@ -67,10 +67,10 @@ namespace sQzLib
                 lbxAns.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
                 lbxAns.BorderThickness = new Thickness(0, 4, 0, 0);
                 vlbxAns[idx] = lbxAns;
-                vAnsItem[idx] = new AnsItem[q.vAns.Length];
-                for (int i = 0; i < q.vAns.Length; ++i)
+                vAnsItem[idx] = new AnsItem[MCItem.N_OPTIONS];
+                for (int i = 0; i < MCItem.N_OPTIONS; ++i)
                 {
-                    AnsItem ai = new AnsItem(q.vAns[i], i, w);
+                    AnsItem ai = new AnsItem(q.Options[i], i, w);
                     ++j;//update view from log
                     if (aAns[j] == Convert.ToByte(true))
                     {

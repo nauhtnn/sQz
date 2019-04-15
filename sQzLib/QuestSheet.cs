@@ -9,22 +9,22 @@ namespace sQzLib
 {
     public class QuestSheet
     {
-        public ExamLv eLv;
+        public ExamLv mLv;
         public static int guDBCurAId;
         public static int guDBCurBId;
         public int uId;
-        public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + ExamineeA.LV_CAP; } }
-        public string tId { get { return eLv.ToString() + uId.ToString("d3"); } }
-        public bool bAlt;
-        List<MCItem> vQuest;
-        public byte[] aQuest;
-        public int Count { get { return vQuest.Count; } }
-        public int CountD
+        public int LvId { get { return (mLv == ExamLv.A) ? uId : uId + ExamineeA.LV_CAP; } }
+        public string tId { get { return mLv.ToString() + uId.ToString("d3"); } }
+        public List<MCItem> Items { get; private set; }
+        public byte[] Items2Array;
+        static readonly IUx[] LvA_IUx = { IUx._1, IUx._2, IUx._3, IUx._4, IUx._5, IUx._6 };
+        static readonly IUx[] LvB_IUx = { IUx._7, IUx._8, IUx._10 };
+        public int CountDifficult
         {
             get
             {
                 int n = 0;
-                foreach (MCItem q in vQuest)
+                foreach (MCItem q in Items)
                     if (q.IsDifficult)
                         ++n;
                 return n;
@@ -33,34 +33,10 @@ namespace sQzLib
 
         public QuestSheet()
         {
-            eLv = ExamLv.A;
-            vQuest = new List<MCItem>();
-            aQuest = null;
+            mLv = ExamLv.A;
+            Items = new List<MCItem>();
+            Items2Array = null;
             uId = ExamineeA.LV_CAP;
-            bAlt = false;
-        }
-
-        public static IUx[] GetIUs(ExamLv lv)
-        {
-            IUx[] x;
-            if (lv == ExamLv.A)
-            {
-                x = new IUx[6];
-                x[0] = IUx._1;
-                x[1] = IUx._2;
-                x[2] = IUx._3;
-                x[3] = IUx._4;
-                x[4] = IUx._5;
-                x[5] = IUx._6;
-            }
-            else
-            {
-                x = new IUx[3];
-                x[0] = IUx._7;
-                x[1] = IUx._8;
-                x[2] = IUx._10;
-            }
-            return x;
         }
 
         public static bool ParseLvId(string s, out ExamLv lv, out int id)
@@ -86,64 +62,73 @@ namespace sQzLib
 
         public MCItem Q(int idx)
         {
-            return vQuest[idx];
+            return Items[idx];
         }
 
         public void Add(MCItem q)
         {
-            vQuest.Add(q);
+            Items.Add(q);
         }
 
         public void Clear()
         {
-            vQuest.Clear();
+            Items.Clear();
         }
 
-        public List<int[]> GetNMod()
+        public List<int[]> CountItemGroupByModule()
         {
-            List<int[]> rv = new List<int[]>();
-            IUx[] viu = GetIUs(eLv);
-            int[] vnesydif = new int[viu.Length];
-            int[] vndif = new int[viu.Length];
-            foreach (MCItem q in vQuest)
+            IUx[] IUx_by_Lv = (mLv == ExamLv.A) ? LvA_IUx : LvB_IUx;
+            int[] n_difficultItems = new int[IUx_by_Lv.Length];
+            int[] n_allItems = new int[IUx_by_Lv.Length];
+            foreach (MCItem i in Items)
             {
-                int idx = (int)q.eIU;//mod on 0705
-                if (idx == 6 || idx == 7)
-                    idx = idx - 6;
-                else if (idx == 9)
-                    idx = 2;
-                ++vnesydif[idx];
-                if (q.IsDifficult)
-                    ++vndif[idx];
+                int module;
+                switch(i.mIU)
+                {
+                    case IUx._7:
+                        module = 0;
+                        break;
+                    case IUx._8:
+                        module = 1;
+                        break;
+                    case IUx._9:
+                        module = 2;
+                        break;
+                    default:
+                        module = (int)i.mIU;
+                        break;
+                }
+                ++n_allItems[module];
+                if (i.IsDifficult)
+                    ++n_difficultItems[module];
             }
-            rv.Add(vnesydif);
-            rv.Add(vndif);
-            return rv;
+            List<int[]> n = new List<int[]>();
+            n.Add(n_allItems);
+            n.Add(n_difficultItems);
+            return n;
         }
 
-        public static List<int[]> DBGetNMod(ExamLv lv)
+        public static List<int[]> DBCountItemGroupByModule(ExamLv lv)
         {
-            List<int[]> rv = new List<int[]>();
-            IUx[] viu = GetIUs(lv);
-            int[] vn = new int[viu.Length];
-            int[] vnd = new int[viu.Length];
+            IUx[] IUx_by_Lv = (lv == ExamLv.A) ? LvA_IUx : LvB_IUx;
+            int[] n_difficultItems = new int[IUx_by_Lv.Length];
+            int[] n_allItems = new int[IUx_by_Lv.Length];
             int j = -1;
-            foreach(IUx i in viu)
+            foreach(IUx i in IUx_by_Lv)
             {
-                int n = DBConnect.Count( "sqz_question", "id",
+                n_allItems[++j] = DBConnect.Count( "sqz_question", "id",
                     "moid=" + (int)i + " AND del=0");
-                if (n < 0)
-                    n = 0;
-                vn[++j] = n;
-                n = DBConnect.Count("sqz_question", "id",
+                if (n_allItems[j] < 0)
+                    n_allItems[++j] = 0;
+                n_difficultItems[j] = DBConnect.Count("sqz_question", "id",
                     "moid=" + (int)i + " AND diff=1 AND del=0");
-                if (n < 0)
-                    n = 0;
-                vnd[j] = n;
+                if (n_difficultItems[j] < 0)
+                    n_difficultItems[j] = 0;
             }
-            rv.Add(vn);
-            rv.Add(vnd);
-            return rv;
+            List<int[]> n = new List<int[]>();
+            n.Add(n_allItems);
+            n.Add(n_difficultItems);
+            return n;
         }
 
         public static int DBGetND(IUx iu)
@@ -172,12 +157,12 @@ namespace sQzLib
         public void ExtractKey(AnsSheet anssh)
         {
             anssh.uQSLvId = LvId;
-            if (0 < vQuest.Count)
-                anssh.aAns = new byte[vQuest.Count * MCItem.N_OPTIONS];
+            if (0 < Items.Count)
+                anssh.aAns = new byte[Items.Count * MCItem.N_OPTIONS];
             else
                 return;
             int i = -1;
-            foreach (MCItem q in vQuest)
+            foreach (MCItem q in Items)
                 foreach (bool x in q.Keys)
                     anssh.aAns[++i] = Convert.ToByte(x);
         }
@@ -285,13 +270,13 @@ namespace sQzLib
 
         void ParseArray(string[] rawData)
         {
-            vQuest.Clear();
+            Items.Clear();
             int stride = 1 + MCItem.N_OPTIONS;
             for (int i = 0; i + stride < rawData.Length; i += stride)
             {
                 MCItem q = new MCItem();
                 q.Parse(rawData, i);
-                vQuest.Add(q);
+                Items.Add(q);
             }
         }
 
@@ -303,7 +288,7 @@ namespace sQzLib
         public IEnumerable<string> ToListOfStrings()
         {
             IEnumerable<string> s = new LinkedList<string>();
-            foreach (MCItem q in vQuest)
+            foreach (MCItem q in Items)
                 s = s.Concat(q.ToListOfStrings()) as IEnumerable<string>;
                 
             return s;
@@ -312,7 +297,7 @@ namespace sQzLib
         public List<MCItem> ShallowCopy()
         {
             List<MCItem> l = new List<MCItem>();
-            foreach (MCItem q in vQuest)
+            foreach (MCItem q in Items)
                 l.Add(q);
             return l;
         }
@@ -320,74 +305,72 @@ namespace sQzLib
         public QuestSheet DeepCopy()
         {
             QuestSheet qs = new QuestSheet();
-            qs.eLv = eLv;
+            qs.mLv = mLv;
             qs.uId = uId;
-            qs.bAlt = bAlt;
-            foreach (MCItem qi in vQuest)
-                qs.vQuest.Add(qi.DeepCopy());
+            foreach (MCItem qi in Items)
+                qs.Items.Add(qi.DeepCopy());
             return qs;
         }
 
         public void Randomize(Random rand)
         {
             List<MCItem> qs = new List<MCItem>();
-            int n = vQuest.Count;
+            int n = Items.Count;
             while (0 < n)
             {
                 int sel = rand.Next() % n;
-                qs.Add(vQuest[sel]);
-                vQuest.RemoveAt(sel);
+                qs.Add(Items[sel]);
+                Items.RemoveAt(sel);
                 --n;
             }
-            vQuest = qs;
-            foreach (MCItem q in vQuest)
+            Items = qs;
+            foreach (MCItem q in Items)
                 q.Randomize(rand);
         }
 
         public QuestSheet RandomizeDeepCopy(Random rand)
         {
             QuestSheet qs = new QuestSheet();
-            qs.eLv = eLv;
+            qs.mLv = mLv;
             qs.uId = uId;
-            qs.bAlt = bAlt;
-            foreach (MCItem qi in vQuest)
-                qs.vQuest.Add(qi.RandomizeDeepCopy(rand));
+            foreach (MCItem qi in Items)
+                qs.Items.Add(qi.RandomizeDeepCopy(rand));
             //randomize
             List<MCItem> lq = new List<MCItem>();
-            int n = qs.vQuest.Count;
+            int n = qs.Items.Count;
             while (0 < n)
             {
                 int idx = rand.Next() % n;
-                lq.Add(qs.vQuest.ElementAt(idx));
-                qs.vQuest.RemoveAt(idx);
+                lq.Add(qs.Items.ElementAt(idx));
+                qs.Items.RemoveAt(idx);
                 --n;
             }
-            qs.vQuest = lq;
+            qs.Items = lq;
 
             return qs;
         }
 
-        public int[] DBCount()
-		{
-            IUx[] ius = new IUx[GetIUs(ExamLv.A).Count() + GetIUs(ExamLv.B).Count()];
-            int i = -1;
-            foreach (IUx iu in GetIUs(ExamLv.A))
-                ius[++i] = iu;
-            foreach (IUx iu in GetIUs(ExamLv.B))
-                ius[++i] = iu;
-			int[] nn = new int[ius.Length];
-			i = -1;
-			StringBuilder emsg = new StringBuilder();
-			foreach(IUx iu in ius)
-			{
-				nn[++i] = DBConnect.Count("sqz_question", "id",
-					"moid=" + (int)iu + " AND del=0");
-			}
-			return nn;
-		}
+  //      public int[] DBCount()
+		//{
+  //          IUx[] ius = new IUx[LvA_IUx.Length + LvB_IUx.Length];
+  //          int i = -1;
+  //          foreach (IUx iu in GetIUs(ExamLv.A))
+  //              ius[++i] = iu;
+  //          foreach (IUx iu in GetIUs(ExamLv.B))
+  //              ius[++i] = iu;
+		//	int[] nn = new int[ius.Length];
+		//	i = -1;
+		//	StringBuilder emsg = new StringBuilder();
+		//	foreach(IUx iu in ius)
+		//	{
+		//		nn[++i] = DBConnect.Count("sqz_question", "id",
+		//			"moid=" + (int)iu + " AND del=0");
+		//	}
+		//	return nn;
+		//}
 
         //only Server0 uses this.
-        public void DBSelect(IUx eIU, QuestDiff d)
+        public void DBSelect(IUx eIU, Difficulty d)
         {
             //vQuest.Clear();
             //string cond = string.Empty;
@@ -419,7 +402,7 @@ namespace sQzLib
         }
 
         //only Server0 uses this.
-        public bool DBSelect(Random rand, IUx iu, int n, QuestDiff d)
+        public bool DBSelect(Random rand, IUx iu, int n, Difficulty d)
         {
             //randomize
             //string qry = "moid=" + (int)iu + " AND del=0";
@@ -483,7 +466,7 @@ namespace sQzLib
         public void DBIns(IUx eIU)
         {
             StringBuilder vals = new StringBuilder();
-            foreach (MCItem q in vQuest)
+            foreach (MCItem q in Items)
             {
                 vals.Append("(" + (int)eIU + ",0," + (q.IsDifficult ? 1 : 0) + ",'");
                 vals.Append(q.Stem.Replace("'", "\\'") + "','");
@@ -565,12 +548,12 @@ namespace sQzLib
 
         public bool UpdateCurQSId()
         {
-            if (eLv == ExamLv.A && -1 < guDBCurAId)
+            if (mLv == ExamLv.A && -1 < guDBCurAId)
             {
                 uId = ++guDBCurAId;
                 return false;
             }
-            if (eLv == ExamLv.B && -1 < guDBCurBId)
+            if (mLv == ExamLv.B && -1 < guDBCurBId)
             {
                 uId = ++guDBCurBId;
                 return false;
@@ -580,63 +563,64 @@ namespace sQzLib
 
         public static bool DBUpdateCurQSId(DateTime dt)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return true;
-            int uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
-                    "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.A.ToString() + "'");
-            if (uid < 0)
-            {
-                DBConnect.Close(ref conn);
-                return true;
-            }
-            guDBCurAId = uid;
+            //MySqlConnection conn = DBConnect.Init();
+            //if (conn == null)
+            //    return true;
+            //int uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
+            //        "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.A.ToString() + "'");
+            //if (uid < 0)
+            //{
+            //    DBConnect.Close(ref conn);
+            //    return true;
+            //}
+            //guDBCurAId = uid;
 
-            uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
-                    "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.B.ToString() + "'");
-            if (uid < 0)
-            {
-                DBConnect.Close(ref conn);
-                return true;
-            }
-            guDBCurBId = uid;
+            //uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
+            //        "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.B.ToString() + "'");
+            //if (uid < 0)
+            //{
+            //    DBConnect.Close(ref conn);
+            //    return true;
+            //}
+            //guDBCurBId = uid;
 
-            return false;
+            //return false;
+            throw new NotImplementedException();
         }
     }
 
-    public class QIdxComparer<T> : Comparer<T>
-    {
-        SortedList<int, int> vIdx;
+    //public class QIdxComparer<T> : Comparer<T>
+    //{
+    //    SortedList<int, int> vIdx;
 
-        public QIdxComparer()
-        {
-            vIdx = new SortedList<int, int>();
-        }
+    //    public QIdxComparer()
+    //    {
+    //        vIdx = new SortedList<int, int>();
+    //    }
 
-        public void Add(int qid, int idx)
-        {
-            vIdx.Add(qid, idx);
-        }
+    //    public void Add(int qid, int idx)
+    //    {
+    //        vIdx.Add(qid, idx);
+    //    }
 
-        public override int Compare(T x, T y)
-        {
-            MCItem qx = x as MCItem;
-            if (qx == null)
-                return 0;
-            MCItem qy = y as MCItem;
-            if (qy == null)
-                return 0;
-            if (vIdx[qx.uId] < vIdx[qy.uId])
-                return -1;
-            else if (vIdx[qx.uId] == vIdx[qy.uId])
-                return 0;
-            return 1;
+    //    public override int Compare(T x, T y)
+    //    {
+    //        MCItem qx = x as MCItem;
+    //        if (qx == null)
+    //            return 0;
+    //        MCItem qy = y as MCItem;
+    //        if (qy == null)
+    //            return 0;
+    //        if (vIdx[qx.uId] < vIdx[qy.uId])
+    //            return -1;
+    //        else if (vIdx[qx.uId] == vIdx[qy.uId])
+    //            return 0;
+    //        return 1;
 
-        }
-    }
+    //    }
+    //}
 
-    public enum QuestDiff
+    public enum Difficulty
     {
         Easy,
         Diff,

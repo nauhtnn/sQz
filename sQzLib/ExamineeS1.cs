@@ -128,7 +128,7 @@ namespace sQzLib
 
             int x;
             if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                eLv = (ExamLv)x;
+                mLv = (ExamLv)x;
             else
                 return true;
             l -= 4;
@@ -227,7 +227,7 @@ namespace sQzLib
         {
             //suppose eStt == NeeStt.Finished
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes((int)eLv));
+            l.Add(BitConverter.GetBytes((int)mLv));
             l.Add(BitConverter.GetBytes(uId));
             if (0 < tComp.Length)
             {

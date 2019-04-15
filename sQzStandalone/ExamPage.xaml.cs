@@ -81,7 +81,7 @@ namespace sQzStandalone
             int m = -1, s = -1;
             if (mNee.eStt < NeeStt.Submitting)
             {
-                string t = Utils.ReadFile("Duration.txt");
+                string t = Utils.ReadAllLines("Duration.txt")[0];
                 if (t != null)
                 {
                     string[] vt = t.Split('\t');
@@ -139,7 +139,7 @@ namespace sQzStandalone
             Label l = new Label();
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             int nAns = 4;//hardcode
-            int i = 0, n = mQSh.Count;
+            int i = 0, n = mQSh.Items.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
             mNee.mAnsSh.Init(mQSh.LvId);
             mNee.mAnsSh.InitView(mQSh, qaWh, null);
@@ -243,7 +243,7 @@ namespace sQzStandalone
         void InitQuestPanel()
         {
             gQuest.Background = Theme.s._[(int)BrushId.Q_BG];
-            int n = mQSh.Count;
+            int n = mQSh.Items.Count;
             for (int i = 1, j = 0; i <= n; i += 2, ++j)
             {
                 gQuest.RowDefinitions.Add(new RowDefinition());
@@ -282,7 +282,7 @@ namespace sQzStandalone
             StackPanel con = new StackPanel();
             TextBlock stmt = new TextBlock();
             MCItem quest = mQSh.Q(idx - 1);
-            stmt.Text = quest.tStmt;
+            stmt.Text = quest.Stem;
             stmt.TextWrapping = TextWrapping.Wrap;
             stmt.Width = qaWh;
             stmt.Background = Theme.s._[(int)BrushId.Q_BG];

@@ -37,7 +37,7 @@ namespace sQzLib
 
     public class Utils
     {
-        public static char[] sWhSp = { ' ', '\t', '\n', '\r' };
+        static readonly char[] WhiteChars = { ' ', '\t', '\n', '\r' };
 
         public static string[] ReadAllLines(string path)
         {
@@ -102,77 +102,22 @@ namespace sQzLib
             return l.ToArray();
         }
 
-        public static string[] Split(string buf, char c)
-        {
-            char[] sWhSp = { ' ', '\t', '\n', '\r' };
-            int s = 0, e = buf.Length;
-            List<string> v = new List<string>();
-            while (s < e && sWhSp.Contains(buf[s]))
-                ++s;//clean front
-            if (s == e)
-                return null;
-            char[] pack = { '{', '}' };//simple KeyValuePair
-            int packing = 0;
-            int i = s;
-            StringBuilder str = new StringBuilder();
-            while (i < e)
-            {
-                if (buf[i] == pack[0])
-                    ++packing;
-                else if (buf[i] == pack[1])
-                {
-                    --packing;
-                    if (packing < 0)
-                        packing = 0;
-                }
-                if (buf[i] == c)//no 'else if' here
-                {
-                    int j = i++ - 1;
-                    while (s < j && sWhSp.Contains(buf[j]))
-                        --j;//clean end
-                    if (s <= j) //sure sWhSp doesnt contain buf[s]
-                        str.Append(buf.Substring(s, j - s + 1));
-                    if (str[str.Length - 1] == '\\') //concatenate
-                    {
-                        str.Remove(str.Length - 1, 1);
-                        str.Append('\n');
-                    }
-                    else if (str[str.Length - 1] == '+') //concatenate
-                        str.Remove(str.Length - 1, 1);
-                    else if (0 < packing)
-                        str.Append('\n');
-                    else
-                    {
-                        v.Add(str.ToString());
-                        str.Clear();
-                    }
-                    while (i < e && sWhSp.Contains(buf[i]))
-                        ++i;
-                    s = i;
-                } else
-                    ++i;
-            }
-            if (s < e)
-                v.Add(buf.Substring(s, e - s));
-            return v.ToArray();
-        }
-
         public static string CleanSpace(string buf)
         {
             int i = 0, e = buf.Length;
-            while (i < e && sWhSp.Contains(buf[i]))
+            while (i < e && WhiteChars.Contains(buf[i]))
                 ++i;//truncate front
             StringBuilder s = new StringBuilder();
             while (i < e)
             {
                 do
                     s.Append(buf[i++]);
-                while (i < e && !sWhSp.Contains(buf[i]));
+                while (i < e && !WhiteChars.Contains(buf[i]));
                 if (i < e)
                 {
                     int h = i;
                     do ++i;//truncate middle
-                    while (i < e && sWhSp.Contains(buf[i]));
+                    while (i < e && WhiteChars.Contains(buf[i]));
                     if (i < e)
                     {//truncate end
                         bool nl = false;
@@ -189,115 +134,24 @@ namespace sQzLib
             return s.ToString();
         }
 
-        public static string CleanFront(string buf, int s)
+        public static string CleanFront(string s)
         {
-            int i = s, e = buf.Length;
-            while (i < e && sWhSp.Contains(buf[i]))
+            int i = 0;
+            while (i < s.Length && WhiteChars.Contains(s[i]))
                 ++i;
-            if (i == e)
-                return null;
-            return buf.Substring(i);
+            if (i == s.Length)
+                return string.Empty;
+            return s.Substring(i);
         }
 
-        public static string CleanFrontBack(string buf, int s, int e)
+        public static string CleantBack(string s)
         {
-            int i = s;
-            while (i < e && sWhSp.Contains(buf[i]))
-                ++i;
-            if (i == e)
-                return null;
-            int j = e;
-            while (i < j && sWhSp.Contains(buf[j]))
+            int j = s.Length - 1;
+            while (0 < j && WhiteChars.Contains(s[j]))
                 --j;
-            return buf.Substring(i, j - i + 1);
-        }
-        //public static void DetectContent(ref string buf)
-        //{
-        //    //content is a block, but doesn't contain '{', '}' inside,
-        //    //  so distingushing from normal block
-        //    System.Text.RegularExpressions.Match m =
-        //        System.Text.RegularExpressions.Regex.Match(buf, "\\{[a-zA-Z0-9\\. \\\\/\\-_:]+\\}");
-        //    if (m.Success)
-        //    {
-        //        t = ContentType.Image;
-        //        string ipath = buf.Substring(m.Index + 1, m.Length - 2);
-        //        buf = buf.Substring(0, m.Index) + "<img src='" + ipath +
-        //            "'>" + buf.Substring(m.Index + m.Length);
-        //    }
-        //}
-        static bool detectContent(char c)
-        {
-            //optimization, not use regex
-            //System.Text.RegularExpressions.Match m =
-            //    System.Text.RegularExpressions.Regex.Match(buf, "\\{[a-zA-Z0-9\\. \\\\/\\-_:]+\\}");
-            if ('a' <= c && c <= 'z')
-                return true;
-            if ('A' <= c && c <= 'Z')
-                return true;
-            if ('0' <= c && c <= '9')
-                return true;
-            char[] spCh = {'.', ' ', '\\', '/', '-', '_', ':'};
-            if (spCh.Contains(c))
-                return true;
-            return false;
-        }
-        public static string HTML(string buf, ref ContentType t)
-        {
-            //suppose buf is already cleaned by Split / CleanSpace
-            if (buf[0] == '{' && buf[buf.Length - 1] == '}')
-                buf = CleanFrontBack(buf, 1, buf.Length - 2);
-
-            if (buf.Contains('&') || buf.Contains('\"') ||
-                buf.Contains('\'') || !buf.Contains('<') ||
-                buf.Contains('>') || !buf.Contains('\n'))
-            {
-                string s = null;
-                for (int i = 0; i < buf.Length; ++i) {
-                    switch (buf[i])
-                    {
-                        case '&':
-                            s += "&amp;";
-                            break;
-                        case '\"':
-                            s += "&quot;";
-                            break;
-                        case '\'':
-                            s += "&apos;";
-                            break;
-                        case '<':
-                            s += "&lt;";
-                            break;
-                        case '>':
-                            s += "&gt;";
-                            break;
-                        case '\n':
-                            s += "<br>";
-                            break;
-                        case '{':
-                            //detect media content
-                            int j = i + 1;
-                            while (j < buf.Length && detectContent(buf[j]))
-                                ++j;
-                            if (j < buf.Length && buf[j] == '}')
-                            {
-                                t = ContentType.Image;
-                                string ipath = buf.Substring(i + 1, j - i - 1);
-                                s += "<img src='" + ipath + "'>";
-                                i = j;
-                            }
-                            else {
-                                s += buf.Substring(i, j - i);
-                                i = j - 1;
-                            }
-                            break;
-                        default:
-                            s += buf[i];
-                            break;
-                    }
-                }
-                buf = s;
-            }
-            return buf;
+            if (j < 0)
+                return string.Empty;
+            return s.Substring(0, j + 1);
         }
     }
 }

@@ -12,7 +12,7 @@ namespace sQzLib
         public const char C1 = '1';
         public int ID_in_DB { get; private set; }
         public string Stem { get; private set; }
-        public IUx eIU;
+        public IUx mIU { get; private set; }
         public string[] Options { get; private set; }
         public bool[] Keys { get; private set; }
         public int[] POptions { get; private set; }
@@ -72,7 +72,7 @@ namespace sQzLib
                     if (Options[i][1] != '\\')
                     {
                         Keys[i] = true;
-                        Options[i] = Utils.CleanFront(Options[i], 1);
+                        Options[i] = Utils.CleanFront(Options[i].Substring(1));
                     }
                     else
                         Options[i] = Options[i].Substring(1);
@@ -105,7 +105,7 @@ namespace sQzLib
             MCItem q = new MCItem();
             q.ID_in_DB = ID_in_DB;
             q.Stem = Stem;
-            q.eIU = eIU;
+            q.mIU = mIU;
             q.Options = new string[N_OPTIONS];
             for (int i = 0; i < N_OPTIONS; ++i)
                 q.Options[i] = Options[i];
@@ -147,7 +147,7 @@ namespace sQzLib
             MCItem q = new MCItem();
             q.ID_in_DB = ID_in_DB;
             q.Stem = Stem;
-            q.eIU = eIU;
+            q.mIU = mIU;
             q.IsDifficult = IsDifficult;
             //randomize
             q.Options = new string[N_OPTIONS];

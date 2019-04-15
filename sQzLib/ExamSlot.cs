@@ -11,31 +11,26 @@ namespace sQzLib
     public enum ExamStt
     {
         Prep = 0,
-        Oper,
-        Arch
+        Doing,
+        Archive
     }
 
     public class ExamSlot
     {
         public DateTime mDt;
         public Dictionary<ExamLv, QuestPack> vQPack;
-        public Dictionary<ExamLv, QuestPack> vQPackAlt;
 
         public AnsPack mKeyPack;
 
         public Dictionary<int, ExamRoom> vRoom;
         public Dictionary<int, DateTime> vT1;
         public Dictionary<int, DateTime> vT2;
-        public Dictionary<int, bool> vbQPkAlt;
-        public bool bQPkAlt;
         public ExamStt eStt;
 
         public ExamSlot()
         {
             mDt = DT.INV_;
             vRoom = new Dictionary<int, ExamRoom>();
-            vbQPkAlt = new Dictionary<int, bool>();
-            bQPkAlt = false;
             eStt = ExamStt.Prep;
             vQPack = new Dictionary<ExamLv, QuestPack>();
             QuestPack p = new QuestPack(false);
@@ -44,14 +39,6 @@ namespace sQzLib
             p = new QuestPack(false);
             p.eLv = ExamLv.B;
             vQPack.Add(p.eLv, p);
-
-            vQPackAlt = new Dictionary<ExamLv, QuestPack>();
-            p = new QuestPack(true);
-            p.eLv = ExamLv.A;
-            vQPackAlt.Add(p.eLv, p);
-            p = new QuestPack(true);
-            p.eLv = ExamLv.B;
-            vQPackAlt.Add(p.eLv, p);
 
             mKeyPack = new AnsPack();
         }
@@ -73,117 +60,79 @@ namespace sQzLib
             return null;
         }
 
-        public string DBSelQPkR()
+        public static List<bool> IsDoing(List<DateTime> l)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
-            string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid,qpkalt",
-                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return eMsg;
-            }
-            while (reader.Read())
-            {
-                int rid = reader.GetInt16(0);
-                if (vbQPkAlt.ContainsKey(rid))
-                    vbQPkAlt[rid] = reader.GetInt16(1) != 0;
-                else
-                    vbQPkAlt.Add(rid, reader.GetInt16(1) != 0);
-            }
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return null;
-        }
-
-        public string DBUpQPAlt(int rid)
-        {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
-            string emsg;
-            int n = DBConnect.Update(conn, "sqz_slot_room", "qpkalt=1", "dt='" +
-                mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "' AND rid=" + rid, out emsg);
-            DBConnect.Close(ref conn);
-            if(0 < n)
-                return null;
-            return emsg;
-        }
-
-        public static List<bool> IsSttOper(List<DateTime> l)
-        {
-            List<bool> v = new List<bool>();
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                int n = l.Count;
-                while(0 < n)
-                {
-                    --n;
-                    v.Add(false);
-                }
-                return v;
-            }
-            foreach (DateTime dt in l)
-            {
-                string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
-                    "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) + "'");
-                string eMsg;
-                MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-                if (reader == null)
-                {
-                    v.Add(false);
-                    continue;
-                }
-                int x;
-                if (reader.Read())
-                    if (Enum.IsDefined(typeof(ExamStt), x = reader.GetInt16(0)))
-                        v.Add((ExamStt)x == ExamStt.Oper);
-                reader.Close();
-            }
-            DBConnect.Close(ref conn);
-            return v;
+            throw new NotImplementedException();
+            //List<bool> v = new List<bool>();
+            //MySqlConnection conn = DBConnect.Init();
+            //if (conn == null)
+            //{
+            //    int n = l.Count;
+            //    while(0 < n)
+            //    {
+            //        --n;
+            //        v.Add(false);
+            //    }
+            //    return v;
+            //}
+            //foreach (DateTime dt in l)
+            //{
+            //    string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
+            //        "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) + "'");
+            //    string eMsg;
+            //    MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            //    if (reader == null)
+            //    {
+            //        v.Add(false);
+            //        continue;
+            //    }
+            //    int x;
+            //    if (reader.Read())
+            //        if (Enum.IsDefined(typeof(ExamStt), x = reader.GetInt16(0)))
+            //            v.Add((ExamStt)x == ExamStt.Doing);
+            //    reader.Close();
+            //}
+            //DBConnect.Close(ref conn);
+            //return v;
         }
 
         public string DBSelStt()
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
-            string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
-                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return eMsg;
-            }
-            int x;
-            if (reader.Read())
-                if (Enum.IsDefined(typeof(ExamStt), x = reader.GetInt16(0)))
-                    eStt = (ExamStt)x;
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return null;
+            throw new NotImplementedException();
+            //MySqlConnection conn = DBConnect.Init();
+            //if (conn == null)
+            //    return Txt.s._[(int)TxI.DB_NOK];
+            //string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
+            //    "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
+            //string eMsg;
+            //MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            //if (reader == null)
+            //{
+            //    DBConnect.Close(ref conn);
+            //    return eMsg;
+            //}
+            //int x;
+            //if (reader.Read())
+            //    if (Enum.IsDefined(typeof(ExamStt), x = reader.GetInt16(0)))
+            //        eStt = (ExamStt)x;
+            //reader.Close();
+            //DBConnect.Close(ref conn);
+            //return null;
         }
 
         public string DBUpStt()
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
-            string emsg;
-            int n = DBConnect.Update(conn, "sqz_slot", "stt=" + (int)eStt,
-                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'",
-                out emsg);
-            if(0 < n)
-                return null;
-            return emsg;
+            throw new NotImplementedException();
+            //MySqlConnection conn = DBConnect.Init();
+            //if (conn == null)
+            //    return Txt.s._[(int)TxI.DB_NOK];
+            //string emsg;
+            //int n = DBConnect.Update(conn, "sqz_slot", "stt=" + (int)eStt,
+            //    "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'",
+            //    out emsg);
+            //if(0 < n)
+            //    return null;
+            //return emsg;
         }
 
         public DateTime Dt {
@@ -192,133 +141,115 @@ namespace sQzLib
                 mDt = value;
                 foreach (QuestPack p in vQPack.Values)
                     p.mDt = value;
-                foreach (QuestPack p in vQPackAlt.Values)
-                    p.mDt = value;
             }
         }
 
         public string ReadF(string fp, ref ExamSlot o)
         {
-            string buf = Utils.ReadFile(fp);
-            if (buf == null)
-                return null;
-            string[] vs = buf.Split('\n');
-            StringBuilder eline = new StringBuilder();
-            StringBuilder dup = new StringBuilder();
-            int i = 0;
-            foreach (string s in vs)
-            {
-                ++i;
-                ExamineeS0 e = new ExamineeS0();
-                string[] v = s.Split('\t');
-                if (v.Length == 5)
-                {
-                    if (v[0].Length < 2)
-                    {
-                        eline.Append(i.ToString() + ", ");
-                        continue;
-                    }
-                    v[0] = v[0].ToUpper();
-                    if(!Enum.TryParse(v[0].Substring(0, 1), out e.eLv))
-                    {
-                        eline.Append(i.ToString() + ", ");
-                        continue;
-                    }
-                    int urid;
-                    if (!int.TryParse(v[0].Substring(1), out e.uId)
-                        || !int.TryParse(v[1], out urid) || !vRoom.ContainsKey(urid))
-                    {
-                        eline.Append(i.ToString() + ", ");
-                        continue;
-                    }
-                    bool bCont = false;
-                    foreach(ExamRoom ro in vRoom.Values)
-                        if(ro.vExaminee.ContainsKey(e.LvId))
-                        {
-                            dup.Append(e.eLv.ToString() + e.uId + ", ");
-                            bCont = true;
-                        }
-                    if (bCont)
-                        continue;
-                    foreach (ExamRoom ro in o.vRoom.Values)
-                        if (ro.vExaminee.ContainsKey(e.LvId))
-                        {
-                            dup.Append(e.eLv.ToString() + e.uId + ", ");
-                            bCont = true;
-                        }
-                    if (bCont)
-                        continue;
-                    e.mDt = mDt;
-                    e.tName = v[2].Trim();
-                    DateTime dt;
-                    if(DT.To_(v[3], DT.RR, out dt))
-                    {
-                        eline.Append(i.ToString() + ", ");
-                        continue;
-                    }
-                    e.tBirdate = v[3];
-                    e.tBirthplace = v[4].Trim();
-                    if (e.tName.Length == 0 || e.tBirdate.Length == 0 || e.tBirthplace.Length == 0)
-                    {
-                        eline.Append(i.ToString() + ", ");
-                        continue;
-                    }
-                    o.vRoom[urid].vExaminee.Add(e.LvId, e);
-                }
-                else
-                    eline.Append(i.ToString() + ", ");
-            }
-            StringBuilder r = new StringBuilder();
-            if(0 < dup.Length)
-            {
-                dup.Remove(dup.Length - 2, 2);//remove the last comma
-                r.Append("\n" + Txt.s._[(int)TxI.NEE_ID_EXIST]);
-                r.Append(dup.ToString() + '.');
-            }
-            if (0 < eline.Length)
-            {
-                eline.Remove(eline.Length - 2, 2);//remove the last comma
-                r.Append("\n" + Txt.s._[(int)TxI.NEE_ELINE]);
-                r.Append(eline.ToString() + '.');
-            }
-            if (r.Length == 0)
-                return null;
-            else
-                return Txt.s._[(int)TxI.NEE_FERR] + r.ToString();
+            throw new NotImplementedException();
+            //string buf = Utils.ReadFile(fp);
+            //if (buf == null)
+            //    return null;
+            //string[] vs = buf.Split('\n');
+            //StringBuilder eline = new StringBuilder();
+            //StringBuilder dup = new StringBuilder();
+            //int i = 0;
+            //foreach (string s in vs)
+            //{
+            //    ++i;
+            //    ExamineeS0 e = new ExamineeS0();
+            //    string[] v = s.Split('\t');
+            //    if (v.Length == 5)
+            //    {
+            //        if (v[0].Length < 2)
+            //        {
+            //            eline.Append(i.ToString() + ", ");
+            //            continue;
+            //        }
+            //        v[0] = v[0].ToUpper();
+            //        if(!Enum.TryParse(v[0].Substring(0, 1), out e.eLv))
+            //        {
+            //            eline.Append(i.ToString() + ", ");
+            //            continue;
+            //        }
+            //        int urid;
+            //        if (!int.TryParse(v[0].Substring(1), out e.uId)
+            //            || !int.TryParse(v[1], out urid) || !vRoom.ContainsKey(urid))
+            //        {
+            //            eline.Append(i.ToString() + ", ");
+            //            continue;
+            //        }
+            //        bool bCont = false;
+            //        foreach(ExamRoom ro in vRoom.Values)
+            //            if(ro.vExaminee.ContainsKey(e.LvId))
+            //            {
+            //                dup.Append(e.eLv.ToString() + e.uId + ", ");
+            //                bCont = true;
+            //            }
+            //        if (bCont)
+            //            continue;
+            //        foreach (ExamRoom ro in o.vRoom.Values)
+            //            if (ro.vExaminee.ContainsKey(e.LvId))
+            //            {
+            //                dup.Append(e.eLv.ToString() + e.uId + ", ");
+            //                bCont = true;
+            //            }
+            //        if (bCont)
+            //            continue;
+            //        e.mDt = mDt;
+            //        e.tName = v[2].Trim();
+            //        DateTime dt;
+            //        if(DT.To_(v[3], DT.RR, out dt))
+            //        {
+            //            eline.Append(i.ToString() + ", ");
+            //            continue;
+            //        }
+            //        e.tBirdate = v[3];
+            //        e.tBirthplace = v[4].Trim();
+            //        if (e.tName.Length == 0 || e.tBirdate.Length == 0 || e.tBirthplace.Length == 0)
+            //        {
+            //            eline.Append(i.ToString() + ", ");
+            //            continue;
+            //        }
+            //        o.vRoom[urid].vExaminee.Add(e.LvId, e);
+            //    }
+            //    else
+            //        eline.Append(i.ToString() + ", ");
+            //}
+            //StringBuilder r = new StringBuilder();
+            //if(0 < dup.Length)
+            //{
+            //    dup.Remove(dup.Length - 2, 2);//remove the last comma
+            //    r.Append("\n" + Txt.s._[(int)TxI.NEE_ID_EXIST]);
+            //    r.Append(dup.ToString() + '.');
+            //}
+            //if (0 < eline.Length)
+            //{
+            //    eline.Remove(eline.Length - 2, 2);//remove the last comma
+            //    r.Append("\n" + Txt.s._[(int)TxI.NEE_ELINE]);
+            //    r.Append(eline.ToString() + '.');
+            //}
+            //if (r.Length == 0)
+            //    return null;
+            //else
+            //    return Txt.s._[(int)TxI.NEE_FERR] + r.ToString();
         }
 
-        public int DBInsNee(out string eMsg)
+        public int DBInsNee()
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
-                return -1;
-            }
-            string vch = ExamRoom.PwChars();
             Random rand = new Random();
             int v = 1;
             StringBuilder sb = new StringBuilder();
             foreach (ExamRoom r in vRoom.Values)
             {
                 int n = 0;
-                bool bNExist = DBConnect.NExist(conn, "sqz_slot_room",
+                bool isExist = DBConnect.IsExist("sqz_slot_room",
                     "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) +
-                    "' AND rid=" + r.uId, out eMsg);
-                if (eMsg != null)
-                {
-                    DBConnect.Close(ref conn);
-                    return -1;
-                }
-                else if (bNExist)
-                    n = DBConnect.Ins(conn, "sqz_slot_room",
+                    "' AND rid=" + r.uId);
+                if (!isExist)
+                    n = DBConnect.Ins("sqz_slot_room",
                         "dt,t,rid,pw,qpkalt", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
-                        "'," + r.uId + ",'" + ExamRoom.GenPw(vch, rand) + "',0)", out eMsg);
-                if(n < 0)
-                {
-                    DBConnect.Close(ref conn);
-                    return n;
-                }
+                        "'," + r.uId + ",'" + ExamRoom.GeneratePw(vch, rand) + "',0)", out eMsg);
                 n = r.DBIns(conn, out eMsg);
                 if (n < 0)
                 {
@@ -337,7 +268,7 @@ namespace sQzLib
             foreach (ExamRoom r in vRoom.Values)
             {
                 r.vExaminee.Clear();
-                r.nLv[ExamLv.A] = r.nLv[ExamLv.B] = 0;
+                r.N_ExamineeGroupByLv[ExamLv.A] = r.N_ExamineeGroupByLv[ExamLv.B] = 0;
             }
         }
 
@@ -389,8 +320,8 @@ namespace sQzLib
         {
             int n = 0;
             foreach (ExamRoom r in vRoom.Values)
-                if (n < r.nLv[lv])
-                    n = r.nLv[lv];
+                if (n < r.N_ExamineeGroupByLv[lv])
+                    n = r.N_ExamineeGroupByLv[lv];
             return n;
         }
 
@@ -448,24 +379,17 @@ namespace sQzLib
         {
             ExamRoom r;
             if(vRoom.TryGetValue(rid, out r))
-                r.DBUpdateRs(vals);
+                r.DBMakeInsResult(vals);
         }
 
         public bool DBUpT1(int rid,
             out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if(conn == null)
-            {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
-                return true;
-            }
             ExamRoom r;
             if (vRoom.TryGetValue(rid, out r))
             {
                 r.t1 = DateTime.Now;
-                bool rv = r.DBUpT1(conn, mDt, out eMsg);
-                DBConnect.Close(ref conn);
+                bool rv = r.DBUpT1(mDt);
                 return rv;
             }
             eMsg = "Room id " + rid + " is not found";

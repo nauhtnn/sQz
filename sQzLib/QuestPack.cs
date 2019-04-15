@@ -68,7 +68,7 @@ namespace sQzLib
                     return true;
                 if (!vSheet.ContainsKey(qs.uId))
                 {
-                    qs.eLv = eLv;//optmz
+                    qs.mLv = eLv;//optmz
                     vSheet.Add(qs.uId, qs);
                 }
                 --nSh;
@@ -225,7 +225,7 @@ namespace sQzLib
             i = -1;
             foreach (QuestSheet qs in l)
             {
-                qs.eLv = eLv;
+                qs.mLv = eLv;
                 qs.Randomize(rand);
                 if (!qs.UpdateCurQSId())//todo: better error handle
                     vSheet.Add(qs.uId, qs);
@@ -266,7 +266,7 @@ namespace sQzLib
             {
                 --n;
                 QuestSheet qs = qs0.RandomizeDeepCopy(rand);
-                qs.eLv = eLv;
+                qs.mLv = eLv;
                 if (!qs.UpdateCurQSId())//todo: better error handle
                 {
                     vSheet.Add(qs.uId, qs);
@@ -288,7 +288,7 @@ namespace sQzLib
             StringBuilder vals = new StringBuilder();
             string prefx = "('" + dt.ToString(DT._) + "',";
             foreach (QuestSheet qs in l)
-                vals.Append(prefx + "'" + qs.eLv.ToString() + "'," + qs.uId +
+                vals.Append(prefx + "'" + qs.mLv.ToString() + "'," + qs.uId +
                     ",'" + dt.ToString(DT.hh) + "'," +
                     (qs.bAlt ? '1' : '0') + "),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
@@ -321,7 +321,7 @@ namespace sQzLib
             if (mMaxQSIdx < mNextQSIdx)
                 mNextQSIdx = 0;
             if (mNextQSIdx < vSheet.Count)
-                return vSheet.ElementAt(mNextQSIdx++).Value.aQuest;
+                return vSheet.ElementAt(mNextQSIdx++).Value.Items2Array;
             else
                 return null;
         }
@@ -344,7 +344,7 @@ namespace sQzLib
         {
             string extension = ".docx";
             foreach (QuestSheet qs in vSheet.Values)
-                QuestSheetDocxPrinter.GetInstance().Print(qs.eLv.ToString() + qs.uId + extension,
+                QuestSheetDocxPrinter.GetInstance().Print(qs.mLv.ToString() + qs.uId + extension,
                     qs.ToListOfStrings(), mDt.ToString(DT.RR), qs.tId);
         }
     }

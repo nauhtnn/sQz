@@ -26,10 +26,10 @@ namespace sQzLib
         public const int LV_CAP = 10000;//db sqz_examinee `id` SMALLINT UNSIGNED
         public DateTime mDt;
         public NeeStt eStt;
-        public ExamLv eLv;
+        public ExamLv mLv;
         public int uId;
-        public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + LV_CAP; } }
-        public string tId { get { return eLv.ToString() + uId.ToString("d4"); } }
+        public int LvId { get { return (mLv == ExamLv.A) ? uId : uId + LV_CAP; } }
+        public string tId { get { return mLv.ToString() + uId.ToString("d4"); } }
         public static string gId(ExamLv lv, int id) { return lv.ToString() + id.ToString("d4"); }
         public string tName;
         public string tBirdate;
@@ -58,7 +58,7 @@ namespace sQzLib
         void Reset()
         {
             mDt = DT.INV_H;
-            eLv = ExamLv.A;
+            mLv = ExamLv.A;
             uId = LV_CAP;
             tName = null;
             tBirdate = null;
@@ -103,7 +103,7 @@ namespace sQzLib
             if (uid < 1 || LV_CAP <= uid)
                 throw new ArgumentException();
             Reset();
-            eLv = lv;
+            mLv = lv;
             uId = uid;
         }
 
@@ -121,7 +121,7 @@ namespace sQzLib
             if (conn == null)
                 return -1;
             string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "qsid",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
                 "' AND neeid=" + uId);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -147,7 +147,7 @@ namespace sQzLib
             if (conn == null)
                 return noans;
             string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "ans",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
                 "' AND neeid=" + uId);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -170,7 +170,7 @@ namespace sQzLib
             if (conn == null)
                 return true;
             string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "grade",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
                 "' AND neeid=" + uId);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -193,7 +193,7 @@ namespace sQzLib
             if (conn == null)
                 return t;
             string qry = DBConnect.mkQrySelect("sqz_examinee",
-                "t", "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+                "t", "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
                 "' AND id=" + uId);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -275,7 +275,7 @@ namespace sQzLib
             catch (UnauthorizedAccessException) { err = true; }
             if (err)
                 return true;
-            w.Write((int)eLv);
+            w.Write((int)mLv);
             w.Write(uId);
             w.Write((int)eStt);
             w.Write(mAnsSh.uQSId);
@@ -311,7 +311,7 @@ namespace sQzLib
             //uSlId = r.ReadUInt32();
             int x;
             if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
-                eLv = (ExamLv)x;
+                mLv = (ExamLv)x;
             uId = r.ReadInt32();
             if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
                 eStt = (NeeStt)x;
