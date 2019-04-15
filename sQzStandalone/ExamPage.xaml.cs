@@ -281,7 +281,7 @@ namespace sQzStandalone
             q.Children.Add(l);
             StackPanel con = new StackPanel();
             TextBlock stmt = new TextBlock();
-            Question quest = mQSh.Q(idx - 1);
+            MCItem quest = mQSh.Q(idx - 1);
             stmt.Text = quest.tStmt;
             stmt.TextWrapping = TextWrapping.Wrap;
             stmt.Width = qaWh;

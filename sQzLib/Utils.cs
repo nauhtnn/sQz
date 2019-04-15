@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Packaging;
+using System.IO;
 namespace sQzLib
 {
     public class UICbMsg
@@ -38,27 +39,31 @@ namespace sQzLib
     {
         public static char[] sWhSp = { ' ', '\t', '\n', '\r' };
 
-        public static string ReadFile(string fileName)
+        public static string[] ReadAllLines(string path)
         {
             try
             {
-                if (!System.IO.File.Exists(fileName))
-                    return null;
-                return System.IO.File.ReadAllText(fileName);
+                if (!File.Exists(path))
+                    return new string[0];
+                if (Path.GetExtension(path) == "txt")
+                    return File.ReadAllLines(path);
+                else if (Path.GetExtension(path) == "docx")
+                    return ReadAllLinesDocx(path);
+                return new string[0];
             }
-            catch (Exception)
+            catch (IOException)
             {
-                return null;
+                return new string[0];
             }
         }
 
-        public static string[] ReadDocx(string fpath)
+        static string[] ReadAllLinesDocx(string path)
         {
             List<string> l = new List<string>();
             WordprocessingDocument doc = null;
             try
             {
-                doc = WordprocessingDocument.Open(fpath, false);
+                doc = WordprocessingDocument.Open(path, false);
             }
             catch(OpenXmlPackageException)
             {
@@ -82,6 +87,7 @@ namespace sQzLib
                 }
                 else
                 {
+                    throw new NotImplementedException();
                     //string id = bl.Embed.Value;
                     //ImagePart ip = doc.MainDocumentPart.GetPartById(id) as ImagePart;
                     //System.IO.Stream st = ip.GetStream();

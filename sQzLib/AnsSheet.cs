@@ -24,7 +24,7 @@ namespace sQzLib
             {
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in aAns)
-                    sb.Append((b == 0) ? Question.C0 : Question.C1);
+                    sb.Append((b == 0) ? MCItem.C0 : MCItem.C1);
                 return sb.ToString();
             }
         }
@@ -57,7 +57,7 @@ namespace sQzLib
             
             int idx = -1;
             int j = -1;
-            foreach (Question q in qs.ShallowCopy())
+            foreach (MCItem q in qs.ShallowCopy())
             {
                 ++idx;
                 ListBox lbxAns = new ListBox();

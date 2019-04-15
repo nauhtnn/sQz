@@ -142,7 +142,7 @@ namespace sQzLib
         {
             char[] noans = new char[AnsSheet.LEN];
             for (int i = 0; i < AnsSheet.LEN; ++i)
-                noans[i] = Question.C0;
+                noans[i] = MCItem.C0;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return noans;

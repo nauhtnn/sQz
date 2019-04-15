@@ -9,181 +9,77 @@ namespace sQzLib
 {
     public class DBConnect
     {
-        //public MySqlConnection connection;
         static string server = null;
         static string database = null;
         static string uid = null;
         static string password = null;
-        public const int PRI_KEY_EXISTS = -1062;
-        //static bool bConnected;
 
-        //Constructor
-        public DBConnect() { }
-
-        //Initialize values
-        public static MySqlConnection Init()
+        public static MySqlConnection Conn
         {
-            if (server == null)
+            get
             {
-                string s = Utils.ReadFile("Database.txt");
-                if (s != null)
-                {
-                    string[] vs = s.Split('\n');
-                    if(vs.Length == 4)
-                    {
-                        server = vs[0];
-                        database = vs[1];
-                        uid = vs[2];
-                        password = vs[3];
-                    }
-                }
                 if (server == null)
                 {
-                    server = "localhost";
-                    database = "sQz";
-                    uid = "root";
-                    password = "1234";
+                    if (System.IO.File.Exists("Database.txt"))
+                    {
+                        string[] s = System.IO.File.ReadAllLines("Database.txt");
+                        if (s != null && s.Length == 4)
+                        {
+                            server = s[0];
+                            database = s[1];
+                            uid = s[2];
+                            password = s[3];
+                        }
+                    }
+                    if (server == null)
+                    {
+                        server = "localhost";
+                        database = "sQz";
+                        uid = "root";
+                        password = "1234";
+                    }
                 }
-            }
-            string connStr = "SERVER=" + server + ";" + "DATABASE=" +
-                database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";charset=utf8";
-            //bConnected = false;
-            MySqlConnection conn = new MySqlConnection(connStr);
-            if (Open(ref conn))
-                return conn;
-            else
-                return null;
-        }
-
-        //open connection to database
-        public static bool Open(ref MySqlConnection conn)
-        {
-            //if (bConnected)
-            //    return true;
-            try
-            {
+                string connStr = "SERVER=" + server + ";" + "DATABASE=" +
+                    database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";charset=utf8";
+                MySqlConnection conn = new MySqlConnection(connStr);
                 conn.Open();
-                //bConnected = true;
-                return true;
-            }
-            catch (MySqlException)
-            {
-                //When handling errors, you can your application's response based 
-                //on the error number.
-                //The two most common error numbers when connecting are as follows:
-                //0: Cannot connect to server.
-                //1045: Invalid user name and/or password.
-                //switch (ex.Number)
-                //{
-                //    case 0:
-                //        Console.Write("Cannot connect to server.  Contact administrator");
-                //        break;
-
-                //    case 1045:
-                //        Console.Write("Invalid username/password, please try again");
-                //        break;
-                //}
-                return false;
-            }
-        }
-
-        //Close connection
-        public static bool Close(ref MySqlConnection conn)
-        {
-            try
-            {
-                //if (bConnected)
-                {
-                    conn.Close();
-                    //bConnected = false;
-                }
-                return true;
-            }
-            catch (MySqlException ex)
-            {
-                Console.Write(ex.Message);
-                return false;
+                return conn;
             }
         }
 
         //Insert statement
-        public static int Ins(MySqlConnection conn, string tb,
-            string attbs, string vals, out string eMsg)
+        public static int Ins(string tb, string attbs, string vals)
         {
-            if (attbs == null || vals == null)
-            {
-                eMsg = Txt.s._[(int)TxI.DB_DAT_NOK];
-                return 0;
-            }
             StringBuilder qry = new StringBuilder();
             qry.Append("INSERT INTO " + tb + "(" + attbs + ")VALUES");
             qry.Append(vals);
             
-            MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
-            int n;
-            try
-            {
-                n = cmd.ExecuteNonQuery();
-                eMsg = null;
-            } catch(MySqlException e) {
-                if (e.Number == -PRI_KEY_EXISTS)
-                {
-                    eMsg = null;
-                    n = PRI_KEY_EXISTS;
-                }
-                else
-                {
-                    eMsg = Txt.s._[(int)TxI.DB_EXCPT] + e.ToString();
-                    n = -1;
-                }
-            }
-            return n;
+            MySqlCommand cmd = new MySqlCommand(qry.ToString(), Conn);
+            return cmd.ExecuteNonQuery();
         }
 
-        public static int Update(MySqlConnection conn, string tb, string vals, string cond,
-            out string eMsg)
+        public static int Update(string tb, string vals, string cond)
         {
             StringBuilder qry = new StringBuilder();
             qry.Append("UPDATE " + tb + " SET " + vals);
             if (cond != null)
                 qry.Append(" WHERE " + cond);
-            MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
-            int n;
-            try
-            {
-                n = cmd.ExecuteNonQuery();
-                eMsg = null;
-            }
-            catch (MySqlException e)
-            {
-                n = -1;
-                eMsg = e.ToString();
-            }
-            return n;
+            MySqlCommand cmd = new MySqlCommand(qry.ToString(), Conn);
+            return cmd.ExecuteNonQuery();
         }
 
         //Delete statement
-        public static int Delete(MySqlConnection conn, string tb, string cond, out string eMsg)
+        public static int Delete(string tb, string cond)
         {
             StringBuilder qry = new StringBuilder();
             qry.Append("DELETE FROM " + tb);
             if(cond != null)
                 qry.Append(" WHERE " + cond);
-            MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
-            int n;
-            try {
-                n = cmd.ExecuteNonQuery();
-                eMsg = null;
-            }
-            catch (MySqlException e) {
-                n = -1;
-                eMsg = e.ToString();
-            }
-            return n;
+            MySqlCommand cmd = new MySqlCommand(qry.ToString(), Conn);
+            return cmd.ExecuteNonQuery();
         }
 
-        public static int Count(MySqlConnection conn, string tb, string attbs,
-            string cond, out string eMsg)
+        public static int Count(string tb, string attbs, string cond)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("SELECT COUNT(");
@@ -194,23 +90,8 @@ namespace sQzLib
             if(cond != null)
                 sb.Append(" WHERE " + cond);
 
-            int n;
-            MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn);
-            try {
-                if (int.TryParse(cmd.ExecuteScalar().ToString(), out n))
-                    eMsg = null;
-                else
-                {
-                    n = -1;
-                    eMsg = Txt.s._[(int)TxI.DB_COUNT_NOK];
-                }
-            }
-            catch (MySqlException e) {
-                eMsg = e.ToString();
-                n = -1;
-            }
-
-            return n;
+            MySqlCommand cmd = new MySqlCommand(sb.ToString(), Conn);
+            return int.Parse(cmd.ExecuteScalar().ToString());
         }
 
         public static bool NExist(MySqlConnection conn, string tb, string cond, out string eMsg)
@@ -261,7 +142,7 @@ namespace sQzLib
             return n;
         }
 
-        public static string mkQrySelect(string tb, string attbs, string cond)
+        public static MySqlDataReader exeQrySelect(string tb, string attbs, string cond)
         {
             string query = "SELECT ";
             if (attbs == null)
@@ -272,21 +153,8 @@ namespace sQzLib
             if (cond != null)
                 query += " WHERE " + cond;
 
-            return query;
-        }
-
-        public static MySqlDataReader exeQrySelect(MySqlConnection conn, string query, out string eMsg) {
-            MySqlCommand cmd = new MySqlCommand(query, conn);
-            MySqlDataReader d = null;
-            try {
-                d = cmd.ExecuteReader();
-                eMsg = null;
-            }
-            catch(MySqlException e) {
-                d = null;
-                eMsg = Txt.s._[(int)TxI.DB_EXCPT] + e.ToString();
-            }
-            return d;
+            MySqlCommand cmd = new MySqlCommand(query, Conn);
+            return cmd.ExecuteReader();
         }
     }
 }

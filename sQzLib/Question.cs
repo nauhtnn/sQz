@@ -5,163 +5,126 @@ using System.Text;
 
 namespace sQzLib
 {
-    public class Question
+    public class MCItem
     {
-        public const int N_ANS = 4;
+        public static readonly int N_OPTIONS = ReadNOptions();
         public const char C0 = '0';
         public const char C1 = '1';
-        public int uId;
-        public string tStmt; //statement
-        public string Stmt { get { return tStmt; } set { tStmt = value; } }
+        public int ID_in_DB { get; private set; }
+        public string Stem { get; private set; }
         public IUx eIU;
-        public string[] vAns;
-        public bool[] vKeys;
-        public int[] vAnsSort;
-        public bool bDiff;
-        static string[] svToken;
-        static int siToken;
-        //static string[] vSTMT_PATT = { "[a-zA-Z]+[0-9]+", "[0-9]+\\." };
-        static string[] vSTMT_PATT = { "[0-9]+\\." };
-        static string[] vANS_PATT = { "\\([a-zA-Z]\\)", "[a-zA-Z]\\." };
+        public string[] Options { get; private set; }
+        public bool[] Keys { get; private set; }
+        public int[] POptions { get; private set; }
+        public bool IsDifficult { get; private set; }
 
-        public Question() {
-            vAns = null;
-            bDiff = false;
-            vAnsSort = new int[N_ANS];
-            for (int i = 0; i < N_ANS; ++i)
-                vAnsSort[i] = i;
-        }
+        public MCItem() { }
 
-        TokenType classify(string s) {
-            return TokenType.Both;
-        }
-
-        bool readStmt()
+        public MCItem(int DB_ID, string[] cleanData, bool[] keys, bool isDifficult)
         {
-            if (svToken.Length == siToken)
-                return true;
-            tStmt = svToken[siToken++];
-            return false;
-        }
-
-        bool readAns()
-        {
-            if (svToken.Length == siToken)
-                return true;
-            vAns = new string[N_ANS];
-            vKeys = new bool[N_ANS];
-            int n = 0;
-            while (n < N_ANS && siToken < svToken.Length) {
-                vAns[n++] = svToken[siToken++];
-            }
-            if (n < N_ANS)
-                return true;
-            return false;
-        }
-
-        public static void StartRead(string[] v, Settings s) {
-            svToken = v;
-            siToken = 0;
-        }
-
-        public bool Read()
-        {
-            if (readStmt())
-                return true;
-            if (readAns())
-                return true;
-            vKeys = new bool[N_ANS];
-            for (int i = 0; i < N_ANS; ++i)
-                vKeys[i] = false;
-            if (tStmt[0] == '*' && 1 < tStmt.Length)
+            ID_in_DB = DB_ID;
+            Stem = cleanData[0];
+            Options = new string[N_OPTIONS];
+            Keys = new bool[N_OPTIONS];
+            POptions = new int[N_OPTIONS];
+            for (int i = 0; i < N_OPTIONS; ++i)
             {
-                bDiff = true;
-                tStmt = tStmt.Substring(1);
+                Options[i] = cleanData[i + 1];
+                Keys[i] = keys[i];
+                POptions[i] = i;
             }
-            else if (tStmt[0] == '\\' && 1 < tStmt.Length
-                && (tStmt[1] == '*' || tStmt[1] == '\\'))
-                tStmt = tStmt.Substring(1);
-            bool hasAnswer = false;
-            for (int i = 0; i < N_ANS; ++i)
+            IsDifficult = isDifficult;
+        }
+
+        static int ReadNOptions()
+        {
+            //if (System.IO.File.Exists(System.IO.Directory.GetCurrentDirectory() + "\\3.txt"))
+            //    return 3;
+            return 4;
+        }
+
+        public void Parse(string[] rawData, int dataIdx)
+        {
+            Stem = rawData[dataIdx];
+            if (1 < Stem.Length && Stem[0] == '*')
             {
-                if (vAns[i][0] == '\\' && 1 < vAns[i].Length)
+                IsDifficult = true;
+                Stem = Stem.Substring(1);
+            }
+            else if (1 < Stem.Length && Stem[0] == '\\' && 
+                (Stem[1] == '*' || Stem[1] == '\\'))
+            {
+                Stem = Stem.Substring(1);
+                IsDifficult = false;
+            }
+            else
+                IsDifficult = false;
+
+            Options = new string[N_OPTIONS];
+            Keys = new bool[N_OPTIONS];
+            POptions = new int[N_OPTIONS];
+            ++dataIdx;
+            for (int i = 0; i < N_OPTIONS; ++i)
+            {
+                Options[i] = rawData[dataIdx + i];
+                if (1 < Options[i].Length && Options[i][0] == '\\')
                 {
-                    if (vAns[i][1] != '\\')
+                    if (Options[i][1] != '\\')
                     {
-                        vKeys[i] = true;
-                        vAns[i] = Utils.CleanFront(vAns[i], 1);
-                        hasAnswer = true;
+                        Keys[i] = true;
+                        Options[i] = Utils.CleanFront(Options[i], 1);
                     }
                     else
-                        vAns[i] = vAns[i].Substring(1);
+                        Options[i] = Options[i].Substring(1);
                 }
+                else
+                    Keys[i] = false;
+                POptions[i] = i;
             }
-            if (!hasAnswer)
-                return true;
-            return false;
+            for (int i = 0; i < N_OPTIONS; ++i)
+                if (Keys[i])
+                    return;
+            throw new ArgumentNullException();
         }
 
         public IEnumerable<string> ToListOfStrings()
         {
             LinkedList<string> s = new LinkedList<string>();
-            s.AddLast(tStmt);
-            foreach (string i in vAns)
+            s.AddLast(Stem);
+            foreach (string i in Options)
                 s.AddLast(i);
             return s;
         }
 
-        //public bool Ans(int idx, out string ans)
-        //{
-        //    if (0 < idx && idx < N_ANS)
-        //    {
-        //        ans = vAns[idx];
-        //        return vKeys[idx];
-        //    }
-        //    else
-        //    {
-        //        ans = string.Empty;
-        //        return false;
-        //    }
-        //}
-
-        public static void Clear()
-        {
-            siToken = 0;//safe to be 0
-        }
-
         public static void DBDelete(IUx eIU, string ids) {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
-            string eMsg;
-            DBConnect.Update(conn, "sqz_question", "del=1", ids, out eMsg);
+            DBConnect.Update("sqz_question", "del=1", ids);
         }
 
-        public Question DeepCopy()
+        public MCItem DeepCopy()
         {
-            Question q = new Question();
-            q.uId = uId;
-            q.tStmt = tStmt;
+            MCItem q = new MCItem();
+            q.ID_in_DB = ID_in_DB;
+            q.Stem = Stem;
             q.eIU = eIU;
-            q.vAns = new string[N_ANS];
-            for (int i = 0; i < N_ANS; ++i)
-                q.vAns[i] = vAns[i];
-            q.vKeys = new bool[N_ANS];
-            for (int i = 0; i < N_ANS; ++i)
-                q.vKeys[i] = vKeys[i];
-            q.vAnsSort = new int[N_ANS];
-            for (int i = 0; i < N_ANS; ++i)
-                q.vAnsSort[i] = vAnsSort[i];
+            q.Options = new string[N_OPTIONS];
+            for (int i = 0; i < N_OPTIONS; ++i)
+                q.Options[i] = Options[i];
+            q.Keys = new bool[N_OPTIONS];
+            for (int i = 0; i < N_OPTIONS; ++i)
+                q.Keys[i] = Keys[i];
+            q.POptions = new int[N_OPTIONS];
+            for (int i = 0; i < N_OPTIONS; ++i)
+                q.POptions[i] = POptions[i];
             return q;
         }
 
         public void Randomize(Random rand)
         {
-            string[] anss = new string[N_ANS];
-            bool[] keys = new bool[N_ANS];
-            int[] asort = new int[N_ANS];
+            string[] anss = new string[N_OPTIONS];
+            bool[] keys = new bool[N_OPTIONS];
+            int[] asort = new int[N_OPTIONS];
             List<int> l = new List<int>();
-            int n = N_ANS;
+            int n = N_OPTIONS;
             for (int i = 0; i < n; ++i)
                 l.Add(i);
             while (0 < n)
@@ -170,38 +133,38 @@ namespace sQzLib
                 int idx = l[lidx];
                 l.RemoveAt(lidx);
                 --n;
-                anss[n] = vAns[idx];
-                keys[n] = vKeys[idx];
+                anss[n] = Options[idx];
+                keys[n] = Keys[idx];
                 asort[n] = idx;
             }
-            vAns = anss;
-            vKeys = keys;
-            vAnsSort = asort;
+            Options = anss;
+            Keys = keys;
+            POptions = asort;
         }
 
-        public Question RandomizeDeepCopy(Random rand)
+        public MCItem RandomizeDeepCopy(Random rand)
         {
-            Question q = new Question();
-            q.uId = uId;
-            q.tStmt = tStmt;
+            MCItem q = new MCItem();
+            q.ID_in_DB = ID_in_DB;
+            q.Stem = Stem;
             q.eIU = eIU;
-            q.bDiff = bDiff;
+            q.IsDifficult = IsDifficult;
             //randomize
-            q.vAns = new string[N_ANS];
-            q.vKeys = new bool[N_ANS];
+            q.Options = new string[N_OPTIONS];
+            q.Keys = new bool[N_OPTIONS];
             List<int> l = new List<int>();
-            for (int i = 0; i < N_ANS; ++i)
+            for (int i = 0; i < N_OPTIONS; ++i)
                 l.Add(i);
-            int n = N_ANS;
+            int n = N_OPTIONS;
             while (0 < n)
             {
                 int lidx = rand.Next() % n;
                 int idx = l[lidx];
                 l.RemoveAt(lidx);
                 --n;
-                q.vAns[n] = vAns[idx];
-                q.vKeys[n] = vKeys[idx];
-                q.vAnsSort[n] = idx;
+                q.Options[n] = Options[idx];
+                q.Keys[n] = Keys[idx];
+                q.POptions[n] = idx;
             }
             return q;
         }
@@ -227,7 +190,7 @@ namespace sQzLib
     public enum TokenType
     {
         Requirement = 0,
-        Stmt = 1,
+        Stem = 1,
         Ans = 2,
         Both = 3
     }

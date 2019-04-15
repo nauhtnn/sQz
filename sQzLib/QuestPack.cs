@@ -191,7 +191,7 @@ namespace sQzLib
                 //
                 foreach (QuestSheet qs in l)
                 {
-                    List<Question> vq = qs0.ShallowCopy();
+                    List<MCItem> vq = qs0.ShallowCopy();
                     int ni = vn[i] - vndiff[i];
                     while (0 < ni)
                     {
@@ -208,7 +208,7 @@ namespace sQzLib
                 //
                 foreach (QuestSheet qs in l)
                 {
-                    List<Question> vq = qs0.ShallowCopy();
+                    List<MCItem> vq = qs0.ShallowCopy();
                     int ni = vndiff[i];
                     while (0 < ni)
                     {
