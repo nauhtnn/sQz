@@ -39,12 +39,12 @@ namespace sQzServer0
             vChk = new List<CheckBox>();
         }
 
-        private void btnMMenu_Click(object sender, RoutedEventArgs e)
+        private void BackToMainMenu(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new Uri("MainMenu.xaml", UriKind.Relative));
         }
 
-        private void btnInsBrd_Click(object sender, RoutedEventArgs e)
+        private void InsertBoard(object sender, RoutedEventArgs e)
         {
             DateTime dt;
             if (DT.To_(tbxBrd.Text, DT._, out dt))
@@ -75,7 +75,7 @@ namespace sQzServer0
             }
         }
 
-        private void btnInsSl_Click(object sender, RoutedEventArgs e)
+        private void InsertSlot(object sender, RoutedEventArgs e)
         {
             DateTime dt;
             string t = tbxSl.Text;
@@ -194,7 +194,7 @@ namespace sQzServer0
             });
         }
 
-        private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SelectBoard(object sender, SelectionChangedEventArgs e)
         {
             tbcNee.Items.Clear();
             ListBox l = sender as ListBox;
@@ -213,7 +213,7 @@ namespace sQzServer0
             }
         }
 
-        private void btnFileQ_Click(object sender, RoutedEventArgs e)
+        private void OpenRawFile_of_MCItems(object sender, RoutedEventArgs e)
         {
             OpenFileDialog dlg = new OpenFileDialog();
 
@@ -333,7 +333,7 @@ namespace sQzServer0
             tbiTmpQ.Header = sb.ToString();
         }
 
-        private void btnImpQ_Click(object sender, RoutedEventArgs e)
+        private void InsertMCItems(object sender, RoutedEventArgs e)
         {
             if (mSelQCat == IUx._0)
             {
@@ -353,7 +353,7 @@ namespace sQzServer0
             ShowDBQ();
         }
 
-        private void lbxQCatgry_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void SelectIUx(object sender, SelectionChangedEventArgs e)
         {
             ListBox l = (ListBox)sender;
             if (Enum.IsDefined(typeof(IUx), l.SelectedIndex))
@@ -389,7 +389,7 @@ namespace sQzServer0
             tbiTmpQ.Header = sb.ToString();
         }
 
-        private void btnDelQ_Click(object sender, RoutedEventArgs e)
+        private void DeleteSelectedMCItems(object sender, RoutedEventArgs e)
         {
             StringBuilder qids = new StringBuilder();
             foreach(CheckBox c in vChk)

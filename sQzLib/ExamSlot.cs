@@ -43,21 +43,17 @@ namespace sQzLib
             mKeyPack = new AnsPack();
         }
 
-        public string DBSelRoomId()
+        public void DBSelectRoomID()
         {
-            string emsg;
-            List<int> rids = ExamRoom.DBSel(out emsg);
-            if (rids == null)
-                return emsg;
+            List<int> rids = ExamRoom.DBSelectRoomIDs();
             foreach (int i in rids)
             {
                 ExamRoom r = new ExamRoom();
                 r.uId = i;
-                r.DBSelTimeAndPw(mDt, out emsg);
+                r.DBSelTimeAndPw(mDt);
                 if(!vRoom.ContainsKey(i))
                     vRoom.Add(i, r);
             }
-            return null;
         }
 
         public static List<bool> IsDoing(List<DateTime> l)
@@ -235,7 +231,7 @@ namespace sQzLib
             //    return Txt.s._[(int)TxI.NEE_FERR] + r.ToString();
         }
 
-        public int DBInsNee()
+        public int DBInsRoom_and_Examinee()
         {
             Random rand = new Random();
             int v = 1;
@@ -247,10 +243,10 @@ namespace sQzLib
                     "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) +
                     "' AND rid=" + r.uId);
                 if (!isExist)
-                    n = DBConnect.Ins("sqz_slot_room",
+                    DBConnect.Ins("sqz_slot_room",
                         "dt,t,rid,pw,qpkalt", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
-                        "'," + r.uId + ",'" + ExamRoom.GeneratePw(vch, rand) + "',0)", out eMsg);
-                n = r.DBIns(conn, out eMsg);
+                        "'," + r.uId + ",'" + ExamRoom.GeneratePw(rand) + "',0)");
+                n = r.DBIns();
                 if (n < 0)
                 {
                     sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DB_NOK] + '\n', r.uId + 1,
@@ -258,8 +254,6 @@ namespace sQzLib
                     v = 0;
                 }
             }
-            eMsg = sb.ToString();
-            DBConnect.Close(ref conn);
             return v;
         }
 
@@ -272,48 +266,36 @@ namespace sQzLib
             }
         }
 
-        public string DBDelNee()
+        public string DBDeleleUnfinishedExaminee()
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
             StringBuilder sb = new StringBuilder();
-            string eMsg;
-            int n = DBConnect.Count(conn, "sqz_nee_qsheet AS a,sqz_examinee AS b",
+            int n = DBConnect.Count("sqz_nee_qsheet AS a,sqz_examinee AS b",
                 "a.dt", "a.dt='" + mDt.ToString(DT._) +
-                "' AND t='" + mDt.ToString(DT.hh) + "' AND a.dt=b.dt AND a.neeid=b.id",
-                out eMsg);
+                "' AND t='" + mDt.ToString(DT.hh) + "' AND a.dt=b.dt AND a.neeid=b.id");
             sb.AppendFormat(Txt.s._[(int)TxI.SLOT], mDt.ToString(DT.hh));
             if (0 < n)
             {
                 sb.Append(Txt.s._[(int)TxI.SLOT_DEL_GRD] + '\n');
-                DBConnect.Close(ref conn);
                 return sb.ToString();
             }
             else if (n < 0)
             {
-                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_ECPT] + eMsg);
-                DBConnect.Close(ref conn);
+                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_ECPT]);
                 return sb.ToString();
             }
-            n = DBConnect.Delete(conn, "sqz_examinee",
-                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'", out eMsg);
+            n = DBConnect.Delete("sqz_examinee",
+                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
             if (n < 0)
-                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_ECPT] + eMsg);
+                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_ECPT]);
             else
                 sb.AppendFormat(Txt.s._[(int)TxI.SLOT_DEL_N], n.ToString());
-            DBConnect.Close(ref conn);
             return sb.ToString();
         }
 
-        public void DBSelNee()
+        public void DBSelectExaminee()
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
             foreach (ExamRoom r in vRoom.Values)
-                r.DBSelNee(conn, mDt);
-            DBConnect.Close(ref conn);
+                r.DBSelectExaminee(mDt);
         }
 
         public int CountQSByRoom(ExamLv lv)

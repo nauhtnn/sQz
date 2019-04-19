@@ -23,7 +23,7 @@ namespace sQzLib
             tPw = null;
         }
 
-        public int DBIns()
+        public int DBInsertExaminees()
         {
             if(vExaminee.Count == 0)
                 return 0;
@@ -44,7 +44,7 @@ namespace sQzLib
             return DBConnect.Ins("sqz_examinee", attbs, vals.ToString());
         }
 
-        public void DBSelectExaminee(MySqlConnection conn, DateTime dt)
+        public void DBSelectExaminees(DateTime dt)
         {
             vExaminee.Clear();
             N_ExamineeGroupByLv[ExamLv.A] = N_ExamineeGroupByLv[ExamLv.B] = 0;
@@ -256,8 +256,6 @@ namespace sQzLib
 
         public bool RegeneratePw()
         {
-            if (vExaminee.Count == 0)
-                return true;
             Random r = new Random();
             ExamineeA x = vExaminee.Values.First();
             string otPw = tPw;

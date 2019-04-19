@@ -12,7 +12,7 @@
     <Viewbox>
         <StackPanel x:Name="spMain" Loaded="Main_Loaded" Orientation="Horizontal" Margin="10" Background="#f0f0f0" Height="720" Width="1280">
             <StackPanel Width="240">
-                <Button x:Name="btnMMenu"  Width="120" Height="40" Click="btnMMenu_Click" Background="#f15a23" Foreground="#fff"
+                <Button x:Name="btnMMenu"  Width="120" Height="40" Click="BackToMainMenu" Background="#f15a23" Foreground="#fff"
                         Margin="0,10,0,0"/>
                 <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
                 <StackPanel Orientation="Horizontal">
@@ -20,22 +20,22 @@
                         <TextBlock Name="txtDt" TextAlignment="Center" FontSize="14"/>
                         <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
                             <TextBox Name="tbxBrd" Height="30" Width="90" />
-                            <Button Name="btnInsBrd"  Content="+" Height="30" Width="30" Click="btnInsBrd_Click" Background="#1c64e7" Foreground="#fff"/>
+                            <Button Name="btnInsBrd"  Content="+" Height="30" Width="30" Click="InsertBoard" Background="#1c64e7" Foreground="#fff"/>
                         </StackPanel>
-                        <ListBox x:Name="lbxBrd" Width="120" Height="120" SelectionChanged="lbxBrd_SelectionChanged"/>
+                        <ListBox x:Name="lbxBrd" Width="120" Height="120" SelectionChanged="SelectBoard"/>
                     </StackPanel>
                     <StackPanel>
                         <TextBlock Name="txtHm" TextAlignment="Center" FontSize="14"/>
                         <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
                             <TextBox x:Name="tbxSl" Height="30" Width="50" />
-                            <Button Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click" Background="#1c64e7" Foreground="#fff"/>
+                            <Button Name="btnInsSl"  Content="+" Height="30" Width="30" Click="InsertSlot" Background="#1c64e7" Foreground="#fff"/>
                         </StackPanel>
                         <ListBox x:Name="lbxSl" Width="80" Height="120" SelectionMode="Multiple"/>
                     </StackPanel>
                 </StackPanel>
                 <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
                 <TextBlock Name="txtIU" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                <ListBox x:Name="lbxQCatgry" Width="220" Height="390" SelectionChanged="lbxQCatgry_SelectionChanged"/>
+                <ListBox x:Name="lbxQCatgry" Width="220" Height="390" SelectionChanged="SelectIUx"/>
             </StackPanel>
             <TabControl Margin="10,0,0,0">
                 <TabItem Name="tbi1">
@@ -53,7 +53,7 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="40"/>
                                     </Grid.RowDefinitions>
-                                    <Button Name="btnDelQ" Click="btnDelQ_Click" Width="160" Background="#f15a23" Foreground="#fff"/>
+                                    <Button Name="btnDelQ" Click="DeleteSelectedMCItems" Width="160" Background="#f15a23" Foreground="#fff"/>
                                     <CheckBox Name="chkAll" Grid.Column="1" VerticalAlignment="Center" Checked="CheckBox_Checked" Unchecked="CheckBox_Unchecked"/>
                                 </Grid>
                                 <ScrollViewer Width="1000" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
@@ -76,8 +76,8 @@
                                     <Grid.RowDefinitions>
                                         <RowDefinition Height="40"/>
                                     </Grid.RowDefinitions>
-                                    <Button Content="+" Width="40" Click="btnFileQ_Click" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
-                                    <Button x:Name="btnImpQ" Width="120" Click="btnImpQ_Click" Background="#80cc28" Foreground="#fff" Grid.Column="1"/>
+                                    <Button Content="+" Width="40" Click="OpenRawFile_of_MCItems" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
+                                    <Button x:Name="btnImpQ" Width="120" Click="InsertMCItems" Background="#80cc28" Foreground="#fff" Grid.Column="1"/>
                                 </Grid>
                                 <ScrollViewer Name="svwrTmpQ" Width="1000" Height="600" VerticalScrollBarVisibility="Auto" BorderBrush="Black" BorderThickness="1">
                                 </ScrollViewer>
