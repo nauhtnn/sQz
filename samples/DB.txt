@@ -45,31 +45,31 @@ FOREIGN KEY(`dt`, `lv`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `lv`, `id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_module`(`id` TINYINT PRIMARY KEY);
 
-CREATE TABLE IF NOT EXISTS `sqz_long_q_path`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS `sqz_long_item_path`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `pat` VARCHAR(256) CHARACTER SET `utf8`);
 
-CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS `sqz_multi_response_item`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `moid` TINYINT, `del` TINYINT, `diff` TINYINT,
-`lqid` INT UNSIGNED, `stmt` VARCHAR(512) CHARACTER SET `utf8`,
-`ans0` VARCHAR(512) CHARACTER SET `utf8`, `ans1` VARCHAR(512) CHARACTER SET `utf8`,
-`ans2` VARCHAR(512) CHARACTER SET `utf8`, `ans3` VARCHAR(512) CHARACTER SET `utf8`,
+`long_id` INT UNSIGNED, `stem` VARCHAR(320) CHARACTER SET `utf8`,
+`op0` VARCHAR(192) CHARACTER SET `utf8`, `op1` VARCHAR(192) CHARACTER SET `utf8`,
+`op2` VARCHAR(192) CHARACTER SET `utf8`, `op3` VARCHAR(192) CHARACTER SET `utf8`,
 `key` CHAR(4) CHARACTER SET `ascii`, FOREIGN KEY(`moid`) REFERENCES `sqz_module`(`id`),
-FOREIGN KEY(`lqid`) REFERENCES `sqz_long_q_path`(`id`),
+FOREIGN KEY(`long_id`) REFERENCES `sqz_long_item_path`(`id`),
 INDEX(`moid`,`del`,`diff`));
 
-CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATE, `lv` CHAR CHARACTER SET `ascii`,
-`qsid` SMALLINT UNSIGNED, `qid` INT UNSIGNED, `asort` CHAR(4) CHARACTER SET `ascii`,
+CREATE TABLE IF NOT EXISTS `sqz_qsheet_item`(`dt` DATE, `lv` CHAR CHARACTER SET `ascii`,
+`qsid` SMALLINT UNSIGNED, `it_id` INT UNSIGNED, `asort` CHAR(4) CHARACTER SET `ascii`,
 `idx` TINYINT,
-PRIMARY KEY(`dt`, `lv`, `qsid`, `qid`),
+PRIMARY KEY(`dt`, `lv`, `qsid`, `it_id`),
 FOREIGN KEY(`dt`, `lv`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `lv`, `id`),
-FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`));
+FOREIGN KEY(`it_id`) REFERENCES `sqz_multi_response_item`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_img_path`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `pat` VARCHAR(256) CHARACTER SET `utf8`);
 
-CREATE TABLE IF NOT EXISTS `sqz_quest_img`(`qid` INT UNSIGNED, `imgid` INT UNSIGNED,
-`pos` INT, PRIMARY KEY(`qid`, `imgid`),
-FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`),
+CREATE TABLE IF NOT EXISTS `sqz_item_img`(`it_id` INT UNSIGNED, `imgid` INT UNSIGNED,
+`pos` INT, PRIMARY KEY(`it_id`, `imgid`),
+FOREIGN KEY(`it_id`) REFERENCES `sqz_multi_response_item`(`id`),
 FOREIGN KEY(`imgid`) REFERENCES `sqz_img_path`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_admin`(`id` TINYINT PRIMARY KEY,
@@ -80,4 +80,4 @@ INSERT INTO `sqz_level` VALUES ('A'),('B');
 INSERT INTO `sqz_module` VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14);
 INSERT INTO `sqz_status` VALUES (0),(1),(2);
 DELETE FROM `sqz_ver`;
-INSERT INTO `sqz_ver` VALUES (9);
+INSERT INTO `sqz_ver` VALUES (20);
