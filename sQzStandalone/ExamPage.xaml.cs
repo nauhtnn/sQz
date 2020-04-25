@@ -281,7 +281,7 @@ namespace sQzStandalone
             q.Children.Add(l);
             StackPanel con = new StackPanel();
             TextBlock stmt = new TextBlock();
-            MCItem quest = mQSh.Q(idx - 1);
+            MultiChoiceItem quest = mQSh.Q(idx - 1);
             stmt.Text = quest.Stem;
             stmt.TextWrapping = TextWrapping.Wrap;
             stmt.Width = qaWh;

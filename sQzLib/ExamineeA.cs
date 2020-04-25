@@ -142,7 +142,7 @@ namespace sQzLib
         {
             char[] noans = new char[AnsSheet.LEN];
             for (int i = 0; i < AnsSheet.LEN; ++i)
-                noans[i] = MCItem.C0;
+                noans[i] = MultiChoiceItem.C0;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return noans;

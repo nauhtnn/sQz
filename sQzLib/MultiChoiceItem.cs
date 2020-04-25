@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
-using MySql.Data.MySqlClient;
-using System.Text;
 
 namespace sQzLib
 {
-    public class MCItem
+    public class MultiChoiceItem
     {
         public static readonly int N_OPTIONS = ReadNOptions();
         public const char C0 = '0';
@@ -18,9 +16,9 @@ namespace sQzLib
         public int[] POptions { get; private set; }
         public bool IsDifficult { get; private set; }
 
-        public MCItem() { }
+        public MultiChoiceItem() { }
 
-        public MCItem(int DB_ID, string[] cleanData, bool[] keys, bool isDifficult)
+        public MultiChoiceItem(int DB_ID, string[] cleanData, bool[] keys, bool isDifficult)
         {
             ID_in_DB = DB_ID;
             Stem = cleanData[0];
@@ -100,9 +98,9 @@ namespace sQzLib
             DBConnect.Update("sqz_question", "del=1", ids);
         }
 
-        public MCItem DeepCopy()
+        public MultiChoiceItem DeepCopy()
         {
-            MCItem q = new MCItem();
+            MultiChoiceItem q = new MultiChoiceItem();
             q.ID_in_DB = ID_in_DB;
             q.Stem = Stem;
             q.mIU = mIU;
@@ -142,9 +140,9 @@ namespace sQzLib
             POptions = asort;
         }
 
-        public MCItem RandomizeDeepCopy(Random rand)
+        public MultiChoiceItem RandomizeDeepCopy(Random rand)
         {
-            MCItem q = new MCItem();
+            MultiChoiceItem q = new MultiChoiceItem();
             q.ID_in_DB = ID_in_DB;
             q.Stem = Stem;
             q.mIU = mIU;

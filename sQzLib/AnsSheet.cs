@@ -24,7 +24,7 @@ namespace sQzLib
             {
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in aAns)
-                    sb.Append((b == 0) ? MCItem.C0 : MCItem.C1);
+                    sb.Append((b == 0) ? MultiChoiceItem.C0 : MultiChoiceItem.C1);
                 return sb.ToString();
             }
         }
@@ -57,7 +57,7 @@ namespace sQzLib
             
             int idx = -1;
             int j = -1;
-            foreach (MCItem q in qs.ShallowCopy())
+            foreach (MultiChoiceItem q in qs.ShallowCopy())
             {
                 ++idx;
                 ListBox lbxAns = new ListBox();
@@ -67,8 +67,8 @@ namespace sQzLib
                 lbxAns.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
                 lbxAns.BorderThickness = new Thickness(0, 4, 0, 0);
                 vlbxAns[idx] = lbxAns;
-                vAnsItem[idx] = new AnsItem[MCItem.N_OPTIONS];
-                for (int i = 0; i < MCItem.N_OPTIONS; ++i)
+                vAnsItem[idx] = new AnsItem[MultiChoiceItem.N_OPTIONS];
+                for (int i = 0; i < MultiChoiceItem.N_OPTIONS; ++i)
                 {
                     AnsItem ai = new AnsItem(q.Options[i], i, w);
                     ++j;//update view from log
