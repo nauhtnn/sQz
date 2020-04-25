@@ -112,37 +112,23 @@ namespace sQzLib
             return l;
         }
 
-        public bool DBSelectQS(DateTime dt, out string eMsg)
+        public bool DBSelectQS(DateTime dt)//todo void
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
-                return true;
-            }
-            string qry = DBConnect.mkQrySelect("sqz_qsheet",
-                "id", "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) +
+            MySqlDataReader reader = DBConnect.exeQrySelect("sqz_qsheet", "id",
+               "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) +
                 "' AND lv='" + eLv.ToString() + "' AND alt=" +
                 (bAlt ? '1' : '0'));
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            List<int> qsids = new List<int>();
-            if (reader != null)
+            List <int> qsids = new List<int>();
+            while (reader.Read())
+                qsids.Add(reader.GetUInt16(0));
+            reader.Close();
+            foreach(int qsid in qsids)
             {
-                while (reader.Read())
-                    qsids.Add(reader.GetUInt16(0));
-                reader.Close();
-                foreach(int qsid in qsids)
-                {
-                    QuestSheet qs = new QuestSheet();
-                    if (qs.DBSelect(conn, dt, eLv, qsid, out eMsg))
-                    {
-                        DBConnect.Close(ref conn);
-                        return true;
-                    }
-                    vSheet.Add(qs.uId, qs);
-                }
+                QuestSheet qs = new QuestSheet();
+                if (qs.DBSelect(dt, eLv, qsid))
+                    return true;
+                vSheet.Add(qs.uId, qs);
             }
-            DBConnect.Close(ref conn);
             return false;
         }
 

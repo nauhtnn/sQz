@@ -117,98 +117,59 @@ namespace sQzLib
 
         public int DBGetQSId()
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return -1;
-            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "qsid",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
+            MySqlDataReader reader = DBConnect.exeQrySelect("sqz_nee_qsheet", "qsid",
+                "dt='" + mDt.ToString(DT._) +
+                "' AND lv='" + mLv.ToString() +
                 "' AND neeid=" + uId);
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return -1;
-            }
-            int qsid = -1;
             if (reader.Read())
-                qsid = reader.GetInt32(0);
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return qsid;
+            {
+                reader.Close();
+                return reader.GetInt32(0);
+            }
+            return -1;
         }
 
         public char[] DBGetAns()
         {
+            MySqlDataReader reader = DBConnect.exeQrySelect("sqz_nee_qsheet", "ans",
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
+                "' AND neeid=" + uId);
+            if (reader.Read())
+            {
+                reader.Close();
+                return reader.GetString(0).ToCharArray();
+            }
             char[] noans = new char[AnsSheet.LEN];
             for (int i = 0; i < AnsSheet.LEN; ++i)
                 noans[i] = MultiChoiceItem.C0;
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return noans;
-            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "ans",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
-                "' AND neeid=" + uId);
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return noans;
-            }
-            string ans = noans.ToString();
-            if (reader.Read())
-                ans = reader.GetString(0);
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return ans.ToCharArray();
+            return noans;
         }
 
         public bool DBSelGrade()
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return true;
-            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "grade",
+            MySqlDataReader reader = DBConnect.exeQrySelect("sqz_nee_qsheet", "grade",
                 "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
                 "' AND neeid=" + uId);
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
+            if (reader.Read())
             {
-                DBConnect.Close(ref conn);
+                reader.Close();
+                uGrade = reader.GetInt16(0);
                 return true;
             }
-            if (reader.Read())
-                uGrade = reader.GetInt16(0);
-            reader.Close();
-            DBConnect.Close(ref conn);
             return false;
         }
 
         public string DBGetT()
         {
-            MySqlConnection conn = DBConnect.Init();
-            string t = DT.INV_H.ToString(DT.hh);
-            if (conn == null)
-                return t;
-            string qry = DBConnect.mkQrySelect("sqz_examinee",
-                "t", "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
+            MySqlDataReader reader = DBConnect.exeQrySelect("sqz_examinee", "t",
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
                 "' AND id=" + uId);
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return t;
-            }
             if (reader.Read())
             {
-                t = reader.GetString(0);
+                reader.Close();
+                return reader.GetString(0);
             }
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return t;
+            return DT.INV_H.ToString(DT.hh);
         }
 
         public abstract List<byte[]> ToByte();

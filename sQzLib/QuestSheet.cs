@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
@@ -482,7 +483,7 @@ namespace sQzLib
                 vals.ToString());
         }
 
-        public bool DBSelect(MySqlConnection conn, DateTime dt, ExamLv lv, int id, out string eMsg)
+        public bool DBSelect(DateTime dt, ExamLv lv, int id)
         {
             //items.Clear();
             //uId = id;

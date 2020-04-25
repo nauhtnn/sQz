@@ -136,8 +136,10 @@ namespace sQzLib
             if (cond != null)
                 query += " WHERE " + cond;
 
-            MySqlCommand cmd = new MySqlCommand(query, Conn);
-            return cmd.ExecuteReader();
+            MySqlDataReader reader = new MySqlCommand(query, Conn).ExecuteReader();
+            if (reader == null)
+                throw new InvalidOperationException();
+            return reader;
         }
     }
 }
