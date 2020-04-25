@@ -2,8 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
@@ -143,7 +141,7 @@ namespace sQzLib
         //public void DBAppendQryIns(string prefx, StringBuilder vals)
         //{
         //    int idx = -1;
-        //    foreach (MCItem q in vQuest)
+        //    foreach (MultiChoiceItem q in items)
         //    {
         //        vals.Append(prefx + "'" + eLv.ToString() + "'," +
         //            uId + "," + q.uId + ",'");
@@ -172,15 +170,15 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             //l.Add(BitConverter.GetBytes((int)eLv));
             //l.Add(BitConverter.GetBytes(uId));
-            //l.Add(BitConverter.GetBytes(vQuest.Count));
-            //foreach (MCItem q in vQuest)
+            //l.Add(BitConverter.GetBytes(items.Count));
+            //foreach (MultiChoiceItem q in items)
             //{
             //    //Stem
             //    byte[] b = Encoding.UTF8.GetBytes(q.GetStem);
             //    l.Add(BitConverter.GetBytes(b.Length));
             //    l.Add(b);
             //    //ans
-            //    for (int j = 0; j < MCItem.N_OPTIONS; ++j)
+            //    for (int j = 0; j < MultiChoiceItem.N_OPTIONS; ++j)
             //    {
             //        //each ans
             //        b = Encoding.UTF8.GetBytes(q.vAns[j]);
@@ -214,10 +212,10 @@ namespace sQzLib
             //offs += 4;
             //l -= 4;
             ////
-            //vQuest = new List<MCItem>();
+            //items = new List<MultiChoiceItem>();
             //while (0 < nq)
             //{
-            //    MCItem q = new MCItem();
+            //    MultiChoiceItem q = new MultiChoiceItem();
             //    //Stem
             //    if (l < 4)
             //        return true;
@@ -230,8 +228,8 @@ namespace sQzLib
             //    l -= sz;
             //    offs += sz;
             //    //ans
-            //    q.vAns = new string[MCItem.N_OPTIONS];
-            //    for (int j = 0; j < MCItem.N_OPTIONS; ++j)
+            //    q.vAns = new string[MultiChoiceItem.N_OPTIONS];
+            //    for (int j = 0; j < MultiChoiceItem.N_OPTIONS; ++j)
             //    {
             //        //each ans
             //        if (l < 4)
@@ -246,7 +244,7 @@ namespace sQzLib
             //        offs += sz;
             //    }
             //    --nq;
-            //    vQuest.Add(q);
+            //    items.Add(q);
             //}
             //if (!Array.Equals(buf, aQuest))
             //{
@@ -372,7 +370,7 @@ namespace sQzLib
         //only Server0 uses this.
         public void DBSelect(IUx eIU, Difficulty d)
         {
-            //vQuest.Clear();
+            //items.Clear();
             //string cond = string.Empty;
             //if (d == QuestDiff.Easy)
             //    cond = " AND diff=0";
@@ -386,15 +384,15 @@ namespace sQzLib
             //    {
             //        int itemID = reader.GetInt32(0);
             //        bool isDifficult = reader.GetInt16(1) != 0;
-            //        string[] cleanData = new string[MCItem.N_OPTIONS + 1];
+            //        string[] cleanData = new string[MultiChoiceItem.N_OPTIONS + 1];
             //        cleanData[0] = reader.GetString(2);
-            //        for (int i = 1; i <= MCItem.N_OPTIONS; ++i)
+            //        for (int i = 1; i <= MultiChoiceItem.N_OPTIONS; ++i)
             //            cleanData[i] = reader.GetString(2 + i);
             //        string keyStr = reader.GetString(7);
             //        bool[] keys = new bool[4];
             //        for (int i = 0; i < 4; ++i)
-            //            keys[i] = (keyStr[i] == MCItem.C1);
-            //        vQuest.Add(new MCItem(itemID, cleanData, keys, isDifficult));
+            //            keys[i] = (keyStr[i] == MultiChoiceItem.C1);
+            //        items.Add(new MultiChoiceItem(itemID, cleanData, keys, isDifficult));
             //    }
             //    reader.Close();
             //}
@@ -448,15 +446,15 @@ namespace sQzLib
 
             //        int itemID = reader.GetInt32(0);
             //        bool isDifficult = reader.GetInt16(1) != 0;
-            //        string[] cleanData = new string[MCItem.N_OPTIONS + 1];
+            //        string[] cleanData = new string[MultiChoiceItem.N_OPTIONS + 1];
             //        cleanData[0] = reader.GetString(2);
-            //        for (int j = 1; j <= MCItem.N_OPTIONS; ++j)
+            //        for (int j = 1; j <= MultiChoiceItem.N_OPTIONS; ++j)
             //            cleanData[j] = reader.GetString(2 + j);
             //        string keyStr = reader.GetString(7);
             //        bool[] keys = new bool[4];
             //        for (int j = 0; j < 4; ++j)
-            //            keys[j] = (keyStr[j] == MCItem.C1);
-            //        vQuest.Add(new MCItem(itemID, cleanData, keys, isDifficult));
+            //            keys[j] = (keyStr[j] == MultiChoiceItem.C1);
+            //        items.Add(new MultiChoiceItem(itemID, cleanData, keys, isDifficult));
             //    }
             //    reader.Close();
             //}
@@ -486,7 +484,7 @@ namespace sQzLib
 
         public bool DBSelect(MySqlConnection conn, DateTime dt, ExamLv lv, int id, out string eMsg)
         {
-            //vQuest.Clear();
+            //items.Clear();
             //uId = id;
             //eLv = lv;
             //string qry = DBConnect.mkQrySelect("sqz_qsheet_quest", "qid,asort,idx",
@@ -497,7 +495,7 @@ namespace sQzLib
             //    return true;
             //List<uint> qids = new List<uint>();
             //List<string> asorts = new List<string>();
-            //QIdxComparer<MCItem> qComparer = new QIdxComparer<MCItem>();
+            //QIdxComparer<MultiChoiceItem> qComparer = new QIdxComparer<MultiChoiceItem>();
             //while (reader.Read())
             //{
             //    uint qid = reader.GetUInt32(0);
@@ -517,32 +515,32 @@ namespace sQzLib
             //        return true;
             //    while (reader.Read())
             //    {
-            //        MCItem q = new MCItem();
+            //        MultiChoiceItem q = new MultiChoiceItem();
             //        q.uId = qid;
             //        q.IsDifficult = reader.GetInt16(0) != 0;
             //        q.GetStem = reader.GetString(1);
-            //        string[] anss = new string[MCItem.N_OPTIONS];
-            //        for (int j = 0; j < MCItem.N_OPTIONS; ++j)
+            //        string[] anss = new string[MultiChoiceItem.N_OPTIONS];
+            //        for (int j = 0; j < MultiChoiceItem.N_OPTIONS; ++j)
             //            anss[j] = reader.GetString(2 + j);
             //        string x = reader.GetString(6);
-            //        bool[] keys = new bool[MCItem.N_OPTIONS];
-            //        for (int j = 0; j < MCItem.N_OPTIONS; ++j)
-            //            keys[j] = (x[j] == MCItem.C1);
+            //        bool[] keys = new bool[MultiChoiceItem.N_OPTIONS];
+            //        for (int j = 0; j < MultiChoiceItem.N_OPTIONS; ++j)
+            //            keys[j] = (x[j] == MultiChoiceItem.C1);
             //        q.vAns = new string[4];
             //        q.Keys = new bool[4];
             //        for(int j = 0; j < 4; ++j)
             //        {
-            //            q.vAns[j] = anss[asorts[i][j] - MCItem.C0];
-            //            q.Keys[j] = keys[asorts[i][j] - MCItem.C0];
+            //            q.vAns[j] = anss[asorts[i][j] - MultiChoiceItem.C0];
+            //            q.Keys[j] = keys[asorts[i][j] - MultiChoiceItem.C0];
             //        }
             //        int iu;
             //        if (Enum.IsDefined(typeof(IUx), iu = reader.GetInt32(7)))
             //            q.eIU = (IUx)iu;
-            //        vQuest.Add(q);
+            //        items.Add(q);
             //    }
             //    reader.Close();
             //}
-            //vQuest.Sort(qComparer);
+            //items.Sort(qComparer);
             throw new NotImplementedException();
         }
 
@@ -605,10 +603,10 @@ namespace sQzLib
 
     //    public override int Compare(T x, T y)
     //    {
-    //        MCItem qx = x as MCItem;
+    //        MultiChoiceItem qx = x as MultiChoiceItem;
     //        if (qx == null)
     //            return 0;
-    //        MCItem qy = y as MCItem;
+    //        MultiChoiceItem qy = y as MultiChoiceItem;
     //        if (qy == null)
     //            return 0;
     //        if (vIdx[qx.uId] < vIdx[qy.uId])
