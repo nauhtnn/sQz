@@ -16,6 +16,19 @@ namespace sQzLib
         public int[] POptions { get; private set; }
         public bool IsDifficult { get; private set; }
 
+        static readonly IUx[] IUs_A = { IUx._1, IUx._2, IUx._3, IUx._4, IUx._5, IUx._6 };
+        static readonly IUx[] IUs_B = { IUx._7, IUx._8, IUx._10 };
+        static readonly IUx[] IUs_C = { IUx._7, IUx._8, IUx._9 };
+
+        public static IUx[] GetIUs(Level lv)
+        {
+            if (lv == Level.A)
+                return IUs_A;
+            else if (lv == Level.B)
+                return IUs_B;
+            return IUs_C;
+        }
+
         public MultiChoiceItem() { }
 
         public MultiChoiceItem(int DB_ID, string[] cleanData, bool[] keys, bool isDifficult)
@@ -196,5 +209,12 @@ namespace sQzLib
     public enum IUx
     {
         _1 = 0, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _0
+    }
+
+    public enum Level
+    {
+        A,
+        B,
+        C
     }
 }

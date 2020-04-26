@@ -125,7 +125,7 @@ namespace sQzLib
             AbstractNum abstractNum = new AbstractNum() { AbstractNumberId = 0 };
             MultiLevelType multiLevelType1 = new MultiLevelType() { Val = MultiLevelValues.HybridMultilevel };
 
-            Level level1 = new Level() { LevelIndex = 0 };
+            DocumentFormat.OpenXml.Wordprocessing.Level level1 = new DocumentFormat.OpenXml.Wordprocessing.Level() { LevelIndex = 0 };
             StartNumberingValue startNumberingValue1 = new StartNumberingValue() { Val = 1 };
             NumberingFormat numberingFormat1 = new NumberingFormat() { Val = NumberFormatValues.Decimal };
             LevelText levelText1 = new LevelText() { Val = "%1." };
@@ -142,7 +142,7 @@ namespace sQzLib
             level1.Append(levelJustification1);
             level1.Append(previousParagraphProperties1);
 
-            Level level2 = new Level() { LevelIndex = 1 };
+            DocumentFormat.OpenXml.Wordprocessing.Level level2 = new DocumentFormat.OpenXml.Wordprocessing.Level() { LevelIndex = 1 };
             StartNumberingValue startNumberingValue2 = new StartNumberingValue() { Val = 1 };
             NumberingFormat numberingFormat2 = new NumberingFormat() { Val = NumberFormatValues.LowerLetter };
             LevelText levelText2 = new LevelText() { Val = "(%2)" };

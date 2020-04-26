@@ -8,16 +8,14 @@ namespace sQzLib
 {
     public class QuestSheet
     {
-        public ExamLv mLv;
+        public Level mLv;
         public static int guDBCurAId;
         public static int guDBCurBId;
         public int uId;
-        public int LvId { get { return (mLv == ExamLv.A) ? uId : uId + ExamineeA.LV_CAP; } }
+        public int LvId { get { return (mLv == Level.A) ? uId : uId + ExamineeA.LV_CAP; } }
         public string tId { get { return mLv.ToString() + uId.ToString("d3"); } }
         public List<MultiChoiceItem> Items { get; private set; }
         public byte[] Items2Array;
-        static readonly IUx[] LvA_IUx = { IUx._1, IUx._2, IUx._3, IUx._4, IUx._5, IUx._6 };
-        static readonly IUx[] LvB_IUx = { IUx._7, IUx._8, IUx._10 };
         public int CountDifficult
         {
             get
@@ -32,17 +30,17 @@ namespace sQzLib
 
         public QuestSheet()
         {
-            mLv = ExamLv.A;
+            mLv = Level.A;
             Items = new List<MultiChoiceItem>();
             Items2Array = null;
             uId = ExamineeA.LV_CAP;
         }
 
-        public static bool ParseLvId(string s, out ExamLv lv, out int id)
+        public static bool ParseLvId(string s, out Level lv, out int id)
         {
             if (s == null || s.Length != 4)
             {
-                lv = ExamLv.A;
+                lv = Level.A;
                 id = ExamineeA.LV_CAP;
                 return true;
             }
@@ -76,7 +74,7 @@ namespace sQzLib
 
         public List<int[]> CountItemGroupByModule()
         {
-            IUx[] IUx_by_Lv = (mLv == ExamLv.A) ? LvA_IUx : LvB_IUx;
+            IUx[] IUx_by_Lv = (mLv == Level.A) ? LevelA_IUs : LevelB_IUs;
             int[] n_difficultItems = new int[IUx_by_Lv.Length];
             int[] n_allItems = new int[IUx_by_Lv.Length];
             foreach (MultiChoiceItem i in Items)
@@ -107,9 +105,9 @@ namespace sQzLib
             return n;
         }
 
-        public static List<int[]> DBCountItemGroupByModule(ExamLv lv)
+        public static List<int[]> DBCountItemGroupByModule(Level lv)
         {
-            IUx[] IUx_by_Lv = (lv == ExamLv.A) ? LvA_IUx : LvB_IUx;
+            IUx[] IUx_by_Lv = (lv == Level.A) ? LevelA_IUs : LevelB_IUs;
             int[] n_difficultItems = new int[IUx_by_Lv.Length];
             int[] n_allItems = new int[IUx_by_Lv.Length];
             int j = -1;
@@ -483,7 +481,7 @@ namespace sQzLib
                 vals.ToString());
         }
 
-        public bool DBSelect(DateTime dt, ExamLv lv, int id)
+        public bool DBSelect(DateTime dt, Level lv, int id)
         {
             //items.Clear();
             //uId = id;
@@ -547,12 +545,12 @@ namespace sQzLib
 
         public bool UpdateCurQSId()
         {
-            if (mLv == ExamLv.A && -1 < guDBCurAId)
+            if (mLv == Level.A && -1 < guDBCurAId)
             {
                 uId = ++guDBCurAId;
                 return false;
             }
-            if (mLv == ExamLv.B && -1 < guDBCurBId)
+            if (mLv == Level.B && -1 < guDBCurBId)
             {
                 uId = ++guDBCurBId;
                 return false;
@@ -622,7 +620,7 @@ namespace sQzLib
     public enum Difficulty
     {
         Easy,
-        Diff,
+        Difficult,
         Both
     }
 }

@@ -10,9 +10,9 @@ namespace sQzLib
     public class QuestPack
     {
         public DateTime mDt;
-        public ExamLv eLv;
+        public Level eLv;
         public bool bAlt;
-        public SortedList<int, QuestSheet> vSheet;
+        public SortedList<int, QuestSheet> Sheets;
         int mNextQSIdx;
         int mMaxQSIdx;
         protected QuestPack()
@@ -21,7 +21,7 @@ namespace sQzLib
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
             bAlt = false;
-            vSheet = new SortedList<int, QuestSheet>();
+            Sheets = new SortedList<int, QuestSheet>();
         }
 
         public QuestPack(bool alt)
@@ -30,7 +30,7 @@ namespace sQzLib
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
             bAlt = alt;
-            vSheet = new SortedList<int, QuestSheet>();
+            Sheets = new SortedList<int, QuestSheet>();
         }
 
         //only Operation0 uses this.
@@ -39,8 +39,8 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((int)eLv));
-            l.Add(BitConverter.GetBytes(vSheet.Values.Count));
-            foreach (QuestSheet qs in vSheet.Values)
+            l.Add(BitConverter.GetBytes(Sheets.Values.Count));
+            foreach (QuestSheet qs in Sheets.Values)
                 foreach (byte[] i in qs.ToByte())
                     l.Add(i);
             return l;
@@ -49,7 +49,7 @@ namespace sQzLib
         //only Operation1 uses this.
         public bool ReadByte(byte[] buf, ref int offs)
         {
-            vSheet.Clear();
+            Sheets.Clear();
             if (buf == null)
                 return true;
             int offs0 = offs;
@@ -66,15 +66,15 @@ namespace sQzLib
                 QuestSheet qs = new QuestSheet();
                 if(qs.ReadByte(buf, ref offs))
                     return true;
-                if (!vSheet.ContainsKey(qs.uId))
+                if (!Sheets.ContainsKey(qs.uId))
                 {
                     qs.mLv = eLv;//optmz
-                    vSheet.Add(qs.uId, qs);
+                    Sheets.Add(qs.uId, qs);
                 }
                 --nSh;
             }
             mNextQSIdx = 0;
-            mMaxQSIdx = vSheet.Keys.Count - 1;
+            mMaxQSIdx = Sheets.Keys.Count - 1;
             return false;
         }
 
@@ -107,7 +107,7 @@ namespace sQzLib
         {
             List<string> l = new List<string>();
             string tlv = eLv.ToString();
-            foreach (QuestSheet qs in vSheet.Values)
+            foreach (QuestSheet qs in Sheets.Values)
                 l.Add(tlv + qs.uId.ToString("d3"));
             return l;
         }
@@ -127,53 +127,46 @@ namespace sQzLib
                 QuestSheet qs = new QuestSheet();
                 if (qs.DBSelect(dt, eLv, qsid))
                     return true;
-                vSheet.Add(qs.uId, qs);
+                Sheets.Add(qs.uId, qs);
             }
             return false;
         }
 
-        public bool DBDelete(out string eMsg)
-        {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
-                return true;
-            }
-            eMsg = null;
-            string cond1 = "dt='" + mDt.ToString(DT._) +
-                    "' AND lv='" + eLv.ToString() + "' AND qsid=";
-            string cond2 = "dt='" + mDt.ToString(DT._) +
-                    "' AND lv='" + eLv.ToString() + "' AND id=";
-            foreach (QuestSheet qs in vSheet.Values)
-            {
-                //int n = DBConnect.Count(conn, "sqz_nee_qsheet", "qsid", cond1 + qs.uId, out eMsg);
-                //if (0 < n)
-                //    continue;
-                if (DBConnect.Delete(conn, "sqz_qsheet_quest", cond1 + qs.uId, out eMsg) < 0)
-                    return true;
-                if (DBConnect.Delete(conn, "sqz_qsheet", cond2 + qs.uId, out eMsg) < 0)
-                    return true;
-            }
-            return false;
-        }
+        //public bool DBDelete(out string eMsg)
+        //{
+        //    string cond1 = "dt='" + mDt.ToString(DT._) +
+        //            "' AND lv='" + eLv.ToString() + "' AND qsid=";
+        //    string cond2 = "dt='" + mDt.ToString(DT._) +
+        //            "' AND lv='" + eLv.ToString() + "' AND id=";
+        //    foreach (QuestSheet qs in Sheets.Values)
+        //    {
+        //        //int n = DBConnect.Count(conn, "sqz_nee_qsheet", "qsid", cond1 + qs.uId, out eMsg);
+        //        //if (0 < n)
+        //        //    continue;
+        //        if (DBConnect.Delete(conn, "sqz_qsheet_quest", cond1 + qs.uId, out eMsg) < 0)
+        //            return true;
+        //        if (DBConnect.Delete(conn, "sqz_qsheet", cond2 + qs.uId, out eMsg) < 0)
+        //            return true;
+        //    }
+        //    return false;
+        //}
 
-        public List<QuestSheet> GenQPack2(int n, int[] vn, int[] vndiff)
+        public List<QuestSheet> Genegrate2(int n, int[] vn, int[] vndiff)
         {
             List<QuestSheet> l = new List<QuestSheet>();
             int i;
             for (i = 0; i < n; ++i)
                 l.Add(new QuestSheet());
-            foreach (QuestSheet qs in l)
-                qs.bAlt = bAlt;
+            //foreach (QuestSheet qs in l)
+            //    qs.bAlt = bAlt;
             i = 0;
             Random rand = new Random();
-            foreach (IUx iu in QuestSheet.GetIUs(eLv))
+            foreach (IUx iu in MultiChoiceItem.GetIUs(eLv))
             {
                 //
                 QuestSheet qs0 = new QuestSheet();
                 //qs0.bAlt = bAlt;
-                qs0.DBSelect(iu, QuestDiff.Easy);
+                qs0.DBSelect(iu, Difficulty.Easy);
                 //
                 foreach (QuestSheet qs in l)
                 {
@@ -190,7 +183,7 @@ namespace sQzLib
                 //
                 qs0 = new QuestSheet();
                 //qs0.bAlt = bAlt;
-                qs0.DBSelect(iu, QuestDiff.Diff);
+                qs0.DBSelect(iu, Difficulty.Difficult);
                 //
                 foreach (QuestSheet qs in l)
                 {
@@ -214,7 +207,7 @@ namespace sQzLib
                 qs.mLv = eLv;
                 qs.Randomize(rand);
                 if (!qs.UpdateCurQSId())//todo: better error handle
-                    vSheet.Add(qs.uId, qs);
+                    Sheets.Add(qs.uId, qs);
                 else
                     eidx.Add(++i);
             }
@@ -228,23 +221,23 @@ namespace sQzLib
 
         public List<QuestSheet> GenQPack3(int n, int[] vn, int[] vndiff)
         {
-            string emsg;
+            //string emsg;
             Random rand = new Random();
             List<QuestSheet> l = new List<QuestSheet>();
             QuestSheet qs0 = new QuestSheet();
-            qs0.bAlt = bAlt;
+            //qs0.bAlt = bAlt;
             int j = -1;
-            foreach (IUx i in QuestSheet.GetIUs(eLv))
+            foreach (IUx i in MultiChoiceItem.GetIUs(eLv))
             {
                 ++j;
-                if (qs0.DBSelect(rand, i, vn[j] - vndiff[j], QuestDiff.Easy, out emsg))
+                if (qs0.DBSelect(rand, i, vn[j] - vndiff[j], Difficulty.Easy))
                 {
-                    WPopup.s.ShowDialog(emsg);
+                    //WPopup.s.ShowDialog(emsg);
                     return new List<QuestSheet>();
                 }
-                if (qs0.DBSelect(rand, i, vndiff[j], QuestDiff.Diff, out emsg))
+                if (qs0.DBSelect(rand, i, vndiff[j], Difficulty.Difficult))
                 {
-                    WPopup.s.ShowDialog(emsg);
+                    //WPopup.s.ShowDialog(emsg);
                     return new List<QuestSheet>();
                 }
             }
@@ -255,7 +248,7 @@ namespace sQzLib
                 qs.mLv = eLv;
                 if (!qs.UpdateCurQSId())//todo: better error handle
                 {
-                    vSheet.Add(qs.uId, qs);
+                    Sheets.Add(qs.uId, qs);
                     l.Add(qs);
                 }
             }
@@ -268,9 +261,6 @@ namespace sQzLib
         {
             if (l.Count == 0)
                 return Txt.s._[(int)TxI.DB_DAT_NOK];
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
             StringBuilder vals = new StringBuilder();
             string prefx = "('" + dt.ToString(DT._) + "',";
             foreach (QuestSheet qs in l)
@@ -306,17 +296,17 @@ namespace sQzLib
                 return null;
             if (mMaxQSIdx < mNextQSIdx)
                 mNextQSIdx = 0;
-            if (mNextQSIdx < vSheet.Count)
-                return vSheet.ElementAt(mNextQSIdx++).Value.Items2Array;
+            if (mNextQSIdx < Sheets.Count)
+                return Sheets.ElementAt(mNextQSIdx++).Value.Items2Array;
             else
                 return null;
         }
 
         public List<int[]> GetNMod()
         {
-            if (vSheet.Values.Count == 0)
+            if (Sheets.Values.Count == 0)
                 return null;
-            return vSheet.First().Value.GetNMod();
+            return Sheets.First().Value.GetNMod();
         }
 
         public void WriteTxt()
@@ -329,7 +319,7 @@ namespace sQzLib
         public void WriteDocx()
         {
             string extension = ".docx";
-            foreach (QuestSheet qs in vSheet.Values)
+            foreach (QuestSheet qs in Sheets.Values)
                 QuestSheetDocxPrinter.GetInstance().Print(qs.mLv.ToString() + qs.uId + extension,
                     qs.ToListOfStrings(), mDt.ToString(DT.RR), qs.tId);
         }

@@ -18,11 +18,11 @@ namespace sQzLib
     public class ExamSlot
     {
         public DateTime mDt;
-        public Dictionary<ExamLv, QuestPack> vQPack;
+        public Dictionary<Level, QuestPack> vQPack;
 
         public AnsPack mKeyPack;
 
-        public Dictionary<int, ExamRoom> vRoom;
+        public Dictionary<int, ExamRoom> Rooms;
         public Dictionary<int, DateTime> vT1;
         public Dictionary<int, DateTime> vT2;
         public ExamStt eStt;
@@ -30,14 +30,14 @@ namespace sQzLib
         public ExamSlot()
         {
             mDt = DT.INV_;
-            vRoom = new Dictionary<int, ExamRoom>();
+            Rooms = new Dictionary<int, ExamRoom>();
             eStt = ExamStt.Prep;
-            vQPack = new Dictionary<ExamLv, QuestPack>();
+            vQPack = new Dictionary<Level, QuestPack>();
             QuestPack p = new QuestPack(false);
-            p.eLv = ExamLv.A;
+            p.eLv = Level.A;
             vQPack.Add(p.eLv, p);
             p = new QuestPack(false);
-            p.eLv = ExamLv.B;
+            p.eLv = Level.B;
             vQPack.Add(p.eLv, p);
 
             mKeyPack = new AnsPack();
@@ -49,10 +49,10 @@ namespace sQzLib
             foreach (int i in rids)
             {
                 ExamRoom r = new ExamRoom();
-                r.uId = i;
+                r.ID = i;
                 r.DBSelTimeAndPw(mDt);
-                if(!vRoom.ContainsKey(i))
-                    vRoom.Add(i, r);
+                if(!Rooms.ContainsKey(i))
+                    Rooms.Add(i, r);
             }
         }
 
@@ -170,13 +170,13 @@ namespace sQzLib
             //        }
             //        int urid;
             //        if (!int.TryParse(v[0].Substring(1), out e.uId)
-            //            || !int.TryParse(v[1], out urid) || !vRoom.ContainsKey(urid))
+            //            || !int.TryParse(v[1], out urid) || !Rooms.ContainsKey(urid))
             //        {
             //            eline.Append(i.ToString() + ", ");
             //            continue;
             //        }
             //        bool bCont = false;
-            //        foreach(ExamRoom ro in vRoom.Values)
+            //        foreach(ExamRoom ro in Rooms.Values)
             //            if(ro.vExaminee.ContainsKey(e.LvId))
             //            {
             //                dup.Append(e.eLv.ToString() + e.uId + ", ");
@@ -184,7 +184,7 @@ namespace sQzLib
             //            }
             //        if (bCont)
             //            continue;
-            //        foreach (ExamRoom ro in o.vRoom.Values)
+            //        foreach (ExamRoom ro in o.Rooms.Values)
             //            if (ro.vExaminee.ContainsKey(e.LvId))
             //            {
             //                dup.Append(e.eLv.ToString() + e.uId + ", ");
@@ -207,7 +207,7 @@ namespace sQzLib
             //            eline.Append(i.ToString() + ", ");
             //            continue;
             //        }
-            //        o.vRoom[urid].vExaminee.Add(e.LvId, e);
+            //        o.Rooms[urid].vExaminee.Add(e.LvId, e);
             //    }
             //    else
             //        eline.Append(i.ToString() + ", ");
@@ -236,20 +236,20 @@ namespace sQzLib
             Random rand = new Random();
             int v = 1;
             StringBuilder sb = new StringBuilder();
-            foreach (ExamRoom r in vRoom.Values)
+            foreach (ExamRoom r in Rooms.Values)
             {
                 int n = 0;
                 bool isExist = DBConnect.IsExist("sqz_slot_room",
                     "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) +
-                    "' AND rid=" + r.uId);
+                    "' AND rid=" + r.ID);
                 if (!isExist)
                     DBConnect.Ins("sqz_slot_room",
                         "dt,t,rid,pw,qpkalt", "('" + mDt.ToString(DT._) + "','" + mDt.ToString(DT.hh) +
-                        "'," + r.uId + ",'" + ExamRoom.GeneratePw(rand) + "',0)");
-                n = r.DBIns();
+                        "'," + r.ID + ",'" + ExamRoom.GeneratePw(rand) + "',0)");
+                n = r.SaveExaminees();
                 if (n < 0)
                 {
-                    sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DB_NOK] + '\n', r.uId + 1,
+                    sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DB_NOK] + '\n', r.ID + 1,
                         Txt.s._[(int)TxI.NEE_EXIST]);
                     v = 0;
                 }
@@ -259,10 +259,10 @@ namespace sQzLib
 
         public void DelNee()
         {
-            foreach (ExamRoom r in vRoom.Values)
+            foreach (ExamRoom r in Rooms.Values)
             {
                 r.vExaminee.Clear();
-                r.N_ExamineeGroupByLv[ExamLv.A] = r.N_ExamineeGroupByLv[ExamLv.B] = 0;
+                r.N_ExamineeGroupByLv[Level.A] = r.N_ExamineeGroupByLv[Level.B] = 0;
             }
         }
 
@@ -294,14 +294,14 @@ namespace sQzLib
 
         public void DBSelectExaminee()
         {
-            foreach (ExamRoom r in vRoom.Values)
-                r.DBSelectExaminee(mDt);
+            foreach (ExamRoom r in Rooms.Values)
+                r.LoadExaminees(mDt);
         }
 
-        public int CountQSByRoom(ExamLv lv)
+        public int CountQSByRoom(Level lv)
         {
             int n = 0;
-            foreach (ExamRoom r in vRoom.Values)
+            foreach (ExamRoom r in Rooms.Values)
                 if (n < r.N_ExamineeGroupByLv[lv])
                     n = r.N_ExamineeGroupByLv[lv];
             return n;
@@ -314,7 +314,7 @@ namespace sQzLib
             int rid = BitConverter.ToInt32(buf, offs);
             offs += 4;
             ExamRoom r;
-            if (!vRoom.TryGetValue(rid, out r) ||
+            if (!Rooms.TryGetValue(rid, out r) ||
                 r.ReadByte0(buf, ref offs))
                 return -1;
             return rid;
@@ -325,7 +325,7 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.ToByteh(mDt));
             ExamRoom r;
-            if (vRoom.TryGetValue(rId, out r))
+            if (Rooms.TryGetValue(rId, out r))
                 l.InsertRange(l.Count, r.ToByte1());
             else
                 l.Add(BitConverter.GetBytes(-1));
@@ -341,7 +341,7 @@ namespace sQzLib
                 return true;
             offs += 4;
             ExamRoom r;
-            if (vRoom.TryGetValue(rId, out r))
+            if (Rooms.TryGetValue(rId, out r))
             {
                 if (r.ReadByte1(buf, ref offs))
                     return true;
@@ -349,10 +349,10 @@ namespace sQzLib
             else
             {
                 r = new ExamRoom();
-                r.uId = rId;
+                r.ID = rId;
                 if (r.ReadByte1(buf, ref offs))
                     return true;
-                vRoom.Add(rId, r);
+                Rooms.Add(rId, r);
             }
             return false;
         }
@@ -360,59 +360,55 @@ namespace sQzLib
         public void DBUpdateRs(int rid, StringBuilder vals)
         {
             ExamRoom r;
-            if(vRoom.TryGetValue(rid, out r))
+            if(Rooms.TryGetValue(rid, out r))
                 r.DBMakeInsResult(vals);
         }
 
-        public bool DBUpT1(int rid,
-            out string eMsg)
+        public bool SaveRetrieveTime(int rid)
         {
             ExamRoom r;
-            if (vRoom.TryGetValue(rid, out r))
+            if (Rooms.TryGetValue(rid, out r))
             {
                 r.t1 = DateTime.Now;
-                bool rv = r.DBUpT1(mDt);
+                bool rv = r.SaveRetrieveTime(mDt);
                 return rv;
             }
-            eMsg = "Room id " + rid + " is not found";
             return true;
         }
 
-        public bool DBUpT2(MySqlConnection conn, int rid,
-            out string eMsg)
+        public bool SaveCommitTime(int rid)
         {
             ExamRoom r;
-            if (vRoom.TryGetValue(rid, out r))
+            if (Rooms.TryGetValue(rid, out r))
             {
                 r.t2 = DateTime.Now;
-                return r.DBUpT2(conn, mDt, out eMsg);
+                return r.SaveCommitTime(mDt);
             }
-            eMsg = "Room id " + rid + " is not found";
             return true;
         }
 
-        public bool GenQ(int n, ExamLv lv, int[] vn, int[] vndiff)
+        public bool GenQ(int n, Level lv, int[] vn, int[] vndiff)
         {
             string emsg;
             if (vQPack[lv].DBDelete(out emsg))
                 WPopup.s.ShowDialog(emsg);
-            vQPack[lv].vSheet.Clear();
-            if (vQPackAlt[lv].DBDelete(out emsg))
-                WPopup.s.ShowDialog(emsg);
-            vQPackAlt[lv].vSheet.Clear();
+            vQPack[lv].Sheets.Clear();
+            //if (vQPackAlt[lv].DBDelete(out emsg))
+            //    WPopup.s.ShowDialog(emsg);
+            //vQPackAlt[lv].vSheet.Clear();
             QuestSheet.DBUpdateCurQSId(mDt);
-            foreach (QuestSheet qs in vQPack[lv].vSheet.Values)
+            foreach (QuestSheet qs in vQPack[lv].Sheets.Values)
                 mKeyPack.vSheet.Remove(qs.LvId);
             List<QuestSheet> l;
             if(System.IO.File.Exists("Randomize.txt"))
             {
                 l = vQPack[lv].GenQPack2(n, vn, vndiff);
-                l.InsertRange(l.Count, vQPackAlt[lv].GenQPack2(n, vn, vndiff));
+                //l.InsertRange(l.Count, vQPackAlt[lv].GenQPack2(n, vn, vndiff));
             }
             else
             {
                 l = vQPack[lv].GenQPack3(n, vn, vndiff);
-                l.InsertRange(l.Count, vQPackAlt[lv].GenQPack3(n, vn, vndiff));
+                //l.InsertRange(l.Count, vQPackAlt[lv].GenQPack3(n, vn, vndiff));
             }
             mKeyPack.ExtractKey(l);
             return false;
@@ -420,19 +416,19 @@ namespace sQzLib
 
         public bool DBSelArchieve(out string eMsg)
         {
-            if (vQPack[ExamLv.A].DBSelectQS(mDt, out eMsg))
+            if (vQPack[Level.A].DBSelectQS(mDt, out eMsg))
                 return true;
-            if (vQPack[ExamLv.B].DBSelectQS(mDt, out eMsg))
+            if (vQPack[Level.B].DBSelectQS(mDt, out eMsg))
                 return true;
-            if (vQPackAlt[ExamLv.A].DBSelectQS(mDt, out eMsg))
+            if (vQPackAlt[Level.A].DBSelectQS(mDt, out eMsg))
                 return true;
-            if (vQPackAlt[ExamLv.B].DBSelectQS(mDt, out eMsg))
+            if (vQPackAlt[Level.B].DBSelectQS(mDt, out eMsg))
                 return true;
             foreach (QuestPack p in vQPack.Values)
-                foreach (QuestSheet qs in p.vSheet.Values)
+                foreach (QuestSheet qs in p.Sheets.Values)
                     mKeyPack.ExtractKey(qs);
             foreach (QuestPack p in vQPackAlt.Values)
-                foreach (QuestSheet qs in p.vSheet.Values)
+                foreach (QuestSheet qs in p.Sheets.Values)
                     mKeyPack.ExtractKey(qs);
             return false;
         }
@@ -469,9 +465,9 @@ namespace sQzLib
                     return true;
                 --n;
                 int x;
-                ExamLv lv;
-                if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                    lv = (ExamLv)x;
+                Level lv;
+                if (Enum.IsDefined(typeof(Level), x = BitConverter.ToInt32(buf, offs)))
+                    lv = (Level)x;
                 else
                     return true;
                 l -= 4;
@@ -493,9 +489,9 @@ namespace sQzLib
                     return true;
                 --n;
                 int x;
-                ExamLv lv;
-                if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                    lv = (ExamLv)x;
+                Level lv;
+                if (Enum.IsDefined(typeof(Level), x = BitConverter.ToInt32(buf, offs)))
+                    lv = (Level)x;
                 else
                     return true;
                 offs += 4;
@@ -507,7 +503,7 @@ namespace sQzLib
             return false;
         }
 
-        public byte[] ToByteNextQS(ExamLv lv)
+        public byte[] ToByteNextQS(Level lv)
         {
             if (bQPkAlt)
                 return vQPackAlt[lv].ToByteNextQS();
@@ -529,7 +525,7 @@ namespace sQzLib
         public ExamineeA Signin(ExamineeA e)
         {
             ExamineeA o;
-            foreach (ExamRoom r in vRoom.Values)
+            foreach (ExamRoom r in Rooms.Values)
                 if ((o = r.Signin(e)) != null)
                     return o;
             return null;
@@ -538,7 +534,7 @@ namespace sQzLib
         public ExamineeA Find(int lvid)
         {
             ExamineeA o;
-            foreach (ExamRoom r in vRoom.Values)
+            foreach (ExamRoom r in Rooms.Values)
                 if (r.vExaminee.TryGetValue(lvid, out o))
                     return o;
             return null;
@@ -548,9 +544,9 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.ToByteh(mDt));
-            if(vRoom.Values.Count == 1)//either 0 or 1
+            if(Rooms.Values.Count == 1)//either 0 or 1
             {
-                foreach(ExamRoom r in vRoom.Values)
+                foreach(ExamRoom r in Rooms.Values)
                     l.InsertRange(l.Count, r.ToByte0());
             }
             return l;

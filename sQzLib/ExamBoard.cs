@@ -299,10 +299,7 @@ namespace sQzLib
                     "dt,lv,neeid,qsid,t1,t2,grade,comp,ans", vals.ToString())) < 0;
             }
             else
-            {
                 rval = true;
-                eMsg = Txt.s._[(int)TxI.RS_UP_NOTHING];
-            }
             if(!rval)
             {
                 foreach (ExamSlot sl in Slots.Values)

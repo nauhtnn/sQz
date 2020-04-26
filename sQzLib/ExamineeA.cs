@@ -5,12 +5,6 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    public enum ExamLv
-    {
-        A,
-        B
-    }
-
     public enum NeeStt
     {
          Signing = 0,
@@ -26,11 +20,11 @@ namespace sQzLib
         public const int LV_CAP = 10000;//db sqz_examinee `id` SMALLINT UNSIGNED
         public DateTime mDt;
         public NeeStt eStt;
-        public ExamLv mLv;
+        public Level mLv;
         public int uId;
-        public int LvId { get { return (mLv == ExamLv.A) ? uId : uId + LV_CAP; } }
+        public int LvId { get { return (mLv == Level.A) ? uId : uId + LV_CAP; } }
         public string tId { get { return mLv.ToString() + uId.ToString("d4"); } }
-        public static string gId(ExamLv lv, int id) { return lv.ToString() + id.ToString("d4"); }
+        public static string gId(Level lv, int id) { return lv.ToString() + id.ToString("d4"); }
         public string tName;
         public string tBirdate;
         public string tBirthplace;
@@ -58,7 +52,7 @@ namespace sQzLib
         void Reset()
         {
             mDt = DT.INV_H;
-            mLv = ExamLv.A;
+            mLv = Level.A;
             uId = LV_CAP;
             tName = null;
             tBirdate = null;
@@ -94,7 +88,7 @@ namespace sQzLib
             if (s == null || s.Length != 5)
                 throw new ArgumentException();
             s = s.ToUpper();
-            ExamLv lv;
+            Level lv;
             if (!Enum.TryParse(s.Substring(0, 1), out lv))
                 throw new ArgumentException();
             int uid;
@@ -271,8 +265,8 @@ namespace sQzLib
                 return false;
             //uSlId = r.ReadUInt32();
             int x;
-            if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
-                mLv = (ExamLv)x;
+            if (Enum.IsDefined(typeof(Level), x = r.ReadInt32()))
+                mLv = (Level)x;
             uId = r.ReadInt32();
             if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
                 eStt = (NeeStt)x;

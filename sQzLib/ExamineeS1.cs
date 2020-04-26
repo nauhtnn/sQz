@@ -127,8 +127,8 @@ namespace sQzLib
                 return true;
 
             int x;
-            if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                mLv = (ExamLv)x;
+            if (Enum.IsDefined(typeof(Level), x = BitConverter.ToInt32(buf, offs)))
+                mLv = (Level)x;
             else
                 return true;
             l -= 4;
