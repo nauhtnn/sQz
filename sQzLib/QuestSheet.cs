@@ -8,12 +8,11 @@ namespace sQzLib
 {
     public class QuestSheet
     {
-        public Level mLv;
         public static int guDBCurAId;
         public static int guDBCurBId;
         public int uId;
-        public int LvId { get { return (mLv == Level.A) ? uId : uId + ExamineeA.LV_CAP; } }
-        public string tId { get { return mLv.ToString() + uId.ToString("d3"); } }
+        public int LvId { get { return (Pack.Lv == Level.A) ? uId : uId + ExamineeA.LV_CAP; } }
+        public string tId { get { return Pack.Lv.ToString() + uId.ToString("d3"); } }
         public List<MultiChoiceItem> Items { get; private set; }
         public byte[] Items2Array;
         public int CountDifficult
@@ -28,9 +27,11 @@ namespace sQzLib
             }
         }
 
-        public QuestSheet()
+        private QuestPack Pack;
+
+        public QuestSheet(QuestPack pack)
         {
-            mLv = Level.A;
+            Pack = pack;
             Items = new List<MultiChoiceItem>();
             Items2Array = null;
             uId = ExamineeA.LV_CAP;
@@ -74,9 +75,9 @@ namespace sQzLib
 
         public List<int[]> CountItemGroupByModule()
         {
-            IUx[] IUx_by_Lv = (mLv == Level.A) ? LevelA_IUs : LevelB_IUs;
-            int[] n_difficultItems = new int[IUx_by_Lv.Length];
-            int[] n_allItems = new int[IUx_by_Lv.Length];
+            IUx[] IUs_by_Lv = MultiChoiceItem.GetIUs(Pack.Lv);
+            int[] n_difficultItems = new int[IUs_by_Lv.Length];
+            int[] n_allItems = new int[IUs_by_Lv.Length];
             foreach (MultiChoiceItem i in Items)
             {
                 int module;
@@ -107,11 +108,11 @@ namespace sQzLib
 
         public static List<int[]> DBCountItemGroupByModule(Level lv)
         {
-            IUx[] IUx_by_Lv = (lv == Level.A) ? LevelA_IUs : LevelB_IUs;
-            int[] n_difficultItems = new int[IUx_by_Lv.Length];
-            int[] n_allItems = new int[IUx_by_Lv.Length];
+            IUx[] IUs_by_Lv = MultiChoiceItem.GetIUs(lv);
+            int[] n_difficultItems = new int[IUs_by_Lv.Length];
+            int[] n_allItems = new int[IUs_by_Lv.Length];
             int j = -1;
-            foreach(IUx i in IUx_by_Lv)
+            foreach(IUx i in IUs_by_Lv)
             {
                 n_allItems[++j] = DBConnect.Count( "sqz_question", "id",
                     "moid=" + (int)i + " AND del=0");

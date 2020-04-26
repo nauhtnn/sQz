@@ -10,8 +10,8 @@ namespace sQzLib
     public class QuestPack
     {
         public DateTime mDt;
-        public Level eLv;
-        public bool bAlt;
+        public Level Lv;
+        public bool IsAlternative;
         public SortedList<int, QuestSheet> Sheets;
         int mNextQSIdx;
         int mMaxQSIdx;
@@ -20,7 +20,7 @@ namespace sQzLib
             mDt = DT.INV_;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
-            bAlt = false;
+            IsAlternative = false;
             Sheets = new SortedList<int, QuestSheet>();
         }
 
@@ -29,7 +29,7 @@ namespace sQzLib
             mDt = DT.INV_;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
-            bAlt = alt;
+            IsAlternative = alt;
             Sheets = new SortedList<int, QuestSheet>();
         }
 
@@ -38,7 +38,7 @@ namespace sQzLib
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes((int)eLv));
+            l.Add(BitConverter.GetBytes((int)Lv));
             l.Add(BitConverter.GetBytes(Sheets.Values.Count));
             foreach (QuestSheet qs in Sheets.Values)
                 foreach (byte[] i in qs.ToByte())
@@ -68,7 +68,7 @@ namespace sQzLib
                     return true;
                 if (!Sheets.ContainsKey(qs.uId))
                 {
-                    qs.mLv = eLv;//optmz
+                    qs.mLv = Lv;//optmz
                     Sheets.Add(qs.uId, qs);
                 }
                 --nSh;
@@ -106,7 +106,7 @@ namespace sQzLib
         public List<string> SelectQStId()
         {
             List<string> l = new List<string>();
-            string tlv = eLv.ToString();
+            string tlv = Lv.ToString();
             foreach (QuestSheet qs in Sheets.Values)
                 l.Add(tlv + qs.uId.ToString("d3"));
             return l;
@@ -116,8 +116,8 @@ namespace sQzLib
         {
             MySqlDataReader reader = DBConnect.exeQrySelect("sqz_qsheet", "id",
                "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) +
-                "' AND lv='" + eLv.ToString() + "' AND alt=" +
-                (bAlt ? '1' : '0'));
+                "' AND lv='" + Lv.ToString() + "' AND alt=" +
+                (IsAlternative ? '1' : '0'));
             List <int> qsids = new List<int>();
             while (reader.Read())
                 qsids.Add(reader.GetUInt16(0));
@@ -125,7 +125,7 @@ namespace sQzLib
             foreach(int qsid in qsids)
             {
                 QuestSheet qs = new QuestSheet();
-                if (qs.DBSelect(dt, eLv, qsid))
+                if (qs.DBSelect(dt, Lv, qsid))
                     return true;
                 Sheets.Add(qs.uId, qs);
             }
@@ -161,7 +161,7 @@ namespace sQzLib
             //    qs.bAlt = bAlt;
             i = 0;
             Random rand = new Random();
-            foreach (IUx iu in MultiChoiceItem.GetIUs(eLv))
+            foreach (IUx iu in MultiChoiceItem.GetIUs(Lv))
             {
                 //
                 QuestSheet qs0 = new QuestSheet();
@@ -204,7 +204,7 @@ namespace sQzLib
             i = -1;
             foreach (QuestSheet qs in l)
             {
-                qs.mLv = eLv;
+                qs.mLv = Lv;
                 qs.Randomize(rand);
                 if (!qs.UpdateCurQSId())//todo: better error handle
                     Sheets.Add(qs.uId, qs);
@@ -227,7 +227,7 @@ namespace sQzLib
             QuestSheet qs0 = new QuestSheet();
             //qs0.bAlt = bAlt;
             int j = -1;
-            foreach (IUx i in MultiChoiceItem.GetIUs(eLv))
+            foreach (IUx i in MultiChoiceItem.GetIUs(Lv))
             {
                 ++j;
                 if (qs0.DBSelect(rand, i, vn[j] - vndiff[j], Difficulty.Easy))
@@ -245,7 +245,7 @@ namespace sQzLib
             {
                 --n;
                 QuestSheet qs = qs0.RandomizeDeepCopy(rand);
-                qs.mLv = eLv;
+                qs.mLv = Lv;
                 if (!qs.UpdateCurQSId())//todo: better error handle
                 {
                     Sheets.Add(qs.uId, qs);

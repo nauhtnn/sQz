@@ -34,11 +34,11 @@ namespace sQzLib
             eStt = ExamStt.Prep;
             vQPack = new Dictionary<Level, QuestPack>();
             QuestPack p = new QuestPack(false);
-            p.eLv = Level.A;
-            vQPack.Add(p.eLv, p);
+            p.Lv = Level.A;
+            vQPack.Add(p.Lv, p);
             p = new QuestPack(false);
-            p.eLv = Level.B;
-            vQPack.Add(p.eLv, p);
+            p.Lv = Level.B;
+            vQPack.Add(p.Lv, p);
 
             mKeyPack = new AnsPack();
         }
