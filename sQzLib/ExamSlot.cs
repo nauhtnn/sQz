@@ -18,13 +18,16 @@ namespace sQzLib
     public class ExamSlot
     {
         public DateTime mDt;
-        public Dictionary<Level, QuestPack> vQPack;
+        public Dictionary<Level, QuestPack> MainPacks;
+        public Dictionary<Level, QuestPack> AltPacks;
 
         public AnsPack mKeyPack;
 
         public Dictionary<int, ExamRoom> Rooms;
-        public Dictionary<int, DateTime> vT1;
-        public Dictionary<int, DateTime> vT2;
+        public Dictionary<int, DateTime> RetrieveTimeByRooms;
+        public Dictionary<int, DateTime> SummitTimeByRooms;
+        public Dictionary<int, bool> UsingAltPacksByRooms;
+        public bool IsTransferingAltPacks;
         public ExamStt eStt;
 
         public ExamSlot()
@@ -32,13 +35,21 @@ namespace sQzLib
             mDt = DT.INV_;
             Rooms = new Dictionary<int, ExamRoom>();
             eStt = ExamStt.Prep;
-            vQPack = new Dictionary<Level, QuestPack>();
+            MainPacks = new Dictionary<Level, QuestPack>();
             QuestPack p = new QuestPack(false);
             p.Lv = Level.A;
-            vQPack.Add(p.Lv, p);
+            MainPacks.Add(p.Lv, p);
             p = new QuestPack(false);
             p.Lv = Level.B;
-            vQPack.Add(p.Lv, p);
+            MainPacks.Add(p.Lv, p);
+
+            AltPacks = new Dictionary<Level, QuestPack>();
+            p = new QuestPack(false);
+            p.Lv = Level.A;
+            AltPacks.Add(p.Lv, p);
+            p = new QuestPack(false);
+            p.Lv = Level.B;
+            AltPacks.Add(p.Lv, p);
 
             mKeyPack = new AnsPack();
         }
@@ -135,7 +146,7 @@ namespace sQzLib
             get { return mDt; }
             set {
                 mDt = value;
-                foreach (QuestPack p in vQPack.Values)
+                foreach (QuestPack p in MainPacks.Values)
                     p.mDt = value;
             }
         }
@@ -389,45 +400,44 @@ namespace sQzLib
 
         public bool GenQ(int n, Level lv, int[] vn, int[] vndiff)
         {
-            string emsg;
-            if (vQPack[lv].DBDelete(out emsg))
-                WPopup.s.ShowDialog(emsg);
-            vQPack[lv].Sheets.Clear();
-            //if (vQPackAlt[lv].DBDelete(out emsg))
+            if (MainPacks[lv].DBDelete())
+                WPopup.s.ShowDialog("todo");// emsg);
+            MainPacks[lv].Sheets.Clear();
+            //if (AltPacks[lv].DBDelete(out emsg))
             //    WPopup.s.ShowDialog(emsg);
-            //vQPackAlt[lv].vSheet.Clear();
+            //AltPacks[lv].Sheets.Clear();
             QuestSheet.DBUpdateCurQSId(mDt);
-            foreach (QuestSheet qs in vQPack[lv].Sheets.Values)
-                mKeyPack.vSheet.Remove(qs.LvId);
+            foreach (QuestSheet qs in MainPacks[lv].Sheets.Values)
+                mKeyPack.Sheets.Remove(qs.LvId);
             List<QuestSheet> l;
             if(System.IO.File.Exists("Randomize.txt"))
             {
-                l = vQPack[lv].GenQPack2(n, vn, vndiff);
-                //l.InsertRange(l.Count, vQPackAlt[lv].GenQPack2(n, vn, vndiff));
+                l = MainPacks[lv].Genegrate2(n, vn, vndiff);
+                //l.InsertRange(l.Count, AltPacks[lv].GenQPack2(n, vn, vndiff));
             }
             else
             {
-                l = vQPack[lv].GenQPack3(n, vn, vndiff);
-                //l.InsertRange(l.Count, vQPackAlt[lv].GenQPack3(n, vn, vndiff));
+                l = MainPacks[lv].GenQPack3(n, vn, vndiff);
+                //l.InsertRange(l.Count, AltPacks[lv].GenQPack3(n, vn, vndiff));
             }
             mKeyPack.ExtractKey(l);
             return false;
         }
 
-        public bool DBSelArchieve(out string eMsg)
+        public bool DBSelArchieve()
         {
-            if (vQPack[Level.A].DBSelectQS(mDt, out eMsg))
+            if (MainPacks[Level.A].DBSelectQS(mDt))
                 return true;
-            if (vQPack[Level.B].DBSelectQS(mDt, out eMsg))
+            if (MainPacks[Level.B].DBSelectQS(mDt))
                 return true;
-            if (vQPackAlt[Level.A].DBSelectQS(mDt, out eMsg))
+            if (AltPacks[Level.A].DBSelectQS(mDt))
                 return true;
-            if (vQPackAlt[Level.B].DBSelectQS(mDt, out eMsg))
+            if (AltPacks[Level.B].DBSelectQS(mDt))
                 return true;
-            foreach (QuestPack p in vQPack.Values)
+            foreach (QuestPack p in MainPacks.Values)
                 foreach (QuestSheet qs in p.Sheets.Values)
                     mKeyPack.ExtractKey(qs);
-            foreach (QuestPack p in vQPackAlt.Values)
+            foreach (QuestPack p in AltPacks.Values)
                 foreach (QuestSheet qs in p.Sheets.Values)
                     mKeyPack.ExtractKey(qs);
             return false;
@@ -437,15 +447,15 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.ToByteh(mDt));
-            if (vbQPkAlt.ContainsKey(rid))
-                l.Add(BitConverter.GetBytes(vbQPkAlt[rid]));
+            if (UsingAltPacksByRooms.ContainsKey(rid))
+                l.Add(BitConverter.GetBytes(UsingAltPacksByRooms[rid]));
             else
                 l.Add(BitConverter.GetBytes(false));
-            l.Add(BitConverter.GetBytes(vQPack.Count));
-            foreach (QuestPack p in vQPack.Values)
+            l.Add(BitConverter.GetBytes(MainPacks.Count));
+            foreach (QuestPack p in MainPacks.Values)
                 l.InsertRange(l.Count, p.ToByte());
-            l.Add(BitConverter.GetBytes(vQPackAlt.Count));
-            foreach (QuestPack p in vQPackAlt.Values)
+            l.Add(BitConverter.GetBytes(AltPacks.Count));
+            foreach (QuestPack p in AltPacks.Values)
                 l.InsertRange(l.Count, p.ToByte());
             return l;
         }
@@ -454,7 +464,7 @@ namespace sQzLib
         {
             if (buf.Length - offs < 5)
                 return true;
-            bQPkAlt = BitConverter.ToBoolean(buf, offs);
+            IsTransferingAltPacks = BitConverter.ToBoolean(buf, offs);
             ++offs;
             int n = BitConverter.ToInt32(buf, offs);
             offs += 4;
@@ -472,7 +482,7 @@ namespace sQzLib
                     return true;
                 l -= 4;
                 offs += 4;
-                if (vQPack[lv].ReadByte(buf, ref offs))
+                if (MainPacks[lv].ReadByte(buf, ref offs))
                     return true;
             }
             if (n != 0)
@@ -495,7 +505,7 @@ namespace sQzLib
                 else
                     return true;
                 offs += 4;
-                if (vQPackAlt[lv].ReadByte(buf, ref offs))
+                if (AltPacks[lv].ReadByte(buf, ref offs))
                     return true;
             }
             if (n != 0)
@@ -505,9 +515,9 @@ namespace sQzLib
 
         public byte[] ToByteNextQS(Level lv)
         {
-            if (bQPkAlt)
-                return vQPackAlt[lv].ToByteNextQS();
-            return vQPack[lv].ToByteNextQS();
+            if (IsTransferingAltPacks)
+                return AltPacks[lv].ToByteNextQS();
+            return MainPacks[lv].ToByteNextQS();
         }
 
         public List<byte[]> ToByteKey()
@@ -559,7 +569,7 @@ namespace sQzLib
                 System.IO.Directory.CreateDirectory(folderToStore);
             System.IO.Directory.SetCurrentDirectory(System.IO.Directory.GetCurrentDirectory() + "\\" +
                 folderToStore);
-            foreach (QuestPack p in vQPack.Values)
+            foreach (QuestPack p in MainPacks.Values)
                 p.WriteDocx();
             System.IO.Directory.SetCurrentDirectory(System.IO.Directory.GetParent(
                 System.IO.Directory.GetCurrentDirectory()).ToString());

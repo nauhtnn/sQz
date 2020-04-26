@@ -9,16 +9,16 @@ namespace sQzLib
 {
     public class AnsPack
     {
-        public SortedList<int, AnsSheet> vSheet;
+        public SortedList<int, AnsSheet> Sheets;
         public AnsPack()
         {
-            vSheet = new SortedList<int, AnsSheet>();
+            Sheets = new SortedList<int, AnsSheet>();
         }
 
         public int GetByteCount()
         {
             int sz = 4;
-            foreach (AnsSheet s in vSheet.Values)
+            foreach (AnsSheet s in Sheets.Values)
                 sz += s.GetByteCount();
             return sz;
         }
@@ -29,10 +29,10 @@ namespace sQzLib
             int l = buf.Length - offs;
             if (l < 4)
                 return true;
-            Buffer.BlockCopy(BitConverter.GetBytes(vSheet.Values.Count), 0, buf, offs, 4);
+            Buffer.BlockCopy(BitConverter.GetBytes(Sheets.Values.Count), 0, buf, offs, 4);
             offs += 4;
             //l -= 4;
-            foreach (AnsSheet i in vSheet.Values)
+            foreach (AnsSheet i in Sheets.Values)
                 i.ToByte(ref buf, ref offs);
             l = buf.Length - offs;
             return false;
@@ -41,8 +41,8 @@ namespace sQzLib
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(vSheet.Values.Count));
-            foreach (AnsSheet i in vSheet.Values)
+            l.Add(BitConverter.GetBytes(Sheets.Values.Count));
+            foreach (AnsSheet i in Sheets.Values)
                 l.Add(i.ToByte());
             return l;
         }
@@ -54,10 +54,10 @@ namespace sQzLib
             {
                 AnsSheet i = new AnsSheet();
                 qs.ExtractKey(i);
-                if (!vSheet.ContainsKey(i.uQSLvId))
-                    vSheet.Add(i.uQSLvId, i);
+                if (!Sheets.ContainsKey(i.uQSLvId))
+                    Sheets.Add(i.uQSLvId, i);
                 else
-                    vSheet[i.uQSLvId] = i;
+                    Sheets[i.uQSLvId] = i;
             }
         }
 
@@ -65,9 +65,9 @@ namespace sQzLib
         {
             AnsSheet i = new AnsSheet();
             qs.ExtractKey(i);
-            if (!vSheet.ContainsKey(i.uQSLvId))
+            if (!Sheets.ContainsKey(i.uQSLvId))
             {
-                vSheet.Add(i.uQSLvId, i);
+                Sheets.Add(i.uQSLvId, i);
                 return i;
             }
             return null;
@@ -76,7 +76,7 @@ namespace sQzLib
         //only Operation1 uses this.
         public bool ReadByte(byte[] buf, ref int offs)
         {
-            vSheet.Clear();
+            Sheets.Clear();
             if (buf == null)
                 return true;
             int l = buf.Length - offs;
@@ -90,9 +90,9 @@ namespace sQzLib
             while (0 < nSh)
             {
                 AnsSheet i = new AnsSheet();
-                if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.uQSLvId))
+                if (i.ReadByte(buf, ref offs) || Sheets.ContainsKey(i.uQSLvId))
                     return true;
-                vSheet.Add(i.uQSLvId, i);
+                Sheets.Add(i.uQSLvId, i);
                 --nSh;
             }
             return false;

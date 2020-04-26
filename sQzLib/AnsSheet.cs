@@ -14,7 +14,7 @@ namespace sQzLib
         public ListBox[] vlbxAns;
         public AnsItem[][] vAnsItem;
         public int uQSLvId;
-        public int uQSId { get { return (ExamineeA.LV_CAP < uQSLvId) ? uQSLvId - ExamineeA.LV_CAP : uQSLvId; } }
+        public int uQSId { get { return ((int)Level.MAX_COUNT_EACH_LEVEL < uQSLvId) ? uQSLvId - (int)Level.MAX_COUNT_EACH_LEVEL : uQSLvId; } }
         public bool bChanged;
         DgEvntCB dgSelChgCB;
         public byte[] aAns;
@@ -32,7 +32,7 @@ namespace sQzLib
         public AnsSheet() {
             bChanged = false;
             aAns = null;
-            uQSLvId = ExamineeA.LV_CAP;
+            uQSLvId = (int)Level.MAX_COUNT_EACH_LEVEL;
             dgSelChgCB = null;
         }
 

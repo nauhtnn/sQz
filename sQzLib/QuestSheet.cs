@@ -11,10 +11,11 @@ namespace sQzLib
         public static int guDBCurAId;
         public static int guDBCurBId;
         public int uId;
-        public int LvId { get { return (Pack.Lv == Level.A) ? uId : uId + ExamineeA.LV_CAP; } }
-        public string tId { get { return Pack.Lv.ToString() + uId.ToString("d3"); } }
+        public Level Lv;
+        public int LvId { get { return (Lv == Level.A) ? uId : uId + (int)Level.MAX_COUNT_EACH_LEVEL; } }
+        public string tId { get { return Lv.ToString() + uId.ToString("d3"); } }
         public List<MultiChoiceItem> Items { get; private set; }
-        public byte[] Items2Array;
+        public byte[] ItemsInBytes;
         public int CountDifficult
         {
             get
@@ -27,14 +28,12 @@ namespace sQzLib
             }
         }
 
-        private QuestPack Pack;
-
-        public QuestSheet(QuestPack pack)
+        public QuestSheet()
         {
-            Pack = pack;
             Items = new List<MultiChoiceItem>();
-            Items2Array = null;
-            uId = ExamineeA.LV_CAP;
+            ItemsInBytes = null;
+            uId = (int)Level.MAX_COUNT_EACH_LEVEL;
+            Lv = Level.A;
         }
 
         public static bool ParseLvId(string s, out Level lv, out int id)
@@ -42,18 +41,18 @@ namespace sQzLib
             if (s == null || s.Length != 4)
             {
                 lv = Level.A;
-                id = ExamineeA.LV_CAP;
+                id = (int)Level.MAX_COUNT_EACH_LEVEL;
                 return true;
             }
             s = s.ToUpper();
             if (!Enum.TryParse(s.Substring(0, 1), out lv))
             {
-                id = ExamineeA.LV_CAP;
+                id = (int)Level.MAX_COUNT_EACH_LEVEL;
                 return true;
             }
             if (!int.TryParse(s.Substring(1), out id))
                 return true;
-            if (id < 1 || ExamineeA.LV_CAP <= id)
+            if (id < 1 || (int)Level.MAX_COUNT_EACH_LEVEL <= id)
                 return true;
             return false;
         }
@@ -75,7 +74,7 @@ namespace sQzLib
 
         public List<int[]> CountItemGroupByModule()
         {
-            IUx[] IUs_by_Lv = MultiChoiceItem.GetIUs(Pack.Lv);
+            IUx[] IUs_by_Lv = MultiChoiceItem.GetIUs(Lv);
             int[] n_difficultItems = new int[IUs_by_Lv.Length];
             int[] n_allItems = new int[IUs_by_Lv.Length];
             foreach (MultiChoiceItem i in Items)
@@ -199,8 +198,8 @@ namespace sQzLib
             //if (l < 12)
             //    return true;
             //int x;
-            //if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-            //    eLv = (ExamLv)x;
+            //if (Enum.IsDefined(typeof(Level), x = BitConverter.ToInt32(buf, offs)))
+            //    eLv = (Level)x;
             //else
             //    return true;
             //offs += 4;
@@ -246,15 +245,15 @@ namespace sQzLib
             //    --nq;
             //    items.Add(q);
             //}
-            //if (!Array.Equals(buf, aQuest))
+            //if (!Array.Equals(buf, ItemsInBytes))
             //{
             //    int sz = offs - offs0;
             //    if (sz == buf.Length)
-            //        aQuest = buf.Clone() as byte[];
+            //        ItemsInBytes = buf.Clone() as byte[];
             //    else
             //    {
-            //        aQuest = new byte[sz];
-            //        Buffer.BlockCopy(buf, offs0, aQuest, 0, sz);
+            //        ItemsInBytes = new byte[sz];
+            //        Buffer.BlockCopy(buf, offs0, ItemsInBytes, 0, sz);
             //    }
             //}
             return false;
@@ -303,7 +302,7 @@ namespace sQzLib
         public QuestSheet DeepCopy()
         {
             QuestSheet qs = new QuestSheet();
-            qs.mLv = mLv;
+            qs.Lv = Lv;
             qs.uId = uId;
             foreach (MultiChoiceItem qi in Items)
                 qs.Items.Add(qi.DeepCopy());
@@ -329,7 +328,7 @@ namespace sQzLib
         public QuestSheet RandomizeDeepCopy(Random rand)
         {
             QuestSheet qs = new QuestSheet();
-            qs.mLv = mLv;
+            qs.Lv = Lv;
             qs.uId = uId;
             foreach (MultiChoiceItem qi in Items)
                 qs.Items.Add(qi.RandomizeDeepCopy(rand));
@@ -352,9 +351,9 @@ namespace sQzLib
 		//{
   //          IUx[] ius = new IUx[LvA_IUx.Length + LvB_IUx.Length];
   //          int i = -1;
-  //          foreach (IUx iu in GetIUs(ExamLv.A))
+  //          foreach (IUx iu in GetIUs(Level.A))
   //              ius[++i] = iu;
-  //          foreach (IUx iu in GetIUs(ExamLv.B))
+  //          foreach (IUx iu in GetIUs(Level.B))
   //              ius[++i] = iu;
 		//	int[] nn = new int[ius.Length];
 		//	i = -1;
@@ -546,12 +545,12 @@ namespace sQzLib
 
         public bool UpdateCurQSId()
         {
-            if (mLv == Level.A && -1 < guDBCurAId)
+            if (Lv == Level.A && -1 < guDBCurAId)
             {
                 uId = ++guDBCurAId;
                 return false;
             }
-            if (mLv == Level.B && -1 < guDBCurBId)
+            if (Lv == Level.B && -1 < guDBCurBId)
             {
                 uId = ++guDBCurBId;
                 return false;
@@ -565,7 +564,7 @@ namespace sQzLib
             //if (conn == null)
             //    return true;
             //int uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
-            //        "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.A.ToString() + "'");
+            //        "dt='" + dt.ToString(DT._) + "' AND lv='" + Level.A.ToString() + "'");
             //if (uid < 0)
             //{
             //    DBConnect.Close(ref conn);
@@ -574,7 +573,7 @@ namespace sQzLib
             //guDBCurAId = uid;
 
             //uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
-            //        "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.B.ToString() + "'");
+            //        "dt='" + dt.ToString(DT._) + "' AND lv='" + Level.B.ToString() + "'");
             //if (uid < 0)
             //{
             //    DBConnect.Close(ref conn);
@@ -617,11 +616,4 @@ namespace sQzLib
 
     //    }
     //}
-
-    public enum Difficulty
-    {
-        Easy,
-        Difficult,
-        Both
-    }
 }

@@ -17,13 +17,12 @@ namespace sQzLib
 
     public abstract class ExamineeA
     {
-        public const int LV_CAP = 10000;//db sqz_examinee `id` SMALLINT UNSIGNED
         public DateTime mDt;
         public NeeStt eStt;
-        public Level mLv;
+        public Level Lv;
         public int uId;
-        public int LvId { get { return (mLv == Level.A) ? uId : uId + LV_CAP; } }
-        public string tId { get { return mLv.ToString() + uId.ToString("d4"); } }
+        public int LvId { get { return (Lv == Level.A) ? uId : uId + (int)Level.MAX_COUNT_EACH_LEVEL; } }
+        public string tId { get { return Lv.ToString() + uId.ToString("d4"); } }
         public static string gId(Level lv, int id) { return lv.ToString() + id.ToString("d4"); }
         public string tName;
         public string tBirdate;
@@ -52,13 +51,13 @@ namespace sQzLib
         void Reset()
         {
             mDt = DT.INV_H;
-            mLv = Level.A;
-            uId = LV_CAP;
+            Lv = Level.A;
+            uId = (int)Level.MAX_COUNT_EACH_LEVEL;
             tName = null;
             tBirdate = null;
             tBirthplace = null;
             eStt = NeeStt.Signing;
-            uGrade = LV_CAP;
+            uGrade = (int)Level.MAX_COUNT_EACH_LEVEL;
             dtTim1 = dtTim2 = DT.INV_;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
@@ -68,17 +67,17 @@ namespace sQzLib
 
         protected void ParseLvID(int lvid)
         {
-            //if (lvid != LV_CAP &&(lvid < 1 || LV_CAP + LV_CAP <= lvid))
+            //if (lvid != Level.MAX_COUNT_EACH_LEVEL &&(lvid < 1 || Level.MAX_COUNT_EACH_LEVEL + Level.MAX_COUNT_EACH_LEVEL <= lvid))
             //    return true;
-            //if(lvid < LV_CAP)
+            //if(lvid < Level.MAX_COUNT_EACH_LEVEL)
             //{
-            //    eLv = ExamLv.A;
+            //    eLv = Level.A;
             //    uId = lvid;
             //}
             //else
             //{
-            //    eLv = ExamLv.B;
-            //    uId = lvid - LV_CAP;
+            //    eLv = Level.B;
+            //    uId = lvid - Level.MAX_COUNT_EACH_LEVEL;
             //}
             //return false;
         }
@@ -94,10 +93,10 @@ namespace sQzLib
             int uid;
             if (!int.TryParse(s.Substring(1), out uid))
                 throw new ArgumentException();
-            if (uid < 1 || LV_CAP <= uid)
+            if (uid < 1 || (int)Level.MAX_COUNT_EACH_LEVEL <= uid)
                 throw new ArgumentException();
             Reset();
-            mLv = lv;
+            Lv = lv;
             uId = uid;
         }
 
@@ -113,7 +112,7 @@ namespace sQzLib
         {
             MySqlDataReader reader = DBConnect.exeQrySelect("sqz_nee_qsheet", "qsid",
                 "dt='" + mDt.ToString(DT._) +
-                "' AND lv='" + mLv.ToString() +
+                "' AND lv='" + Lv.ToString() +
                 "' AND neeid=" + uId);
             if (reader.Read())
             {
@@ -126,7 +125,7 @@ namespace sQzLib
         public char[] DBGetAns()
         {
             MySqlDataReader reader = DBConnect.exeQrySelect("sqz_nee_qsheet", "ans",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + Lv.ToString() +
                 "' AND neeid=" + uId);
             if (reader.Read())
             {
@@ -142,7 +141,7 @@ namespace sQzLib
         public bool DBSelGrade()
         {
             MySqlDataReader reader = DBConnect.exeQrySelect("sqz_nee_qsheet", "grade",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + Lv.ToString() +
                 "' AND neeid=" + uId);
             if (reader.Read())
             {
@@ -156,7 +155,7 @@ namespace sQzLib
         public string DBGetT()
         {
             MySqlDataReader reader = DBConnect.exeQrySelect("sqz_examinee", "t",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + mLv.ToString() +
+                "dt='" + mDt.ToString(DT._) + "' AND lv='" + Lv.ToString() +
                 "' AND id=" + uId);
             if (reader.Read())
             {
@@ -230,7 +229,7 @@ namespace sQzLib
             catch (UnauthorizedAccessException) { err = true; }
             if (err)
                 return true;
-            w.Write((int)mLv);
+            w.Write((int)Lv);
             w.Write(uId);
             w.Write((int)eStt);
             w.Write(mAnsSh.uQSId);
@@ -266,7 +265,7 @@ namespace sQzLib
             //uSlId = r.ReadUInt32();
             int x;
             if (Enum.IsDefined(typeof(Level), x = r.ReadInt32()))
-                mLv = (Level)x;
+                Lv = (Level)x;
             uId = r.ReadInt32();
             if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
                 eStt = (NeeStt)x;

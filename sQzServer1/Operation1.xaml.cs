@@ -109,7 +109,7 @@ namespace sQzServer1
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
-            WPopup.s.wpCb = Exit;
+            WPopup.s.CbOK = Exit;
             WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_EXIT_CAUT],
                 Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], null);
         }
@@ -162,7 +162,7 @@ namespace sQzServer1
                     {
                         ExamineeA o = null;
                         dt = DateTime.Now;
-                        foreach(ExamSlot sl in mBrd.vSl.Values)
+                        foreach(ExamSlot sl in mBrd.Slots.Values)
                             if ((o = sl.Signin(e)) != null)
                             {
                                 dt = sl.Dt;
@@ -210,11 +210,11 @@ namespace sQzServer1
                     else
                     {
                         ExamineeA o = null;
-                        foreach (ExamSlot sl in mBrd.vSl.Values)
+                        foreach (ExamSlot sl in mBrd.Slots.Values)
                             if ((o = sl.Find(e.LvId)) != null)
                                 break;
                         if (o == null)
-                            o = new ExamineeC();
+                            o = new ExamineeC(e.tId);
                         if (o.tComp == null)
                             outMsg = new byte[16];
                         else
@@ -244,8 +244,8 @@ namespace sQzServer1
                     outMsg = null;
                     lvid = BitConverter.ToInt32(buf, offs);
                     ExamSlot slo = null;
-                    foreach (ExamSlot s in mBrd.vSl.Values)
-                        foreach(ExamRoom r in s.vRoom.Values)
+                    foreach (ExamSlot s in mBrd.Slots.Values)
+                        foreach(ExamRoom r in s.Rooms.Values)
                             if(r.vExaminee.ContainsKey(lvid))
                             {
                                 slo = s;
@@ -257,10 +257,10 @@ namespace sQzServer1
                         Array.Copy(BitConverter.GetBytes((int)TxI.NEEID_NF), 0, outMsg, 0, 4);
                         break;
                     }
-                    ExamLv lv = (lvid < ExamineeA.LV_CAP) ? ExamLv.A : ExamLv.B;
+                    Level lv = (lvid < (int)Level.MAX_COUNT_EACH_LEVEL) ? Level.A : Level.B;
                     offs += 4;
                     int qsid = BitConverter.ToInt32(buf, offs);
-                    if (qsid == ExamineeA.LV_CAP)
+                    if (qsid == (int)Level.MAX_COUNT_EACH_LEVEL)
                     {
                         byte[] a = slo.ToByteNextQS(lv);
                         if (a != null)
@@ -270,11 +270,11 @@ namespace sQzServer1
                             Array.Copy(a, 0, outMsg, 4, a.Length);
                         }
                     }
-                    else if (slo.vQPack[lv].vSheet.TryGetValue(qsid, out qs))
+                    else if (slo.MainPacks[lv].Sheets.TryGetValue(qsid, out qs))
                     {
-                        outMsg = new byte[qs.aQuest.Length + 4];
+                        outMsg = new byte[qs.ItemsInBytes.Length + 4];
                         Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
-                        Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
+                        Array.Copy(qs.ItemsInBytes, 0, outMsg, 4, qs.ItemsInBytes.Length);
                     }
                     if (outMsg == null)
                     {
@@ -291,8 +291,8 @@ namespace sQzServer1
                     {
                         AnsSheet keySh = null;
                         found = false;
-                        foreach(ExamSlot sl in mBrd.vSl.Values)
-                            if(sl.mKeyPack.vSheet.TryGetValue(e.mAnsSh.uQSLvId, out keySh))
+                        foreach(ExamSlot sl in mBrd.Slots.Values)
+                            if(sl.mKeyPack.Sheets.TryGetValue(e.mAnsSh.uQSLvId, out keySh))
                             {
                                 found = true;
                                 break;
@@ -305,7 +305,7 @@ namespace sQzServer1
                         ExamineeA o = null;
                         lvid = e.LvId;
                         found = false;
-                        foreach (ExamSlot sl in mBrd.vSl.Values)
+                        foreach (ExamSlot sl in mBrd.Slots.Values)
                             if ((o = sl.Find(lvid)) != null)
                                 break;
                         if (o != null)
@@ -497,7 +497,7 @@ namespace sQzServer1
                 if (t.Name == "_" + (i.Content as string).Replace(':', '_'))
                     return;
             ExamSlot sl;
-            if (!mBrd.vSl.TryGetValue(i.Content as string, out sl))
+            if (!mBrd.Slots.TryGetValue(i.Content as string, out sl))
                 return;
 
             Op1SlotView vw = new Op1SlotView();
@@ -517,7 +517,7 @@ namespace sQzServer1
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
-            mBrd.vSl.Remove(i.Content as string);
+            mBrd.Slots.Remove(i.Content as string);
             foreach (TabItem ti in tbcSl.Items)
                 if (ti.Name == "_" + (i.Content as string).Replace(':', '_'))
                 {

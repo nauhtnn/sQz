@@ -303,7 +303,7 @@ namespace sQzLib
             if(!rval)
             {
                 foreach (ExamSlot sl in Slots.Values)
-                    sl.DBUpT2(conn, rid, out eMsg);
+                    sl.SaveCommitTime(rid);
             }
             return rval;
         }
@@ -313,7 +313,7 @@ namespace sQzLib
             foreach(ExamSlot sl in Slots.Values)
             {
                 bool bArch = true;
-                foreach (ExamRoom r in sl.vRoom.Values)
+                foreach (ExamRoom r in sl.Rooms.Values)
                     if (0 < r.vExaminee.Count && r.t2.Hour == DT.INV)
                     {
                         bArch = false;

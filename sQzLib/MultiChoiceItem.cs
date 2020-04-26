@@ -215,6 +215,14 @@ namespace sQzLib
     {
         A,
         B,
-        C
+        C,
+        MAX_COUNT_EACH_LEVEL = 10000, //unsigned smallint 65535
+    }
+
+    public enum Difficulty
+    {
+        Easy,
+        Difficult,
+        Both
     }
 }

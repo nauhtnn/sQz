@@ -54,7 +54,7 @@ namespace sQzServer1
             vDt1.Clear();
             vDt2.Clear();
             int rid = -1;
-            foreach (ExamRoom r in mSl.vRoom.Values)
+            foreach (ExamRoom r in mSl.Rooms.Values)
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
                     RowDefinition rd = new RowDefinition();
@@ -128,7 +128,7 @@ namespace sQzServer1
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.HorizontalAlignment = HorizontalAlignment.Center;
-                    if (e.uGrade != ExamineeA.LV_CAP)
+                    if (e.uGrade != (int)Level.MAX_COUNT_EACH_LEVEL)
                     {
                         t.Text = e.Grade;
                         cbx.IsEnabled = false;
@@ -153,14 +153,14 @@ namespace sQzServer1
                 }
         }
 
-        public void UpdateRsView(List<ExamRoom> vRoom)
+        public void UpdateRsView(List<ExamRoom> Rooms)
         {
             TextBlock t;
-            foreach (ExamRoom r in vRoom)
+            foreach (ExamRoom r in Rooms)
                 foreach (ExamineeA e in r.vExaminee.Values)
                 {
                     int lvid = e.LvId;
-                    if (e.uGrade != ExamineeA.LV_CAP && vGrade.TryGetValue(lvid, out t))
+                    if (e.uGrade != (int)Level.MAX_COUNT_EACH_LEVEL && vGrade.TryGetValue(lvid, out t))
                         t.Text = e.Grade;
                     if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");
@@ -251,7 +251,7 @@ namespace sQzServer1
             if (int.TryParse(cbx.Name.Substring(1), out key))
             {
                 ExamineeA nee;
-                foreach (ExamRoom r in mSl.vRoom.Values)
+                foreach (ExamRoom r in mSl.Rooms.Values)
                     if(r.vExaminee.TryGetValue(key, out nee) &&
                         nee.eStt != NeeStt.Finished)
                     {
@@ -270,7 +270,7 @@ namespace sQzServer1
         public bool ToSubmit()
         {
             CheckBox cbx;
-            foreach (ExamRoom r in mSl.vRoom.Values)
+            foreach (ExamRoom r in mSl.Rooms.Values)
                 foreach (ExamineeA nee in r.vExaminee.Values)
                     if (nee.eStt != NeeStt.Finished &&
                         (!vAbsen.TryGetValue(nee.LvId, out cbx) ||

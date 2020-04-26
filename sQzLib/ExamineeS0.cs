@@ -18,7 +18,7 @@ namespace sQzLib
         public override List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes((int)mLv));
+            l.Add(BitConverter.GetBytes((int)Lv));
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes((int)eStt));
             byte[] b;
@@ -64,7 +64,7 @@ namespace sQzLib
                 return true;
             int x;
             if (Enum.IsDefined(typeof(Level), x = BitConverter.ToInt32(buf, offs)))
-                mLv = (Level)x;
+                Lv = (Level)x;
             else
                 return true;
             l -= 4;

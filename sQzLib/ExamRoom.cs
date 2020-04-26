@@ -17,7 +17,7 @@ namespace sQzLib
         public string tPw;
         public ExamRoom()
         {
-            ID = ExamineeA.LV_CAP;
+            ID = (int)Level.MAX_COUNT_EACH_LEVEL;
             vExaminee = new SortedList<int, ExamineeA>();
             N_ExamineeGroupByLv = new Dictionary<Level, int>();
             tPw = null;
@@ -32,7 +32,7 @@ namespace sQzLib
             foreach (ExamineeA e in vExaminee.Values)
             {
                 vals.Append("('" + e.mDt.ToString(DT._) + "','");
-                vals.Append(e.mLv.ToString() + "',");
+                vals.Append(e.Lv.ToString() + "',");
                 vals.Append(e.uId + ",");
                 vals.Append("'" + e.mDt.ToString(DT.hh) + "',");
                 vals.Append(ID + ",");
@@ -56,14 +56,14 @@ namespace sQzLib
             {
                 ExamineeS0 e = new ExamineeS0();
                 e.mDt = dt;
-                if (!Enum.TryParse(reader.GetString(0), out e.mLv))
+                if (!Enum.TryParse(reader.GetString(0), out e.Lv))
                     continue;
                 e.uId = reader.GetUInt16(1);
                 e.tName = reader.GetString(2);
                 e.tBirdate = reader.GetDateTime(3).ToString(DT.RR);
                 e.tBirthplace = reader.GetString(4);
                 vExaminee.Add(e.LvId, e);
-                ++N_ExamineeGroupByLv[e.mLv];
+                ++N_ExamineeGroupByLv[e.Lv];
             }
             reader.Close();
 
@@ -71,7 +71,7 @@ namespace sQzLib
             {
                 reader = DBConnect.exeQrySelect("sqz_nee_qsheet",
                     "t1,t2,grade,comp", "dt='" + e.mDt.ToString(DT._) + "' AND lv='" +
-                    e.mLv + "' AND neeid=" + e.uId);
+                    e.Lv + "' AND neeid=" + e.uId);
                 if (reader != null)
                 {
                     if (reader.Read())
@@ -95,7 +95,7 @@ namespace sQzLib
                 if (e.bToDB)
                 {
                     e.bToDB = false;
-                    vals.Append("('" + e.mDt.ToString(DT._) + "','" + e.mLv.ToString() + "'," +
+                    vals.Append("('" + e.mDt.ToString(DT._) + "','" + e.Lv.ToString() + "'," +
                         e.uId + "," + (e.mAnsSh.uQSId)
                         + ",'" + e.dtTim1.ToString(DT.hh) +
                         "','" + e.dtTim2.ToString(DT.hh) + "'," + e.uGrade + ",'" +

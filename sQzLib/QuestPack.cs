@@ -10,11 +10,11 @@ namespace sQzLib
     public class QuestPack
     {
         public DateTime mDt;
-        public Level Lv;
         public bool IsAlternative;
         public SortedList<int, QuestSheet> Sheets;
         int mNextQSIdx;
         int mMaxQSIdx;
+        public Level Lv;
         protected QuestPack()
         {
             mDt = DT.INV_;
@@ -38,7 +38,7 @@ namespace sQzLib
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes((int)Lv));
+            //l.Add(BitConverter.GetBytes((int)Lv));
             l.Add(BitConverter.GetBytes(Sheets.Values.Count));
             foreach (QuestSheet qs in Sheets.Values)
                 foreach (byte[] i in qs.ToByte())
@@ -68,7 +68,7 @@ namespace sQzLib
                     return true;
                 if (!Sheets.ContainsKey(qs.uId))
                 {
-                    qs.mLv = Lv;//optmz
+                    //qs.Lv = Lv;//optmz
                     Sheets.Add(qs.uId, qs);
                 }
                 --nSh;
@@ -92,7 +92,7 @@ namespace sQzLib
         //    {
         //        while (reader.Read())
         //        {
-        //            ExamLv lv;
+        //            Level lv;
         //            if (Enum.TryParse(reader.GetString(0), out lv))
         //                break;
         //            l.Add(lv.ToString() + reader.GetUInt16(1).ToString("d3"));
@@ -132,24 +132,24 @@ namespace sQzLib
             return false;
         }
 
-        //public bool DBDelete(out string eMsg)
-        //{
-        //    string cond1 = "dt='" + mDt.ToString(DT._) +
-        //            "' AND lv='" + eLv.ToString() + "' AND qsid=";
-        //    string cond2 = "dt='" + mDt.ToString(DT._) +
-        //            "' AND lv='" + eLv.ToString() + "' AND id=";
-        //    foreach (QuestSheet qs in Sheets.Values)
-        //    {
-        //        //int n = DBConnect.Count(conn, "sqz_nee_qsheet", "qsid", cond1 + qs.uId, out eMsg);
-        //        //if (0 < n)
-        //        //    continue;
-        //        if (DBConnect.Delete(conn, "sqz_qsheet_quest", cond1 + qs.uId, out eMsg) < 0)
-        //            return true;
-        //        if (DBConnect.Delete(conn, "sqz_qsheet", cond2 + qs.uId, out eMsg) < 0)
-        //            return true;
-        //    }
-        //    return false;
-        //}
+        public bool DBDelete()
+        {
+            string cond1 = "dt='" + mDt.ToString(DT._) +
+                    "' AND lv='" + Lv.ToString() + "' AND qsid=";
+            string cond2 = "dt='" + mDt.ToString(DT._) +
+                    "' AND lv='" + Lv.ToString() + "' AND id=";
+            foreach (QuestSheet qs in Sheets.Values)
+            {
+                //int n = DBConnect.Count(conn, "sqz_nee_qsheet", "qsid", cond1 + qs.uId, out eMsg);
+                //if (0 < n)
+                //    continue;
+                if (DBConnect.Delete("sqz_qsheet_quest", cond1 + qs.uId) < 0)
+                    return true;
+                if (DBConnect.Delete("sqz_qsheet", cond2 + qs.uId) < 0)
+                    return true;
+            }
+            return false;
+        }
 
         public List<QuestSheet> Genegrate2(int n, int[] vn, int[] vndiff)
         {
@@ -204,7 +204,7 @@ namespace sQzLib
             i = -1;
             foreach (QuestSheet qs in l)
             {
-                qs.mLv = Lv;
+                qs.Lv = Lv;
                 qs.Randomize(rand);
                 if (!qs.UpdateCurQSId())//todo: better error handle
                     Sheets.Add(qs.uId, qs);
@@ -245,7 +245,7 @@ namespace sQzLib
             {
                 --n;
                 QuestSheet qs = qs0.RandomizeDeepCopy(rand);
-                qs.mLv = Lv;
+                qs.Lv = Lv;
                 if (!qs.UpdateCurQSId())//todo: better error handle
                 {
                     Sheets.Add(qs.uId, qs);
@@ -259,35 +259,36 @@ namespace sQzLib
 
         public static string DBIns(DateTime dt, List<QuestSheet> l)
         {
-            if (l.Count == 0)
-                return Txt.s._[(int)TxI.DB_DAT_NOK];
-            StringBuilder vals = new StringBuilder();
-            string prefx = "('" + dt.ToString(DT._) + "',";
-            foreach (QuestSheet qs in l)
-                vals.Append(prefx + "'" + qs.mLv.ToString() + "'," + qs.uId +
-                    ",'" + dt.ToString(DT.hh) + "'," +
-                    (qs.bAlt ? '1' : '0') + "),");
-            vals.Remove(vals.Length - 1, 1);//remove the last comma
-            string eMsg;
-            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,lv,id,t,alt", vals.ToString(), out eMsg) < 0)
-            {
-                DBConnect.Close(ref conn);
-                if (eMsg == null)
-                    eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.QS_ID_EXISTS];
-                return eMsg;
-            }
-            vals.Clear();
-            prefx = "('" + dt.ToString(DT._) + "',";
-            foreach (QuestSheet qs in l)
-                qs.DBAppendQryIns(prefx, vals);
-            vals.Remove(vals.Length - 1, 1);//remove the last comma
-            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid,asort,idx", vals.ToString(), out eMsg) < 0)
-            {
-                DBConnect.Close(ref conn);
-                return eMsg;
-            }
-            DBConnect.Close(ref conn);
-            return null;
+            //if (l.Count == 0)
+            //    return Txt.s._[(int)TxI.DB_DAT_NOK];
+            //StringBuilder vals = new StringBuilder();
+            //string prefx = "('" + dt.ToString(DT._) + "',";
+            //foreach (QuestSheet qs in l)
+            //    vals.Append(prefx + "'" + qs.Lv.ToString() + "'," + qs.uId +
+            //        ",'" + dt.ToString(DT.hh) + "'," +
+            //        (qs.bAlt ? '1' : '0') + "),");
+            //vals.Remove(vals.Length - 1, 1);//remove the last comma
+            //string eMsg;
+            //if(DBConnect.Ins(conn, "sqz_qsheet", "dt,lv,id,t,alt", vals.ToString(), out eMsg) < 0)
+            //{
+            //    DBConnect.Close(ref conn);
+            //    if (eMsg == null)
+            //        eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.QS_ID_EXISTS];
+            //    return eMsg;
+            //}
+            //vals.Clear();
+            //prefx = "('" + dt.ToString(DT._) + "',";
+            //foreach (QuestSheet qs in l)
+            //    qs.DBAppendQryIns(prefx, vals);
+            //vals.Remove(vals.Length - 1, 1);//remove the last comma
+            //if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid,asort,idx", vals.ToString(), out eMsg) < 0)
+            //{
+            //    DBConnect.Close(ref conn);
+            //    return eMsg;
+            //}
+            //DBConnect.Close(ref conn);
+            //return null;
+            throw new NotImplementedException();
         }
 
         public byte[] ToByteNextQS()
@@ -297,30 +298,31 @@ namespace sQzLib
             if (mMaxQSIdx < mNextQSIdx)
                 mNextQSIdx = 0;
             if (mNextQSIdx < Sheets.Count)
-                return Sheets.ElementAt(mNextQSIdx++).Value.Items2Array;
+                return Sheets.ElementAt(mNextQSIdx++).Value.ItemsInBytes;
             else
                 return null;
         }
 
         public List<int[]> GetNMod()
         {
-            if (Sheets.Values.Count == 0)
-                return null;
-            return Sheets.First().Value.GetNMod();
+            //if (Sheets.Values.Count == 0)
+            //    return null;
+            //return Sheets.First().Value.GetNMod();
+            throw new NotImplementedException();
         }
 
         public void WriteTxt()
         {
             //string extension = ".txt";
-            //foreach (QuestSheet qs in vSheet.Values)
-            //    qs.WriteTxt(qs.eLv.ToString() + qs.uId + extension);
+            //foreach (QuestSheet qs in Sheets.Values)
+            //    qs.WriteTxt(qs.Lv.ToString() + qs.uId + extension);
         }
 
         public void WriteDocx()
         {
             string extension = ".docx";
             foreach (QuestSheet qs in Sheets.Values)
-                QuestSheetDocxPrinter.GetInstance().Print(qs.mLv.ToString() + qs.uId + extension,
+                QuestSheetDocxPrinter.GetInstance().Print(qs.Lv.ToString() + qs.uId + extension,
                     qs.ToListOfStrings(), mDt.ToString(DT.RR), qs.tId);
         }
     }
