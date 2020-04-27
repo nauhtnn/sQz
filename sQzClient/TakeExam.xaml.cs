@@ -69,7 +69,7 @@ namespace sQzClient
             qaWh = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
 
             InitLeftPanel();
-            InitQuestPanel();
+            InitItemPanel();
 
             bBtnBusy = false;
 
@@ -245,21 +245,21 @@ namespace sQzClient
             //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
         }
 
-        void InitQuestPanel()
+        void InitItemPanel()
         {
-            gQuest.Background = Theme.s._[(int)BrushId.Q_BG];
+            QuestPanel.Background = Theme.s._[(int)BrushId.Q_BG];
             int n = UserSheet.Items.Count;
             for (int i = 1, j = 0; i <= n; i += 2, ++j)
             {
                 gQuest.RowDefinitions.Add(new RowDefinition());
-                StackPanel q = CreateQuestion(i);
+                StackPanel q = CreateQuestBox(i);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 0);
                 gQuest.Children.Add(q);
             }
             for (int i = 2, j = 0; i <= n; i += 2, ++j)
             {
-                StackPanel q = CreateQuestion(i);
+                StackPanel q = CreateQuestBox(i);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 1);
                 gQuest.Children.Add(q);
@@ -267,41 +267,59 @@ namespace sQzClient
             gQuest.Background = Theme.s._[(int)BrushId.BG];
         }
 
-        StackPanel CreateQuestion(int idx)
+        Label CreateIndexInsideQuestBox(int idx)
         {
-            StackPanel q = new StackPanel();
-            q.Orientation = Orientation.Horizontal;
-            q.Margin = qMrg;
-            Label l = new Label();
-            l.HorizontalAlignment = HorizontalAlignment.Left;
-            l.VerticalAlignment = VerticalAlignment.Top;
-            l.Content = idx;
-            l.Background = Theme.s._[(int)BrushId.QID_BG];
-            l.Foreground = Theme.s._[(int)BrushId.QID_Color];
-            l.Width = qiWh;
-            l.Height = qiWh;
-            l.HorizontalContentAlignment = HorizontalAlignment.Center;
-            l.VerticalContentAlignment = VerticalAlignment.Center;
-            l.Padding = new Thickness(0);
-            q.Children.Add(l);
-            StackPanel con = new StackPanel();
+            Label idxBox = new Label();
+            idxBox.HorizontalAlignment = HorizontalAlignment.Left;
+            idxBox.VerticalAlignment = VerticalAlignment.Top;
+            idxBox.Content = idx;
+            idxBox.Background = Theme.s._[(int)BrushId.QID_BG];
+            idxBox.Foreground = Theme.s._[(int)BrushId.QID_Color];
+            idxBox.Width = qiWh;
+            idxBox.Height = qiWh;
+            idxBox.HorizontalContentAlignment = HorizontalAlignment.Center;
+            idxBox.VerticalContentAlignment = VerticalAlignment.Center;
+            idxBox.Padding = new Thickness(0);
+            return idxBox;
+        }
+
+        Label CreateStmtInsideQuestBox(MultiChoiceItem question)
+        {
             TextBlock stmt = new TextBlock();
-            MultiChoiceItem quest = UserSheet.Q(idx - 1);
-            stmt.Text = quest.Stem;
+            stmt.Text = question.Stem;
             stmt.TextWrapping = TextWrapping.Wrap;
             stmt.Width = qaWh;
             stmt.Background = Theme.s._[(int)BrushId.Q_BG];
-            Label stmtCon = new Label();
-            stmtCon.Content = stmt;
-            stmtCon.BorderBrush = Theme.s._[(int)BrushId.QID_BG];
-            stmtCon.BorderThickness = new Thickness(0, 4, 0, 0);
+            Label stmtBox = new Label();
+            stmtBox.Content = stmt;
+            stmtBox.BorderBrush = Theme.s._[(int)BrushId.QID_BG];
+            stmtBox.BorderThickness = new Thickness(0, 4, 0, 0);
             Thickness zero = new Thickness(0);
-            stmtCon.Margin = stmtCon.Padding = zero;
-            con.Children.Add(stmtCon);
-            con.Children.Add(User.mAnsSh.vlbxAns[idx-1]);
-            q.Children.Add(con);
-            q.Background = Theme.s._[(int)BrushId.BG];
-            return q;
+            stmtBox.Margin = stmtBox.Padding = zero;
+
+            return stmtBox;
+        }
+
+        StackPanel CreateQuestBox(int idx)
+        {
+            StackPanel questBox = new StackPanel();
+            questBox.Orientation = Orientation.Horizontal;
+            questBox.Margin = qMrg;
+            questBox.Background = Theme.s._[(int)BrushId.BG];
+            
+            questBox.Children.Add(CreateIndexInsideQuestBox(idx));
+
+            StackPanel questBoxInside = new StackPanel();
+
+            MultiChoiceItem question = UserSheet.Q(idx - 1);
+
+            questBoxInside.Children.Add(CreateStmtInsideQuestBox(question));
+
+            questBoxInside.Children.Add(User.mAnsSh.vlbxAns[idx-1]);
+
+            questBox.Children.Add(questBoxInside);
+
+            return questBox;
         }
 
         public void Submit()
