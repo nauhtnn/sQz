@@ -40,7 +40,11 @@ namespace sQzClient
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            if (mNee.ParseLvId(tbxId.Text))
+            try
+            {
+                mNee.ParseLvID(tbxId.Text);
+            }
+            catch(ArgumentException)
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);
@@ -89,7 +93,7 @@ namespace sQzClient
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bRunning = false;
-            WPopup.s.cncl = false;
+            WPopup.s.IsOK = false;
             mClnt.Close();
         }
 

@@ -8,6 +8,7 @@ namespace sQzLib
 {
     public sealed class ExamineeC : ExamineeA
     {
+        public ExamineeC():base() { }
         public ExamineeC(string id)
         {
             ParseLvID(id);

@@ -23,7 +23,7 @@ namespace sQzLib
         Button OK;
         Button NOK;
         Grid mG;
-        bool IsOK;
+        public bool IsOK;
         bool IsShowed;
         //bool IsCollapse;
         bool DoNotClose;

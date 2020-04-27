@@ -76,12 +76,15 @@ namespace sQzClient
             LoadTxt();
 
             WPopup.nwIns(w);
-            WPopup.s.wpCbCncl = WPCancel;
+            WPopup.s.CbNOK = WPCancel;
 
             int m = -1, s = -1;
             if (mNee.eStt < NeeStt.Submitting)
             {
-                string t = Utils.ReadFile("Duration.txt");
+                string[] lines = Utils.ReadAllLines("Duration.txt");
+                string t = null;
+                if (lines.Length > 0)
+                    t = lines[0];
                 if (t != null)
                 {
                     string[] vt = t.Split('\t');
@@ -106,7 +109,7 @@ namespace sQzClient
             else
                 msg.AppendFormat(Txt.s._[(int)TxI.EXAMING_MSG_2],
                     mNee.kDtDuration.Minutes, mNee.kDtDuration.Seconds);
-            WPopup.s.wpCb = ShowQuestion;
+            WPopup.s.CbOK = ShowQuestion;
             spMain.Opacity = 0.5;
             WPopup.s.ShowDialog(msg.ToString());
             spMain.Opacity = 1;
@@ -118,7 +121,7 @@ namespace sQzClient
 
         void ShowQuestion()
         {
-            WPopup.s.wpCb = null;
+            WPopup.s.CbOK = null;
             spMain.Effect = null;
             bBtnBusy = false;
             svwrQSh.Visibility = Visibility.Visible;
@@ -139,7 +142,7 @@ namespace sQzClient
             Label l = new Label();
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             int nAns = 4;//hardcode
-            int i = 0, n = mQSh.Count;
+            int i = 0, n = mQSh.Items.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
             mNee.mAnsSh.Init(mQSh.LvId);
             mNee.mAnsSh.InitView(mQSh, qaWh, null);
@@ -243,7 +246,7 @@ namespace sQzClient
         void InitQuestPanel()
         {
             gQuest.Background = Theme.s._[(int)BrushId.Q_BG];
-            int n = mQSh.Count;
+            int n = mQSh.Items.Count;
             for (int i = 1, j = 0; i <= n; i += 2, ++j)
             {
                 gQuest.RowDefinitions.Add(new RowDefinition());
@@ -281,8 +284,8 @@ namespace sQzClient
             q.Children.Add(l);
             StackPanel con = new StackPanel();
             TextBlock stmt = new TextBlock();
-            Question quest = mQSh.Q(idx - 1);
-            stmt.Text = quest.tStmt;
+            MultiChoiceItem quest = mQSh.Q(idx - 1);
+            stmt.Text = quest.Stem;
             stmt.TextWrapping = TextWrapping.Wrap;
             stmt.Width = qaWh;
             stmt.Background = Theme.s._[(int)BrushId.Q_BG];
@@ -303,7 +306,7 @@ namespace sQzClient
         {
             bBtnBusy = true;//
             spMain.Effect = null;
-            WPopup.s.wpCb = null;
+            WPopup.s.CbOK = null;
             bRunning = false;
             DisableAll();
             mState = NetCode.Submiting;
@@ -318,7 +321,7 @@ namespace sQzClient
             if (bBtnBusy)
                 return;
             bBtnBusy = true;
-            WPopup.s.wpCb = Submit;
+            WPopup.s.CbOK = Submit;
             spMain.Opacity = 0.5;
             WPopup.s.ShowDialog(Txt.s._[(int)TxI.SUBMIT_CAUT],
                 Txt.s._[(int)TxI.SUBMIT], Txt.s._[(int)TxI.BTN_CNCL], null);
@@ -464,7 +467,7 @@ namespace sQzClient
             if (bBtnBusy)
                 return;
             bBtnBusy = true;
-            WPopup.s.wpCb = Exit;
+            WPopup.s.CbOK = Exit;
             spMain.Opacity = 0.5;
             if (mNee.eStt < NeeStt.Submitting)
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_1],

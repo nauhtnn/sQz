@@ -65,7 +65,7 @@ namespace sQzLib
             tLog = new StringBuilder();
         }
 
-        protected void ParseLvID(int lvid)
+        public void ParseLvID(int lvid)
         {
             //if (lvid != Level.MAX_COUNT_EACH_LEVEL &&(lvid < 1 || Level.MAX_COUNT_EACH_LEVEL + Level.MAX_COUNT_EACH_LEVEL <= lvid))
             //    return true;
@@ -82,7 +82,7 @@ namespace sQzLib
             //return false;
         }
 
-        protected void ParseLvID(string s)
+        public void ParseLvID(string s)
         {
             if (s == null || s.Length != 5)
                 throw new ArgumentException();
