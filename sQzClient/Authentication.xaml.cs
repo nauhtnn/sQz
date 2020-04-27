@@ -20,7 +20,7 @@ namespace sQzClient
         UICbMsg mCbMsg;
         bool bRunning;
         DateTime mDt;
-        ExamineeC mNee;
+        ExamineeC User;
         TakeExam pgTkExm;
 
         public Authentication()
@@ -33,16 +33,16 @@ namespace sQzClient
             bRunning = true;
 
             mDt = DT.INV_;
-            mNee = new ExamineeC();
+            User = new ExamineeC();
 
-            mNee.kDtDuration = new TimeSpan(1, 0, 0);
+            User.kDtDuration = new TimeSpan(1, 0, 0);
         }
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
             try
             {
-                mNee.ParseLvID(tbxId.Text);
+                User.ParseLvID(tbxId.Text);
             }
             catch(ArgumentException)
             {
@@ -55,17 +55,17 @@ namespace sQzClient
             if(!int.TryParse(tbxD.Text, out x) || !int.TryParse(tbxM.Text, out y)
                 || !int.TryParse(tbxY.Text, out z))
             {
-                mNee.tBirdate = null;
+                User.tBirdate = null;
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
                 spMain.Opacity = 1;
                 return;
             }
-            mNee.tBirdate = x.ToString("d2") + "-" + y.ToString("d2") + "-" + z.ToString("d2");
+            User.tBirdate = x.ToString("d2") + "-" + y.ToString("d2") + "-" + z.ToString("d2");
             DateTime dum;
-            if (DT.To_(mNee.tBirdate, DT.RR, out dum))
+            if (DT.To_(User.tBirdate, DT.RR, out dum))
             {
-                mNee.tBirdate = null;
+                User.tBirdate = null;
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
                 spMain.Opacity = 1;
@@ -73,8 +73,8 @@ namespace sQzClient
             }
             try
             {
-                mNee.tComp = Environment.MachineName;
-            } catch(InvalidOperationException) { mNee.tComp = "unknown"; }//todo
+                User.tComp = Environment.MachineName;
+            } catch(InvalidOperationException) { User.tComp = "unknown"; }//todo
             DisableControls();
             Thread th = new Thread(() => {
                 if (mClnt.ConnectWR(ref mCbMsg) && bRunning)
@@ -155,12 +155,12 @@ namespace sQzClient
                     if(errc == 0)
                     {
                         ExamineeC e = new ExamineeC();
-                        e.bLog = mNee.bLog;
+                        e.bLog = User.bLog;
                         bool b = e.ReadByte(buf, ref offs);
                         l = buf.Length - offs;
                         if (!b)
                         {
-                            mNee.Merge(e);
+                            User.Merge(e);
                             mState = NetCode.ExamRetrieving;
                             return true;//continue
                         }
@@ -247,8 +247,8 @@ namespace sQzClient
                         Dispatcher.Invoke(() =>
                         {
                             pgTkExm = new TakeExam();
-                            pgTkExm.mNee = mNee;
-                            pgTkExm.mQSh = qs;
+                            pgTkExm.User = User;
+                            pgTkExm.UserSheet = qs;
                             NavigationService.Navigate(pgTkExm);
                         });
                     break;
@@ -265,13 +265,13 @@ namespace sQzClient
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.Authenticating:
-                    mNee.ToByte(out outBuf, (int)mState);
+                    User.ToByte(out outBuf, (int)mState);
                     break;
                 case NetCode.ExamRetrieving:
                     outBuf = new byte[12];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.LvId), 0, outBuf, 4, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 8, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(User.LvId), 0, outBuf, 4, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(User.mAnsSh.uQSId), 0, outBuf, 8, 4);
                     break;
                 default:
                     outBuf = null;
@@ -302,9 +302,9 @@ namespace sQzClient
                 filePath = dlg.FileName;
             if (filePath != null)
             {
-                if(mNee.ReadLogFile(filePath))
+                if(User.ReadLogFile(filePath))
                 {
-                    tbxId.Text = mNee.tId;
+                    tbxId.Text = User.tId;
                     WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
                 }
                 else
