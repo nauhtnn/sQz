@@ -9,9 +9,9 @@ namespace sQzLib
         public const char C0 = '0';
         public const char C1 = '1';
         public int ID_in_DB { get; private set; }
-        public string Stem { get; private set; }
+        public RichText Stem { get; private set; }
         public IUx mIU { get; private set; }
-        public string[] Options { get; private set; }
+        public RichText[] Options { get; private set; }
         public bool[] Keys { get; private set; }
         public int[] POptions { get; private set; }
         public bool IsDifficult { get; private set; }
@@ -31,11 +31,11 @@ namespace sQzLib
 
         public MultiChoiceItem() { }
 
-        public MultiChoiceItem(int DB_ID, string[] cleanData, bool[] keys, bool isDifficult)
+        public MultiChoiceItem(int DB_ID, RichText[] cleanData, bool[] keys, bool isDifficult)
         {
             ID_in_DB = DB_ID;
             Stem = cleanData[0];
-            Options = new string[N_OPTIONS];
+            Options = new RichText[N_OPTIONS];
             Keys = new bool[N_OPTIONS];
             POptions = new int[N_OPTIONS];
             for (int i = 0; i < N_OPTIONS; ++i)
@@ -54,10 +54,10 @@ namespace sQzLib
             return 4;
         }
 
-        public void Parse(string[] rawData, int dataIdx)
+        public void Parse(RichText[] rawData, int dataIdx)
         {
             Stem = rawData[dataIdx];
-            if (1 < Stem.Length && Stem[0] == '*')
+            if (1 < Stem. Length && Stem[0] == '*')
             {
                 IsDifficult = true;
                 Stem = Stem.Substring(1);

@@ -52,8 +52,8 @@ namespace sQzLib
             if (cb != null)
                 dgSelChgCB = cb;
 
-            vlbxAns = new ListBox[qs.Items.Count];
-            vAnsItem = new AnsItem[qs.Items.Count][];
+            vlbxAns = new ListBox[qs.Questions.Count];
+            vAnsItem = new AnsItem[qs.Questions.Count][];
             
             int idx = -1;
             int j = -1;

@@ -8,7 +8,7 @@ namespace sQzLib
 {
     public class RichText
     {
-        string RawText;
+        public string RawText { get; private set; }
         List<KeyValuePair<int, byte[]>> ImagesAtPositions;
 
         public RichText(string rawText)
@@ -35,6 +35,11 @@ namespace sQzLib
         public bool HasImage()
         {
             return ImagesAtPositions.Count > 0;
+        }
+
+        public RichText TruncateLeft(int charCount)
+        {
+            
         }
 
         public List<object> GetRuns()

@@ -14,14 +14,14 @@ namespace sQzLib
         public Level Lv;
         public int LvId { get { return (Lv == Level.A) ? uId : uId + (int)Level.MAX_COUNT_EACH_LEVEL; } }
         public string tId { get { return Lv.ToString() + uId.ToString("d3"); } }
-        public List<MultiChoiceItem> Items { get; private set; }
+        public List<MultiChoiceItem> Questions { get; private set; }
         public byte[] ItemsInBytes;
         public int CountDifficult
         {
             get
             {
                 int n = 0;
-                foreach (MultiChoiceItem q in Items)
+                foreach (MultiChoiceItem q in Questions)
                     if (q.IsDifficult)
                         ++n;
                 return n;
@@ -30,7 +30,7 @@ namespace sQzLib
 
         public QuestSheet()
         {
-            Items = new List<MultiChoiceItem>();
+            Questions = new List<MultiChoiceItem>();
             ItemsInBytes = null;
             uId = (int)Level.MAX_COUNT_EACH_LEVEL;
             Lv = Level.A;
@@ -59,17 +59,17 @@ namespace sQzLib
 
         public MultiChoiceItem Q(int idx)
         {
-            return Items[idx];
+            return Questions[idx];
         }
 
         public void Add(MultiChoiceItem q)
         {
-            Items.Add(q);
+            Questions.Add(q);
         }
 
         public void Clear()
         {
-            Items.Clear();
+            Questions.Clear();
         }
 
         public List<int[]> CountItemGroupByModule()
@@ -77,7 +77,7 @@ namespace sQzLib
             IUx[] IUs_by_Lv = MultiChoiceItem.GetIUs(Lv);
             int[] n_difficultItems = new int[IUs_by_Lv.Length];
             int[] n_allItems = new int[IUs_by_Lv.Length];
-            foreach (MultiChoiceItem i in Items)
+            foreach (MultiChoiceItem i in Questions)
             {
                 int module;
                 switch(i.mIU)
@@ -154,12 +154,12 @@ namespace sQzLib
         public void ExtractKey(AnsSheet anssh)
         {
             anssh.uQSLvId = LvId;
-            if (0 < Items.Count)
-                anssh.aAns = new byte[Items.Count * MultiChoiceItem.N_OPTIONS];
+            if (0 < Questions.Count)
+                anssh.aAns = new byte[Questions.Count * MultiChoiceItem.N_OPTIONS];
             else
                 return;
             int i = -1;
-            foreach (MultiChoiceItem q in Items)
+            foreach (MultiChoiceItem q in Questions)
                 foreach (bool x in q.Keys)
                     anssh.aAns[++i] = Convert.ToByte(x);
         }
@@ -261,19 +261,19 @@ namespace sQzLib
 
         public void ParseDocx(string path)
         {
-            string[] rawData = Utils.ReadAllLines(path);
+            RichText[] rawData = Utils.ReadAllLines(path);
             ParseArray(rawData);
         }
 
-        void ParseArray(string[] rawData)
+        void ParseArray(RichText[] rawData)
         {
-            Items.Clear();
+            Questions.Clear();
             int stride = 1 + MultiChoiceItem.N_OPTIONS;
             for (int i = 0; i + stride < rawData.Length; i += stride)
             {
                 MultiChoiceItem q = new MultiChoiceItem();
                 q.Parse(rawData, i);
-                Items.Add(q);
+                Questions.Add(q);
             }
         }
 
@@ -285,7 +285,7 @@ namespace sQzLib
         public IEnumerable<string> ToListOfStrings()
         {
             IEnumerable<string> s = new LinkedList<string>();
-            foreach (MultiChoiceItem q in Items)
+            foreach (MultiChoiceItem q in Questions)
                 s = s.Concat(q.ToListOfStrings()) as IEnumerable<string>;
                 
             return s;
@@ -294,7 +294,7 @@ namespace sQzLib
         public List<MultiChoiceItem> ShallowCopy()
         {
             List<MultiChoiceItem> l = new List<MultiChoiceItem>();
-            foreach (MultiChoiceItem q in Items)
+            foreach (MultiChoiceItem q in Questions)
                 l.Add(q);
             return l;
         }
@@ -304,24 +304,24 @@ namespace sQzLib
             QuestSheet qs = new QuestSheet();
             qs.Lv = Lv;
             qs.uId = uId;
-            foreach (MultiChoiceItem qi in Items)
-                qs.Items.Add(qi.DeepCopy());
+            foreach (MultiChoiceItem qi in Questions)
+                qs.Questions.Add(qi.DeepCopy());
             return qs;
         }
 
         public void Randomize(Random rand)
         {
             List<MultiChoiceItem> qs = new List<MultiChoiceItem>();
-            int n = Items.Count;
+            int n = Questions.Count;
             while (0 < n)
             {
                 int sel = rand.Next() % n;
-                qs.Add(Items[sel]);
-                Items.RemoveAt(sel);
+                qs.Add(Questions[sel]);
+                Questions.RemoveAt(sel);
                 --n;
             }
-            Items = qs;
-            foreach (MultiChoiceItem q in Items)
+            Questions = qs;
+            foreach (MultiChoiceItem q in Questions)
                 q.Randomize(rand);
         }
 
@@ -330,19 +330,19 @@ namespace sQzLib
             QuestSheet qs = new QuestSheet();
             qs.Lv = Lv;
             qs.uId = uId;
-            foreach (MultiChoiceItem qi in Items)
-                qs.Items.Add(qi.RandomizeDeepCopy(rand));
+            foreach (MultiChoiceItem qi in Questions)
+                qs.Questions.Add(qi.RandomizeDeepCopy(rand));
             //randomize
             List<MultiChoiceItem> lq = new List<MultiChoiceItem>();
-            int n = qs.Items.Count;
+            int n = qs.Questions.Count;
             while (0 < n)
             {
                 int idx = rand.Next() % n;
-                lq.Add(qs.Items.ElementAt(idx));
-                qs.Items.RemoveAt(idx);
+                lq.Add(qs.Questions.ElementAt(idx));
+                qs.Questions.RemoveAt(idx);
                 --n;
             }
-            qs.Items = lq;
+            qs.Questions = lq;
 
             return qs;
         }
@@ -463,7 +463,7 @@ namespace sQzLib
         public void DBIns(IUx eIU)
         {
             StringBuilder vals = new StringBuilder();
-            foreach (MultiChoiceItem q in Items)
+            foreach (MultiChoiceItem q in Questions)
             {
                 vals.Append("(" + (int)eIU + ",0," + (q.IsDifficult ? 1 : 0) + ",'");
                 vals.Append(q.Stem.Replace("'", "\\'") + "','");

@@ -83,10 +83,13 @@ namespace sQzClient
             int m = -1, s = -1;
             if (User.eStt < NeeStt.Submitting)
             {
-                string[] lines = Utils.ReadAllLines("Duration.txt");
                 string t = null;
-                if (lines.Length > 0)
-                    t = lines[0];
+                if(System.IO.File.Exists("Duration.txt"))
+                {
+                    string[] lines = System.IO.File.ReadAllLines("Duration.txt");
+                    if (lines.Length > 0)
+                        t = lines[0];
+                }
                 if (t != null)
                 {
                     string[] vt = t.Split('\t');
