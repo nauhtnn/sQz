@@ -6,13 +6,38 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    class RichText
+    public class RichText
     {
-        List<object> Runs;
+        string RawText;
+        List<KeyValuePair<int, byte[]>> ImagesAtPositions;
 
-        public bool IsTextOnly()
+        public RichText(string rawText, List<KeyValuePair<int, byte[]>> imagesAtPositions)
         {
-            return (Runs.Count == 1) && (Runs[0].GetType() == typeof(string));
+            RawText = rawText;
+            ImagesAtPositions = imagesAtPositions;
+        }
+
+        public bool HasImage()
+        {
+            return ImagesAtPositions.Count > 0;
+        }
+
+        public List<object> GetRuns()
+        {
+            List<object> runs = new List<object>();
+            int textPos1 = 0;
+            int textPos2 = 0;
+            foreach(KeyValuePair<int, byte[]> image in ImagesAtPositions)
+            {
+                textPos2 = image.Key;
+                if(textPos1 < textPos2)
+                    runs.Add(RawText.Substring(textPos1, textPos2));
+                runs.Add(image.Value);
+                textPos1 = textPos2;
+            }
+            if (textPos2 < RawText.Length)
+                runs.Add(RawText.Substring(textPos1));
+            return runs;
         }
     }
 }
