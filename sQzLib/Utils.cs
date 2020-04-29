@@ -39,27 +39,17 @@ namespace sQzLib
     {
         static readonly char[] WhiteChars = { ' ', '\t', '\n', '\r' };
 
-        public static string[] ReadAllLines(string path)
+        public static RichText[] ReadAllLines(string path)
         {
-            try
-            {
-                if (!File.Exists(path))
-                    return new string[0];
-                if (Path.GetExtension(path) == "txt")
-                    return File.ReadAllLines(path);
-                else if (Path.GetExtension(path) == "docx")
-                    return ReadAllLinesDocx(path);
-                return new string[0];
-            }
-            catch (IOException)
-            {
-                return new string[0];
-            }
+            if (Path.GetExtension(path) == "docx")
+                return ReadAllLinesDocx(path);
+            else
+                return RichText.NewWith(File.ReadAllLines(path));
         }
 
-        static string[] ReadAllLinesDocx(string path)
+        static RichText[] ReadAllLinesDocx(string path)
         {
-            List<string> l = new List<string>();
+            List<RichText> richTexts = new List<RichText>();
             WordprocessingDocument doc = null;
             try
             {
@@ -67,39 +57,54 @@ namespace sQzLib
             }
             catch(OpenXmlPackageException)
             {
-                return l.ToArray();
+                return richTexts.ToArray();
             }
             catch (System.IO.IOException)
             {
-                return l.ToArray();
+                return richTexts.ToArray();
             }
-            string s;
             Body body = doc.MainDocumentPart.Document.Body;
-            //int idx = -1;
-            foreach (Paragraph p in body.ChildElements.OfType<Paragraph>())
+            foreach (Paragraph paragraph in body.ChildElements.OfType<Paragraph>())
             {
-                DocumentFormat.OpenXml.Drawing.Blip bl =
-                    p.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
-                if (bl == null)
+                DocumentFormat.OpenXml.Drawing.Blip hasImage =
+                    paragraph.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().First();
+                if (hasImage == null)
                 {
-                    if (0 < (s = CleanSpace(p.InnerText)).Length)
-                        l.Add(s);
+                    string rawText = CleanSpace(paragraph.InnerText);
+                    if (rawText.Length > 0)
+                        richTexts.Add(new RichText(rawText));
                 }
                 else
                 {
-                    throw new NotImplementedException();
-                    //string id = bl.Embed.Value;
-                    //ImagePart ip = doc.MainDocumentPart.GetPartById(id) as ImagePart;
-                    //System.IO.Stream st = ip.GetStream();
-                    //byte[] img = new byte[st.Length];
-                    //st.Read(img, 0, (int)st.Length);
-                    //System.IO.FileStream fs = new System.IO.FileStream("img" + ++idx, System.IO.FileMode.OpenOrCreate);
-                    //fs.Write(img, 0, (int)st.Length);
-                    //fs.Close();
+                    RichTextBuilder richTextRuns = new RichTextBuilder();
+                    foreach (Run run in paragraph.ChildElements)
+                    {
+                        DocumentFormat.OpenXml.Drawing.Blip imgContainer =
+                            run.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
+                        if (imgContainer == null)
+                        {
+                            richTextRuns.AddRawText(CleanSpace(run.InnerText));
+                        }
+                        else
+                        {
+                            string imgId = imgContainer.Embed.Value;
+                            ImagePart imgPart = doc.MainDocumentPart.GetPartById(imgId) as ImagePart;
+                            System.IO.Stream imgStream = imgPart.GetStream();
+                            byte[] imgInBytes = new byte[imgStream.Length];
+                            imgStream.Read(imgInBytes, 0, (int)imgStream.Length);
+                            richTextRuns.AddImage(imgInBytes);
+                        }
+                    }
+                    richTexts.Add(richTextRuns.ToRichText());
                 }
             }
             doc.Close();
-            return l.ToArray();
+            return richTexts.ToArray();
+        }
+
+        public static int GetImageGUID()
+        {
+            return 0;
         }
 
         public static string CleanSpace(string buf)

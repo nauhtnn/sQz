@@ -11,6 +11,21 @@ namespace sQzLib
         string RawText;
         List<KeyValuePair<int, byte[]>> ImagesAtPositions;
 
+        public RichText(string rawText)
+        {
+            RawText = rawText;
+            ImagesAtPositions = new List<KeyValuePair<int, byte[]>>();
+        }
+
+        public static RichText[] NewWith(string[] rawTexts)
+        {
+            RichText[] richTexts = new RichText[rawTexts.Length];
+            int i = 0;
+            foreach (string rawText in rawTexts)
+                richTexts[i++] = new RichText(rawText);
+            return richTexts;
+        }
+
         public RichText(string rawText, List<KeyValuePair<int, byte[]>> imagesAtPositions)
         {
             RawText = rawText;

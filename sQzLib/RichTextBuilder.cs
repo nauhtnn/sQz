@@ -27,5 +27,10 @@ namespace sQzLib
             int position = RawText.ToString().Length;
             ImagesAtPositions.Add(new KeyValuePair<int, byte[]>(position, imageInBytes));
         }
+
+        public RichText ToRichText()
+        {
+            return new RichText(RawText.ToString(), ImagesAtPositions);
+        }
     }
 }
