@@ -42,6 +42,8 @@ namespace sQzClient
                     bi.EndInit();
                     Image img = new Image();
                     img.Source = bi;
+                    img.Width = bi.Width;
+                    img.Height = bi.Height;
                     content.Children.Add(img);
                 }
                 else

@@ -27,7 +27,7 @@
                         </Grid>
                     </ScrollViewer>
                 </StackPanel>
-                <ScrollViewer Grid.Column="1" x:Name="QuestSheetView" Width="1020" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
+                <ScrollViewer Grid.Column="1" x:Name="QuestSheetBG" Width="1020" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
                     <StackPanel x:Name="QuestStackView" Width="1000"/>
                 </ScrollViewer>
             </Grid>

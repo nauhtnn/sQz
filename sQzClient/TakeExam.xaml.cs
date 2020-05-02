@@ -79,12 +79,12 @@ namespace sQzClient
             double mrg = FontSize / 2;
             qiWh = 3 * mrg;
             qMrg = new Thickness(mrg, mrg, 0, mrg);
-            qaWh = (QuestSheetView.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
+            qaWh = (QuestSheetBG.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
 
             HackTest();
 
             SetAnswerSheetView();
-            SetQuestSheetView();
+            SetQuestSheetBG();
 
             bBtnBusy = false;
 
@@ -144,7 +144,7 @@ namespace sQzClient
             PopupMgr.Singleton.CbOK = null;
             AppView.Effect = null;
             bBtnBusy = false;
-            QuestSheetView.Visibility = Visibility.Visible;
+            QuestSheetBG.Visibility = Visibility.Visible;
 
             mTimer = new System.Timers.Timer(1000);
             mTimer.Elapsed += UpdateSrvrMsg;
@@ -255,7 +255,7 @@ namespace sQzClient
             SetAnswerTableBottomRow();
         }
 
-        void SetQuestSheetView()
+        void SetQuestSheetBG()
         {
             //QuestStackView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
             //int n = mQuestSheet.Questions.Count;
