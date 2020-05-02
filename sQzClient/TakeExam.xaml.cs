@@ -67,6 +67,11 @@ namespace sQzClient
             PopupMgr.Singleton.CbNOK = WPCancel;
         }
 
+        void HackTest()
+        {
+            mQuestSheet.ParseDocx("quiz.docx");
+        }
+
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             SetWindowFullScreen();

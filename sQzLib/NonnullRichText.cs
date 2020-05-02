@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    public partial class NonnullRichText
+    public class NonnullRichText
     {
         // no null or empty element in this list
         public IReadOnlyList<object> Runs { get; private set; }
