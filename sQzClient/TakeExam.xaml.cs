@@ -69,7 +69,7 @@ namespace sQzClient
 
         void HackTest()
         {
-            mQuestSheet.ParseDocx("quiz.docx");
+            mQuestSheet.ParseDocx(".\\quiz.docx");
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
@@ -80,6 +80,8 @@ namespace sQzClient
             qiWh = 3 * mrg;
             qMrg = new Thickness(mrg, mrg, 0, mrg);
             qaWh = (QuestSheetView.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
+
+            HackTest();
 
             SetAnswerSheetView();
             SetQuestSheetView();
@@ -220,7 +222,7 @@ namespace sQzClient
                 AnswerTable.Children.Add(cell);
                 for (int i = 1; i <= MultiChoiceItem.N_OPTIONS; ++i)
                 {
-                    cell = mExaminee.mAnsSheet.vAnsItem[j - 1][i - 1].lbl;
+                    cell = new Label(); cell.Content = "x";// mExaminee.mAnsSheet.vAnsItem[j - 1][i - 1].lbl;
                     cell.BorderBrush = black;
                     cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.MiddleTop];
                     cell.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -478,11 +480,10 @@ namespace sQzClient
 
         void Exit()
         {
-            return;
             //WPopup.s.wpCb = null;
             //bBtnBusy = false;
-            if (mExaminee.mAnsSheet.bChanged)
-                mExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+            //if (mExaminee.mAnsSheet.bChanged)
+            //    mExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             Window.GetWindow(this).Close();
         }
 

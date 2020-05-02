@@ -41,7 +41,7 @@ namespace sQzLib
 
         public static Queue<NonnullRichTextBuilder> ReadAllLines(string path)
         {
-            if (Path.GetExtension(path) == "docx")
+            if (Path.GetExtension(path) == ".docx")
                 return ReadAllLinesDocx(path);
             else
                 return NonnullRichTextBuilder.NewWith(File.ReadAllLines(path));
@@ -67,7 +67,7 @@ namespace sQzLib
             foreach (Paragraph paragraph in body.ChildElements.OfType<Paragraph>())
             {
                 DocumentFormat.OpenXml.Drawing.Blip hasImage =
-                    paragraph.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().First();
+                    paragraph.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
                 if (hasImage == null)
                 {
                     richTexts.Enqueue(new NonnullRichTextBuilder(paragraph.InnerText));
@@ -75,7 +75,7 @@ namespace sQzLib
                 else
                 {
                     List<object> runs = new List<object>();
-                    foreach (Run docRun in paragraph.ChildElements)
+                    foreach (Run docRun in paragraph.ChildElements.OfType<Run>())
                     {
                         DocumentFormat.OpenXml.Drawing.Blip imgContainer =
                             docRun.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
