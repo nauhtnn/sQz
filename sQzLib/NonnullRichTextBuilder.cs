@@ -93,16 +93,27 @@ namespace sQzLib
 
         public void Trunc1AtLeft()
         {
-            if (Runs.Count > 0)
+            string text = Runs[0] as string;
+            if(text == null)
+                throw new ArgumentException();
+            if(text.Length == 1)
             {
-                string text = Runs[0] as string;
-                if(text != null && text.Length > 1)
-                {
-                    string newText = Utils.CleanSpace(text.Substring(1));
+                if (Runs.Count > 1)
                     Runs.RemoveAt(0);
-                    Runs.Insert(0, newText);
-                }
+                else
+                    throw new ArgumentException();
             }
+            else
+            {
+                string newText = Utils.CleanSpace(text.Substring(1));
+                if (newText.Length == 0)
+                    throw new ArgumentException();
+                Runs.RemoveAt(0);
+                if (Runs.Count == 0)
+                    Runs.Add(newText);
+                else
+                    Runs.Insert(0, newText);
+            }   
         }
 
         public void Replace(string oldValue, string newValue)
@@ -113,7 +124,10 @@ namespace sQzLib
                 string s = Runs[i] as string;
                 if(s != null && s.IndexOf(oldValue) > -1)
                 {
-                    Runs.Insert(i++, Utils.CleanSpace(s.Replace(oldValue, newValue)));
+                    s = Utils.CleanSpace(s.Replace(oldValue, newValue));
+                    if (s.Length == 0)
+                        throw new ArgumentException();
+                    Runs.Insert(i++, s);
                     Runs.RemoveAt(i--);
                 }
             }

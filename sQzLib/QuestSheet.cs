@@ -270,7 +270,7 @@ namespace sQzLib
             Questions.Clear();
             int stride = 1 + MultiChoiceItem.N_OPTIONS;
             while(richTexts.Count > 0)
-                Questions.Add(new MultiChoiceItem().Parse(richTexts));
+                Questions.Add(MultiChoiceItem.NewWith(richTexts));
         }
 
         public void WriteTxt(string fpath)

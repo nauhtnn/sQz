@@ -21,7 +21,7 @@ namespace sQzLib
 
     public class MultiChoiceItem
     {
-        public static readonly int N_OPTIONS = ReadNOptions();
+        public static readonly int N_OPTIONS = 4;// ReadNOptions();
         public const char C0 = '0';
         public const char C1 = '1';
         public int ID_in_DB { get; private set; }
@@ -29,7 +29,7 @@ namespace sQzLib
         public IUx mIU { get; private set; }
         public NonnullRichText[] Options { get; private set; }
         public bool[] Keys { get; private set; }
-        public int[] POptions { get; private set; }
+        public int[] PermutedOptions { get; private set; }
         public bool IsDifficult { get; private set; }
 
         static readonly IUx[] IUs_A = { IUx._1, IUx._2, IUx._3, IUx._4, IUx._5, IUx._6 };
@@ -45,7 +45,7 @@ namespace sQzLib
             return IUs_C;
         }
 
-        public MultiChoiceItem() { }
+        MultiChoiceItem() { }
 
         public MultiChoiceItem(int DB_ID, NonnullRichText[] cleanData, bool[] keys, bool isDifficult)
         {
@@ -53,75 +53,90 @@ namespace sQzLib
             Stem = cleanData[0];
             Options = new NonnullRichText[N_OPTIONS];
             Keys = new bool[N_OPTIONS];
-            POptions = new int[N_OPTIONS];
+            PermutedOptions = new int[N_OPTIONS];
             for (int i = 0; i < N_OPTIONS; ++i)
             {
                 Options[i] = cleanData[i + 1];
                 Keys[i] = keys[i];
-                POptions[i] = i;
+                PermutedOptions[i] = i;
             }
             IsDifficult = isDifficult;
         }
 
-        static int ReadNOptions()
-        {
-            //if (System.IO.File.Exists(System.IO.Directory.GetCurrentDirectory() + "\\3.txt"))
-            //    return 3;
-            return 4;
-        }
+        //static int ReadNOptions()
+        //{
+        //    //if (System.IO.File.Exists(System.IO.Directory.GetCurrentDirectory() + "\\3.txt"))
+        //    //    return 3;
+        //    return 4;
+        //}
 
-        public void Parse(Queue<NonnullRichTextBuilder> richTexts)
+        public static MultiChoiceItem NewWith(Queue<NonnullRichTextBuilder> richTexts)
         {
+            MultiChoiceItem question = new MultiChoiceItem();
             MultiChoiceData questTexts = new MultiChoiceData(richTexts, N_OPTIONS);
-            string stem = questTexts.Stem.FirstOrDefault();
-            if (stem != && stem[0] == '*')
+            string stem = questTexts.Stem.FirstStringOrDefault();
+            if (stem[0] == '*')
             {
-                IsDifficult = true;
-                Stem = Stem.Substring(1);
+                question.IsDifficult = true;
+                questTexts.Stem.Trunc1AtLeft();
             }
-            else if (1 < Stem.Length && Stem[0] == '\\' && 
-                (Stem[1] == '*' || Stem[1] == '\\'))
+            else if (1 < stem.Length && stem[0] == '\\' && 
+                (stem[1] == '*' || stem[1] == '\\'))
             {
-                Stem = Stem.Substring(1);
-                IsDifficult = false;
+                question.IsDifficult = false;
+                questTexts.Stem.Trunc1AtLeft();
             }
             else
-                IsDifficult = false;
+                question.IsDifficult = false;
+            question.Stem = new NonnullRichText(questTexts.Stem);
 
-            Options = new string[N_OPTIONS];
-            Keys = new bool[N_OPTIONS];
-            POptions = new int[N_OPTIONS];
-            ++dataIdx;
+            question.Options = new NonnullRichText[N_OPTIONS];
+            question.Keys = new bool[N_OPTIONS];
+            question.PermutedOptions = new int[N_OPTIONS];
             for (int i = 0; i < N_OPTIONS; ++i)
             {
-                Options[i] = rawData[dataIdx + i];
-                if (1 < Options[i].Length && Options[i][0] == '\\')
+                string isKey = questTexts.Options[i].FirstStringOrDefault();
+                if(isKey == null)
+                    question.Keys[i] = false;
+                else if(isKey[0] == '\\')
                 {
-                    if (Options[i][1] != '\\')
+                    if(isKey.Length == 1)
                     {
-                        Keys[i] = true;
-                        Options[i] = Utils.CleanFront(Options[i].Substring(1));
+                        if(questTexts.Options[i].Runs.Count == 1)
+                            question.Keys[i] = false;
+                        else
+                        {
+                            question.Keys[i] = true;
+                            questTexts.Options[i].Runs.RemoveAt(0);
+                        }
                     }
                     else
-                        Options[i] = Options[i].Substring(1);
+                    {
+                        if (isKey[1] != '\\')
+                            question.Keys[i] = true;
+                        else
+                            question.Keys[i] = false;
+                        questTexts.Options[i].Trunc1AtLeft();
+                    }
                 }
                 else
-                    Keys[i] = false;
-                POptions[i] = i;
+                    question.Keys[i] = false;
+                question.Options[i] = new NonnullRichText(questTexts.Options[i]);
+
+                question.PermutedOptions[i] = i;
             }
+            bool noAnswer = true;
             for (int i = 0; i < N_OPTIONS; ++i)
-                if (Keys[i])
-                    return;
-            throw new ArgumentNullException();
+                if (question.Keys[i])
+                    noAnswer = false;
+            if(noAnswer)
+                throw new ArgumentNullException();
+            return question;
         }
 
         public IEnumerable<string> ToListOfStrings()
         {
-            LinkedList<string> s = new LinkedList<string>();
-            s.AddLast(Stem);
-            foreach (string i in Options)
-                s.AddLast(i);
-            return s;
+            throw new NotImplementedException();
         }
 
         public static void DBDelete(IUx eIU, string ids) {
@@ -134,23 +149,23 @@ namespace sQzLib
             q.ID_in_DB = ID_in_DB;
             q.Stem = Stem;
             q.mIU = mIU;
-            q.Options = new string[N_OPTIONS];
+            q.Options = new NonnullRichText[N_OPTIONS];
             for (int i = 0; i < N_OPTIONS; ++i)
                 q.Options[i] = Options[i];
             q.Keys = new bool[N_OPTIONS];
             for (int i = 0; i < N_OPTIONS; ++i)
                 q.Keys[i] = Keys[i];
-            q.POptions = new int[N_OPTIONS];
+            q.PermutedOptions = new int[N_OPTIONS];
             for (int i = 0; i < N_OPTIONS; ++i)
-                q.POptions[i] = POptions[i];
+                q.PermutedOptions[i] = PermutedOptions[i];
             return q;
         }
 
         public void Randomize(Random rand)
         {
-            string[] anss = new string[N_OPTIONS];
+            NonnullRichText[] options = new NonnullRichText[N_OPTIONS];
             bool[] keys = new bool[N_OPTIONS];
-            int[] asort = new int[N_OPTIONS];
+            int[] originIdx = new int[N_OPTIONS];
             List<int> l = new List<int>();
             int n = N_OPTIONS;
             for (int i = 0; i < n; ++i)
@@ -161,13 +176,13 @@ namespace sQzLib
                 int idx = l[lidx];
                 l.RemoveAt(lidx);
                 --n;
-                anss[n] = Options[idx];
+                options[n] = Options[idx];
                 keys[n] = Keys[idx];
-                asort[n] = idx;
+                originIdx[n] = idx;
             }
-            Options = anss;
+            Options = options;
             Keys = keys;
-            POptions = asort;
+            PermutedOptions = originIdx;
         }
 
         public MultiChoiceItem RandomizeDeepCopy(Random rand)
@@ -178,7 +193,7 @@ namespace sQzLib
             q.mIU = mIU;
             q.IsDifficult = IsDifficult;
             //randomize
-            q.Options = new string[N_OPTIONS];
+            q.Options = new NonnullRichText[N_OPTIONS];
             q.Keys = new bool[N_OPTIONS];
             List<int> l = new List<int>();
             for (int i = 0; i < N_OPTIONS; ++i)
@@ -192,7 +207,7 @@ namespace sQzLib
                 --n;
                 q.Options[n] = Options[idx];
                 q.Keys[n] = Keys[idx];
-                q.POptions[n] = idx;
+                q.PermutedOptions[n] = idx;
             }
             return q;
         }
