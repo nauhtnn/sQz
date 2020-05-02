@@ -10,7 +10,7 @@ namespace sQzLib
 {
     public delegate void DgEvntCB();
 
-    public class AnsItem : StackPanel
+    public class AnswerSheetCellView : StackPanel
     {
         public static CornerRadius sCr;
         static double sW;
@@ -26,7 +26,7 @@ namespace sQzLib
             sW = w;
         }
 
-        public AnsItem(string txt, int idx, double w)
+        public AnswerSheetCellView(string txt, int idx, double w)
         {
             w -= 10;//alignment
             StackPanel sp = new StackPanel();

@@ -17,11 +17,11 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(LvId));
-            l.Add(BitConverter.GetBytes((int)eStt));
+            l.Add(BitConverter.GetBytes((int)mPhase));
 			l.Add(BitConverter.GetBytes(bLog));
             byte[] b;
 
-            if (eStt < NeeStt.Examing || bLog)
+            if (mPhase < ExamineePhase.Examing || bLog)
             {
                 b = Encoding.UTF8.GetBytes(tBirdate);
                 l.Add(BitConverter.GetBytes(b.Length));
@@ -32,15 +32,15 @@ namespace sQzLib
                 l.Add(b);
             }
 
-            if (eStt < NeeStt.Examing)
+            if (mPhase < ExamineePhase.Examing)
                 return l;
 
-            l.Add(BitConverter.GetBytes(mAnsSh.uQSLvId));
+            l.Add(BitConverter.GetBytes(mAnsSheet.uQSLvId));
 
-            if (eStt < NeeStt.Submitting)
+            if (mPhase < ExamineePhase.Submitting)
                 return l;
 
-            l.Add(mAnsSh.aAns);
+            l.Add(mAnsSheet.aAns);
 
             return l;
         }
@@ -52,19 +52,19 @@ namespace sQzLib
             if (l < 4)
                 return true;
             int x;
-            if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
-                eStt = (NeeStt)x;
+            if (Enum.IsDefined(typeof(ExamineePhase), x = BitConverter.ToInt32(buf, offs)))
+                mPhase = (ExamineePhase)x;
             l -= 4;
             offs += 4;
 
-            if (eStt == NeeStt.Finished)
+            if (mPhase == ExamineePhase.Finished)
             {
                 uGrade = BitConverter.ToInt32(buf, offs);
                 l -= 4;
                 offs += 4;
             }
 
-			if(eStt < NeeStt.Submitting || bLog)
+			if(mPhase < ExamineePhase.Submitting || bLog)
 			{
 				if (l < 4)
 					return true;
@@ -107,10 +107,10 @@ namespace sQzLib
 
         public override void Merge(ExamineeA e)
         {
-            eStt = e.eStt;
-            if (eStt == NeeStt.Finished)
+            mPhase = e.mPhase;
+            if (mPhase == ExamineePhase.Finished)
                 uGrade = e.uGrade;
-            if (eStt < NeeStt.Finished || bLog)
+            if (mPhase < ExamineePhase.Finished || bLog)
             {
                 tBirdate = e.tBirdate;
                 tName = e.tName;

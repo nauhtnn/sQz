@@ -12,7 +12,7 @@ namespace sQzLib
     {
         public const int LEN = 120;
         public ListBox[] vlbxAns;
-        public AnsItem[][] vAnsItem;
+        public AnswerSheetCellView[][] vAnsItem;
         public int uQSLvId;
         public int uQSId { get { return ((int)Level.MAX_COUNT_EACH_LEVEL < uQSLvId) ? uQSLvId - (int)Level.MAX_COUNT_EACH_LEVEL : uQSLvId; } }
         public bool bChanged;
@@ -53,7 +53,7 @@ namespace sQzLib
                 dgSelChgCB = cb;
 
             vlbxAns = new ListBox[qs.Questions.Count];
-            vAnsItem = new AnsItem[qs.Questions.Count][];
+            vAnsItem = new AnswerSheetCellView[qs.Questions.Count][];
             
             int idx = -1;
             int j = -1;
@@ -67,10 +67,10 @@ namespace sQzLib
                 lbxAns.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
                 lbxAns.BorderThickness = new Thickness(0, 4, 0, 0);
                 vlbxAns[idx] = lbxAns;
-                vAnsItem[idx] = new AnsItem[MultiChoiceItem.N_OPTIONS];
+                vAnsItem[idx] = new AnswerSheetCellView[MultiChoiceItem.N_OPTIONS];
                 for (int i = 0; i < MultiChoiceItem.N_OPTIONS; ++i)
                 {
-                    AnsItem ai = new AnsItem(q.Options[i], i, w);
+                    AnswerSheetCellView ai = new AnswerSheetCellView(q.Options[i], i, w);
                     ++j;//update view from log
                     if (aAns[j] == Convert.ToByte(true))
                     {

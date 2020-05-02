@@ -20,7 +20,7 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((int)Lv));
             l.Add(BitConverter.GetBytes(uId));
-            l.Add(BitConverter.GetBytes((int)eStt));
+            l.Add(BitConverter.GetBytes((int)mPhase));
             byte[] b;
 
             b = Encoding.UTF8.GetBytes(tBirdate);
@@ -34,7 +34,7 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
 
-            if (eStt < NeeStt.Finished)
+            if (mPhase < ExamineePhase.Finished)
                 return l;
 
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
@@ -98,11 +98,11 @@ namespace sQzLib
                 dtTim1 = DT.INV_;
                 return true;
             }
-            mAnsSh.uQSLvId = BitConverter.ToInt32(buf, offs);
+            mAnsSheet.uQSLvId = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            mAnsSh.aAns = new byte[AnsSheet.LEN];
-            Array.Copy(buf, offs, mAnsSh.aAns, 0, AnsSheet.LEN);
+            mAnsSheet.aAns = new byte[AnsSheet.LEN];
+            Array.Copy(buf, offs, mAnsSheet.aAns, 0, AnsSheet.LEN);
             l -= AnsSheet.LEN;
             offs += AnsSheet.LEN;
 
@@ -126,13 +126,13 @@ namespace sQzLib
 
         public override void Merge(ExamineeA e)
         {
-            if (eStt == NeeStt.Finished)
+            if (mPhase == ExamineePhase.Finished)
                 return;
             //suppose eStt = eINFO and e.eStt = NeeStt.Finished
-            eStt = NeeStt.Finished;
+            mPhase = ExamineePhase.Finished;
             bToVw = bToDB = true;
             tComp = e.tComp;
-            mAnsSh = e.mAnsSh;
+            mAnsSheet = e.mAnsSheet;
             dtTim1 = e.dtTim1;
             uGrade = e.uGrade;
             dtTim2 = e.dtTim2;

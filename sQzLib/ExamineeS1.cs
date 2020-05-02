@@ -31,11 +31,11 @@ namespace sQzLib
         public List<byte[]> ToByteC()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes((int)eStt));
-            if (eStt == NeeStt.Finished)
+            l.Add(BitConverter.GetBytes((int)mPhase));
+            if (mPhase == ExamineePhase.Finished)
                 l.Add(BitConverter.GetBytes(uGrade));
 
-            if (eStt < NeeStt.Finished || bLog)
+            if (mPhase < ExamineePhase.Finished || bLog)
             {
                 byte[] b = Encoding.UTF8.GetBytes(tBirdate);
                 l.Add(BitConverter.GetBytes(b.Length));
@@ -138,8 +138,8 @@ namespace sQzLib
             l -= 4;
             offs += 4;
 
-            if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
-                eStt = (NeeStt)x;
+            if (Enum.IsDefined(typeof(ExamineePhase), x = BitConverter.ToInt32(buf, offs)))
+                mPhase = (ExamineePhase)x;
             l -= 4;
             offs += 4;
 
@@ -179,7 +179,7 @@ namespace sQzLib
                 l -= sz;
                 offs += sz;
             }
-            if (eStt < NeeStt.Finished)
+            if (mPhase < ExamineePhase.Finished)
                 return false;
             bNRecd = false;
             //
@@ -239,8 +239,8 @@ namespace sQzLib
                 l.Add(BitConverter.GetBytes(0));
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
             l.Add(BitConverter.GetBytes(dtTim1.Minute));
-            l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
-            l.Add(mAnsSh.aAns);
+            l.Add(BitConverter.GetBytes(mAnsSheet.uQSId));
+            l.Add(mAnsSheet.aAns);
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
             l.Add(BitConverter.GetBytes(uGrade));
@@ -257,29 +257,29 @@ namespace sQzLib
 
         public void MergeC(ExamineeA e)
         {
-            if (eStt == NeeStt.Finished)
+            if (mPhase == ExamineePhase.Finished)
                 return;
             bLog = e.bLog;
-            if (eStt < NeeStt.Examing || bLog)
+            if (mPhase < ExamineePhase.Examing || bLog)
                 tComp = e.tComp;
-            if (e.eStt < NeeStt.Examing)
-                eStt = NeeStt.Examing;
+            if (e.mPhase < ExamineePhase.Examing)
+                mPhase = ExamineePhase.Examing;
             else
-                eStt = e.eStt;
-            if (eStt < NeeStt.Examing)
+                mPhase = e.mPhase;
+            if (mPhase < ExamineePhase.Examing)
                 return;
-            mAnsSh = new AnsSheet();
-            mAnsSh.uQSLvId = e.mAnsSh.uQSLvId;
+            mAnsSheet = new AnsSheet();
+            mAnsSheet.uQSLvId = e.mAnsSheet.uQSLvId;
 
-            if (eStt < NeeStt.Submitting)
+            if (mPhase < ExamineePhase.Submitting)
                 return;
-            mAnsSh.aAns = e.mAnsSh.aAns;
+            mAnsSheet.aAns = e.mAnsSheet.aAns;
         }
 
         public void MergeS(ExamineeA e)
         {
             //suppose e.eStt = NeeStt.Finished
-            eStt = e.eStt;
+            mPhase = e.mPhase;
             dtTim1 = e.dtTim1;
             dtTim2 = e.dtTim2;
             uGrade = e.uGrade;

@@ -458,23 +458,24 @@ namespace sQzLib
 
         public void DBIns(IUx eIU)
         {
-            StringBuilder vals = new StringBuilder();
-            foreach (MultiChoiceItem q in Questions)
-            {
-                vals.Append("(" + (int)eIU + ",0," + (q.IsDifficult ? 1 : 0) + ",'");
-                vals.Append(q.Stem.Replace("'", "\\'") + "','");
-                for (int i = 0; i < MultiChoiceItem.N_OPTIONS; ++i)
-                    vals.Append(q.Options[i].Replace("'", "\\'") + "','");
-                for (int i = 0; i < MultiChoiceItem.N_OPTIONS; ++i)
-                    if (q.Keys[i])
-                        vals.Append(MultiChoiceItem.C1);
-                    else
-                        vals.Append(MultiChoiceItem.C0);
-                vals.Append("'),");
-            }
-            vals.Remove(vals.Length - 1, 1);//remove the last comma
-            DBConnect.Ins("sqz_question", "moid,del,diff,Stem,ans0,ans1,ans2,ans3,`key`",
-                vals.ToString());
+            throw new NotImplementedException();
+            //StringBuilder vals = new StringBuilder();
+            //foreach (MultiChoiceItem q in Questions)
+            //{
+            //    vals.Append("(" + (int)eIU + ",0," + (q.IsDifficult ? 1 : 0) + ",'");
+            //    vals.Append(q.Stem.Replace("'", "\\'") + "','");
+            //    for (int i = 0; i < MultiChoiceItem.N_OPTIONS; ++i)
+            //        vals.Append(q.Options[i].Replace("'", "\\'") + "','");
+            //    for (int i = 0; i < MultiChoiceItem.N_OPTIONS; ++i)
+            //        if (q.Keys[i])
+            //            vals.Append(MultiChoiceItem.C1);
+            //        else
+            //            vals.Append(MultiChoiceItem.C0);
+            //    vals.Append("'),");
+            //}
+            //vals.Remove(vals.Length - 1, 1);//remove the last comma
+            //DBConnect.Ins("sqz_question", "moid,del,diff,Stem,ans0,ans1,ans2,ans3,`key`",
+            //    vals.ToString());
         }
 
         public bool DBSelect(DateTime dt, Level lv, int id)

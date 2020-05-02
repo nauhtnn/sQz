@@ -82,7 +82,7 @@ namespace sQzLib
                             break;
                         e.uGrade = reader.GetInt16(2);
                         e.tComp = reader.GetString(3);
-                        e.eStt = NeeStt.Finished;
+                        e.mPhase = ExamineePhase.Finished;
                     }
                     reader.Close();
                 }
@@ -96,10 +96,10 @@ namespace sQzLib
                 {
                     e.bToDB = false;
                     vals.Append("('" + e.mDt.ToString(DT._) + "','" + e.Lv.ToString() + "'," +
-                        e.uId + "," + (e.mAnsSh.uQSId)
+                        e.uId + "," + (e.mAnsSheet.uQSId)
                         + ",'" + e.dtTim1.ToString(DT.hh) +
                         "','" + e.dtTim2.ToString(DT.hh) + "'," + e.uGrade + ",'" +
-                        e.tComp + "','" + e.mAnsSh.tAns + "'),");
+                        e.tComp + "','" + e.mAnsSheet.tAns + "'),");
                 }
         }
 
@@ -161,7 +161,7 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(ID));
             int n = 0;
             foreach (ExamineeS1 e in vExaminee.Values)
-                if (e.eStt == NeeStt.Finished && e.NRecd)
+                if (e.mPhase == ExamineePhase.Finished && e.NRecd)
                 {
                     ++n;
                     e.bFromC = false;

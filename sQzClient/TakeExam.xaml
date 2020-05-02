@@ -10,16 +10,16 @@
       Title="TakeExam">
 
     <Viewbox>
-        <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
-            <Grid x:Name="gQSheet">
+        <StackPanel x:Name="AppView" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
+            <Grid>
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="144"/>
                     <ColumnDefinition Width="1116"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="652" Width="144">
-                    <TextBlock x:Name="txtAnsSh" Height="30" FontSize="20" HorizontalAlignment="Center"/>
-                    <ScrollViewer x:Name="svwrASh" Height="622" Width="144" VerticalScrollBarVisibility="Auto" FontSize="14">
-                        <Grid x:Name="gAnsSh">
+                <StackPanel x:Name="AnswerSheetView" HorizontalAlignment="Left" Height="652" Width="144">
+                    <TextBlock x:Name="AnswerSheetTitle" Height="30" FontSize="20" HorizontalAlignment="Center"/>
+                    <ScrollViewer Height="622" Width="144" VerticalScrollBarVisibility="Auto" FontSize="14">
+                        <Grid x:Name="AnswerSheetTable">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
@@ -27,8 +27,8 @@
                         </Grid>
                     </ScrollViewer>
                 </StackPanel>
-                <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1020" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
-                    <StackPanel x:Name="QuestPanel" Width="1000"/>
+                <ScrollViewer Grid.Column="1" x:Name="QuestSheetView" Width="1020" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
+                    <StackPanel x:Name="QuestStackView" Width="1000"/>
                 </ScrollViewer>
             </Grid>
             <Grid Height="48">

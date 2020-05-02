@@ -5,7 +5,7 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    public enum NeeStt
+    public enum ExamineePhase
     {
          Signing = 0,
          Info,
@@ -18,7 +18,7 @@ namespace sQzLib
     public abstract class ExamineeA
     {
         public DateTime mDt;
-        public NeeStt eStt;
+        public ExamineePhase mPhase;
         public Level Lv;
         public int uId;
         public int LvId { get { return (Lv == Level.A) ? uId : uId + (int)Level.MAX_COUNT_EACH_LEVEL; } }
@@ -32,7 +32,7 @@ namespace sQzLib
         public string tComp;
         public DateTime dtTim1;
         public DateTime dtTim2;
-        public AnsSheet mAnsSh;
+        public AnsSheet mAnsSheet;
 
         public TimeSpan kDtDuration;
 
@@ -56,11 +56,11 @@ namespace sQzLib
             tName = null;
             tBirdate = null;
             tBirthplace = null;
-            eStt = NeeStt.Signing;
+            mPhase = ExamineePhase.Signing;
             uGrade = (int)Level.MAX_COUNT_EACH_LEVEL;
             dtTim1 = dtTim2 = DT.INV_;
             tComp = string.Empty;
-            mAnsSh = new AnsSheet();
+            mAnsSheet = new AnsSheet();
             kDtDuration = new TimeSpan(0, 30, 0);
             tLog = new StringBuilder();
         }
@@ -231,10 +231,10 @@ namespace sQzLib
                 return true;
             w.Write((int)Lv);
             w.Write(uId);
-            w.Write((int)eStt);
-            w.Write(mAnsSh.uQSId);
-            w.Write(mAnsSh.aAns, 0, AnsSheet.LEN);
-            if (eStt == NeeStt.Finished)
+            w.Write((int)mPhase);
+            w.Write(mAnsSheet.uQSId);
+            w.Write(mAnsSheet.aAns, 0, AnsSheet.LEN);
+            if (mPhase == ExamineePhase.Finished)
             {
                 w.Write(dtTim1.Hour);
                 w.Write(dtTim1.Minute);
@@ -247,7 +247,7 @@ namespace sQzLib
                 w.Write(s);
             }
             w.Close();
-            mAnsSh.bChanged = false;
+            mAnsSheet.bChanged = false;
             return false;
         }
 
@@ -267,12 +267,12 @@ namespace sQzLib
             if (Enum.IsDefined(typeof(Level), x = r.ReadInt32()))
                 Lv = (Level)x;
             uId = r.ReadInt32();
-            if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
-                eStt = (NeeStt)x;
-            mAnsSh.uQSLvId = r.ReadInt32();
-            mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
+            if (Enum.IsDefined(typeof(ExamineePhase), x = r.ReadInt32()))
+                mPhase = (ExamineePhase)x;
+            mAnsSheet.uQSLvId = r.ReadInt32();
+            mAnsSheet.aAns = r.ReadBytes(AnsSheet.LEN);
             int h, m;
-            if(eStt == NeeStt.Finished)
+            if(mPhase == ExamineePhase.Finished)
             {
                 h = r.ReadInt32();
                 m = r.ReadInt32();

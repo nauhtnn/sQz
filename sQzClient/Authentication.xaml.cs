@@ -46,9 +46,9 @@ namespace sQzClient
             }
             catch(ArgumentException)
             {
-                spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);
-                spMain.Opacity = 1;
+                AppView.Opacity = 0.5;
+                PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);
+                AppView.Opacity = 1;
                 return;
             }
             int x, y, z;
@@ -56,9 +56,9 @@ namespace sQzClient
                 || !int.TryParse(tbxY.Text, out z))
             {
                 User.tBirdate = null;
-                spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
-                spMain.Opacity = 1;
+                AppView.Opacity = 0.5;
+                PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
+                AppView.Opacity = 1;
                 return;
             }
             User.tBirdate = x.ToString("d2") + "-" + y.ToString("d2") + "-" + z.ToString("d2");
@@ -66,9 +66,9 @@ namespace sQzClient
             if (DT.To_(User.tBirdate, DT.RR, out dum))
             {
                 User.tBirdate = null;
-                spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
-                spMain.Opacity = 1;
+                AppView.Opacity = 0.5;
+                PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
+                AppView.Opacity = 1;
                 return;
             }
             try
@@ -80,9 +80,9 @@ namespace sQzClient
                 if (mClnt.ConnectWR(ref mCbMsg) && bRunning)
                     Dispatcher.Invoke(() =>
                     {
-                        spMain.Opacity = 0.5;
-                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
-                        spMain.Opacity = 1;
+                        AppView.Opacity = 0.5;
+                        PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
+                        AppView.Opacity = 1;
                         DisableControls();
                         btnReconn.IsEnabled = true;
                     });
@@ -93,7 +93,7 @@ namespace sQzClient
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bRunning = false;
-            WPopup.s.IsOK = false;
+            PopupMgr.Singleton.IsOK = false;
             mClnt.Close();
         }
 
@@ -108,7 +108,7 @@ namespace sQzClient
 
             LoadTxt();
 
-            WPopup.s.owner = w;
+            PopupMgr.Singleton.ParentWindow = w;
 
             //FirewallHandler fwHndl = new FirewallHandler(3);
             //lblStatus.Text += fwHndl.OpenFirewall();
@@ -204,9 +204,9 @@ namespace sQzClient
                             msg = Txt.s._[(int)TxI.RECV_DAT_ER];
                         if (bRunning && msg != null)
                             Dispatcher.Invoke(() => {
-                                spMain.Opacity = 0.5;
-                                WPopup.s.ShowDialog(msg);
-                                spMain.Opacity = 1;
+                                AppView.Opacity = 0.5;
+                                PopupMgr.Singleton.ShowDialog(msg);
+                                AppView.Opacity = 1;
                                 EnableControls();
                             });
                     }
@@ -222,9 +222,9 @@ namespace sQzClient
                         if (bRunning)
                             Dispatcher.Invoke(() =>
                             {
-                                spMain.Opacity = 0.5;
-                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND] + qsid);
-                                spMain.Opacity = 1;
+                                AppView.Opacity = 0.5;
+                                PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND] + qsid);
+                                AppView.Opacity = 1;
                                 EnableControls();
                             });
                         break;
@@ -236,9 +236,9 @@ namespace sQzClient
                         if(bRunning)
                             Dispatcher.Invoke(() =>
                             {
-                                spMain.Opacity = 0.5;
-                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]);
-                                spMain.Opacity = 1;
+                                AppView.Opacity = 0.5;
+                                PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]);
+                                AppView.Opacity = 1;
                                 EnableControls();
                             });
                         break;
@@ -247,8 +247,8 @@ namespace sQzClient
                         Dispatcher.Invoke(() =>
                         {
                             pgTkExm = new TakeExam();
-                            pgTkExm.User = User;
-                            pgTkExm.UserSheet = qs;
+                            pgTkExm.mExaminee = User;
+                            pgTkExm.mQuestSheet = qs;
                             NavigationService.Navigate(pgTkExm);
                         });
                     break;
@@ -271,7 +271,7 @@ namespace sQzClient
                     outBuf = new byte[12];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(User.LvId), 0, outBuf, 4, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(User.mAnsSh.uQSId), 0, outBuf, 8, 4);
+                    Buffer.BlockCopy(BitConverter.GetBytes(User.mAnsSheet.uQSId), 0, outBuf, 8, 4);
                     break;
                 default:
                     outBuf = null;
@@ -294,7 +294,7 @@ namespace sQzClient
             // set filter for file extension and default file extension 
             //dlg.DefaultExt = ".bin";
             //dlg.Filter = "binary file (*.bin)|*.bin";
-            spMain.Opacity = 0.5;
+            AppView.Opacity = 0.5;
             bool? result = dlg.ShowDialog();
 
             string filePath = null;
@@ -305,12 +305,12 @@ namespace sQzClient
                 if(User.ReadLogFile(filePath))
                 {
                     tbxId.Text = User.tId;
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
+                    PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
                 }
                 else
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
+                    PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
             }
-            spMain.Opacity = 1;
+            AppView.Opacity = 1;
             //EnableControls();
         }
 
@@ -349,9 +349,9 @@ namespace sQzClient
                 if (mClnt.ConnectWR(ref mCbMsg) && bRunning)
                     Dispatcher.Invoke(() =>
                     {
-                        spMain.Opacity = 0.5;
-                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
-                        spMain.Opacity = 1;
+                        AppView.Opacity = 0.5;
+                        PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
+                        AppView.Opacity = 1;
                         btnReconn.IsEnabled = true;
                     });
             });

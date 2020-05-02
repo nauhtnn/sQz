@@ -401,7 +401,7 @@ namespace sQzLib
         public bool GenQ(int n, Level lv, int[] vn, int[] vndiff)
         {
             if (MainPacks[lv].DBDelete())
-                WPopup.s.ShowDialog("todo");// emsg);
+                PopupMgr.Singleton.ShowDialog("todo");// emsg);
             MainPacks[lv].Sheets.Clear();
             //if (AltPacks[lv].DBDelete(out emsg))
             //    WPopup.s.ShowDialog(emsg);
