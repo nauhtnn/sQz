@@ -8,6 +8,7 @@ namespace sQzLib
 {
     public class RichText
     {
+        // no null or empty element in this list
         public IReadOnlyList<object> Runs { get; private set; }
 
         public RichText(RichTextBuilder richText)

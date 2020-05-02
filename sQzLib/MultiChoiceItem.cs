@@ -3,6 +3,24 @@ using System.Collections.Generic;
 
 namespace sQzLib
 {
+    struct MultiChoiceData
+    {
+        public RichTextBuilder Stem;
+        public RichTextBuilder[] Options;
+
+        public MultiChoiceData(Queue<RichTextBuilder> richTexts, int n_options)
+        {
+            Stem = null;
+            Options = null;
+            if (richTexts.Count < 5)
+                throw new ArgumentException();
+            Stem = richTexts.Dequeue();
+            Options = new RichTextBuilder[n_options];
+            for(int i = 0; i < n_options; ++i)
+                Options[i] = richTexts.Dequeue();
+        }
+    }
+
     public class MultiChoiceItem
     {
         public static readonly int N_OPTIONS = ReadNOptions();
@@ -54,10 +72,11 @@ namespace sQzLib
             return 4;
         }
 
-        public void Parse(RichText[] rawData, int dataIdx)
+        public void Parse(Queue<RichTextBuilder> richTexts)
         {
-            Stem = rawData[dataIdx];
-            if (1 < Stem. Length && Stem[0] == '*')
+            MultiChoiceData texts = new MultiChoiceData(richTexts, N_OPTIONS);
+            string stem = texts.Stem.FirstOrDefault();
+            if (1 < stem.Length && stem[0] == '*')
             {
                 IsDifficult = true;
                 Stem = Stem.Substring(1);

@@ -261,20 +261,16 @@ namespace sQzLib
 
         public void ParseDocx(string path)
         {
-            RichText[] rawData = Utils.ReadAllLines(path);
-            ParseArray(rawData);
+            Queue<RichTextBuilder> richTexts = Utils.ReadAllLines(path);
+            ParseQueue(richTexts);
         }
 
-        void ParseArray(RichText[] rawData)
+        void ParseQueue(Queue<RichTextBuilder> richTexts)
         {
             Questions.Clear();
             int stride = 1 + MultiChoiceItem.N_OPTIONS;
-            for (int i = 0; i + stride < rawData.Length; i += stride)
-            {
-                MultiChoiceItem q = new MultiChoiceItem();
-                q.Parse(rawData, i);
-                Questions.Add(q);
-            }
+            while(richTexts.Count > 0)
+                Questions.Add(new MultiChoiceItem().Parse(richTexts));
         }
 
         public void WriteTxt(string fpath)

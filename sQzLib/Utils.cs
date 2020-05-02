@@ -39,17 +39,17 @@ namespace sQzLib
     {
         static readonly char[] WhiteChars = { ' ', '\t', '\n', '\r' };
 
-        public static RichText[] ReadAllLines(string path)
+        public static Queue<RichTextBuilder> ReadAllLines(string path)
         {
             if (Path.GetExtension(path) == "docx")
                 return ReadAllLinesDocx(path);
             else
-                return RichText.NewWith(File.ReadAllLines(path));
+                return RichTextBuilder.NewWith(File.ReadAllLines(path));
         }
 
-        static RichText[] ReadAllLinesDocx(string path)
+        static Queue<RichTextBuilder> ReadAllLinesDocx(string path)
         {
-            List<RichText> richTexts = new List<RichText>();
+            Queue<RichTextBuilder> richTexts = new Queue<RichTextBuilder>();
             WordprocessingDocument doc = null;
             try
             {
@@ -57,11 +57,11 @@ namespace sQzLib
             }
             catch(OpenXmlPackageException)
             {
-                return richTexts.ToArray();
+                return richTexts;
             }
             catch (System.IO.IOException)
             {
-                return richTexts.ToArray();
+                return richTexts;
             }
             Body body = doc.MainDocumentPart.Document.Body;
             foreach (Paragraph paragraph in body.ChildElements.OfType<Paragraph>())
@@ -72,18 +72,18 @@ namespace sQzLib
                 {
                     string rawText = CleanSpace(paragraph.InnerText);
                     if (rawText.Length > 0)
-                        richTexts.Add(new RichText(rawText));
+                        richTexts.Enqueue(new RichTextBuilder(rawText));
                 }
                 else
                 {
                     RichTextBuilder richTextRuns = new RichTextBuilder();
-                    foreach (Run run in paragraph.ChildElements)
+                    foreach (Run docRun in paragraph.ChildElements)
                     {
                         DocumentFormat.OpenXml.Drawing.Blip imgContainer =
-                            run.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
+                            docRun.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
                         if (imgContainer == null)
                         {
-                            richTextRuns.AddRawText(CleanSpace(run.InnerText));
+                            richTextRuns.AddRun(CleanSpace(docRun.InnerText));
                         }
                         else
                         {
@@ -92,14 +92,14 @@ namespace sQzLib
                             System.IO.Stream imgStream = imgPart.GetStream();
                             byte[] imgInBytes = new byte[imgStream.Length];
                             imgStream.Read(imgInBytes, 0, (int)imgStream.Length);
-                            richTextRuns.AddImage(imgInBytes);
+                            richTextRuns.AddRun(imgInBytes);
                         }
                     }
-                    richTexts.Add(richTextRuns.ToRichText());
+                    richTexts.Enqueue(richTextRuns);
                 }
             }
             doc.Close();
-            return richTexts.ToArray();
+            return richTexts;
         }
 
         public static int GetImageGUID()
