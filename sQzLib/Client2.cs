@@ -4,7 +4,7 @@ using System.Net.Sockets;
 
 namespace sQzLib
 {
-    public enum NetCode
+    public enum NetPhase
     {
         Srvr1Auth = 0,
         Srvr1DatRetriving,

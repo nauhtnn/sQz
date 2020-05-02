@@ -6,10 +6,10 @@ namespace sQzLib
 {
     public class Theme
     {
-        public SolidColorBrush[] _;
-        public Thickness[] l;
+        public SolidColorBrush[] DefinedColors;
+        public Thickness[] CellThick;
         static Theme _s;
-        public static Theme s
+        public static Theme Singleton
         {
             get {
                 if (_s == null)
@@ -20,34 +20,34 @@ namespace sQzLib
 
         public Theme()
         {
-            _ = new SolidColorBrush[(int)BrushId.Count];
+            DefinedColors = new SolidColorBrush[(int)BrushId.Count];
             if(System.IO.File.Exists("theme.txt"))
             {
-                string[] cls = System.IO.File.ReadAllLines("theme.txt");
+                string[] hexColors = System.IO.File.ReadAllLines("theme.txt");
                 int j = -1;
-                foreach(string cl in cls)
+                foreach(string hexColor in hexColors)
                 {
-                    Color c = new Color();
-                    c.A = 0xff;
+                    Color color = new Color();
+                    color.A = 0xff;
                     int i;
-                    if (int.TryParse(cl.Substring(0, 2), NumberStyles.AllowHexSpecifier, null, out i))
-                        c.R = (byte)i;
-                    if (int.TryParse(cl.Substring(2, 2), NumberStyles.AllowHexSpecifier, null, out i))
-                        c.G = (byte)i;
-                    if (int.TryParse(cl.Substring(4, 2), NumberStyles.AllowHexSpecifier, null, out i))
-                        c.B = (byte)i;
-                    SolidColorBrush br = new SolidColorBrush(c);
-                    _[++j] = br;
+                    if (int.TryParse(hexColor.Substring(0, 2), NumberStyles.AllowHexSpecifier, null, out i))
+                        color.R = (byte)i;
+                    if (int.TryParse(hexColor.Substring(2, 2), NumberStyles.AllowHexSpecifier, null, out i))
+                        color.G = (byte)i;
+                    if (int.TryParse(hexColor.Substring(4, 2), NumberStyles.AllowHexSpecifier, null, out i))
+                        color.B = (byte)i;
+                    SolidColorBrush brush = new SolidColorBrush(color);
+                    DefinedColors[++j] = brush;
                 }
             }
             
-            l = new Thickness[(int)ThicknessId.Count];
-            l[(int)ThicknessId.LT] = new Thickness(0, 0, 0, 0);
-            l[(int)ThicknessId.MT] = new Thickness(1, 1, 0, 0);
-            l[(int)ThicknessId.RT] = new Thickness(1, 1, 1, 0);
-            l[(int)ThicknessId.LB] = new Thickness(1, 1, 0, 1);
-            l[(int)ThicknessId.MB] = new Thickness(1, 1, 0, 1);
-            l[(int)ThicknessId.RB] = new Thickness(1, 1, 1, 1);
+            CellThick = new Thickness[(int)ThicknessId.Count];
+            CellThick[(int)ThicknessId.LeftTop] = new Thickness(0, 0, 0, 0);
+            CellThick[(int)ThicknessId.MiddleTop] = new Thickness(1, 1, 0, 0);
+            CellThick[(int)ThicknessId.RightTop] = new Thickness(1, 1, 1, 0);
+            CellThick[(int)ThicknessId.LeftBottom] = new Thickness(1, 1, 0, 1);
+            CellThick[(int)ThicknessId.MiddleBottom] = new Thickness(1, 1, 0, 1);
+            CellThick[(int)ThicknessId.RightBottom] = new Thickness(1, 1, 1, 1);
         }
     }
 
@@ -55,7 +55,7 @@ namespace sQzLib
     public enum BrushId
     {
         BG = 0,
-        LeftPanel_BG,
+        AnswerSheet_BG,
         Sheet_BG,
         Button_Hover,
         Q_BG,
@@ -77,12 +77,12 @@ namespace sQzLib
 
     public enum ThicknessId
     {
-        LT = 0,
-        MT,
-        RT,
-        LB,
-        MB,
-        RB,
+        LeftTop = 0,
+        MiddleTop,
+        RightTop,
+        LeftBottom,
+        MiddleBottom,
+        RightBottom,
         Count
     }
 }

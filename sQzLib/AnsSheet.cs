@@ -64,13 +64,13 @@ namespace sQzLib
                 lbxAns.Width = w;
                 lbxAns.Name = "_" + idx;
                 lbxAns.SelectionChanged += Ans_SelectionChanged;
-                lbxAns.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
+                lbxAns.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
                 lbxAns.BorderThickness = new Thickness(0, 4, 0, 0);
                 vlbxAns[idx] = lbxAns;
                 vAnsItem[idx] = new AnswerSheetCellView[MultiChoiceItem.N_OPTIONS];
                 for (int i = 0; i < MultiChoiceItem.N_OPTIONS; ++i)
                 {
-                    AnswerSheetCellView ai = new AnswerSheetCellView(q.Options[i], i, w);
+                    AnswerSheetCellView ai = new AnswerSheetCellView("xx", i, w);// q.Options[i], i, w);
                     ++j;//update view from log
                     if (aAns[j] == Convert.ToByte(true))
                     {

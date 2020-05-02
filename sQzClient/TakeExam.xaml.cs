@@ -27,7 +27,7 @@ namespace sQzClient
         public QuestSheet mQuestSheet;
 
         Client2 mClnt;
-        NetCode mState;
+        NetPhase mState;
 
         public static double qaWh;
         double qiWh;
@@ -37,7 +37,7 @@ namespace sQzClient
         public TakeExam()
         {
             InitializeComponent();
-            mState = NetCode.Dating;
+            mState = NetPhase.Dating;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
             bRunning = true;
@@ -49,7 +49,7 @@ namespace sQzClient
 
         private void LoadTxt()
         {
-            AnswerSheetTitle.Text = Txt.s._[(int)TxI.ANS_SHEET];
+            AnswerTitle.Text = Txt.s._[(int)TxI.ANS_SHEET];
             btnSubmit.Content = Txt.s._[(int)TxI.SUBMIT];
             btnExit.Content = Txt.s._[(int)TxI.EXIT];
         }
@@ -76,8 +76,8 @@ namespace sQzClient
             qMrg = new Thickness(mrg, mrg, 0, mrg);
             qaWh = (QuestSheetView.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
 
-            InitAnswerSheetView();
-            InitQuestSheetView();
+            SetAnswerSheetView();
+            SetQuestSheetView();
 
             bBtnBusy = false;
 
@@ -133,6 +133,7 @@ namespace sQzClient
 
         void ShowQuestion()
         {
+            return;
             PopupMgr.Singleton.CbOK = null;
             AppView.Effect = null;
             bBtnBusy = false;
@@ -145,135 +146,128 @@ namespace sQzClient
             dtLastLog = kDtStart = DateTime.Now;
         }
 
-        void InitAnswerSheetView()
+        void SetAnswerTableHeader()
         {
-            //left panel
-            AnswerSheetView.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-            //title
-            Label l = new Label();
-            AnswerSheetTable.Background = Theme.s._[(int)BrushId.Sheet_BG];
-            int nAns = 4;//hardcode
-            int i = 0, n = mQuestSheet.Questions.Count;
-            AnswerSheetCellView.SInit(Window.GetWindow(this).FontSize);
-            mExaminee.mAnsSheet.Init(mQuestSheet.LvId);
-            mExaminee.mAnsSheet.InitView(mQuestSheet, qaWh, null);
-            mExaminee.mAnsSheet.bChanged = false;
-            //top line
-            AnswerSheetTable.RowDefinitions.Add(new RowDefinition());
-            l = new Label();
-            Grid.SetRow(l, 0);
-            Grid.SetColumn(l, 0);
-            AnswerSheetTable.Children.Add(l);
-            SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
-            for (i = 1; i < nAns; ++i)
+            AnswerTable.RowDefinitions.Add(new RowDefinition());
+            Label cell = new Label();
+            Grid.SetRow(cell, 0);
+            Grid.SetColumn(cell, 0);
+            AnswerTable.Children.Add(cell);
+            SolidColorBrush black = new SolidColorBrush(Colors.Black);
+            for (int i = 1; i <= MultiChoiceItem.N_OPTIONS; ++i)
             {
-                l = new Label();
-                l.Content = (char)('@' + i);
-                l.BorderBrush = brBK;
-                l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
-                l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                l.FontWeight = FontWeights.Bold;
-                Grid.SetRow(l, 0);
-                Grid.SetColumn(l, i);
-                AnswerSheetTable.Children.Add(l);
-
+                cell = new Label();
+                cell.Content = (char)('@' + i);
+                cell.BorderBrush = black;
+                cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.MiddleTop];
+                cell.HorizontalContentAlignment = HorizontalAlignment.Center;
+                cell.FontWeight = FontWeights.Bold;
+                Grid.SetRow(cell, 0);
+                Grid.SetColumn(cell, i);
+                AnswerTable.Children.Add(cell);
             }
-            l = new Label();
-            l.BorderBrush = brBK;
-            l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
-            l.HorizontalContentAlignment = HorizontalAlignment.Center;
-            l.Content = (char)('@' + i);
-            l.FontWeight = FontWeights.Bold;
-            Grid.SetRow(l, 0);
-            Grid.SetColumn(l, i);
-            AnswerSheetTable.Children.Add(l);
-            //next lines
-            //n -= 1;
-            int j = 1;
-            for (; j < n; ++j)
-            {
-                AnswerSheetTable.RowDefinitions.Add(new RowDefinition());
-                l = new Label();
-                l.Content = j;
-                l.BorderBrush = brBK;
-                l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
-                l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                l.FontWeight = FontWeights.Bold;
-                Grid.SetRow(l, j);
-                Grid.SetColumn(l, 0);
-                AnswerSheetTable.Children.Add(l);
-                for (i = 1; i < nAns; ++i)
-                {
-                    l = mExaminee.mAnsSheet.vAnsItem[j - 1][i - 1].lbl;
-                    l.BorderBrush = brBK;
-                    l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
-                    l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                    l.VerticalContentAlignment = VerticalAlignment.Top;
-                    Grid.SetRow(l, j);
-                    Grid.SetColumn(l, i);
-                    AnswerSheetTable.Children.Add(l);
-                }
-                l = l = mExaminee.mAnsSheet.vAnsItem[j - 1][i - 1].lbl;
-                l.BorderBrush = brBK;
-                l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
-                l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                Grid.SetRow(l, j);
-                Grid.SetColumn(l, i);
-                AnswerSheetTable.Children.Add(l);
-            }
-            //bottom lines
-            AnswerSheetTable.RowDefinitions.Add(new RowDefinition());
-            l = new Label();
-            l.Content = j;
-            l.BorderBrush = brBK;
-            l.BorderThickness = Theme.s.l[(int)ThicknessId.LB];
-            l.HorizontalContentAlignment = HorizontalAlignment.Center;
-            l.FontWeight = FontWeights.Bold;
-            Grid.SetRow(l, j);
-            Grid.SetColumn(l, 0);
-            AnswerSheetTable.Children.Add(l);
-            for (i = 1; i < nAns; ++i)
-            {
-                l = mExaminee.mAnsSheet.vAnsItem[j - 1][i - 1].lbl;
-                l.BorderBrush = brBK;
-                l.BorderThickness = Theme.s.l[(int)ThicknessId.MB];
-                l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                Grid.SetRow(l, j);
-                Grid.SetColumn(l, i);
-                AnswerSheetTable.Children.Add(l);
-            }
-            l = mExaminee.mAnsSheet.vAnsItem[j - 1][i - 1].lbl;
-            l.BorderBrush = brBK;
-            l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
-            l.HorizontalContentAlignment = HorizontalAlignment.Center;
-            Grid.SetRow(l, j);
-            Grid.SetColumn(l, i);
-            AnswerSheetTable.Children.Add(l);
-
-            //for (j = Question.svQuest[0].Count; -1 < j; --j)
-            //    AnswerSheetTable.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
+            cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.RightTop];
         }
 
-        void InitQuestSheetView()
+        void SetAnswerTableBottomRow()
         {
-            QuestStackView.Background = Theme.s._[(int)BrushId.Q_BG];
-            int n = mQuestSheet.Questions.Count;
-            for (int i = 1, j = 0; i <= n; i += 2, ++j)
+            SolidColorBrush black = new SolidColorBrush(Colors.Black);
+            //bottom lines
+            AnswerTable.RowDefinitions.Add(new RowDefinition());
+            Label cell = new Label();
+            int lastRowIdx = mQuestSheet.Questions.Count;
+            cell.Content = lastRowIdx;
+            cell.BorderBrush = black;
+            cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.LeftBottom];
+            cell.HorizontalContentAlignment = HorizontalAlignment.Center;
+            cell.FontWeight = FontWeights.Bold;
+            Grid.SetRow(cell, lastRowIdx);
+            Grid.SetColumn(cell, 0);
+            AnswerTable.Children.Add(cell);
+            for (int i = 1; i <= MultiChoiceItem.N_OPTIONS; ++i)
             {
-                gQuest.RowDefinitions.Add(new RowDefinition());
-                StackPanel q = CreateQuestBox(i);
-                Grid.SetRow(q, j);
-                Grid.SetColumn(q, 0);
-                gQuest.Children.Add(q);
+                cell = new Label();cell.Content = "x";// mExaminee.mAnsSheet.vAnsItem[lastRowIdx - 1][i - 1].lbl;
+                cell.BorderBrush = black;
+                cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.MiddleBottom];
+                cell.HorizontalContentAlignment = HorizontalAlignment.Center;
+                Grid.SetRow(cell, lastRowIdx);
+                Grid.SetColumn(cell, i);
+                AnswerTable.Children.Add(cell);
             }
-            for (int i = 2, j = 0; i <= n; i += 2, ++j)
+            cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.RightBottom];
+        }
+
+        void SetAnswerTableMiddleRows()
+        {
+            SolidColorBrush black = new SolidColorBrush(Colors.Black);
+            Label cell = new Label();
+            for (int j = 1, n = mQuestSheet.Questions.Count; j < n; ++j)
             {
-                StackPanel q = CreateQuestBox(i);
-                Grid.SetRow(q, j);
-                Grid.SetColumn(q, 1);
-                gQuest.Children.Add(q);
+                AnswerTable.RowDefinitions.Add(new RowDefinition());
+                cell = new Label();
+                cell.Content = j;
+                cell.BorderBrush = black;
+                cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.MiddleTop];
+                cell.HorizontalContentAlignment = HorizontalAlignment.Center;
+                cell.FontWeight = FontWeights.Bold;
+                Grid.SetRow(cell, j);
+                Grid.SetColumn(cell, 0);
+                AnswerTable.Children.Add(cell);
+                for (int i = 1; i <= MultiChoiceItem.N_OPTIONS; ++i)
+                {
+                    cell = mExaminee.mAnsSheet.vAnsItem[j - 1][i - 1].lbl;
+                    cell.BorderBrush = black;
+                    cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.MiddleTop];
+                    cell.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    cell.VerticalContentAlignment = VerticalAlignment.Top;
+                    Grid.SetRow(cell, j);
+                    Grid.SetColumn(cell, i);
+                    AnswerTable.Children.Add(cell);
+                }
+                cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.RightTop];
             }
-            gQuest.Background = Theme.s._[(int)BrushId.BG];
+
+
+            //for (j = Question.svQuest[0].Count; -1 < j; --j)
+            //    AnswerTable.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
+        }
+
+        void SetAnswerSheetView()
+        {
+            AnswerSheetBG.Background = Theme.Singleton.DefinedColors[(int)BrushId.AnswerSheet_BG];
+            
+            AnswerTable.Background = Theme.Singleton.DefinedColors[(int)BrushId.Sheet_BG];
+            
+            //AnswerSheetCellView.SInit(Window.GetWindow(this).FontSize);
+            //mExaminee.mAnsSheet.Init(mQuestSheet.LvId);
+            //mExaminee.mAnsSheet.InitView(mQuestSheet, qaWh, null);
+            //mExaminee.mAnsSheet.bChanged = false;
+
+            SetAnswerTableHeader();
+            SetAnswerTableMiddleRows();
+            SetAnswerTableBottomRow();
+        }
+
+        void SetQuestSheetView()
+        {
+            //QuestStackView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
+            //int n = mQuestSheet.Questions.Count;
+            //for (int i = 1, j = 0; i <= n; i += 2, ++j)
+            //{
+            //    gQuest.RowDefinitions.Add(new RowDefinition());
+            //    StackPanel q = CreateQuestBox(i);
+            //    Grid.SetRow(q, j);
+            //    Grid.SetColumn(q, 0);
+            //    gQuest.Children.Add(q);
+            //}
+            //for (int i = 2, j = 0; i <= n; i += 2, ++j)
+            //{
+            //    StackPanel q = CreateQuestBox(i);
+            //    Grid.SetRow(q, j);
+            //    Grid.SetColumn(q, 1);
+            //    gQuest.Children.Add(q);
+            //}
+            //gQuest.Background = Theme.Singleton.DefinedColors[(int)BrushId.BG];
         }
 
         Label CreateIndexInsideQuestBox(int idx)
@@ -282,8 +276,8 @@ namespace sQzClient
             idxBox.HorizontalAlignment = HorizontalAlignment.Left;
             idxBox.VerticalAlignment = VerticalAlignment.Top;
             idxBox.Content = idx;
-            idxBox.Background = Theme.s._[(int)BrushId.QID_BG];
-            idxBox.Foreground = Theme.s._[(int)BrushId.QID_Color];
+            idxBox.Background = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
+            idxBox.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_Color];
             idxBox.Width = qiWh;
             idxBox.Height = qiWh;
             idxBox.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -295,13 +289,13 @@ namespace sQzClient
         Label CreateStmtInsideQuestBox(MultiChoiceItem question)
         {
             TextBlock stmt = new TextBlock();
-            stmt.Text = question.Stem;
+            stmt.Text = "xx";// question.Stem;
             stmt.TextWrapping = TextWrapping.Wrap;
             stmt.Width = qaWh;
-            stmt.Background = Theme.s._[(int)BrushId.Q_BG];
+            stmt.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
             Label stmtBox = new Label();
             stmtBox.Content = stmt;
-            stmtBox.BorderBrush = Theme.s._[(int)BrushId.QID_BG];
+            stmtBox.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
             stmtBox.BorderThickness = new Thickness(0, 4, 0, 0);
             Thickness zero = new Thickness(0);
             stmtBox.Margin = stmtBox.Padding = zero;
@@ -314,7 +308,7 @@ namespace sQzClient
             StackPanel questBox = new StackPanel();
             questBox.Orientation = Orientation.Horizontal;
             questBox.Margin = qMrg;
-            questBox.Background = Theme.s._[(int)BrushId.BG];
+            questBox.Background = Theme.Singleton.DefinedColors[(int)BrushId.BG];
             
             questBox.Children.Add(CreateIndexInsideQuestBox(idx));
 
@@ -338,7 +332,7 @@ namespace sQzClient
             PopupMgr.Singleton.CbOK = null;
             bRunning = false;
             DisableAll();
-            mState = NetCode.Submiting;
+            mState = NetPhase.Submiting;
             mExaminee.mPhase = ExamineePhase.Submitting;
             mExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             if (mClnt.ConnectWR(ref mCbMsg))
@@ -362,7 +356,7 @@ namespace sQzClient
             int offs = 0;
             switch (mState)
             {
-                case NetCode.Submiting:
+                case NetPhase.Submiting:
                     int rs;
                     string msg = null;
                     int l = buf.Length - offs;
@@ -422,7 +416,7 @@ namespace sQzClient
             byte[] outBuf;
             switch (mState)
             {
-                case NetCode.Submiting:
+                case NetPhase.Submiting:
                     mExaminee.ToByte(out outBuf, (int)mState);
                     break;
                 default:
@@ -479,6 +473,7 @@ namespace sQzClient
 
         void Exit()
         {
+            return;
             //WPopup.s.wpCb = null;
             //bBtnBusy = false;
             if (mExaminee.mAnsSheet.bChanged)

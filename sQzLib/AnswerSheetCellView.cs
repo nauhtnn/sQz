@@ -12,18 +12,18 @@ namespace sQzLib
 
     public class AnswerSheetCellView : StackPanel
     {
-        public static CornerRadius sCr;
-        static double sW;
-        Border mB;
+        public static CornerRadius mCornerRadius;
+        static double Width;
+        Border mBorder;
 
         public Label mLbl;
         public ListBoxItem mLbxItem;
 
         public static void SInit(double w)
         {
-            sCr = new CornerRadius();
-            sCr.BottomLeft = sCr.BottomRight = sCr.TopLeft = sCr.TopRight = 50;
-            sW = w;
+            mCornerRadius = new CornerRadius();
+            mCornerRadius.BottomLeft = mCornerRadius.BottomRight = mCornerRadius.TopLeft = mCornerRadius.TopRight = 50;
+            Width = w;
         }
 
         public AnswerSheetCellView(string txt, int idx, double w)
@@ -31,21 +31,21 @@ namespace sQzLib
             w -= 10;//alignment
             StackPanel sp = new StackPanel();
             sp.Orientation = Orientation.Horizontal;
-            mB = new Border();
-            mB.Width = mB.Height = 30;
-            mB.CornerRadius = sCr;
-            mB.Background = Theme.s._[(int)BrushId.Q_BG];
+            mBorder = new Border();
+            mBorder.Width = mBorder.Height = 30;
+            mBorder.CornerRadius = mCornerRadius;
+            mBorder.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
             TextBlock tb = new TextBlock();
             tb.Text = "" + (char)('A' + idx);
-            tb.Foreground = Theme.s._[(int)BrushId.QID_BG];
+            tb.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
             tb.VerticalAlignment = VerticalAlignment.Center;
             tb.HorizontalAlignment = HorizontalAlignment.Center;
-            mB.Child = tb;
-            sp.Children.Add(mB);
+            mBorder.Child = tb;
+            sp.Children.Add(mBorder);
             TextBlock ansTxt = new TextBlock();
             ansTxt.Text = txt;
             ansTxt.TextWrapping = TextWrapping.Wrap;
-            ansTxt.Width = w - mB.Width;
+            ansTxt.Width = w - mBorder.Width;
             ansTxt.VerticalAlignment = VerticalAlignment.Center;
             sp.Children.Add(ansTxt);
 
@@ -69,17 +69,17 @@ namespace sQzLib
 
         public void Selected()
         {
-            mB.Background = Theme.s._[(int)BrushId.QID_BG];
-            TextBlock t = (TextBlock)mB.Child;
-            t.Foreground = Theme.s._[(int)BrushId.QID_Color];
+            mBorder.Background = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
+            TextBlock t = (TextBlock)mBorder.Child;
+            t.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_Color];
             mLbl.Content = 'X';
         }
 
         public void Unselected()
         {
-            mB.Background = Theme.s._[(int)BrushId.Q_BG];
-            TextBlock t = (TextBlock)mB.Child;
-            t.Foreground = Theme.s._[(int)BrushId.QID_BG];
+            mBorder.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
+            TextBlock t = (TextBlock)mBorder.Child;
+            t.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
             mLbl.Content = string.Empty;
         }
     }

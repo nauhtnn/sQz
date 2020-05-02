@@ -16,7 +16,7 @@ namespace sQzClient
     public partial class Authentication : Page
     {
         Client2 mClnt;
-        NetCode mState;
+        NetPhase mState;
         UICbMsg mCbMsg;
         bool bRunning;
         DateTime mDt;
@@ -27,7 +27,7 @@ namespace sQzClient
         {
             InitializeComponent();
 
-            mState = NetCode.Dating;
+            mState = NetPhase.Dating;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
             bRunning = true;
@@ -135,7 +135,7 @@ namespace sQzClient
             int l, errc;
             switch (mState)
             {
-                case NetCode.Dating:
+                case NetPhase.Dating:
                     if(!DT.ReadByte(buf, ref offs, out mDt) && bRunning)
                     {
                         Dispatcher.Invoke(() => {
@@ -143,10 +143,10 @@ namespace sQzClient
                             EnableControls();
                             btnReconn.IsEnabled = false;
                         });
-                        mState = NetCode.Authenticating;
+                        mState = NetPhase.Authenticating;
                     }
                     break;
-                case NetCode.Authenticating:
+                case NetPhase.Authenticating:
                     l = buf.Length - offs;
                     if (l < 4)
                         break;
@@ -161,7 +161,7 @@ namespace sQzClient
                         if (!b)
                         {
                             User.Merge(e);
-                            mState = NetCode.ExamRetrieving;
+                            mState = NetPhase.ExamRetrieving;
                             return true;//continue
                         }
                     }
@@ -211,12 +211,12 @@ namespace sQzClient
                             });
                     }
                     break;
-                case NetCode.ExamRetrieving:
+                case NetPhase.ExamRetrieving:
                     errc = BitConverter.ToInt32(buf, offs);
                     offs += 4;
                     if(errc == (int)TxI.QS_NFOUND)
                     {
-                        mState = NetCode.Authenticating;
+                        mState = NetPhase.Authenticating;
                         int qsid = BitConverter.ToInt32(buf, offs);
                         offs += 4;
                         if (bRunning)
@@ -232,7 +232,7 @@ namespace sQzClient
                     QuestSheet qs = new QuestSheet();
                     if (qs.ReadByte(buf, ref offs))
                     {
-                        mState = NetCode.Authenticating;
+                        mState = NetPhase.Authenticating;
                         if(bRunning)
                             Dispatcher.Invoke(() =>
                             {
@@ -261,13 +261,13 @@ namespace sQzClient
             byte[] outBuf;
             switch (mState)
             {
-                case NetCode.Dating:
+                case NetPhase.Dating:
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
-                case NetCode.Authenticating:
+                case NetPhase.Authenticating:
                     User.ToByte(out outBuf, (int)mState);
                     break;
-                case NetCode.ExamRetrieving:
+                case NetPhase.ExamRetrieving:
                     outBuf = new byte[12];
                     Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
                     Buffer.BlockCopy(BitConverter.GetBytes(User.LvId), 0, outBuf, 4, 4);

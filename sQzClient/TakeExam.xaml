@@ -16,10 +16,10 @@
                     <ColumnDefinition Width="144"/>
                     <ColumnDefinition Width="1116"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel x:Name="AnswerSheetView" HorizontalAlignment="Left" Height="652" Width="144">
-                    <TextBlock x:Name="AnswerSheetTitle" Height="30" FontSize="20" HorizontalAlignment="Center"/>
+                <StackPanel x:Name="AnswerSheetBG" HorizontalAlignment="Left" Height="652" Width="144">
+                    <TextBlock x:Name="AnswerTitle" Height="30" FontSize="20" HorizontalAlignment="Center"/>
                     <ScrollViewer Height="622" Width="144" VerticalScrollBarVisibility="Auto" FontSize="14">
-                        <Grid x:Name="AnswerSheetTable">
+                        <Grid x:Name="AnswerTable">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
