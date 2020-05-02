@@ -1,8 +1,13 @@
 CREATE TABLE IF NOT EXISTS `sqz_ver`(`id` INT UNSIGNED PRIMARY KEY);
 
+DELETE FROM `sqz_ver`;
+INSERT INTO `sqz_ver` VALUES (20);
+
 CREATE TABLE IF NOT EXISTS `sqz_board`(`dt` DATE PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_status`(`id` TINYINT PRIMARY KEY);
+
+INSERT INTO `sqz_status` VALUES (0),(1),(2);
 
 CREATE TABLE IF NOT EXISTS `sqz_slot`(`dt` DATE, `t` TIME, `stt` TINYINT NOT NULL,
 PRIMARY KEY(`dt`, `t`),
@@ -12,6 +17,8 @@ INDEX(`stt`));
 
 CREATE TABLE IF NOT EXISTS `sqz_room`(`id` TINYINT PRIMARY KEY);
 
+INSERT INTO `sqz_room` VALUES (0),(1),(2),(3),(4),(5);
+
 CREATE TABLE IF NOT EXISTS `sqz_slot_room`(`dt` DATE, `t` TIME, `rid` TINYINT,
 `pw` CHAR(8) CHARACTER SET `ascii`, `qpkalt` TINYINT NOT NULL,
 `t1` TIME, `t2` TIME,
@@ -20,6 +27,8 @@ FOREIGN KEY(`dt`, `t`) REFERENCES `sqz_slot`(`dt`, `t`),
 FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_level`(`id` CHAR CHARACTER SET `ascii` PRIMARY KEY);
+
+INSERT INTO `sqz_level` VALUES ('A'),('B');
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATE, `lv` CHAR CHARACTER SET `ascii`,
 `t` TIME, `id` SMALLINT UNSIGNED, `alt` TINYINT NOT NULL,
@@ -45,6 +54,8 @@ FOREIGN KEY(`dt`, `lv`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `lv`, `id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_module`(`id` TINYINT PRIMARY KEY);
 
+INSERT INTO `sqz_module` VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14);
+
 CREATE TABLE IF NOT EXISTS `sqz_long_item_path`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `pat` VARCHAR(256) CHARACTER SET `utf8`);
 
@@ -67,17 +78,11 @@ FOREIGN KEY(`it_id`) REFERENCES `sqz_multi_response_item`(`id`));
 CREATE TABLE IF NOT EXISTS `sqz_img_path`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `pat` VARCHAR(256) CHARACTER SET `utf8`);
 
+/*it_stem_option_id = 0 (option 1), 1 (option 2), ..., 3 (option 4), others (stem)*/
 CREATE TABLE IF NOT EXISTS `sqz_item_img`(`it_id` INT UNSIGNED, `imgid` INT UNSIGNED,
-`pos` INT, PRIMARY KEY(`it_id`, `imgid`),
+`it_stem_option_id` INT, `pos` INT, PRIMARY KEY(`it_id`, `imgid`, `it_stem_option_id`),
 FOREIGN KEY(`it_id`) REFERENCES `sqz_multi_response_item`(`id`),
 FOREIGN KEY(`imgid`) REFERENCES `sqz_img_path`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_admin`(`id` TINYINT PRIMARY KEY,
 `name` VARCHAR(32) CHARACTER SET `utf8`, `pw` CHAR(8) CHARACTER SET `ascii`);
-
-INSERT INTO `sqz_room` VALUES (0),(1),(2),(3),(4),(5);
-INSERT INTO `sqz_level` VALUES ('A'),('B');
-INSERT INTO `sqz_module` VALUES (0),(1),(2),(3),(4),(5),(6),(7),(8),(9),(10),(11),(12),(13),(14);
-INSERT INTO `sqz_status` VALUES (0),(1),(2);
-DELETE FROM `sqz_ver`;
-INSERT INTO `sqz_ver` VALUES (20);

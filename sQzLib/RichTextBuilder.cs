@@ -6,31 +6,61 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    class RichTextBuilder
+    public class RichTextBuilder
     {
-        public StringBuilder RawText { get; private set; }
-        public List<KeyValuePair<int, byte[]>> ImagesAtPositions { get; private set; }
+        public List<object> Runs;
 
         public RichTextBuilder()
         {
-            RawText = new StringBuilder();
-            ImagesAtPositions = new List<KeyValuePair<int, byte[]>>();
+            Runs = new List<object>();
         }
 
-        public void AddRawText(string rawText)
+        public void AddRun(object run)
         {
-            RawText.Append(rawText);
+            if (run is string || run is byte[])
+            {
+                Runs.Add(run);
+            }
+            else
+                throw new ArgumentException();
         }
 
-        public void AddImage(byte[] imageInBytes)
+        public KeyValuePair<string, List<KeyValuePair<int, byte[]>>> SeparateTextFromImages()
         {
-            int position = RawText.ToString().Length;
-            ImagesAtPositions.Add(new KeyValuePair<int, byte[]>(position, imageInBytes));
+            StringBuilder rawText = new StringBuilder();
+            List<KeyValuePair<int, byte[]>> imagesAtPositions = new List<KeyValuePair<int, byte[]>>();
+
+            foreach(object run in Runs)
+            {
+                string s = run as string;
+                if (s != null)
+                    rawText.Append(s);
+                else if(run is byte[])
+                {
+                    int position = rawText.ToString().Length;
+                    imagesAtPositions.Add(new KeyValuePair<int, byte[]>(position, run as byte[]));
+                }
+                else
+                    throw new ArgumentException();
+            }
+            return new KeyValuePair<string, List<KeyValuePair<int, byte[]>>>(rawText.ToString(), imagesAtPositions);
         }
 
-        public RichText ToRichText()
+        public string FirstOrDefault(int i)
         {
-            return new RichText(RawText.ToString(), ImagesAtPositions);
+            if(Runs.Count > 0 && Runs[0] is string)
+                return Runs[0] as string;
+            return null;
+        }
+
+        public void Replace(string oldValue, string newValue)
+        {
+            foreach(object i in Runs)
+            {
+                string s = i as string;
+                if(s != null)
+                    s.Replace(oldValue, newValue);
+            }
         }
     }
 }
