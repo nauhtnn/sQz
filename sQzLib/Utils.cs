@@ -39,17 +39,17 @@ namespace sQzLib
     {
         static readonly char[] WhiteChars = { ' ', '\t', '\n', '\r' };
 
-        public static Queue<RichTextBuilder> ReadAllLines(string path)
+        public static Queue<NonnullRichTextBuilder> ReadAllLines(string path)
         {
             if (Path.GetExtension(path) == "docx")
                 return ReadAllLinesDocx(path);
             else
-                return RichTextBuilder.NewWith(File.ReadAllLines(path));
+                return NonnullRichTextBuilder.NewWith(File.ReadAllLines(path));
         }
 
-        static Queue<RichTextBuilder> ReadAllLinesDocx(string path)
+        static Queue<NonnullRichTextBuilder> ReadAllLinesDocx(string path)
         {
-            Queue<RichTextBuilder> richTexts = new Queue<RichTextBuilder>();
+            Queue<NonnullRichTextBuilder> richTexts = new Queue<NonnullRichTextBuilder>();
             WordprocessingDocument doc = null;
             try
             {
@@ -70,21 +70,17 @@ namespace sQzLib
                     paragraph.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().First();
                 if (hasImage == null)
                 {
-                    string rawText = CleanSpace(paragraph.InnerText);
-                    if (rawText.Length > 0)
-                        richTexts.Enqueue(new RichTextBuilder(rawText));
+                    richTexts.Enqueue(new NonnullRichTextBuilder(paragraph.InnerText));
                 }
                 else
                 {
-                    RichTextBuilder richTextRuns = new RichTextBuilder();
+                    List<object> runs = new List<object>();
                     foreach (Run docRun in paragraph.ChildElements)
                     {
                         DocumentFormat.OpenXml.Drawing.Blip imgContainer =
                             docRun.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
                         if (imgContainer == null)
-                        {
-                            richTextRuns.AddRun(CleanSpace(docRun.InnerText));
-                        }
+                            runs.Add(docRun.InnerText);
                         else
                         {
                             string imgId = imgContainer.Embed.Value;
@@ -92,9 +88,10 @@ namespace sQzLib
                             System.IO.Stream imgStream = imgPart.GetStream();
                             byte[] imgInBytes = new byte[imgStream.Length];
                             imgStream.Read(imgInBytes, 0, (int)imgStream.Length);
-                            richTextRuns.AddRun(imgInBytes);
+                            runs.Add(imgInBytes);
                         }
                     }
+                    NonnullRichTextBuilder richTextRuns = new NonnullRichTextBuilder(runs);
                     richTexts.Enqueue(richTextRuns);
                 }
             }

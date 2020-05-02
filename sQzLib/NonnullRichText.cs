@@ -6,12 +6,12 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    public class RichText
+    public class NonnullRichText
     {
         // no null or empty element in this list
         public IReadOnlyList<object> Runs { get; private set; }
 
-        public RichText(RichTextBuilder richText)
+        public NonnullRichText(NonnullRichTextBuilder richText)
         {
             Runs = richText.Runs.AsReadOnly();
         }

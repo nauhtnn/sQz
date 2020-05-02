@@ -1,4 +1,5 @@
-﻿using System;
+﻿using DocumentFormat.OpenXml.Drawing;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -6,40 +7,47 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    public class RichTextBuilder
+    public class NonnullRichTextBuilder
     {
-        // no null or empty element in this list
         public List<object> Runs;
 
-        public static Queue<RichTextBuilder> NewWith(string[] rawTexts)
+        public static Queue<NonnullRichTextBuilder> NewWith(string[] rawTexts)
         {
-            Queue<RichTextBuilder> richTexts = new Queue<RichTextBuilder>();
+            Queue<NonnullRichTextBuilder> richTexts = new Queue<NonnullRichTextBuilder>();
             foreach(string rawText in rawTexts)
-            {
-                if (rawText == null)
-                    continue;
-                string tidyText = Utils.CleanSpace(rawText);
-                if(tidyText.Length > 0)
-                    richTexts.Enqueue(new RichTextBuilder(tidyText));
-            }
+                richTexts.Enqueue(new NonnullRichTextBuilder(Utils.CleanSpace(rawText)));
             return richTexts;
         }
 
-        public RichTextBuilder()
+        public NonnullRichTextBuilder(List<object> runs)
         {
+            if (runs == null)
+                throw new ArgumentException();
             Runs = new List<object>();
+            foreach (object run in runs)
+                AddRun(run);
+            if (Runs.Count == 0)
+                throw new ArgumentException();
         }
 
-        public RichTextBuilder(string rawText)
+        public NonnullRichTextBuilder(string rawText)
         {
-            Runs = new List<object>();
+            if(rawText == null)
+                throw new ArgumentException();
             string tidyText = Utils.CleanSpace(rawText);
             if (tidyText.Length > 0)
+            {
+                Runs = new List<object>();
                 Runs.Add(tidyText);
+            }
+            else
+                throw new ArgumentException();
         }
 
-        public void AddRun(object run)
+        void AddRun(object run)
         {
+            if (run == null)
+                throw new ArgumentException();
             if (run is byte[])
                 Runs.Add(run);
             else
@@ -50,8 +58,9 @@ namespace sQzLib
                 else
                 {
                     string tidyText = Utils.CleanSpace(s);
-                    if (tidyText.Length > 0)
-                        Runs.Add(tidyText);
+                    if (tidyText.Length == 0)
+                        throw new ArgumentException();
+                    Runs.Add(tidyText);
                 }
             }   
         }
@@ -77,11 +86,9 @@ namespace sQzLib
             return new KeyValuePair<string, List<KeyValuePair<int, byte[]>>>(rawText.ToString(), imagesAtPositions);
         }
 
-        public string FirstOrDefault()
+        public string FirstStringOrDefault()
         {
-            if(Runs.Count > 0 && Runs[0] is string)
-                return Runs[0] as string;
-            return null;
+            return Runs[0] as string;
         }
 
         public void Trunc1AtLeft()

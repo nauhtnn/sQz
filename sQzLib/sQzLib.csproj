@@ -73,8 +73,8 @@
     <Compile Include="HotkeyHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="MultiChoiceItem.cs" />
-    <Compile Include="RichText.cs" />
-    <Compile Include="RichTextBuilder.cs" />
+    <Compile Include="NonnullRichText.cs" />
+    <Compile Include="NonnullRichTextBuilder.cs" />
     <Compile Include="Server2.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Theme.xaml.cs" />

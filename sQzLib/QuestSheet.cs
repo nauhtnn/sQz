@@ -261,11 +261,11 @@ namespace sQzLib
 
         public void ParseDocx(string path)
         {
-            Queue<RichTextBuilder> richTexts = Utils.ReadAllLines(path);
+            Queue<NonnullRichTextBuilder> richTexts = Utils.ReadAllLines(path);
             ParseQueue(richTexts);
         }
 
-        void ParseQueue(Queue<RichTextBuilder> richTexts)
+        void ParseQueue(Queue<NonnullRichTextBuilder> richTexts)
         {
             Questions.Clear();
             int stride = 1 + MultiChoiceItem.N_OPTIONS;
