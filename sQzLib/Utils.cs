@@ -91,12 +91,36 @@ namespace sQzLib
                             runs.Add(imgInBytes);
                         }
                     }
-                    NonnullRichTextBuilder richTextRuns = new NonnullRichTextBuilder(runs);
+                    NonnullRichTextBuilder richTextRuns = new NonnullRichTextBuilder(CompactRuns(runs));
                     richTexts.Enqueue(richTextRuns);
                 }
             }
             doc.Close();
             return richTexts;
+        }
+
+        static List<object> CompactRuns(List<object> runs)
+        {
+            List<object> compactRuns = new List<object>();
+            StringBuilder joinTexts = new StringBuilder();
+            foreach(object run in runs)
+            {
+                string s = run as string;
+                if(s == null)
+                {
+                    if(joinTexts.Length > 0)
+                    {
+                        compactRuns.Add(joinTexts.ToString());
+                        joinTexts.Clear();
+                    }
+                    compactRuns.Add(run);
+                }
+                else
+                    joinTexts.Append(s);
+            }
+            if (joinTexts.Length > 0)
+                compactRuns.Add(joinTexts.ToString());
+            return compactRuns;
         }
 
         public static int GetImageGUID()
