@@ -12,22 +12,15 @@ namespace sQzClient
 {
     public class NonnullRichTextView
     {
-        NonnullRichText RichText;
-
-        public NonnullRichTextView(NonnullRichText richText)
-        {
-            RichText = richText;
-        }
-
-        public UIElement ToUIElement()
+        public static UIElement Render(NonnullRichText RichText)
         {
             if (RichText.HasImage())
-                return ToViewWithImage();
+                return ToViewWithImage(RichText);
             else
-                return ToViewNoImage();
+                return ToViewNoImage(RichText);
         }
 
-        UIElement ToViewWithImage()
+        static UIElement ToViewWithImage(NonnullRichText RichText)
         {
             StackPanel content = new StackPanel();
             foreach (object run in RichText.Runs)
@@ -56,7 +49,7 @@ namespace sQzClient
             return content;
         }
 
-        UIElement ToViewNoImage()
+        static UIElement ToViewNoImage(NonnullRichText RichText)
         {
             StringBuilder text = new StringBuilder();
             foreach (object run in RichText.Runs)

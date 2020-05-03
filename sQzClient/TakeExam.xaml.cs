@@ -70,6 +70,8 @@ namespace sQzClient
         void HackTest()
         {
             mQuestSheet.ParseDocx(".\\quiz.docx");
+
+            QuestSheetBG.Visibility = Visibility.Visible;
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
@@ -140,7 +142,6 @@ namespace sQzClient
 
         void ShowQuestion()
         {
-            return;
             PopupMgr.Singleton.CbOK = null;
             AppView.Effect = null;
             bBtnBusy = false;
@@ -257,7 +258,9 @@ namespace sQzClient
 
         void SetQuestSheetBG()
         {
-            //QuestStackView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
+            QuestTextView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
+            foreach (MultiChoiceItem question in mQuestSheet.Questions)
+                MultiChoiceItemView.Render(question, QuestTextView);
             //int n = mQuestSheet.Questions.Count;
             //for (int i = 1, j = 0; i <= n; i += 2, ++j)
             //{
