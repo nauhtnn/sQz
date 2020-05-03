@@ -57,10 +57,45 @@ namespace sQzLib
                     throw new ArgumentException();
                 else
                 {
-                    string tidyText = Utils.CleanSpace(s);
-                    if (tidyText.Length == 0)
+                    string[] newLine = { "\\n" };
+                    string[] lines = s.Split(newLine, StringSplitOptions.None);
+                    bool allEmpty = true;
+                    //accept first string empty
+                    if(lines.Length > 0)
+                    {
+                        string tidyText = Utils.CleanSpace(lines[0]);
+                        if (tidyText.Length > 0)
+                        {
+                            Runs.Add(tidyText);
+                            allEmpty = false;
+                        }
+                        Runs.Add(new TextLineBreak());
+                    }
+                    if (lines.Length == 1)
+                        Runs.RemoveAt(Runs.Count - 1);
+                    //do not accept middle strings empty
+                    for(int i = 1; i < lines.Length - 2; ++i)
+                    {
+                        string tidyText = Utils.CleanSpace(lines[i]);
+                        if (tidyText.Length > 0)
+                        {
+                            Runs.Add(tidyText);
+                            allEmpty = false;
+                        }
+                        Runs.Add(new TextLineBreak());
+                    }
+                    //accept last string empty
+                    if (lines.Length > 1)
+                    {
+                        string tidyText = Utils.CleanSpace(lines[lines.Length - 1]);
+                        if (tidyText.Length > 0)
+                        {
+                            Runs.Add(tidyText);
+                            allEmpty = false;
+                        }
+                    }
+                    if (allEmpty)
                         throw new ArgumentException();
-                    Runs.Add(tidyText);
                 }
             }   
         }
