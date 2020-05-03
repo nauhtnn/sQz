@@ -78,15 +78,10 @@ namespace sQzClient
         {
             SetWindowFullScreen();
 
-            double mrg = FontSize / 2;
-            qiWh = 3 * mrg;
-            qMrg = new Thickness(mrg, mrg, 0, mrg);
-            qaWh = (QuestSheetBG.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
-
             HackTest();
 
             SetAnswerSheetView();
-            SetQuestSheetBG();
+            SetQuestSheetView();
 
             bBtnBusy = false;
 
@@ -256,83 +251,18 @@ namespace sQzClient
             SetAnswerTableBottomRow();
         }
 
-        void SetQuestSheetBG()
+        void SetQuestSheetView()
         {
-            QuestTextView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
+            //double mrg = FontSize / 2;
+            //qiWh = 3 * mrg;
+            //qMrg = new Thickness(mrg, mrg, 0, mrg);
+            //qaWh = (QuestSheetBG.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
+            MultiChoiceItemView.SetSize(QuestSheetBG.Width - SystemParameters.ScrollWidth, FontSize / 2);
+
+            QuestionsView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
+            int questIdx = 1;
             foreach (MultiChoiceItem question in mQuestSheet.Questions)
-                MultiChoiceItemView.Render(question, QuestTextView);
-            //int n = mQuestSheet.Questions.Count;
-            //for (int i = 1, j = 0; i <= n; i += 2, ++j)
-            //{
-            //    gQuest.RowDefinitions.Add(new RowDefinition());
-            //    StackPanel q = CreateQuestBox(i);
-            //    Grid.SetRow(q, j);
-            //    Grid.SetColumn(q, 0);
-            //    gQuest.Children.Add(q);
-            //}
-            //for (int i = 2, j = 0; i <= n; i += 2, ++j)
-            //{
-            //    StackPanel q = CreateQuestBox(i);
-            //    Grid.SetRow(q, j);
-            //    Grid.SetColumn(q, 1);
-            //    gQuest.Children.Add(q);
-            //}
-            //gQuest.Background = Theme.Singleton.DefinedColors[(int)BrushId.BG];
-        }
-
-        Label CreateIndexInsideQuestBox(int idx)
-        {
-            Label idxBox = new Label();
-            idxBox.HorizontalAlignment = HorizontalAlignment.Left;
-            idxBox.VerticalAlignment = VerticalAlignment.Top;
-            idxBox.Content = idx;
-            idxBox.Background = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
-            idxBox.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_Color];
-            idxBox.Width = qiWh;
-            idxBox.Height = qiWh;
-            idxBox.HorizontalContentAlignment = HorizontalAlignment.Center;
-            idxBox.VerticalContentAlignment = VerticalAlignment.Center;
-            idxBox.Padding = new Thickness(0);
-            return idxBox;
-        }
-
-        Label CreateStmtInsideQuestBox(MultiChoiceItem question)
-        {
-            TextBlock stmt = new TextBlock();
-            stmt.Text = "xx";// question.Stem;
-            stmt.TextWrapping = TextWrapping.Wrap;
-            stmt.Width = qaWh;
-            stmt.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
-            Label stmtBox = new Label();
-            stmtBox.Content = stmt;
-            stmtBox.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
-            stmtBox.BorderThickness = new Thickness(0, 4, 0, 0);
-            Thickness zero = new Thickness(0);
-            stmtBox.Margin = stmtBox.Padding = zero;
-
-            return stmtBox;
-        }
-
-        StackPanel CreateQuestBox(int idx)
-        {
-            StackPanel questBox = new StackPanel();
-            questBox.Orientation = Orientation.Horizontal;
-            questBox.Margin = qMrg;
-            questBox.Background = Theme.Singleton.DefinedColors[(int)BrushId.BG];
-            
-            questBox.Children.Add(CreateIndexInsideQuestBox(idx));
-
-            StackPanel questBoxInside = new StackPanel();
-
-            MultiChoiceItem question = mQuestSheet.Q(idx - 1);
-
-            questBoxInside.Children.Add(CreateStmtInsideQuestBox(question));
-
-            questBoxInside.Children.Add(mExaminee.mAnsSheet.vlbxAns[idx-1]);
-
-            questBox.Children.Add(questBoxInside);
-
-            return questBox;
+                MultiChoiceItemView.RenderQuestWithIdxToViewer(question, questIdx++, QuestionsView);
         }
 
         public void Submit()
