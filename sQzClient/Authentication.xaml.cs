@@ -248,7 +248,7 @@ namespace sQzClient
                         {
                             pgTkExm = new TakeExam();
                             pgTkExm.mExaminee = User;
-                            pgTkExm.mQuestSheet = qs;
+                            pgTkExm.QuestSheetModel = qs;
                             NavigationService.Navigate(pgTkExm);
                         });
                     break;

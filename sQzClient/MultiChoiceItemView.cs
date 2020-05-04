@@ -9,15 +9,10 @@ namespace sQzClient
 {
     class MultiChoiceItemView
     {
-        static double IdxHeight;
-        static double StemWidth;
+        public static double IdxHeight;
+        public static double QuestionWidth;
 
-        public static void SetSize(double backgroundSize, double margin)
-        {
-            IdxHeight = 3 * margin;
-            StemWidth = backgroundSize - margin - margin;
-        }
-        public static void RenderQuestWithIdxToViewer(MultiChoiceItem question, int idx, StackPanel questionsView)
+        public static void RenderModelToViewer(MultiChoiceItem question, int idx, StackPanel questionsView)
         {
             RenderIndexToViewer(idx, questionsView);
             RenderIndexLineToViewer(questionsView);
@@ -67,7 +62,7 @@ namespace sQzClient
             //TextBlock stmt = new TextBlock();
             //stmt.Text = "xx";// question.Stem;
             //stmt.TextWrapping = TextWrapping.Wrap;
-            //stmt.Width = StemWidth;
+            //stmt.Width = QuestionWidth;
             //stmt.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
             Label stmtBox = new Label();
             //stmtBox.Content = stmt;

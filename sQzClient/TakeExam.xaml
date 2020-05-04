@@ -19,7 +19,7 @@
                 <StackPanel x:Name="AnswerSheetBG" HorizontalAlignment="Left" Height="652" Width="144">
                     <TextBlock x:Name="AnswerTitle" Height="30" FontSize="20" HorizontalAlignment="Center"/>
                     <ScrollViewer Height="622" Width="144" VerticalScrollBarVisibility="Auto" FontSize="14">
-                        <Grid x:Name="AnswerTable">
+                        <Grid x:Name="AnswerCells">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>

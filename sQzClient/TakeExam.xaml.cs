@@ -3,6 +3,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Collections.Generic;
 using sQzLib;
 
 namespace sQzClient
@@ -24,15 +25,19 @@ namespace sQzClient
         const int SMT_OK_M = 20;
         const int SMT_OK_S = 60;
 
-        public QuestSheet mQuestSheet;
+        //models
+
+        public QuestSheet QuestSheetModel;//may be only for hacking rendering test
+        public ExamineeA mExaminee;//reference to Auth.mNee
+
+        //controllers
+        Dictionary<string, ListBox> OptionsGroupByQuestion;
+        Dictionary<string, Label> AnswerLetters;
 
         Client2 mClnt;
         NetPhase mState;
 
         public static double qaWh;
-        double qiWh;
-        Thickness qMrg;
-        public ExamineeA mExaminee;//reference to Auth.mNee
 
         public TakeExam()
         {
@@ -44,41 +49,14 @@ namespace sQzClient
 
             mExaminee = new ExamineeC();
 
-            mQuestSheet = new QuestSheet();
-        }
-
-        private void LoadTxt()
-        {
-            AnswerTitle.Text = Txt.s._[(int)TxI.ANS_SHEET];
-            btnSubmit.Content = Txt.s._[(int)TxI.SUBMIT];
-            btnExit.Content = Txt.s._[(int)TxI.EXIT];
-        }
-
-        private void SetWindowFullScreen()
-        {
-            Window w = Window.GetWindow(this);
-            w.WindowStyle = WindowStyle.None;
-            w.WindowState = WindowState.Maximized;
-            w.ResizeMode = ResizeMode.NoResize;
-            w.Closing += W_Closing;
-            w.FontSize = 16;
-
-            PopupMgr.SetParentWindow(w);
-            PopupMgr.Singleton.CbNOK = WPCancel;
-        }
-
-        void HackTest()
-        {
-            mQuestSheet.ParseDocx(".\\quiz.docx");
-
-            QuestSheetBG.Visibility = Visibility.Visible;
+            QuestSheetModel = new QuestSheet();
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
             SetWindowFullScreen();
 
-            HackTest();
+            HackingRenderingTest();
 
             SetAnswerSheetView();
             SetQuestSheetView();
@@ -147,122 +125,6 @@ namespace sQzClient
             mTimer.AutoReset = true;
             mTimer.Enabled = true;
             dtLastLog = kDtStart = DateTime.Now;
-        }
-
-        void SetAnswerTableHeader()
-        {
-            AnswerTable.RowDefinitions.Add(new RowDefinition());
-            Label cell = new Label();
-            Grid.SetRow(cell, 0);
-            Grid.SetColumn(cell, 0);
-            AnswerTable.Children.Add(cell);
-            SolidColorBrush black = new SolidColorBrush(Colors.Black);
-            for (int i = 1; i <= MultiChoiceItem.N_OPTIONS; ++i)
-            {
-                cell = new Label();
-                cell.Content = (char)('@' + i);
-                cell.BorderBrush = black;
-                cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.MiddleTop];
-                cell.HorizontalContentAlignment = HorizontalAlignment.Center;
-                cell.FontWeight = FontWeights.Bold;
-                Grid.SetRow(cell, 0);
-                Grid.SetColumn(cell, i);
-                AnswerTable.Children.Add(cell);
-            }
-            cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.RightTop];
-        }
-
-        void SetAnswerTableBottomRow()
-        {
-            SolidColorBrush black = new SolidColorBrush(Colors.Black);
-            //bottom lines
-            AnswerTable.RowDefinitions.Add(new RowDefinition());
-            Label cell = new Label();
-            int lastRowIdx = mQuestSheet.Questions.Count;
-            cell.Content = lastRowIdx;
-            cell.BorderBrush = black;
-            cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.LeftBottom];
-            cell.HorizontalContentAlignment = HorizontalAlignment.Center;
-            cell.FontWeight = FontWeights.Bold;
-            Grid.SetRow(cell, lastRowIdx);
-            Grid.SetColumn(cell, 0);
-            AnswerTable.Children.Add(cell);
-            for (int i = 1; i <= MultiChoiceItem.N_OPTIONS; ++i)
-            {
-                cell = new Label();cell.Content = "x";// mExaminee.mAnsSheet.vAnsItem[lastRowIdx - 1][i - 1].lbl;
-                cell.BorderBrush = black;
-                cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.MiddleBottom];
-                cell.HorizontalContentAlignment = HorizontalAlignment.Center;
-                Grid.SetRow(cell, lastRowIdx);
-                Grid.SetColumn(cell, i);
-                AnswerTable.Children.Add(cell);
-            }
-            cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.RightBottom];
-        }
-
-        void SetAnswerTableMiddleRows()
-        {
-            SolidColorBrush black = new SolidColorBrush(Colors.Black);
-            Label cell = new Label();
-            for (int j = 1, n = mQuestSheet.Questions.Count; j < n; ++j)
-            {
-                AnswerTable.RowDefinitions.Add(new RowDefinition());
-                cell = new Label();
-                cell.Content = j;
-                cell.BorderBrush = black;
-                cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.MiddleTop];
-                cell.HorizontalContentAlignment = HorizontalAlignment.Center;
-                cell.FontWeight = FontWeights.Bold;
-                Grid.SetRow(cell, j);
-                Grid.SetColumn(cell, 0);
-                AnswerTable.Children.Add(cell);
-                for (int i = 1; i <= MultiChoiceItem.N_OPTIONS; ++i)
-                {
-                    cell = new Label(); cell.Content = "x";// mExaminee.mAnsSheet.vAnsItem[j - 1][i - 1].lbl;
-                    cell.BorderBrush = black;
-                    cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.MiddleTop];
-                    cell.HorizontalContentAlignment = HorizontalAlignment.Center;
-                    cell.VerticalContentAlignment = VerticalAlignment.Top;
-                    Grid.SetRow(cell, j);
-                    Grid.SetColumn(cell, i);
-                    AnswerTable.Children.Add(cell);
-                }
-                cell.BorderThickness = Theme.Singleton.CellThick[(int)ThicknessId.RightTop];
-            }
-
-
-            //for (j = Question.svQuest[0].Count; -1 < j; --j)
-            //    AnswerTable.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
-        }
-
-        void SetAnswerSheetView()
-        {
-            AnswerSheetBG.Background = Theme.Singleton.DefinedColors[(int)BrushId.AnswerSheet_BG];
-            
-            AnswerTable.Background = Theme.Singleton.DefinedColors[(int)BrushId.Sheet_BG];
-            
-            //AnswerSheetCellView.SInit(Window.GetWindow(this).FontSize);
-            //mExaminee.mAnsSheet.Init(mQuestSheet.LvId);
-            //mExaminee.mAnsSheet.InitView(mQuestSheet, qaWh, null);
-            //mExaminee.mAnsSheet.bChanged = false;
-
-            SetAnswerTableHeader();
-            SetAnswerTableMiddleRows();
-            SetAnswerTableBottomRow();
-        }
-
-        void SetQuestSheetView()
-        {
-            //double mrg = FontSize / 2;
-            //qiWh = 3 * mrg;
-            //qMrg = new Thickness(mrg, mrg, 0, mrg);
-            //qaWh = (QuestSheetBG.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
-            MultiChoiceItemView.SetSize(QuestSheetBG.Width - SystemParameters.ScrollWidth, FontSize / 2);
-
-            QuestionsView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
-            int questIdx = 1;
-            foreach (MultiChoiceItem question in mQuestSheet.Questions)
-                MultiChoiceItemView.RenderQuestWithIdxToViewer(question, questIdx++, QuestionsView);
         }
 
         public void Submit()
