@@ -59,10 +59,10 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="AnswerSheetView.cs" />
-    <Compile Include="MultiChoiceItemView.cs" />
-    <Compile Include="NonnullRichTextView.cs" />
-    <Compile Include="QuestSheetView.cs" />
-    <Compile Include="TakeExamView.cs" />
+    <Compile Include="Views\MultiChoiceItemView.cs" />
+    <Compile Include="Views\NonnullRichTextView.cs" />
+    <Compile Include="Views\QuestSheetView.cs" />
+    <Compile Include="Views\TakeExamView.cs" />
     <Compile Include="TakeExam.xaml.cs" />
     <Page Include="Authentication.xaml">
       <Generator>MSBuild:Compile</Generator>
