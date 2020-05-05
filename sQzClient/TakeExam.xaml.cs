@@ -30,10 +30,6 @@ namespace sQzClient
         public QuestSheet QuestSheetModel;//may be only for hacking rendering test
         public ExamineeA mExaminee;//reference to Auth.mNee
 
-        //controllers
-        Dictionary<string, ListBox> OptionsGroupByQuestion;
-        Dictionary<string, Label> AnswerLetters;
-
         Client2 mClnt;
         NetPhase mState;
 

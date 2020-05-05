@@ -12,19 +12,28 @@ namespace sQzClient
         public static double IdxHeight;
         public static double QuestionWidth;
 
-        public static void RenderModelToViewer(MultiChoiceItem question, int idx, StackPanel questionsView)
+        public static void RenderModelToViewer(MultiChoiceItem question, int idx, StackPanel viewer)
         {
-            RenderIndexToViewer(idx, questionsView);
-            RenderIndexLineToViewer(questionsView);
-            questionsView.Children.Add(NonnullRichTextView.Render(question.Stem));
-            RenderOptionsLineToViewer(questionsView);
-            ListBox optionsView = new ListBox();
-            foreach (NonnullRichText richText in question.Options)
-                optionsView.Items.Add(NonnullRichTextView.Render(richText));
-            questionsView.Children.Add(optionsView);
+            RenderIndexToViewer(idx, viewer);
+            RenderIndexLineToViewer(viewer);
+            viewer.Children.Add(NonnullRichTextView.Render(question.Stem));
+            RenderOptionsToViewer(question, idx, viewer);
         }
 
-        static void RenderIndexToViewer(int idx, StackPanel questionsView)
+        static void RenderOptionsToViewer(MultiChoiceItem question, int idx, StackPanel viewer)
+        {
+            ListBox optionsView = new ListBox();
+            optionsView.Width = QuestionWidth;
+            optionsView.Name = "_" + idx;
+            optionsView.SelectionChanged += Ans_SelectionChanged;
+            optionsView.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
+            optionsView.BorderThickness = new Thickness(0, 4, 0, 0);
+            foreach (NonnullRichText richText in question.Options)
+                optionsView.Items.Add(NonnullRichTextView.Render(richText));
+            viewer.Children.Add(optionsView);
+        }
+
+        static void RenderIndexToViewer(int idx, StackPanel viewer)
         {
             Label idxLabel = new Label();
             idxLabel.HorizontalAlignment = HorizontalAlignment.Left;
@@ -38,7 +47,7 @@ namespace sQzClient
             idxLabel.VerticalContentAlignment = VerticalAlignment.Center;
             idxLabel.Padding = new Thickness(0);
             idxLabel.Margin = new Thickness(0, IdxHeight, 0, 0);
-            questionsView.Children.Add(idxLabel);
+            viewer.Children.Add(idxLabel);
         }
 
         static void RenderIndexLineToViewer(StackPanel questionsView)
@@ -55,43 +64,6 @@ namespace sQzClient
             Thickness zero = new Thickness(0);
             stmtBox.Margin = stmtBox.Padding = zero;
             questionsView.Children.Add(stmtBox);
-        }
-
-        static void RenderOptionsLineToViewer(StackPanel questionsView)
-        {
-            //TextBlock stmt = new TextBlock();
-            //stmt.Text = "xx";// question.Stem;
-            //stmt.TextWrapping = TextWrapping.Wrap;
-            //stmt.Width = QuestionWidth;
-            //stmt.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
-            Label stmtBox = new Label();
-            //stmtBox.Content = stmt;
-            stmtBox.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
-            stmtBox.BorderThickness = new Thickness(0, 4, 0, 0);
-            Thickness zero = new Thickness(0);
-            stmtBox.Margin = stmtBox.Padding = zero;
-            questionsView.Children.Add(stmtBox);
-        }
-
-        StackPanel CreateQuestBox(int idx)
-        {
-            throw new NotImplementedException();
-            //StackPanel questBox = new StackPanel();
-            //questBox.Orientation = Orientation.Horizontal;
-            //questBox.Margin = qMrg;
-            //questBox.Background = Theme.Singleton.DefinedColors[(int)BrushId.BG];
-
-            //StackPanel questBoxInside = new StackPanel();
-
-            //MultiChoiceItem question = mQuestSheet.Q(idx - 1);
-
-            //questBoxInside.Children.Add(CreateStmtInsideQuestBox(question));
-
-            //questBoxInside.Children.Add(mExaminee.mAnsSheet.vlbxAns[idx - 1]);
-
-            //questBox.Children.Add(questBoxInside);
-
-            //return questBox;
         }
     }
 }
