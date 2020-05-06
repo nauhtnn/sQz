@@ -11,6 +11,7 @@ namespace sQzClient
     {
         public static double IdxHeight;
         public static double QuestionWidth;
+        public static TakeExam Controller;
 
         public static void RenderModelToViewer(MultiChoiceItem question, int idx, StackPanel viewer)
         {
@@ -25,7 +26,7 @@ namespace sQzClient
             ListBox optionsView = new ListBox();
             optionsView.Width = QuestionWidth;
             optionsView.Name = "_" + idx;
-            optionsView.SelectionChanged += Ans_SelectionChanged;
+            optionsView.SelectionChanged += Controller.Options_SelectionChanged;
             optionsView.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
             optionsView.BorderThickness = new Thickness(0, 4, 0, 0);
             foreach (NonnullRichText richText in question.Options)

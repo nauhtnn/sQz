@@ -63,6 +63,7 @@ namespace sQzClient
         void SetQuestSheetView()
         {
             QuestionsView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
+            MultiChoiceItemView.Controller = this;
             //double mrg = FontSize / 2;
             //qiWh = 3 * mrg;
             //qMrg = new Thickness(mrg, mrg, 0, mrg);

@@ -10,7 +10,7 @@ namespace sQzClient
 {
     public partial class TakeExam : Page
     {
-        public void Ans_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        public void Options_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             //bChanged = true;
             ListBox l = sender as ListBox;
