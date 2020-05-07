@@ -58,8 +58,8 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="AnswerSheetView.cs" />
-    <Compile Include="TakeExamController.cs" />
+    <Compile Include="Views\AnswerSheetView.cs" />
+    <Compile Include="TakeExamModel.cs" />
     <Compile Include="Views\MultiChoiceItemView.cs" />
     <Compile Include="Views\NonnullRichTextView.cs" />
     <Compile Include="Views\QuestSheetView.cs" />

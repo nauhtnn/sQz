@@ -30,7 +30,11 @@ namespace sQzClient
             optionsView.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
             optionsView.BorderThickness = new Thickness(0, 4, 0, 0);
             foreach (NonnullRichText richText in question.Options)
-                optionsView.Items.Add(NonnullRichTextView.Render(richText));
+            {
+                ListBoxItem option = new ListBoxItem();
+                option.Content = NonnullRichTextView.Render(richText);
+                optionsView.Items.Add(option);
+            }
             viewer.Children.Add(optionsView);
         }
 

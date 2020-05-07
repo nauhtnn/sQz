@@ -63,7 +63,7 @@ namespace sQzLib
                 ListBox lbxAns = new ListBox();
                 lbxAns.Width = w;
                 lbxAns.Name = "_" + idx;
-                lbxAns.SelectionChanged += Ans_SelectionChanged;
+                //lbxAns.SelectionChanged += Ans_SelectionChanged;
                 lbxAns.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
                 lbxAns.BorderThickness = new Thickness(0, 4, 0, 0);
                 vlbxAns[idx] = lbxAns;
@@ -151,31 +151,6 @@ namespace sQzLib
         {
             foreach (ListBox lbx in vlbxAns)
                 lbx.IsEnabled = false;
-        }
-
-        private void Ans_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            bChanged = true;
-            ListBox l = sender as ListBox;
-            if (l.SelectedItem == null)
-                return;
-            int qid = Convert.ToInt32(l.Name.Substring(1));
-            int i = -1;
-            foreach(ListBoxItem li in l.Items)
-            {
-                ++i;
-                if (li.IsSelected)
-                {
-                    aAns[qid * 4 + i] = 1;//todo
-                    vAnsItem[qid][i].Selected();
-                }
-                else
-                {
-                    aAns[qid * 4 + i] = 0;//todo
-                    vAnsItem[qid][i].Unselected();
-                }
-            }
-            dgSelChgCB?.Invoke();
         }
     }
 }
