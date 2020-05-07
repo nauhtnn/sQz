@@ -17,6 +17,35 @@ namespace sQzClient
 
         QuestSheetView QuestSheetViewer;
         AnswerSheetView AnswerSheetViewer;
+		
+		private void InitViews()
+		{
+			SetWindowFullScreen();
+
+            HackingRenderingTest();
+
+            SetAnswerSheetView();
+            SetQuestSheetView();
+			
+			LoadTxt();
+			
+			txtWelcome.Text = mExaminee.ToString();
+            
+            txtRTime.Text = "" + RemainingTime.Minutes + " : " + RemainingTime.Seconds;
+            BackupInterval = new TimeSpan(0, 0, 30);
+
+            System.Text.StringBuilder msg = new System.Text.StringBuilder();
+            msg.Append(mExaminee.tId + " (" + mExaminee.tName + ")");
+            if (mExaminee.kDtDuration.Minutes == 30)
+                msg.Append(Txt.s._[(int)TxI.EXAMING_MSG_1]);
+            else
+                msg.AppendFormat(Txt.s._[(int)TxI.EXAMING_MSG_2],
+                    mExaminee.kDtDuration.Minutes, mExaminee.kDtDuration.Seconds);
+            PopupMgr.Singleton.CbOK = ShowQuestion;
+            AppView.Opacity = 0.5;
+            PopupMgr.Singleton.ShowDialog(msg.ToString());
+            AppView.Opacity = 1;
+		}
 
         private void LoadTxt()
         {

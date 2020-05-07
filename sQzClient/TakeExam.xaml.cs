@@ -13,96 +13,19 @@ namespace sQzClient
     /// </summary>
     public partial class TakeExam : Page
     {
-        DateTime kDtStart;
-        TimeSpan dtRemn;
-        DateTime dtLastLog;
-        TimeSpan kLogIntvl;
-        bool bRunning;
-        bool bBtnBusy;
+		System.Timers.Timer TimeController;
         UICbMsg mCbMsg;
-        System.Timers.Timer mTimer;
-
-        const int SMT_OK_M = 20;
-        const int SMT_OK_S = 60;
-
-        //models
-
-        public QuestSheet QuestSheetModel;//may be only for hacking rendering test
-        public ExamineeA mExaminee;//reference to Auth.mNee
-
-        Client2 mClnt;
-        NetPhase mState;
-
-        public static double qaWh;
-
+        
         public TakeExam()
         {
             InitializeComponent();
-            mState = NetPhase.Dating;
-            mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
-            mCbMsg = new UICbMsg();
-            bRunning = true;
-
-            mExaminee = new ExamineeC();
-
-            QuestSheetModel = new QuestSheet();
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
-            SetWindowFullScreen();
+			InitModels();
+			InitViews();
 
-            HackingRenderingTest();
-
-            SetAnswerSheetView();
-            SetQuestSheetView();
-
-            bBtnBusy = false;
-
-            txtWelcome.Text = mExaminee.ToString();
-
-            LoadTxt();
-
-            
-
-            int m = -1, s = -1;
-            if (mExaminee.mPhase < ExamineePhase.Submitting)
-            {
-                string t = null;
-                if(System.IO.File.Exists("Duration.txt"))
-                {
-                    string[] lines = System.IO.File.ReadAllLines("Duration.txt");
-                    if (lines.Length > 0)
-                        t = lines[0];
-                }
-                if (t != null)
-                {
-                    string[] vt = t.Split('\t');
-                    if (vt.Length == 2)
-                    {
-                        int.TryParse(vt[0], out m);
-                        int.TryParse(vt[1], out s);
-                    }
-                    if (-1 < m && -1 < s)
-                        dtRemn = mExaminee.kDtDuration = new TimeSpan(0, m, s);
-                }
-            }
-            if (m < 0 || s < 0)
-                dtRemn = mExaminee.kDtDuration;
-            txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
-            kLogIntvl = new TimeSpan(0, 0, 30);
-
-            System.Text.StringBuilder msg = new System.Text.StringBuilder();
-            msg.Append(mExaminee.tId + " (" + mExaminee.tName + ")");
-            if (mExaminee.kDtDuration.Minutes == 30)
-                msg.Append(Txt.s._[(int)TxI.EXAMING_MSG_1]);
-            else
-                msg.AppendFormat(Txt.s._[(int)TxI.EXAMING_MSG_2],
-                    mExaminee.kDtDuration.Minutes, mExaminee.kDtDuration.Seconds);
-            PopupMgr.Singleton.CbOK = ShowQuestion;
-            AppView.Opacity = 0.5;
-            PopupMgr.Singleton.ShowDialog(msg.ToString());
-            AppView.Opacity = 1;
             if (mExaminee.mPhase < ExamineePhase.Examing)
                 mExaminee.mPhase = ExamineePhase.Examing;
             else if (mExaminee.mPhase == ExamineePhase.Submitting)
@@ -115,13 +38,19 @@ namespace sQzClient
             AppView.Effect = null;
             bBtnBusy = false;
             QuestSheetBG.Visibility = Visibility.Visible;
-
-            mTimer = new System.Timers.Timer(1000);
-            mTimer.Elapsed += UpdateSrvrMsg;
-            mTimer.AutoReset = true;
-            mTimer.Enabled = true;
-            dtLastLog = kDtStart = DateTime.Now;
+			
+			InitTimeController();
         }
+		
+		void InitTimeController()
+		{
+			TimeController = new System.Timers.Timer(1000);
+            TimeController.Elapsed += TimeControllerUpdate;
+            TimeController.AutoReset = true;
+            TimeController.Enabled = true;
+            StartingTime = DateTime.Now;
+			LastBackupTime = StartingTime;
+		}
 
         public void Submit()
         {
@@ -132,7 +61,7 @@ namespace sQzClient
             DisableAll();
             mState = NetPhase.Submiting;
             mExaminee.mPhase = ExamineePhase.Submitting;
-            mExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+            mExaminee.ToLogFile(RemainingTime.Minutes, RemainingTime.Seconds);
             if (mClnt.ConnectWR(ref mCbMsg))
                 bBtnBusy = false;
         }
@@ -149,104 +78,29 @@ namespace sQzClient
             AppView.Opacity = 1;
         }
 
-        public bool ClntBufHndl(byte[] buf)
-        {
-            int offs = 0;
-            switch (mState)
-            {
-                case NetPhase.Submiting:
-                    int rs;
-                    string msg = null;
-                    int l = buf.Length - offs;
-                    if(l < 4)
-                    {
-                        rs = -1;
-                        msg = Txt.s._[(int)TxI.RECV_DAT_ER];
-                    }
-                    else
-                        rs = BitConverter.ToInt32(buf, offs);
-                    l -= 4;
-                    offs += 4;
-                    if(rs == 0)
-                    {
-                        ExamineeC e = new ExamineeC();
-                        if (!e.ReadByte(buf, ref offs))
-                        {
-                            mExaminee.Merge(e);
-                            btnSubmit.Content = mExaminee.Grade;
-                            msg = Txt.s._[(int)TxI.RESULT] + mExaminee.Grade;
-                        }
-                        else
-                            msg = Txt.s._[(int)TxI.RECV_DAT_ER];
-                    }
-                    else if (rs == (int)TxI.NEEID_NF)
-                        msg = Txt.s._[(int)TxI.NEEID_NF];
-                    else if (rs == (int)TxI.RECV_DAT_ER)
-                        msg = Txt.s._[(int)TxI.RECV_DAT_ER];
-                    else if(msg == null)
-                    {
-                        if(l < 4)
-                            msg = Txt.s._[(int)TxI.RECV_DAT_ER];
-                        else
-                        {
-                            int sz = BitConverter.ToInt32(buf, offs);
-                            l -= 4;
-                            offs += 4;
-                            if(l < sz)
-                                msg = Txt.s._[(int)TxI.RECV_DAT_ER];
-                            else
-                                msg = System.Text.Encoding.UTF8.GetString(buf, offs, sz);
-                        }
-                    }
-                    Dispatcher.Invoke(() => {
-                        AppView.Opacity = 0.5;
-                        PopupMgr.Singleton.ShowDialog(msg);
-                        AppView.Opacity = 1;
-                    });
-                    break;
-            }
-            bBtnBusy = false;
-            return false;
-        }
-
-        public byte[] ClntBufPrep()
-        {
-            byte[] outBuf;
-            switch (mState)
-            {
-                case NetPhase.Submiting:
-                    mExaminee.ToByte(out outBuf, (int)mState);
-                    break;
-                default:
-                    outBuf = null;
-                    break;
-            }
-            return outBuf;
-        }
-
-        private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
+        private void TimeControllerUpdate(object source, System.Timers.ElapsedEventArgs e)
         {
             if (bRunning)
             {
-                if (0 < dtRemn.Ticks)
+                if (0 < RemainingTime.Ticks)
                 {
-                    dtRemn = mExaminee.kDtDuration - (DateTime.Now - kDtStart);
-                    if (mExaminee.mAnsSheet.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
+                    RemainingTime = mExaminee.kDtDuration - (DateTime.Now - StartingTime);
+                    if (mExaminee.mAnsSheet.bChanged && BackupInterval < DateTime.Now - LastBackupTime)
                     {
-                        dtLastLog = DateTime.Now;
-                        mExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+                        LastBackupTime = DateTime.Now;
+                        mExaminee.ToLogFile(RemainingTime.Minutes, RemainingTime.Seconds);
                     }
                     Dispatcher.Invoke(() =>
                     {
-                        txtRTime.Text = dtRemn.Minutes.ToString() + " : " + dtRemn.Seconds;
-                        if (!btnSubmit.IsEnabled && dtRemn.Minutes < SMT_OK_M
-                                && dtRemn.Seconds < SMT_OK_S)
+                        txtRTime.Text = RemainingTime.Minutes.ToString() + " : " + RemainingTime.Seconds;
+                        if (!btnSubmit.IsEnabled && RemainingTime.Minutes < SMT_OK_M
+                                && RemainingTime.Seconds < SMT_OK_S)
                             btnSubmit.IsEnabled = true;
                     });
                 }
                 else
                 {
-                    dtRemn = new TimeSpan(0, 0, 0);
+                    RemainingTime = new TimeSpan(0, 0, 0);
                     bRunning = false;
                     Dispatcher.Invoke(() =>
                     {
@@ -263,7 +117,7 @@ namespace sQzClient
         private void DisableAll()
         {
             btnSubmit.IsEnabled = false;
-            mTimer.Stop();
+            TimeController.Stop();
             foreach (ListBox l in mExaminee.mAnsSheet.vlbxAns)
                 l.IsEnabled = false;
             btnExit.IsEnabled = true;
@@ -274,7 +128,7 @@ namespace sQzClient
             //WPopup.s.wpCb = null;
             //bBtnBusy = false;
             //if (mExaminee.mAnsSheet.bChanged)
-            //    mExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+            //    mExaminee.ToLogFile(RemainingTime.Minutes, RemainingTime.Seconds);
             Window.GetWindow(this).Close();
         }
 
@@ -304,6 +158,31 @@ namespace sQzClient
             bRunning = false;
             mClnt.Close();
             PopupMgr.Singleton.Exit();
+        }
+		
+		public void Options_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //bChanged = true;
+            ListBox l = sender as ListBox;
+            if (l.SelectedItem == null)
+                return;
+            int qid = Convert.ToInt32(l.Name.Substring(1));
+            int i = -1;
+            foreach (ListBoxItem li in l.Items)
+            {
+                ++i;
+                if (li.IsSelected)
+                {
+                    //aAns[qid * 4 + i] = 1;//todo
+                    //vAnsItem[qid][i].Selected();
+                }
+                else
+                {
+                    //aAns[qid * 4 + i] = 0;//todo
+                    //vAnsItem[qid][i].Unselected();
+                }
+            }
+            //dgSelChgCB?.Invoke();
         }
     }
 }
