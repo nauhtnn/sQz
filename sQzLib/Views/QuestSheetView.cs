@@ -15,7 +15,7 @@ namespace sQzLib
         {
             QuestSheetView questSheetViewer = new QuestSheetView();
             questSheetViewer.QuestionViewer = MultiChoiceItemView.NewWith(3 * margin, backgroundSize - margin - margin, viewer, controller);
-            OptionView.InitLabelWidth();// margin * 2);
+            OptionView.InitLabelCircle();
             return questSheetViewer;
         }
 

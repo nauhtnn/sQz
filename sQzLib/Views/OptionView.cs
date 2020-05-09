@@ -13,19 +13,17 @@ namespace sQzLib
     public class OptionView : StackPanel
     {
         static CornerRadius LabelCornerRadius;
-        //static double LabelWidth;
         Border LabelBorder;
 
         //public Label AnsCellLabel;TODO: MVC remove
         public ListBoxItem mLbxItem;
 
-        public static void InitLabelWidth()//double labelWidth)
+        public static void InitLabelCircle()
         {
             //if(LabelCornerRadius.Equals(default(CornerRadius)))
             //{
                 LabelCornerRadius = new CornerRadius();
                 LabelCornerRadius.BottomLeft = LabelCornerRadius.BottomRight = LabelCornerRadius.TopLeft = LabelCornerRadius.TopRight = 50;
-                //LabelWidth = labelWidth;
             //}
         }
 
