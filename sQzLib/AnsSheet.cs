@@ -12,7 +12,7 @@ namespace sQzLib
     {
         public const int LEN = 120;
         public ListBox[] vlbxAns;
-        public AnswerSheetCellView[][] vAnsItem;
+        public OptionView[][] vAnsItem;
         public int uQSLvId;
         public int uQSId { get { return ((int)Level.MAX_COUNT_EACH_LEVEL < uQSLvId) ? uQSLvId - (int)Level.MAX_COUNT_EACH_LEVEL : uQSLvId; } }
         public bool bChanged;
@@ -49,38 +49,39 @@ namespace sQzLib
 
         public void InitView(QuestSheet qs, double w, DgEvntCB cb)
         {
-            if (cb != null)
-                dgSelChgCB = cb;
+            throw new NotImplementedException();
+            //if (cb != null)
+            //    dgSelChgCB = cb;
 
-            vlbxAns = new ListBox[qs.Questions.Count];
-            vAnsItem = new AnswerSheetCellView[qs.Questions.Count][];
+            //vlbxAns = new ListBox[qs.Questions.Count];
+            //vAnsItem = new OptionView[qs.Questions.Count][];
             
-            int idx = -1;
-            int j = -1;
-            foreach (MultiChoiceItem q in qs.ShallowCopy())
-            {
-                ++idx;
-                ListBox lbxAns = new ListBox();
-                lbxAns.Width = w;
-                lbxAns.Name = "_" + idx;
-                //lbxAns.SelectionChanged += Ans_SelectionChanged;
-                lbxAns.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
-                lbxAns.BorderThickness = new Thickness(0, 4, 0, 0);
-                vlbxAns[idx] = lbxAns;
-                vAnsItem[idx] = new AnswerSheetCellView[MultiChoiceItem.N_OPTIONS];
-                for (int i = 0; i < MultiChoiceItem.N_OPTIONS; ++i)
-                {
-                    AnswerSheetCellView ai = new AnswerSheetCellView("xx", i, w);// q.Options[i], i, w);
-                    ++j;//update view from log
-                    if (aAns[j] == Convert.ToByte(true))
-                    {
-                        ai.mLbl.Content = 'X';
-                        ai.mLbxItem.IsSelected = true;
-                    }
-                    vAnsItem[idx][i] = ai;
-                    lbxAns.Items.Add(ai.lbxi);
-                }
-            }
+            //int idx = -1;
+            //int j = -1;
+            //foreach (MultiChoiceItem q in qs.ShallowCopy())
+            //{
+            //    ++idx;
+            //    ListBox lbxAns = new ListBox();
+            //    lbxAns.Width = w;
+            //    lbxAns.Name = "_" + idx;
+            //    //lbxAns.SelectionChanged += Ans_SelectionChanged;
+            //    lbxAns.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
+            //    lbxAns.BorderThickness = new Thickness(0, 4, 0, 0);
+            //    vlbxAns[idx] = lbxAns;
+            //    vAnsItem[idx] = new OptionView[MultiChoiceItem.N_OPTIONS];
+            //    for (int i = 0; i < MultiChoiceItem.N_OPTIONS; ++i)
+            //    {
+            //        OptionView ai = new OptionView("xx", i, w);// q.Options[i], i, w);
+            //        ++j;//update view from log
+            //        if (aAns[j] == Convert.ToByte(true))
+            //        {
+            //            ai.AnsCellLabel.Content = 'X';
+            //            ai.mLbxItem.IsSelected = true;
+            //        }
+            //        vAnsItem[idx][i] = ai;
+            //        lbxAns.Items.Add(ai.lbxi);
+            //    }
+            //}
         }
 
         public int GetByteCount()

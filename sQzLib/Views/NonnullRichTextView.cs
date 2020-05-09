@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using sQzLib;
 using System.Net.NetworkInformation;
 
-namespace sQzClient
+namespace sQzLib
 {
     public class NonnullRichTextView
     {

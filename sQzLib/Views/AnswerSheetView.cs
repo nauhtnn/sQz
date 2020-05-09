@@ -6,7 +6,7 @@ using System.Windows.Media.Effects;
 using System.Collections.Generic;
 using sQzLib;
 
-namespace sQzClient
+namespace sQzLib
 {
     public class AnswerSheetView
     {

@@ -51,7 +51,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Views\AnswerSheetCellView.cs" />
+    <Compile Include="Views\OptionView.cs" />
     <Compile Include="AnsPack.cs" />
     <Compile Include="AnsSheet.cs" />
     <Compile Include="Client2.cs" />

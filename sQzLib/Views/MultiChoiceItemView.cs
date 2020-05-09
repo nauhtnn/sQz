@@ -5,7 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Effects;
 using sQzLib;
 
-namespace sQzClient
+namespace sQzLib
 {
     public class MultiChoiceItemView
     {
@@ -24,14 +24,14 @@ namespace sQzClient
             return questionViewer;
         }
 
-        public void RenderModelToViewer(MultiChoiceItem question, int idx)
+        public void RenderModel(MultiChoiceItem question, int idx)
         {
-            RenderIndexToViewer(idx);
+            RenderIndex(idx);
             Viewer.Children.Add(NonnullRichTextView.Render(question.Stem));
-            RenderOptionsToViewer(question, idx);
+            RenderOptions(question, idx);
         }
 
-        void RenderOptionsToViewer(MultiChoiceItem question, int idx)
+        void RenderOptions(MultiChoiceItem question, int idx)
         {
             ListBox optionsView = new ListBox();
             optionsView.Width = QuestionWidth;
@@ -39,16 +39,16 @@ namespace sQzClient
             optionsView.SelectionChanged += Controller.Options_SelectionChanged;
             optionsView.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
             optionsView.BorderThickness = new Thickness(0, 4, 0, 0);
+            int optionIdx = 0;
             foreach (NonnullRichText richText in question.Options)
             {
-                ListBoxItem option = new ListBoxItem();
-                option.Content = NonnullRichTextView.Render(richText);
-                optionsView.Items.Add(option);
+                OptionView option = new OptionView();
+                optionsView.Items.Add(option.Render(richText, optionIdx++, QuestionWidth));
             }
             Viewer.Children.Add(optionsView);
         }
 
-        void RenderIndexToViewer(int idx)
+        void RenderIndex(int idx)
         {
             Label idxLabel = new Label();
             idxLabel.HorizontalAlignment = HorizontalAlignment.Left;
@@ -63,10 +63,10 @@ namespace sQzClient
             idxLabel.Margin = new Thickness(0, IdxHeight, 0, 0);
             Viewer.Children.Add(idxLabel);
 
-            RenderIndexLineToViewer();
+            RenderIndexLine();
         }
 
-        void RenderIndexLineToViewer()
+        void RenderIndexLine()
         {
             //TextBlock stmt = new TextBlock();
             //stmt.Text = "xx";// question.Stem;

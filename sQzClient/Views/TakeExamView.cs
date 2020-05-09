@@ -80,7 +80,6 @@ namespace sQzClient
             
             AnswerCells.Background = Theme.Singleton.DefinedColors[(int)BrushId.Sheet_BG];
 
-            //AnswerSheetCellView.SInit(Window.GetWindow(this).FontSize);
             //mExaminee.mAnsSheet.Init(mQuestSheet.LvId);
             //mExaminee.mAnsSheet.InitView(mQuestSheet, qaWh, null);
             //mExaminee.mAnsSheet.bChanged = false;
