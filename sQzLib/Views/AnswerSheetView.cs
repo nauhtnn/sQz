@@ -8,7 +8,7 @@ using sQzLib;
 
 namespace sQzClient
 {
-    class AnswerSheetView
+    public class AnswerSheetView
     {
         public void FirstRenderTableToView(int rowCount, Grid view)
         {

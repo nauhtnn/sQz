@@ -92,16 +92,9 @@ namespace sQzClient
         void SetQuestSheetView()
         {
             QuestionsView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
-            MultiChoiceItemView.Controller = this;
-            //double mrg = FontSize / 2;
-            //qiWh = 3 * mrg;
-            //qMrg = new Thickness(mrg, mrg, 0, mrg);
-            //qaWh = (QuestSheetBG.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
-            QuestSheetViewer = new QuestSheetView();
+            QuestSheetViewer = QuestSheetView.NewWith(QuestSheetBG.Width - SystemParameters.ScrollWidth, FontSize / 2, QuestionsView, this);
 
-            QuestSheetViewer.SetSize(QuestSheetBG.Width - SystemParameters.ScrollWidth, FontSize / 2);
-
-            QuestSheetViewer.RenderModelToView(QuestSheetModel, QuestionsView);
+            QuestSheetViewer.RenderModelToView(QuestSheetModel);
         }
     }
 }

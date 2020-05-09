@@ -7,21 +7,31 @@ using sQzLib;
 
 namespace sQzClient
 {
-    class MultiChoiceItemView
+    public class MultiChoiceItemView
     {
-        public static double IdxHeight;
-        public static double QuestionWidth;
-        public static TakeExam Controller;
+        double IdxHeight;
+        double QuestionWidth;
+        MultiChoiceItemController Controller;
+        StackPanel Viewer;
 
-        public static void RenderModelToViewer(MultiChoiceItem question, int idx, StackPanel viewer)
+        public static MultiChoiceItemView NewWith(double idxHeight, double questionWidth, StackPanel viewer, MultiChoiceItemController controller)
         {
-            RenderIndexToViewer(idx, viewer);
-            RenderIndexLineToViewer(viewer);
-            viewer.Children.Add(NonnullRichTextView.Render(question.Stem));
-            RenderOptionsToViewer(question, idx, viewer);
+            MultiChoiceItemView questionViewer = new MultiChoiceItemView();
+            questionViewer.IdxHeight = idxHeight;
+            questionViewer.QuestionWidth = questionWidth;
+            questionViewer.Controller = controller;
+            questionViewer.Viewer = viewer;
+            return questionViewer;
         }
 
-        static void RenderOptionsToViewer(MultiChoiceItem question, int idx, StackPanel viewer)
+        public void RenderModelToViewer(MultiChoiceItem question, int idx)
+        {
+            RenderIndexToViewer(idx);
+            Viewer.Children.Add(NonnullRichTextView.Render(question.Stem));
+            RenderOptionsToViewer(question, idx);
+        }
+
+        void RenderOptionsToViewer(MultiChoiceItem question, int idx)
         {
             ListBox optionsView = new ListBox();
             optionsView.Width = QuestionWidth;
@@ -35,14 +45,13 @@ namespace sQzClient
                 option.Content = NonnullRichTextView.Render(richText);
                 optionsView.Items.Add(option);
             }
-            viewer.Children.Add(optionsView);
+            Viewer.Children.Add(optionsView);
         }
 
-        static void RenderIndexToViewer(int idx, StackPanel viewer)
+        void RenderIndexToViewer(int idx)
         {
             Label idxLabel = new Label();
             idxLabel.HorizontalAlignment = HorizontalAlignment.Left;
-            idxLabel.VerticalAlignment = VerticalAlignment.Top;
             idxLabel.Content = idx;
             idxLabel.Background = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
             idxLabel.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_Color];
@@ -52,10 +61,12 @@ namespace sQzClient
             idxLabel.VerticalContentAlignment = VerticalAlignment.Center;
             idxLabel.Padding = new Thickness(0);
             idxLabel.Margin = new Thickness(0, IdxHeight, 0, 0);
-            viewer.Children.Add(idxLabel);
+            Viewer.Children.Add(idxLabel);
+
+            RenderIndexLineToViewer();
         }
 
-        static void RenderIndexLineToViewer(StackPanel questionsView)
+        void RenderIndexLineToViewer()
         {
             //TextBlock stmt = new TextBlock();
             //stmt.Text = "xx";// question.Stem;
@@ -68,7 +79,7 @@ namespace sQzClient
             stmtBox.BorderThickness = new Thickness(0, 4, 0, 0);
             Thickness zero = new Thickness(0);
             stmtBox.Margin = stmtBox.Padding = zero;
-            questionsView.Children.Add(stmtBox);
+            Viewer.Children.Add(stmtBox);
         }
     }
 }

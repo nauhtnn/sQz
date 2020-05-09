@@ -13,7 +13,7 @@ namespace sQzLib
     public class AnswerSheetCellView : StackPanel
     {
         public static CornerRadius mCornerRadius;
-        static double Width;
+        static double CellWidth;
         Border mBorder;
 
         public Label mLbl;
@@ -23,7 +23,7 @@ namespace sQzLib
         {
             mCornerRadius = new CornerRadius();
             mCornerRadius.BottomLeft = mCornerRadius.BottomRight = mCornerRadius.TopLeft = mCornerRadius.TopRight = 50;
-            Width = w;
+            CellWidth = w;
         }
 
         public AnswerSheetCellView(string txt, int idx, double w)
