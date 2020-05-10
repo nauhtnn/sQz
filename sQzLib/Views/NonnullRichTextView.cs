@@ -11,7 +11,7 @@ using System.Net.NetworkInformation;
 
 namespace sQzLib
 {
-    public class NonnullRichTextView
+    class NonnullRichTextView
     {
         public static UIElement Render(NonnullRichText RichText)
         {

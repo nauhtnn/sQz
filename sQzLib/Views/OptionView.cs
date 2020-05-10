@@ -10,7 +10,7 @@ namespace sQzLib
 {
     public delegate void DgEvntCB();
 
-    public class OptionView : StackPanel
+    class OptionView : StackPanel
     {
         static CornerRadius LabelCornerRadius;
         Border LabelBorder;

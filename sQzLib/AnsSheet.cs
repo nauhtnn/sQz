@@ -12,7 +12,7 @@ namespace sQzLib
     {
         public const int LEN = 120;
         public ListBox[] vlbxAns;
-        public OptionView[][] vAnsItem;
+        //public OptionView[][] vAnsItem;
         public int uQSLvId;
         public int uQSId { get { return ((int)Level.MAX_COUNT_EACH_LEVEL < uQSLvId) ? uQSLvId - (int)Level.MAX_COUNT_EACH_LEVEL : uQSLvId; } }
         public bool bChanged;

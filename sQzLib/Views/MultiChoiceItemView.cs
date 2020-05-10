@@ -7,27 +7,27 @@ using sQzLib;
 
 namespace sQzLib
 {
-    public class MultiChoiceItemView
+    class MultiChoiceItemView
     {
         double IdxHeight;
         double QuestionWidth;
         MultiChoiceItemController Controller;
-        StackPanel Viewer;
+        StackPanel UI_Container;
 
-        public static MultiChoiceItemView NewWith(double idxHeight, double questionWidth, StackPanel viewer, MultiChoiceItemController controller)
+        public static MultiChoiceItemView NewWith(double idxHeight, double questionWidth, StackPanel UI_container, MultiChoiceItemController controller)
         {
             MultiChoiceItemView questionViewer = new MultiChoiceItemView();
             questionViewer.IdxHeight = idxHeight;
             questionViewer.QuestionWidth = questionWidth;
             questionViewer.Controller = controller;
-            questionViewer.Viewer = viewer;
+            questionViewer.UI_Container = UI_container;
             return questionViewer;
         }
 
         public void RenderModel(MultiChoiceItem question, int idx)
         {
             RenderIndex(idx);
-            Viewer.Children.Add(NonnullRichTextView.Render(question.Stem));
+            UI_Container.Children.Add(NonnullRichTextView.Render(question.Stem));
             RenderOptions(question, idx);
         }
 
@@ -45,7 +45,7 @@ namespace sQzLib
                 OptionView option = new OptionView();
                 optionsView.Items.Add(option.Render(richText, optionIdx++, QuestionWidth));
             }
-            Viewer.Children.Add(optionsView);
+            UI_Container.Children.Add(optionsView);
         }
 
         void RenderIndex(int idx)
@@ -61,7 +61,7 @@ namespace sQzLib
             idxLabel.VerticalContentAlignment = VerticalAlignment.Center;
             idxLabel.Padding = new Thickness(0);
             idxLabel.Margin = new Thickness(0, IdxHeight, 0, 0);
-            Viewer.Children.Add(idxLabel);
+            UI_Container.Children.Add(idxLabel);
 
             RenderIndexLine();
         }
@@ -79,7 +79,7 @@ namespace sQzLib
             stmtBox.BorderThickness = new Thickness(0, 4, 0, 0);
             Thickness zero = new Thickness(0);
             stmtBox.Margin = stmtBox.Padding = zero;
-            Viewer.Children.Add(stmtBox);
+            UI_Container.Children.Add(stmtBox);
         }
     }
 }

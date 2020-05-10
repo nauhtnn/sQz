@@ -11,10 +11,10 @@ namespace sQzLib
     {
         MultiChoiceItemView QuestionViewer;
 
-        public static QuestSheetView NewWith(double backgroundSize, double margin, StackPanel viewer, MultiChoiceItemController controller)
+        public static QuestSheetView NewWith(double backgroundSize, double margin, StackPanel UI_container, MultiChoiceItemController controller)
         {
             QuestSheetView questSheetViewer = new QuestSheetView();
-            questSheetViewer.QuestionViewer = MultiChoiceItemView.NewWith(3 * margin, backgroundSize - margin - margin, viewer, controller);
+            questSheetViewer.QuestionViewer = MultiChoiceItemView.NewWith(3 * margin, backgroundSize - margin - margin, UI_container, controller);
             OptionView.InitLabelCircle();
             return questSheetViewer;
         }
