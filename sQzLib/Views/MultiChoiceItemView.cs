@@ -16,12 +16,14 @@ namespace sQzLib
 
         public static MultiChoiceItemView NewWith(double idxHeight, double questionWidth, StackPanel UI_container, MultiChoiceItemController controller)
         {
-            MultiChoiceItemView questionViewer = new MultiChoiceItemView();
-            questionViewer.IdxHeight = idxHeight;
-            questionViewer.QuestionWidth = questionWidth;
-            questionViewer.Controller = controller;
-            questionViewer.UI_Container = UI_container;
-            return questionViewer;
+            OptionView.InitLabelCircle();
+
+            MultiChoiceItemView question = new MultiChoiceItemView();
+            question.IdxHeight = idxHeight;
+            question.QuestionWidth = questionWidth;
+            question.Controller = controller;
+            question.UI_Container = UI_container;
+            return question;
         }
 
         public void RenderModel(MultiChoiceItem question, int idx)

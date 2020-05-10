@@ -13,13 +13,12 @@ namespace sQzLib
 
         public static QuestSheetView NewWith(double backgroundSize, double margin, StackPanel UI_container, MultiChoiceItemController controller)
         {
-            QuestSheetView questSheetViewer = new QuestSheetView();
-            questSheetViewer.QuestionViewer = MultiChoiceItemView.NewWith(3 * margin, backgroundSize - margin - margin, UI_container, controller);
-            OptionView.InitLabelCircle();
-            return questSheetViewer;
+            QuestSheetView questSheet = new QuestSheetView();
+            questSheet.QuestionViewer = MultiChoiceItemView.NewWith(3 * margin, backgroundSize - margin - margin, UI_container, controller);
+            return questSheet;
         }
 
-        public void RenderModelToView(QuestSheet model)
+        public void RenderModel(QuestSheet model)
         {
             int questIdx = 1;
             foreach (MultiChoiceItem question in model.Questions)
