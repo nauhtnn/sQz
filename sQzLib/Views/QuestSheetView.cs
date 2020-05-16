@@ -9,20 +9,36 @@ namespace sQzLib
 {
     public class QuestSheetView
     {
-        MultiChoiceItemView QuestionViewer;
+		double BackgroundWidth;
+		double Padding;
+		StackPanel UI_Container;
+		QuestSheet Model;
+		public List<ListBox> OptionsGroupedByQuestion;
 
-        public static QuestSheetView NewWith(double backgroundSize, double margin, StackPanel UI_container, MultiChoiceItemController controller)
+        public static QuestSheetView NewWith(QuestSheet model, double backgroundWidth, double padding, StackPanel UI_container)
         {
             QuestSheetView questSheet = new QuestSheetView();
-            questSheet.QuestionViewer = MultiChoiceItemView.NewWith(3 * margin, backgroundSize - margin - margin, UI_container, controller);
+			questSheet.Model = model;
+			questSheet.BackgroundWidth = backgroundWidth;
+			questSheet.Padding = padding;
+			questSheet.UI_Container = UI_container;
+			OptionsGroupedByQuestion = new List<ListBox>();
             return questSheet;
         }
 
-        public void RenderModel(QuestSheet model)
+        public void View()
         {
-            int questIdx = 1;
-            foreach (MultiChoiceItem question in model.Questions)
-                QuestionViewer.RenderModel(question, questIdx++);
+			OptionView.InitLabelCircle();
+			
+			double questionIdxHeight = 3 * Padding;
+			double questionWidth = BackgroundWidth - Padding - Padding;
+            int idxInQuestSheet = 1;
+            foreach (MultiChoiceItem model in Model.Questions)
+			{
+				MultiChoiceItemView question = MultiChoiceItemView.NewWith(model, idxInQuestSheet, questionIdxHeight, questionWidth, UI_container);
+				question.Render();
+				OptionsGroupedByQuestion.Add(question.Options);
+			}
         }
     }
 }

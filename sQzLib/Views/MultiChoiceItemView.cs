@@ -9,45 +9,46 @@ namespace sQzLib
 {
     class MultiChoiceItemView
     {
+		MultiChoiceItem Model;
+		int IdxInQuestSheet;
         double IdxHeight;
         double QuestionWidth;
-        MultiChoiceItemController Controller;
         StackPanel UI_Container;
+		ListBox Options;
 
-        public static MultiChoiceItemView NewWith(double idxHeight, double questionWidth, StackPanel UI_container, MultiChoiceItemController controller)
+        public static MultiChoiceItemView NewWith(MultiChoiceItem model, int idx, double idxHeight, double questionWidth, StackPanel UI_container)
         {
-            OptionView.InitLabelCircle();
-
             MultiChoiceItemView question = new MultiChoiceItemView();
-            question.IdxHeight = idxHeight;
+            question.IdxInQuestSheet = idx;
+			question.IdxHeight = idxHeight;
             question.QuestionWidth = questionWidth;
             question.Controller = controller;
             question.UI_Container = UI_container;
             return question;
         }
 
-        public void RenderModel(MultiChoiceItem question, int idx)
+        public void Render()
         {
-            RenderIndex(idx);
-            UI_Container.Children.Add(NonnullRichTextView.Render(question.Stem));
-            RenderOptions(question, idx);
+            RenderIndex();
+            UI_Container.Children.Add(NonnullRichTextView.Render(Model.Stem));
+            RenderOptions();
         }
 
-        void RenderOptions(MultiChoiceItem question, int idx)
+        void RenderOptions()
         {
-            ListBox optionsView = new ListBox();
-            optionsView.Width = QuestionWidth;
-            optionsView.Name = "_" + idx;
-            optionsView.SelectionChanged += Controller.Options_SelectionChanged;
-            optionsView.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
-            optionsView.BorderThickness = new Thickness(0, 4, 0, 0);
+            ListBox Options = new ListBox();
+            Options.Width = QuestionWidth;
+            Options.Name = "_" + IdxInQuestSheet;
+            Options.SelectionChanged += Controller.Options_SelectionChanged;
+            Options.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
+            Options.BorderThickness = new Thickness(0, 4, 0, 0);
             int optionIdx = 0;
-            foreach (NonnullRichText richText in question.Options)
+            foreach (NonnullRichText richText in Model.Options)
             {
                 OptionView option = new OptionView();
-                optionsView.Items.Add(option.Render(richText, optionIdx++, QuestionWidth));
+                Options.Items.Add(option.Render(richText, optionIdx++, QuestionWidth));
             }
-            UI_Container.Children.Add(optionsView);
+            UI_Container.Children.Add(Options);
         }
 
         void RenderIndex(int idx)
