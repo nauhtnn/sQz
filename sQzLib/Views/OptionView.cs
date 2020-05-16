@@ -10,13 +10,12 @@ namespace sQzLib
 {
     public delegate void DgEvntCB();
 
-    class OptionView : StackPanel
+    class OptionView : ListBoxItem
     {
         static CornerRadius LabelCornerRadius;
         Border LabelBorder;
 
         //public Label AnsCellLabel;TODO: MVC remove
-        public ListBoxItem mLbxItem;
 
         public static void InitLabelCircle()
         {
@@ -28,23 +27,26 @@ namespace sQzLib
         }
 
         //TODO: MVC remove
-        public ListBoxItem Render(NonnullRichText richText, int idx, double questionWidth)
+        public static OptionView NewWith(NonnullRichText richText, int idx, double questionWidth)
         {
+            OptionView option = new OptionView();
+
             questionWidth -= 10;//alignment
 
             StackPanel sp = new StackPanel();
             sp.Orientation = Orientation.Horizontal;
-            LabelBorder = new Border();
-            LabelBorder.Width = LabelBorder.Height = 30;
-            LabelBorder.CornerRadius = LabelCornerRadius;
-            LabelBorder.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
+            option.LabelBorder = new Border();
+            option.LabelBorder.Width = 30;
+            option.LabelBorder.Height = 30;
+            option.LabelBorder.CornerRadius = LabelCornerRadius;
+            option.LabelBorder.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
             TextBlock tb = new TextBlock();
             tb.Text = "" + (char)('A' + idx);
             tb.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
             tb.VerticalAlignment = VerticalAlignment.Center;
             tb.HorizontalAlignment = HorizontalAlignment.Center;
-            LabelBorder.Child = tb;
-            sp.Children.Add(LabelBorder);
+            option.LabelBorder.Child = tb;
+            sp.Children.Add(option.LabelBorder);
             //TextBlock ansTxt = new TextBlock();
             //ansTxt.Text = text;
             //ansTxt.TextWrapping = TextWrapping.Wrap;
@@ -53,14 +55,13 @@ namespace sQzLib
             //sp.Children.Add(ansTxt);
             sp.Children.Add(NonnullRichTextView.Render(richText));
 
-            mLbxItem = new ListBoxItem();
-            mLbxItem.Content = sp;
-            mLbxItem.Padding = new Thickness(0);
-            mLbxItem.Name = "_" + idx.ToString();
+            option.Content = sp;
+            option.Padding = new Thickness(0);
+            option.Name = "_" + idx.ToString();
 
             //AnsCellLabel = new Label();TODO: MVC remove
 
-            return mLbxItem;
+            return option;
         }
 
         //TODO: MVC remove
@@ -72,19 +73,26 @@ namespace sQzLib
         //TODO: MVC remove
         //public ListBoxItem lbxi
         //{
-        //    get { return mLbxItem; }
+        //    get { return SelectableTextAndIdx; }
         //}
 
-        public void Selected()
+        protected override void OnSelected(RoutedEventArgs e)
         {
+            base.OnSelected(e);
             LabelBorder.Background = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
             TextBlock t = (TextBlock)LabelBorder.Child;
             t.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_Color];
             //AnsCellLabel.Content = 'X';TODO: MVC remove
+            //ListBox options = Parent as ListBox;
+            //if(options != null)
+            //{
+            //    foreach
+            //}
         }
 
-        public void Unselected()
+        protected override void OnUnselected(RoutedEventArgs e)
         {
+            base.OnUnselected(e);
             LabelBorder.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
             TextBlock t = (TextBlock)LabelBorder.Child;
             t.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];

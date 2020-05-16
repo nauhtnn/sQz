@@ -11,7 +11,7 @@ namespace sQzClient
     /// <summary>
     /// Interaction logic for MainWindow.xaml
     /// </summary>
-    public partial class TakeExam : Page, MultiChoiceItemController
+    public partial class TakeExam : Page
     {
 		System.Timers.Timer TimeController;
         UICbMsg mCbMsg;

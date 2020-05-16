@@ -37,6 +37,7 @@ namespace sQzLib
         void RenderOptions()
         {
             ListBox Options = new ListBox();
+            Options.SelectionMode = SelectionMode.Single;
             Options.Width = QuestionWidth;
             Options.Name = "_" + Idx;
             //Options.SelectionChanged += Controller.Options_SelectionChanged;TODO
@@ -45,8 +46,7 @@ namespace sQzLib
             int optionIdx = 0;
             foreach (NonnullRichText richText in Model.Options)
             {
-                OptionView option = new OptionView();
-                Options.Items.Add(option.Render(richText, optionIdx++, QuestionWidth));
+                Options.Items.Add(OptionView.NewWith(richText, optionIdx++, QuestionWidth));
             }
             UI_Container.Children.Add(Options);
         }
