@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Windows;
 using System.Windows.Controls;
+using System.Collections.Generic;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
 using sQzLib;
@@ -22,7 +23,7 @@ namespace sQzLib
 			questSheet.BackgroundWidth = backgroundWidth;
 			questSheet.Padding = padding;
 			questSheet.UI_Container = UI_container;
-			OptionsGroupedByQuestion = new List<ListBox>();
+            questSheet.OptionsGroupedByQuestion = new List<ListBox>();
             return questSheet;
         }
 
@@ -35,7 +36,7 @@ namespace sQzLib
             int idxInQuestSheet = 1;
             foreach (MultiChoiceItem model in Model.Questions)
 			{
-				MultiChoiceItemView question = MultiChoiceItemView.NewWith(model, idxInQuestSheet, questionIdxHeight, questionWidth, UI_container);
+				MultiChoiceItemView question = MultiChoiceItemView.NewWith(model, idxInQuestSheet++, questionIdxHeight, questionWidth, UI_Container);
 				question.Render();
 				OptionsGroupedByQuestion.Add(question.Options);
 			}

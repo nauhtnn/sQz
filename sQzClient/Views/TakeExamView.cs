@@ -91,9 +91,9 @@ namespace sQzClient
         void SetQuestSheetView()
         {
             QuestionsView.Background = Theme.Singleton.DefinedColors[(int)BrushId.Q_BG];
-            QuestSheetViewer = QuestSheetView.NewWith(QuestSheetBG.Width - SystemParameters.ScrollWidth, FontSize / 2, QuestionsView, this);
+            QuestSheetViewer = QuestSheetView.NewWith(QuestSheetModel, QuestSheetBG.Width - SystemParameters.ScrollWidth, FontSize / 2, QuestionsView);
 
-            QuestSheetViewer.RenderModel(QuestSheetModel);
+            QuestSheetViewer.View();
         }
     }
 }

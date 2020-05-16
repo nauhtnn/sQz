@@ -10,20 +10,20 @@ namespace sQzLib
     class MultiChoiceItemView
     {
 		MultiChoiceItem Model;
-		int IdxInQuestSheet;
+		int Idx;
         double IdxHeight;
         double QuestionWidth;
         StackPanel UI_Container;
-		ListBox Options;
+		public ListBox Options;
 
-        public static MultiChoiceItemView NewWith(MultiChoiceItem model, int idx, double idxHeight, double questionWidth, StackPanel UI_container)
+        public static MultiChoiceItemView NewWith(MultiChoiceItem model, int idx, double idxHeight, double questionWidth, StackPanel UI_Container)
         {
             MultiChoiceItemView question = new MultiChoiceItemView();
-            question.IdxInQuestSheet = idx;
+            question.Model = model;
+            question.Idx = idx;
 			question.IdxHeight = idxHeight;
             question.QuestionWidth = questionWidth;
-            question.Controller = controller;
-            question.UI_Container = UI_container;
+            question.UI_Container = UI_Container;
             return question;
         }
 
@@ -38,8 +38,8 @@ namespace sQzLib
         {
             ListBox Options = new ListBox();
             Options.Width = QuestionWidth;
-            Options.Name = "_" + IdxInQuestSheet;
-            Options.SelectionChanged += Controller.Options_SelectionChanged;
+            Options.Name = "_" + Idx;
+            //Options.SelectionChanged += Controller.Options_SelectionChanged;TODO
             Options.BorderBrush = Theme.Singleton.DefinedColors[(int)BrushId.Ans_TopLine];
             Options.BorderThickness = new Thickness(0, 4, 0, 0);
             int optionIdx = 0;
@@ -51,11 +51,11 @@ namespace sQzLib
             UI_Container.Children.Add(Options);
         }
 
-        void RenderIndex(int idx)
+        void RenderIndex()
         {
             Label idxLabel = new Label();
             idxLabel.HorizontalAlignment = HorizontalAlignment.Left;
-            idxLabel.Content = idx;
+            idxLabel.Content = Idx;
             idxLabel.Background = Theme.Singleton.DefinedColors[(int)BrushId.QID_BG];
             idxLabel.Foreground = Theme.Singleton.DefinedColors[(int)BrushId.QID_Color];
             idxLabel.Width = IdxHeight;
