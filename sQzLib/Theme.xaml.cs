@@ -7,7 +7,7 @@ namespace sQzLib
     public class Theme
     {
         public SolidColorBrush[] DefinedColors;
-        public Thickness[] CellThick;
+        public Thickness[] BorderVisibility;
         static Theme _s;
         public static Theme Singleton
         {
@@ -41,13 +41,13 @@ namespace sQzLib
                 }
             }
             
-            CellThick = new Thickness[(int)ThicknessId.Count];
-            CellThick[(int)ThicknessId.LeftTop] = new Thickness(0, 0, 0, 0);
-            CellThick[(int)ThicknessId.MiddleTop] = new Thickness(1, 1, 0, 0);
-            CellThick[(int)ThicknessId.RightTop] = new Thickness(1, 1, 1, 0);
-            CellThick[(int)ThicknessId.LeftBottom] = new Thickness(1, 1, 0, 1);
-            CellThick[(int)ThicknessId.MiddleBottom] = new Thickness(1, 1, 0, 1);
-            CellThick[(int)ThicknessId.RightBottom] = new Thickness(1, 1, 1, 1);
+            BorderVisibility = new Thickness[(int)SelectedEdge.Count];
+            BorderVisibility[(int)SelectedEdge.LeftTop] = new Thickness(0, 0, 0, 0);
+            BorderVisibility[(int)SelectedEdge.MiddleTop] = new Thickness(1, 1, 0, 0);
+            BorderVisibility[(int)SelectedEdge.RightTop] = new Thickness(1, 1, 1, 0);
+            BorderVisibility[(int)SelectedEdge.LeftBottom] = new Thickness(1, 1, 0, 1);
+            BorderVisibility[(int)SelectedEdge.MiddleBottom] = new Thickness(1, 1, 0, 1);
+            BorderVisibility[(int)SelectedEdge.RightBottom] = new Thickness(1, 1, 1, 1);
         }
     }
 
@@ -75,7 +75,7 @@ namespace sQzLib
         Count
     }
 
-    public enum ThicknessId
+    public enum SelectedEdge
     {
         LeftTop = 0,
         MiddleTop,

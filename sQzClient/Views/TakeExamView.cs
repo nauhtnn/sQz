@@ -16,7 +16,7 @@ namespace sQzClient
         //views
 
         QuestSheetView QuestSheetViewer;
-        AnswerSheetView AnswerSheetViewer;
+        AnswerGridView AnswerSheetViewer;
 		
 		private void InitViews()
 		{
@@ -84,7 +84,7 @@ namespace sQzClient
             //mExaminee.mAnsSheet.InitView(mQuestSheet, qaWh, null);
             //mExaminee.mAnsSheet.bChanged = false;
 
-            AnswerSheetViewer = new AnswerSheetView();
+            AnswerSheetViewer = AnswerGridView.NewWith(AnswerCells);
             AnswerSheetViewer.FirstRenderTableToView(QuestSheetModel.Questions.Count, AnswerCells);
         }
 
