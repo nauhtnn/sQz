@@ -30,6 +30,7 @@ namespace sQzLib
         string mCode;
         WPopup()
         {
+            isClose = false;
             mW = new Window();
             mW.Title = Txt.s._[(int)TxI.POPUP_TIT];
             mW.Closing += wPopup_Closing;
@@ -88,6 +89,9 @@ namespace sQzLib
 
         private void BtnCncl_Click(object sender, RoutedEventArgs e)
         {
+            if (isClose)
+                return;
+            isClose = true;
             mW.Close();
         }
 
@@ -97,6 +101,9 @@ namespace sQzLib
             {
                 mC.Text = string.Empty;
                 bOk = true;
+                if (isClose)
+                    return;
+                isClose = true;
                 mW.Close();
             }
         }
@@ -145,10 +152,15 @@ namespace sQzLib
             }
         }
 
+        private bool isClose;
+
         public void Exit()
         {
             cncl = false;
             wpCb = wpCbCncl = null;
+            if (isClose)
+                return;
+            isClose = true;
             mW.Close();
         }
 
