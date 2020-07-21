@@ -78,6 +78,14 @@ namespace sQzServer1
         {
             btnStop_Click(null, null);
             //todo: check th state to return
+            bool printerTest = true;
+            if(printerTest)
+            {
+                mState = NetCode.Srvr1DatRetriving;
+                mBrd = CreateFakeData();
+                ClntBufHndl(null);
+                return;
+            }
             Task.Run(() => { mClnt.ConnectWR(ref mCbMsg); });
         }
 
@@ -131,7 +139,7 @@ namespace sQzServer1
         {
             outMsg = null;
             int offs = 0;
-            NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
+			NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
             offs += 4;
             QuestSheet qs;
             int lvid;
@@ -364,18 +372,20 @@ namespace sQzServer1
 
         public bool ClntBufHndl(byte[] buf)
         {
+            bool isProduction = false;
             int offs = 0;
             switch (mState)
             {
                 case NetCode.Srvr1DatRetriving:
-                    if (mBrd.ReadByteSl1(buf, ref offs))
+                    if (isProduction && mBrd.ReadByteSl1(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
                             WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_DT_NOK]));
                         break;
                     }
                     Dispatcher.InvokeAsync(() => LoadSl());
-                    mState = NetCode.QuestRetrieving;
+                    if(isProduction)
+                        mState = NetCode.QuestRetrieving;
                     return true;
                 case NetCode.QuestRetrieving:
                     if (mBrd.ReadByteQPack(buf, ref offs))
@@ -387,7 +397,7 @@ namespace sQzServer1
                     mState = NetCode.AnsKeyRetrieving;
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    if (mBrd.ReadByteKey(buf, ref offs))
+                    if (isProduction && mBrd.ReadByteKey(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
                             WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_KEY_NOK]));
@@ -564,6 +574,23 @@ namespace sQzServer1
                         Theme.s._[(int)BrushId.mSubmit];
                 }
             }
+        }
+
+        private ExamBoard CreateFakeData()
+        {
+            var board = new ExamBoard();
+            board.mDt = DateTime.Now;
+            var slot = new ExamSlot();
+            slot.Dt = board.mDt;
+            board.vSl.Add(slot.mDt.ToString("hh:mm"), slot);
+            for (int i = 0; i < 6; ++i)
+            {
+                ExamRoom r = new ExamRoom();
+                r.uId = i;
+                slot.vRoom.Add(r.uId, r);
+            }
+            slot.ReadF("fake.txt", ref slot);
+            return board;
         }
     }
 }
