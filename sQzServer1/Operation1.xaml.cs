@@ -592,5 +592,150 @@ namespace sQzServer1
             slot.ReadF("fake.txt", ref slot);
             return board;
         }
+
+        private void btnPrint_Click(object sender, RoutedEventArgs e)
+        {
+                var word = new Microsoft.Office.Interop.Word.Application { Visible = false };
+        // where did you get this file name?
+        string fileName = "F:/projects/sqz009printer/sQzServer1/bin/Debug/sqz_server1_template.docx";
+
+            // as you mentioned, you open your word document here
+            var doc = word.Documents.Open(fileName, ReadOnly: true, Visible: true);
+
+            doc.PrintOut();
+        }
+
+    private void PrintFlowDoc()
+        {
+            var document = CreateFlowDocument();
+            // Clone the source document's content into a new FlowDocument.
+            // This is because the pagination for the printer needs to be
+            // done differently than the pagination for the displayed page.
+            // We print the copy, rather that the original FlowDocument.
+            System.IO.MemoryStream s = new System.IO.MemoryStream();
+            TextRange source = new TextRange(document.ContentStart, document.ContentEnd);
+            source.Save(s, DataFormats.Xaml);
+            FlowDocument copy = new FlowDocument();
+            TextRange dest = new TextRange(copy.ContentStart, copy.ContentEnd);
+            dest.Load(s, DataFormats.Xaml);
+
+            // Create a XpsDocumentWriter object, implicitly opening a Windows common print dialog,
+            // and allowing the user to select a printer.
+
+            // get information about the dimensions of the seleted printer+media.
+            System.Printing.PrintDocumentImageableArea ia = null;
+            System.Windows.Xps.XpsDocumentWriter docWriter = System.Printing.PrintQueue.CreateXpsDocumentWriter(ref ia);
+
+            if (docWriter != null && ia != null)
+            {
+                DocumentPaginator paginator = ((IDocumentPaginatorSource)copy).DocumentPaginator;
+
+                // Change the PageSize and PagePadding for the document to match the CanvasSize for the printer device.
+                paginator.PageSize = new Size(ia.MediaSizeWidth, ia.MediaSizeHeight);
+                Thickness t = new Thickness(72);  // copy.PagePadding;
+                copy.PagePadding = new Thickness(
+                                 Math.Max(ia.OriginWidth, t.Left),
+                                   Math.Max(ia.OriginHeight, t.Top),
+                                   Math.Max(ia.MediaSizeWidth - (ia.OriginWidth + ia.ExtentWidth), t.Right),
+                                   Math.Max(ia.MediaSizeHeight - (ia.OriginHeight + ia.ExtentHeight), t.Bottom));
+
+                copy.ColumnWidth = double.PositiveInfinity;
+                //copy.PageWidth = 528; // allow the page to be the natural with of the output device
+
+                // Send content to the printer.
+                docWriter.Write(paginator);
+            }
+        }
+
+        private FlowDocument CreateFlowDocument()
+        {
+            var table1 = new Table();
+            // Create 6 columns and add them to the table's Columns collection.
+            int numberOfColumns = 5;
+            for (int x = 0; x < numberOfColumns; x++)
+            {
+                table1.Columns.Add(new TableColumn());
+
+                // Set alternating background colors for the middle colums.
+                if (x % 2 == 0)
+                    table1.Columns[x].Background = Brushes.Beige;
+                else
+                    table1.Columns[x].Background = Brushes.LightSteelBlue;
+            }
+
+            // Create and add an empty TableRowGroup to hold the table's Rows.
+            table1.RowGroups.Add(new TableRowGroup());
+
+            // Add the first (title) row.
+            table1.RowGroups[0].Rows.Add(new TableRow());
+
+            // Alias the current working row for easy reference.
+            TableRow currentRow = table1.RowGroups[0].Rows[0];
+
+            // Global formatting for the title row.
+            currentRow.Background = Brushes.Silver;
+            currentRow.FontSize = 40;
+            currentRow.FontWeight = System.Windows.FontWeights.Bold;
+
+            // Add the header row with content,
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("2004 Sales Project"))));
+            // and set the row to span all 6 columns.
+            currentRow.Cells[0].ColumnSpan = 6;
+
+            // Add the second (header) row.
+            table1.RowGroups[0].Rows.Add(new TableRow());
+            currentRow = table1.RowGroups[0].Rows[1];
+
+            // Global formatting for the header row.
+            currentRow.FontSize = 18;
+            currentRow.FontWeight = FontWeights.Bold;
+
+            // Add cells with content to the second row.
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Product"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 1"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 2"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 3"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 4"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("TOTAL"))));
+
+            // Add the third row.
+            table1.RowGroups[0].Rows.Add(new TableRow());
+            currentRow = table1.RowGroups[0].Rows[2];
+
+            // Global formatting for the row.
+            currentRow.FontSize = 12;
+            currentRow.FontWeight = FontWeights.Normal;
+
+            // Add cells with content to the third row.
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Widgets"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$50,000"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$55,000"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$60,000"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$65,000"))));
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$230,000"))));
+
+            // Bold the first cell.
+            currentRow.Cells[0].FontWeight = FontWeights.Bold;
+
+            table1.RowGroups[0].Rows.Add(new TableRow());
+            currentRow = table1.RowGroups[0].Rows[3];
+
+            // Global formatting for the footer row.
+            currentRow.Background = Brushes.LightGray;
+            currentRow.FontSize = 18;
+            currentRow.FontWeight = System.Windows.FontWeights.Normal;
+
+            // Add the header row with content,
+            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Projected 2004 Revenue: $810,000"))));
+            // and set the row to span all 6 columns.
+            currentRow.Cells[0].ColumnSpan = 6;
+
+
+            // ...and add it to the FlowDocument Blocks collection.
+            var flowDoc = new FlowDocument();
+            flowDoc.Blocks.Add(table1);
+
+            return flowDoc;
+        }
     }
 }

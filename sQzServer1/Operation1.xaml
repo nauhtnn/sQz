@@ -19,9 +19,11 @@
                     <Button x:Name="btnStrt" Width="120" Height="40" Click="btnStart_Click" Background="#f4f4f4" Foreground="#838383"
                         Margin="10,10,10,10" IsEnabled="False"/>
                     <Button x:Name="btnStop" Width="120" Height="40" Click="btnStop_Click" Background="#f4f4f4" Foreground="#838383"
-                        Margin="10,10,10,50" IsEnabled="False"/>
+                        Margin="10,10,10,10" IsEnabled="False"/>
                     <Button x:Name="btnSubmit" Width="120" Height="40" Click="btnSubmit_Click" Background="#f4f4f4" Foreground="#838383"
-                            Margin="10,10,10,50" IsEnabled="False"/>
+                            Margin="10,10,10,10" IsEnabled="False"/>
+                    <Button x:Name="btnPrint" Width="120" Height="40" Click="btnPrint_Click"  Background="#f4f4f4" Foreground="#838383"
+                            Margin="10,10,10,50" IsEnabled="True"/>
                     <Button x:Name="btnClose" Width="120" Height="40" Click="btnClose_Click" Background="#f15a23" Foreground="#fff"
                         Margin="10,10,10,10"/>
                     <Button Name="btnHck" Width="60" Height="40" Click="btnHck_Click" Background="#f4f4f4" Foreground="#fff"
