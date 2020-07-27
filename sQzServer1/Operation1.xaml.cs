@@ -582,7 +582,7 @@ namespace sQzServer1
             board.mDt = DateTime.Now;
             var slot = new ExamSlot();
             slot.Dt = board.mDt;
-            board.vSl.Add(slot.mDt.ToString("hh:mm"), slot);
+            board.vSl.Add(slot.mDt.ToString("HH:mm"), slot);
             for (int i = 0; i < 6; ++i)
             {
                 ExamRoom r = new ExamRoom();
