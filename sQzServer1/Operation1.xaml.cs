@@ -595,14 +595,41 @@ namespace sQzServer1
 
         private void btnPrint_Click(object sender, RoutedEventArgs e)
         {
-                var word = new Microsoft.Office.Interop.Word.Application { Visible = false };
-        // where did you get this file name?
-        string fileName = "F:/projects/sqz009printer/sQzServer1/bin/Debug/sqz_server1_template.docx";
+                // where did you get this file name?
+        string filePath = System.IO.Directory.GetCurrentDirectory() +
+                "/sqz_server1_";
 
-            // as you mentioned, you open your word document here
-            var doc = word.Documents.Open(fileName, ReadOnly: true, Visible: true);
+            if (!System.IO.File.Exists(filePath + "template.docx"))
+            {
+                MessageBox.Show("No template!");
+                return;
+            }
 
-            doc.PrintOut();
+            int i;
+            for (i = 0; i < 100; ++i)
+                if (!System.IO.File.Exists(filePath + i + ".docx"))
+                    break;
+            if(i == 100)
+            {
+                MessageBox.Show("Out of index to print. 99 slots have been taken!");
+                return;
+            }
+            var word = new Microsoft.Office.Interop.Word.Application { Visible = true };
+            var doc = word.Documents.Open(filePath + "template.docx", ReadOnly: true, Visible: true);
+            doc.SaveAs2(filePath + i + ".docx");
+            DocxReplaceDate(doc);
+        }
+
+        private void DocxReplaceDate(Microsoft.Office.Interop.Word.Document doc)
+        {
+            foreach(Microsoft.Office.Interop.Word.Range i in doc.Words)
+            {
+                if(i.Text.Contains("DDMMYYYY"))
+                {
+                    i.Text = i.Text.Replace("DDMMYYYY", DateTime.Now.ToString("dd/MM/yyyy"));
+                    return;
+                }
+            }
         }
 
     private void PrintFlowDoc()
