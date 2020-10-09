@@ -185,13 +185,13 @@ namespace sQzServer0
             tbcQ = new TabControl();
             tbcQ.Width = refTbc.Width;
             TabItem i = new TabItem();
-            i.Header = Txt.s._[(int)TxI.OP_Q_PRI];
+            i.Header = Txt.s._((int)TxI.OP_Q_PRI);
             i.Content = tbcQ;
             tbc.Items.Add(i);
             tbcQAlt = new TabControl();
             tbcQAlt.Width = refTbc.Width;
             i = new TabItem();
-            i.Header = Txt.s._[(int)TxI.OP_Q_ALT];
+            i.Header = Txt.s._((int)TxI.OP_Q_ALT);
             i.Content = tbcQAlt;
             tbc.Items.Add(i);
             Content = tbc;
@@ -307,7 +307,7 @@ namespace sQzServer0
                 g.Children.Add(t);
 
                 Button btn = new Button();
-                btn.Content = Txt.s._[(int)TxI.OP_GEN_PW];
+                btn.Content = Txt.s._((int)TxI.OP_GEN_PW);
                 btn.Name = "b" + r.uId;
                 btn.Click += btnGenPw_Click;
                 btn.Background = Theme.s._[(int)BrushId.Button_Hover];
@@ -319,7 +319,7 @@ namespace sQzServer0
             //
             TabItem tbi = new TabItem();
             tbi.Content = g;
-            tbi.Header = Txt.s._[(int)TxI.OP_STT];
+            tbi.Header = Txt.s._((int)TxI.OP_STT);
             return tbi;
         }
 
@@ -395,7 +395,7 @@ namespace sQzServer0
             }
             TabItem tbi = new TabItem();
             tbi.Content = sp;
-            tbi.Header = Txt.s._[(int)TxI.OP_NEE];
+            tbi.Header = Txt.s._((int)TxI.OP_NEE);
             return tbi;
         }
 

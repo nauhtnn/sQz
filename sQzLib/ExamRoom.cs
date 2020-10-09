@@ -213,7 +213,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                eMsg = Txt.s._((int)TxI.DB_NOK);
                 return true;
             }
             string qry = DBConnect.mkQrySelect("sqz_slot_room", "pw,t1,t2",
@@ -264,7 +264,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                eMsg = Txt.s._((int)TxI.DB_NOK);
                 return null;
             }
             string qry = DBConnect.mkQrySelect("sqz_room", null, null);

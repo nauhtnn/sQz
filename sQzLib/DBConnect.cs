@@ -112,7 +112,7 @@ namespace sQzLib
         {
             if (attbs == null || vals == null)
             {
-                eMsg = Txt.s._[(int)TxI.DB_DAT_NOK];
+                eMsg = Txt.s._((int)TxI.DB_DAT_NOK);
                 return 0;
             }
             StringBuilder qry = new StringBuilder();
@@ -133,7 +133,7 @@ namespace sQzLib
                 }
                 else
                 {
-                    eMsg = Txt.s._[(int)TxI.DB_EXCPT] + e.ToString();
+                    eMsg = Txt.s._((int)TxI.DB_EXCPT) + e.ToString();
                     n = -1;
                 }
             }
@@ -202,7 +202,7 @@ namespace sQzLib
                 else
                 {
                     n = -1;
-                    eMsg = Txt.s._[(int)TxI.DB_COUNT_NOK];
+                    eMsg = Txt.s._((int)TxI.DB_COUNT_NOK);
                 }
             }
             catch (MySqlException e) {
@@ -229,7 +229,7 @@ namespace sQzLib
                 else
                 {
                     n = -1;
-                    eMsg = Txt.s._[(int)TxI.DB_COUNT_NOK];
+                    eMsg = Txt.s._((int)TxI.DB_COUNT_NOK);
                 }
             }
             catch (MySqlException e)
@@ -284,7 +284,7 @@ namespace sQzLib
             }
             catch(MySqlException e) {
                 d = null;
-                eMsg = Txt.s._[(int)TxI.DB_EXCPT] + e.ToString();
+                eMsg = Txt.s._((int)TxI.DB_EXCPT) + e.ToString();
             }
             return d;
         }

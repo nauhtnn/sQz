@@ -77,7 +77,7 @@ namespace sQzLib
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
+                return Txt.s._((int)TxI.DB_NOK);
             string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid,qpkalt",
                 "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
             string eMsg;
@@ -104,7 +104,7 @@ namespace sQzLib
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
+                return Txt.s._((int)TxI.DB_NOK);
             string emsg;
             int n = DBConnect.Update(conn, "sqz_slot_room", "qpkalt=1", "dt='" +
                 mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "' AND rid=" + rid, out emsg);
@@ -153,7 +153,7 @@ namespace sQzLib
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
+                return Txt.s._((int)TxI.DB_NOK);
             string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
                 "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
             string eMsg;
@@ -176,7 +176,7 @@ namespace sQzLib
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
+                return Txt.s._((int)TxI.DB_NOK);
             string emsg;
             int n = DBConnect.Update(conn, "sqz_slot", "stt=" + (int)eStt,
                 "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'",
@@ -272,19 +272,19 @@ namespace sQzLib
             if(0 < dup.Length)
             {
                 dup.Remove(dup.Length - 2, 2);//remove the last comma
-                r.Append("\n" + Txt.s._[(int)TxI.NEE_ID_EXIST]);
+                r.Append("\n" + Txt.s._((int)TxI.NEE_ID_EXIST));
                 r.Append(dup.ToString() + '.');
             }
             if (0 < eline.Length)
             {
                 eline.Remove(eline.Length - 2, 2);//remove the last comma
-                r.Append("\n" + Txt.s._[(int)TxI.NEE_ELINE]);
+                r.Append("\n" + Txt.s._((int)TxI.NEE_ELINE));
                 r.Append(eline.ToString() + '.');
             }
             if (r.Length == 0)
                 return null;
             else
-                return Txt.s._[(int)TxI.NEE_FERR] + r.ToString();
+                return Txt.s._((int)TxI.NEE_FERR) + r.ToString();
         }
 
         public int DBInsNee(out string eMsg)
@@ -292,7 +292,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                eMsg = Txt.s._((int)TxI.DB_NOK);
                 return -1;
             }
             string vch = ExamRoom.PwChars();
@@ -322,8 +322,8 @@ namespace sQzLib
                 n = r.DBIns(conn, out eMsg);
                 if (n < 0)
                 {
-                    sb.AppendFormat(Txt.s._[(int)TxI.ROOM_DB_NOK] + '\n', r.uId + 1,
-                        Txt.s._[(int)TxI.NEE_EXIST]);
+                    sb.AppendFormat(Txt.s._((int)TxI.ROOM_DB_NOK) + '\n', r.uId + 1,
+                        Txt.s._((int)TxI.NEE_EXIST));
                     v = 0;
                 }
             }
@@ -345,32 +345,32 @@ namespace sQzLib
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
+                return Txt.s._((int)TxI.DB_NOK);
             StringBuilder sb = new StringBuilder();
             string eMsg;
             int n = DBConnect.Count(conn, "sqz_nee_qsheet AS a,sqz_examinee AS b",
                 "a.dt", "a.dt='" + mDt.ToString(DT._) +
                 "' AND t='" + mDt.ToString(DT.hh) + "' AND a.dt=b.dt AND a.neeid=b.id",
                 out eMsg);
-            sb.AppendFormat(Txt.s._[(int)TxI.SLOT], mDt.ToString(DT.hh));
+            sb.AppendFormat(Txt.s._((int)TxI.SLOT), mDt.ToString(DT.hh));
             if (0 < n)
             {
-                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_GRD] + '\n');
+                sb.Append(Txt.s._((int)TxI.SLOT_DEL_GRD) + '\n');
                 DBConnect.Close(ref conn);
                 return sb.ToString();
             }
             else if (n < 0)
             {
-                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_ECPT] + eMsg);
+                sb.Append(Txt.s._((int)TxI.SLOT_DEL_ECPT) + eMsg);
                 DBConnect.Close(ref conn);
                 return sb.ToString();
             }
             n = DBConnect.Delete(conn, "sqz_examinee",
                 "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'", out eMsg);
             if (n < 0)
-                sb.Append(Txt.s._[(int)TxI.SLOT_DEL_ECPT] + eMsg);
+                sb.Append(Txt.s._((int)TxI.SLOT_DEL_ECPT) + eMsg);
             else
-                sb.AppendFormat(Txt.s._[(int)TxI.SLOT_DEL_N], n.ToString());
+                sb.AppendFormat(Txt.s._((int)TxI.SLOT_DEL_N), n.ToString());
             DBConnect.Close(ref conn);
             return sb.ToString();
         }
@@ -457,7 +457,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if(conn == null)
             {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                eMsg = Txt.s._((int)TxI.DB_NOK);
                 return true;
             }
             ExamRoom r;

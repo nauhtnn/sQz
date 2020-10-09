@@ -117,7 +117,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                eMsg = Txt.s._((int)TxI.DB_NOK);
                 return true;
             }
             string qry = DBConnect.mkQrySelect("sqz_qsheet",
@@ -151,7 +151,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                eMsg = Txt.s._((int)TxI.DB_NOK);
                 return true;
             }
             eMsg = null;
@@ -281,10 +281,10 @@ namespace sQzLib
         public static string DBIns(DateTime dt, List<QuestSheet> l)
         {
             if (l.Count == 0)
-                return Txt.s._[(int)TxI.DB_DAT_NOK];
+                return Txt.s._((int)TxI.DB_DAT_NOK);
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return Txt.s._[(int)TxI.DB_NOK];
+                return Txt.s._((int)TxI.DB_NOK);
             StringBuilder vals = new StringBuilder();
             string prefx = "('" + dt.ToString(DT._) + "',";
             foreach (QuestSheet qs in l)
@@ -297,7 +297,7 @@ namespace sQzLib
             {
                 DBConnect.Close(ref conn);
                 if (eMsg == null)
-                    eMsg = Txt.s._[(int)TxI.DB_EXCPT] + Txt.s._[(int)TxI.QS_ID_EXISTS];
+                    eMsg = Txt.s._((int)TxI.DB_EXCPT) + Txt.s._((int)TxI.QS_ID_EXISTS);
                 return eMsg;
             }
             vals.Clear();

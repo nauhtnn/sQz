@@ -12,7 +12,14 @@ namespace sQzLib
         List<string> avTxt;
         byte[] mBuf;
         int mSz;
-        public string[] _;
+        public string[] __;
+
+        public string _(int str_idx)
+        {
+            if (__ != null && __.Length > str_idx && __[str_idx] != null)
+                return __[str_idx];
+            return "NO STRING";
+        }
 
         static Txt _s = null;
 
@@ -21,7 +28,7 @@ namespace sQzLib
             avEnum = new List<string>();
             avTxt = new List<string>();
             mBuf = null;
-            _ = null;
+            __ = null;
             mSz = 0;
         }
 		
@@ -102,16 +109,25 @@ namespace sQzLib
 
         public void ReadByte(string fp)
         {
+
+            byte[] mBuf;
+            try
+            {
+                mBuf = System.IO.File.ReadAllBytes(fp);
+            }
+            catch(System.IO.FileNotFoundException)
+            {
+                return;
+            }
             int offs = 0;
-            byte[] mBuf = System.IO.File.ReadAllBytes(fp);
             int n = BitConverter.ToInt32(mBuf, offs);
             offs += 4;
-            _ = new string[n];
+            __ = new string[n];
             for (int i = 0; i < n; ++i)
             {
                 int l = BitConverter.ToInt32(mBuf, offs);
                 offs += 4;
-                _[i] = Encoding.UTF8.GetString(mBuf, offs, l);
+                __[i] = Encoding.UTF8.GetString(mBuf, offs, l);
                 offs += l;
             }
             //int j = -1;

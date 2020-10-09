@@ -57,7 +57,7 @@ namespace sQzLib
         {
             if (code == 10061)
             {
-                cbm += Txt.s._[(int)TxI.CONN_NOK];
+                cbm += Txt.s._((int)TxI.CONN_NOK);
                 return false;
             }
             return true;
@@ -168,7 +168,7 @@ namespace sQzLib
                     bRW = dgBufHndl(recvMsg);
             }
             if (bCbMsg)
-                cbMsg += Txt.s._[(int)TxI.CONN_CLNT_CE];
+                cbMsg += Txt.s._((int)TxI.CONN_CLNT_CE);
             mTcpClnt.Close();
             mTcpClnt = null;
             return !bConn;

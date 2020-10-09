@@ -50,7 +50,7 @@ namespace sQzServer0
             if (DT.To_(tbxBrd.Text, DT._, out dt))
             {
                 spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BOARD_NOK]);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.BOARD_NOK));
                 spMain.Opacity = 1;
             }
             else
@@ -61,7 +61,7 @@ namespace sQzServer0
                 if(0 < eb.DBIns(out msg))
                 {
                     spMain.Opacity = 0.5;
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.BOARD_OK]);
+                    WPopup.s.ShowDialog(Txt.s._((int)TxI.BOARD_OK));
                     spMain.Opacity = 1;
                     LoadBrd();
                     tbxBrd.Text = string.Empty;
@@ -82,7 +82,7 @@ namespace sQzServer0
             if (DT.To_(t, DT.h, out dt))
             {
                 spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_NOK]);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.SLOT_NOK));
                 spMain.Opacity = 1;
             }
             else
@@ -91,7 +91,7 @@ namespace sQzServer0
                 if(0 < mBrd.DBInsSl(dt, out msg))
                 {
                     spMain.Opacity = 0.5;
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_OK]);
+                    WPopup.s.ShowDialog(Txt.s._((int)TxI.SLOT_OK));
                     spMain.Opacity = 1;
                     LoadSl();
                     tbxSl.Text = string.Empty;
@@ -174,7 +174,7 @@ namespace sQzServer0
         {
             List<string> qCatName = new List<string>();
             for (int i = (int)TxI.IU01; i <= (int)TxI.IU15; ++i)
-                qCatName.Add(Txt.s._[i]);
+                qCatName.Add(Txt.s._(i));
             bool dark = true;
             Color c = new Color();
             c.A = 0xff;
@@ -285,7 +285,7 @@ namespace sQzServer0
                 vChk.Add(chk);
             }
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], mDBQS.Count, QuestSheet.DBGetND(mSelQCat));
+            sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, QuestSheet.DBGetND(mSelQCat));
             tbiDBQ.Header = sb.ToString();
         }
 
@@ -329,7 +329,7 @@ namespace sQzServer0
             }
             svwrTmpQ.Content = sp;
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], mTmpQS.Count, mTmpQS.CountD);
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountD);
             tbiTmpQ.Header = sb.ToString();
         }
 
@@ -337,7 +337,7 @@ namespace sQzServer0
         {
             if (mSelQCat == IUx._0)
             {
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.PREP_IU15]);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.PREP_IU15));
                 return;
             }
             if (mTmpQS.Count == 0)
@@ -347,7 +347,7 @@ namespace sQzServer0
             mTmpQS.DBIns(mSelQCat);
             mTmpQS.Clear();
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0, mTmpQS.CountD);
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), 0, mTmpQS.CountD);
             tbiTmpQ.Header = sb.ToString();
             mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
             ShowDBQ();
@@ -367,25 +367,25 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
-            txtDt.Text = t._[(int)TxI.DATE_L];
-            txtHm.Text = t._[(int)TxI.TIME_L];
-            txtIU.Text = t._[(int)TxI.IUS];
-            tbi1.Header = t._[(int)TxI.PREP_NEE];
-            tbi2.Header = t._[(int)TxI.PREP_Q];
-            txtId.Text = t._[(int)TxI.NEEID_S];
-            txtName.Text = t._[(int)TxI.NEE_NAME];
-            txtBirdate.Text = t._[(int)TxI.BIRDATE];
-            txtBirpl.Text = t._[(int)TxI.BIRPL];
-            txtRoom.Text = t._[(int)TxI.ROOM];
-            btnImp.Content = t._[(int)TxI.PREP_IMP];
-            btnDelQ.Content = t._[(int)TxI.PREP_DEL_SEL];
-            btnImpQ.Content = t._[(int)TxI.PREP_IMP];
+            btnMMenu.Content = t._((int)TxI.BACK_MMENU);
+            txtDt.Text = t._((int)TxI.DATE_L);
+            txtHm.Text = t._((int)TxI.TIME_L);
+            txtIU.Text = t._((int)TxI.IUS);
+            tbi1.Header = t._((int)TxI.PREP_NEE);
+            tbi2.Header = t._((int)TxI.PREP_Q);
+            txtId.Text = t._((int)TxI.NEEID_S);
+            txtName.Text = t._((int)TxI.NEE_NAME);
+            txtBirdate.Text = t._((int)TxI.BIRDATE);
+            txtBirpl.Text = t._((int)TxI.BIRPL);
+            txtRoom.Text = t._((int)TxI.ROOM);
+            btnImp.Content = t._((int)TxI.PREP_IMP);
+            btnDelQ.Content = t._((int)TxI.PREP_DEL_SEL);
+            btnImpQ.Content = t._((int)TxI.PREP_IMP);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], 0, QuestSheet.DBGetND(mSelQCat));
+            sb.AppendFormat(Txt.s._((int)TxI.Q_DB), 0, QuestSheet.DBGetND(mSelQCat));
             tbiDBQ.Header = sb.ToString();
             sb.Clear();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0, mTmpQS.CountD);
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), 0, mTmpQS.CountD);
             tbiTmpQ.Header = sb.ToString();
         }
 

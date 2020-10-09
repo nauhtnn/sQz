@@ -30,12 +30,12 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            txtLalgitc.Text = t._[(int)TxI.LALGITC];
-            txtsQz.Text = t._[(int)TxI.SQZ];
-            btnPrep.Content = t._[(int)TxI.PREP];
-            btnOp.Content = t._[(int)TxI.OPER];
-            btnArchv.Content = t._[(int)TxI.ARCH];
-            btnExit.Content = t._[(int)TxI.EXIT];
+            txtLalgitc.Text = t._((int)TxI.LALGITC);
+            txtsQz.Text = t._((int)TxI.SQZ);
+            btnPrep.Content = t._((int)TxI.PREP);
+            btnOp.Content = t._((int)TxI.OPER);
+            btnArchv.Content = t._((int)TxI.ARCH);
+            btnExit.Content = t._((int)TxI.EXIT);
         }
 
         private void btnPrep_Click(object sender, RoutedEventArgs e)
@@ -73,7 +73,7 @@ namespace sQzServer0
             if (conn == null)
             {
                 DisableBtns();
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.DB_NOK]);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.DB_NOK));
                 return;
             }
             string qry = DBConnect.mkQrySelect("sqz_ver", "id", null);
@@ -100,7 +100,7 @@ namespace sQzServer0
                 if (bNVer)
                 {
                     DisableBtns();
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.DB_VER_NOK] +
+                    WPopup.s.ShowDialog(Txt.s._((int)TxI.DB_VER_NOK) +
                         (uVer / 100) + '.' + (uVer % 100 / 10) + '.' + (uVer % 10));
                 }
             }

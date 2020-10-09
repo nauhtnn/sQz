@@ -50,7 +50,7 @@ namespace sQzServer0
             btnDel.Width = 120;
             btnDel.Height = 40;
             btnDel.Margin = new Thickness(0, 10, 0, 10);
-            btnDel.Content = Txt.s._[(int)TxI.PREP_DEL];
+            btnDel.Content = Txt.s._((int)TxI.PREP_DEL);
             if (mSlDB.eStt == ExamStt.Prep)
             {
                 btnDel.IsEnabled = true;
@@ -74,7 +74,7 @@ namespace sQzServer0
             sp.Children.Add(vwr);
             tbiDB = new TabItem();
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_DB], 0);
+            sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_DB), 0);
             tbiDB.Header = sb.ToString();
             tbiDB.Content = sp;
             tbc.Items.Add(tbiDB);
@@ -98,7 +98,7 @@ namespace sQzServer0
             sp.Children.Add(vwr);
             tbiTmp = new TabItem();
             sb.Clear();
-            sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_TMP], 0);
+            sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_TMP), 0);
             tbiTmp.Header = sb.ToString(); ;
             tbiTmp.Content = sp;
             tbc.Items.Add(tbiTmp);
@@ -153,7 +153,7 @@ namespace sQzServer0
                 Grid.SetColumn(b, Grid.GetColumn(btn));
                 if (btn.Name == "btnImp")
                 {
-                    b.Content = Txt.s._[(int)TxI.PREP_IMP];
+                    b.Content = Txt.s._((int)TxI.PREP_IMP);
                     b.Click += btnImp_Click;
                 }
                 else if (btn.Name == "btnFile")
@@ -261,12 +261,12 @@ namespace sQzServer0
             StringBuilder sb = new StringBuilder();
             if(db)
             {
-                sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_DB], n);
+                sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_DB), n);
                 tbiDB.Header = sb.ToString();
             }
             else
             {
-                sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_TMP], n);
+                sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_TMP), n);
                 tbiTmp.Header = sb.ToString();
             }
             g.Children.Clear();
@@ -327,7 +327,7 @@ namespace sQzServer0
             mSlTmp.DelNee();
             grdTmp.Children.Clear();
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_TMP], 0);
+            sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_TMP), 0);
             tbiTmp.Header = sb.ToString();
             mSlDB.DBSelNee();
             Show(true);

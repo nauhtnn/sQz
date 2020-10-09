@@ -284,7 +284,7 @@ namespace sQzServer0
                             mCbMsg += emsg;
                         else if (emsg == null)
                         {
-                            mCbMsg += Txt.s._[(int)TxI.SRVR_DB_OK];
+                            mCbMsg += Txt.s._((int)TxI.SRVR_DB_OK);
                             Dispatcher.InvokeAsync(() =>
                             {
                                 foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
@@ -306,40 +306,40 @@ namespace sQzServer0
         {
             Txt t = Txt.s;
 
-            btnStart.Content = t._[(int)TxI.STRT_SRVR];
-            btnStop.Content = t._[(int)TxI.STOP_SRVR];
-            btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
-            btnQGen.Content = t._[(int)TxI.QS_GEN];
-            btnQSav.Content = t._[(int)TxI.OP_Q_SAV];
+            btnStart.Content = t._((int)TxI.STRT_SRVR);
+            btnStop.Content = t._((int)TxI.STOP_SRVR);
+            btnMMenu.Content = t._((int)TxI.BACK_MMENU);
+            btnQGen.Content = t._((int)TxI.QS_GEN);
+            btnQSav.Content = t._((int)TxI.OP_Q_SAV);
 
-            txtDate.Text = t._[(int)TxI.DATE_L];
-            txtTime.Text = t._[(int)TxI.TIME_L];
+            txtDate.Text = t._((int)TxI.DATE_L);
+            txtTime.Text = t._((int)TxI.TIME_L);
 
-            rdoA.Content = t._[(int)TxI.BASIC];
-            rdoB.Content = t._[(int)TxI.ADVAN];
-            txtMod.Text = t._[(int)TxI.MODULE];
-            txtNEsyDif.Text = t._[(int)TxI.N_ESY_DIF];
-            txtNDiff.Text = t._[(int)TxI.N_DIFF];
-            txtnQs.Text = t._[(int)TxI.QS_N];
-            txtnQ.Text = t._[(int)TxI.Q_N];
-            txtBirdate.Text = t._[(int)TxI.BIRDATE];
-            txtBirpl.Text = t._[(int)TxI.BIRPL];
-            txtName.Text = t._[(int)TxI.NEE_NAME];
-            txtId.Text = t._[(int)TxI.NEEID_S];
-            txtGrade.Text = t._[(int)TxI.MARK];
-            txtRoom.Text = t._[(int)TxI.ROOM];
-            txtT1.Text = t._[(int)TxI.T1];
-            txtT2.Text = t._[(int)TxI.T2];
-            txtComp.Text = t._[(int)TxI.COMP];
+            rdoA.Content = t._((int)TxI.BASIC);
+            rdoB.Content = t._((int)TxI.ADVAN);
+            txtMod.Text = t._((int)TxI.MODULE);
+            txtNEsyDif.Text = t._((int)TxI.N_ESY_DIF);
+            txtNDiff.Text = t._((int)TxI.N_DIFF);
+            txtnQs.Text = t._((int)TxI.QS_N);
+            txtnQ.Text = t._((int)TxI.Q_N);
+            txtBirdate.Text = t._((int)TxI.BIRDATE);
+            txtBirpl.Text = t._((int)TxI.BIRPL);
+            txtName.Text = t._((int)TxI.NEE_NAME);
+            txtId.Text = t._((int)TxI.NEEID_S);
+            txtGrade.Text = t._((int)TxI.MARK);
+            txtRoom.Text = t._((int)TxI.ROOM);
+            txtT1.Text = t._((int)TxI.T1);
+            txtT2.Text = t._((int)TxI.T2);
+            txtComp.Text = t._((int)TxI.COMP);
 
-            txtRId.Text = t._[(int)TxI.ROOM];
-            txtRN.Text = t._[(int)TxI.OP_N_NEE];
-            txtRT1.Text = t._[(int)TxI.T1];
-            txtRT2.Text = t._[(int)TxI.T2];
-            txtRQPack.Text = t._[(int)TxI.OP_Q];
-            txtQPackR0.Text = t._[(int)TxI.OP_PRI];
-            txtQPackR1.Text = t._[(int)TxI.OP_ALT];
-            txtPw.Text = t._[(int)TxI.OP_PW];
+            txtRId.Text = t._((int)TxI.ROOM);
+            txtRN.Text = t._((int)TxI.OP_N_NEE);
+            txtRT1.Text = t._((int)TxI.T1);
+            txtRT2.Text = t._((int)TxI.T2);
+            txtRQPack.Text = t._((int)TxI.OP_Q);
+            txtQPackR0.Text = t._((int)TxI.OP_PRI);
+            txtQPackR1.Text = t._((int)TxI.OP_ALT);
+            txtPw.Text = t._((int)TxI.OP_PW);
         }
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)

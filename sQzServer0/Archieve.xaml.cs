@@ -141,31 +141,31 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
-            rdoA.Content = t._[(int)TxI.BASIC];
-            rdoB.Content = t._[(int)TxI.ADVAN];
-            txtMod.Text = t._[(int)TxI.MODULE];
-            txtNEsyDif.Text = t._[(int)TxI.N_ESY_DIF];
-            txtNDiff.Text = t._[(int)TxI.N_DIFF];
-            txtnQs.Text = t._[(int)TxI.QS_N];
-            txtnQ.Text = t._[(int)TxI.Q_N];
-            txtBirdate.Text = t._[(int)TxI.BIRDATE];
-            txtBirpl.Text = t._[(int)TxI.BIRPL];
-            txtName.Text = t._[(int)TxI.NEE_NAME];
-            txtId.Text = t._[(int)TxI.NEEID_S];
-            txtGrade.Text = t._[(int)TxI.MARK];
-            txtRoom.Text = t._[(int)TxI.ROOM];
-            txtT1.Text = t._[(int)TxI.T1];
-            txtT2.Text = t._[(int)TxI.T2];
-            txtComp.Text = t._[(int)TxI.COMP];
+            btnMMenu.Content = t._((int)TxI.BACK_MMENU);
+            rdoA.Content = t._((int)TxI.BASIC);
+            rdoB.Content = t._((int)TxI.ADVAN);
+            txtMod.Text = t._((int)TxI.MODULE);
+            txtNEsyDif.Text = t._((int)TxI.N_ESY_DIF);
+            txtNDiff.Text = t._((int)TxI.N_DIFF);
+            txtnQs.Text = t._((int)TxI.QS_N);
+            txtnQ.Text = t._((int)TxI.Q_N);
+            txtBirdate.Text = t._((int)TxI.BIRDATE);
+            txtBirpl.Text = t._((int)TxI.BIRPL);
+            txtName.Text = t._((int)TxI.NEE_NAME);
+            txtId.Text = t._((int)TxI.NEEID_S);
+            txtGrade.Text = t._((int)TxI.MARK);
+            txtRoom.Text = t._((int)TxI.ROOM);
+            txtT1.Text = t._((int)TxI.T1);
+            txtT2.Text = t._((int)TxI.T2);
+            txtComp.Text = t._((int)TxI.COMP);
 
-            txtRId.Text = t._[(int)TxI.ROOM];
-            txtRN.Text = t._[(int)TxI.OP_N_NEE];
-            txtRT1.Text = t._[(int)TxI.T1];
-            txtRT2.Text = t._[(int)TxI.T2];
-            txtRQPack.Text = t._[(int)TxI.OP_Q];
-            txtQPackR0.Text = t._[(int)TxI.OP_PRI];
-            txtQPackR1.Text = t._[(int)TxI.OP_ALT];
+            txtRId.Text = t._((int)TxI.ROOM);
+            txtRN.Text = t._((int)TxI.OP_N_NEE);
+            txtRT1.Text = t._((int)TxI.T1);
+            txtRT2.Text = t._((int)TxI.T2);
+            txtRQPack.Text = t._((int)TxI.OP_Q);
+            txtQPackR0.Text = t._((int)TxI.OP_PRI);
+            txtQPackR1.Text = t._((int)TxI.OP_ALT);
         }
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -385,10 +385,10 @@ namespace sQzServer0
             nee.DBSelGrade();
             StackPanel spl = new StackPanel();
             TextBlock tx = new TextBlock();
-            tx.Text = Txt.s._[(int)TxI.QS_ID] + ' ' + qs.tId + ", ";
+            tx.Text = Txt.s._((int)TxI.QS_ID) + ' ' + qs.tId + ", ";
             spl.Children.Add(tx);
             tx = new TextBlock();
-            tx.Text = Txt.s._[(int)TxI.MARK] + ' ' + nee.Grade;
+            tx.Text = Txt.s._((int)TxI.MARK) + ' ' + nee.Grade;
             spl.Children.Add(tx);
             ScrollViewer svwr = new ScrollViewer();
             svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;

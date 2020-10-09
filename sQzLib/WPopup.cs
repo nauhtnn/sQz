@@ -32,7 +32,7 @@ namespace sQzLib
         {
             isClose = false;
             mW = new Window();
-            mW.Title = Txt.s._[(int)TxI.POPUP_TIT];
+            mW.Title = Txt.s._((int)TxI.POPUP_TIT);
             mW.Closing += wPopup_Closing;
             mW.WindowStartupLocation = WindowStartupLocation.CenterScreen;
             mW.ResizeMode = ResizeMode.NoResize;

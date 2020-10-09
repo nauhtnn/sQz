@@ -396,7 +396,7 @@ namespace sQzLib
 			MySqlConnection conn = DBConnect.Init();
             if (conn == null)
 			{
-				eMsg = Txt.s._[(int)TxI.DB_NOK];
+				eMsg = Txt.s._((int)TxI.DB_NOK);
                 return null;
 			}
             IUx[] ius = new IUx[GetIUs(ExamLv.A).Count() + GetIUs(ExamLv.B).Count()];
@@ -473,7 +473,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
-                eMsg = Txt.s._[(int)TxI.DB_NOK];
+                eMsg = Txt.s._((int)TxI.DB_NOK);
                 return true;
             }
             //randomize
