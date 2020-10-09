@@ -1,0 +1,16 @@
+
+.vs/
+ConsoleUtils/bin/
+ConsoleUtils/obj/
+sQzClient/bin/
+sQzClient/obj/
+sQzLib/bin/
+sQzLib/obj/
+sQzServer0/bin/
+sQzServer0/obj/
+sQzServer0_print/obj/
+sQzServer0_print/obj/
+sQzServer1/bin/
+sQzServer1/obj/
+sQzStandalone/bin/
+sQzStandalone/obj/
