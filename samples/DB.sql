@@ -17,6 +17,7 @@ FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATETIME,
 `id` SMALLINT UNSIGNED,
+PRIMARY KEY(`dt`, `id`),
 FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`));
 
 CREATE TABLE IF NOT EXISTS `sqz_examinee`(`dt` DATETIME,
@@ -28,8 +29,8 @@ CREATE TABLE IF NOT EXISTS `sqz_examinee`(`dt` DATETIME,
 `comp` VARCHAR(32),
 `ans` VARCHAR(1024),
 PRIMARY KEY(`dt`, `id`),
-FOREIGN KEY(`dt`, `rid`) REFERENCES `sqz_slot_room`(`dt`, `rid`));
---FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
+FOREIGN KEY(`dt`, `rid`) REFERENCES `sqz_slot_room`(`dt`, `rid`),
+FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_passage`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `psg` TEXT);
@@ -39,8 +40,8 @@ CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED PRIMARY KEY,
 `stmt` TEXT CHARACTER SET `utf8mb4`,
 `ans0` TEXT CHARACTER SET `utf8mb4`, `ans1` TEXT CHARACTER SET `utf8mb4`,
 `ans2` TEXT CHARACTER SET `utf8mb4`, `ans3` TEXT CHARACTER SET `utf8mb4`,
-`akey` CHAR(4) CHARACTER SET `ascii`);
---FOREIGN KEY `pid` REFERENCES `sqz_passage`(`id`));
+`akey` CHAR(4) CHARACTER SET `ascii`,
+FOREIGN KEY(`pid`) REFERENCES `sqz_passage`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATETIME,
 `qsid` SMALLINT UNSIGNED, `qid` INT UNSIGNED, `asort` CHAR(4) CHARACTER SET `ascii`,
