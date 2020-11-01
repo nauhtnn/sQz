@@ -21,7 +21,7 @@ namespace sQzServer0
     /// </summary>
     public partial class MainMenu : Page
     {
-        int uVer = 9;
+        int uVer = 100;
         public MainMenu()
         {
             InitializeComponent();
@@ -76,7 +76,7 @@ namespace sQzServer0
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.DB_NOK));
                 return;
             }
-            string qry = DBConnect.mkQrySelect("sqz_ver", "id", null);
+            string qry = DBConnect.mkQrySelect("sqz_version", "ver", null);
             string emsg;
             MySql.Data.MySqlClient.MySqlDataReader reader =
                 DBConnect.exeQrySelect(conn, qry, out emsg);

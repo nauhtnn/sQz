@@ -1,5 +1,5 @@
 -- database name = sqz[port][version]
-CREATE TABLE IF NOT EXISTS `sqz_version`(`id` INT UNSIGNED);
+CREATE TABLE IF NOT EXISTS `sqz_version`(`ver` INT UNSIGNED);
 INSERT INTO `sqz_version` VALUES (100);
 
 CREATE TABLE IF NOT EXISTS `sqz_slot`(`dt` DATETIME, `open` TINYINT,
