@@ -15,6 +15,7 @@ namespace sQzLib
         static string uid = null;
         static string password = null;
         public const int PRI_KEY_EXISTS = -1062;
+        private const string DB_CONF_FILE = "Database.txt";
         //static bool bConnected;
 
         //Constructor
@@ -25,17 +26,15 @@ namespace sQzLib
         {
             if (server == null)
             {
-                string s = Utils.ReadFile("Database.txt");
-                if (s != null)
+                string[] conf = null;
+                if (System.IO.File.Exists(DB_CONF_FILE))
+                    conf = System.IO.File.ReadAllLines(DB_CONF_FILE);
+                if (conf.Length == 4)
                 {
-                    string[] vs = s.Split('\n');
-                    if(vs.Length == 4)
-                    {
-                        server = vs[0];
-                        database = vs[1];
-                        uid = vs[2];
-                        password = vs[3];
-                    }
+                    server = conf[0];
+                    database = conf[1];
+                    uid = conf[2];
+                    password = conf[3];
                 }
                 if (server == null)
                 {
