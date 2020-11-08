@@ -62,6 +62,8 @@
     <Compile Include="ExamineeS1.cs" />
     <Compile Include="ExamRoom.cs" />
     <Compile Include="ExamSlot.cs" />
+    <Compile Include="PlainTextQuestParser.cs" />
+    <Compile Include="QuestParser.cs" />
     <Compile Include="QuestSheetDocxPrinter.cs" />
     <Compile Include="QuestPack.cs" />
     <Compile Include="QuestSheet.cs" />

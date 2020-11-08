@@ -8,35 +8,38 @@ namespace sQzLib
 {
     public class PlainTextQueue
     {
-		public Queue<string> GetTextQueue(string filePath)
+		public static Queue<string> GetTextQueue(string filePath)
 		{
 			Queue<string> lines = ReadTrimLines(filePath);
             Queue<string> tokens = new Queue<string>();
 			while(lines.Count > 0)
 			{
-				if(lines[0].First() != '{')
-					tokens.add(lines.pop(0));
-				else if(lines[0].charAt(lines[0].Length - 1) == '}')
-					tokens.add(lines.pop(0).Substring(1, lines[0].Length - 1));
+                if (lines.Peek().ElementAt(0) != '{')
+                    tokens.Enqueue(lines.Dequeue());
+                else if (lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
+                {
+                    string s = lines.Dequeue();
+                    tokens.Enqueue(s.Substring(1, s.Length - 1));
+                }
 				else
-					tokens.add(CreateTokenFromLines(lines));
+					tokens.Enqueue(AppendLines(lines));
 			}
 			return tokens;
 		}
 		
-		string CreateTokenFromLines(List<string> lines)
+		static string AppendLines(Queue<string> lines)
 		{
 			StringBuilder token = new StringBuilder();
-			token.append(lines.pop(0).Substring(1));
-			while(!lines.IsEmpty())
+			token.Append(lines.Dequeue().Substring(1));
+			while(lines.Count > 0)
 			{
-				if(lines[0].charAt(lines[0].Length) == '}')
+				if(lines.Peek().ElementAt(lines.Peek().Length) == '}')
 				{
-					token.append(lines.pop(0).Substring(-1));
+					token.Append(lines.Dequeue().Substring(-1));
 					break;
 				}
 				else
-					token.append(lines.pop(0));
+					token.Append(lines.Dequeue());
 			}
 			return token.ToString();
 		}
@@ -57,7 +60,7 @@ namespace sQzLib
 			{
 				string s;
 				if (0 < (s = Utils.CleanSpace(line)).Length)
-					lines.Add(s);
+					lines.Enqueue(s);
 			}
 			return lines;
 		}

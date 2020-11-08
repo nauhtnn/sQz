@@ -292,25 +292,16 @@ namespace sQzLib
         }
 
         //only Prep0 uses this.
-        public void ReadTxt(string fpath)
+        public void ReadTxt(string filePath)
         {
             vQuest.Clear();
-            string buf = Utils.ReadFile(fpath);
-            if (buf == null)
-                return;
-            Question.StartRead(Utils.Split(buf, '\n'), null);
-            Question q = new Question();
-            while (!q.Read())
-            {
-                vQuest.Add(q);
-                q = new Question();
-            }
+            QuestParser p = new PlainTextQuestParser();
+            vQuest = p.ParseLines(PlainTextQueue.GetTextQueue(filePath));
         }
 
         public void ReadDocx(string fpath)
         {
             vQuest.Clear();
-            Question.StartRead(Utils.ReadDocx(fpath), null);
             Question q = new Question();
             while (!q.Read())
             {
