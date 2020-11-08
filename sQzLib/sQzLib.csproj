@@ -30,9 +30,8 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="DocumentFormat.OpenXml, Version=2.11.3.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
+    <Reference Include="DocumentFormat.OpenXml">
       <HintPath>..\WpfApplication1\packages\DocumentFormat.OpenXml.2.11.3\lib\net40\DocumentFormat.OpenXml.dll</HintPath>
-      <Private>True</Private>
     </Reference>
     <Reference Include="MySql.Data, Version=8.0.22.0, Culture=neutral, PublicKeyToken=c5687fc88969c44d, processorArchitecture=MSIL" />
     <Reference Include="PresentationCore" />
@@ -63,6 +62,7 @@
     <Compile Include="ExamRoom.cs" />
     <Compile Include="ExamSlot.cs" />
     <Compile Include="PlainTextQuestParser.cs" />
+    <Compile Include="QSheetSections.cs" />
     <Compile Include="QuestParser.cs" />
     <Compile Include="QuestSheetDocxPrinter.cs" />
     <Compile Include="QuestPack.cs" />

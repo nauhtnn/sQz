@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    interface QuestParser<T>
+    public abstract class QuestParser<T>
     {
-        Queue<Question> ParseLines(Queue<T> lines);
+        public QSheetSections SheetSections = new QSheetSections();
+        public abstract Queue<Question> ParseLines(Queue<T> lines);
     }
 }
