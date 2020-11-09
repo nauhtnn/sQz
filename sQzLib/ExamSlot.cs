@@ -199,10 +199,7 @@ namespace sQzLib
 
         public string ReadF(string fp, ref ExamSlot o)
         {
-            string buf = Utils.ReadFile(fp);
-            if (buf == null)
-                return null;
-            string[] vs = buf.Split('\n');
+            string[] vs = System.IO.File.ReadAllLines(fp);
             StringBuilder eline = new StringBuilder();
             StringBuilder dup = new StringBuilder();
             int i = 0;
@@ -497,18 +494,18 @@ namespace sQzLib
             QuestSheet.DBUpdateCurQSId(mDt);
             foreach (QuestSheet qs in vQPack[lv].vSheet.Values)
                 mKeyPack.vSheet.Remove(qs.LvId);
-            List<QuestSheet> l;
+            List<QuestSheet> sheets;
             if(System.IO.File.Exists("Randomize.txt"))
             {
-                l = vQPack[lv].GenQPack2(n, vn, vndiff);
-                l.InsertRange(l.Count, vQPackAlt[lv].GenQPack2(n, vn, vndiff));
+                sheets = vQPack[lv].GenQPack2(n, vn, vndiff);
+                sheets.InsertRange(sheets.Count, vQPackAlt[lv].GenQPack2(n, vn, vndiff));
             }
             else
             {
-                l = vQPack[lv].GenQPack3(n, vn, vndiff);
-                l.InsertRange(l.Count, vQPackAlt[lv].GenQPack3(n, vn, vndiff));
+                sheets = vQPack[lv].GenQPack3(n, vn, vndiff);
+                sheets.InsertRange(sheets.Count, vQPackAlt[lv].GenQPack3(n, vn, vndiff));
             }
-            mKeyPack.ExtractKey(l);
+            mKeyPack.ExtractKey(sheets);
             return false;
         }
 

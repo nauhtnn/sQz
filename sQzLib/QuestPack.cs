@@ -172,13 +172,13 @@ namespace sQzLib
             return false;
         }
 
-        public List<QuestSheet> GenQPack2(int n, int[] vn, int[] vndiff)
+        public List<QuestSheet> GenQPack2(int numberOfSheet, int[] nQuestGroupByModule, int[] nDiffQuestGroupByModule)
         {
-            List<QuestSheet> l = new List<QuestSheet>();
+            List<QuestSheet> sheets = new List<QuestSheet>();
             int i;
-            for (i = 0; i < n; ++i)
-                l.Add(new QuestSheet());
-            foreach (QuestSheet qs in l)
+            for (i = 0; i < numberOfSheet; ++i)
+                sheets.Add(new QuestSheet());
+            foreach (QuestSheet qs in sheets)
                 qs.bAlt = bAlt;
             i = 0;
             Random rand = new Random();
@@ -189,10 +189,10 @@ namespace sQzLib
                 //qs0.bAlt = bAlt;
                 qs0.DBSelect(iu, QuestDiff.Easy);
                 //
-                foreach (QuestSheet qs in l)
+                foreach (QuestSheet qs in sheets)
                 {
                     List<Question> vq = qs0.ShallowCopy();
-                    int ni = vn[i] - vndiff[i];
+                    int ni = nQuestGroupByModule[i] - nDiffQuestGroupByModule[i];
                     while (0 < ni)
                     {
                         int idx = rand.Next() % ni;
@@ -206,10 +206,10 @@ namespace sQzLib
                 //qs0.bAlt = bAlt;
                 qs0.DBSelect(iu, QuestDiff.Diff);
                 //
-                foreach (QuestSheet qs in l)
+                foreach (QuestSheet qs in sheets)
                 {
                     List<Question> vq = qs0.ShallowCopy();
-                    int ni = vndiff[i];
+                    int ni = nDiffQuestGroupByModule[i];
                     while (0 < ni)
                     {
                         int idx = rand.Next() % ni;
@@ -223,7 +223,7 @@ namespace sQzLib
             }
             List<int> eidx = new List<int>();
             i = -1;
-            foreach (QuestSheet qs in l)
+            foreach (QuestSheet qs in sheets)
             {
                 qs.eLv = eLv;
                 qs.Randomize(rand);
@@ -233,48 +233,48 @@ namespace sQzLib
                     eidx.Add(++i);
             }
             foreach (int idx in eidx)
-                l.RemoveAt(idx);
+                sheets.RemoveAt(idx);
 
-            if (DBIns(mDt, l) == null)
-                return l;
+            if (DBIns(mDt, sheets) == null)
+                return sheets;
             return new List<QuestSheet>();
         }
 
-        public List<QuestSheet> GenQPack3(int n, int[] vn, int[] vndiff)
+        public List<QuestSheet> GenQPack3(int numberOfSheet, int[] nQuestGroupByModule, int[] nDiffQuestGroupByModule)
         {
             string emsg;
             Random rand = new Random();
-            List<QuestSheet> l = new List<QuestSheet>();
-            QuestSheet qs0 = new QuestSheet();
-            qs0.bAlt = bAlt;
+            List<QuestSheet> sheets = new List<QuestSheet>();
+            QuestSheet questInDBGroupByModuleAndDiff = new QuestSheet();
+            questInDBGroupByModuleAndDiff.bAlt = bAlt;
             int j = -1;
-            foreach (IUx i in QuestSheet.GetIUs(eLv))
+            foreach (IUx module in QuestSheet.GetIUs(eLv))
             {
                 ++j;
-                if (qs0.DBSelect(rand, i, vn[j] - vndiff[j], QuestDiff.Easy, out emsg))
+                if (questInDBGroupByModuleAndDiff.DBSelect(rand, module, nQuestGroupByModule[j] - nDiffQuestGroupByModule[j], QuestDiff.Easy, out emsg))
                 {
                     WPopup.s.ShowDialog(emsg);
                     return new List<QuestSheet>();
                 }
-                if (qs0.DBSelect(rand, i, vndiff[j], QuestDiff.Diff, out emsg))
+                if (questInDBGroupByModuleAndDiff.DBSelect(rand, module, nDiffQuestGroupByModule[j], QuestDiff.Diff, out emsg))
                 {
                     WPopup.s.ShowDialog(emsg);
                     return new List<QuestSheet>();
                 }
             }
-            while (0 < n)
+            while (0 < numberOfSheet)
             {
-                --n;
-                QuestSheet qs = qs0.RandomizeDeepCopy(rand);
+                --numberOfSheet;
+                QuestSheet qs = questInDBGroupByModuleAndDiff.RandomizeDeepCopy(rand);
                 qs.eLv = eLv;
                 if (!qs.UpdateCurQSId())//todo: better error handle
                 {
                     vSheet.Add(qs.uId, qs);
-                    l.Add(qs);
+                    sheets.Add(qs);
                 }
             }
-            if (DBIns(mDt, l) == null)
-                return l;
+            if (DBIns(mDt, sheets) == null)
+                return sheets;
             return new List<QuestSheet>();
         }
 

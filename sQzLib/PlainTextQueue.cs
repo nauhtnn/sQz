@@ -73,12 +73,12 @@ namespace sQzLib
             {
                 doc = WordprocessingDocument.Open(fpath, false);
             }
-            catch(OpenXmlPackageException err)
+            catch(OpenXmlPackageException)
             {
                 //messagebox(err);
                 return lines;
             }
-            catch (System.IO.IOException err)
+            catch (System.IO.IOException)
             {
 				//messagebox(err);
                 return lines;

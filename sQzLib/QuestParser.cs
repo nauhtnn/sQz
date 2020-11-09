@@ -8,7 +8,6 @@ namespace sQzLib
 {
     public abstract class QuestParser<T>
     {
-        public QSheetSections SheetSections = new QSheetSections();
         public abstract Queue<Question> ParseLines(Queue<T> lines);
     }
 }

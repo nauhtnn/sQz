@@ -18,8 +18,6 @@ namespace sQzLib
         public bool[] vKeys;
         public int[] vAnsSort;
         public bool bDiff;
-        static string[] svToken;
-        static int siToken;
         //static string[] vSTMT_PATT = { "[a-zA-Z]+[0-9]+", "[0-9]+\\." };
         static string[] vSTMT_PATT = { "[0-9]+\\." };
         static string[] vANS_PATT = { "\\([a-zA-Z]\\)", "[a-zA-Z]\\." };
@@ -58,11 +56,6 @@ namespace sQzLib
         //        return false;
         //    }
         //}
-
-        public static void Clear()
-        {
-            siToken = 0;//safe to be 0
-        }
 
         public static void DBDelete(IUx eIU, string ids) {
             MySqlConnection conn = DBConnect.Init();

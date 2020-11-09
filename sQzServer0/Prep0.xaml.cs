@@ -227,10 +227,7 @@ namespace sQzServer0
                 fpath = dlg.FileName;
             else
                 return;
-            if (fpath.EndsWith(".docx"))
-                mTmpQS.ReadDocx(fpath);
-            else
-                mTmpQS.ReadTxt(fpath);
+            mTmpQS.LoadFromFile(fpath);
             ShowTmpQ();
         }
 

@@ -29,7 +29,7 @@ namespace sQzLib
                 string[] conf = null;
                 if (System.IO.File.Exists(DB_CONF_FILE))
                     conf = System.IO.File.ReadAllLines(DB_CONF_FILE);
-                if (conf.Length == 4)
+                if (conf != null && conf.Length == 4)
                 {
                     server = conf[0];
                     database = conf[1];

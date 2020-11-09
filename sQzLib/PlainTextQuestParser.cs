@@ -6,77 +6,117 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    class PlainTextQuestParser<T> : QuestParser<T>
+    class PlainTextQuestParser
     {
-        override public Queue<Question> ParseLines(Queue<T> lines)
+        public Tuple<List<Question>, List<PassageQuestion>> ParseLines(Queue<string> lines)
         {
-            Type listType = typeof(T);
-            if (listType == typeof(string))
-            {
-                System.Windows.MessageBox.Show("Cannot parse question file: Plain text only!");
-                return new Queue<Question>();
-            }
             string[] plainTexts = lines.Cast<string>().ToArray();
-            Queue<Question> questions = new Queue<Question>();
-            for(int i = 0; i < plainTexts.Length;)
+            List<Question> singleQuestions = new List<Question>();
+            List<PassageQuestion> passageQuestions = new List<PassageQuestion>();
+            for(int index = 0; index < plainTexts.Length;)
             {
-                string sectionHeader = ParseSectionHeader(plainTexts[i]);
+                string sectionHeader = ParsePassage(plainTexts[index]);
                 if(sectionHeader != null)
-                    SheetSections.AddSection(i++, sectionHeader);
-                if (i + Question.N_ANS > plainTexts.Length)
                 {
-                    System.Windows.MessageBox.Show("Line " + i + " doesn't have 1 stem 4 options! Only " + questions.Count + " are read.");
-                    return questions;
+                    passageQuestions = ParsePassageQuestion(plainTexts, ref index);
+                    break;
                 }
-
-                Question q = new Question();
-                q.Stmt = plainTexts[i++];
-                q.vAns = new string[Question.N_ANS];
-                for (int j = 0; j < Question.N_ANS;)
-                    q.vAns[j++] = plainTexts[i++];
-                q.vKeys = new bool[Question.N_ANS];
-                for (int j = 0; j < Question.N_ANS; ++j)
-                    q.vKeys[i] = false;
-                if (q.tStmt[0] == '*' && 1 < q.tStmt.Length)
+                Question question = Parse1Question(plainTexts, ref index);
+                if(question == null)
                 {
-                    q.bDiff = true;
-                    q.tStmt = q.tStmt.Substring(1);
+                    System.Windows.MessageBox.Show("Only " + singleQuestions.Count + " are read.");
+                    break;
                 }
-                else if (q.tStmt[0] == '\\' && 1 < q.tStmt.Length
-                    && (q.tStmt[1] == '*' || q.tStmt[1] == '\\'))
-                    q.tStmt = q.tStmt.Substring(1);
-                int nKey = 0;
-                for (int j = 0; j < Question.N_ANS; ++j)
-                {
-                    if (q.vAns[j][0] == '\\' && 1 < q.vAns[j].Length)
-                    {
-                        if (q.vAns[j][1] != '\\')
-                        {
-                            q.vKeys[j] = true;
-                            q.vAns[j] = Utils.CleanFront(q.vAns[j].Substring(1));
-                            ++nKey;
-                        }
-                        else
-                            q.vAns[j] = q.vAns[j].Substring(1);
-                    }
-                }
-                if (nKey != 1)
-                {
-                    System.Windows.MessageBox.Show("Line " + i + " has " + nKey + " key! Only " + questions.Count + " are read.");
-                    return questions;
-                }
+                singleQuestions.Add(question);
             }
-            return questions;
+            return new Tuple<List<Question>, List<PassageQuestion>>(singleQuestions, passageQuestions);
         }
 
-        string ParseSectionHeader(string line)
+        List<PassageQuestion> ParsePassageQuestion(string[] plainTexts, ref int index)
         {
-            if(line.IndexOf(QSheetSections.SECTION_HEADER) == 0)
+            List<PassageQuestion> passageQuestions = new List<PassageQuestion>();
+            PassageQuestion passageQuestion = null;
+            while(index < plainTexts.Length)
             {
-                if (line.Length > QSheetSections.SECTION_HEADER.Length)
-                    return Utils.CleanFront(line.Substring(QSheetSections.SECTION_HEADER.Length - 1));
-                else
+                string passage = ParsePassage(plainTexts[index]);
+                if (passage != null)
+                {
+                    if (passageQuestion != null)
+                        passageQuestions.Add(passageQuestion);
+                    passageQuestion = new PassageQuestion();
+                    passageQuestion.Passage = passage;
+                }
+                Question question = Parse1Question(plainTexts, ref index);
+                if (question == null)
+                {
+                    System.Windows.MessageBox.Show("Only " + passageQuestions.Count + " are read.");
+                    break;
+                }
+                passageQuestion.Questions.Add(question);
+            }
+            return passageQuestions;
+        }
+
+        Question Parse1Question(string[] plainTexts, ref int index)
+        {
+            if (index + Question.N_ANS > plainTexts.Length)
+            {
+                System.Windows.MessageBox.Show("Line " + index + " doesn't have 1 stem 4 options!");
+                return null;
+            }
+
+            Question question = new Question();
+            question.Stmt = plainTexts[index++];
+            question.vAns = new string[Question.N_ANS];
+            for (int j = 0; j < Question.N_ANS;)
+                question.vAns[j++] = plainTexts[index++];
+            question.vKeys = new bool[Question.N_ANS];
+            for (int j = 0; j < Question.N_ANS; ++j)
+                question.vKeys[index] = false;
+            if (question.tStmt[0] == '*' && 1 < question.tStmt.Length)
+            {
+                question.bDiff = true;
+                question.tStmt = question.tStmt.Substring(1);
+            }
+            else if (question.tStmt[0] == '\\' && 1 < question.tStmt.Length
+                && (question.tStmt[1] == '*' || question.tStmt[1] == '\\'))
+                question.tStmt = question.tStmt.Substring(1);
+            int nKey = 0;
+            for (int j = 0; j < Question.N_ANS; ++j)
+            {
+                if (question.vAns[j][0] == '\\' && 1 < question.vAns[j].Length)
+                {
+                    if (question.vAns[j][1] != '\\')
+                    {
+                        question.vKeys[j] = true;
+                        question.vAns[j] = Utils.CleanFront(question.vAns[j].Substring(1));
+                        ++nKey;
+                    }
+                    else
+                        question.vAns[j] = question.vAns[j].Substring(1);
+                }
+            }
+            if (nKey != 1)
+            {
+                System.Windows.MessageBox.Show("Line " + index + " has " + nKey + " key!");
+                return null;
+            }
+            return question;
+        }
+
+        string ParsePassage(string line)
+        {
+            if(line.IndexOf(PassageQuestion.MAGIC_WORD) == 0)
+            {
+                string s = string.Empty;
+                if (line.Length > PassageQuestion.MAGIC_WORD.Length)
+                    s = Utils.CleanFront(line.Substring(PassageQuestion.MAGIC_WORD.Length - 1));
+                if(s.Length == 0)
+                {
+                    System.Windows.MessageBox.Show("Passage is empty!");
                     return string.Empty;
+                }
+                return s;
             }
             return null;
         }

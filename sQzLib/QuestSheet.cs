@@ -17,6 +17,7 @@ namespace sQzLib
         public string tId { get { return eLv.ToString() + uId.ToString("d3"); } }
         public bool bAlt;
         List<Question> vQuest;
+        List<PassageQuestion> PassageQuestions;
         public byte[] aQuest;
         public int Count { get { return vQuest.Count; } }
         public int CountD
@@ -292,22 +293,13 @@ namespace sQzLib
         }
 
         //only Prep0 uses this.
-        public void ReadTxt(string filePath)
+        public void LoadFromFile(string filePath)
         {
             vQuest.Clear();
-            QuestParser p = new PlainTextQuestParser();
-            vQuest = p.ParseLines(PlainTextQueue.GetTextQueue(filePath));
-        }
-
-        public void ReadDocx(string fpath)
-        {
-            vQuest.Clear();
-            Question q = new Question();
-            while (!q.Read())
-            {
-                vQuest.Add(q);
-                q = new Question();
-            }
+            PlainTextQuestParser p = new PlainTextQuestParser();
+            Tuple<List<Question>, List<PassageQuestion>> tuple = p.ParseLines(PlainTextQueue.GetTextQueue(filePath));
+            vQuest = tuple.Item1;
+            PassageQuestions = tuple.Item2;
         }
 
         public void WriteTxt(string fpath)
