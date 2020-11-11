@@ -27,7 +27,6 @@ namespace sQzServer0
         IUx mSelQCat;
         QuestSheet mDBQS;
         QuestSheet mTmpQS;
-        ExamBoard mBrd;
 
         public Prep0()
         {
@@ -35,7 +34,6 @@ namespace sQzServer0
             mSelQCat = IUx._0;
             mDBQS = new QuestSheet();
             mTmpQS = new QuestSheet();
-            mBrd = new ExamBoard();
             vChk = new List<CheckBox>();
         }
 
@@ -44,10 +42,10 @@ namespace sQzServer0
             NavigationService.Navigate(new Uri("MainMenu.xaml", UriKind.Relative));
         }
 
-        private void btnInsBrd_Click(object sender, RoutedEventArgs e)
+        private void InsertSlot(object sender, RoutedEventArgs e)
         {
             DateTime dt;
-            if (DT.To_(tbxBrd.Text, DT._, out dt))
+            if (DT.To_(newSlot.Text, DT.H, out dt))
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.BOARD_NOK));
@@ -55,16 +53,16 @@ namespace sQzServer0
             }
             else
             {
-                ExamBoard eb = new ExamBoard();
-                eb.mDt = dt;
+                ExamSlot slot = new ExamSlot();
+                slot.mDt = dt;
                 string msg;
-                if(0 < eb.DBIns(out msg))
+                if(0 < slot.InsertSlot(out msg))
                 {
                     spMain.Opacity = 0.5;
                     WPopup.s.ShowDialog(Txt.s._((int)TxI.BOARD_OK));
                     spMain.Opacity = 1;
-                    LoadBrd();
-                    tbxBrd.Text = string.Empty;
+                    LoadSlotView();
+                    newSlot.Text = string.Empty;
                 }
                 else
                 {
@@ -75,40 +73,10 @@ namespace sQzServer0
             }
         }
 
-        private void btnInsSl_Click(object sender, RoutedEventArgs e)
-        {
-            DateTime dt;
-            string t = tbxSl.Text;
-            if (DT.To_(t, DT.h, out dt))
-            {
-                spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._((int)TxI.SLOT_NOK));
-                spMain.Opacity = 1;
-            }
-            else
-            {
-                string msg;
-                if(0 < mBrd.DBInsSl(dt, out msg))
-                {
-                    spMain.Opacity = 0.5;
-                    WPopup.s.ShowDialog(Txt.s._((int)TxI.SLOT_OK));
-                    spMain.Opacity = 1;
-                    LoadSl();
-                    tbxSl.Text = string.Empty;
-                }
-                else
-                {
-                    spMain.Opacity = 0.5;
-                    WPopup.s.ShowDialog(msg);
-                    spMain.Opacity = 1;
-                }
-            }
-        }
-
-        private void LoadBrd()
+        private void LoadSlotView()
         {
             string emsg;
-            List<DateTime> v = ExamBoard.DBSel(out emsg);
+            List<DateTime> v = ExamSlot.DBSelectSlots(false, out emsg);
             if(v == null)
             {
                 spMain.Opacity = 0.5;
@@ -116,41 +84,14 @@ namespace sQzServer0
                 spMain.Opacity = 1;
                 return;
             }
-            lbxBrd.Items.Clear();
-            foreach(DateTime dt in v)
-            {
-                ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT.__);
-                lbxBrd.Items.Add(it);
-            }
-        }
-
-        private void LoadSl()
-        {
-            string emsg;
-            List<DateTime> v = mBrd.DBSelSl(false, out emsg);
-            if(v == null)
-            {
-                spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(emsg);
-                spMain.Opacity = 1;
-                return;
-            }
-            //bool dark = true;
-            //Color c = new Color();
-            //c.A = 0xff;
-            //c.B = c.G = c.R = 0xf0;
-            lbxSl.Items.Clear();
+            SlotsView.Items.Clear();
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT.hh);
-                it.Selected += lbxSl_Selected;
-                it.Unselected += lbxSl_Unselected;
-                //dark = !dark;
-                //if (dark)
-                //    it.Background = new SolidColorBrush(c);
-                lbxSl.Items.Add(it);
+                it.Content = dt.ToString(DT.H);
+                it.Selected += SlotsView_Selected;
+                it.Unselected += SlotsView_Unselected;
+                SlotsView.Items.Add(it);
             }
         }
 
@@ -163,54 +104,10 @@ namespace sQzServer0
 
             LoadTxt();
 
-            InitLbxQCatgry();
-            LoadBrd();
+            LoadSlotView();
             Window w = Window.GetWindow(this);
             if(w != null)
                 w.Closing += W_Closing;
-        }
-
-        void InitLbxQCatgry()
-        {
-            List<string> qCatName = new List<string>();
-            for (int i = (int)TxI.IU01; i <= (int)TxI.IU15; ++i)
-                qCatName.Add(Txt.s._(i));
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            Brush b = new SolidColorBrush(c);
-            Dispatcher.Invoke(() => {
-                lbxQCatgry.Items.Clear();
-                foreach (string i in qCatName)
-                {
-                    ListBoxItem it = new ListBoxItem();
-                    it.Content = i;
-                    dark = !dark;
-                    if (dark)
-                        it.Background = b;
-                    lbxQCatgry.Items.Add(i);
-                }
-            });
-        }
-
-        private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            tbcNee.Items.Clear();
-            ListBox l = sender as ListBox;
-            ListBoxItem i = l.SelectedItem as ListBoxItem;
-            if (i == null)
-            {
-                lbxSl.IsEnabled = false;
-                return;
-            }
-            DateTime dt;
-            if(!DT.To_(i.Content as string, DT._, out dt))
-            {
-                mBrd.mDt = dt;
-                lbxSl.IsEnabled = true;
-                LoadSl();
-            }
         }
 
         private void btnFileQ_Click(object sender, RoutedEventArgs e)
@@ -350,24 +247,11 @@ namespace sQzServer0
             ShowDBQ();
         }
 
-        private void lbxQCatgry_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            ListBox l = (ListBox)sender;
-            if (Enum.IsDefined(typeof(IUx), l.SelectedIndex))
-            {
-                mSelQCat = (IUx)l.SelectedIndex;
-                mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
-                ShowDBQ();
-            }
-        }
-
         private void LoadTxt()
         {
             Txt t = Txt.s;
             btnMMenu.Content = t._((int)TxI.BACK_MMENU);
-            txtDt.Text = t._((int)TxI.DATE_L);
-            txtHm.Text = t._((int)TxI.TIME_L);
-            txtIU.Text = t._((int)TxI.IUS);
+            //txtDt.Text = t._((int)TxI.DATE_L);
             tbi1.Header = t._((int)TxI.PREP_NEE);
             tbi2.Header = t._((int)TxI.PREP_Q);
             txtId.Text = t._((int)TxI.NEEID_S);
@@ -411,14 +295,14 @@ namespace sQzServer0
             chkAll.IsChecked = false;
         }
 
-        private void lbxSl_Selected(object sender, RoutedEventArgs e)
+        private void SlotsView_Selected(object sender, RoutedEventArgs e)
         {
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
             ExamSlot sl = new ExamSlot();
             DateTime dt;
-            DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
+            DT.To_(i.Content as string, DT.H, out dt);
             sl.Dt = dt;
             sl.DBSelRoomId();
             sl.DBSelStt();
@@ -430,7 +314,7 @@ namespace sQzServer0
             pnv.Focus();
         }
 
-        private void lbxSl_Unselected(object sender, RoutedEventArgs e)
+        private void SlotsView_Unselected(object sender, RoutedEventArgs e)
         {
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)

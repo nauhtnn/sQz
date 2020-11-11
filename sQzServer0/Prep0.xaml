@@ -15,27 +15,14 @@
                 <Button x:Name="btnMMenu"  Width="120" Height="40" Click="btnMMenu_Click" Background="#f15a23" Foreground="#fff"
                         Margin="0,10,0,0"/>
                 <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
-                <StackPanel Orientation="Horizontal">
-                    <StackPanel>
-                        <TextBlock Name="txtDt" TextAlignment="Center" FontSize="14"/>
-                        <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
-                            <TextBox Name="tbxBrd" Height="30" Width="90" />
-                            <Button Name="btnInsBrd"  Content="+" Height="30" Width="30" Click="btnInsBrd_Click" Background="#1c64e7" Foreground="#fff"/>
-                        </StackPanel>
-                        <ListBox x:Name="lbxBrd" Width="120" Height="120" SelectionChanged="lbxBrd_SelectionChanged"/>
+                <StackPanel>
+                    <TextBlock Name="txtDt" Margin="45,0,0,0" FontSize="14" Text="yyyy-MM-dd hh:mm"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBox Name="newSlot" Height="30" Width="150" />
+                        <Button Name="btnInsSlot"  Content="+" Height="30" Width="30" Click="InsertSlot" Background="#1c64e7" Foreground="#fff"/>
                     </StackPanel>
-                    <StackPanel>
-                        <TextBlock Name="txtHm" TextAlignment="Center" FontSize="14"/>
-                        <StackPanel Orientation="Horizontal" Margin="10,5,10,0">
-                            <TextBox x:Name="tbxSl" Height="30" Width="50" />
-                            <Button Name="btnInsSl"  Content="+" Height="30" Width="30" Click="btnInsSl_Click" Background="#1c64e7" Foreground="#fff"/>
-                        </StackPanel>
-                        <ListBox x:Name="lbxSl" Width="80" Height="120" SelectionMode="Multiple"/>
-                    </StackPanel>
+                    <ListBox x:Name="SlotsView" Width="180" Height="120" SelectionMode="Single"/>
                 </StackPanel>
-                <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
-                <TextBlock Name="txtIU" Margin="0,0,0,10" HorizontalAlignment="Center"/>
-                <ListBox x:Name="lbxQCatgry" Width="220" Height="390" SelectionChanged="lbxQCatgry_SelectionChanged"/>
             </StackPanel>
             <TabControl Margin="10,0,0,0">
                 <TabItem Name="tbi1">

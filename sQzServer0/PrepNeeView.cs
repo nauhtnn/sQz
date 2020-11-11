@@ -23,8 +23,8 @@ namespace sQzServer0
         public PrepNeeView(ExamSlot sl)
         {
             mSlDB = sl;
-            Header = mSlDB.Dt.ToString(DT.hh);
-            Name = "_" + (Header as string).Replace(':', '_');
+            Header = mSlDB.Dt.ToString(DT.H);
+            Name = "_" + (Header as string).Replace(':', '_').Replace('-', '_');
             mSlTmp = new ExamSlot();
             mSlTmp.Dt = mSlDB.Dt;
             foreach (ExamRoom rom in mSlDB.vRoom.Values)

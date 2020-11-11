@@ -56,6 +56,55 @@ namespace sQzLib
             mKeyPack = new AnsPack();
         }
 
+        public int InsertSlot(out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                eMsg = Txt.s._((int)TxI.DB_NOK);
+                return 0;
+            }
+            string v = "('" + mDt.ToString(DT.H) + "'," + (int)ExamStt.Prep + ")";
+            int n = DBConnect.Ins(conn, "sqz_slot", "dt,open", v, out eMsg);
+            DBConnect.Close(ref conn);
+            if (n == -1062)
+                eMsg = Txt.s._((int)TxI.DB_EXCPT) + Txt.s._((int)TxI.SLOT_EXIST);
+            return n;
+        }
+
+        public static List<DateTime> DBSelectSlots(bool arch, out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                eMsg = Txt.s._((int)TxI.DB_NOK);
+                return null;
+            }
+            string qry;
+            if (arch)
+                qry = "open=" + (int)ExamStt.Arch;
+            else
+                qry = "open!=" + (int)ExamStt.Arch;
+            qry = DBConnect.mkQrySelect("sqz_slot", "dt", qry);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return null;
+            }
+            List<DateTime> r = new List<DateTime>();
+            while (reader.Read())
+            {
+                string s = reader.GetString(0);
+                DateTime dt;
+                DT.To_(s, DT.HS, out dt);
+                r.Add(dt);
+            }
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return r;
+        }
+
         public string DBSelRoomId()
         {
             string emsg;
