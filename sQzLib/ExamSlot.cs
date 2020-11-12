@@ -97,7 +97,7 @@ namespace sQzLib
             {
                 string s = reader.GetString(0);
                 DateTime dt;
-                DT.To_(s, DT.HS, out dt);
+                DT.To_(s, out dt);
                 r.Add(dt);
             }
             reader.Close();
@@ -128,7 +128,8 @@ namespace sQzLib
             if (conn == null)
                 return Txt.s._((int)TxI.DB_NOK);
             string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid,qpkalt",
-                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
+                //"dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
+                "dt='" + mDt.ToString(DT.H) + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -156,7 +157,8 @@ namespace sQzLib
                 return Txt.s._((int)TxI.DB_NOK);
             string emsg;
             int n = DBConnect.Update(conn, "sqz_slot_room", "qpkalt=1", "dt='" +
-                mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "' AND rid=" + rid, out emsg);
+                //mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "' AND rid=" + rid, out emsg);
+                mDt.ToString(DT.H) + "' AND rid=" + rid, out emsg);
             DBConnect.Close(ref conn);
             if(0 < n)
                 return null;
@@ -180,7 +182,8 @@ namespace sQzLib
             foreach (DateTime dt in l)
             {
                 string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
-                    "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) + "'");
+                    //"dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) + "'");
+                    "dt='" + dt.ToString(DT.H) + "'");
                 string eMsg;
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
                 if (reader == null)
@@ -204,7 +207,8 @@ namespace sQzLib
             if (conn == null)
                 return Txt.s._((int)TxI.DB_NOK);
             string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
-                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
+                //"dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
+                "dt='" + mDt.ToString(DT.H) + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -228,7 +232,7 @@ namespace sQzLib
                 return Txt.s._((int)TxI.DB_NOK);
             string emsg;
             int n = DBConnect.Update(conn, "sqz_slot", "stt=" + (int)eStt,
-                "dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'",
+                "dt='" + mDt.ToString(DT.H) + "'",
                 out emsg);
             if(0 < n)
                 return null;
