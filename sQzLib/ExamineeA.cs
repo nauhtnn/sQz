@@ -191,27 +191,28 @@ namespace sQzLib
 
         public string DBGetT()
         {
-            MySqlConnection conn = DBConnect.Init();
-            string t = DT.INV_H.ToString(DT.hh);
-            if (conn == null)
-                return t;
-            string qry = DBConnect.mkQrySelect("sqz_examinee",
-                "t", "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
-                "' AND id=" + uId);
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return t;
-            }
-            if (reader.Read())
-            {
-                t = reader.GetString(0);
-            }
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return t;
+            throw new NotImplementedException();
+            //MySqlConnection conn = DBConnect.Init();
+            //string t = DT.INV_H.ToString(DT.hh);
+            //if (conn == null)
+            //    return t;
+            //string qry = DBConnect.mkQrySelect("sqz_examinee",
+            //    "t", "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+            //    "' AND id=" + uId);
+            //string eMsg;
+            //MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            //if (reader == null)
+            //{
+            //    DBConnect.Close(ref conn);
+            //    return t;
+            //}
+            //if (reader.Read())
+            //{
+            //    t = reader.GetString(0);
+            //}
+            //reader.Close();
+            //DBConnect.Close(ref conn);
+            //return t;
         }
 
         public abstract List<byte[]> ToByte();

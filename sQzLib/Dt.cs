@@ -15,8 +15,9 @@ namespace sQzLib
         //public const string h = "H:m";
         //public const string hh = "HH:mm";
         //public const string hs = "H:m:s";
-        public const string H = "yyyy-M-d HH:mm";
+        //public const string H = "yyyy-M-d HH:mm";
         //public const string HS = "yyyy-M-d H:m:s";
+        public const string _ = "yyyy-M-d HH:mm";
         //public const string _ = "yyyy-M-d";
         //public const string __ = "yyyy-MM-dd";
         //public const string RR = "dd-MM-yyyy";
@@ -35,8 +36,8 @@ namespace sQzLib
         {
             DateTime dt;
             if (!To_(s, out dt))
-                return dt.ToString(H);
-            return INV_.ToString(H);
+                return dt.ToString(_);
+            return INV_.ToString(_);
         }
 
         public static bool Toh(string s, string form, out DateTime t)

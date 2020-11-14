@@ -64,7 +64,7 @@ namespace sQzLib
                 eMsg = Txt.s._((int)TxI.DB_NOK);
                 return 0;
             }
-            string v = "('" + mDt.ToString(DT.H) + "'," + (int)ExamStt.Prep + ")";
+            string v = "('" + mDt.ToString(DT._) + "'," + (int)ExamStt.Prep + ")";
             int n = DBConnect.Ins(conn, "sqz_slot", "dt,open", v, out eMsg);
             DBConnect.Close(ref conn);
             if (n == -1062)
@@ -129,7 +129,7 @@ namespace sQzLib
                 return Txt.s._((int)TxI.DB_NOK);
             string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid,qpkalt",
                 //"dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
-                "dt='" + mDt.ToString(DT.H) + "'");
+                "dt='" + mDt.ToString(DT._) + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -158,7 +158,7 @@ namespace sQzLib
             string emsg;
             int n = DBConnect.Update(conn, "sqz_slot_room", "qpkalt=1", "dt='" +
                 //mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "' AND rid=" + rid, out emsg);
-                mDt.ToString(DT.H) + "' AND rid=" + rid, out emsg);
+                mDt.ToString(DT._) + "' AND rid=" + rid, out emsg);
             DBConnect.Close(ref conn);
             if(0 < n)
                 return null;
@@ -183,7 +183,7 @@ namespace sQzLib
             {
                 string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
                     //"dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) + "'");
-                    "dt='" + dt.ToString(DT.H) + "'");
+                    "dt='" + dt.ToString(DT._) + "'");
                 string eMsg;
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
                 if (reader == null)
@@ -208,7 +208,7 @@ namespace sQzLib
                 return Txt.s._((int)TxI.DB_NOK);
             string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
                 //"dt='" + mDt.ToString(DT._) + "' AND t='" + mDt.ToString(DT.hh) + "'");
-                "dt='" + mDt.ToString(DT.H) + "'");
+                "dt='" + mDt.ToString(DT._) + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -232,7 +232,7 @@ namespace sQzLib
                 return Txt.s._((int)TxI.DB_NOK);
             string emsg;
             int n = DBConnect.Update(conn, "sqz_slot", "stt=" + (int)eStt,
-                "dt='" + mDt.ToString(DT.H) + "'",
+                "dt='" + mDt.ToString(DT._) + "'",
                 out emsg);
             if(0 < n)
                 return null;
@@ -455,6 +455,18 @@ namespace sQzLib
                 r.ReadByte0(buf, ref offs))
                 return -1;
             return rid;
+        }
+
+        public List<byte[]> ToByteR1(int rId)
+        {
+            List<byte[]> l = new List<byte[]>();
+            l.Add(DT.ToByteh(mDt));
+            ExamRoom r;
+            if (vRoom.TryGetValue(rId, out r))
+                l.InsertRange(l.Count, r.ToByte1());
+            else
+                l.Add(BitConverter.GetBytes(-1));
+            return l;
         }
 
         public List<byte[]> ToByteR1(int rId)

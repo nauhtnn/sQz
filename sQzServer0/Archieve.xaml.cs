@@ -262,42 +262,43 @@ namespace sQzServer0
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
         {
-            ListBoxItem i = sender as ListBoxItem;
-            if (i == null)
-                return;
-            if (mBrd.vSl.ContainsKey(i.Content as string))
-                return;
+            throw new NotImplementedException();
+            //ListBoxItem i = sender as ListBoxItem;
+            //if (i == null)
+            //    return;
+            //if (mBrd.vSl.ContainsKey(i.Content as string))
+            //    return;
 
-            ExamSlot sl = new ExamSlot();
-            DateTime dt;
-            DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
-            sl.Dt = dt;
-            string emsg;
-            if ((emsg = sl.DBSelRoomId()) != null)
-            {
-                WPopup.s.ShowDialog(emsg);
-                return;
-            }
-            sl.DBSelStt();
-            sl.DBSelQPkR();
-            sl.DBSelNee();
-            if(sl.DBSelArchieve(out emsg))
-            {
-                WPopup.s.ShowDialog(emsg);
-                return;
-            }
-            Op0SlotView tbi = new Op0SlotView(sl);
-            tbi.DeepCopy(tbcRefSl);
-            tbi.ShowExaminee();
-            tbi.ShowQSHeader();
-            tbcSl.Items.Add(tbi);
-            QuestSheet.DBUpdateCurQSId(mBrd.mDt);
-            mBrd.vSl.Add(i.Content as string, sl);
-            if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
-                    tbi.mSl.eStt == ExamStt.Prep)
-                EnableQSGen();
-            else
-                DisableQSGen();
+            //ExamSlot sl = new ExamSlot();
+            //DateTime dt;
+            //DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
+            //sl.Dt = dt;
+            //string emsg;
+            //if ((emsg = sl.DBSelRoomId()) != null)
+            //{
+            //    WPopup.s.ShowDialog(emsg);
+            //    return;
+            //}
+            //sl.DBSelStt();
+            //sl.DBSelQPkR();
+            //sl.DBSelNee();
+            //if(sl.DBSelArchieve(out emsg))
+            //{
+            //    WPopup.s.ShowDialog(emsg);
+            //    return;
+            //}
+            //Op0SlotView tbi = new Op0SlotView(sl);
+            //tbi.DeepCopy(tbcRefSl);
+            //tbi.ShowExaminee();
+            //tbi.ShowQSHeader();
+            //tbcSl.Items.Add(tbi);
+            //QuestSheet.DBUpdateCurQSId(mBrd.mDt);
+            //mBrd.vSl.Add(i.Content as string, sl);
+            //if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
+            //        tbi.mSl.eStt == ExamStt.Prep)
+            //    EnableQSGen();
+            //else
+            //    DisableQSGen();
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)

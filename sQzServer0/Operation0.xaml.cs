@@ -25,7 +25,7 @@ namespace sQzServer0
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamBoard mBrd;
+        ExamSlot Slot;
         Dictionary<ExamLv, TextBox[]> vtxtNEsyDif;
         Dictionary<ExamLv, TextBlock[]> vtxtN;
         Dictionary<ExamLv, TextBox[]> vtxtNDiff;
@@ -38,7 +38,7 @@ namespace sQzServer0
             mServer = new Server2(SrvrBufHndl);
             mCbMsg = new UICbMsg();
 
-            mBrd = new ExamBoard();
+            //mBrd = new ExamBoard();
 
             bRunning = true;
 
@@ -54,29 +54,30 @@ namespace sQzServer0
 
         private void LoadBrd()
         {
-            string emsg;
-            List<DateTime> v = ExamBoard.DBSel(out emsg);
-            if (v == null)
-            {
-                spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(emsg);
-                spMain.Opacity = 1;
-                return;
-            }
-            bool dark = true;
-            Color c = new Color();
-            c.A = 0xff;
-            c.B = c.G = c.R = 0xf0;
-            lbxBrd.Items.Clear();
-            foreach (DateTime dt in v)
-            {
-                ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT.__);
-                dark = !dark;
-                if (dark)
-                    it.Background = new SolidColorBrush(c);
-                lbxBrd.Items.Add(it);
-            }
+            throw new NotImplementedException();
+            //string emsg;
+            //List<DateTime> v = ExamBoard.DBSel(out emsg);
+            //if (v == null)
+            //{
+            //    spMain.Opacity = 0.5;
+            //    WPopup.s.ShowDialog(emsg);
+            //    spMain.Opacity = 1;
+            //    return;
+            //}
+            //bool dark = true;
+            //Color c = new Color();
+            //c.A = 0xff;
+            //c.B = c.G = c.R = 0xf0;
+            //lbxBrd.Items.Clear();
+            //foreach (DateTime dt in v)
+            //{
+            //    ListBoxItem it = new ListBoxItem();
+            //    it.Content = dt.ToString(DT.__);
+            //    dark = !dark;
+            //    if (dark)
+            //        it.Background = new SolidColorBrush(c);
+            //    lbxBrd.Items.Add(it);
+            //}
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
@@ -235,15 +236,12 @@ namespace sQzServer0
                     offs += 4;
                     string pw = Encoding.ASCII.GetString(buf, offs, 8);
                     offs += 8;
-                    foreach (ExamSlot sl in mBrd.vSl.Values)
+                    if(Slot.vRoom.ContainsKey(x))
                     {
-                        if(sl.vRoom.ContainsKey(x))
+                        if(pw == Slot.vRoom[x].tPw)
                         {
-                            if(pw == sl.vRoom[x].tPw)
-                            {
-                                outMsg = BitConverter.GetBytes((int)TxI.OP_AUTH_OK);
-                                break;
-                            }
+                            outMsg = BitConverter.GetBytes((int)TxI.OP_AUTH_OK);
+                            break;
                         }
                     }
                     break;
@@ -253,9 +251,9 @@ namespace sQzServer0
                         outMsg = null;
                         break;
                     }
-                    x = BitConverter.ToInt32(buf, offs);
+                    int roomId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
-                    outMsg = mBrd.ToByteSl1(x);
+                    outMsg = Slot.ToByteR1(roomId);
                     Dispatcher.InvokeAsync(() =>
                     {
                         foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
@@ -353,7 +351,7 @@ namespace sQzServer0
                 return;
             }
             DateTime dt;
-            if (!DT.To_(i.Content as string, DT._, out dt))
+            if (!DT.To_(i.Content as string, out dt))
             {
                 mBrd.mDt = dt;
                 lbxSl.IsEnabled = true;
@@ -379,7 +377,7 @@ namespace sQzServer0
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT.hh);
+                it.Content = dt.ToString(DT._);// hh);
                 it.Selected += lbxSl_Selected;
                 it.Unselected += lbxSl_Unselected;
                 //dark = !dark;
@@ -423,42 +421,43 @@ namespace sQzServer0
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
         {
-            ListBoxItem i = sender as ListBoxItem;
-            if (i == null)
-                return;
-            if (mBrd.vSl.ContainsKey(i.Content as string))
-                return;
+            throw new NotImplementedException();
+            //ListBoxItem i = sender as ListBoxItem;
+            //if (i == null)
+            //    return;
+            //if (mBrd.vSl.ContainsKey(i.Content as string))
+            //    return;
 
-            ExamSlot sl = new ExamSlot();
-            DateTime dt;
-            DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
-            sl.Dt = dt;
-            string emsg;
-            if ((emsg = sl.DBSelRoomId()) != null)
-            {
-                WPopup.s.ShowDialog(emsg);
-                return;
-            }
-            sl.DBSelStt();
-            sl.DBSelQPkR();
-            sl.DBSelNee();
-            if(sl.DBSelArchieve(out emsg))
-            {
-                WPopup.s.ShowDialog(emsg);
-                return;
-            }
-            Op0SlotView tbi = new Op0SlotView(sl);
-            tbi.DeepCopy(tbcRefSl);
-            tbi.ShowExaminee();
-            tbi.ShowQSHeader();
-            tbcSl.Items.Add(tbi);
-            QuestSheet.DBUpdateCurQSId(mBrd.mDt);
-            mBrd.vSl.Add(i.Content as string, sl);
-            if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
-                    tbi.mSl.eStt == ExamStt.Prep)
-                EnableQSGen();
-            else
-                DisableQSGen();
+            //ExamSlot sl = new ExamSlot();
+            //DateTime dt;
+            //DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
+            //sl.Dt = dt;
+            //string emsg;
+            //if ((emsg = sl.DBSelRoomId()) != null)
+            //{
+            //    WPopup.s.ShowDialog(emsg);
+            //    return;
+            //}
+            //sl.DBSelStt();
+            //sl.DBSelQPkR();
+            //sl.DBSelNee();
+            //if(sl.DBSelArchieve(out emsg))
+            //{
+            //    WPopup.s.ShowDialog(emsg);
+            //    return;
+            //}
+            //Op0SlotView tbi = new Op0SlotView(sl);
+            //tbi.DeepCopy(tbcRefSl);
+            //tbi.ShowExaminee();
+            //tbi.ShowQSHeader();
+            //tbcSl.Items.Add(tbi);
+            //QuestSheet.DBUpdateCurQSId(mBrd.mDt);
+            //mBrd.vSl.Add(i.Content as string, sl);
+            //if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
+            //        tbi.mSl.eStt == ExamStt.Prep)
+            //    EnableQSGen();
+            //else
+            //    DisableQSGen();
         }
 
         private void lbxSl_Unselected(object sender, RoutedEventArgs e)
