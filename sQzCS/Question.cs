@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 //using System.Linq;
 //using System.Threading.Tasks;
-using MySql.Data.MySqlClient;
 
 namespace sQzCS
 {
@@ -65,8 +64,8 @@ namespace sQzCS
         }
 
         TokenType classify(string s) {
-            if (s.StartsWith("!"))
-                return TokenType.Requirement;
+            //if (s.StartsWith("!"))
+            //    return TokenType.Requirement;
             int x = s.IndexOf(' '), y = s.IndexOf('\t');
             if (-1 < x && -1 < y)
                 x = System.Math.Min(x, y);
@@ -99,20 +98,21 @@ namespace sQzCS
             return TokenType.Both;
         }
 
-        void readStmt()
+        bool readStmt()
         {
             if (svToken.Length <= siToken)
-                return;
+                return false;
             TokenType t = classify(svToken[siToken]);
-            if (t == TokenType.Stmt || t == TokenType.Both)
-            {
+            //if (t == TokenType.Stmt || t == TokenType.Both)
+            //{
                 if (-1 < qSubs)
                     mStmt = Utils.CleanFront(svToken[siToken++], qSubs);
                 else
                     mStmt = svToken[siToken++];
-            }
-
-            //else: error
+                return true;
+            //}
+            //else
+            //    throw new ArgumentException();
             //TODO: detect qType
         }
 
@@ -159,7 +159,7 @@ namespace sQzCS
         void readAns()
         {
             if (svToken.Length <= siToken)
-                return;
+                throw new ArgumentException();
             vAns = new string[nAns];
             vKeys = new bool[nAns];
             int np = aSubs.Count;
@@ -224,11 +224,13 @@ namespace sQzCS
                 s = System.Math.Max(s, x);
             }
             svToken[siToken] = svToken[siToken].Substring(s);
-            readStmt();
-            if (svToken.Length <= siToken)
+            if (!readStmt())
                 return false;
+            if (svToken.Length <= siToken)
+                throw new ArgumentException();
             if (qType == QuestType.Single || qType == QuestType.Multiple)
                 readAns();
+            CheckError();
             mStmt = Utils.HTML(mStmt, ref cType);
             vKeys = new bool[nAns];
             for (int ki = 0; ki < nAns; ++ki)
@@ -244,16 +246,26 @@ namespace sQzCS
                     vAns[ci] = vAns[ci].Substring(1);
                 }
             }
-            if (ci < nAns)
-            {
-                for (int cj = ci; cj < nAns; ++cj)
-                    vAns[cj] = null;
-                nAns = ci;
-            }
+            //if (ci < nAns)
+            //{
+            //    for (int cj = ci; cj < nAns; ++cj)
+            //        vAns[cj] = null;
+            //    nAns = ci;
+            //}
             if (1 < keyC && qType == QuestType.Single)
                 qType = QuestType.Multiple;
             return true;
         }
+
+        void CheckError()
+        {
+            if (mStmt == null || vKeys.Length != vAns.Length)
+                throw new ArgumentException();
+            foreach (string option in vAns)
+                if (option == null)
+                    throw new ArgumentException();
+        }
+
         public void write(System.IO.StreamWriter os, int idx, ref int col)
         {
             if (cType == ContentType.Image)
@@ -423,6 +435,16 @@ namespace sQzCS
                     q.vKeys[j] = BitConverter.ToBoolean(buf, offs++);
                 svQuest.Add(q);
             }
+        }
+
+        public List<string> ToListOfString()
+        {
+            List<string> lines = new List<string>();
+            lines.Add(mStmt);
+            foreach (string option in vAns)
+                lines.Add(option);
+            lines.Add("\n");
+            return lines;
         }
 
         public static void Clear()

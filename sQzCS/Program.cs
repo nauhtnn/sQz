@@ -16,14 +16,33 @@ namespace sQzCS
         [System.Runtime.InteropServices.DllImport("kernel32.dll")]
         private static extern bool AttachConsole(int pid);
 
-        static void Main(string[] args)
+        static void PrintQuestionList(string filePath, List<Question> questions)
+        {
+            if (System.IO.File.Exists(filePath))
+                System.IO.File.Delete(filePath);
+            List<string> lines = new List<string>();
+            foreach (Question question in questions)
+                lines.AddRange(question.ToListOfString());
+            System.IO.File.WriteAllLines(filePath, lines, Encoding.UTF8);
+        }
+
+        static void LogError(string errorFile, List<Question> questions)
+        {
+            Console.WriteLine("Error in " + errorFile);
+            string errorLog = "qz_error.txt";
+            Console.WriteLine("Check current questions in " + errorLog);
+            PrintQuestionList(errorLog, questions);
+            Console.Read();
+        }
+
+        public static void Main(string[] args)
         {
             if (!AttachConsole(-1))
             { // Attach to an parent process console
                 AllocConsole(); // Alloc a new console
             }
 
-            System.Console.WriteLine("sQz version 0.0.2");
+            System.Console.WriteLine("sQz_CS 1.1.0.0");
             int fi = 1;
             string fn = "qz" + fi + ".txt";
             string buf = Utils.ReadFile(fn);
@@ -35,10 +54,29 @@ namespace sQzCS
                 Question.StartRead(Utils.Split(buf, '\n'), pg.mSt);
                 List<Question> vQuest = new List<Question>();
                 Question q = new Question();
-                while (q.Read())
+                bool hasQuestion;
+                try
+                {
+                    hasQuestion = q.Read();
+                }
+                catch(ArgumentException)
+                {
+                    LogError(fn, vQuest);
+                    return;
+                }
+                while (hasQuestion)
                 {
                     vQuest.Add(q);
                     q = new Question();
+                    try
+                    {
+                        hasQuestion = q.Read();
+                    }
+                    catch (ArgumentException)
+                    {
+                        LogError(fn, vQuest);
+                        return;
+                    }
                 }
                 q = null;
                 fn = "qz" + fi + ".html";

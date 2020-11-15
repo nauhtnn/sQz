@@ -14,7 +14,10 @@ namespace sQzCS
             try
             {
                 if (!System.IO.File.Exists(fileName))
+                {
+                    Console.WriteLine("File not found: " + fileName);
                     return null;
+                }
                 return System.IO.File.ReadAllText(fileName);
             }
             catch (System.Exception)

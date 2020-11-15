@@ -1,9 +1,0 @@
-﻿<Application x:Class="sQzServer0.App"
-             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
-             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:local="clr-namespace:sQzServer0"
-             StartupUri="Operation0.xaml">
-    <Application.Resources>
-         
-    </Application.Resources>
-</Application>
