@@ -253,7 +253,7 @@ namespace sQzLib
         public string ReadF(string fp, ref ExamSlot o)
         {
             string[] vs = System.IO.File.ReadAllLines(fp);
-            StringBuilder eline = new StringBuilder();
+            StringBuilder errorLines = new StringBuilder();
             StringBuilder dup = new StringBuilder();
             int i = 0;
             foreach (string s in vs)
@@ -265,20 +265,20 @@ namespace sQzLib
                 {
                     if (v[0].Length < 2)
                     {
-                        eline.Append(i.ToString() + ", ");
+                        errorLines.Append(i.ToString() + ", ");
                         continue;
                     }
                     v[0] = v[0].ToUpper();
                     if(!Enum.TryParse(v[0].Substring(0, 1), out e.eLv))
                     {
-                        eline.Append(i.ToString() + ", ");
+                        errorLines.Append(i.ToString() + ", ");
                         continue;
                     }
                     int urid;
                     if (!int.TryParse(v[0].Substring(1), out e.uId)
                         || !int.TryParse(v[1], out urid) || !vRoom.ContainsKey(urid))
                     {
-                        eline.Append(i.ToString() + ", ");
+                        errorLines.Append(i.ToString() + ", ");
                         continue;
                     }
                     bool bCont = false;
@@ -303,20 +303,20 @@ namespace sQzLib
                     DateTime dt;
                     if(DT.To_(v[3], DT.RR, out dt))
                     {
-                        eline.Append(i.ToString() + ", ");
+                        errorLines.Append(i.ToString() + ", ");
                         continue;
                     }
                     e.tBirdate = v[3];
                     e.tBirthplace = v[4].Trim();
                     if (e.tName.Length == 0 || e.tBirdate.Length == 0 || e.tBirthplace.Length == 0)
                     {
-                        eline.Append(i.ToString() + ", ");
+                        errorLines.Append(i.ToString() + ", ");
                         continue;
                     }
                     o.vRoom[urid].vExaminee.Add(e.LvId, e);
                 }
                 else
-                    eline.Append(i.ToString() + ", ");
+                    errorLines.Append(i.ToString() + ", ");
             }
             StringBuilder r = new StringBuilder();
             if(0 < dup.Length)
@@ -325,11 +325,11 @@ namespace sQzLib
                 r.Append("\n" + Txt.s._((int)TxI.NEE_ID_EXIST));
                 r.Append(dup.ToString() + '.');
             }
-            if (0 < eline.Length)
+            if (0 < errorLines.Length)
             {
-                eline.Remove(eline.Length - 2, 2);//remove the last comma
+                errorLines.Remove(errorLines.Length - 2, 2);//remove the last comma
                 r.Append("\n" + Txt.s._((int)TxI.NEE_ELINE));
-                r.Append(eline.ToString() + '.');
+                r.Append(errorLines.ToString() + '.');
             }
             if (r.Length == 0)
                 return null;

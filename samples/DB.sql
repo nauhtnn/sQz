@@ -23,7 +23,7 @@ FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`));
 CREATE TABLE IF NOT EXISTS `sqz_examinee`(`dt` DATETIME,
 `id` CHAR(5)  CHARACTER SET `utf8mb4`, `rid` TINYINT,
 `name` VARCHAR(64) CHARACTER SET `utf8mb4`,
-`birdate` VARCHAR(10), `birthplace` VARCHAR(96) CHARACTER SET `utf8mb4`,
+`birthdate` VARCHAR(10), `birthplace` VARCHAR(96) CHARACTER SET `utf8mb4`,
 `qsid` SMALLINT UNSIGNED,
 `t1` TIME, `t2` TIME, `grade` SMALLINT UNSIGNED,
 `comp` VARCHAR(32),

@@ -23,18 +23,19 @@ namespace sQzLib
 
     public abstract class ExamineeA
     {
-        public const int LV_CAP = 10000;//db sqz_examinee `id` SMALLINT UNSIGNED
+        //public const int LV_CAP = 10000;//db sqz_examinee `id` SMALLINT UNSIGNED
         public DateTime mDt;
         public NeeStt eStt;
-        public ExamLv eLv;
-        public int uId;
-        public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + LV_CAP; } }
-        public string tId { get { return eLv.ToString() + uId.ToString("d4"); } }
-        public static string gId(ExamLv lv, int id) { return lv.ToString() + id.ToString("d4"); }
-        public string tName;
-        public string tBirdate;
-        public string tBirthplace;
-        public int uGrade;
+        //public ExamLv eLv;
+        //public int uId;
+        public string ID;
+        //public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + LV_CAP; } }
+        //public string tId { get { return eLv.ToString() + uId.ToString("d4"); } }
+        //public static string gId(ExamLv lv, int id) { return lv.ToString() + id.ToString("d4"); }
+        public string Name;
+        public string Birthdate;
+        public string Birthplace;
+        public int Grade;
 
         public string tComp;
         public DateTime dtTim1;
@@ -59,13 +60,13 @@ namespace sQzLib
         public void Reset()
         {
             mDt = DT.INV_H;
-            eLv = ExamLv.A;
-            uId = LV_CAP;
-            tName = null;
-            tBirdate = null;
-            tBirthplace = null;
+            //eLv = ExamLv.A;
+            //uId = LV_CAP;
+            Name = null;
+            Birthdate = null;
+            Birthplace = null;
             eStt = NeeStt.Signing;
-            uGrade = LV_CAP;
+            //uGrade = LV_CAP;
             dtTim1 = dtTim2 = DT.INV_;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
@@ -73,59 +74,61 @@ namespace sQzLib
             tLog = new StringBuilder();
         }
 
-        public bool ParseLvId(int lvid)
-        {
-            if (lvid != LV_CAP &&(lvid < 1 || LV_CAP + LV_CAP <= lvid))
-                return true;
-            if(lvid < LV_CAP)
-            {
-                eLv = ExamLv.A;
-                uId = lvid;
-            }
-            else
-            {
-                eLv = ExamLv.B;
-                uId = lvid - LV_CAP;
-            }
-            return false;
-        }
+        //public bool ParseLvId(int lvid)
+        //{
+        //    if (lvid != LV_CAP &&(lvid < 1 || LV_CAP + LV_CAP <= lvid))
+        //        return true;
+        //    if(lvid < LV_CAP)
+        //    {
+        //        eLv = ExamLv.A;
+        //        uId = lvid;
+        //    }
+        //    else
+        //    {
+        //        eLv = ExamLv.B;
+        //        uId = lvid - LV_CAP;
+        //    }
+        //    return false;
+        //}
 
-        public bool ParseLvId(string s)
-        {
-            if (s == null || s.Length != 5)
-                return true;
-            s = s.ToUpper();
-            ExamLv lv;
-            if (!Enum.TryParse(s.Substring(0, 1), out lv))
-                return true;
-            int uid;
-            if (!int.TryParse(s.Substring(1), out uid))
-                return true;
-            if (uid < 1 || LV_CAP <= uid)
-                return true;
-            if (eLv != lv || uId != uid)
-                Reset();
-            eLv = lv;
-            uId = uid;
-            return false;
-        }
+        //public bool ParseLvId(string s)
+        //{
+        //    if (s == null || s.Length != 5)
+        //        return true;
+        //    s = s.ToUpper();
+        //    ExamLv lv;
+        //    if (!Enum.TryParse(s.Substring(0, 1), out lv))
+        //        return true;
+        //    int uid;
+        //    if (!int.TryParse(s.Substring(1), out uid))
+        //        return true;
+        //    if (uid < 1 || LV_CAP <= uid)
+        //        return true;
+        //    if (eLv != lv || uId != uid)
+        //        Reset();
+        //    eLv = lv;
+        //    uId = uid;
+        //    return false;
+        //}
 
-        public override string ToString()
-        {
-            StringBuilder s = new StringBuilder();
-            s.AppendFormat("{0}, {1}, {2}, {3}",
-                tId, tName, tBirdate, tBirthplace);
-            return s.ToString();
-        }
+        //public override string ToString()
+        //{
+        //    StringBuilder s = new StringBuilder();
+        //    s.AppendFormat("{0}, {1}, {2}, {3}",
+        //        tId, tName, tBirdate, tBirthplace);
+        //    return s.ToString();
+        //}
 
         public int DBGetQSId()
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return -1;
-            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "qsid",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
-                "' AND neeid=" + uId);
+            //string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "qsid",
+            //    "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+            //    "' AND neeid=" + uId);
+            string qry = DBConnect.mkQrySelect("sqz_examinee", "qsid",
+                "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -149,9 +152,8 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return noans;
-            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "ans",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
-                "' AND neeid=" + uId);
+            string qry = DBConnect.mkQrySelect("sqz_examinee", "ans",
+                "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -172,9 +174,8 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return true;
-            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "grade",
-                "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
-                "' AND neeid=" + uId);
+            string qry = DBConnect.mkQrySelect("sqz_examinee", "grade",
+                "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -183,7 +184,7 @@ namespace sQzLib
                 return true;
             }
             if (reader.Read())
-                uGrade = reader.GetInt16(0);
+                Grade = reader.GetInt16(0);
             reader.Close();
             DBConnect.Close(ref conn);
             return false;
@@ -269,7 +270,7 @@ namespace sQzLib
             if (err)
                 return true;
             var fileName = System.IO.Path.Combine(p, tLOG_PRE +
-                tId + '-' + m.ToString("d2") + s.ToString("d2"));
+                ID + '-' + m.ToString("d2") + s.ToString("d2"));
             System.IO.BinaryWriter w = null;
             try
             {
@@ -279,8 +280,8 @@ namespace sQzLib
             catch (UnauthorizedAccessException) { err = true; }
             if (err)
                 return true;
-            w.Write((int)eLv);
-            w.Write(uId);
+            //w.Write((int)eLv);
+            w.Write(ID);
             w.Write((int)eStt);
             w.Write(mAnsSh.uQSId);
             w.Write(mAnsSh.aAns, 0, AnsSheet.LEN);
@@ -314,8 +315,8 @@ namespace sQzLib
                 return false;
             //uSlId = r.ReadUInt32();
             int x;
-            if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
-                eLv = (ExamLv)x;
+            //if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
+            //    eLv = (ExamLv)x;
             uId = r.ReadInt32();
             if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
                 eStt = (NeeStt)x;
