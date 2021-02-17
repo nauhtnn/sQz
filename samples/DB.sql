@@ -1,14 +1,14 @@
 -- database name = sqz[port][version]
-CREATE TABLE IF NOT EXISTS `sqz_version`(`ver` INT UNSIGNED);
+CREATE TABLE IF NOT EXISTS `sqz_version`(`ver` INT);
 INSERT INTO `sqz_version` VALUES (100);
 
-CREATE TABLE IF NOT EXISTS `sqz_slot`(`dt` DATETIME, `status` TINYINT,
+CREATE TABLE IF NOT EXISTS `sqz_slot`(`dt` DATETIME, `status` INT,
 PRIMARY KEY(`dt`));
 
-CREATE TABLE IF NOT EXISTS `sqz_room`(`id` TINYINT PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS `sqz_room`(`id` INT PRIMARY KEY);
 INSERT INTO `sqz_room` VALUES (1),(2),(3),(4),(5),(6);
 
-CREATE TABLE IF NOT EXISTS `sqz_slot_room`(`dt` DATETIME, `rid` TINYINT,
+CREATE TABLE IF NOT EXISTS `sqz_slot_room`(`dt` DATETIME, `rid` INT,
 `pw` CHAR(8) CHARACTER SET `ascii`,
 `t1` TIME, `t2` TIME,
 PRIMARY KEY(`dt`, `rid`),
@@ -16,27 +16,30 @@ FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`),
 FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATETIME,
-`id` SMALLINT UNSIGNED,
+`id` INT,
 PRIMARY KEY(`dt`, `id`),
 FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`));
 
 CREATE TABLE IF NOT EXISTS `sqz_examinee`(`dt` DATETIME,
-`id` CHAR(5)  CHARACTER SET `utf8mb4`, `rid` TINYINT,
+`id` VARCHAR(8) CHARACTER SET `utf8mb4`, `rid` INT,
 `name` VARCHAR(64) CHARACTER SET `utf8mb4`,
 `birthdate` VARCHAR(10), `birthplace` VARCHAR(96) CHARACTER SET `utf8mb4`,
-`qsid` SMALLINT UNSIGNED,
-`t1` TIME, `t2` TIME, `grade` SMALLINT UNSIGNED,
+PRIMARY KEY(`dt`, `id`),
+FOREIGN KEY(`dt`, `rid`) REFERENCES `sqz_slot_room`(`dt`, `rid`));
+
+CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATETIME,
+`neeid` VARCHAR(8) CHARACTER SET `utf8mb4`, `qsid` INT,
+`t1` TIME, `t2` TIME, `grade` INT,
 `comp` VARCHAR(32),
 `ans` VARCHAR(1024),
-PRIMARY KEY(`dt`, `id`),
-FOREIGN KEY(`dt`, `rid`) REFERENCES `sqz_slot_room`(`dt`, `rid`),
+FOREIGN KEY(`dt`, `neeid`) REFERENCES `sqz_examinee`(`dt`, `id`),
 FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_passage`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `psg` TEXT);
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED PRIMARY KEY,
-`pid` INT UNSIGNED,
+`pid` INT UNSIGNED, `deleted` INT,
 `stmt` TEXT CHARACTER SET `utf8mb4`,
 `ans0` TEXT CHARACTER SET `utf8mb4`, `ans1` TEXT CHARACTER SET `utf8mb4`,
 `ans2` TEXT CHARACTER SET `utf8mb4`, `ans3` TEXT CHARACTER SET `utf8mb4`,
@@ -44,7 +47,7 @@ CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED PRIMARY KEY,
 FOREIGN KEY(`pid`) REFERENCES `sqz_passage`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATETIME,
-`qsid` SMALLINT UNSIGNED, `qid` INT UNSIGNED, `asort` CHAR(4) CHARACTER SET `ascii`,
+`qsid`INT, `qid` INT UNSIGNED, `asort` CHAR(4) CHARACTER SET `ascii`,
 `idx` TINYINT,
 PRIMARY KEY(`dt`, `qsid`, `qid`),
 FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`),
