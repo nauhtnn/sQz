@@ -183,21 +183,26 @@ namespace sQzServer0
 
         private void ShowTmpQ()
         {
+            StackPanel sp = new StackPanel();
+            //svwrTmpQ.Content = null;
+            AddListOfSingleQuestionToPanel(mTmpQS.ShallowCopy(), 0, sp);
+            svwrTmpQ.Content = sp;
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountD);
+            tbiTmpQ.Header = sb.ToString();
+        }
+
+        private void AddListOfSingleQuestionToPanel(List<Question> questions, int index, StackPanel panel)
+        {
             SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
             SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
             SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
             SolidColorBrush bg;
             bool even = false;
-            int x = -1;
+            int idx = index;
             double w = svwrTmpQ.Width;
-            svwrTmpQ.Content = null;
-            StackPanel sp = new StackPanel();
-            foreach (Question q in mTmpQS.ShallowCopy())
+            foreach (Question q in questions)
             {
-                TextBlock i = new TextBlock();
-                i.Text = (++x + 1) + ". " + q.Stmt;
-                i.Width = w;
-                i.TextWrapping = TextWrapping.Wrap;
                 if (q.bDiff)
                     bg = difbg;
                 else if (even)
@@ -205,24 +210,30 @@ namespace sQzServer0
                 else
                     bg = oddbg;
                 even = !even;
-                i.Background = bg;
-                sp.Children.Add(i);
-                for (int idx = 0; idx < Question.N_ANS; ++idx)
-                {
-                    TextBlock j = new TextBlock();
-                    j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
-                    j.Width = w;
-                    j.TextWrapping = TextWrapping.Wrap;
-                    if (q.vKeys[idx])
-                        j.FontWeight = FontWeights.Bold;
-                    j.Background = bg;
-                    sp.Children.Add(j);
-                }
+                AddSingleQuestionToPanel(q, ++idx, w, bg, panel);
             }
-            svwrTmpQ.Content = sp;
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountD);
-            tbiTmpQ.Header = sb.ToString();
+        }
+
+        private void AddSingleQuestionToPanel(Question question, int index, double width, SolidColorBrush background, StackPanel panel)
+        {
+            TextBlock i = new TextBlock();
+            i.Text = index + ". " + question.Stmt;
+            i.Width = width;
+            i.TextWrapping = TextWrapping.Wrap;
+            
+            i.Background = background;
+            panel.Children.Add(i);
+            for (int idx = 0; idx < Question.N_ANS; ++idx)
+            {
+                TextBlock j = new TextBlock();
+                j.Text = ((char)('A' + idx)).ToString() + ") " + question.vAns[idx];
+                j.Width = width;
+                j.TextWrapping = TextWrapping.Wrap;
+                if (question.vKeys[idx])
+                    j.FontWeight = FontWeights.Bold;
+                j.Background = background;
+                panel.Children.Add(j);
+            }
         }
 
         private void btnImpQ_Click(object sender, RoutedEventArgs e)

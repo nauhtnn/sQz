@@ -8,52 +8,47 @@ namespace sQzLib
 {
     class PlainTextQuestParser
     {
-        public Tuple<List<Question>, List<PassageQuestion>> ParseLines(Queue<string> tokens)
+        public Tuple<List<Question>, List<PassageQuestion>> ParseTokens(Queue<string> tokens)
         {
-            List<Question> independentQuestions = new List<Question>();
-            List<PassageQuestion> passageQuestions = new List<PassageQuestion>();
-            while(tokens.Count > 0)
-            {
-                if (sQzLib.Utils.CleanFront(tokens.Peek()).IndexOf(PassageQuestion.MAGIC_WORD) == 0)
-                {
-                    tokens.Dequeue();
-                    break;
-                }
-                Question question = Parse1Question(tokens);
-                if(question == null)
-                {
-                    System.Windows.MessageBox.Show("Number of independent questions " + independentQuestions.Count + " are read.");
-                    break;
-                }
-                independentQuestions.Add(question);
-            }
+            List<Question> independentQuestions = ParseQuestions(tokens);
+            List<PassageQuestion> passageQuestions = ParsePassages(tokens);
             return new Tuple<List<Question>, List<PassageQuestion>>(independentQuestions, passageQuestions);
         }
 
-        List<PassageQuestion> ParsePassageQuestion(Queue<string> lines)
+        List<Question> ParseQuestions(Queue<string> tokens)
         {
-            return null;
-            //List<PassageQuestion> passageQuestions = new List<PassageQuestion>();
-            //PassageQuestion passageQuestion = null;
-            //while(index < plainTexts.Length)
-            //{
-            //    string passage = ParsePassage(plainTexts[index]);
-            //    if (passage != null)
-            //    {
-            //        if (passageQuestion != null)
-            //            passageQuestions.Add(passageQuestion);
-            //        passageQuestion = new PassageQuestion();
-            //        passageQuestion.Passage = passage;
-            //    }
-            //    Question question = Parse1Question(lines);
-            //    if (question == null)
-            //    {
-            //        System.Windows.MessageBox.Show("Only " + passageQuestions.Count + " are read.");
-            //        break;
-            //    }
-            //    passageQuestion.Questions.Add(question);
-            //}
-            //return passageQuestions;
+            List<Question> questions = new List<Question>();
+            while (tokens.Count > 0)
+            {
+                if (sQzLib.Utils.CleanFront(tokens.Peek()).IndexOf(PassageQuestion.MAGIC_WORD) == 0)
+                    break;
+
+                Question question = Parse1Question(tokens);
+                if (question == null)
+                {
+                    System.Windows.MessageBox.Show("Stop at question " + questions.Count);
+                    break;
+                }
+                questions.Add(question);
+            }
+
+            return questions;
+        }
+
+        List<PassageQuestion> ParsePassages(Queue<string> tokens)
+        {
+            List<PassageQuestion> passageQuestions = new List<PassageQuestion>();
+            while (tokens.Count > 0)
+            {
+                PassageQuestion passageQuestion = Parse1Passage(tokens);
+                if (passageQuestion == null)
+                {
+                    System.Windows.MessageBox.Show("Stop at passage question " + passageQuestions.Count);
+                    break;
+                }
+                passageQuestions.Add(passageQuestion);
+            }
+            return passageQuestions;
         }
 
         Question Parse1Question(Queue<string> tokens)
@@ -103,21 +98,16 @@ namespace sQzLib
             return question;
         }
 
-        string ParsePassage(string line)
+        PassageQuestion Parse1Passage(Queue<string> tokens)
         {
-            if(line.IndexOf(PassageQuestion.MAGIC_WORD) == 0)
-            {
-                string s = string.Empty;
-                if (line.Length > PassageQuestion.MAGIC_WORD.Length)
-                    s = Utils.CleanFront(line.Substring(PassageQuestion.MAGIC_WORD.Length - 1));
-                if(s.Length == 0)
-                {
-                    System.Windows.MessageBox.Show("Passage is empty!");
-                    return string.Empty;
-                }
-                return s;
-            }
-            return null;
+            if (tokens.Count == 0)
+                return null;
+            if (sQzLib.Utils.CleanFront(tokens.Dequeue()).IndexOf(PassageQuestion.MAGIC_WORD) != 0)
+                return null;
+            PassageQuestion passageQuest = new PassageQuestion();
+            passageQuest.Passage = tokens.Dequeue();
+            passageQuest.Questions = ParseQuestions(tokens);
+            return passageQuest;
         }
     }
 }

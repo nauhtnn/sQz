@@ -216,7 +216,7 @@ namespace sQzLib
         {
             vQuest.Clear();
             PlainTextQuestParser p = new PlainTextQuestParser();
-            Tuple<List<Question>, List<PassageQuestion>> tuple = p.ParseLines(PlainTextQueue.GetTextQueue(filePath));
+            Tuple<List<Question>, List<PassageQuestion>> tuple = p.ParseTokens(PlainTextQueue.GetTextQueue(filePath));
             vQuest = tuple.Item1;
             PassageQuestions = tuple.Item2;
         }
