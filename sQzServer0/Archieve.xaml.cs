@@ -339,9 +339,9 @@ namespace sQzServer0
             QuestSheet qs = null;
             foreach(ExamSlot sl in mBrd.vSl.Values)
             {
-                if (sl.vQPack[nee.eLv].vSheet.ContainsKey(qsid))
+                if (sl.QuestionPack[nee.eLv].vSheet.ContainsKey(qsid))
                 {
-                    qs = sl.vQPack[nee.eLv].vSheet[qsid];
+                    qs = sl.QuestionPack[nee.eLv].vSheet[qsid];
                     break;
                 }
                 else if (sl.vQPackAlt[nee.eLv].vSheet.ContainsKey(qsid))
@@ -375,8 +375,8 @@ namespace sQzServer0
                     }
                     mBrd.vSl.Add(t.Substring(0, 5), sl);
                     //
-                    if (sl.vQPack[nee.eLv].vSheet.ContainsKey(qsid))
-                        qs = sl.vQPack[nee.eLv].vSheet[qsid];
+                    if (sl.QuestionPack[nee.eLv].vSheet.ContainsKey(qsid))
+                        qs = sl.QuestionPack[nee.eLv].vSheet[qsid];
                     else if (sl.vQPackAlt[nee.eLv].vSheet.ContainsKey(qsid))
                         qs = sl.vQPackAlt[nee.eLv].vSheet[qsid];
                 }
@@ -459,22 +459,22 @@ namespace sQzServer0
             }
         }
 
-        private void Lv_Checked(object sender, RoutedEventArgs e)
-        {
-            ExamSlot sl = (tbcSl.SelectedItem as Op0SlotView).mSl;
-            if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-            {
-                grdB.Visibility = Visibility.Collapsed;
-                grdA.Visibility = Visibility.Visible;
-                txtNqs.Text = sl.CountQSByRoom(ExamLv.A).ToString();
-            }
-            else
-            {
-                grdA.Visibility = Visibility.Collapsed;
-                grdB.Visibility = Visibility.Visible;
-                txtNqs.Text = sl.CountQSByRoom(ExamLv.B).ToString();
-            }
-        }
+        //private void Lv_Checked(object sender, RoutedEventArgs e)
+        //{
+        //    ExamSlot sl = (tbcSl.SelectedItem as Op0SlotView).mSl;
+        //    if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
+        //    {
+        //        grdB.Visibility = Visibility.Collapsed;
+        //        grdA.Visibility = Visibility.Visible;
+        //        txtNqs.Text = sl.CountQSByRoom(ExamLv.A).ToString();
+        //    }
+        //    else
+        //    {
+        //        grdA.Visibility = Visibility.Collapsed;
+        //        grdB.Visibility = Visibility.Visible;
+        //        txtNqs.Text = sl.CountQSByRoom(ExamLv.B).ToString();
+        //    }
+        //}
 
         private void tbcSl_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {

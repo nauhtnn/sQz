@@ -317,7 +317,8 @@ namespace sQzLib
             int x;
             //if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
             //    eLv = (ExamLv)x;
-            uId = r.ReadInt32();
+            //uId = r.ReadInt32();
+            ID = r.ReadString();
             if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
                 eStt = (NeeStt)x;
             mAnsSh.uQSLvId = r.ReadInt32();
@@ -347,6 +348,6 @@ namespace sQzLib
             tLog.Append(s);
         }
 
-        public string Grade { get { return Math.Round((float)uGrade * 0.333, 1).ToString(); } }
+        //public string Grade { get { return Math.Round((float)uGrade * 0.333, 1).ToString(); } }
     }
 }

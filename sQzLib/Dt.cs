@@ -12,7 +12,7 @@ namespace sQzLib
         public const int INV = 0;
         public static DateTime INV_H = DateTime.Parse("1000-01-01 00:00:00");//h = m = INVALID
         public static DateTime INV_ = DateTime.Parse("1000-01-01");
-        //public const string h = "H:m";
+        public const string h = "H:m";
         //public const string hh = "HH:mm";
         //public const string hs = "H:m:s";
         //public const string H = "yyyy-M-d HH:mm";

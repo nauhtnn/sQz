@@ -412,8 +412,8 @@ namespace sQzServer0
             if (QuestSheet.ParseLvId((tbi.Header as TextBlock).Text, out lv, out id))
                 return;
             QuestSheet qs = null;
-            if (mSl.vQPack[lv].vSheet.ContainsKey(id))
-                qs = mSl.vQPack[lv].vSheet[id];
+            if (mSl.QuestionPack[lv].vSheet.ContainsKey(id))
+                qs = mSl.QuestionPack[lv].vSheet[id];
             else if (mSl.vQPackAlt[lv].vSheet.ContainsKey(id))
                 qs = mSl.vQPackAlt[lv].vSheet[id];
             if (qs == null)
@@ -465,7 +465,7 @@ namespace sQzServer0
             if (bInitNMod)
                 return;
             bInitNMod = true;
-            foreach (QuestPack p in mSl.vQPack.Values)
+            foreach (QuestPack p in mSl.QuestionPack.Values)
             {
                 List<int[]> l = p.GetNMod();
                 if(l != null && l.Count == 2)
@@ -498,7 +498,7 @@ namespace sQzServer0
         public void ShowQSHeader()
         {
             tbcQ.Items.Clear();
-            foreach (QuestPack p in mSl.vQPack.Values)
+            foreach (QuestPack p in mSl.QuestionPack.Values)
                 foreach (QuestSheet qs in p.vSheet.Values)
                 {
                     TabItem ti = new TabItem();

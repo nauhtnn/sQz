@@ -11,7 +11,6 @@ namespace sQzLib
     {
         public DateTime mDt;
         public ExamLv eLv;
-        public bool bAlt;
         public SortedList<int, QuestSheet> vSheet;
         int mNextQSIdx;
         int mMaxQSIdx;
@@ -20,7 +19,6 @@ namespace sQzLib
             mDt = DT.INV_;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
-            bAlt = false;
             vSheet = new SortedList<int, QuestSheet>();
         }
 
@@ -29,7 +27,6 @@ namespace sQzLib
             mDt = DT.INV_;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
-            bAlt = alt;
             vSheet = new SortedList<int, QuestSheet>();
         }
 
@@ -121,7 +118,7 @@ namespace sQzLib
                 return true;
             }
             string qry = DBConnect.mkQrySelect("sqz_qsheet",
-                "id", "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) +
+                "id", "dt='" + dt.ToString(DT._) +
                 "' AND lv='" + eLv.ToString() + "' AND alt=" +
                 (bAlt ? '1' : '0'));
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -288,12 +285,10 @@ namespace sQzLib
             StringBuilder vals = new StringBuilder();
             string prefx = "('" + dt.ToString(DT._) + "',";
             foreach (QuestSheet qs in l)
-                vals.Append(prefx + "'" + qs.eLv.ToString() + "'," + qs.uId +
-                    ",'" + dt.ToString(DT.hh) + "'," +
-                    (qs.bAlt ? '1' : '0') + "),");
+                vals.Append(prefx + "," + qs.uId + "),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
-            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,lv,id,t,alt", vals.ToString(), out eMsg) < 0)
+            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,id", vals.ToString(), out eMsg) < 0)
             {
                 DBConnect.Close(ref conn);
                 if (eMsg == null)
@@ -342,10 +337,10 @@ namespace sQzLib
 
         public void WriteDocx()
         {
-            string extension = ".docx";
-            foreach (QuestSheet qs in vSheet.Values)
-                QuestSheetDocxPrinter.GetInstance().Print(qs.eLv.ToString() + qs.uId + extension,
-                    qs.ToListOfStrings(), mDt.ToString(DT.RR), qs.tId);
+            //string extension = ".docx";
+            //foreach (QuestSheet qs in vSheet.Values)
+            //    QuestSheetDocxPrinter.GetInstance().Print(qs.eLv.ToString() + qs.uId + extension,
+            //        qs.ToListOfStrings(), mDt.ToString(DT.RR), qs.tId);
         }
     }
 }

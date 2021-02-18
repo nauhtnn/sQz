@@ -10,14 +10,14 @@ namespace sQzLib
     public class ExamRoom
     {
         public int uId;
-        public SortedList<int, ExamineeA> vExaminee;
+        public SortedList<string, ExamineeA> vExaminee;
         public DateTime t1, t2;
         public Dictionary<ExamLv, int> nLv;
         public string tPw;
         public ExamRoom()
         {
-            uId = ExamineeA.LV_CAP;
-            vExaminee = new SortedList<int, ExamineeA>();
+            uId = -1;
+            vExaminee = new SortedList<string, ExamineeA>();
             nLv = new Dictionary<ExamLv, int>();
             tPw = null;
         }
@@ -34,13 +34,11 @@ namespace sQzLib
             foreach (ExamineeA e in vExaminee.Values)
             {
                 vals.Append("('" + e.mDt.ToString(DT._) + "','");
-                vals.Append(e.eLv.ToString() + "',");
-                vals.Append(e.uId + ",");
-                vals.Append("'" + e.mDt.ToString(DT.hh) + "',");
+                vals.Append(e.ID + "',");
                 vals.Append(uId + ",");
-                vals.Append("'" + e.tName + "',");
-                vals.Append("'" + DT.ToS(e.tBirdate, DT.RR) + "',");
-                vals.Append("'" + e.tBirthplace + "'),");
+                vals.Append("'" + e.Name + "',");
+                vals.Append("'" + e.Birthdate + "',");
+                vals.Append("'" + e.Birthplace + "'),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             int n = DBConnect.Ins(conn, "sqz_examinee",
@@ -51,11 +49,10 @@ namespace sQzLib
         public void DBSelNee(MySqlConnection conn, DateTime dt)
         {
             vExaminee.Clear();
-            nLv[ExamLv.A] = nLv[ExamLv.B] = 0;
             string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
-                "lv,id,name,birdate,birthplace", "a.rid=" + uId +
-                " AND a.dt='" + dt.ToString(DT._) + "' AND a.t='" + dt.ToString(DT.hh) +
-                "' AND a.dt=b.dt AND a.t=b.t AND a.rid=b.rid");
+                "id,name,birdate,birthplace", "a.rid=" + uId +
+                " AND a.dt='" + dt.ToString(DT._) +
+                "' AND a.dt=b.dt AND a.rid=b.rid");
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             if (reader == null)
@@ -64,13 +61,11 @@ namespace sQzLib
             {
                 ExamineeS0 e = new ExamineeS0();
                 e.mDt = dt;
-                if (!Enum.TryParse(reader.GetString(0), out e.eLv))
-                    continue;
-                e.uId = reader.GetUInt16(1);
-                e.tName = reader.GetString(2);
-                e.tBirdate = reader.GetDateTime(3).ToString(DT.RR);
-                e.tBirthplace = reader.GetString(4);
-                vExaminee.Add(e.LvId, e);
+                e.ID = reader.GetString(0);
+                e.Name = reader.GetString(1);
+                e.Birthdate = reader.GetString(2);
+                e.Birthplace = reader.GetString(3);
+                vExaminee.Add(e.ID, e);
                 ++nLv[e.eLv];
             }
             reader.Close();
@@ -217,8 +212,7 @@ namespace sQzLib
                 return true;
             }
             string qry = DBConnect.mkQrySelect("sqz_slot_room", "pw,t1,t2",
-                "dt='" + dt.ToString(DT._) + "' AND t='" + dt.ToString(DT.hh) +
-                "' AND rid=" + uId + " LIMIT 1");
+                "dt='" + dt.ToString(DT._) + "' AND rid=" + uId + " LIMIT 1");
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
@@ -240,8 +234,7 @@ namespace sQzLib
 
         public bool DBUpT1(MySqlConnection conn, DateTime dt, out string eMsg)
         {
-            string cond = "dt='" + dt.ToString(DT._) + "' AND t='" +
-                dt.ToString(DT.hh) + "' AND rid=" + uId;
+            string cond = "dt='" + dt.ToString(DT._) + "' AND rid=" + uId;
             string val = "t1='" + t1.ToString(DT.hh) + "'";
             if (DBConnect.Update(conn, "sqz_slot_room", val, cond, out eMsg) < 1)
                 return true;
@@ -251,8 +244,7 @@ namespace sQzLib
         public bool DBUpT2(MySqlConnection conn, DateTime dt,
             out string eMsg)
         {
-            string cond = "dt='" + dt.ToString(DT._) + "' AND t='" +
-                dt.ToString(DT.hh) + "' AND rid=" + uId;
+            string cond = "dt='" + dt.ToString(DT._) + "' AND rid=" + uId;
             string val = "t2='" + t2.ToString(DT.hh) + "'";
             if (DBConnect.Update(conn, "sqz_slot_room", val, cond, out eMsg) < 1)
                 return true;
@@ -333,8 +325,7 @@ namespace sQzLib
             tPw = GenPw(vch, r);
             string emsg;
             int n = DBConnect.Update(conn, "sqz_slot_room", "pw='" + tPw + "'",
-                "dt='" + x.mDt.ToString(DT._) + "' AND t='" +
-                x.mDt.ToString(DT.hh) + "' AND rid=" + uId, out emsg);
+                "dt='" + x.mDt.ToString(DT._) + "' AND rid=" + uId, out emsg);
             if(0 < n)
                 return false;
             tPw = otPw;

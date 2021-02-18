@@ -1,4 +1,5 @@
--- database name = sqz[port][version]
+-- proposed database name = sqz[port][version]
+-- database name = sqzEN
 CREATE TABLE IF NOT EXISTS `sqz_version`(`ver` INT);
 INSERT INTO `sqz_version` VALUES (100);
 
