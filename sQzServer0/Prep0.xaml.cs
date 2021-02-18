@@ -43,7 +43,7 @@ namespace sQzServer0
         private void InsertSlot(object sender, RoutedEventArgs e)
         {
             DateTime dt;
-            if (DT.To_(newSlot.Text, "yyyy-MM-dd hh:mm", out dt))
+            if (DT.To_(newSlot.Text, DT.SYSTEM_DT_FMT, out dt))
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.BOARD_NOK));
