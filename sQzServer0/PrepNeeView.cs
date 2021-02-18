@@ -310,7 +310,7 @@ namespace sQzServer0
                     t = new TextBlock();
                     if (dark)
                         t.Background = br;
-                    t.Text = (r.uId + 1).ToString();
+                    t.Text = r.uId.ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
                     t.HorizontalAlignment = HorizontalAlignment.Center;

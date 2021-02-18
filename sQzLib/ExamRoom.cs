@@ -27,7 +27,7 @@ namespace sQzLib
                 eMsg = null;
                 return 0;
             }
-            string attbs = "dt,lv,id,t,rid,name,birdate,birthplace";
+            string attbs = "dt,id,rid,name,birthdate,birthplace";
             StringBuilder vals = new StringBuilder();
             foreach (ExamineeA e in vExaminee.Values)
             {
@@ -48,7 +48,7 @@ namespace sQzLib
         {
             vExaminee.Clear();
             string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
-                "id,name,birdate,birthplace", "a.rid=" + uId +
+                "id,name,birthdate,birthplace", "a.rid=" + uId +
                 " AND a.dt='" + dt.ToString(DT._) +
                 "' AND a.dt=b.dt AND a.rid=b.rid");
             string emsg;

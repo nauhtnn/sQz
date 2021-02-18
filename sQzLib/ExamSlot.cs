@@ -260,8 +260,8 @@ namespace sQzLib
                     }
                     e.ID = v[0].Trim();
                     bool bCont = false;
-                    foreach(ExamRoom ro in vRoom.Values)
-                        if(ro.vExaminee.ContainsKey(e.ID))
+                    foreach (ExamRoom ro in vRoom.Values)
+                        if (ro.vExaminee.ContainsKey(e.ID))
                         {
                             dup.Append(e.ID + ", ");
                             bCont = true;
@@ -277,7 +277,7 @@ namespace sQzLib
                     if (bCont)
                         continue;
                     int roomID = -1;
-                    if(!int.TryParse(v[1], out roomID))// || roomID < 0 || 6 roomID)
+                    if (!int.TryParse(v[1], out roomID) || !vRoom.ContainsKey(roomID))
                     {
                         errorLines.Append(i.ToString() + ", ");
                         continue;
@@ -340,8 +340,8 @@ namespace sQzLib
                 }
                 else if (bNExist)
                     n = DBConnect.Ins(conn, "sqz_slot_room",
-                        "dt,t,rid,pw,qpkalt", "('" + mDt.ToString(DT._) +
-                        "'," + r.uId + ",'" + ExamRoom.GenPw(vch, rand) + "',0)", out eMsg);
+                        "dt,rid,pw", "('" + mDt.ToString(DT._) +
+                        "'," + r.uId + ",'" + ExamRoom.GenPw(vch, rand) + "')", out eMsg);
                 if(n < 0)
                 {
                     DBConnect.Close(ref conn);
@@ -350,7 +350,7 @@ namespace sQzLib
                 n = r.DBIns(conn, out eMsg);
                 if (n < 0)
                 {
-                    sb.AppendFormat(Txt.s._((int)TxI.ROOM_DB_NOK) + '\n', r.uId + 1,
+                    sb.AppendFormat(Txt.s._((int)TxI.ROOM_DB_NOK) + '\n', r.uId,
                         Txt.s._((int)TxI.NEE_EXIST));
                     v = 0;
                 }

@@ -96,7 +96,7 @@ namespace sQzServer0
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    t.Text = (r.uId + 1).ToString();
+                    t.Text = r.uId.ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
                     grdNee.Children.Add(t);
@@ -240,7 +240,7 @@ namespace sQzServer0
 
                 TextBlock t = new TextBlock();
                 t.TextAlignment = TextAlignment.Center;
-                t.Text = (r.uId + 1).ToString();
+                t.Text = r.uId.ToString();
                 Grid.SetRow(t, ++i);
                 Grid.SetColumn(t, 0);
                 g.Children.Add(t);
