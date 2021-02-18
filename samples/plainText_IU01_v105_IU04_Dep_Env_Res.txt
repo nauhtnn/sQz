@@ -1,0 +1,445 @@
+﻿Máy tính cá nhân (PC) có đặc điểm:
+\Phục vụ nhu cầu học tập, làm việc, giải trí thông thường.
+Hoạt động liên tục 24/24, chia sẻ tài nguyên cho hàng ngàn máy khác cùng lúc.
+Có tốc độ xử lý cao nhất tại thời điểm máy được sản xuất.
+Chỉ thực hiện được các phép tính số học.
+Hãy chọn thiết bị có kích thước LỚN nhất trong các thiết bị sau:
+Điện thoại thông minh.
+Máy tính bảng.
+Máy tính xách tay.
+\Máy tính để bàn.
+Điện thoại thông minh, máy tính bảng thường KHÔNG có thành phần nào?
+Màn hình cảm ứng.
+Máy ảnh (camera).
+Loa và micro.
+\Chuột.
+Thiết bị ngoại vi kết nối vào máy tính thông qua:
+\Các cổng
+Chuột.
+Bàn phím.
+Màn hình.
+Để kết nối các máy tính tạo thành mạng máy tính, cần có:
+\Thiết bị mạng.
+Trang web.
+Tường lửa.
+Máy tìm kiếm.
+Lựa chọn nào là thiết bị mạng?
+\Bộ định tuyến không dây (Wi-Fi router).
+Bi lăn (trackball).
+Bảng chạm (touchpad).
+Tai nghe.
+Thiết bị nào thực hiện tính toán số học, luận lý và điều khiển hoạt động của máy tính?
+\CPU.
+ROM.
+RAM.
+Thiết bị lưu  trữ (ví dụ: ổ USB).
+Thiết bị nào chứa dữ liệu phục vụ cho quá trình tính toán của CPU, và khi không được cấp điện thì dữ liệu sẽ bị mất?
+Màn hình.
+ROM.
+\RAM.
+Thiết bị lưu  trữ (ví dụ: ổ USB).
+Một byte bằng:
+\8 bits.
+64 bits.
+1024 bits.
+1024 kilobytes.
+Lựa chọn nào sắp xếp các đơn vị đo dung lượng lưu trữ từ nhỏ đến lớn, từ trái qua phải?
+\KB, MB, GB.
+MB, GB, KB.
+GB, KB, MB.
+KB, GB, MB.
+Khi người dùng mở một tệp tin lưu trong đĩa cứng thì bên trong máy tính thực hiện hành động đọc, ghi nào?
+Đọc dữ liệu từ ROM ghi vào ROM. 
+Đọc dữ liệu từ RAM ghi vào ROM. 
+Đọc dữ liệu từ đĩa cứng ghi vào ROM.
+\Đọc dữ liệu từ đĩa cứng ghi vào RAM.
+Lựa chọn nào là thiết bị lưu trữ dữ liệu của người dùng?
+\Ổ cứng di động.
+CPU.
+Bút chạm (stylus).
+Màn hình.
+Thiết bị nào ghi hình trực tiếp và truyền hình ảnh vào máy tính?
+\Webcam.
+Bàn phím.
+Chuột.
+Bảng chạm (touchpad).
+Màn hình cảm ứng thuộc loại:
+\Thiết bị vừa nhập vừa xuất.
+Thiết bị lưu trữ.
+Thiết bị mạng.
+Bộ nhớ.
+Máy tính có thể xuất hình ảnh ra máy chiếu, màn hình, TV qua cổng (hoặc các cổng) nào?
+Cổng USB.
+\Cổng HDMI, DVI hoặc VGA.
+Cổng mạng Ethernet.
+Cổng âm thanh.
+Nếu thiếu thành phần nào thì máy tính KHÔNG chạy được?
+Phần mềm ứng dụng.
+\Phần mềm hệ thống.
+Phần mềm mã nguồn mở.
+Internet.
+Chức năng của hệ điều hành là:
+\Quản lý tài nguyên, làm trung gian giao tiếp giữa người dùng và máy tính.
+Kết nối người dùng với những người khác, có thể chia sẻ ảnh, video.
+Cung cấp điện cho máy hoạt động.
+Tự sửa chữa những hư hỏng phần cứng.
+Phần mềm mã nguồn mở có đặc điểm:
+\Mã nguồn được công khai.
+Tự ý sản xuất bản sao, phân phối cho người khác là xâm phạm quyền tác giả.
+Không có giấy phép sử dụng.
+Có tính phí sử dụng.
+Lựa chọn nào là bộ phần mềm để xử lý văn bản, bảng tính, trình chiếu?
+GIMP.
+Thunderbird.
+\Open Office.
+Chromium.
+Thay thế CPU cũ bằng một CPU mới có tốc độ xử lý cao hơn có thể mang lại lợi ích gì?
+Đĩa cứng lưu được nhiều dữ liệu hơn.
+ROM có dung lượng lớn hơn.
+RAM có dung lượng lớn hơn.
+\Máy tính chạy nhanh hơn.
+Một máy tính bị chậm khi chạy đồng thời Firefox và GIMP. Nếu chỉ chạy một trong hai (Firefox hoặc GIMP) thì máy chạy nhanh. Một cách cải thiện là:
+\Tăng dung lượng RAM.
+Tăng dung lượng ROM.
+Gắn thêm đĩa cứng.
+Thay màn hình khác lớn hơn.
+Mạng máy tính là:
+\Tập hợp các máy tính có thể trao đổi dữ liệu.
+Một nhóm người dùng có thể liên lạc với nhau.
+Mạng Internet.
+Mạng xã hội.
+Các máy tính cá nhân trong mạng dùng để lướt web, sử dụng chung máy in, dịch vụ do máy khác cung cấp, gọi là:
+Máy chủ.
+\Máy khách (máy trạm).
+Phương tiện truyền dẫn.
+Vệ tinh.
+Điện thoại thông minh thường kết nối vào mạng thông qua phương tiện truyền dẫn nào?
+Cáp điện thoại
+Cáp đồng trục.
+Cáp quang.
+\Sóng vô tuyến.
+Đặc điểm của mạng Internet là:
+Không ai kiểm duyệt nội dung.
+Tất cả thông tin đăng trên Internet là sự thật khách quan.
+\Không ai nắm quyền điều khiển toàn bộ mạng.
+Các tổ chức chính phủ không tham gia mạng Internet.
+Dịch vụ công trực tuyến là một ví dụ của:
+Thương mại điện tử.
+\Chính phủ điện tử.
+Học trực tuyến.
+Hội nghị trực tuyến.
+Dịch vụ giúp thực hiện các cuộc họp từ xa, tạo thành một văn phòng ảo có hình ảnh âm thanh, là một ví dụ của:
+Thương mại điện tử.
+Chính phủ điện tử.
+Ngân hàng điện tử.
+\Hội nghị trực tuyến.
+Dịch vụ truyền văn bản qua mạng, cho phép giao tiếp trực tiếp (real-time), là:
+E-mail.
+Tin nhắn ngắn (SMS).
+\Nhắn tin tức thời (IM).
+Nói chuyện qua giao thức Internet (VoIP).
+Tổ chức hoặc cá nhân nào phân loại trang thông tin điện tử (viết tắt TTTĐT) thành báo điện tử, TTTĐT tổng hợp, TTTĐT nội bộ, TTTĐT cá nhân, TTTĐT ứng dụng chuyên ngành?
+Mỗi người dùng cá nhân.
+Nhà cung cấp dịch vụ Internet.
+\Cơ quan Nhà nước Việt Nam.
+Công ty thiết kế web.
+Một số bệnh liên quan đến việc sử dụng máy tính lâu dài là:
+Tim, phổi, gan.
+Thận, dạ dày, tiểu đường.
+\Mắt, khớp, tâm thần.
+Cả 3 lựa chọn trên đều đúng.
+Để đảm bảo an toàn, trước khi gỡ giấy bị kẹt trong máy in, phải:
+Gỡ hộp mực.
+Kéo tờ giấy khỏi thanh cuộn.
+\Tắt máy, rút phích cắm điện.	
+Rút dây cáp nối máy in với máy tính.
+Máy tính ở trạng thái nào KHÔNG sử dụng năng lượng?
+Trạng thái ngủ.
+Trạng thái tắt màn hình.
+Trạng thái bảo vệ màn hình (screen saver).
+\Trạng thái ngủ đông (hibernation).
+Một tập hợp thông tin đại diện duy nhất cho người sử dụng trên hệ thống thông tin, được dùng để đăng nhập, gọi là:
+\Tài khoản người dùng.
+Phân quyền người dùng.
+Xác thực người dùng.
+Địa chỉ.
+Một trong những công dụng của tường lửa trong hệ thống mạng nội bộ là:
+\Chống sự xâm nhập trái phép từ bên ngoài.
+Hạn chế hỏa hoạn.
+Thiết lập mạng không dây.
+Tăng tốc độ truyền dữ liệu.
+Lựa chọn nào giúp hạn chế rủi ro dữ liệu bị lấy cắp và sử dụng trái mục đích?
+Khóa máy tính khi rời nơi làm việc.
+Cấm người không phận sự tiếp cận thiết bị lưu trữ.
+Mã hóa dữ liệu.
+\Cả 3 lựa chọn trên đều đúng.
+Trong các lựa chọn sau, hãy chọn cách tốt nhất giúp hạn chế rủi ro dữ liệu bị mất do phá hoại hay hư hỏng vật lý:
+Mã hóa dữ liệu.
+Cất giấu dữ liệu vào thùng rác.
+Đặt thuộc tính ẩn cho dữ liệu.
+\Sao lưu dữ liệu dự phòng.
+Phần mềm được chèn một cách bí mật vào hệ thống với mục đích làm tổn hại đến tính bí mật, tính toàn vẹn hoặc tính sẵn sàng của hệ thống, được gọi chung là :
+\Mã độc.
+Phần mềm diệt virus.
+Trojan.
+Adware.
+Loại mã độc nào có đặc trưng là tự nhân bản, tự tìm cách lan truyền qua hệ thống mạng , không cần ký sinh trong một tệp tin?
+\Worm.
+Trojan.
+Adware.
+Spyware.
+Trong các lựa chọn sau, cách tốt nhất để phòng chống phần mềm độc hại xâm nhập vào máy là:
+Mã hóa dữ liệu cá nhân.
+\Cài đặt phần mềm diệt mã độc và thường xuyên cập nhật.
+Dọn dẹp thùng rác thường xuyên.
+Không tiết lộ thông tin cá nhân trên mạng Internet.
+Ở Việt Nam, văn bản nào bảo hộ quyền tác giả đối với chương trình máy tính?
+\Luật sở hữu trí tuệ.
+Thông tư quy định chuẩn kĩ năng sử dụng công nghệ thông tin.
+Thông tư liên tịch quy định tổ chức thi và cấp chứng chỉ ứng dụng công nghệ thông tin.
+Luật giáo dục.
+Loại phần mềm nào tác giả giữ bí mật mã nguồn, người dùng được sao chép, phân phối, sử dụng không phải trả tiền?
+\Phần mềm miễn phí (freeware).
+Phần mềm mã nguồn mở.
+Phần mềm trong đĩa DVD.
+Phần mềm tải từ mạng Internet.
+
+Trong Microsoft Excel, ô Name Box có công dụng gì?
+Hiển thị công thức của ô
+Hiển thị dữ liệu trong ô
+Canh lề dữ liệu cho ô
+\Hiển thị tên địa chỉ ô hiện hành hoặc tên của vùng đang chọn
+
+Trong Microsoft Excel, địa chỉ vùng được thể hiện ở câu nào sau đây là đúng?
+A1 .. D5
+A1…D5
+A1 – D5
+\A1 : D5
+
+Trong Microsoft Excel, địa chỉ vùng A1: D4 gồm có bao nhiêu ô (cell):
+12 
+14
+\16 
+20
+
+Trong Microsoft Excel, địa chỉ nào sau đây là địa chỉ tuyệt đối: 
+ C$1:D$10
+\$C$1:$D$10
+C$1:$D$10
+$C$1:$D10
+
+Trong Microsoft Excel, để tạo địa chỉ dòng (cột) tuyệt đối, ta sử dụng ký tự nào trước tên dòng (cột):
+?
+@ 
+#
+\$
+
+Câu nào sau đây sai?
+\Dữ liệu kiểu số sẽ mặc nhiên căn thẳng lề trái
+Dữ liệu kiểu chuỗi sẽ mặc nhiên căn thẳng lề trái
+Dữ liệu kiểu giờ phút sẽ mặc nhiên căn thẳng lề phải
+Dữ liệu kiểu ngày tháng sẽ mặc nhiên căn thẳng lề phải
+
+Dữ liệu kiểu chuỗi trong Microsoft Excel mặc định nằm ở vị trí nào trong ô.
+\Bên trái
+Giữa
+Bên phải
+Tất cả đều sai
+
+Trong Microsoft Excel, để xuống dòng trong cùng một ô, ta nhấn tổ hợp phím:
+Ctrl + B
+\Alt + Enter
+Alt + F11
+Ctrl + D
+
+Trong Microsoft Excel, khi muốn sắp xếp (Sort) vùng dữ liệu đang chọn
+Vào Data   Options…, 
+Vào Data   Filter…, 
+\Vào Data  Sort..., 
+Vào Format  Options…
+
+Trong Microsoft Excel, để giữ cố định dòng (hoặc cột) trong cửa sổ bảng tính, ta chọn dòng (hoặc cột) phía dưới (hoặc phía sau) dòng (hoặc cột) cần cố định, sau đó thực hiện:
+ Vào thẻ Review  Freeze Panes
+\Vào thẻ View  Freeze Panes
+Vào thẻ Page Layout  Freeze Panes
+Vào thẻ Home  Freeze Panes
+
+Trong Microsoft Excel, khi viết sai tên hàm trong tính toán, chương trình thông báo lỗi:
+\#NAME?
+#DIV/0!
+ #VALUE!
+#N/A
+
+Trong bảng tính Excel, tại ô A2 có sẵn giá trị số không (0); Tại ô B2 gõ vào công thức=5/A2 thì nhận được kết quả:
+0
+5
+#VALUE!
+\#DIV/0!
+
+Trong bảng tính Excel, giá trị trả về của công thức  =ROUND(136485.22, -3) là:
+136,000.22      
+137,000.22             
+\136000
+137000
+
+Trong Microsoft Excel, để tính giá trị trung bình ta dùng hàm nào?
+\Average(Number1, Number2,…)
+Sum(Number1, Number2,…)
+Max(Number1, Number2,…)
+Min(Number1, Number2,…)
+
+Trong Microsoft Excel, để đếm các giá trị là số, ta sử dụng hàm?
+Counta(Value1, Value2,…)
+Sum(Value1, Value2,…)
+Max(Value1, Value2,…)
+\Count(Value1, Value2,…)
+
+Trong Microsoft Excel, ta nhập công thức =AVERAGE(4,6,7,8), kết quả trả về:
+\6.25
+25
+8
+4
+
+Trong bảng tính Excel, giả sử tại ô A2 có giá trị là số 80, B2 có giá trị là số 100. Công thức=COUNT(A2:B2)+B2 trả về kết quả nào?
+80
+190
+280
+\102
+
+Trong Microsoft Excel, công thức =OR(5>4, 6<9, 2<1) trả về kết quả nào?
+\True
+False
+#Name?
+# Value!
+
+Trong Microsoft Excel, các hàm IF, AND và OR là thuộc loại hàm xử lý dữ liệu:
+Số
+Ngày Tháng Năm
+\Logic
+Chuỗi
+
+Trong bảng tính Excel, tại ô A2 có giá trị thuộc kiểu ngày: 30/04/2017. Tại ô B4, ta gõ công thức =DAY(A2)-MONTH(A2) thì nhận được kết quả:
+\26
+34
+30-04
+04
+
+Trong bảng tính Excel, khi chiều dài dữ liệu kiểu số lớn hơn chiều rộng của ô thì sẽ hiển thị trong ô các ký tự:
+&
+\#
+$
+*
+
+Trong Microsoft Excel, muốn một ô trong bảng có hướng chữ nghiêng 45 độ, tại ô đó thựchiện:
+Nhấn nút phải chuột  Format CellTab Alignment Wraptext, chọn 45
+Kẻ đường thẳng 45 độ rồi gõ dữ liệu vào
+\Nhấp nút phải chuột   Format Cells  Tab Alignment  Orientation, chọn 45 Degrees
+Tất cả đều sai
+
+Trong Microsoft Excel, để tạo biểu đồ cho vùng giá trị được chọn.
+Vào thẻ Tool    Chart…
+\Vào thẻ Insert  Chart...
+Vào thẻ View     Chart...
+Vào thẻ Format  Chart...
+
+Trong Microsoft Excel, để thực hiện định dạng lề trang trước khi in?
+Vào Page Layout, chọn Page Setup, chọn thẻ Page.
+Vào Page Layout, chọn Page Setup, chọn thẻ Sheet. 
+Vào Page Layout, chọn Page Setup, chọn thẻ Layout.
+\Vào Page Layout, chọn Page Setup, chọn thẻ Margins.
+
+Trong Microsoft Excel, để lưu trang tính sang tệp có phần mở rộng là .XLS, ta thực hiện?
+Chọn Save As Type là Excel Template
+\Chọn Save As Type là Excel 97-2003 Workbook 
+Chọn Save As Type là XPS Document
+Chọn Save As Type là PDF
+
+Trong Microsoft Excel, để thực hiện đặt mật khẩu kiểm soát khi mở trang tính đã lưu, ta thực hiện?
+Vào Home chọn Save rồi chọn Tools chọn General Option
+Vào Insert chọn Save As rồi chọn Tools chọn General Option
+\Vào File chọn Save As rồi chọn Tools chọn General Option
+Vào Design chọn Save rồi chọn Tools chọn General Option
+
+Các ô dữ liệu của bảng tính Excel có thể chứa
+Các giá trị kiểu logic, ngày, số, chuỗi
+Các giá trị kiểu ngày, số, chuỗi
+Các dữ liệu là công thức
+\Tất cả đều đúng
+
+Sau khi khởi động Microsoft Excel, ta nhập dữ liệu vào một ô. Phát biểu nào sau đây là đúng?
+Nếu dữ liệu là giá trị số, Excel sẽ tự động canh phải.
+Nếu dữ liệu là giá trị chuỗi, Excel sẽ tự động canh trái.
+Nếu dữ liệu là giá trị ngày, Excel sẽ tự động canh phải.
+\Tất cả đều đúng.
+
+Trong bảng tính Excel, để sửa dữ liệu trong một ô tính mà không cần nhập lại, ta thực hiện:
+\Nháy chuột vào ô cần sửa, rồi bấm phím F2
+Nháy chuột vào ô cần sửa, rồi bấm phím F4
+Nháy chuột vào ô cần sửa, rồi bấm phím F10
+Nháy chuột vào ô cần sửa, rồi bấm phím F12
+
+Trong Microsoft Excel, để chèn thêm 1 Cột (Column) trước cột hiện tại:
+\Vào Home  Insert  Insert Sheet Columns
+Vào View  Insert  Insert Sheet Column
+Vào Insert  Insert Sheet Columns
+Vào Data  Insert   Insert Sheet Columns
+
+Trong bảng tính Excel, tại ô A3 có công thức =SUM(A1:B2)&$B$1. Khi sao chép công thức này đến ô D5, công thức tại ô D5 sẽ là:
+=SUM(D4:E5)&$B$2
+=SUM(D5:E6)&$B$3
+\=SUM(D3:E4)&$B$1
+=SUM(D3:E4)&$B$4
+
+Trong Microsoft Excel, hàm ROUND dùng để:
+Tính tổng
+Tìm giá trị nhỏ nhất
+\Làm tròn số
+Tính giá trị trung bình
+
+Trong bảng tính Excel, giả sử tại ô C2 có chứa giá trị thuộc kiểu số 3.124567. Công thức nào sau đây nhập không đúng cú pháp?
+\=ROUND(C2)
+=ROUND(C2,-1)
+=ROUND(C2,0)
+ =ROUND(C2,1)
+
+Trong bảng tính Excel, công thức  =COUNT(3,"HOA",5,6,"DA LAT",8) trả về kết quả là:
+3
+\4
+5
+6
+
+Trong Microsoft Excel, khi sử dụng hàm SUM ta có thể:
+không sử dụng tham số nào 
+sử dụng tối đa là 1 tham số 
+sử dụng tối đa là 2 tham số 
+\sử dụng tối đa là 255 tham số
+
+Trong bảng tính Excel, giá trị trả về của công thức =IF( “B” > “A”, 0, 1) là:
+1
+\0
+False
+# Value!
+
+Trong bảng tính Excel, điều kiện trong hàm IF được phát biểu dưới dạng một phép so sánh. Khi cần so sánh khác nhau thì sử dụng ký hiệu nào sau đây:
+\<>
+#
+&
+><
+
+Trong Microsoft Excel, để tìm các số thỏa điều kiện <=5 hoặc  >=10, ta dùng:
+Hàm AND.
+\Hàm OR.
+Hàm NOT.
+Tất cả đều đúng.
+
+Trong Microsoft Excel, công thức =AND(5>4, 6<9, 2<1) trả về kết quả nào?
+True
+\False
+#Name?
+# Value!
+
+Trong bảng tính Excel, để tính tổng các giá trị trên vùng địa chỉ (B5:B7), ta nhập công thức nào?
+=SUM(B5:B7)
+=SUM(B5,B6,B7)
+=SUM($B$5:$B$7)
+\Tất cả đều đúng

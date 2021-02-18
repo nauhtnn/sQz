@@ -19,23 +19,26 @@ namespace sQzLib
                 else if (lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
                 {
                     string s = lines.Dequeue();
-                    tokens.Enqueue(s.Substring(1, s.Length - 1));
+                    if(s.Length > 2)
+                        tokens.Enqueue(s.Substring(1, s.Length - 2));
                 }
 				else
-					tokens.Enqueue(AppendLines(lines));
+					tokens.Enqueue(JoinLinesTo1Token(lines));
 			}
 			return tokens;
 		}
 		
-		static string AppendLines(Queue<string> lines)
+		static string JoinLinesTo1Token(Queue<string> lines)
 		{
 			StringBuilder token = new StringBuilder();
 			token.Append(lines.Dequeue().Substring(1));
 			while(lines.Count > 0)
 			{
-				if(lines.Peek().ElementAt(lines.Peek().Length) == '}')
+				if(lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
 				{
-					token.Append(lines.Dequeue().Substring(-1));
+                    string s = lines.Dequeue();
+                    if (s.Length > 1)
+                        token.Append(s.Substring(0, s.Length - 2));
 					break;
 				}
 				else
@@ -46,7 +49,7 @@ namespace sQzLib
 		
 		static Queue<string> ReadTrimLines(string filePath)
 		{
-			if(System.IO.Path.GetExtension(filePath) == "docx")
+			if(System.IO.Path.GetExtension(filePath) == ".docx")
 				return ReadTrimDocx(filePath);
 			else
 				return ReadTrimTxt(filePath);
@@ -55,7 +58,16 @@ namespace sQzLib
 		static Queue<string> ReadTrimTxt(string filePath)
 		{
             Queue<string> lines = new Queue<string>();
-			string[] rawLines = System.IO.File.ReadAllLines(filePath);
+            string[] rawLines;
+            try
+            {
+                rawLines = System.IO.File.ReadAllLines(filePath);
+            }
+            catch(System.IO.IOException e)
+            {
+                System.Windows.MessageBox.Show(e.ToString());
+                return lines;
+            }
 			foreach(string line in rawLines)
 			{
 				string s;
@@ -73,14 +85,14 @@ namespace sQzLib
             {
                 doc = WordprocessingDocument.Open(fpath, false);
             }
-            catch(OpenXmlPackageException)
+            catch(OpenXmlPackageException e)
             {
-                //messagebox(err);
+                System.Windows.MessageBox.Show(e.ToString());
                 return lines;
             }
-            catch (System.IO.IOException)
+            catch (System.IO.IOException e)
             {
-				//messagebox(err);
+                System.Windows.MessageBox.Show(e.ToString());
                 return lines;
             }
             Body body = doc.MainDocumentPart.Document.Body;

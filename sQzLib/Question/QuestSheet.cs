@@ -91,7 +91,7 @@ namespace sQzLib
                 return 0;
             string emsg;
             int n = DBConnect.Count(conn, "sqz_question", "id",
-                    "AND del=0", out emsg);
+                    "AND deleted=0", out emsg);
             if (n < 0)
                 n = 0;
             return n;
@@ -328,7 +328,7 @@ namespace sQzLib
                 return;
             }
             string qry = DBConnect.mkQrySelect("sqz_question",
-                "id,stmt,ans0,ans1,ans2,ans3,akey", "del=0");
+                "id,stmt,ans0,ans1,ans2,ans3,akey", "deleted=0");
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             if (reader != null)
@@ -369,7 +369,7 @@ namespace sQzLib
             else
                 condition = "pid=" + passageID;
             string query = DBConnect.mkQrySelect("sqz_question",
-                "id,stmt,ans0,ans1,ans2,ans3,akey", "del=0 AND " + condition);
+                "id,stmt,ans0,ans1,ans2,ans3,akey", "deleted=0 AND " + condition);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
             
             if (reader != null)
@@ -415,7 +415,7 @@ namespace sQzLib
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
-            DBConnect.Ins(conn, "sqz_question", "pid,del,stmt,ans0,ans1,ans2,ans3,akey",
+            DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
                 vals.ToString(), out eMsg);
             DBConnect.Close(ref conn);
         }

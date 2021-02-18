@@ -8,71 +8,70 @@ namespace sQzLib
 {
     class PlainTextQuestParser
     {
-        public Tuple<List<Question>, List<PassageQuestion>> ParseLines(Queue<string> lines)
+        public Tuple<List<Question>, List<PassageQuestion>> ParseLines(Queue<string> tokens)
         {
-            string[] plainTexts = lines.Cast<string>().ToArray();
-            List<Question> singleQuestions = new List<Question>();
+            List<Question> independentQuestions = new List<Question>();
             List<PassageQuestion> passageQuestions = new List<PassageQuestion>();
-            for(int index = 0; index < plainTexts.Length;)
+            while(tokens.Count > 0)
             {
-                string sectionHeader = ParsePassage(plainTexts[index]);
-                if(sectionHeader != null)
+                if (sQzLib.Utils.CleanFront(tokens.Peek()).IndexOf(PassageQuestion.MAGIC_WORD) == 0)
                 {
-                    passageQuestions = ParsePassageQuestion(plainTexts, ref index);
+                    tokens.Dequeue();
                     break;
                 }
-                Question question = Parse1Question(plainTexts, ref index);
+                Question question = Parse1Question(tokens);
                 if(question == null)
                 {
-                    System.Windows.MessageBox.Show("Only " + singleQuestions.Count + " are read.");
+                    System.Windows.MessageBox.Show("Number of independent questions " + independentQuestions.Count + " are read.");
                     break;
                 }
-                singleQuestions.Add(question);
+                independentQuestions.Add(question);
             }
-            return new Tuple<List<Question>, List<PassageQuestion>>(singleQuestions, passageQuestions);
+            return new Tuple<List<Question>, List<PassageQuestion>>(independentQuestions, passageQuestions);
         }
 
-        List<PassageQuestion> ParsePassageQuestion(string[] plainTexts, ref int index)
+        List<PassageQuestion> ParsePassageQuestion(Queue<string> lines)
         {
-            List<PassageQuestion> passageQuestions = new List<PassageQuestion>();
-            PassageQuestion passageQuestion = null;
-            while(index < plainTexts.Length)
-            {
-                string passage = ParsePassage(plainTexts[index]);
-                if (passage != null)
-                {
-                    if (passageQuestion != null)
-                        passageQuestions.Add(passageQuestion);
-                    passageQuestion = new PassageQuestion();
-                    passageQuestion.Passage = passage;
-                }
-                Question question = Parse1Question(plainTexts, ref index);
-                if (question == null)
-                {
-                    System.Windows.MessageBox.Show("Only " + passageQuestions.Count + " are read.");
-                    break;
-                }
-                passageQuestion.Questions.Add(question);
-            }
-            return passageQuestions;
+            return null;
+            //List<PassageQuestion> passageQuestions = new List<PassageQuestion>();
+            //PassageQuestion passageQuestion = null;
+            //while(index < plainTexts.Length)
+            //{
+            //    string passage = ParsePassage(plainTexts[index]);
+            //    if (passage != null)
+            //    {
+            //        if (passageQuestion != null)
+            //            passageQuestions.Add(passageQuestion);
+            //        passageQuestion = new PassageQuestion();
+            //        passageQuestion.Passage = passage;
+            //    }
+            //    Question question = Parse1Question(lines);
+            //    if (question == null)
+            //    {
+            //        System.Windows.MessageBox.Show("Only " + passageQuestions.Count + " are read.");
+            //        break;
+            //    }
+            //    passageQuestion.Questions.Add(question);
+            //}
+            //return passageQuestions;
         }
 
-        Question Parse1Question(string[] plainTexts, ref int index)
+        Question Parse1Question(Queue<string> tokens)
         {
-            if (index + Question.N_ANS > plainTexts.Length)
+            if (tokens.Count < Question.N_ANS + 1)
             {
-                System.Windows.MessageBox.Show("Line " + index + " doesn't have 1 stem 4 options!");
+                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " doesn't have 1 stem 4 options!");
                 return null;
             }
 
             Question question = new Question();
-            question.Stmt = plainTexts[index++];
+            question.Stmt = tokens.Dequeue();
             question.vAns = new string[Question.N_ANS];
             for (int j = 0; j < Question.N_ANS;)
-                question.vAns[j++] = plainTexts[index++];
+                question.vAns[j++] = tokens.Dequeue();
             question.vKeys = new bool[Question.N_ANS];
             for (int j = 0; j < Question.N_ANS; ++j)
-                question.vKeys[index] = false;
+                question.vKeys[j] = false;
             if (question.tStmt[0] == '*' && 1 < question.tStmt.Length)
             {
                 question.bDiff = true;
@@ -98,7 +97,7 @@ namespace sQzLib
             }
             if (nKey != 1)
             {
-                System.Windows.MessageBox.Show("Line " + index + " has " + nKey + " key!");
+                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has " + nKey + " key!");
                 return null;
             }
             return question;
