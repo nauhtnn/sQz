@@ -12,13 +12,11 @@ namespace sQzLib
         public int uId;
         public SortedList<string, ExamineeA> vExaminee;
         public DateTime t1, t2;
-        public Dictionary<ExamLv, int> nLv;
         public string tPw;
         public ExamRoom()
         {
             uId = -1;
             vExaminee = new SortedList<string, ExamineeA>();
-            nLv = new Dictionary<ExamLv, int>();
             tPw = null;
         }
 
@@ -66,15 +64,14 @@ namespace sQzLib
                 e.Birthdate = reader.GetString(2);
                 e.Birthplace = reader.GetString(3);
                 vExaminee.Add(e.ID, e);
-                ++nLv[e.eLv];
             }
             reader.Close();
 
             foreach (ExamineeA e in vExaminee.Values)
             {
                 qry = DBConnect.mkQrySelect("sqz_nee_qsheet",
-                    "t1,t2,grade,comp", "dt='" + e.mDt.ToString(DT._) + "' AND lv='" +
-                    e.eLv + "' AND neeid=" + e.uId);
+                    "t1,t2,grade,comp", "dt='" + e.mDt.ToString(DT._) +
+                    "' AND neeid=" + e.ID);
                 reader = DBConnect.exeQrySelect(conn, qry, out emsg);
                 if (reader != null)
                 {
@@ -84,7 +81,7 @@ namespace sQzLib
                             break;
                         if (DT.Toh(reader.GetString(1), DT.hs, out e.dtTim2))
                             break;
-                        e.uGrade = reader.GetInt16(2);
+                        e.Grade = reader.GetInt16(2);
                         e.tComp = reader.GetString(3);
                         e.eStt = NeeStt.Finished;
                     }
@@ -99,10 +96,10 @@ namespace sQzLib
                 if (e.bToDB)
                 {
                     e.bToDB = false;
-                    vals.Append("('" + e.mDt.ToString(DT._) + "','" + e.eLv.ToString() + "'," +
-                        e.uId + "," + (e.mAnsSh.uQSId)
+                    vals.Append("('" + e.mDt.ToString(DT._) + "','" +
+                        e.ID + "'," + (e.mAnsSh.uQSId)
                         + ",'" + e.dtTim1.ToString(DT.hh) +
-                        "','" + e.dtTim2.ToString(DT.hh) + "'," + e.uGrade + ",'" +
+                        "','" + e.dtTim2.ToString(DT.hh) + "'," + e.Grade + ",'" +
                         e.tComp + "','" + e.mAnsSh.tAns + "'),");
                 }
         }
@@ -110,7 +107,7 @@ namespace sQzLib
         public ExamineeA Signin(ExamineeA e)
         {
             ExamineeA o;
-            if (vExaminee.TryGetValue(e.LvId, out o) && o.tBirdate == e.tBirdate)
+            if (vExaminee.TryGetValue(e.ID, out o) && o.Birthdate == e.Birthdate)
             {
                 o.bFromC = true;
                 o.Merge(e);
@@ -145,13 +142,13 @@ namespace sQzLib
                 if (e.ReadByte(buf, ref offs))
                     return true;
                 ExamineeA o;
-                if (vExaminee.TryGetValue(e.LvId, out o))
+                if (vExaminee.TryGetValue(e.ID, out o))
                 {
                     o.bFromC = false;
                     o.Merge(e);
                 }
                 else
-                    vExaminee.Add(e.LvId, e);
+                    vExaminee.Add(e.ID, e);
             }
             if (n == 0)
                 return false;
@@ -191,7 +188,7 @@ namespace sQzLib
                 if (e.ReadByte(buf, ref offs))
                     return true;
                 ExamineeA o;
-                if (vExaminee.TryGetValue(e.LvId, out o))
+                if (vExaminee.TryGetValue(e.ID, out o))
                 {
                     o.bFromC = false;
                     o.Merge(e);

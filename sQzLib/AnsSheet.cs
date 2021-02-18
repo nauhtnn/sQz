@@ -13,8 +13,8 @@ namespace sQzLib
         public const int LEN = 120;
         public ListBox[] vlbxAns;
         public AnsItem[][] vAnsItem;
-        public int uQSLvId;
-        public int uQSId { get { return (ExamineeA.LV_CAP < uQSLvId) ? uQSLvId - ExamineeA.LV_CAP : uQSLvId; } }
+        public int questSheetID;
+        public int uQSId { get { return (ExamineeA.LV_CAP < questSheetID) ? questSheetID - ExamineeA.LV_CAP : questSheetID; } }
         public bool bChanged;
         DgEvntCB dgSelChgCB;
         public byte[] aAns;
@@ -32,13 +32,13 @@ namespace sQzLib
         public AnsSheet() {
             bChanged = false;
             aAns = null;
-            uQSLvId = ExamineeA.LV_CAP;
+            questSheetID = ExamineeA.LV_CAP;
             dgSelChgCB = null;
         }
 
         public void Init(int uqslvid)
         {
-            uQSLvId = uqslvid;
+            questSheetID = uqslvid;
             if (aAns == null)
             {
                 aAns = new byte[LEN];
@@ -90,7 +90,7 @@ namespace sQzLib
 
         public void ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
         {
-            Buffer.BlockCopy(BitConverter.GetBytes(uQSLvId),
+            Buffer.BlockCopy(BitConverter.GetBytes(questSheetID),
                         0, buf, offs, 4);
             offs += 4;
             Buffer.BlockCopy(aAns, 0, buf, offs, LEN);
@@ -101,7 +101,7 @@ namespace sQzLib
         {
             byte[] buf = new byte[4 + LEN];
             int offs = 0;
-            Buffer.BlockCopy(BitConverter.GetBytes(uQSLvId),
+            Buffer.BlockCopy(BitConverter.GetBytes(questSheetID),
                         0, buf, offs, 4);
             offs += 4;
             Buffer.BlockCopy(aAns, 0, buf, offs, LEN);
@@ -113,7 +113,7 @@ namespace sQzLib
             int l = buf.Length - offs;
             if (l < 4)
                 return true;
-            uQSLvId = BitConverter.ToInt32(buf, offs);
+            questSheetID = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
             if (l < LEN)

@@ -33,19 +33,19 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((int)eStt));
             if (eStt == NeeStt.Finished)
-                l.Add(BitConverter.GetBytes(uGrade));
+                l.Add(BitConverter.GetBytes(Grade));
 
             if (eStt < NeeStt.Finished || bLog)
             {
-                byte[] b = Encoding.UTF8.GetBytes(tBirdate);
+                byte[] b = Encoding.UTF8.GetBytes(Birthdate);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
 
-                b = Encoding.UTF8.GetBytes(tName);
+                b = Encoding.UTF8.GetBytes(Name);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
 
-                b = Encoding.UTF8.GetBytes(tBirthplace);
+                b = Encoding.UTF8.GetBytes(Birthplace);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
             }
@@ -59,17 +59,20 @@ namespace sQzLib
         {
             int l = buf.Length - offs;
             //
-            if (l < 12)
+            if (l < 4)
                 return true;
-            int x = BitConverter.ToInt32(buf, offs);
+            int sz = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (ParseLvId(x))
+
+            if (l < sz)
                 return true;
-            if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
-                eStt = (NeeStt)x;
-            l -= 4;
-            offs += 4;
+            ID = Encoding.UTF8.GetString(buf, offs, sz);
+            l -= sz;
+            offs += sz;
+
+            if (l < 4)
+                return true;
             bLog = BitConverter.ToBoolean(buf, offs);
             l -= 1;
             offs += 1;
@@ -78,12 +81,12 @@ namespace sQzLib
             {
                 if (l < 4)
                     return true;
-                int sz = BitConverter.ToInt32(buf, offs);
+                sz = BitConverter.ToInt32(buf, offs);
                 l -= 4;
                 offs += 4;
                 if (l < sz + 4)
                     return true;
-                tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
+                Birthdate = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
                 sz = BitConverter.ToInt32(buf, offs);
@@ -101,7 +104,7 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-            mAnsSh.uQSLvId = BitConverter.ToInt32(buf, offs);
+            mAnsSh.questSheetID = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
 
@@ -122,27 +125,32 @@ namespace sQzLib
         {
             int l = buf.Length - offs;
             //
-            if (l < 20)
+            if (l < 4)
+                return true;
+
+            int sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            //
+            if (l < sz)
+                return true;
+            if (0 < sz)
+            {
+                Birthdate = Encoding.UTF8.GetString(buf, offs, sz);
+                l -= sz;
+                offs += sz;
+            }
+
+            if (l < 4)
                 return true;
 
             int x;
-            if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                eLv = (ExamLv)x;
-            else
-                return true;
-            l -= 4;
-            offs += 4;
-
-            uId = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-
             if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
                 eStt = (NeeStt)x;
             l -= 4;
             offs += 4;
 
-            int sz = BitConverter.ToInt32(buf, offs);
+            sz = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
             //
@@ -150,7 +158,7 @@ namespace sQzLib
                 return true;
             if (0 < sz)
             {
-                tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
+                Birthdate = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
             }
@@ -162,7 +170,7 @@ namespace sQzLib
                 return true;
             if (0 < sz)
             {
-                tName = Encoding.UTF8.GetString(buf, offs, sz);
+                Name = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
             }
@@ -174,7 +182,7 @@ namespace sQzLib
                 return true;
             if (0 < sz)
             {
-                tBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
+                Birthplace = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
             }
@@ -206,7 +214,7 @@ namespace sQzLib
                 dtTim2 = DT.INV_;
                 return true;
             }
-            uGrade = BitConverter.ToInt32(buf, offs);
+            Grade = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
             sz = BitConverter.ToInt32(buf, offs);
@@ -226,11 +234,12 @@ namespace sQzLib
         {
             //suppose eStt == NeeStt.Finished
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes((int)eLv));
-            l.Add(BitConverter.GetBytes(uId));
+            byte[] x = Encoding.UTF8.GetBytes(ID);
+            l.Add(BitConverter.GetBytes(x.Length));
+            l.Add(x);
             if (0 < tComp.Length)
             {
-                byte[] x = Encoding.UTF8.GetBytes(tComp);
+                x = Encoding.UTF8.GetBytes(tComp);
                 l.Add(BitConverter.GetBytes(x.Length));
                 l.Add(x);
             }
@@ -242,7 +251,7 @@ namespace sQzLib
             l.Add(mAnsSh.aAns);
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
-            l.Add(BitConverter.GetBytes(uGrade));
+            l.Add(BitConverter.GetBytes(Grade));
             return l;
         }
 
@@ -268,7 +277,7 @@ namespace sQzLib
             if (eStt < NeeStt.Examing)
                 return;
             mAnsSh = new AnsSheet();
-            mAnsSh.uQSLvId = e.mAnsSh.uQSLvId;
+            mAnsSh.questSheetID = e.mAnsSh.questSheetID;
 
             if (eStt < NeeStt.Submitting)
                 return;
@@ -281,7 +290,7 @@ namespace sQzLib
             eStt = e.eStt;
             dtTim1 = e.dtTim1;
             dtTim2 = e.dtTim2;
-            uGrade = e.uGrade;
+            Grade = e.Grade;
         }
     }
 }

@@ -23,8 +23,8 @@ namespace sQzServer0
         public PrepNeeView(ExamSlot sl)
         {
             mSlDB = sl;
-            Header = mSlDB.Dt.ToString(DT._);
-            Name = "_" + (Header as string).Replace(':', '_').Replace('-', '_');
+            Header = "Header";// mSlDB.Dt.ToString(DT._);
+            Name = "Name";// "_" + (Header as string).Replace(':', '_').Replace('-', '_').Replace(' ','_');
             mSlTmp = new ExamSlot();
             mSlTmp.Dt = mSlDB.Dt;
             foreach (ExamRoom rom in mSlDB.vRoom.Values)
@@ -279,21 +279,21 @@ namespace sQzServer0
                     rd.Height = rh;
                     g.RowDefinitions.Add(rd);
                     TextBlock t = new TextBlock();
-                    t.Text = e.tId;
+                    t.Text = e.ID;
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     g.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tName;
+                    t.Text = e.Name;
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
                     g.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tBirdate;
+                    t.Text = e.Birthdate;
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);
@@ -301,7 +301,7 @@ namespace sQzServer0
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     g.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tBirthplace;
+                    t.Text = e.Birthplace;
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);

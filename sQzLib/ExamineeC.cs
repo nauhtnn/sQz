@@ -12,14 +12,15 @@ namespace sQzLib
         public override List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(LvId));
+            byte[] b = Encoding.UTF8.GetBytes(ID);
+            l.Add(BitConverter.GetBytes(b.Length));
+            l.Add(b);
             l.Add(BitConverter.GetBytes((int)eStt));
 			l.Add(BitConverter.GetBytes(bLog));
-            byte[] b;
 
             if (eStt < NeeStt.Examing || bLog)
             {
-                b = Encoding.UTF8.GetBytes(tBirdate);
+                b = Encoding.UTF8.GetBytes(Birthdate);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
 
@@ -31,7 +32,7 @@ namespace sQzLib
             if (eStt < NeeStt.Examing)
                 return l;
 
-            l.Add(BitConverter.GetBytes(mAnsSh.uQSLvId));
+            l.Add(BitConverter.GetBytes(mAnsSh.questSheetID));
 
             if (eStt < NeeStt.Submitting)
                 return l;
@@ -55,7 +56,7 @@ namespace sQzLib
 
             if (eStt == NeeStt.Finished)
             {
-                uGrade = BitConverter.ToInt32(buf, offs);
+                Grade = BitConverter.ToInt32(buf, offs);
                 l -= 4;
                 offs += 4;
             }
@@ -69,7 +70,7 @@ namespace sQzLib
 				offs += 4;
 				if (l < sz)
 					return true;
-				tBirdate = Encoding.UTF8.GetString(buf, offs, sz);
+				Birthdate = Encoding.UTF8.GetString(buf, offs, sz);
 				l -= sz;
 				offs += sz;
 
@@ -80,7 +81,7 @@ namespace sQzLib
 				offs += 4;
 				if (l < sz)
 					return true;
-				tName = Encoding.UTF8.GetString(buf, offs, sz);
+				Name = Encoding.UTF8.GetString(buf, offs, sz);
 				l -= sz;
 				offs += sz;
 
@@ -91,7 +92,7 @@ namespace sQzLib
 				offs += 4;
 				if (l < sz)
 					return true;
-				tBirthplace = Encoding.UTF8.GetString(buf, offs, sz);
+				Birthplace = Encoding.UTF8.GetString(buf, offs, sz);
 				l -= sz;
 				offs += sz;
             }
@@ -105,12 +106,12 @@ namespace sQzLib
         {
             eStt = e.eStt;
             if (eStt == NeeStt.Finished)
-                uGrade = e.uGrade;
+                Grade = e.Grade;
             if (eStt < NeeStt.Finished || bLog)
             {
-                tBirdate = e.tBirdate;
-                tName = e.tName;
-                tBirthplace = e.tBirthplace;
+                Birthdate = e.Birthdate;
+                Name = e.Name;
+                Birthplace = e.Birthplace;
             }
             bLog = false;
         }

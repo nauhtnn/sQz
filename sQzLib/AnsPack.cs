@@ -54,10 +54,10 @@ namespace sQzLib
             {
                 AnsSheet i = new AnsSheet();
                 qs.ExtractKey(i);
-                if (!vSheet.ContainsKey(i.uQSLvId))
-                    vSheet.Add(i.uQSLvId, i);
+                if (!vSheet.ContainsKey(i.questSheetID))
+                    vSheet.Add(i.questSheetID, i);
                 else
-                    vSheet[i.uQSLvId] = i;
+                    vSheet[i.questSheetID] = i;
             }
         }
 
@@ -65,9 +65,9 @@ namespace sQzLib
         {
             AnsSheet i = new AnsSheet();
             qs.ExtractKey(i);
-            if (!vSheet.ContainsKey(i.uQSLvId))
+            if (!vSheet.ContainsKey(i.questSheetID))
             {
-                vSheet.Add(i.uQSLvId, i);
+                vSheet.Add(i.questSheetID, i);
                 return i;
             }
             return null;
@@ -90,9 +90,9 @@ namespace sQzLib
             while (0 < nSh)
             {
                 AnsSheet i = new AnsSheet();
-                if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.uQSLvId))
+                if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.questSheetID))
                     return true;
-                vSheet.Add(i.uQSLvId, i);
+                vSheet.Add(i.questSheetID, i);
                 --nSh;
             }
             return false;

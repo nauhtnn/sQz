@@ -10,19 +10,10 @@ namespace sQzLib
     public class QuestPack
     {
         public DateTime mDt;
-        public ExamLv eLv;
         public SortedList<int, QuestSheet> vSheet;
         int mNextQSIdx;
         int mMaxQSIdx;
-        protected QuestPack()
-        {
-            mDt = DT.INV_;
-            mNextQSIdx = 0;
-            mMaxQSIdx = -1;
-            vSheet = new SortedList<int, QuestSheet>();
-        }
-
-        public QuestPack(bool alt)
+        public QuestPack()
         {
             mDt = DT.INV_;
             mNextQSIdx = 0;
@@ -35,7 +26,6 @@ namespace sQzLib
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes((int)eLv));
             l.Add(BitConverter.GetBytes(vSheet.Values.Count));
             foreach (QuestSheet qs in vSheet.Values)
                 foreach (byte[] i in qs.ToByte())
@@ -63,10 +53,9 @@ namespace sQzLib
                 QuestSheet qs = new QuestSheet();
                 if(qs.ReadByte(buf, ref offs))
                     return true;
-                if (!vSheet.ContainsKey(qs.uId))
+                if (!vSheet.ContainsKey(qs.ID))
                 {
-                    qs.eLv = eLv;//optmz
-                    vSheet.Add(qs.uId, qs);
+                    vSheet.Add(qs.ID, qs);
                 }
                 --nSh;
             }
@@ -103,9 +92,8 @@ namespace sQzLib
         public List<string> SelectQStId()
         {
             List<string> l = new List<string>();
-            string tlv = eLv.ToString();
             foreach (QuestSheet qs in vSheet.Values)
-                l.Add(tlv + qs.uId.ToString("d3"));
+                l.Add(qs.ID.ToString("d3"));
             return l;
         }
 
@@ -118,9 +106,7 @@ namespace sQzLib
                 return true;
             }
             string qry = DBConnect.mkQrySelect("sqz_qsheet",
-                "id", "dt='" + dt.ToString(DT._) +
-                "' AND lv='" + eLv.ToString() + "' AND alt=" +
-                (bAlt ? '1' : '0'));
+                "id", "dt='" + dt.ToString(DT._) + "'");
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             List<int> qsids = new List<int>();
             if (reader != null)
@@ -131,12 +117,12 @@ namespace sQzLib
                 foreach(int qsid in qsids)
                 {
                     QuestSheet qs = new QuestSheet();
-                    if (qs.DBSelect(conn, dt, eLv, qsid, out eMsg))
+                    if (qs.DBSelect(conn, dt, qsid, out eMsg))
                     {
                         DBConnect.Close(ref conn);
                         return true;
                     }
-                    vSheet.Add(qs.uId, qs);
+                    vSheet.Add(qs.ID, qs);
                 }
             }
             DBConnect.Close(ref conn);
@@ -153,120 +139,36 @@ namespace sQzLib
             }
             eMsg = null;
             string cond1 = "dt='" + mDt.ToString(DT._) +
-                    "' AND lv='" + eLv.ToString() + "' AND qsid=";
+                    "' AND qsid=";
             string cond2 = "dt='" + mDt.ToString(DT._) +
-                    "' AND lv='" + eLv.ToString() + "' AND id=";
+                    "' AND id=";
             foreach (QuestSheet qs in vSheet.Values)
             {
                 //int n = DBConnect.Count(conn, "sqz_nee_qsheet", "qsid", cond1 + qs.uId, out eMsg);
                 //if (0 < n)
                 //    continue;
-                if (DBConnect.Delete(conn, "sqz_qsheet_quest", cond1 + qs.uId, out eMsg) < 0)
+                if (DBConnect.Delete(conn, "sqz_qsheet_quest", cond1 + qs.ID, out eMsg) < 0)
                     return true;
-                if (DBConnect.Delete(conn, "sqz_qsheet", cond2 + qs.uId, out eMsg) < 0)
+                if (DBConnect.Delete(conn, "sqz_qsheet", cond2 + qs.ID, out eMsg) < 0)
                     return true;
             }
             return false;
         }
 
-        public List<QuestSheet> GenQPack2(int numberOfSheet, int[] nQuestGroupByModule, int[] nDiffQuestGroupByModule)
-        {
-            List<QuestSheet> sheets = new List<QuestSheet>();
-            int i;
-            for (i = 0; i < numberOfSheet; ++i)
-                sheets.Add(new QuestSheet());
-            foreach (QuestSheet qs in sheets)
-                qs.bAlt = bAlt;
-            i = 0;
-            Random rand = new Random();
-            foreach (IUx iu in QuestSheet.GetIUs(eLv))
-            {
-                //
-                QuestSheet qs0 = new QuestSheet();
-                //qs0.bAlt = bAlt;
-                qs0.DBSelect(iu, QuestDiff.Easy);
-                //
-                foreach (QuestSheet qs in sheets)
-                {
-                    List<Question> vq = qs0.ShallowCopy();
-                    int ni = nQuestGroupByModule[i] - nDiffQuestGroupByModule[i];
-                    while (0 < ni)
-                    {
-                        int idx = rand.Next() % ni;
-                        qs.Add(vq.ElementAt(idx).DeepCopy());
-                        vq.RemoveAt(idx);
-                        --ni;
-                    }
-                }
-                //
-                qs0 = new QuestSheet();
-                //qs0.bAlt = bAlt;
-                qs0.DBSelect(iu, QuestDiff.Diff);
-                //
-                foreach (QuestSheet qs in sheets)
-                {
-                    List<Question> vq = qs0.ShallowCopy();
-                    int ni = nDiffQuestGroupByModule[i];
-                    while (0 < ni)
-                    {
-                        int idx = rand.Next() % ni;
-                        qs.Add(vq.ElementAt(idx).DeepCopy());
-                        vq.RemoveAt(idx);
-                        --ni;
-                    }
-                }
-                //
-                ++i;
-            }
-            List<int> eidx = new List<int>();
-            i = -1;
-            foreach (QuestSheet qs in sheets)
-            {
-                qs.eLv = eLv;
-                qs.Randomize(rand);
-                if (!qs.UpdateCurQSId())//todo: better error handle
-                    vSheet.Add(qs.uId, qs);
-                else
-                    eidx.Add(++i);
-            }
-            foreach (int idx in eidx)
-                sheets.RemoveAt(idx);
-
-            if (DBIns(mDt, sheets) == null)
-                return sheets;
-            return new List<QuestSheet>();
-        }
-
-        public List<QuestSheet> GenQPack3(int numberOfSheet, int[] nQuestGroupByModule, int[] nDiffQuestGroupByModule)
+        public List<QuestSheet> GenQPack3(int numberOfSheet)
         {
             string emsg;
-            Random rand = new Random();
             List<QuestSheet> sheets = new List<QuestSheet>();
-            QuestSheet questInDBGroupByModuleAndDiff = new QuestSheet();
-            questInDBGroupByModuleAndDiff.bAlt = bAlt;
-            int j = -1;
-            foreach (IUx module in QuestSheet.GetIUs(eLv))
-            {
-                ++j;
-                if (questInDBGroupByModuleAndDiff.DBSelect(rand, module, nQuestGroupByModule[j] - nDiffQuestGroupByModule[j], QuestDiff.Easy, out emsg))
-                {
-                    WPopup.s.ShowDialog(emsg);
-                    return new List<QuestSheet>();
-                }
-                if (questInDBGroupByModuleAndDiff.DBSelect(rand, module, nDiffQuestGroupByModule[j], QuestDiff.Diff, out emsg))
-                {
-                    WPopup.s.ShowDialog(emsg);
-                    return new List<QuestSheet>();
-                }
-            }
+            QuestSheet independentQuestions = new QuestSheet();
+            independentQuestions.DBSelect(-1, out emsg);
+            Random rand = new Random();
             while (0 < numberOfSheet)
             {
                 --numberOfSheet;
-                QuestSheet qs = questInDBGroupByModuleAndDiff.RandomizeDeepCopy(rand);
-                qs.eLv = eLv;
+                QuestSheet qs = independentQuestions.RandomizeDeepCopy(rand);
                 if (!qs.UpdateCurQSId())//todo: better error handle
                 {
-                    vSheet.Add(qs.uId, qs);
+                    vSheet.Add(qs.ID, qs);
                     sheets.Add(qs);
                 }
             }
@@ -285,7 +187,7 @@ namespace sQzLib
             StringBuilder vals = new StringBuilder();
             string prefx = "('" + dt.ToString(DT._) + "',";
             foreach (QuestSheet qs in l)
-                vals.Append(prefx + "," + qs.uId + "),");
+                vals.Append(prefx + "," + qs.ID + "),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
             if(DBConnect.Ins(conn, "sqz_qsheet", "dt,id", vals.ToString(), out eMsg) < 0)
@@ -300,7 +202,7 @@ namespace sQzLib
             foreach (QuestSheet qs in l)
                 qs.DBAppendQryIns(prefx, vals);
             vals.Remove(vals.Length - 1, 1);//remove the last comma
-            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,lv,qsid,qid,asort,idx", vals.ToString(), out eMsg) < 0)
+            if (DBConnect.Ins(conn, "sqz_qsheet_quest", "dt,qsid,qid,asort,idx", vals.ToString(), out eMsg) < 0)
             {
                 DBConnect.Close(ref conn);
                 return eMsg;
@@ -321,12 +223,12 @@ namespace sQzLib
                 return null;
         }
 
-        public List<int[]> GetNMod()
-        {
-            if (vSheet.Values.Count == 0)
-                return null;
-            return vSheet.First().Value.GetNMod();
-        }
+        //public List<int[]> GetNMod()
+        //{
+        //    if (vSheet.Values.Count == 0)
+        //        return null;
+        //    return vSheet.First().Value.GetNMod();
+        //}
 
         public void WriteTxt()
         {

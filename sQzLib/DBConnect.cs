@@ -39,7 +39,7 @@ namespace sQzLib
                 if (server == null)
                 {
                     server = "localhost";
-                    database = "sQz";
+                    database = "sQzEN";
                     uid = "root";
                     password = "1234";
                 }

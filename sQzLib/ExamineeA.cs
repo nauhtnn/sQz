@@ -5,12 +5,6 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    public enum ExamLv
-    {
-        A = 'A',
-        B = 'B'
-    }
-
     public enum NeeStt
     {
          Signing = 0,
@@ -23,7 +17,7 @@ namespace sQzLib
 
     public abstract class ExamineeA
     {
-        //public const int LV_CAP = 10000;//db sqz_examinee `id` SMALLINT UNSIGNED
+        public const int LV_CAP = 10000;//db sqz_examinee `id` SMALLINT UNSIGNED
         public DateTime mDt;
         public NeeStt eStt;
         //public ExamLv eLv;
@@ -60,13 +54,11 @@ namespace sQzLib
         public void Reset()
         {
             mDt = DT.INV_H;
-            //eLv = ExamLv.A;
-            //uId = LV_CAP;
             Name = null;
             Birthdate = null;
             Birthplace = null;
             eStt = NeeStt.Signing;
-            //uGrade = LV_CAP;
+            Grade = LV_CAP;
             dtTim1 = dtTim2 = DT.INV_;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
@@ -74,59 +66,11 @@ namespace sQzLib
             tLog = new StringBuilder();
         }
 
-        //public bool ParseLvId(int lvid)
-        //{
-        //    if (lvid != LV_CAP &&(lvid < 1 || LV_CAP + LV_CAP <= lvid))
-        //        return true;
-        //    if(lvid < LV_CAP)
-        //    {
-        //        eLv = ExamLv.A;
-        //        uId = lvid;
-        //    }
-        //    else
-        //    {
-        //        eLv = ExamLv.B;
-        //        uId = lvid - LV_CAP;
-        //    }
-        //    return false;
-        //}
-
-        //public bool ParseLvId(string s)
-        //{
-        //    if (s == null || s.Length != 5)
-        //        return true;
-        //    s = s.ToUpper();
-        //    ExamLv lv;
-        //    if (!Enum.TryParse(s.Substring(0, 1), out lv))
-        //        return true;
-        //    int uid;
-        //    if (!int.TryParse(s.Substring(1), out uid))
-        //        return true;
-        //    if (uid < 1 || LV_CAP <= uid)
-        //        return true;
-        //    if (eLv != lv || uId != uid)
-        //        Reset();
-        //    eLv = lv;
-        //    uId = uid;
-        //    return false;
-        //}
-
-        //public override string ToString()
-        //{
-        //    StringBuilder s = new StringBuilder();
-        //    s.AppendFormat("{0}, {1}, {2}, {3}",
-        //        tId, tName, tBirdate, tBirthplace);
-        //    return s.ToString();
-        //}
-
         public int DBGetQSId()
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return -1;
-            //string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "qsid",
-            //    "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
-            //    "' AND neeid=" + uId);
             string qry = DBConnect.mkQrySelect("sqz_examinee", "qsid",
                 "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
             string eMsg;
@@ -280,10 +224,9 @@ namespace sQzLib
             catch (UnauthorizedAccessException) { err = true; }
             if (err)
                 return true;
-            //w.Write((int)eLv);
             w.Write(ID);
             w.Write((int)eStt);
-            w.Write(mAnsSh.uQSId);
+            w.Write(mAnsSh.questSheetID);
             w.Write(mAnsSh.aAns, 0, AnsSheet.LEN);
             if (eStt == NeeStt.Finished)
             {
@@ -321,7 +264,7 @@ namespace sQzLib
             ID = r.ReadString();
             if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
                 eStt = (NeeStt)x;
-            mAnsSh.uQSLvId = r.ReadInt32();
+            mAnsSh.questSheetID = r.ReadInt32();
             mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
             int h, m;
             if(eStt == NeeStt.Finished)

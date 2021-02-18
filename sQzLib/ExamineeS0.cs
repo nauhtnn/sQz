@@ -18,19 +18,19 @@ namespace sQzLib
         public override List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes((int)eLv));
-            l.Add(BitConverter.GetBytes(uId));
+            byte[] b = Encoding.UTF8.GetBytes(Birthdate);
+            l.Add(BitConverter.GetBytes(b.Length));
+            l.Add(b);
             l.Add(BitConverter.GetBytes((int)eStt));
-            byte[] b;
 
-            b = Encoding.UTF8.GetBytes(tBirdate);
+            b = Encoding.UTF8.GetBytes(Birthdate);
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
 
-            b = Encoding.UTF8.GetBytes(tName);
+            b = Encoding.UTF8.GetBytes(Name);
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
-            b = Encoding.UTF8.GetBytes(tBirthplace);
+            b = Encoding.UTF8.GetBytes(Birthplace);
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
 
@@ -42,7 +42,7 @@ namespace sQzLib
 
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
-            l.Add(BitConverter.GetBytes(uGrade));
+            l.Add(BitConverter.GetBytes(Grade));
             if(0 < tComp.Length)
             {
                 byte[] x = Encoding.UTF8.GetBytes(tComp);
@@ -60,18 +60,21 @@ namespace sQzLib
             //suppose eStt == NeeStt.Finished
             int l = buf.Length - offs;
             //
-            if (l < 12)
+            if (l < 4)
                 return true;
-            int x;
-            if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                eLv = (ExamLv)x;
-            else
-                return true;
+            int x = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            uId = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
+            //
+            if (l < x || x < 1)
+                return true;
+            ID = Encoding.UTF8.GetString(buf, offs, x);
+            l -= x;
+            offs += x;
+
+            if (l < 4)
+                return true;
+
             x = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
@@ -98,7 +101,7 @@ namespace sQzLib
                 dtTim1 = DT.INV_;
                 return true;
             }
-            mAnsSh.uQSLvId = BitConverter.ToInt32(buf, offs);
+            mAnsSh.questSheetID = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
             mAnsSh.aAns = new byte[AnsSheet.LEN];
@@ -117,7 +120,7 @@ namespace sQzLib
                 dtTim2 = DT.INV_;
                 return true;
             }
-            uGrade = BitConverter.ToInt32(buf, offs);
+            Grade = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
             //
@@ -134,7 +137,7 @@ namespace sQzLib
             tComp = e.tComp;
             mAnsSh = e.mAnsSh;
             dtTim1 = e.dtTim1;
-            uGrade = e.uGrade;
+            Grade = e.Grade;
             dtTim2 = e.dtTim2;
         }
     }

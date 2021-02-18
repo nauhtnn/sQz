@@ -44,8 +44,6 @@
                         <RowDefinition Height="40"/>
                         <RowDefinition Height="40"/>
                     </Grid.RowDefinitions>
-                    <RadioButton x:Name="rdoA" GroupName="IU" HorizontalAlignment="Center" VerticalAlignment="Center" Checked="Lv_Checked" IsEnabled="False" Background="Gray"/>
-                    <RadioButton x:Name="rdoB" GroupName="IU" Grid.Column="1" HorizontalAlignment="Center" VerticalAlignment="Center" Checked="Lv_Checked" IsEnabled="False" Background="Gray"/>
                     <TextBlock x:Name="txtnQs" Grid.Row="1" Grid.Column="0" Margin="5" Height="25" HorizontalAlignment="Right"/>
                     <TextBlock x:Name="txtNqs" Grid.Row="1" Width="30" Grid.Column="1" Margin="5" Text="0" HorizontalAlignment="Left"/>
                     <TextBlock x:Name="txtnQ" Grid.Row="2" Grid.Column="0" Margin="5" Height="25" HorizontalAlignment="Right"/>
@@ -67,7 +65,7 @@
                     <TextBlock x:Name="txtNEsyDif" Grid.Column="1" Grid.ColumnSpan="2" HorizontalAlignment="Center"/>
                     <TextBlock x:Name="txtNDiff" Grid.Column="3" Grid.ColumnSpan="2" HorizontalAlignment="Center"/>
                 </Grid>
-                <Grid x:Name="grdA" Visibility="Collapsed">
+                <Grid x:Name="grdA">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="*"/>
                         <ColumnDefinition Width="*"/>
@@ -115,38 +113,9 @@
                     <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="5" IsEnabled="False" HorizontalAlignment="Right"/>
                     <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="5" HorizontalAlignment="Left"/>
                 </Grid>
-                <Grid x:Name="grdB" Visibility="Collapsed">
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="30"/>
-                        <RowDefinition Height="30"/>
-                    </Grid.RowDefinitions>
-                    <TextBlock Text="7" FontWeight="Bold" HorizontalAlignment="Center" />
-                    <TextBox Width="30" Grid.Column="1" TextAlignment="Center" HorizontalAlignment="Right"/>
-                    <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" HorizontalAlignment="Left"/>
-                    <TextBox Width="30" Grid.Column="3" TextAlignment="Center" IsEnabled="False" HorizontalAlignment="Right"/>
-                    <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" HorizontalAlignment="Left"/>
-                    <TextBlock Text="8" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="1"/>
-                    <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="1" HorizontalAlignment="Right"/>
-                    <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="1" HorizontalAlignment="Left"/>
-                    <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="1" IsEnabled="False" HorizontalAlignment="Right"/>
-                    <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="1" HorizontalAlignment="Left"/>
-                    <TextBlock Text="10" FontWeight="Bold" HorizontalAlignment="Center" Grid.Row="2"/>
-                    <TextBox Width="30" Grid.Column="1" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Right"/>
-                    <TextBlock Width="40" Grid.Column="2" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Left"/>
-                    <TextBox Width="30" Grid.Column="3" TextAlignment="Center" Grid.Row="2" IsEnabled="False" HorizontalAlignment="Right"/>
-                    <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="2" HorizontalAlignment="Left"/>
-                </Grid>
             </StackPanel>
-            <TabControl Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged"/>
-            <TabControl Name="tbcRefSl" Width="876" Visibility="Collapsed">
+            <TabControl Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged" Visibility="Collapsed"/>
+            <TabControl Name="tbcRefSl" Width="876">
                 <TabItem Name="tbiStat" Width="876">
                     <Grid ShowGridLines="True">
                         <Grid.ColumnDefinitions>

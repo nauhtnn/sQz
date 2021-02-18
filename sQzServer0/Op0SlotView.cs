@@ -15,16 +15,15 @@ namespace sQzServer0
     {
         TabControl tbcQ;
         TabControl tbcQAlt;
-        public SortedList<int, TextBlock> vGrade;
-        public SortedList<int, TextBlock> vDt1;
-        public SortedList<int, TextBlock> vDt2;
-        public SortedList<int, TextBlock> vComp;
+        public SortedList<string, TextBlock> vGrade;
+        public SortedList<string, TextBlock> vDt1;
+        public SortedList<string, TextBlock> vDt2;
+        public SortedList<string, TextBlock> vComp;
         public Dictionary<int, TextBlock> vRT1;
         public Dictionary<int, TextBlock> vRT2;
         Dictionary<int, TextBlock> vRPw;
         Grid grdNee;
         public ExamSlot mSl;
-        Dictionary<ExamLv, int[]> vNEsyDif, vNDiff;
         bool bInitNMod;
 
         public Op0SlotView()
@@ -43,17 +42,10 @@ namespace sQzServer0
 
         void Init()
         {
-            vGrade = new SortedList<int, TextBlock>();
-            vDt1 = new SortedList<int, TextBlock>();
-            vDt2 = new SortedList<int, TextBlock>();
-            vComp = new SortedList<int, TextBlock>();
-            vNEsyDif = new Dictionary<ExamLv, int[]>();
-            vNDiff = new Dictionary<ExamLv, int[]>();
-            vNEsyDif.Add(ExamLv.A, null);
-            vNDiff.Add(ExamLv.A, null);
-            vNEsyDif.Add(ExamLv.B, null);
-            vNDiff.Add(ExamLv.B, null);
-            bInitNMod = false;
+            vGrade = new SortedList<string, TextBlock>();
+            vDt1 = new SortedList<string, TextBlock>();
+            vDt2 = new SortedList<string, TextBlock>();
+            vComp = new SortedList<string, TextBlock>();
         }
 
         public void ShowExaminee()
@@ -78,25 +70,25 @@ namespace sQzServer0
                     grdNee.RowDefinitions.Add(rd);
                     //
                     TextBlock t = new TextBlock();
-                    t.Text = e.tId;
+                    t.Text = e.ID;
                     t.Background = bg;
                     Grid.SetRow(t, rid);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tName;
+                    t.Text = e.Name;
                     t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
                     grdNee.Children.Add(t);
                     //
                     t = new TextBlock();
-                    t.Text = e.tBirdate;
+                    t.Text = e.Birthdate;
                     t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 2);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tBirthplace;
+                    t.Text = e.Birthplace;
                     t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
@@ -111,17 +103,16 @@ namespace sQzServer0
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    int lvid = e.LvId;
-                    vGrade.Add(lvid, t);
-                    if (e.uGrade != ExamineeA.LV_CAP)
-                        t.Text = e.Grade;
+                    vGrade.Add(e.ID, t);
+                    if (e.Grade != ExamineeA.LV_CAP)
+                        t.Text = e.Grade.ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 5);
                     grdNee.Children.Add(t);
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    vDt1.Add(lvid, t);
+                    vDt1.Add(e.ID, t);
                     if (e.dtTim1.Year != DT.INV)
                         t.Text = e.dtTim1.ToString("HH:mm");
                     Grid.SetRow(t, rid);
@@ -130,7 +121,7 @@ namespace sQzServer0
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    vDt2.Add(lvid, t);
+                    vDt2.Add(e.ID, t);
                     if (e.dtTim2.Year != DT.INV)
                         t.Text = e.dtTim2.ToString("HH:mm");
                     Grid.SetRow(t, rid);
@@ -139,7 +130,7 @@ namespace sQzServer0
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    vComp.Add(lvid, t);
+                    vComp.Add(e.ID, t);
                     if (e.tComp != null)
                         t.Text = e.tComp;
                     Grid.SetRow(t, rid);
@@ -159,15 +150,14 @@ namespace sQzServer0
                 if(e.bToVw)
                 {
                     e.bToVw = false;
-                    int lvid = e.LvId;
                     TextBlock t;
-                    if (e.uGrade != ExamineeA.LV_CAP && vGrade.TryGetValue(lvid, out t))
-                        t.Text = e.Grade;
-                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
+                    if (e.Grade != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
+                        t.Text = e.Grade.ToString();
+                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.ID, out t))
                         t.Text = e.dtTim1.ToString("HH:mm");
-                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))
+                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.ID, out t))
                         t.Text = e.dtTim2.ToString("HH:mm");
-                    if (e.tComp != null && vComp.TryGetValue(lvid, out t))
+                    if (e.tComp != null && vComp.TryGetValue(e.ID, out t))
                         t.Text = e.tComp;
                 }
         }
@@ -280,25 +270,6 @@ namespace sQzServer0
                 Grid.SetColumn(t, 3);
                 g.Children.Add(t);
 
-                RadioButton rdo = new RadioButton();
-                rdo.GroupName = "_" + r.uId;
-                rdo.IsChecked = true;
-                rdo.IsEnabled = false;
-                Grid.SetRow(rdo, i);
-                Grid.SetColumn(rdo, 4);
-                rdo.HorizontalAlignment = HorizontalAlignment.Center;
-                g.Children.Add(rdo);
-
-                rdo = new RadioButton();
-                rdo.GroupName = "_" + r.uId;
-                if (mSl.vbQPkAlt.ContainsKey(r.uId) && mSl.vbQPkAlt[r.uId])
-                    rdo.IsChecked = true;
-                rdo.Checked += Alt_Checked;
-                Grid.SetRow(rdo, i);
-                Grid.SetColumn(rdo, 5);
-                rdo.HorizontalAlignment = HorizontalAlignment.Center;
-                g.Children.Add(rdo);
-
                 t = new TextBlock();
                 vRPw.Add(r.uId, t);
                 t.Text = r.tPw;
@@ -330,19 +301,6 @@ namespace sQzServer0
             if(mSl.vRoom.ContainsKey(rid) && vRPw.ContainsKey(rid)
                 && !mSl.vRoom[rid].RegenPw())
                     vRPw[rid].Text = mSl.vRoom[rid].tPw;
-        }
-
-        private void Alt_Checked(object sender, RoutedEventArgs e)
-        {
-            RadioButton rdo = sender as RadioButton;
-            if (rdo == null)
-                return;
-            int rid = int.Parse(rdo.GroupName.Substring(1));
-            if (mSl.vbQPkAlt.ContainsKey(rid) && !mSl.vbQPkAlt[rid])
-            {
-                mSl.vbQPkAlt[rid] = true;
-                mSl.DBUpQPAlt(rid);
-            }
         }
 
         TabItem DeepCopyNee(TabItem refTbi)
@@ -401,21 +359,17 @@ namespace sQzServer0
 
         private void tbiQ_GotFocus(object sender, RoutedEventArgs e)
         {
+            throw new NotImplementedException();
             TabItem tbi = sender as TabItem;
             if (tbi == null || tbi.Content != null)
                 return;
             TabControl tbc = tbi.Parent as TabControl;
             if (tbc == null)
                 return;
-            ExamLv lv;
-            int id;
-            if (QuestSheet.ParseLvId((tbi.Header as TextBlock).Text, out lv, out id))
-                return;
+            int id = -1;
             QuestSheet qs = null;
-            if (mSl.QuestionPack[lv].vSheet.ContainsKey(id))
-                qs = mSl.QuestionPack[lv].vSheet[id];
-            else if (mSl.vQPackAlt[lv].vSheet.ContainsKey(id))
-                qs = mSl.vQPackAlt[lv].vSheet[id];
+            if (mSl.QuestionPack.vSheet.ContainsKey(id))
+                qs = mSl.QuestionPack.vSheet[id];
             if (qs == null)
                 return;
             ScrollViewer svwr = new ScrollViewer();
@@ -460,37 +414,9 @@ namespace sQzServer0
             tbi.Content = svwr;
         }
 
-        public void InitNMod()
+        public void GenQ()
         {
-            if (bInitNMod)
-                return;
-            bInitNMod = true;
-            foreach (QuestPack p in mSl.QuestionPack.Values)
-            {
-                List<int[]> l = p.GetNMod();
-                if(l != null && l.Count == 2)
-                {
-                    vNEsyDif[p.eLv] = l[0];
-                    vNDiff[p.eLv] = l[1];
-                }
-            }
-        }
-
-        public List<int[]> GetNMod(ExamLv lv)
-        {
-            if (vNEsyDif[lv] == null)
-                return null;
-            List<int[]> rv = new List<int[]>();
-            rv.Add(vNEsyDif[lv]);
-            rv.Add(vNDiff[lv]);
-            return rv;
-        }
-
-        public void GenQ(ExamLv lv, int[] vnesydif, int[] vndiff)
-        {
-            vNEsyDif[lv] = vnesydif;
-            vNDiff[lv] = vndiff;
-            mSl.GenQ(mSl.CountQSByRoom(lv), lv, vnesydif, vndiff);
+            mSl.GenQ(mSl.CountQSByRoom());
 
             ShowQSHeader();
         }
@@ -498,35 +424,19 @@ namespace sQzServer0
         public void ShowQSHeader()
         {
             tbcQ.Items.Clear();
-            foreach (QuestPack p in mSl.QuestionPack.Values)
-                foreach (QuestSheet qs in p.vSheet.Values)
-                {
-                    TabItem ti = new TabItem();
-                    TextBlock t = new TextBlock();
-                    t.Text = qs.eLv.ToString() + qs.uId.ToString("d3");
-                    t.FontSize = 12;
-                    ti.Header = t;
-                    ti.GotFocus += tbiQ_GotFocus;
+            foreach (QuestSheet qs in mSl.QuestionPack.vSheet.Values)
+            {
+                TabItem ti = new TabItem();
+                TextBlock t = new TextBlock();
+                t.Text = qs.ID.ToString("d3");
+                t.FontSize = 12;
+                ti.Header = t;
+                ti.GotFocus += tbiQ_GotFocus;
                         
-                    tbcQ.Items.Add(ti);
-                }
+                tbcQ.Items.Add(ti);
+            }
             if (0 < tbcQ.Items.Count)
                 tbiQ_GotFocus(tbcQ.Items[0], null);
-            tbcQAlt.Items.Clear();
-            foreach (QuestPack p in mSl.vQPackAlt.Values)
-                foreach (QuestSheet qs in p.vSheet.Values)
-                {
-                    TabItem ti = new TabItem();
-                    TextBlock t = new TextBlock();
-                    t.Text = qs.eLv.ToString() + qs.uId.ToString("d3");
-                    t.FontSize = 12;
-                    ti.Header = t;
-                    ti.GotFocus += tbiQ_GotFocus;
-
-                    tbcQAlt.Items.Add(ti);
-                }
-            if (0 < tbcQAlt.Items.Count)
-                tbiQ_GotFocus(tbcQAlt.Items[0], null);
         }
 
         public void UpRT1(int rid)

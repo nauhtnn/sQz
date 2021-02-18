@@ -9,13 +9,8 @@ namespace sQzLib
 {
     public class QuestSheet
     {
-        public ExamLv eLv;
-        public static int guDBCurAId;
-        public static int guDBCurBId;
-        public int uId;
-        public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + ExamineeA.LV_CAP; } }
-        public string tId { get { return eLv.ToString() + uId.ToString("d3"); } }
-        public bool bAlt;
+        public static int globalMaxID_inDB;
+        public int ID;
         List<Question> vQuest;
         List<PassageQuestion> PassageQuestions;
         public byte[] aQuest;
@@ -34,55 +29,9 @@ namespace sQzLib
 
         public QuestSheet()
         {
-            eLv = ExamLv.A;
             vQuest = new List<Question>();
             aQuest = null;
-            uId = ExamineeA.LV_CAP;
-            bAlt = false;
-        }
-
-        public static IUx[] GetIUs(ExamLv lv)
-        {
-            IUx[] x;
-            if (lv == ExamLv.A)
-            {
-                x = new IUx[6];
-                x[0] = IUx._1;
-                x[1] = IUx._2;
-                x[2] = IUx._3;
-                x[3] = IUx._4;
-                x[4] = IUx._5;
-                x[5] = IUx._6;
-            }
-            else
-            {
-                x = new IUx[3];
-                x[0] = IUx._7;
-                x[1] = IUx._8;
-                x[2] = IUx._10;
-            }
-            return x;
-        }
-
-        public static bool ParseLvId(string s, out ExamLv lv, out int id)
-        {
-            if (s == null || s.Length != 4)
-            {
-                lv = ExamLv.A;
-                id = ExamineeA.LV_CAP;
-                return true;
-            }
-            s = s.ToUpper();
-            if (!Enum.TryParse(s.Substring(0, 1), out lv))
-            {
-                id = ExamineeA.LV_CAP;
-                return true;
-            }
-            if (!int.TryParse(s.Substring(1), out id))
-                return true;
-            if (id < 1 || ExamineeA.LV_CAP <= id)
-                return true;
-            return false;
+            ID = -1;
         }
 
         public Question Q(int idx)
@@ -100,62 +49,40 @@ namespace sQzLib
             vQuest.Clear();
         }
 
-        public List<int[]> GetNMod()
-        {
-            List<int[]> rv = new List<int[]>();
-            IUx[] viu = GetIUs(eLv);
-            int[] vnesydif = new int[viu.Length];
-            int[] vndif = new int[viu.Length];
-            foreach (Question q in vQuest)
-            {
-                int idx = (int)q.eIU;//mod on 0705
-                if (idx == 6 || idx == 7)
-                    idx = idx - 6;
-                else if (idx == 9)
-                    idx = 2;
-                ++vnesydif[idx];
-                if (q.bDiff)
-                    ++vndif[idx];
-            }
-            rv.Add(vnesydif);
-            rv.Add(vndif);
-            return rv;
-        }
-
-        public static List<int[]> DBGetNMod(ExamLv lv)
-        {
-            List<int[]> rv = new List<int[]>();
-            IUx[] viu = GetIUs(lv);
-            int[] vn = new int[viu.Length];
-            int[] vnd = new int[viu.Length];
-            MySqlConnection conn = DBConnect.Init();
-            if(conn == null)
-            {
-                for(int i = 0; i < viu.Length; ++i)
-                    vn[i] = 0;
-                rv.Add(vn);
-                rv.Add(vn);
-                return rv;
-            }
-            int j = -1;
-            foreach(IUx i in viu)
-            {
-                string emsg;
-                int n = DBConnect.Count(conn, "sqz_question", "id",
-                    "moid=" + (int)i + " AND del=0", out emsg);
-                if (n < 0)
-                    n = 0;
-                vn[++j] = n;
-                n = DBConnect.Count(conn, "sqz_question", "id",
-                    "moid=" + (int)i + " AND diff=1 AND del=0", out emsg);
-                if (n < 0)
-                    n = 0;
-                vnd[j] = n;
-            }
-            rv.Add(vn);
-            rv.Add(vnd);
-            return rv;
-        }
+        //public static List<int[]> DBGetNMod(ExamLv lv)
+        //{
+        //    List<int[]> rv = new List<int[]>();
+        //    IUx[] viu = GetIUs(lv);
+        //    int[] vn = new int[viu.Length];
+        //    int[] vnd = new int[viu.Length];
+        //    MySqlConnection conn = DBConnect.Init();
+        //    if(conn == null)
+        //    {
+        //        for(int i = 0; i < viu.Length; ++i)
+        //            vn[i] = 0;
+        //        rv.Add(vn);
+        //        rv.Add(vn);
+        //        return rv;
+        //    }
+        //    int j = -1;
+        //    foreach(IUx i in viu)
+        //    {
+        //        string emsg;
+        //        int n = DBConnect.Count(conn, "sqz_question", "id",
+        //            "moid=" + (int)i + " AND del=0", out emsg);
+        //        if (n < 0)
+        //            n = 0;
+        //        vn[++j] = n;
+        //        n = DBConnect.Count(conn, "sqz_question", "id",
+        //            "moid=" + (int)i + " AND diff=1 AND del=0", out emsg);
+        //        if (n < 0)
+        //            n = 0;
+        //        vnd[j] = n;
+        //    }
+        //    rv.Add(vn);
+        //    rv.Add(vnd);
+        //    return rv;
+        //}
 
         public static int DBGetND(IUx iu)
         {
@@ -164,7 +91,7 @@ namespace sQzLib
                 return 0;
             string emsg;
             int n = DBConnect.Count(conn, "sqz_question", "id",
-                    "moid=" + (int)iu + " AND diff=1 AND del=0", out emsg);
+                    "AND del=0", out emsg);
             if (n < 0)
                 n = 0;
             return n;
@@ -175,8 +102,8 @@ namespace sQzLib
             int idx = -1;
             foreach (Question q in vQuest)
             {
-                vals.Append(prefx + "'" + eLv.ToString() + "'," +
-                    uId + "," + q.uId + ",'");
+                vals.Append(prefx +
+                    ID + "," + q.uId + ",'");
                 foreach (int i in q.vAnsSort)
                     vals.Append(i.ToString());
                 vals.Append("'," + ++idx + "),");
@@ -186,7 +113,7 @@ namespace sQzLib
         //only Operation0 uses this.
         public void ExtractKey(AnsSheet anssh)
         {
-            anssh.uQSLvId = LvId;
+            anssh.questSheetID = ID;
             if (0 < vQuest.Count)
                 anssh.aAns = new byte[vQuest.Count * Question.N_ANS];
             else
@@ -200,8 +127,7 @@ namespace sQzLib
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes((int)eLv));
-            l.Add(BitConverter.GetBytes(uId));
+            l.Add(BitConverter.GetBytes(ID));
             l.Add(BitConverter.GetBytes(vQuest.Count));
             foreach (Question q in vQuest)
             {
@@ -228,16 +154,9 @@ namespace sQzLib
             int offs0 = offs;
             int l = buf.Length - offs;
             //
-            if (l < 12)
+            if (l < 8)
                 return true;
-            int x;
-            if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                eLv = (ExamLv)x;
-            else
-                return true;
-            offs += 4;
-            l -= 4;
-            uId = BitConverter.ToInt32(buf, offs);
+            ID = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
             int nq = BitConverter.ToInt32(buf, offs);
@@ -327,9 +246,7 @@ namespace sQzLib
         public QuestSheet DeepCopy()
         {
             QuestSheet qs = new QuestSheet();
-            qs.eLv = eLv;
-            qs.uId = uId;
-            qs.bAlt = bAlt;
+            qs.ID = ID;
             foreach (Question qi in vQuest)
                 qs.vQuest.Add(qi.DeepCopy());
             return qs;
@@ -354,9 +271,7 @@ namespace sQzLib
         public QuestSheet RandomizeDeepCopy(Random rand)
         {
             QuestSheet qs = new QuestSheet();
-            qs.eLv = eLv;
-            qs.uId = uId;
-            qs.bAlt = bAlt;
+            qs.ID = ID;
             foreach (Question qi in vQuest)
                 qs.vQuest.Add(qi.RandomizeDeepCopy(rand));
             //randomize
@@ -374,50 +289,46 @@ namespace sQzLib
             return qs;
         }
 
-        public int[] DBCount(out string eMsg)
-		{
-			MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-			{
-				eMsg = Txt.s._((int)TxI.DB_NOK);
-                return null;
-			}
-            IUx[] ius = new IUx[GetIUs(ExamLv.A).Count() + GetIUs(ExamLv.B).Count()];
-            int i = -1;
-            foreach (IUx iu in GetIUs(ExamLv.A))
-                ius[++i] = iu;
-            foreach (IUx iu in GetIUs(ExamLv.B))
-                ius[++i] = iu;
-			int[] nn = new int[ius.Length];
-			i = -1;
-			StringBuilder emsg = new StringBuilder();
-			foreach(IUx iu in ius)
-			{
-				nn[++i] = DBConnect.Count(conn, "sqz_question", "id",
-					"moid=" + (int)iu + " AND del=0", out eMsg);
-				if(eMsg != null)
-					emsg.Append(iu.ToString() + '-' + eMsg);
-			}
-			DBConnect.Close(ref conn);
-			eMsg = emsg.ToString();
-			return nn;
-		}
+        //      public int[] DBCount(out string eMsg)
+        //{
+        //	MySqlConnection conn = DBConnect.Init();
+        //          if (conn == null)
+        //	{
+        //		eMsg = Txt.s._((int)TxI.DB_NOK);
+        //              return null;
+        //	}
+        //          IUx[] ius = new IUx[GetIUs(ExamLv.A).Count() + GetIUs(ExamLv.B).Count()];
+        //          int i = -1;
+        //          foreach (IUx iu in GetIUs(ExamLv.A))
+        //              ius[++i] = iu;
+        //          foreach (IUx iu in GetIUs(ExamLv.B))
+        //              ius[++i] = iu;
+        //	int[] nn = new int[ius.Length];
+        //	i = -1;
+        //	StringBuilder emsg = new StringBuilder();
+        //	foreach(IUx iu in ius)
+        //	{
+        //		nn[++i] = DBConnect.Count(conn, "sqz_question", "id",
+        //			"moid=" + (int)iu + " AND del=0", out eMsg);
+        //		if(eMsg != null)
+        //			emsg.Append(iu.ToString() + '-' + eMsg);
+        //	}
+        //	DBConnect.Close(ref conn);
+        //	eMsg = emsg.ToString();
+        //	return nn;
+        //}
 
         //only Server0 uses this.
-        public void DBSelect(IUx eIU, QuestDiff d)
+        public void DBSelect()
         {
             vQuest.Clear();
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-			{
+            {
                 return;
-			}
+            }
             string qry = DBConnect.mkQrySelect("sqz_question",
-                "id,diff,stmt,ans0,ans1,ans2,ans3,`key`", "moid=" + (int)eIU + " AND del=0");
-            if (d == QuestDiff.Easy)
-                qry = qry + " AND diff=0";
-            else if (d == QuestDiff.Diff)
-                qry = qry + " AND diff=1";
+                "id,stmt,ans0,ans1,ans2,ans3,akey", "del=0");
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
             if (reader != null)
@@ -426,16 +337,14 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    q.bDiff = reader.GetInt16(1) != 0;
-                    q.Stmt = reader.GetString(2);
+                    q.Stmt = reader.GetString(1);
                     q.vAns = new string[4];
                     for (int i = 0; i < 4; ++i)
-                        q.vAns[i] = reader.GetString(3 + i);
-                    string x = reader.GetString(7);
+                        q.vAns[i] = reader.GetString(2 + i);
+                    string x = reader.GetString(6);
                     q.vKeys = new bool[4];
                     for (int i = 0; i < 4; ++i)
                         q.vKeys[i] = (x[i] == Question.C1);
-                    q.eIU = eIU;
                     vQuest.Add(q);
                 }
                 reader.Close();
@@ -446,72 +355,37 @@ namespace sQzLib
         }
 
         //only Server0 uses this.
-        public bool DBSelect(Random rand, IUx iu, int n, QuestDiff d, out string eMsg)
+        public bool DBSelect(int passageID, out string eMsg)
         {
-            if (n < 1)
-            {
-                eMsg = string.Empty;
-                return false;
-            }
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_NOK);
                 return true;
             }
-            //randomize
-            string qry = "moid=" + (int)iu + " AND del=0";
-            if (d == QuestDiff.Easy)
-                qry = qry + " AND diff=0";
-            else if (d == QuestDiff.Diff)
-                qry = qry + " AND diff=1";
-            int nn = DBConnect.Count(conn, "sqz_question", "id", qry, out eMsg);
-            if (nn < 1 || nn < n)
-                return true;
-            List<int> vIds = new List<int>();
-            int i;
-            for (i = 0; i < nn; ++i)
-                vIds.Add(i);
-            int[] vSel = new int[n];
-            i = n;
-            while (0 < i)
-            {
-                --i;
-                int idx = rand.Next() % nn;
-                --nn;
-                vSel[i] = vIds[idx];
-                vIds.RemoveAt(idx);
-            }
-            Array.Sort(vSel);
-            //
-            qry = DBConnect.mkQrySelect("sqz_question",
-                "id,diff,stmt,ans0,ans1,ans2,ans3,`key`", "moid=" + (int)iu + " AND del=0");
-            if (d == QuestDiff.Easy)
-                qry = qry + " AND diff=0";
-            else if (d == QuestDiff.Diff)
-                qry = qry + " AND diff=1";
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            i = 0;
-            int ii = -1;
+            string condition;
+            if (passageID < 0)
+                condition = "pid IS NULL";
+            else
+                condition = "pid=" + passageID;
+            string query = DBConnect.mkQrySelect("sqz_question",
+                "id,stmt,ans0,ans1,ans2,ans3,akey", "del=0 AND " + condition);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
+            
             if (reader != null)
             {
-                while (reader.Read() && i < n)
+                while (reader.Read())
                 {
-                    if (++ii != vSel[i])
-                        continue;
-                    ++i;
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    q.bDiff = reader.GetInt16(1) != 0;
-                    q.Stmt = reader.GetString(2);
+                    q.Stmt = reader.GetString(1);
                     q.vAns = new string[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
-                        q.vAns[j] = reader.GetString(3 + j);
-                    string x = reader.GetString(7);
+                        q.vAns[j] = reader.GetString(2 + j);
+                    string x = reader.GetString(5);
                     q.vKeys = new bool[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
                         q.vKeys[j] = (x[j] == Question.C1);
-                    q.eIU = iu;
                     vQuest.Add(q);
                 }
                 reader.Close();
@@ -520,7 +394,7 @@ namespace sQzLib
             return false;
         }
 
-        public void DBIns(IUx eIU)
+        public void DBIns()
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -528,7 +402,7 @@ namespace sQzLib
             StringBuilder vals = new StringBuilder();
             foreach (Question q in vQuest)
             {
-                vals.Append("(" + (int)eIU + ",0," + (q.bDiff ? 1 : 0) + ",'");
+                vals.Append("(NULL,0,'");
                 vals.Append(q.Stmt.Replace("'", "\\'") + "','");
                 for (int i = 0; i < Question.N_ANS; ++i)
                     vals.Append(q.vAns[i].Replace("'", "\\'") + "','");
@@ -541,18 +415,17 @@ namespace sQzLib
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
-            DBConnect.Ins(conn, "sqz_question", "moid,del,diff,stmt,ans0,ans1,ans2,ans3,`key`",
+            DBConnect.Ins(conn, "sqz_question", "pid,del,stmt,ans0,ans1,ans2,ans3,akey",
                 vals.ToString(), out eMsg);
             DBConnect.Close(ref conn);
         }
 
-        public bool DBSelect(MySqlConnection conn, DateTime dt, ExamLv lv, int id, out string eMsg)
+        public bool DBSelect(MySqlConnection conn, DateTime dt, int id, out string eMsg)
         {
             vQuest.Clear();
-            uId = id;
-            eLv = lv;
+            ID = id;
             string qry = DBConnect.mkQrySelect("sqz_qsheet_quest", "qid,asort,idx",
-                "dt='" + dt.ToString(DT._) + "' AND lv='" + lv.ToString() +
+                "dt='" + dt.ToString(DT._) +
                 "' AND qsid=" + id);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -573,7 +446,7 @@ namespace sQzLib
             {
                 ++i;
                 qry = DBConnect.mkQrySelect("sqz_question",
-                    "diff,stmt,ans0,ans1,ans2,ans3,`key`,moid", "id=" + qid);
+                    "stmt,ans0,ans1,ans2,ans3,akey", "id=" + qid);
                 reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
                 if (reader == null)
                     return true;
@@ -581,12 +454,11 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = qid;
-                    q.bDiff = reader.GetInt16(0) != 0;
-                    q.Stmt = reader.GetString(1);
+                    q.Stmt = reader.GetString(0);
                     string[] anss = new string[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
-                        anss[j] = reader.GetString(2 + j);
-                    string x = reader.GetString(6);
+                        anss[j] = reader.GetString(1 + j);
+                    string x = reader.GetString(5);
                     bool[] keys = new bool[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
                         keys[j] = (x[j] == Question.C1);
@@ -610,14 +482,9 @@ namespace sQzLib
 
         public bool UpdateCurQSId()
         {
-            if (eLv == ExamLv.A && -1 < guDBCurAId)
+            if (-1 < globalMaxID_inDB)
             {
-                uId = ++guDBCurAId;
-                return false;
-            }
-            if (eLv == ExamLv.B && -1 < guDBCurBId)
-            {
-                uId = ++guDBCurBId;
+                ID = ++globalMaxID_inDB;
                 return false;
             }
             return true;
@@ -629,22 +496,13 @@ namespace sQzLib
             if (conn == null)
                 return true;
             int uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
-                    "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.A.ToString() + "'");
+                    "dt='" + dt.ToString(DT._) + "'");
             if (uid < 0)
             {
                 DBConnect.Close(ref conn);
                 return true;
             }
-            guDBCurAId = uid;
-
-            uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
-                    "dt='" + dt.ToString(DT._) + "' AND lv='" + ExamLv.B.ToString() + "'");
-            if (uid < 0)
-            {
-                DBConnect.Close(ref conn);
-                return true;
-            }
-            guDBCurBId = uid;
+            globalMaxID_inDB = uid;
 
             return false;
         }

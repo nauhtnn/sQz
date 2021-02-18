@@ -32,20 +32,7 @@ namespace sQzLib
             mDt = DT.INV_;
             vRoom = new Dictionary<int, ExamRoom>();
             eStt = ExamStt.Prep;
-            QuestionPack = new QuestPack(false);
-            p.eLv = ExamLv.A;
-            QuestionPack.Add(p.eLv, p);
-            p = new QuestPack(false);
-            p.eLv = ExamLv.B;
-            QuestionPack.Add(p.eLv, p);
-
-            vQPackAlt = new Dictionary<ExamLv, QuestPack>();
-            p = new QuestPack(true);
-            p.eLv = ExamLv.A;
-            vQPackAlt.Add(p.eLv, p);
-            p = new QuestPack(true);
-            p.eLv = ExamLv.B;
-            vQPackAlt.Add(p.eLv, p);
+            QuestionPack = new QuestPack();
 
             mKeyPack = new AnsPack();
         }
@@ -59,7 +46,7 @@ namespace sQzLib
                 return 0;
             }
             string v = "('" + mDt.ToString(DT._) + "'," + (int)ExamStt.Prep + ")";
-            int n = DBConnect.Ins(conn, "sqz_slot", "dt,open", v, out eMsg);
+            int n = DBConnect.Ins(conn, "sqz_slot", "dt,status", v, out eMsg);
             DBConnect.Close(ref conn);
             if (n == -1062)
                 eMsg = Txt.s._((int)TxI.DB_EXCPT) + Txt.s._((int)TxI.SLOT_EXIST);
@@ -76,9 +63,9 @@ namespace sQzLib
             }
             string qry;
             if (arch)
-                qry = "open=" + (int)ExamStt.Arch;
+                qry = "status=" + (int)ExamStt.Arch;
             else
-                qry = "open!=" + (int)ExamStt.Arch;
+                qry = "status!=" + (int)ExamStt.Arch;
             qry = DBConnect.mkQrySelect("sqz_slot", "dt", qry);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
@@ -121,7 +108,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return Txt.s._((int)TxI.DB_NOK);
-            string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid,qpkalt",
+            string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid",
                 "dt='" + mDt.ToString(DT._) + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -132,11 +119,11 @@ namespace sQzLib
             }
             while (reader.Read())
             {
-                int rid = reader.GetInt16(0);
-                if (vbQPkAlt.ContainsKey(rid))
-                    vbQPkAlt[rid] = reader.GetInt16(1) != 0;
-                else
-                    vbQPkAlt.Add(rid, reader.GetInt16(1) != 0);
+                int rid = reader.GetInt32(0);
+                //if (vbQPkAlt.ContainsKey(rid))
+                //    vbQPkAlt[rid] = reader.GetInt16(1) != 0;
+                //else
+                //    vbQPkAlt.Add(rid, reader.GetInt16(1) != 0);
             }
             reader.Close();
             DBConnect.Close(ref conn);
@@ -215,13 +202,29 @@ namespace sQzLib
             return null;
         }
 
+        public void DBSafeUpdateArchiveStatus()
+        {
+            bool bArch = true;
+            foreach (ExamRoom r in vRoom.Values)
+                if (0 < r.vExaminee.Count && r.t2.Hour == DT.INV)
+                {
+                    bArch = false;
+                    break;
+                }
+            if (bArch)
+            {
+                eStt = ExamStt.Arch;
+                DBUpStt();
+            }
+        }
+
         public string DBUpStt()
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return Txt.s._((int)TxI.DB_NOK);
             string emsg;
-            int n = DBConnect.Update(conn, "sqz_slot", "stt=" + (int)eStt,
+            int n = DBConnect.Update(conn, "sqz_slot", "status=" + (int)eStt,
                 "dt='" + mDt.ToString(DT._) + "'",
                 out emsg);
             if(0 < n)
@@ -233,10 +236,7 @@ namespace sQzLib
             get { return mDt; }
             set {
                 mDt = value;
-                foreach (QuestPack p in QuestionPack.Values)
-                    p.mDt = value;
-                foreach (QuestPack p in vQPackAlt.Values)
-                    p.mDt = value;
+                QuestionPack.mDt = value;
             }
         }
 
@@ -363,10 +363,7 @@ namespace sQzLib
         public void DelNee()
         {
             foreach (ExamRoom r in vRoom.Values)
-            {
                 r.vExaminee.Clear();
-                r.nLv[ExamLv.A] = r.nLv[ExamLv.B] = 0;
-            }
         }
 
         public string DBDelNee()
@@ -426,6 +423,13 @@ namespace sQzLib
         {
             if (buf.Length - offs < 4)
                 return -1;
+
+            DateTime dt;
+            if (DT.ReadByte(buf, ref offs, out dt) || dt != mDt)
+                return -1;
+
+            if (buf.Length - offs < 4)
+                return -1;
             int rid = BitConverter.ToInt32(buf, offs);
             offs += 4;
             ExamRoom r;
@@ -435,7 +439,18 @@ namespace sQzLib
             return rid;
         }
 
-        public List<byte[]> ToByteR1(int rId)
+        public int ReadByteSl0(byte[] buf, ref int offs)
+        {
+            DateTime dt;
+            if (DT.ReadByte(buf, ref offs, out dt) || dt != mDt)
+                return -1;
+            int rid = ReadByteR0(buf, ref offs);
+            if (rid < 0)
+                return -1;
+            return rid;
+        }
+
+        public byte[] ToByteR1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.ToByteh(mDt));
@@ -444,23 +459,25 @@ namespace sQzLib
                 l.InsertRange(l.Count, r.ToByte1());
             else
                 l.Add(BitConverter.GetBytes(-1));
-            return l;
-        }
 
-        //public List<byte[]> ToByteR1(int rId)
-        //{
-        //    List<byte[]> l = new List<byte[]>();
-        //    l.Add(DT.ToByteh(mDt));
-        //    ExamRoom r;
-        //    if (vRoom.TryGetValue(rId, out r))
-        //        l.InsertRange(l.Count, r.ToByte1());
-        //    else
-        //        l.Add(BitConverter.GetBytes(-1));
-        //    return l;
-        //}
+            int sz = DT.BYTE_COUNT;
+            foreach (byte[] x in l)
+                sz += x.Length;
+            byte[] buf = new byte[sz];
+            sz = 0;
+            DT.ToByte(buf, ref sz, mDt);
+            foreach (byte[] x in l)
+            {
+                Buffer.BlockCopy(x, 0, buf, sz, x.Length);
+                sz += x.Length;
+            }
+            return buf;
+        }
 
         public bool ReadByteR1(byte[] buf, ref int offs)
         {
+            if (DT.ReadByteh(buf, ref offs, out mDt))
+                return true;
             if (buf.Length - offs < 4)
                 return true;
             int rId;
@@ -482,6 +499,41 @@ namespace sQzLib
                 vRoom.Add(rId, r);
             }
             return false;
+        }
+
+        public bool DBUpdateRs(int rid, out string eMsg)
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+            {
+                eMsg = Txt.s._((int)TxI.DB_NOK);
+                return true;
+            }
+            StringBuilder vals = new StringBuilder();
+
+            DBUpdateRs(rid, vals);
+
+            bool rval;
+            if (0 < vals.Length)
+            {
+                vals.Remove(vals.Length - 1, 1);//remove the last comma
+                int rs;
+                rval = (rs = DBConnect.Ins(conn, "sqz_nee_qsheet",
+                    "dt,lv,neeid,qsid,t1,t2,grade,comp,ans", vals.ToString(), out eMsg)) < 0;
+                if (rs == DBConnect.PRI_KEY_EXISTS)
+                    eMsg = Txt.s._((int)TxI.RS_UP_EXISTS);
+            }
+            else
+            {
+                rval = true;
+                eMsg = Txt.s._((int)TxI.RS_UP_NOTHING);
+            }
+            if (!rval)
+            {
+                DBUpT2(conn, rid, out eMsg);
+            }
+            DBConnect.Close(ref conn);
+            return rval;
         }
 
         public void DBUpdateRs(int rid, StringBuilder vals)
@@ -525,134 +577,72 @@ namespace sQzLib
             return true;
         }
 
-        public bool GenQ(int n, ExamLv lv, int[] vn, int[] vndiff)
+        public bool GenQ(int n)
         {
             string emsg;
-            if (QuestionPack[lv].DBDelete(out emsg))
+            if (QuestionPack.DBDelete(out emsg))
                 WPopup.s.ShowDialog(emsg);
-            QuestionPack[lv].vSheet.Clear();
-            if (vQPackAlt[lv].DBDelete(out emsg))
-                WPopup.s.ShowDialog(emsg);
-            vQPackAlt[lv].vSheet.Clear();
+            QuestionPack.vSheet.Clear();
             QuestSheet.DBUpdateCurQSId(mDt);
-            foreach (QuestSheet qs in QuestionPack[lv].vSheet.Values)
-                mKeyPack.vSheet.Remove(qs.LvId);
+            foreach (QuestSheet qs in QuestionPack.vSheet.Values)
+                mKeyPack.vSheet.Remove(qs.ID);
             List<QuestSheet> sheets;
-            if(System.IO.File.Exists("Randomize.txt"))
-            {
-                sheets = QuestionPack[lv].GenQPack2(n, vn, vndiff);
-                sheets.InsertRange(sheets.Count, vQPackAlt[lv].GenQPack2(n, vn, vndiff));
-            }
-            else
-            {
-                sheets = QuestionPack[lv].GenQPack3(n, vn, vndiff);
-                sheets.InsertRange(sheets.Count, vQPackAlt[lv].GenQPack3(n, vn, vndiff));
-            }
+            sheets = QuestionPack.GenQPack3(n);
             mKeyPack.ExtractKey(sheets);
             return false;
         }
 
         public bool DBSelArchieve(out string eMsg)
         {
-            if (QuestionPack[ExamLv.A].DBSelectQS(mDt, out eMsg))
+            if (QuestionPack.DBSelectQS(mDt, out eMsg))
                 return true;
-            if (QuestionPack[ExamLv.B].DBSelectQS(mDt, out eMsg))
-                return true;
-            if (vQPackAlt[ExamLv.A].DBSelectQS(mDt, out eMsg))
-                return true;
-            if (vQPackAlt[ExamLv.B].DBSelectQS(mDt, out eMsg))
-                return true;
-            foreach (QuestPack p in QuestionPack.Values)
-                foreach (QuestSheet qs in p.vSheet.Values)
-                    mKeyPack.ExtractKey(qs);
-            foreach (QuestPack p in vQPackAlt.Values)
-                foreach (QuestSheet qs in p.vSheet.Values)
-                    mKeyPack.ExtractKey(qs);
+            foreach (QuestSheet qs in QuestionPack.vSheet.Values)
+                mKeyPack.ExtractKey(qs);
             return false;
         }
 
-        public List<byte[]> ToByteQPack(int rid)
+        public byte[] ToByteQPack(int rid)
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.ToByteh(mDt));
-            if (vbQPkAlt.ContainsKey(rid))
-                l.Add(BitConverter.GetBytes(vbQPkAlt[rid]));
-            else
-                l.Add(BitConverter.GetBytes(false));
-            l.Add(BitConverter.GetBytes(QuestionPack.Count));
-            foreach (QuestPack p in QuestionPack.Values)
-                l.InsertRange(l.Count, p.ToByte());
-            l.Add(BitConverter.GetBytes(vQPackAlt.Count));
-            foreach (QuestPack p in vQPackAlt.Values)
-                l.InsertRange(l.Count, p.ToByte());
-            return l;
+            l.InsertRange(l.Count, QuestionPack.ToByte());
+
+            return ListOfByte_ToArray(l);
+        }
+
+        private byte[] ListOfByte_ToArray(List<byte[]> l)
+        {
+            int sz = DT.BYTE_COUNT;
+            foreach (byte[] x in l)
+                sz += x.Length;
+            byte[] buf = new byte[sz];
+            sz = 0;
+            DT.ToByte(buf, ref sz, mDt);
+            foreach (byte[] x in l)
+            {
+                Buffer.BlockCopy(x, 0, buf, sz, x.Length);
+                sz += x.Length;
+            }
+            return buf;
         }
 
         public bool ReadByteQPack(byte[] buf, ref int offs)
         {
-            if (buf.Length - offs < 5)
-                return true;
-            bQPkAlt = BitConverter.ToBoolean(buf, offs);
-            ++offs;
-            int n = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int l = buf.Length - offs;
-            while (0 < n)
-            {
-                if (l < 4)
-                    return true;
-                --n;
-                int x;
-                ExamLv lv;
-                if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                    lv = (ExamLv)x;
-                else
-                    return true;
-                l -= 4;
-                offs += 4;
-                if (QuestionPack[lv].ReadByte(buf, ref offs))
-                    return true;
-            }
-            if (n != 0)
-                return true;
-            //
-            if (buf.Length - offs < 4)
-                return true;
-            n = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            l = buf.Length - offs;
-            while (0 < n)
-            {
-                if (l < 4)
-                    return true;
-                --n;
-                int x;
-                ExamLv lv;
-                if (Enum.IsDefined(typeof(ExamLv), x = BitConverter.ToInt32(buf, offs)))
-                    lv = (ExamLv)x;
-                else
-                    return true;
-                offs += 4;
-                if (vQPackAlt[lv].ReadByte(buf, ref offs))
-                    return true;
-            }
-            if (n != 0)
+            if (QuestionPack.ReadByte(buf, ref offs))
                 return true;
             return false;
         }
 
-        public byte[] ToByteNextQS(ExamLv lv)
+        public byte[] ToByteNextQS()
         {
-            if (bQPkAlt)
-                return vQPackAlt[lv].ToByteNextQS();
-            return QuestionPack[lv].ToByteNextQS();
+            return QuestionPack.ToByteNextQS();
         }
 
-        public List<byte[]> ToByteKey()
+        public byte[] ToByteKey()
         {
             List<byte[]> l = mKeyPack.ToByte();
             l.Insert(0, DT.ToByteh(mDt));
-            return l;
+            return ListOfByte_ToArray(l);
         }
 
         public bool ReadByteKey(byte[] buf, ref int offs)

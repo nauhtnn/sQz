@@ -57,7 +57,7 @@ namespace sQzLib
         //    }
         //}
 
-        public static void DBDelete(IUx eIU, string ids) {
+        public static void DBDelete(string ids) {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;

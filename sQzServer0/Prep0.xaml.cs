@@ -24,14 +24,12 @@ namespace sQzServer0
     public partial class Prep0 : Page
     {
         List<CheckBox> vChk;
-        IUx mSelQCat;
         QuestSheet mDBQS;
         QuestSheet mTmpQS;
 
         public Prep0()
         {
             InitializeComponent();
-            mSelQCat = IUx._0;
             mDBQS = new QuestSheet();
             mTmpQS = new QuestSheet();
             vChk = new List<CheckBox>();
@@ -45,7 +43,7 @@ namespace sQzServer0
         private void InsertSlot(object sender, RoutedEventArgs e)
         {
             DateTime dt;
-            if (DT.To_(newSlot.Text, out dt))
+            if (DT.To_(newSlot.Text, "yyyy-MM-dd hh:mm", out dt))
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.BOARD_NOK));
@@ -88,7 +86,7 @@ namespace sQzServer0
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT._);
+                it.Content = dt.ToString(DT.SYSTEM_DT_FMT);
                 it.Selected += SlotsView_Selected;
                 it.Unselected += SlotsView_Unselected;
                 SlotsView.Items.Add(it);
@@ -178,9 +176,9 @@ namespace sQzServer0
                 gDBQuest.Children.Add(chk);
                 vChk.Add(chk);
             }
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, QuestSheet.DBGetND(mSelQCat));
-            tbiDBQ.Header = sb.ToString();
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, QuestSheet.DBGetND(mSelQCat));
+            tbiDBQ.Header = "CSDL";//sb.ToString();
         }
 
         private void ShowTmpQ()
@@ -229,21 +227,16 @@ namespace sQzServer0
 
         private void btnImpQ_Click(object sender, RoutedEventArgs e)
         {
-            if (mSelQCat == IUx._0)
-            {
-                WPopup.s.ShowDialog(Txt.s._((int)TxI.PREP_IU15));
-                return;
-            }
             if (mTmpQS.Count == 0)
                 return;
             gDBQuest.Children.Clear();
             svwrTmpQ.Content = null;
-            mTmpQS.DBIns(mSelQCat);
+            mTmpQS.DBIns();
             mTmpQS.Clear();
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), 0, mTmpQS.CountD);
             tbiTmpQ.Header = sb.ToString();
-            mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
+            mDBQS.DBSelect();
             ShowDBQ();
         }
 
@@ -251,7 +244,7 @@ namespace sQzServer0
         {
             Txt t = Txt.s;
             btnMMenu.Content = t._((int)TxI.BACK_MMENU);
-            //txtDt.Text = t._((int)TxI.DATE_L);
+            txtDt.Text = DT.SYSTEM_DT_FMT;// t._((int)TxI.DATE_L);
             tbi1.Header = t._((int)TxI.PREP_NEE);
             tbi2.Header = t._((int)TxI.PREP_Q);
             txtId.Text = t._((int)TxI.NEEID_S);
@@ -262,12 +255,10 @@ namespace sQzServer0
             btnImp.Content = t._((int)TxI.PREP_IMP);
             btnDelQ.Content = t._((int)TxI.PREP_DEL_SEL);
             btnImpQ.Content = t._((int)TxI.PREP_IMP);
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_DB), 0, QuestSheet.DBGetND(mSelQCat));
-            tbiDBQ.Header = sb.ToString();
-            sb.Clear();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), 0, mTmpQS.CountD);
-            tbiTmpQ.Header = sb.ToString();
+            tbiDBQ.Header = "tbiDBQ.Header";
+            //sb.Clear();
+            //sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), 0, mTmpQS.CountD);
+            tbiTmpQ.Header = "tbiTmpQ.Header";
         }
 
         private void btnDelQ_Click(object sender, RoutedEventArgs e)
@@ -284,12 +275,12 @@ namespace sQzServer0
             if (0 < qids.Length)
             {
                 qids.Remove(qids.Length - 4, 4);//remove the last " OR "
-                Question.DBDelete(mSelQCat, qids.ToString());
+                Question.DBDelete(qids.ToString());
                 toUpdate = true;
             }
             if (toUpdate)
             {
-                mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
+                mDBQS.DBSelect();
                 ShowDBQ();
             }
             chkAll.IsChecked = false;
