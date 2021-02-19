@@ -200,7 +200,7 @@ namespace sQzServer0
             SolidColorBrush bg;
             bool even = false;
             int idx = index;
-            double w = svwrTmpQ.Width - 20;
+            double w = svwrTmpQ.Width - 30;
             foreach (Question q in questions)
             {
                 if (even)
@@ -220,13 +220,14 @@ namespace sQzServer0
             SolidColorBrush bg;
             bool even = false;
             int idx = index;
-            double w = svwrTmpQ.Width - 20;
+            double w = svwrTmpQ.Width - 30;
             foreach (PassageQuestion p in passages)
             {
                 TextBlock passageText = new TextBlock();
                 passageText.Text = "\n\n" + p.Passage + "\n\n";
                 passageText.Width = w;
                 passageText.TextWrapping = TextWrapping.Wrap;
+                passageText.TextAlignment = TextAlignment.Justify;
                 panel.Children.Add(passageText);
                 AddListOfSingleQuestionsToPanel(p.Questions, ++idx, panel);
             }
@@ -262,10 +263,14 @@ namespace sQzServer0
             svwrTmpQ.Content = null;
             mTmpQS.DBIns();
             mTmpQS.Clear();
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), 0, mTmpQS.CountD);
-            //tbiTmpQ.Header = sb.ToString();
-            tbiTmpQ.Header = mTmpQS.Count;
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountPassage);
+            tbiTmpQ.Header = sb.ToString();
+            LoadAndShowQuestionFromDB();
+        }
+
+        private void LoadAndShowQuestionFromDB()
+        {
             mDBQS.DBSelect();
             ShowDBQ();
         }
@@ -309,10 +314,7 @@ namespace sQzServer0
                 toUpdate = true;
             }
             if (toUpdate)
-            {
-                mDBQS.DBSelect();
-                ShowDBQ();
-            }
+                LoadAndShowQuestionFromDB();
             chkAll.IsChecked = false;
         }
 
@@ -358,6 +360,11 @@ namespace sQzServer0
         {
             foreach (CheckBox c in vChk)
                 c.IsChecked = false;
+        }
+
+        private void tbiDBQ_Loaded(object sender, RoutedEventArgs e)
+        {
+            LoadAndShowQuestionFromDB();
         }
     }
 }

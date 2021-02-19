@@ -30,7 +30,7 @@
                 </TabItem>
                 <TabItem Name="tbi2">
                     <TabControl>
-                        <TabItem Name="tbiDBQ">
+                        <TabItem Name="tbiDBQ" Loaded="tbiDBQ_Loaded">
                             <StackPanel>
                                 <Grid>
                                     <Grid.ColumnDefinitions>

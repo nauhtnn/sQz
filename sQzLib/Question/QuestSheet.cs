@@ -14,7 +14,21 @@ namespace sQzLib
         List<Question> vQuest;
         List<PassageQuestion> PassageQuestions;
         public byte[] aQuest;
-        public int Count { get { return vQuest.Count + PassageQuestions.Count; } }
+        public int Count { get { return vQuest.Count; } }
+        public string CountPassage {
+            get {
+                StringBuilder sb = new StringBuilder();
+                sb.Append(PassageQuestions.Count);
+                if (PassageQuestions.Count == 0)
+                    return sb.ToString();
+                else
+                    sb.Append('(');
+                foreach (PassageQuestion p in PassageQuestions)
+                    sb.Append(p.Questions.Count + ", ");
+                sb.Remove(sb.Length - 2, 2);//remove last comma and space
+                sb.Append(')');
+                return sb.ToString();
+            } }
 
         public QuestSheet()
         {
@@ -322,53 +336,42 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
+                System.Windows.MessageBox.Show(Txt.s._((int)TxI.DB_NOK));
                 return;
             }
-            string qry = DBConnect.mkQrySelect("sqz_question",
-                "id,stmt,ans0,ans1,ans2,ans3,akey", "deleted=0");
-            string emsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out emsg);
-            if (reader != null)
-            {
-                while (reader.Read())
-                {
-                    Question q = new Question();
-                    q.uId = reader.GetInt32(0);
-                    q.Stem = reader.GetString(1);
-                    q.vAns = new string[4];
-                    for (int i = 0; i < 4; ++i)
-                        q.vAns[i] = reader.GetString(2 + i);
-                    string x = reader.GetString(6);
-                    q.vKeys = new bool[4];
-                    for (int i = 0; i < 4; ++i)
-                        q.vKeys[i] = (x[i] == Question.C1);
+            string eMsg;
+            List<Question> allQuestions = DBSelectQuestions(conn, -1, out eMsg);
+            foreach (Question q in allQuestions)
+                if (q.PassageID == -1)
                     vQuest.Add(q);
-                }
-                reader.Close();
-            }
-            else
-                WPopup.s.ShowDialog(emsg);
+            SortedSet<int> passageIDs = GetPassageIDs(allQuestions);
+            //todo add passages
             DBConnect.Close(ref conn);
         }
 
-        //only Server0 uses this.
-        public bool DBSelect(int passageID, out string eMsg)
+        private SortedSet<int> GetPassageIDs(List<Question> questions)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                eMsg = Txt.s._((int)TxI.DB_NOK);
-                return true;
-            }
+            SortedSet<int> passageIDs = new SortedSet<int>();
+            foreach (Question q in questions)
+                if (!passageIDs.Contains(q.PassageID))
+                    passageIDs.Add(q.PassageID);
+            return passageIDs;
+        }
+
+        private List<Question> DBSelectQuestions(MySqlConnection conn, int passageID, out string eMsg)
+        {
             string condition;
+            if (passageID == int.MaxValue)
+                condition = string.Empty;
             if (passageID < 0)
-                condition = "pid IS NULL";
+                condition = " AND pid IS NULL";
             else
-                condition = "pid=" + passageID;
+                condition = " AND pid=" + passageID;
             string query = DBConnect.mkQrySelect("sqz_question",
-                "id,stmt,ans0,ans1,ans2,ans3,akey", "deleted=0 AND " + condition);
+                "id,stmt,ans0,ans1,ans2,ans3,akey", "deleted=0" + condition);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
-            
+            List<Question> questions = new List<Question>();
+
             if (reader != null)
             {
                 while (reader.Read())
@@ -383,12 +386,13 @@ namespace sQzLib
                     q.vKeys = new bool[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
                         q.vKeys[j] = (x[j] == Question.C1);
-                    vQuest.Add(q);
+                    questions.Add(q);
                 }
                 reader.Close();
             }
-            DBConnect.Close(ref conn);
-            return false;
+            else
+                System.Windows.MessageBox.Show(eMsg.ToString());
+            return questions;
         }
 
         public void DBIns()

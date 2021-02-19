@@ -160,7 +160,7 @@ namespace sQzLib
             string emsg;
             List<QuestSheet> sheets = new List<QuestSheet>();
             QuestSheet independentQuestions = new QuestSheet();
-            independentQuestions.DBSelect(-1, out emsg);
+            independentQuestions.DBSelect();
             Random rand = new Random();
             while (0 < numberOfSheet)
             {

@@ -39,8 +39,8 @@ FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 CREATE TABLE IF NOT EXISTS `sqz_passage`(`id` INT PRIMARY KEY,
 `psg` TEXT);
 
-CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED PRIMARY KEY,
-`pid` INT UNSIGNED, `deleted` INT,
+CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+`pid` INT, `deleted` INT,
 `stmt` TEXT CHARACTER SET `utf8mb4`,
 `ans0` TEXT CHARACTER SET `utf8mb4`, `ans1` TEXT CHARACTER SET `utf8mb4`,
 `ans2` TEXT CHARACTER SET `utf8mb4`, `ans3` TEXT CHARACTER SET `utf8mb4`,
