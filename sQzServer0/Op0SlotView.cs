@@ -382,7 +382,7 @@ namespace sQzServer0
             SolidColorBrush bg;
             bool even = false;
 
-            foreach (Question q in qs.ShallowCopy())
+            foreach (Question q in qs.ShallowCopyIndependentQuestions())
             {
                 if (q.bDiff)
                     bg = difbg;

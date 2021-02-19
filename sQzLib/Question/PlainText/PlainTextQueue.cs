@@ -38,11 +38,11 @@ namespace sQzLib
 				{
                     string s = lines.Dequeue();
                     if (s.Length > 1)
-                        token.Append(s.Substring(0, s.Length - 2));
+                        token.Append("\n" + s.Substring(0, s.Length - 2));
 					break;
 				}
 				else
-					token.Append(lines.Dequeue());
+					token.Append("\n" + lines.Dequeue());
 			}
 			return token.ToString();
 		}
@@ -70,9 +70,8 @@ namespace sQzLib
             }
 			foreach(string line in rawLines)
 			{
-				string s;
-				if (0 < (s = Utils.CleanSpace(line)).Length)
-					lines.Enqueue(s);
+				if (0 < Utils.CleanSpace(line).Length)
+					lines.Enqueue(line);
 			}
 			return lines;
 		}
@@ -102,9 +101,8 @@ namespace sQzLib
                     p.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
                 if (bl == null)
                 {
-					string s;
-                    if (0 < (s = Utils.CleanSpace(p.InnerText)).Length)
-                        lines.Enqueue(s);
+                    if (0 < Utils.CleanSpace(p.InnerText).Length)
+                        lines.Enqueue(p.InnerText);
                 }
                 else
                 {

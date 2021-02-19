@@ -57,7 +57,7 @@ namespace sQzLib
             
             int idx = -1;
             int j = -1;
-            foreach (Question q in qs.ShallowCopy())
+            foreach (Question q in qs.ShallowCopyIndependentQuestions())
             {
                 ++idx;
                 ListBox lbxAns = new ListBox();

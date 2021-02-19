@@ -15,17 +15,6 @@ namespace sQzLib
         List<PassageQuestion> PassageQuestions;
         public byte[] aQuest;
         public int Count { get { return vQuest.Count; } }
-        public int CountD
-        {
-            get
-            {
-                int n = 0;
-                foreach (Question q in vQuest)
-                    if (q.bDiff)
-                        ++n;
-                return n;
-            }
-        }
 
         public QuestSheet()
         {
@@ -235,11 +224,19 @@ namespace sQzLib
             return s;
         }
 
-        public List<Question> ShallowCopy()
+        public List<Question> ShallowCopyIndependentQuestions()
         {
             List<Question> l = new List<Question>();
             foreach (Question q in vQuest)
                 l.Add(q);
+            return l;
+        }
+
+        public List<PassageQuestion> ShallowCopyPassages()
+        {
+            List<PassageQuestion> l = new List<PassageQuestion>();
+            foreach (PassageQuestion p in PassageQuestions)
+                l.Add(p);
             return l;
         }
 

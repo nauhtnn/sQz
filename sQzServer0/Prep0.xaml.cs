@@ -138,7 +138,7 @@ namespace sQzServer0
             gDBQuest.RowDefinitions.Clear();
             vChk.Clear();
             double w = gDBQuest.ColumnDefinitions.First().Width.Value;
-            foreach (Question q in mDBQS.ShallowCopy())
+            foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
             {
                 TextBlock i = new TextBlock();
                 i.Text = (++x + 1) + ". " + q.Stmt;
@@ -185,14 +185,16 @@ namespace sQzServer0
         {
             StackPanel sp = new StackPanel();
             //svwrTmpQ.Content = null;
-            AddListOfSingleQuestionToPanel(mTmpQS.ShallowCopy(), 0, sp);
+            AddListOfSingleQuestionsToPanel(mTmpQS.ShallowCopyIndependentQuestions(), 0, sp);
+            AddListOfPassageQuestionsToPanel(mTmpQS.ShallowCopyPassages(), 0, sp);
             svwrTmpQ.Content = sp;
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountD);
-            tbiTmpQ.Header = sb.ToString();
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountD);
+            //tbiTmpQ.Header = sb.ToString();
+            tbiTmpQ.Header = mTmpQS.Count;
         }
 
-        private void AddListOfSingleQuestionToPanel(List<Question> questions, int index, StackPanel panel)
+        private void AddListOfSingleQuestionsToPanel(List<Question> questions, int index, StackPanel panel)
         {
             SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
             SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
@@ -200,7 +202,7 @@ namespace sQzServer0
             SolidColorBrush bg;
             bool even = false;
             int idx = index;
-            double w = svwrTmpQ.Width;
+            double w = svwrTmpQ.Width - 20;
             foreach (Question q in questions)
             {
                 if (q.bDiff)
@@ -211,6 +213,26 @@ namespace sQzServer0
                     bg = oddbg;
                 even = !even;
                 AddSingleQuestionToPanel(q, ++idx, w, bg, panel);
+            }
+        }
+
+        private void AddListOfPassageQuestionsToPanel(List<PassageQuestion> passages, int index, StackPanel panel)
+        {
+            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
+            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
+            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
+            SolidColorBrush bg;
+            bool even = false;
+            int idx = index;
+            double w = svwrTmpQ.Width - 20;
+            foreach (PassageQuestion p in passages)
+            {
+                TextBlock passageText = new TextBlock();
+                passageText.Text = "\n\n" + p.Passage + "\n\n";
+                passageText.Width = w;
+                passageText.TextWrapping = TextWrapping.Wrap;
+                panel.Children.Add(passageText);
+                AddListOfSingleQuestionsToPanel(p.Questions, ++idx, panel);
             }
         }
 
@@ -244,9 +266,10 @@ namespace sQzServer0
             svwrTmpQ.Content = null;
             mTmpQS.DBIns();
             mTmpQS.Clear();
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), 0, mTmpQS.CountD);
-            tbiTmpQ.Header = sb.ToString();
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), 0, mTmpQS.CountD);
+            //tbiTmpQ.Header = sb.ToString();
+            tbiTmpQ.Header = mTmpQS.Count;
             mDBQS.DBSelect();
             ShowDBQ();
         }
