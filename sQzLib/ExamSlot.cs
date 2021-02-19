@@ -583,7 +583,9 @@ namespace sQzLib
             if (QuestionPack.DBDelete(out emsg))
                 WPopup.s.ShowDialog(emsg);
             QuestionPack.vSheet.Clear();
-            QuestSheet.DBUpdateCurQSId(mDt);
+            if(QuestSheet.GetMaxID_inDB(mDt) &&
+                MessageBox.Show("Cannot get QuestSheet.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                return true;
             foreach (QuestSheet qs in QuestionPack.vSheet.Values)
                 mKeyPack.vSheet.Remove(qs.ID);
             List<QuestSheet> sheets;

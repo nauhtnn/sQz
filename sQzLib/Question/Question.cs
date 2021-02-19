@@ -11,20 +11,15 @@ namespace sQzLib
         public const char C0 = '0';
         public const char C1 = '1';
         public int uId;
-        public string tStmt; //statement
-        public string Stmt { get { return tStmt; } set { tStmt = value; } }
-        public IUx eIU;
+        public int PassageID;
+        public string Stem;
         public string[] vAns;
         public bool[] vKeys;
         public int[] vAnsSort;
-        public bool bDiff;
-        //static string[] vSTMT_PATT = { "[a-zA-Z]+[0-9]+", "[0-9]+\\." };
-        static string[] vSTMT_PATT = { "[0-9]+\\." };
-        static string[] vANS_PATT = { "\\([a-zA-Z]\\)", "[a-zA-Z]\\." };
 
         public Question() {
             vAns = null;
-            bDiff = false;
+            PassageID = -1;
             vAnsSort = new int[N_ANS];
             for (int i = 0; i < N_ANS; ++i)
                 vAnsSort[i] = i;
@@ -37,7 +32,7 @@ namespace sQzLib
         public IEnumerable<string> ToListOfStrings()
         {
             LinkedList<string> s = new LinkedList<string>();
-            s.AddLast(tStmt);
+            s.AddLast(Stem);
             foreach (string i in vAns)
                 s.AddLast(i);
             return s;
@@ -69,8 +64,8 @@ namespace sQzLib
         {
             Question q = new Question();
             q.uId = uId;
-            q.tStmt = tStmt;
-            q.eIU = eIU;
+            q.Stem = Stem;
+            q.PassageID = PassageID;
             q.vAns = new string[N_ANS];
             for (int i = 0; i < N_ANS; ++i)
                 q.vAns[i] = vAns[i];
@@ -111,9 +106,8 @@ namespace sQzLib
         {
             Question q = new Question();
             q.uId = uId;
-            q.tStmt = tStmt;
-            q.eIU = eIU;
-            q.bDiff = bDiff;
+            q.Stem = Stem;
+            q.PassageID = PassageID;
             //randomize
             q.vAns = new string[N_ANS];
             q.vKeys = new bool[N_ANS];
@@ -155,7 +149,7 @@ namespace sQzLib
     public enum TokenType
     {
         Requirement = 0,
-        Stmt = 1,
+        Stem = 1,
         Ans = 2,
         Both = 3
     }

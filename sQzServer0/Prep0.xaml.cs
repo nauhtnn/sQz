@@ -141,7 +141,7 @@ namespace sQzServer0
             foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
             {
                 TextBlock i = new TextBlock();
-                i.Text = (++x + 1) + ". " + q.Stmt;
+                i.Text = (++x + 1) + ". " + q.Stem;
                 i.Width = w;
                 i.TextWrapping = TextWrapping.Wrap;
                 StackPanel sp = new StackPanel();
@@ -156,9 +156,7 @@ namespace sQzServer0
                         j.FontWeight = FontWeights.Bold;
                     sp.Children.Add(j);
                 }
-                if (q.bDiff)
-                    bg = difbg;
-                else if (even)
+                if (even)
                     bg = evenbg;
                 else
                     bg = oddbg;
@@ -205,9 +203,7 @@ namespace sQzServer0
             double w = svwrTmpQ.Width - 20;
             foreach (Question q in questions)
             {
-                if (q.bDiff)
-                    bg = difbg;
-                else if (even)
+                if (even)
                     bg = evenbg;
                 else
                     bg = oddbg;
@@ -239,7 +235,7 @@ namespace sQzServer0
         private void AddSingleQuestionToPanel(Question question, int index, double width, SolidColorBrush background, StackPanel panel)
         {
             TextBlock i = new TextBlock();
-            i.Text = index + ". " + question.Stmt;
+            i.Text = index + ". " + question.Stem;
             i.Width = width;
             i.TextWrapping = TextWrapping.Wrap;
             

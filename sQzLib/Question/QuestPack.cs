@@ -166,7 +166,7 @@ namespace sQzLib
             {
                 --numberOfSheet;
                 QuestSheet qs = independentQuestions.RandomizeDeepCopy(rand);
-                if (!qs.UpdateCurQSId())//todo: better error handle
+                if (!qs.AccquireGlobalMaxID())//todo: better error handle
                 {
                     vSheet.Add(qs.ID, qs);
                     sheets.Add(qs);

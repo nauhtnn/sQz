@@ -384,9 +384,7 @@ namespace sQzServer0
 
             foreach (Question q in qs.ShallowCopyIndependentQuestions())
             {
-                if (q.bDiff)
-                    bg = difbg;
-                else if (even)
+                if (even)
                     bg = evenbg;
                 else
                     bg = oddbg;
@@ -394,7 +392,7 @@ namespace sQzServer0
                 TextBlock i = new TextBlock();
                 i.Width = tbc.Width - SystemParameters.ScrollWidth;
                 i.TextWrapping = TextWrapping.Wrap;
-                i.Text = ++x + ". " + q.Stmt;
+                i.Text = ++x + ". " + q.Stem;
                 i.Background = bg;
                 sp.Children.Add(i);
                 for (int idx = 0; idx < Question.N_ANS; ++idx)

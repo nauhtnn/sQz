@@ -3,13 +3,45 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
     public class PassageQuestion
     {
+        public static int globalMaxID = -1;
         public const string MAGIC_WORD = "<PASSAGE>";
         public string Passage;
+        private int _ID;
+        public int ID { get { return _ID; } }
         public List<Question> Questions;
+
+        public bool AccquireGlobalMaxID()
+        {
+            if (-1 < globalMaxID)
+            {
+                _ID = ++globalMaxID;
+                foreach (Question q in Questions)
+                    q.PassageID = _ID;
+                return false;
+            }
+            return true;
+        }
+
+        public static bool GetMaxID_inDB()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return true;
+            int uid = DBConnect.MaxInt(conn, "sqz_passage", "id", null);
+            if (uid < 0)
+            {
+                DBConnect.Close(ref conn);
+                return true;
+            }
+            globalMaxID = uid;
+
+            return false;
+        }
     }
 }

@@ -9,12 +9,12 @@ namespace sQzLib
 {
     public class QuestSheet
     {
-        public static int globalMaxID_inDB;
+        public static int globalMaxID = -1;
         public int ID;
         List<Question> vQuest;
         List<PassageQuestion> PassageQuestions;
         public byte[] aQuest;
-        public int Count { get { return vQuest.Count; } }
+        public int Count { get { return vQuest.Count + PassageQuestions.Count; } }
 
         public QuestSheet()
         {
@@ -121,7 +121,7 @@ namespace sQzLib
             foreach (Question q in vQuest)
             {
                 //stmt
-                byte[] b = Encoding.UTF8.GetBytes(q.Stmt);
+                byte[] b = Encoding.UTF8.GetBytes(q.Stem);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
                 //ans
@@ -164,7 +164,7 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     return true;
-                q.Stmt = Encoding.UTF8.GetString(buf, offs, sz);
+                q.Stem = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
                 //ans
@@ -334,7 +334,7 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    q.Stmt = reader.GetString(1);
+                    q.Stem = reader.GetString(1);
                     q.vAns = new string[4];
                     for (int i = 0; i < 4; ++i)
                         q.vAns[i] = reader.GetString(2 + i);
@@ -375,7 +375,7 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    q.Stmt = reader.GetString(1);
+                    q.Stem = reader.GetString(1);
                     q.vAns = new string[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
                         q.vAns[j] = reader.GetString(2 + j);
@@ -396,25 +396,46 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            StringBuilder vals = new StringBuilder();
+            StringBuilder questionVals = new StringBuilder();
             foreach (Question q in vQuest)
+                AppendQuestionInsertQuery(q, questionVals);
+            if (PassageQuestion.GetMaxID_inDB() &&
+                System.Windows.MessageBox.Show("Cannot get PassageQuestion.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!",
+                System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
+                return;
+            StringBuilder passageVals = new StringBuilder();
+            foreach (PassageQuestion p in PassageQuestions)
             {
-                vals.Append("(NULL,0,'");
-                vals.Append(q.Stmt.Replace("'", "\\'") + "','");
-                for (int i = 0; i < Question.N_ANS; ++i)
-                    vals.Append(q.vAns[i].Replace("'", "\\'") + "','");
-                for (int i = 0; i < Question.N_ANS; ++i)
-                    if (q.vKeys[i])
-                        vals.Append(Question.C1);
-                    else
-                        vals.Append(Question.C0);
-                vals.Append("'),");
+                p.AccquireGlobalMaxID();
+                passageVals.Append("(" + p.ID + "),'" + DBConnect.SafeSQL_Text(p.Passage) + "'),");
+                foreach (Question q in p.Questions)
+                    AppendQuestionInsertQuery(q, questionVals);
             }
-            vals.Remove(vals.Length - 1, 1);//remove the last comma
+            questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
+            passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
             string eMsg;
             DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
-                vals.ToString(), out eMsg);
+                questionVals.ToString(), out eMsg);
+            DBConnect.Ins(conn, "sqz_passage", "id,psg",
+                passageVals.ToString(), out eMsg);
             DBConnect.Close(ref conn);
+        }
+
+        private void AppendQuestionInsertQuery(Question q, StringBuilder query)
+        {
+            if (q.PassageID < 0)
+                query.Append("(NULL,0,'");
+            else
+                query.Append("(" + q.PassageID + ",0,'");
+            query.Append(DBConnect.SafeSQL_Text(q.Stem) + "','");
+            for (int i = 0; i < Question.N_ANS; ++i)
+                query.Append(DBConnect.SafeSQL_Text(q.vAns[i]) + "','");
+            for (int i = 0; i < Question.N_ANS; ++i)
+                if (q.vKeys[i])
+                    query.Append(Question.C1);
+                else
+                    query.Append(Question.C0);
+            query.Append("'),");
         }
 
         public bool DBSelect(MySqlConnection conn, DateTime dt, int id, out string eMsg)
@@ -451,7 +472,7 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = qid;
-                    q.Stmt = reader.GetString(0);
+                    q.Stem = reader.GetString(0);
                     string[] anss = new string[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
                         anss[j] = reader.GetString(1 + j);
@@ -466,9 +487,6 @@ namespace sQzLib
                         q.vAns[j] = anss[asorts[i][j] - Question.C0];
                         q.vKeys[j] = keys[asorts[i][j] - Question.C0];
                     }
-                    int iu;
-                    if (Enum.IsDefined(typeof(IUx), iu = reader.GetInt32(7)))
-                        q.eIU = (IUx)iu;
                     vQuest.Add(q);
                 }
                 reader.Close();
@@ -477,17 +495,17 @@ namespace sQzLib
             return false;
         }
 
-        public bool UpdateCurQSId()
+        public bool AccquireGlobalMaxID()
         {
-            if (-1 < globalMaxID_inDB)
+            if (-1 < globalMaxID)
             {
-                ID = ++globalMaxID_inDB;
+                ID = ++globalMaxID;
                 return false;
             }
             return true;
         }
 
-        public static bool DBUpdateCurQSId(DateTime dt)
+        public static bool GetMaxID_inDB(DateTime dt)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -499,7 +517,7 @@ namespace sQzLib
                 DBConnect.Close(ref conn);
                 return true;
             }
-            globalMaxID_inDB = uid;
+            globalMaxID = uid;
 
             return false;
         }

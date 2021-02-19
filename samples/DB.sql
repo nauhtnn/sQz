@@ -36,7 +36,7 @@ CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATETIME,
 FOREIGN KEY(`dt`, `neeid`) REFERENCES `sqz_examinee`(`dt`, `id`),
 FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 
-CREATE TABLE IF NOT EXISTS `sqz_passage`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS `sqz_passage`(`id` INT PRIMARY KEY,
 `psg` TEXT);
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED PRIMARY KEY,

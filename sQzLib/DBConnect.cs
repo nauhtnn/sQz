@@ -245,7 +245,9 @@ namespace sQzLib
         //Max statement
         public static int MaxInt(MySqlConnection conn, string tb, string attb, string cond)
         {
-            string query = "SELECT MAX(" + attb + ") FROM " + tb + " WHERE " + cond;
+            string query = "SELECT MAX(" + attb + ") FROM " + tb;
+            if(cond != null)
+                query = query + " WHERE " + cond;
             int n;
             MySqlCommand cmd = new MySqlCommand(query, conn);
             try {
@@ -258,6 +260,11 @@ namespace sQzLib
             catch (MySqlException) { n = -1; }
 
             return n;
+        }
+
+        public static string SafeSQL_Text(string unsafeText)
+        {
+            return unsafeText.Replace("'", "\\'");
         }
 
         public static string mkQrySelect(string tb, string attbs, string cond)

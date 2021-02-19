@@ -60,21 +60,16 @@ namespace sQzLib
             }
 
             Question question = new Question();
-            question.Stmt = tokens.Dequeue();
+            question.Stem = tokens.Dequeue();
             question.vAns = new string[Question.N_ANS];
             for (int j = 0; j < Question.N_ANS;)
                 question.vAns[j++] = tokens.Dequeue();
             question.vKeys = new bool[Question.N_ANS];
             for (int j = 0; j < Question.N_ANS; ++j)
                 question.vKeys[j] = false;
-            if (question.tStmt[0] == '*' && 1 < question.tStmt.Length)
-            {
-                question.bDiff = true;
-                question.tStmt = question.tStmt.Substring(1);
-            }
-            else if (question.tStmt[0] == '\\' && 1 < question.tStmt.Length
-                && (question.tStmt[1] == '*' || question.tStmt[1] == '\\'))
-                question.tStmt = question.tStmt.Substring(1);
+            if (question.Stem[0] == '\\' && 1 < question.Stem.Length
+                && (question.Stem[1] == '*' || question.Stem[1] == '\\'))
+                question.Stem = question.Stem.Substring(1);
             int nKey = 0;
             for (int j = 0; j < Question.N_ANS; ++j)
             {
