@@ -12,7 +12,7 @@ namespace sQzLib
         public static int globalMaxID = -1;
         public int ID;
         List<Question> vQuest;
-        List<PassageQuestion> PassageQuestions;
+        Dictionary<int, PassageQuestion> PassageQuestions;
         public byte[] aQuest;
         public int Count { get { return vQuest.Count; } }
         public string CountPassage {
@@ -23,7 +23,7 @@ namespace sQzLib
                     return sb.ToString();
                 else
                     sb.Append('(');
-                foreach (PassageQuestion p in PassageQuestions)
+                foreach (PassageQuestion p in PassageQuestions.Values)
                     sb.Append(p.Questions.Count + ", ");
                 sb.Remove(sb.Length - 2, 2);//remove last comma and space
                 sb.Append(')');
@@ -33,6 +33,7 @@ namespace sQzLib
         public QuestSheet()
         {
             vQuest = new List<Question>();
+            PassageQuestions = new Dictionary<int, PassageQuestion>();
             aQuest = null;
             ID = -1;
         }
@@ -221,7 +222,14 @@ namespace sQzLib
             PlainTextQuestParser p = new PlainTextQuestParser();
             Tuple<List<Question>, List<PassageQuestion>> tuple = p.ParseTokens(PlainTextQueue.GetTextQueue(filePath));
             vQuest = tuple.Item1;
-            PassageQuestions = tuple.Item2;
+            PassageQuestions = new Dictionary<int, PassageQuestion>();
+            int tempt_ID = -1;
+            foreach(PassageQuestion passage in tuple.Item2)
+            {
+                while (PassageQuestions.ContainsKey(tempt_ID))
+                    --tempt_ID;
+                PassageQuestions.Add(tempt_ID, passage);
+            }
         }
 
         public void WriteTxt(string fpath)
@@ -249,7 +257,7 @@ namespace sQzLib
         public List<PassageQuestion> ShallowCopyPassages()
         {
             List<PassageQuestion> l = new List<PassageQuestion>();
-            foreach (PassageQuestion p in PassageQuestions)
+            foreach (PassageQuestion p in PassageQuestions.Values)
                 l.Add(p);
             return l;
         }
@@ -339,36 +347,56 @@ namespace sQzLib
                 System.Windows.MessageBox.Show(Txt.s._((int)TxI.DB_NOK));
                 return;
             }
-            string eMsg;
-            List<Question> allQuestions = DBSelectQuestions(conn, -1, out eMsg);
+            List<Question> allQuestions = DBSelectNondeletedQuestions(conn);
+            SortedSet<int> passageIDs = new SortedSet<int>();
             foreach (Question q in allQuestions)
                 if (q.PassageID == -1)
                     vQuest.Add(q);
-            SortedSet<int> passageIDs = GetPassageIDs(allQuestions);
-            //todo add passages
-            DBConnect.Close(ref conn);
-        }
-
-        private SortedSet<int> GetPassageIDs(List<Question> questions)
-        {
-            SortedSet<int> passageIDs = new SortedSet<int>();
-            foreach (Question q in questions)
-                if (!passageIDs.Contains(q.PassageID))
+                else if (!passageIDs.Contains(q.PassageID))
                     passageIDs.Add(q.PassageID);
-            return passageIDs;
+            DBSelectPassage(conn, passageIDs);
+            DBConnect.Close(ref conn);
+            foreach(Question q in allQuestions)
+            {
+                if (q.PassageID > -1 && PassageQuestions.ContainsKey(q.PassageID))
+                    PassageQuestions[q.PassageID].Questions.Add(q);
+            }
         }
 
-        private List<Question> DBSelectQuestions(MySqlConnection conn, int passageID, out string eMsg)
+        private void DBSelectPassage(MySqlConnection conn, SortedSet<int> IDs)
         {
-            string condition;
-            if (passageID == int.MaxValue)
-                condition = string.Empty;
-            if (passageID < 0)
-                condition = " AND pid IS NULL";
+            PassageQuestions = new Dictionary<int, PassageQuestion>();
+            if (IDs.Count == 0)
+                return;
+            StringBuilder condition_IDS = new StringBuilder();
+            condition_IDS.Append("(");
+            foreach (int id in IDs)
+                condition_IDS.Append(id + ",");
+            condition_IDS.Remove(condition_IDS.Length - 1, 1);//remove last comma
+            condition_IDS.Append(")");
+            string query = DBConnect.mkQrySelect("sqz_passage",
+                "id,psg", "id IN " + condition_IDS);
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
+            if (reader != null)
+            {
+                while (reader.Read())
+                {
+                    PassageQuestion p = new PassageQuestion(reader.GetInt32(0));
+                    p.Passage = reader.GetString(1);
+                    PassageQuestions.Add(p.ID, p);
+                }
+                reader.Close();
+            }
             else
-                condition = " AND pid=" + passageID;
+                System.Windows.MessageBox.Show(eMsg.ToString());
+        }
+
+        private List<Question> DBSelectNondeletedQuestions(MySqlConnection conn)
+        {
             string query = DBConnect.mkQrySelect("sqz_question",
-                "id,stmt,ans0,ans1,ans2,ans3,akey", "deleted=0" + condition);
+                "id,pid,stmt,ans0,ans1,ans2,ans3,akey", "deleted=0");
+            string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
             List<Question> questions = new List<Question>();
 
@@ -378,11 +406,15 @@ namespace sQzLib
                 {
                     Question q = new Question();
                     q.uId = reader.GetInt32(0);
-                    q.Stem = reader.GetString(1);
+                    if (reader.IsDBNull(1))
+                        q.PassageID = -1;
+                    else
+                        q.PassageID = reader.GetInt32(1);
+                    q.Stem = reader.GetString(2);
                     q.vAns = new string[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
-                        q.vAns[j] = reader.GetString(2 + j);
-                    string x = reader.GetString(5);
+                        q.vAns[j] = reader.GetString(3 + j);
+                    string x = reader.GetString(7);
                     q.vKeys = new bool[Question.N_ANS];
                     for (int j = 0; j < Question.N_ANS; ++j)
                         q.vKeys[j] = (x[j] == Question.C1);
@@ -408,20 +440,28 @@ namespace sQzLib
                 System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
                 return;
             StringBuilder passageVals = new StringBuilder();
-            foreach (PassageQuestion p in PassageQuestions)
+            foreach (PassageQuestion p in PassageQuestions.Values)
             {
                 p.AccquireGlobalMaxID();
-                passageVals.Append("(" + p.ID + "),'" + DBConnect.SafeSQL_Text(p.Passage) + "'),");
+                passageVals.Append("(" + p.ID + ",'" + DBConnect.SafeSQL_Text(p.Passage) + "'),");
                 foreach (Question q in p.Questions)
                     AppendQuestionInsertQuery(q, questionVals);
             }
             questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
             passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
             string eMsg;
-            DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
-                questionVals.ToString(), out eMsg);
-            DBConnect.Ins(conn, "sqz_passage", "id,psg",
-                passageVals.ToString(), out eMsg);
+            if (DBConnect.Ins(conn, "sqz_passage", "id,psg",
+                passageVals.ToString(), out eMsg) < 0)
+            {
+                System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
+                return;
+            }
+            if (DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
+                questionVals.ToString(), out eMsg) < 0)
+            {
+                System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
+                return;
+            }
             DBConnect.Close(ref conn);
         }
 

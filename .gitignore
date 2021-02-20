@@ -6,11 +6,14 @@ sQzClient/bin/
 sQzClient/obj/
 sQzLib/bin/
 sQzLib/obj/
+sQzLib/sQzLib.csproj
 sQzServer0/bin/
 sQzServer0/obj/
+sQzServer0/sQzServer0.csproj
 sQzServer0_print/obj/
 sQzServer0_print/obj/
 sQzServer1/bin/
 sQzServer1/obj/
 sQzStandalone/bin/
 sQzStandalone/obj/
+WpfApplication1/.vs/

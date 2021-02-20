@@ -140,56 +140,66 @@ namespace sQzServer0
             double w = gDBQuest.ColumnDefinitions.First().Width.Value;
             foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
             {
-                TextBlock i = new TextBlock();
-                i.Text = (++x + 1) + ". " + q.Stem;
-                i.Width = w;
-                i.TextWrapping = TextWrapping.Wrap;
-                StackPanel sp = new StackPanel();
-                sp.Children.Add(i);
-                for (int idx = 0; idx < Question.N_ANS; ++idx)
-                {
-                    TextBlock j = new TextBlock();
-                    j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
-                    j.Width = w;
-                    j.TextWrapping = TextWrapping.Wrap;
-                    if (q.vKeys[idx])
-                        j.FontWeight = FontWeights.Bold;
-                    sp.Children.Add(j);
-                }
-                if (even)
-                    bg = evenbg;
-                else
-                    bg = oddbg;
+                bg = (even) ? evenbg : oddbg;
                 even = !even;
-                sp.Background = bg;
-                RowDefinition rd = new RowDefinition();
-                gDBQuest.RowDefinitions.Add(rd);
-                Grid.SetRow(sp, x);
-                gDBQuest.Children.Add(sp);
-                CheckBox chk = new CheckBox();
-                chk.Name = "c" + q.uId;
-                chk.VerticalAlignment = VerticalAlignment.Center;
-                Grid.SetColumn(chk, 1);
-                Grid.SetRow(chk, x);
-                gDBQuest.Children.Add(chk);
-                vChk.Add(chk);
+                AddSingleQuestionToDBView(q, ++x, w, even, bg);
             }
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, QuestSheet.DBGetND(mSelQCat));
-            tbiDBQ.Header = "CSDL";//sb.ToString();
+
+            foreach (PassageQuestion p in mDBQS.ShallowCopyPassages())
+            {
+                AddPassageTextToDBView(p.Passage, ++x, w);
+                foreach (Question q in p.Questions)
+                {
+                    bg = (even) ? evenbg : oddbg;
+                    even = !even;
+                    AddSingleQuestionToDBView(q, ++x, w, even, bg);
+                }
+            }
+            
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, mDBQS.CountPassage);
+        }
+
+        private void AddPassageTextToDBView(string text, int x, double w)
+        {
+            TextBlock passageText = new TextBlock();
+            passageText.Text = "\n\n" + text + "\n\n";
+            passageText.Width = w;
+            passageText.TextWrapping = TextWrapping.Wrap;
+            passageText.TextAlignment = TextAlignment.Justify;
+            RowDefinition rd = new RowDefinition();
+            gDBQuest.RowDefinitions.Add(rd);
+            Grid.SetRow(passageText, x);
+            gDBQuest.Children.Add(passageText);
+        }
+
+        private void AddSingleQuestionToDBView(Question q, int x, double w, bool even, SolidColorBrush bg)
+        {
+            StackPanel sp = new StackPanel();
+            AddSingleQuestionToPanel(q, x, w, bg, sp);
+            //sp.Background = bg;
+            RowDefinition rd = new RowDefinition();
+            gDBQuest.RowDefinitions.Add(rd);
+            Grid.SetRow(sp, x);
+            gDBQuest.Children.Add(sp);
+            CheckBox chk = new CheckBox();
+            chk.Name = "c" + q.uId;
+            chk.VerticalAlignment = VerticalAlignment.Center;
+            Grid.SetColumn(chk, 1);
+            Grid.SetRow(chk, x);
+            gDBQuest.Children.Add(chk);
+            vChk.Add(chk);
         }
 
         private void ShowTmpQ()
         {
             StackPanel sp = new StackPanel();
-            //svwrTmpQ.Content = null;
             AddListOfSingleQuestionsToPanel(mTmpQS.ShallowCopyIndependentQuestions(), 0, sp);
             AddListOfPassageQuestionsToPanel(mTmpQS.ShallowCopyPassages(), 0, sp);
             svwrTmpQ.Content = sp;
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountD);
-            //tbiTmpQ.Header = sb.ToString();
-            tbiTmpQ.Header = mTmpQS.Count;
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountPassage);
+            tbiTmpQ.Header = sb.ToString();
         }
 
         private void AddListOfSingleQuestionsToPanel(List<Question> questions, int index, StackPanel panel)
@@ -290,10 +300,12 @@ namespace sQzServer0
             btnImp.Content = t._((int)TxI.PREP_IMP);
             btnDelQ.Content = t._((int)TxI.PREP_DEL_SEL);
             btnImpQ.Content = t._((int)TxI.PREP_IMP);
-            tbiDBQ.Header = "tbiDBQ.Header";
-            //sb.Clear();
-            //sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), 0, mTmpQS.CountD);
-            tbiTmpQ.Header = "tbiTmpQ.Header";
+            StringBuilder sb = new StringBuilder();
+            sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, mDBQS.CountPassage);
+            tbiDBQ.Header = sb.ToString();
+            sb.Clear();
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountPassage);
+            tbiTmpQ.Header = sb.ToString();
         }
 
         private void btnDelQ_Click(object sender, RoutedEventArgs e)

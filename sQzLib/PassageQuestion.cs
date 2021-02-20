@@ -14,7 +14,17 @@ namespace sQzLib
         public string Passage;
         private int _ID;
         public int ID { get { return _ID; } }
-        public List<Question> Questions;
+        public List<Question> Questions = new List<Question>();
+
+        public PassageQuestion()
+        {
+            _ID = -1;
+        }
+
+        public PassageQuestion(int id)
+        {
+            _ID = id;
+        }
 
         public bool AccquireGlobalMaxID()
         {
