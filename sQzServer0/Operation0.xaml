@@ -22,11 +22,7 @@
                     </StackPanel>
                     <StackPanel>
                         <TextBlock x:Name="txtDate" HorizontalAlignment="Center" FontSize="14"/>
-                        <ListBox x:Name="lbxBrd" Width="120" Height="200" SelectionChanged="lbxBrd_SelectionChanged" Margin="20,0,20,0"/>
-                    </StackPanel>
-                    <StackPanel>
-                        <TextBlock x:Name="txtTime" HorizontalAlignment="Center" FontSize="14"/>
-                        <ListBox x:Name="lbxSl" Width="60" Height="200" SelectionMode="Multiple" Margin="20,0,20,0"/>
+                        <ListBox x:Name="lbxBrd" Width="200" Height="200" SelectionChanged="lbxBrd_SelectionChanged" Margin="20,0,20,0"/>
                     </StackPanel>
                 </StackPanel>
                 <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,20,0,20"/>

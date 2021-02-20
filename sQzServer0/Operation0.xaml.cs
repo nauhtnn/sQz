@@ -50,30 +50,29 @@ namespace sQzServer0
 
         private void LoadBrd()
         {
-            throw new NotImplementedException();
-            //string emsg;
-            //List<DateTime> v = ExamBoard.DBSel(out emsg);
-            //if (v == null)
-            //{
-            //    spMain.Opacity = 0.5;
-            //    WPopup.s.ShowDialog(emsg);
-            //    spMain.Opacity = 1;
-            //    return;
-            //}
-            //bool dark = true;
-            //Color c = new Color();
-            //c.A = 0xff;
-            //c.B = c.G = c.R = 0xf0;
-            //lbxBrd.Items.Clear();
-            //foreach (DateTime dt in v)
-            //{
-            //    ListBoxItem it = new ListBoxItem();
-            //    it.Content = dt.ToString(DT.__);
-            //    dark = !dark;
-            //    if (dark)
-            //        it.Background = new SolidColorBrush(c);
-            //    lbxBrd.Items.Add(it);
-            //}
+            string emsg;
+            List<DateTime> v = ExamSlot.DBSelectSlots(false, out emsg);
+            if (v == null)
+            {
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(emsg);
+                spMain.Opacity = 1;
+                return;
+            }
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            lbxBrd.Items.Clear();
+            foreach (DateTime dt in v)
+            {
+                ListBoxItem it = new ListBoxItem();
+                it.Content = dt.ToString(DT.SYSTEM_DT_FMT);
+                dark = !dark;
+                if (dark)
+                    it.Background = new SolidColorBrush(c);
+                lbxBrd.Items.Add(it);
+            }
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
@@ -230,8 +229,7 @@ namespace sQzServer0
             btnQGen.Content = t._((int)TxI.QS_GEN);
             btnQSav.Content = t._((int)TxI.OP_Q_SAV);
 
-            txtDate.Text = t._((int)TxI.DATE_L);
-            txtTime.Text = t._((int)TxI.TIME_L);
+            txtDate.Text = DT.SYSTEM_DT_FMT;//t._((int)TxI.DATE_L);
 
             txtMod.Text = t._((int)TxI.MODULE);
             txtNEsyDif.Text = t._((int)TxI.N_ESY_DIF);
@@ -264,47 +262,10 @@ namespace sQzServer0
             ListBox l = sender as ListBox;
             ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
-            {
-                lbxSl.IsEnabled = false;
                 return;
-            }
             DateTime dt;
             if (!DT.To_(i.Content as string, out dt))
-            {
-                //mBrd.mDt = dt;
-                lbxSl.IsEnabled = true;
-                LoadSl();
-            }
-        }
-
-        private void LoadSl()
-        {
-            MessageBox.Show("not implement");
-            return;
-            string emsg = null;
-            List<DateTime> v = null;// mBrd.DBSelSl(false, out emsg);
-            if (v == null)
-            {
-                spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(emsg);
-                spMain.Opacity = 1;
-            }
-            //bool dark = true;
-            //Color c = new Color();
-            //c.A = 0xff;
-            //c.B = c.G = c.R = 0xf0;
-            lbxSl.Items.Clear();
-            foreach (DateTime dt in v)
-            {
-                ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT._);// hh);
-                it.Selected += lbxSl_Selected;
-                it.Unselected += lbxSl_Unselected;
-                //dark = !dark;
-                //if (dark)
-                //    it.Background = new SolidColorBrush(c);
-                lbxSl.Items.Add(it);
-            }
+                lbxSl_Selected();
         }
 
         void DisableQSGen()
@@ -358,21 +319,6 @@ namespace sQzServer0
             //    EnableQSGen();
             //else
             //    DisableQSGen();
-        }
-
-        private void lbxSl_Unselected(object sender, RoutedEventArgs e)
-        {
-            ListBoxItem i = sender as ListBoxItem;
-            if (i == null)
-                return;
-            //mBrd.vSl.Remove(i.Content as string);
-            Slot = new ExamSlot();
-            foreach (TabItem ti in tbcSl.Items)
-                if (ti.Name == "_" + (i.Content as string).Replace(':', '_'))
-                {
-                    tbcSl.Items.Remove(ti);
-                    break;
-                }
         }
 
         private void btnQGen_Click(object sender, RoutedEventArgs e)
