@@ -38,7 +38,7 @@ namespace sQzLib
 				{
                     string s = lines.Dequeue();
                     if (s.Length > 1)
-                        token.Append("\n" + s.Substring(0, s.Length - 2));
+                        token.Append("\n" + s.Substring(0, s.Length - 1));
 					break;
 				}
 				else
