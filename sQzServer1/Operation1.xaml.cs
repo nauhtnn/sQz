@@ -589,17 +589,40 @@ namespace sQzServer1
                 r.uId = i;
                 slot.vRoom.Add(r.uId, r);
             }
-            slot.ReadF("fake.txt", ref slot);
+            slot.ReadF(FileOpen("fake_slot.txt"), ref slot);
             return board;
+        }
+
+        private string FileOpen(string defaultName)
+        {
+            //remember to opt-out System.Windows.Form after testing
+            var fileDialog = new System.Windows.Forms.OpenFileDialog();
+            var result = fileDialog.ShowDialog();
+            string filePath = null;
+            switch (result)
+            {
+                case System.Windows.Forms.DialogResult.OK:
+                    filePath = fileDialog.FileName;
+                    break;
+                case System.Windows.Forms.DialogResult.Cancel:
+                default:
+                    break;
+            }
+            if (filePath == null)
+            {
+                System.Windows.MessageBox.Show("No file chosen. Use default fake.txt");
+                filePath = System.IO.Directory.GetCurrentDirectory() +
+                "/" + defaultName;
+            }
+            return filePath;
         }
 
         private void btnPrint_Click(object sender, RoutedEventArgs e)
         {
                 // where did you get this file name?
-        string filePath = System.IO.Directory.GetCurrentDirectory() +
-                "/sqz_server1_";
+        string filePath =  FileOpen("sqz_server1_template.docx");
 
-            if (!System.IO.File.Exists(filePath + "template.docx"))
+            if (!System.IO.File.Exists(filePath))
             {
                 MessageBox.Show("No template!");
                 return;
@@ -615,11 +638,21 @@ namespace sQzServer1
                 return;
             }
             var word = new Microsoft.Office.Interop.Word.Application { Visible = true };
-            var doc = word.Documents.Open(filePath + "template.docx", ReadOnly: true, Visible: true);
+            var doc = word.Documents.Open(filePath, ReadOnly: true, Visible: true);
             doc.SaveAs2(filePath + i + ".docx");
             DocxReplaceDate(doc);
         }
 
+        private void DocxAddExaminee(Microsoft.Office.Interop.Word.Document doc)
+        {
+            foreach(ExamSlot slot in mBrd.vSl.Values)
+                foreach(ExamRoom room in slot.vRoom.Values)
+                    foreach(ExamineeS1 nee in room.vExaminee.Values)
+                    {
+                        int nRow = doc.Tables[0].Rows.Count;
+                        //to add new row
+                    }
+        }
         private void DocxReplaceDate(Microsoft.Office.Interop.Word.Document doc)
         {
             foreach(Microsoft.Office.Interop.Word.Range i in doc.Words)
