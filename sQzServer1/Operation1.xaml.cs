@@ -31,6 +31,9 @@ namespace sQzServer1
         ExamBoard mBrd;
         int uRId;//todo change to enum
         List<SortedList<int, bool>> vfbLock;
+        bool isProduction = true;
+        Dictionary<string, string> ExamineeID_Map = new Dictionary<string, string>();
+        const string EXAMINEE_ID_MAP_FILE_PATH = "ExamineeID_Map.txt";
 
         public Operation1()
         {
@@ -42,6 +45,11 @@ namespace sQzServer1
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
             bRunning = true;
+
+            if (System.IO.File.Exists("developing.txt"))
+                isProduction = false;
+
+            MapExamineeIDs();
 
             mBrd = new ExamBoard();
 
@@ -78,8 +86,7 @@ namespace sQzServer1
         {
             btnStop_Click(null, null);
             //todo: check th state to return
-            bool printerTest = true;
-            if(printerTest)
+            if(!isProduction)
             {
                 mState = NetCode.Srvr1DatRetriving;
                 mBrd = CreateFakeData();
@@ -372,7 +379,6 @@ namespace sQzServer1
 
         public bool ClntBufHndl(byte[] buf)
         {
-            bool isProduction = false;
             int offs = 0;
             switch (mState)
             {
@@ -469,6 +475,7 @@ namespace sQzServer1
             btnStrt.Content = s._[(int)TxI.STRT_SRVR];
             btnStop.Content = s._[(int)TxI.STOP_SRVR];
             btnSubmit.Content = s._[(int)TxI.SUBMIT];
+            btnPrint.Content = "Print";
 
             txtId.Text = s._[(int)TxI.NEEID_S];
             txtName.Text = s._[(int)TxI.NEE_NAME];
@@ -489,12 +496,20 @@ namespace sQzServer1
                 btnSubmit.IsEnabled = true;
                 btnSubmit.Foreground = Theme.s._[(int)BrushId.FG];
                 btnSubmit.Background = Theme.s._[(int)BrushId.mSubmit];
+
+                btnPrint.IsEnabled = true;
+                btnPrint.Foreground = Theme.s._[(int)BrushId.FG];
+                btnPrint.Background = Theme.s._[(int)BrushId.mReconn];
             }
             else
             {
                 btnSubmit.IsEnabled = false;
                 btnSubmit.Foreground = Theme.s._[(int)BrushId.FG_Gray];
                 btnSubmit.Background = Theme.s._[(int)BrushId.BG_Gray];
+
+                btnPrint.IsEnabled = false;
+                btnPrint.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+                btnPrint.Background = Theme.s._[(int)BrushId.BG_Gray];
             }
         }
 
@@ -568,9 +583,9 @@ namespace sQzServer1
                 if (t == "allButtons")
                 {
                     btnConn.IsEnabled = btnStrt.IsEnabled =
-                        btnStop.IsEnabled = btnSubmit.IsEnabled = true;
+                        btnStop.IsEnabled = btnSubmit.IsEnabled = btnPrint.IsEnabled = true;
                     btnConn.Foreground = btnStrt.Foreground =
-                        btnStop.Foreground = btnSubmit.Foreground =
+                        btnStop.Foreground = btnSubmit.Foreground = btnPrint.Foreground =
                         Theme.s._[(int)BrushId.mSubmit];
                 }
             }
@@ -617,10 +632,32 @@ namespace sQzServer1
             return filePath;
         }
 
+        private void MapExamineeIDs()
+        {
+            ExamineeID_Map = new Dictionary<string, string>();
+            if (!System.IO.File.Exists(EXAMINEE_ID_MAP_FILE_PATH))
+                return;
+            string[] lines;
+            try
+            {
+                lines = System.IO.File.ReadAllLines(EXAMINEE_ID_MAP_FILE_PATH);
+            }
+            catch(System.IO.IOException e)
+            {
+                System.Windows.MessageBox.Show(e.ToString());
+                return;
+            }
+            foreach(string line in lines)
+            {
+                string[] id_map = line.Split('\t');
+                if(id_map.Length == 2 && !ExamineeID_Map.ContainsKey(id_map[0]))
+                    ExamineeID_Map.Add(id_map[0], id_map[1]);
+            }
+        }
+
         private void btnPrint_Click(object sender, RoutedEventArgs e)
         {
-                // where did you get this file name?
-        string filePath =  FileOpen("sqz_server1_template.docx");
+            string filePath =  FileOpen("sqz_server1_template.docx");
 
             if (!System.IO.File.Exists(filePath))
             {
@@ -640,7 +677,6 @@ namespace sQzServer1
             var word = new Microsoft.Office.Interop.Word.Application { Visible = true };
             var doc = word.Documents.Open(filePath, ReadOnly: true, Visible: true);
             doc.SaveAs2(filePath + i + ".docx");
-            DocxReplaceDate(doc);
             DocxAddExaminee(doc);
         }
 
@@ -663,7 +699,11 @@ namespace sQzServer1
                         var endRow = System.Reflection.Missing.Value;
                         doc.Tables[1].Rows.Add(endRow);
                         int insertedRow = doc.Tables[1].Rows.Count;
-                        doc.Tables[1].Rows[insertedRow].Cells[1].Range.Text = nee.tId;
+                        if (ExamineeID_Map.ContainsKey(nee.tId))
+                            doc.Tables[1].Rows[insertedRow].Cells[1].Range.Text =
+                                ExamineeID_Map[nee.tId];
+                        else
+                            doc.Tables[1].Rows[insertedRow].Cells[1].Range.Text = nee.tId;
                         doc.Tables[1].Rows[insertedRow].Cells[2].Range.Text = nee.tName;
                         doc.Tables[1].Rows[insertedRow].Cells[3].Range.Text = nee.tBirdate;
                         doc.Tables[1].Rows[insertedRow].Cells[4].Range.Text = nee.tBirthplace;
