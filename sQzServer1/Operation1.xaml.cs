@@ -641,16 +641,33 @@ namespace sQzServer1
             var doc = word.Documents.Open(filePath, ReadOnly: true, Visible: true);
             doc.SaveAs2(filePath + i + ".docx");
             DocxReplaceDate(doc);
+            DocxAddExaminee(doc);
         }
 
         private void DocxAddExaminee(Microsoft.Office.Interop.Word.Document doc)
         {
+            if (doc.Tables.Count == 0)
+            {
+                System.Windows.MessageBox.Show("The docx file has no table!");
+                return;
+            }
+            if(doc.Tables[1].Columns.Count != 5)
+            {
+                System.Windows.MessageBox.Show("The number of column != 5 (ID, name, birthdate, birthplace, grade)");
+                return;
+            }
             foreach(ExamSlot slot in mBrd.vSl.Values)
                 foreach(ExamRoom room in slot.vRoom.Values)
-                    foreach(ExamineeS1 nee in room.vExaminee.Values)
+                    foreach(ExamineeA nee in room.vExaminee.Values)
                     {
-                        int nRow = doc.Tables[0].Rows.Count;
-                        //to add new row
+                        var endRow = System.Reflection.Missing.Value;
+                        doc.Tables[1].Rows.Add(endRow);
+                        int insertedRow = doc.Tables[1].Rows.Count;
+                        doc.Tables[1].Rows[insertedRow].Cells[1].Range.Text = nee.tId;
+                        doc.Tables[1].Rows[insertedRow].Cells[2].Range.Text = nee.tName;
+                        doc.Tables[1].Rows[insertedRow].Cells[3].Range.Text = nee.tBirdate;
+                        doc.Tables[1].Rows[insertedRow].Cells[4].Range.Text = nee.tBirthplace;
+                        doc.Tables[1].Rows[insertedRow].Cells[5].Range.Text = nee.Grade;
                     }
         }
         private void DocxReplaceDate(Microsoft.Office.Interop.Word.Document doc)
