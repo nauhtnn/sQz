@@ -687,9 +687,9 @@ namespace sQzServer1
                 System.Windows.MessageBox.Show("The docx file has no table!");
                 return;
             }
-            if(doc.Tables[1].Columns.Count != 5)
+            if(doc.Tables[1].Columns.Count < 6)
             {
-                System.Windows.MessageBox.Show("The number of column != 5 (ID, name, birthdate, birthplace, grade)");
+                System.Windows.MessageBox.Show("The number of column < 6 (ID, name, birthdate, birthplace, grade, signature)");
                 return;
             }
             foreach(ExamSlot slot in mBrd.vSl.Values)
