@@ -259,13 +259,8 @@ namespace sQzServer0
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             tbcSl.Items.Clear();
-            ListBox l = sender as ListBox;
-            ListBoxItem i = l.SelectedItem as ListBoxItem;
-            if (i == null)
-                return;
-            DateTime dt;
-            if (!DT.To_(i.Content as string, out dt))
-                lbxSl_Selected();
+            if(lbxBrd.SelectedItem != null)
+                lbxSl_Selected(lbxBrd.SelectedItem, null);
         }
 
         void DisableQSGen()
@@ -282,43 +277,38 @@ namespace sQzServer0
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
         {
-            throw new NotImplementedException();
-            //ListBoxItem i = sender as ListBoxItem;
-            //if (i == null)
-            //    return;
-            //if (mBrd.vSl.ContainsKey(i.Content as string))
-            //    return;
+            ListBoxItem i = sender as ListBoxItem;
+            if (i == null)
+                return;
 
-            //ExamSlot sl = new ExamSlot();
-            //DateTime dt;
-            //DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
-            //sl.Dt = dt;
-            //string emsg;
-            //if ((emsg = sl.DBSelRoomId()) != null)
-            //{
-            //    WPopup.s.ShowDialog(emsg);
-            //    return;
-            //}
-            //sl.DBSelStt();
-            //sl.DBSelQPkR();
-            //sl.DBSelNee();
-            //if(sl.DBSelArchieve(out emsg))
-            //{
-            //    WPopup.s.ShowDialog(emsg);
-            //    return;
-            //}
-            //Op0SlotView tbi = new Op0SlotView(sl);
-            //tbi.DeepCopy(tbcRefSl);
-            //tbi.ShowExaminee();
-            //tbi.ShowQSHeader();
-            //tbcSl.Items.Add(tbi);
-            //QuestSheet.DBUpdateCurQSId(mBrd.mDt);
-            //mBrd.vSl.Add(i.Content as string, sl);
-            //if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
-            //        tbi.mSl.eStt == ExamStt.Prep)
-            //    EnableQSGen();
-            //else
-            //    DisableQSGen();
+            Slot = new ExamSlot();
+            DateTime dt;
+            DT.To_(i.Content as string, out dt);
+            Slot.Dt = dt;
+            string emsg;
+            if ((emsg = Slot.DBSelRoomId()) != null)
+            {
+                WPopup.s.ShowDialog(emsg);
+                return;
+            }
+            Slot.DBSelStt();
+            Slot.DBSelNee();
+            if (Slot.DBSelArchieve(out emsg))
+            {
+                WPopup.s.ShowDialog(emsg);
+                return;
+            }
+            Op0SlotView tbi = new Op0SlotView(Slot);
+            tbi.DeepCopy(tbcRefSl);
+            tbi.ShowExaminee();
+            tbi.ShowQSHeader();
+            tbcSl.Items.Add(tbi);
+            QuestSheet.GetMaxID_inDB(Slot.Dt);
+            if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
+                    tbi.mSl.eStt == ExamStt.Prep)
+                EnableQSGen();
+            else
+                DisableQSGen();
         }
 
         private void btnQGen_Click(object sender, RoutedEventArgs e)

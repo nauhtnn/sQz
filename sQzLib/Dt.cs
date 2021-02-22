@@ -28,7 +28,7 @@ namespace sQzLib
 
         public static bool To_(string s, out DateTime dt)
         {
-            return To_(s, SYSTEM_DT_FMT, out dt);
+            return To_(s, _, out dt);
         }
 
         public static bool To_(string s, string format, out DateTime dt)

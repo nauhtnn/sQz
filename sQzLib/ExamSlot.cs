@@ -78,7 +78,7 @@ namespace sQzLib
             {
                 string s = reader.GetString(0);
                 DateTime dt;
-                DT.To_(s, out dt);
+                DT.To_(s, DT.SYSTEM_DT_FMT, out dt);
                 r.Add(dt);
             }
             reader.Close();
@@ -103,47 +103,6 @@ namespace sQzLib
             return null;
         }
 
-        public string DBSelQPkR()
-        {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return Txt.s._((int)TxI.DB_NOK);
-            string qry = DBConnect.mkQrySelect("sqz_slot_room", "rid",
-                "dt='" + mDt.ToString(DT._) + "'");
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return eMsg;
-            }
-            while (reader.Read())
-            {
-                int rid = reader.GetInt32(0);
-                //if (vbQPkAlt.ContainsKey(rid))
-                //    vbQPkAlt[rid] = reader.GetInt16(1) != 0;
-                //else
-                //    vbQPkAlt.Add(rid, reader.GetInt16(1) != 0);
-            }
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return null;
-        }
-
-        public string DBUpQPAlt(int rid)
-        {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return Txt.s._((int)TxI.DB_NOK);
-            string emsg;
-            int n = DBConnect.Update(conn, "sqz_slot_room", "qpkalt=1", "dt='" +
-                mDt.ToString(DT._) + "' AND rid=" + rid, out emsg);
-            DBConnect.Close(ref conn);
-            if(0 < n)
-                return null;
-            return emsg;
-        }
-
         public static List<bool> IsSttOper(List<DateTime> l)
         {
             List<bool> v = new List<bool>();
@@ -160,7 +119,7 @@ namespace sQzLib
             }
             foreach (DateTime dt in l)
             {
-                string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
+                string qry = DBConnect.mkQrySelect("sqz_slot", "status",
                     "dt='" + dt.ToString(DT._) + "'");
                 string eMsg;
                 MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
@@ -184,13 +143,14 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return Txt.s._((int)TxI.DB_NOK);
-            string qry = DBConnect.mkQrySelect("sqz_slot", "stt",
+            string qry = DBConnect.mkQrySelect("sqz_slot", "status",
                 "dt='" + mDt.ToString(DT._) + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
                 DBConnect.Close(ref conn);
+                System.Windows.MessageBox.Show("DBSelStt error\n" + eMsg.ToString());
                 return eMsg;
             }
             int x;
