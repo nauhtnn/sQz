@@ -105,7 +105,8 @@ namespace sQzServer0
                     vw.mSl.DBUpStt();
                 }
             }
-            DisableQSGen();
+
+            btnQGen.IsEnabled = false;
             Thread th = new Thread(() => {mServer.Start(ref mCbMsg);});
             th.Start();
             btnStop.IsEnabled = true;
@@ -227,7 +228,7 @@ namespace sQzServer0
             btnStop.Content = t._((int)TxI.STOP_SRVR);
             btnMMenu.Content = t._((int)TxI.BACK_MMENU);
             btnQGen.Content = t._((int)TxI.QS_GEN);
-            btnQSav.Content = t._((int)TxI.OP_Q_SAV);
+            //btnQSav.Content = t._((int)TxI.OP_Q_SAV);
 
             txtDate.Text = DT._;
 
@@ -263,17 +264,17 @@ namespace sQzServer0
                 lbxSl_Selected(lbxBrd.SelectedItem, null);
         }
 
-        void DisableQSGen()
-        {
-            btnQGen.IsEnabled = false;
-            btnQGen.Foreground = Theme.s._[(int)BrushId.FG_Gray];
-            btnQGen.Background = Theme.s._[(int)BrushId.BG_Gray];
-        }
+        //void DisableQSGen()
+        //{
+        //    btnQGen.IsEnabled = false;
+        //    //btnQGen.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+        //    //btnQGen.Background = Theme.s._[(int)BrushId.BG_Gray];
+        //}
 
-        void EnableQSGen()
-        {
-            
-        }
+        //void EnableQSGen()
+        //{
+        //    btnQGen.IsEnabled = true;
+        //}
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
         {
@@ -303,12 +304,12 @@ namespace sQzServer0
             tbi.ShowExaminee();
             tbi.ShowQSHeader();
             tbcSl.Items.Add(tbi);
-            QuestSheet.GetMaxID_inDB(Slot.Dt);
-            if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
-                    tbi.mSl.eStt == ExamStt.Prep)
-                EnableQSGen();
-            else
-                DisableQSGen();
+            //QuestSheet.GetMaxID_inDB(Slot.Dt);
+            //if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
+            //        tbi.mSl.eStt == ExamStt.Prep)
+            //    btnQGen.IsEnabled = true; //EnableQSGen();
+            //else
+            //    btnQGen.IsEnabled = false; //DisableQSGen();
         }
 
         private void btnQGen_Click(object sender, RoutedEventArgs e)
@@ -328,19 +329,12 @@ namespace sQzServer0
             if (tbi == null || tbiSelected == tbi)
                 return;
             tbiSelected = tbi;
-            Op0SlotView vw = tbi as Op0SlotView;
-            if (vw == null)
-            {
-                btnQGen.IsEnabled = false;
-                btnQGen.Background = Theme.s._[(int)BrushId.BG_Gray];
-                btnQGen.Foreground = Theme.s._[(int)BrushId.FG_Gray];
-                return;
-            }
+            Op0SlotView vw;
             if ((vw = tbcSl.SelectedItem as Op0SlotView) != null &&
-                    vw.mSl.eStt == ExamStt.Prep)
-                EnableQSGen();
+                    vw.mSl.eStt == ExamStt.Prep && vw.mSl.CountQSByRoom() > 0)
+                btnQGen.IsEnabled = true; //EnableQSGen();
             else
-                DisableQSGen();
+                btnQGen.IsEnabled = false; //DisableQSGen();
         }
     }
 }

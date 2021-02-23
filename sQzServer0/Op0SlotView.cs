@@ -358,15 +358,14 @@ namespace sQzServer0
         }
 
         private void tbiQ_GotFocus(object sender, RoutedEventArgs e)
-        {
-            throw new NotImplementedException();
+        {;
             TabItem tbi = sender as TabItem;
             if (tbi == null || tbi.Content != null)
                 return;
             TabControl tbc = tbi.Parent as TabControl;
             if (tbc == null)
                 return;
-            int id = -1;
+            int id = int.Parse((tbi.Header as TextBlock).Text);
             QuestSheet qs = null;
             if (mSl.QuestionPack.vSheet.ContainsKey(id))
                 qs = mSl.QuestionPack.vSheet[id];

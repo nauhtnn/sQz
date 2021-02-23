@@ -287,23 +287,35 @@ namespace sQzLib
 
         public QuestSheet RandomizeDeepCopy(Random rand)
         {
-            QuestSheet qs = new QuestSheet();
-            qs.ID = ID;
-            foreach (Question qi in vQuest)
-                qs.vQuest.Add(qi.RandomizeDeepCopy(rand));
+            QuestSheet sheet = new QuestSheet();
+            sheet.ID = ID;
+            sheet.vQuest = RandomizeDeepCopy(rand, vQuest);
+            foreach(PassageQuestion p in PassageQuestions.Values)
+            {
+                PassageQuestion passage = new PassageQuestion(p.ID);
+                passage.Questions = RandomizeDeepCopy(rand, p.Questions);
+                sheet.PassageQuestions.Add(passage.ID, passage);
+            }
+
+            return sheet;
+        }
+
+        private List<Question> RandomizeDeepCopy(Random rand, List<Question> originalList)
+        {
+            List<Question> tempList = new List<Question>();
+            foreach (Question q in originalList)
+                tempList.Add(q.RandomizeDeepCopy(rand));
             //randomize
-            List<Question> lq = new List<Question>();
-            int n = qs.vQuest.Count;
+            List<Question> newList = new List<Question>();
+            int n = tempList.Count;
             while (0 < n)
             {
                 int idx = rand.Next() % n;
-                lq.Add(qs.vQuest.ElementAt(idx));
-                qs.vQuest.RemoveAt(idx);
+                newList.Add(tempList.ElementAt(idx));
+                tempList.RemoveAt(idx);
                 --n;
             }
-            qs.vQuest = lq;
-
-            return qs;
+            return newList;
         }
 
         //      public int[] DBCount(out string eMsg)

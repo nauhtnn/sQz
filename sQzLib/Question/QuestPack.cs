@@ -159,13 +159,13 @@ namespace sQzLib
         {
             string emsg;
             List<QuestSheet> sheets = new List<QuestSheet>();
-            QuestSheet independentQuestions = new QuestSheet();
-            independentQuestions.DBSelect();
+            QuestSheet originSheet = new QuestSheet();
+            originSheet.DBSelect();
             Random rand = new Random();
             while (0 < numberOfSheet)
             {
                 --numberOfSheet;
-                QuestSheet qs = independentQuestions.RandomizeDeepCopy(rand);
+                QuestSheet qs = originSheet.RandomizeDeepCopy(rand);
                 if (!qs.AccquireGlobalMaxID())//todo: better error handle
                 {
                     vSheet.Add(qs.ID, qs);
