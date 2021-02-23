@@ -53,7 +53,7 @@ namespace sQzLib
 
         Question Parse1Question(Queue<string> tokens)
         {
-            if (tokens.Count < Question.N_ANS + 1)
+            if (tokens.Count < Question.NUMBER_OF_OPTIONS + 1)
             {
                 System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " doesn't have 1 stem 4 options!");
                 return null;
@@ -61,17 +61,17 @@ namespace sQzLib
 
             Question question = new Question();
             question.Stem = tokens.Dequeue();
-            question.vAns = new string[Question.N_ANS];
-            for (int j = 0; j < Question.N_ANS;)
+            question.vAns = new string[Question.NUMBER_OF_OPTIONS];
+            for (int j = 0; j < Question.NUMBER_OF_OPTIONS;)
                 question.vAns[j++] = tokens.Dequeue();
-            question.vKeys = new bool[Question.N_ANS];
-            for (int j = 0; j < Question.N_ANS; ++j)
+            question.vKeys = new bool[Question.NUMBER_OF_OPTIONS];
+            for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
                 question.vKeys[j] = false;
             if (question.Stem[0] == '\\' && 1 < question.Stem.Length
                 && (question.Stem[1] == '*' || question.Stem[1] == '\\'))
                 question.Stem = question.Stem.Substring(1);
             int nKey = 0;
-            for (int j = 0; j < Question.N_ANS; ++j)
+            for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
             {
                 if (question.vAns[j][0] == '\\' && 1 < question.vAns[j].Length)
                 {

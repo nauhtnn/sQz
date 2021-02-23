@@ -394,7 +394,7 @@ namespace sQzServer0
                 i.Text = ++x + ". " + q.Stem;
                 i.Background = bg;
                 sp.Children.Add(i);
-                for (int idx = 0; idx < Question.N_ANS; ++idx)
+                for (int idx = 0; idx < Question.NUMBER_OF_OPTIONS; ++idx)
                 {
                     TextBlock j = new TextBlock();
                     j.Width = tbc.Width - SystemParameters.ScrollWidth;

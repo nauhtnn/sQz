@@ -30,8 +30,6 @@ namespace sQzClient
         NetCode mState;
 
         public static double qaWh;
-        double qiWh;
-        Thickness qMrg;
         public ExamineeA mNee;//reference to Auth.mNee
 
         public TakeExam()
@@ -47,9 +45,9 @@ namespace sQzClient
 
         private void LoadTxt()
         {
-            txtAnsSh.Text = Txt.s._[(int)TxI.ANS_SHEET];
-            btnSubmit.Content = Txt.s._[(int)TxI.SUBMIT];
-            btnExit.Content = Txt.s._[(int)TxI.EXIT];
+            txtAnsSh.Text = Txt.s._((int)TxI.ANS_SHEET);
+            btnSubmit.Content = Txt.s._((int)TxI.SUBMIT);
+            btnExit.Content = Txt.s._((int)TxI.EXIT);
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
@@ -62,9 +60,9 @@ namespace sQzClient
             w.FontSize = 16;
 
             double mrg = FontSize / 2;
-            qiWh = 3 * mrg;
-            qMrg = new Thickness(mrg, mrg, 0, mrg);
-            qaWh = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
+            SingleQuestionView.IdxWidth = 3 * mrg;
+            SingleQuestionView.Margin = new Thickness(mrg, mrg, 0, mrg);
+            SingleQuestionView.StemWidth = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - SingleQuestionView.IdxWidth;
 
             InitLeftPanel();
             InitQuestPanel();
@@ -78,10 +76,36 @@ namespace sQzClient
             WPopup.nwIns(w);
             WPopup.s.wpCbCncl = WPCancel;
 
+            InitRemainingTime();
+
+            txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
+            kLogIntvl = new TimeSpan(0, 0, 30);
+
+            System.Text.StringBuilder msg = new System.Text.StringBuilder();
+            msg.Append(mNee.ID + " (" + mNee.Name + ")");
+            if (mNee.kDtDuration.Minutes == 30)
+                msg.Append(Txt.s._((int)TxI.EXAMING_MSG_1));
+            else
+                msg.AppendFormat(Txt.s._((int)TxI.EXAMING_MSG_2),
+                    mNee.kDtDuration.Minutes, mNee.kDtDuration.Seconds);
+            WPopup.s.wpCb = ShowQuestion;
+            spMain.Opacity = 0.5;
+            WPopup.s.ShowDialog(msg.ToString());
+            spMain.Opacity = 1;
+            if (mNee.eStt < NeeStt.Examing)
+                mNee.eStt = NeeStt.Examing;
+            else if (mNee.eStt == NeeStt.Submitting)
+                Submit();
+        }
+
+        private void InitRemainingTime()
+        {
             int m = -1, s = -1;
             if (mNee.eStt < NeeStt.Submitting)
             {
-                string t = Utils.ReadFile("Duration.txt");
+                string t = null;
+                if (System.IO.File.Exists("Duration.txt"))
+                    t = System.IO.File.ReadAllText("Duration.txt");
                 if (t != null)
                 {
                     string[] vt = t.Split('\t');
@@ -96,24 +120,6 @@ namespace sQzClient
             }
             if (m < 0 || s < 0)
                 dtRemn = mNee.kDtDuration;
-            txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
-            kLogIntvl = new TimeSpan(0, 0, 30);
-
-            System.Text.StringBuilder msg = new System.Text.StringBuilder();
-            msg.Append(mNee.tId + " (" + mNee.tName + ")");
-            if (mNee.kDtDuration.Minutes == 30)
-                msg.Append(Txt.s._[(int)TxI.EXAMING_MSG_1]);
-            else
-                msg.AppendFormat(Txt.s._[(int)TxI.EXAMING_MSG_2],
-                    mNee.kDtDuration.Minutes, mNee.kDtDuration.Seconds);
-            WPopup.s.wpCb = ShowQuestion;
-            spMain.Opacity = 0.5;
-            WPopup.s.ShowDialog(msg.ToString());
-            spMain.Opacity = 1;
-            if (mNee.eStt < NeeStt.Examing)
-                mNee.eStt = NeeStt.Examing;
-            else if (mNee.eStt == NeeStt.Submitting)
-                Submit();
         }
 
         void ShowQuestion()
@@ -141,7 +147,7 @@ namespace sQzClient
             int nAns = 4;//hardcode
             int i = 0, n = mQSh.Count;
             AnsItem.SInit(Window.GetWindow(this).FontSize);
-            mNee.mAnsSh.Init(mQSh.LvId);
+            mNee.mAnsSh.Init(mQSh.ID);
             mNee.mAnsSh.InitView(mQSh, qaWh, null);
             mNee.mAnsSh.bChanged = false;
             //top line
@@ -247,14 +253,14 @@ namespace sQzClient
             for (int i = 1, j = 0; i <= n; i += 2, ++j)
             {
                 gQuest.RowDefinitions.Add(new RowDefinition());
-                StackPanel q = CreateQuestion(i);
+                StackPanel q = SingleQuestionView.CreateSingleQuestionView(i, mQSh.Q(i - 1).Stem, mNee.mAnsSh.OptionContainers[i - 1]);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 0);
                 gQuest.Children.Add(q);
             }
             for (int i = 2, j = 0; i <= n; i += 2, ++j)
             {
-                StackPanel q = CreateQuestion(i);
+                StackPanel q = SingleQuestionView.CreateSingleQuestionView(i, mQSh.Q(i - 1).Stem, mNee.mAnsSh.OptionContainers[i - 1]);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 1);
                 gQuest.Children.Add(q);
@@ -262,42 +268,7 @@ namespace sQzClient
             gQuest.Background = Theme.s._[(int)BrushId.BG];
         }
 
-        StackPanel CreateQuestion(int idx)
-        {
-            StackPanel q = new StackPanel();
-            q.Orientation = Orientation.Horizontal;
-            q.Margin = qMrg;
-            Label l = new Label();
-            l.HorizontalAlignment = HorizontalAlignment.Left;
-            l.VerticalAlignment = VerticalAlignment.Top;
-            l.Content = idx;
-            l.Background = Theme.s._[(int)BrushId.QID_BG];
-            l.Foreground = Theme.s._[(int)BrushId.QID_Color];
-            l.Width = qiWh;
-            l.Height = qiWh;
-            l.HorizontalContentAlignment = HorizontalAlignment.Center;
-            l.VerticalContentAlignment = VerticalAlignment.Center;
-            l.Padding = new Thickness(0);
-            q.Children.Add(l);
-            StackPanel con = new StackPanel();
-            TextBlock stmt = new TextBlock();
-            Question quest = mQSh.Q(idx - 1);
-            stmt.Text = quest.tStmt;
-            stmt.TextWrapping = TextWrapping.Wrap;
-            stmt.Width = qaWh;
-            stmt.Background = Theme.s._[(int)BrushId.Q_BG];
-            Label stmtCon = new Label();
-            stmtCon.Content = stmt;
-            stmtCon.BorderBrush = Theme.s._[(int)BrushId.QID_BG];
-            stmtCon.BorderThickness = new Thickness(0, 4, 0, 0);
-            Thickness zero = new Thickness(0);
-            stmtCon.Margin = stmtCon.Padding = zero;
-            con.Children.Add(stmtCon);
-            con.Children.Add(mNee.mAnsSh.vlbxAns[idx-1]);
-            q.Children.Add(con);
-            q.Background = Theme.s._[(int)BrushId.BG];
-            return q;
-        }
+        
 
         public void Submit()
         {
@@ -440,7 +411,7 @@ namespace sQzClient
         {
             btnSubmit.IsEnabled = false;
             mTimer.Stop();
-            foreach (ListBox l in mNee.mAnsSh.vlbxAns)
+            foreach (ListBox l in mNee.mAnsSh.OptionContainers)
                 l.IsEnabled = false;
             btnExit.IsEnabled = true;
         }

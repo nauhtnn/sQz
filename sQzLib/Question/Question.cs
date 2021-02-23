@@ -7,7 +7,7 @@ namespace sQzLib
 {
     public class Question
     {
-        public const int N_ANS = 4;
+        public const int NUMBER_OF_OPTIONS = 4;
         public const char C0 = '0';
         public const char C1 = '1';
         public int uId;
@@ -20,8 +20,8 @@ namespace sQzLib
         public Question() {
             vAns = null;
             PassageID = -1;
-            vAnsSort = new int[N_ANS];
-            for (int i = 0; i < N_ANS; ++i)
+            vAnsSort = new int[NUMBER_OF_OPTIONS];
+            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
                 vAnsSort[i] = i;
         }
 
@@ -66,25 +66,25 @@ namespace sQzLib
             q.uId = uId;
             q.Stem = Stem;
             q.PassageID = PassageID;
-            q.vAns = new string[N_ANS];
-            for (int i = 0; i < N_ANS; ++i)
+            q.vAns = new string[NUMBER_OF_OPTIONS];
+            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
                 q.vAns[i] = vAns[i];
-            q.vKeys = new bool[N_ANS];
-            for (int i = 0; i < N_ANS; ++i)
+            q.vKeys = new bool[NUMBER_OF_OPTIONS];
+            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
                 q.vKeys[i] = vKeys[i];
-            q.vAnsSort = new int[N_ANS];
-            for (int i = 0; i < N_ANS; ++i)
+            q.vAnsSort = new int[NUMBER_OF_OPTIONS];
+            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
                 q.vAnsSort[i] = vAnsSort[i];
             return q;
         }
 
         public void Randomize(Random rand)
         {
-            string[] anss = new string[N_ANS];
-            bool[] keys = new bool[N_ANS];
-            int[] asort = new int[N_ANS];
+            string[] anss = new string[NUMBER_OF_OPTIONS];
+            bool[] keys = new bool[NUMBER_OF_OPTIONS];
+            int[] asort = new int[NUMBER_OF_OPTIONS];
             List<int> l = new List<int>();
-            int n = N_ANS;
+            int n = NUMBER_OF_OPTIONS;
             for (int i = 0; i < n; ++i)
                 l.Add(i);
             while (0 < n)
@@ -109,12 +109,12 @@ namespace sQzLib
             q.Stem = Stem;
             q.PassageID = PassageID;
             //randomize
-            q.vAns = new string[N_ANS];
-            q.vKeys = new bool[N_ANS];
+            q.vAns = new string[NUMBER_OF_OPTIONS];
+            q.vKeys = new bool[NUMBER_OF_OPTIONS];
             List<int> l = new List<int>();
-            for (int i = 0; i < N_ANS; ++i)
+            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
                 l.Add(i);
-            int n = N_ANS;
+            int n = NUMBER_OF_OPTIONS;
             while (0 < n)
             {
                 int lidx = rand.Next() % n;

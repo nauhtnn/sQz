@@ -117,7 +117,7 @@ namespace sQzLib
         {
             anssh.questSheetID = ID;
             if (0 < vQuest.Count)
-                anssh.aAns = new byte[vQuest.Count * Question.N_ANS];
+                anssh.aAns = new byte[vQuest.Count * Question.NUMBER_OF_OPTIONS];
             else
                 return;
             int i = -1;
@@ -138,7 +138,7 @@ namespace sQzLib
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
                 //ans
-                for (int j = 0; j < Question.N_ANS; ++j)
+                for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
                 {
                     //each ans
                     b = Encoding.UTF8.GetBytes(q.vAns[j]);
@@ -181,8 +181,8 @@ namespace sQzLib
                 l -= sz;
                 offs += sz;
                 //ans
-                q.vAns = new string[Question.N_ANS];
-                for (int j = 0; j < Question.N_ANS; ++j)
+                q.vAns = new string[Question.NUMBER_OF_OPTIONS];
+                for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
                 {
                     //each ans
                     if (l < 4)
@@ -421,12 +421,12 @@ namespace sQzLib
                     else
                         q.PassageID = reader.GetInt32(1);
                     q.Stem = reader.GetString(2);
-                    q.vAns = new string[Question.N_ANS];
-                    for (int j = 0; j < Question.N_ANS; ++j)
+                    q.vAns = new string[Question.NUMBER_OF_OPTIONS];
+                    for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
                         q.vAns[j] = reader.GetString(3 + j);
                     string x = reader.GetString(7);
-                    q.vKeys = new bool[Question.N_ANS];
-                    for (int j = 0; j < Question.N_ANS; ++j)
+                    q.vKeys = new bool[Question.NUMBER_OF_OPTIONS];
+                    for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
                         q.vKeys[j] = (x[j] == Question.C1);
                     questions.Add(q);
                 }
@@ -482,9 +482,9 @@ namespace sQzLib
             else
                 query.Append("(" + q.PassageID + ",0,'");
             query.Append(DBConnect.SafeSQL_Text(q.Stem) + "','");
-            for (int i = 0; i < Question.N_ANS; ++i)
+            for (int i = 0; i < Question.NUMBER_OF_OPTIONS; ++i)
                 query.Append(DBConnect.SafeSQL_Text(q.vAns[i]) + "','");
-            for (int i = 0; i < Question.N_ANS; ++i)
+            for (int i = 0; i < Question.NUMBER_OF_OPTIONS; ++i)
                 if (q.vKeys[i])
                     query.Append(Question.C1);
                 else
@@ -527,12 +527,12 @@ namespace sQzLib
                     Question q = new Question();
                     q.uId = qid;
                     q.Stem = reader.GetString(0);
-                    string[] anss = new string[Question.N_ANS];
-                    for (int j = 0; j < Question.N_ANS; ++j)
+                    string[] anss = new string[Question.NUMBER_OF_OPTIONS];
+                    for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
                         anss[j] = reader.GetString(1 + j);
                     string x = reader.GetString(5);
-                    bool[] keys = new bool[Question.N_ANS];
-                    for (int j = 0; j < Question.N_ANS; ++j)
+                    bool[] keys = new bool[Question.NUMBER_OF_OPTIONS];
+                    for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
                         keys[j] = (x[j] == Question.C1);
                     q.vAns = new string[4];
                     q.vKeys = new bool[4];

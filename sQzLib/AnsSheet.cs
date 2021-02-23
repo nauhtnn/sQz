@@ -11,7 +11,7 @@ namespace sQzLib
     public class AnsSheet
     {
         public const int LEN = 120;
-        public ListBox[] vlbxAns;
+        public ListBox[] OptionContainers;
         public AnsItem[][] vAnsItem;
         public int questSheetID;
         public int uQSId { get { return (ExamineeA.LV_CAP < questSheetID) ? questSheetID - ExamineeA.LV_CAP : questSheetID; } }
@@ -49,38 +49,35 @@ namespace sQzLib
 
         public void InitView(QuestSheet qs, double w, DgEvntCB cb)
         {
-            if (cb != null)
-                dgSelChgCB = cb;
+            //if (cb != null)
+            //    dgSelChgCB = cb;
 
-            vlbxAns = new ListBox[qs.Count];
-            vAnsItem = new AnsItem[qs.Count][];
+            //OptionContainers = new ListBox[qs.Count];
+            //vAnsItem = new AnsItem[qs.Count][];
             
-            int idx = -1;
-            int j = -1;
-            foreach (Question q in qs.ShallowCopyIndependentQuestions())
-            {
-                ++idx;
-                ListBox lbxAns = new ListBox();
-                lbxAns.Width = w;
-                lbxAns.Name = "_" + idx;
-                lbxAns.SelectionChanged += Ans_SelectionChanged;
-                lbxAns.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
-                lbxAns.BorderThickness = new Thickness(0, 4, 0, 0);
-                vlbxAns[idx] = lbxAns;
-                vAnsItem[idx] = new AnsItem[q.vAns.Length];
-                for (int i = 0; i < q.vAns.Length; ++i)
-                {
-                    AnsItem ai = new AnsItem(q.vAns[i], i, w);
-                    ++j;//update view from log
-                    if (aAns[j] == Convert.ToByte(true))
-                    {
-                        ai.mLbl.Content = 'X';
-                        ai.mLbxItem.IsSelected = true;
-                    }
-                    vAnsItem[idx][i] = ai;
-                    lbxAns.Items.Add(ai.lbxi);
-                }
-            }
+            //int idx = -1;
+            //int j = -1;
+            //foreach (Question q in qs.ShallowCopyIndependentQuestions())
+            //{
+            //    ++idx;
+            //    SingleQuestionView questView = new SingleQuestionView(q, idx);
+            //    questView.optionsView.Name = "_" + idx;
+            //    questView.optionsView.SelectionChanged += Ans_SelectionChanged;
+            //    OptionContainers[idx] = questView.optionsView;
+            //    vAnsItem[idx] = new AnsItem[q.vAns.Length];
+            //    for (int i = 0; i < q.vAns.Length; ++i)
+            //    {
+            //        AnsItem ai = new AnsItem(q.vAns[i], i, w);
+            //        ++j;//update view from log
+            //        if (aAns[j] == Convert.ToByte(true))
+            //        {
+            //            ai.mLbl.Content = 'X';
+            //            ai.mLbxItem.IsSelected = true;
+            //        }
+            //        vAnsItem[idx][i] = ai;
+            //        optionsContainer.Items.Add(ai.lbxi);
+            //    }
+            //}
         }
 
         public int GetByteCount()
@@ -149,7 +146,7 @@ namespace sQzLib
 
         public void Disable()
         {
-            foreach (ListBox lbx in vlbxAns)
+            foreach (ListBox lbx in OptionContainers)
                 lbx.IsEnabled = false;
         }
 

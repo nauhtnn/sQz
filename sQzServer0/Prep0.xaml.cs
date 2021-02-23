@@ -128,32 +128,21 @@ namespace sQzServer0
 
         private void ShowDBQ()
         {
-            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
-            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
-            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
-            SolidColorBrush bg;
-            bool even = false;
             int x = -1;
             gDBQuest.Children.Clear();
             gDBQuest.RowDefinitions.Clear();
             vChk.Clear();
-            double w = gDBQuest.ColumnDefinitions.First().Width.Value;
+            SingleQuestionView.staticMargin = new Thickness(FontSize);
+            SingleQuestionView.IdxWidth = FontSize * 2;
+            SingleQuestionView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleQuestionView.IdxWidth;
             foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
-            {
-                bg = (even) ? evenbg : oddbg;
-                even = !even;
-                AddSingleQuestionToDBView(q, ++x, w, even, bg);
-            }
+                AddSingleQuestionToDBView(q, ++x);
 
             foreach (PassageQuestion p in mDBQS.ShallowCopyPassages())
             {
-                AddPassageTextToDBView(p.Passage, ++x, w);
+                AddPassageTextToDBView(p.Passage, ++x, SingleQuestionView.StemWidth);
                 foreach (Question q in p.Questions)
-                {
-                    bg = (even) ? evenbg : oddbg;
-                    even = !even;
-                    AddSingleQuestionToDBView(q, ++x, w, even, bg);
-                }
+                    AddSingleQuestionToDBView(q, ++x);
             }
             
             StringBuilder sb = new StringBuilder();
@@ -174,15 +163,15 @@ namespace sQzServer0
             gDBQuest.Children.Add(passageText);
         }
 
-        private void AddSingleQuestionToDBView(Question q, int x, double w, bool even, SolidColorBrush bg)
+        static readonly bool[] noAnswerArray = new bool[1024];
+
+        private void AddSingleQuestionToDBView(Question q, int x)
         {
-            StackPanel sp = new StackPanel();
-            AddSingleQuestionToPanel(q, x, w, bg, sp);
-            //sp.Background = bg;
+            SingleQuestionView questionView = new SingleQuestionView(q, x, noAnswerArray);
             RowDefinition rd = new RowDefinition();
             gDBQuest.RowDefinitions.Add(rd);
-            Grid.SetRow(sp, x);
-            gDBQuest.Children.Add(sp);
+            Grid.SetRow(questionView, x);
+            gDBQuest.Children.Add(questionView);
             CheckBox chk = new CheckBox();
             chk.Name = "c" + q.uId;
             chk.VerticalAlignment = VerticalAlignment.Center;
@@ -203,24 +192,12 @@ namespace sQzServer0
             tbiTmpQ.Header = sb.ToString();
         }
 
-        private void AddListOfSingleQuestionsToPanel(List<Question> questions, int index, StackPanel panel)
+        private void AddListOfSingleQuestionsToPanel(List<Question> questions, int idx, StackPanel panel)
         {
-            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
-            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
-            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
-            SolidColorBrush bg;
-            bool even = false;
-            int idx = index;
-            double w = svwrTmpQ.Width - 30;
+            SingleQuestionView.IdxWidth = FontSize * 2;
+            SingleQuestionView.StemWidth = svwrTmpQ.Width - 30 - SingleQuestionView.IdxWidth;
             foreach (Question q in questions)
-            {
-                if (even)
-                    bg = evenbg;
-                else
-                    bg = oddbg;
-                even = !even;
-                AddSingleQuestionToPanel(q, ++idx, w, bg, panel);
-            }
+                panel.Children.Add(new SingleQuestionView(q, idx++, noAnswerArray));
         }
 
         private void AddListOfPassageQuestionsToPanel(List<PassageQuestion> passages, int index, StackPanel panel)
@@ -241,28 +218,6 @@ namespace sQzServer0
                 passageText.TextAlignment = TextAlignment.Justify;
                 panel.Children.Add(passageText);
                 AddListOfSingleQuestionsToPanel(p.Questions, ++idx, panel);
-            }
-        }
-
-        private void AddSingleQuestionToPanel(Question question, int index, double width, SolidColorBrush background, StackPanel panel)
-        {
-            TextBlock i = new TextBlock();
-            i.Text = index + ". " + question.Stem;
-            i.Width = width;
-            i.TextWrapping = TextWrapping.Wrap;
-            
-            i.Background = background;
-            panel.Children.Add(i);
-            for (int idx = 0; idx < Question.N_ANS; ++idx)
-            {
-                TextBlock j = new TextBlock();
-                j.Text = ((char)('A' + idx)).ToString() + ") " + question.vAns[idx];
-                j.Width = width;
-                j.TextWrapping = TextWrapping.Wrap;
-                if (question.vKeys[idx])
-                    j.FontWeight = FontWeights.Bold;
-                j.Background = background;
-                panel.Children.Add(j);
             }
         }
 
