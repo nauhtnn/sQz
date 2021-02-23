@@ -206,7 +206,7 @@ namespace sQzServer0
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT.hh);
+                it.Content = dt.ToString(DT._);
                 it.Selected += lbxSl_Selected;
                 it.Unselected += lbxSl_Unselected;
                 //dark = !dark;
@@ -308,7 +308,7 @@ namespace sQzServer0
                 return;
             mBrd.vSl.Remove(i.Content as string);
             foreach (TabItem ti in tbcSl.Items)
-                if (ti.Name == "_" + (i.Content as string).Replace(':', '_'))
+                if (ti.Name == DT.CreateNameFromDateTime(i.Content as string))
                 {
                     tbcSl.Items.Remove(ti);
                     break;

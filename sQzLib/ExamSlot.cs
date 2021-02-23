@@ -53,7 +53,7 @@ namespace sQzLib
             return n;
         }
 
-        public static List<DateTime> DBSelectSlots(bool arch, out string eMsg)
+        public static List<DateTime> DBSelectSlotIDs(bool arch, out string eMsg)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)

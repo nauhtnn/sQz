@@ -51,7 +51,7 @@ namespace sQzServer0
         private void LoadBrd()
         {
             string emsg;
-            List<DateTime> v = ExamSlot.DBSelectSlots(false, out emsg);
+            List<DateTime> v = ExamSlot.DBSelectSlotIDs(false, out emsg);
             if (v == null)
             {
                 spMain.Opacity = 0.5;

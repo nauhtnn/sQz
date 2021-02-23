@@ -36,8 +36,8 @@ namespace sQzServer0
             Init();
             //
             mSl = sl;
-            Header = mSl.Dt.ToString(DT.hh);
-            Name = "_" + (Header as string).Replace(':', '_');
+            Header = mSl.Dt.ToString(DT._);
+            Name = DT.CreateNameFromDateTime(Header as string);
         }
 
         void Init()
@@ -145,7 +145,7 @@ namespace sQzServer0
             if (!mSl.vRoom.TryGetValue(rid, out r))
                 return;
             if (vRT2.ContainsKey(rid))
-                vRT2[rid].Text = DateTime.Now.ToString(DT.hh);
+                vRT2[rid].Text = DateTime.Now.ToString(DT._);
             foreach (ExamineeS0 e in r.vExaminee.Values)
                 if(e.bToVw)
                 {
@@ -255,7 +255,7 @@ namespace sQzServer0
                 t = new TextBlock();
                 vRT1.Add(r.uId, t);
                 if (r.t1.Hour != DT.INV)
-                    t.Text = r.t1.ToString(DT.hh);
+                    t.Text = r.t1.ToString(DT._);
                 t.TextAlignment = TextAlignment.Center;
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 2);
@@ -264,7 +264,7 @@ namespace sQzServer0
                 t = new TextBlock();
                 vRT2.Add(r.uId, t);
                 if (r.t2.Hour != DT.INV)
-                    t.Text = r.t2.ToString(DT.hh);
+                    t.Text = r.t2.ToString(DT._);
                 t.TextAlignment = TextAlignment.Center;
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 3);
@@ -440,7 +440,7 @@ namespace sQzServer0
         public void UpRT1(int rid)
         {
             if (vRT1.ContainsKey(rid))
-                vRT1[rid].Text = DateTime.Now.ToString(DT.hh);
+                vRT1[rid].Text = DateTime.Now.ToString(DT._);
             string emsg;
             mSl.DBUpT1(rid, out emsg);
         }

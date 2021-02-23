@@ -74,7 +74,7 @@ namespace sQzServer0
         private void LoadSlotView()
         {
             string emsg;
-            List<DateTime> v = ExamSlot.DBSelectSlots(false, out emsg);
+            List<DateTime> v = ExamSlot.DBSelectSlotIDs(false, out emsg);
             if(v == null)
             {
                 spMain.Opacity = 0.5;
@@ -158,6 +158,7 @@ namespace sQzServer0
             
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, mDBQS.CountPassage);
+            tbiDBQ.Header = sb.ToString();
         }
 
         private void AddPassageTextToDBView(string text, int x, double w)
@@ -301,9 +302,6 @@ namespace sQzServer0
             btnDelQ.Content = t._((int)TxI.PREP_DEL_SEL);
             btnImpQ.Content = t._((int)TxI.PREP_IMP);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, mDBQS.CountPassage);
-            tbiDBQ.Header = sb.ToString();
-            sb.Clear();
             sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountPassage);
             tbiTmpQ.Header = sb.ToString();
         }
@@ -355,7 +353,7 @@ namespace sQzServer0
             if (i == null)
                 return;
             foreach(TabItem ti in tbcNee.Items)
-                if(ti.Name == "_" + (i.Content as string).Replace(':', '_'))
+                if(ti.Name == DT.CreateNameFromDateTime(i.Content as string))
                 {
                     tbcNee.Items.Remove(ti);
                     break;

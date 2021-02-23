@@ -17,12 +17,10 @@ namespace sQzLib
         public int Count { get { return vQuest.Count; } }
         public string CountPassage {
             get {
-                StringBuilder sb = new StringBuilder();
-                sb.Append(PassageQuestions.Count);
                 if (PassageQuestions.Count == 0)
-                    return sb.ToString();
-                else
-                    sb.Append('(');
+                    return "()";
+                StringBuilder sb = new StringBuilder();
+                sb.Append("(");
                 foreach (PassageQuestion p in PassageQuestions.Values)
                     sb.Append(p.Questions.Count + ", ");
                 sb.Remove(sb.Length - 2, 2);//remove last comma and space

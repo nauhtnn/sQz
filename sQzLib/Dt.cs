@@ -120,5 +120,10 @@ namespace sQzLib
                 return true;
             return false;
         }
+
+        public static string CreateNameFromDateTime(string dt)
+        {
+            return "_" + dt.Replace(':', '_').Replace('-', '_').Replace(' ', '_');
+        }
     }
 }
