@@ -67,7 +67,7 @@ namespace sQzServer0
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT.SYSTEM_DT_FMT);
+                it.Content = dt.ToString(DT._);
                 dark = !dark;
                 if (dark)
                     it.Background = new SolidColorBrush(c);
@@ -229,7 +229,7 @@ namespace sQzServer0
             btnQGen.Content = t._((int)TxI.QS_GEN);
             btnQSav.Content = t._((int)TxI.OP_Q_SAV);
 
-            txtDate.Text = DT.SYSTEM_DT_FMT;//t._((int)TxI.DATE_L);
+            txtDate.Text = DT._;
 
             txtMod.Text = t._((int)TxI.MODULE);
             txtNEsyDif.Text = t._((int)TxI.N_ESY_DIF);

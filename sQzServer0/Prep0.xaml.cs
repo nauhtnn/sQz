@@ -43,7 +43,7 @@ namespace sQzServer0
         private void InsertSlot(object sender, RoutedEventArgs e)
         {
             DateTime dt;
-            if (DT.To_(newSlot.Text, DT.SYSTEM_DT_FMT, out dt))
+            if (DT.To_(newSlot.Text, DT._, out dt))
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.BOARD_NOK));
@@ -86,7 +86,7 @@ namespace sQzServer0
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT.SYSTEM_DT_FMT);
+                it.Content = dt.ToString(DT._);
                 it.Selected += SlotsView_Selected;
                 it.Unselected += SlotsView_Unselected;
                 SlotsView.Items.Add(it);
@@ -289,7 +289,7 @@ namespace sQzServer0
         {
             Txt t = Txt.s;
             btnMMenu.Content = t._((int)TxI.BACK_MMENU);
-            txtDt.Text = DT.SYSTEM_DT_FMT;// t._((int)TxI.DATE_L);
+            txtDt.Text = DT._;
             tbi1.Header = t._((int)TxI.PREP_NEE);
             tbi2.Header = t._((int)TxI.PREP_Q);
             txtId.Text = t._((int)TxI.NEEID_S);
