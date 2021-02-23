@@ -110,8 +110,8 @@
                     <TextBlock Width="40" Grid.Column="4" TextAlignment="Center" Grid.Row="5" HorizontalAlignment="Left"/>
                 </Grid>
             </StackPanel>
-            <TabControl Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged" Visibility="Collapsed"/>
-            <TabControl Name="tbcRefSl" Width="876">
+            <TabControl Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged"/>
+            <TabControl Name="tbcRefSl" Width="876" Visibility="Collapsed">
                 <TabItem Name="tbiStat" Width="876">
                     <Grid ShowGridLines="True">
                         <Grid.ColumnDefinitions>
