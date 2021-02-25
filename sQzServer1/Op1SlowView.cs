@@ -14,14 +14,14 @@ namespace sQzServer1
     public delegate void ToSubmitCb(bool bEnable);
     public class Op1SlotView : TabItem
     {
-        public Dictionary<int, TextBlock> vGrade;
-        public Dictionary<int, TextBlock> vDt1;
-        public Dictionary<int, TextBlock> vDt2;
-        public Dictionary<int, TextBlock> vMark;
-        public Dictionary<int, TextBlock> vComp;
-        public SortedList<int, CheckBox> vLock;
-        public SortedList<int, bool> vbLock;
-        public SortedList<int, CheckBox> vAbsen;
+        public Dictionary<string, TextBlock> vGrade;
+        public Dictionary<string, TextBlock> vDt1;
+        public Dictionary<string, TextBlock> vDt2;
+        public Dictionary<string, TextBlock> vMark;
+        public Dictionary<string, TextBlock> vComp;
+        public SortedList<string, CheckBox> vLock;
+        public SortedList<string, bool> vbLock;
+        public SortedList<string, CheckBox> vAbsen;
         Grid grdNee;
         public ExamSlot mSl;
         bool bQShowed;

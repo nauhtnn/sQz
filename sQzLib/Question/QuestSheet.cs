@@ -135,40 +135,21 @@ namespace sQzLib
                     anssh.aAns[++i] = Convert.ToByte(x);
         }
 
-        private string ReadBytesOfString(byte[] buf, ref int offs)
-        {
-            int l = buf.Length - offs;
-            if (l < 4)
-                return null;
-            int sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (l < sz)
-                return null;
-            string text = Encoding.UTF8.GetString(buf, offs, sz);
-            //l -= sz;
-            offs += sz;
-            return text;
-        }
+        
 
-        private void AppendBytesOf(string text, List<byte[]> byteList)
-        {
-            byte[] b = Encoding.UTF8.GetBytes(text);
-            byteList.Add(BitConverter.GetBytes(b.Length));
-            byteList.Add(b);
-        }
+        
 
         private Question ReadBytesOfQuestion(byte[] buf, ref int offs)
         {
             Question q = new Question();
-            q.Stem = ReadBytesOfString(buf, ref offs);
+            q.Stem = Utils.ReadBytesOfString(buf, ref offs);
             if (q.Stem == null)
                 return null;
             //ans
             q.vAns = new string[Question.NUMBER_OF_OPTIONS];
             for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
             {
-                q.vAns[j] = ReadBytesOfString(buf, ref offs);
+                q.vAns[j] = Utils.ReadBytesOfString(buf, ref offs);
                 if (q.vAns[j] == null)
                     return null;
             }
@@ -177,9 +158,9 @@ namespace sQzLib
 
         private void AppendBytesOf(Question q, List<byte[]> byteList)
         {
-            AppendBytesOf(q.Stem, byteList);
+            Utils.AppendBytesOfString(q.Stem, byteList);
             foreach (string option in q.vAns)
-                AppendBytesOf(option, byteList);
+                Utils.AppendBytesOfString(option, byteList);
         }
 
         private List<Question> ReadBytesOfQuestions(byte[] buf, ref int offs)
@@ -208,7 +189,7 @@ namespace sQzLib
                 return null;
             PassageWithQuestions p = new PassageWithQuestions(BitConverter.ToInt32(buf, offs));
             offs += 4;
-            p.Passage = ReadBytesOfString(buf, ref offs);
+            p.Passage = Utils.ReadBytesOfString(buf, ref offs);
             if (p.Passage == null)
                 return null;
             p.Questions = ReadBytesOfQuestions(buf, ref offs);
@@ -239,7 +220,7 @@ namespace sQzLib
 
         private void AppendBytesOf(PassageWithQuestions p, List<byte[]> byteList)
         {
-            AppendBytesOf(p.Passage, byteList);
+            Utils.AppendBytesOfString(p.Passage, byteList);
             byteList.Add(BitConverter.GetBytes(p.Questions.Count));
             foreach (Question q in p.Questions)
                 AppendBytesOf(q, byteList);

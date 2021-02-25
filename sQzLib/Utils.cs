@@ -5,9 +5,31 @@ using System.Text;
 
 namespace sQzLib
 {
-    class Utils
+    public class Utils
     {
         static char[] WhiteChars = { ' ', '\t', '\n', '\r' };
+
+        public static string ReadBytesOfString(byte[] buf, ref int offs)
+        {
+            int l = buf.Length - offs;
+            if (l < 4)
+                return null;
+            int sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (l < sz)
+                return null;
+            string text = Encoding.UTF8.GetString(buf, offs, sz);
+            offs += sz;
+            return text;
+        }
+
+        public static void AppendBytesOfString(string text, List<byte[]> byteList)
+        {
+            byte[] b = Encoding.UTF8.GetBytes(text);
+            byteList.Add(BitConverter.GetBytes(b.Length));
+            byteList.Add(b);
+        }
 
         public static string CleanSpace(string buf)
         {

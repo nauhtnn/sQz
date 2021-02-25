@@ -28,9 +28,9 @@ namespace sQzServer1
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamBoard mBrd;
+        ExamSlot Slot;
         int uRId;//todo change to enum
-        List<SortedList<int, bool>> vfbLock;
+        List<SortedList<string, bool>> vfbLock;
 
         public Operation1()
         {
@@ -43,13 +43,13 @@ namespace sQzServer1
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            mBrd = new ExamBoard();
+            Slot = new ExamSlot();
 
             if(!System.IO.File.Exists("Room.txt") ||
                 !int.TryParse(System.IO.File.ReadAllText("Room.txt"), out uRId))
                 uRId = 0;
 
-            vfbLock = new List<SortedList<int, bool>>();
+            vfbLock = new List<SortedList<string, bool>>();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -78,14 +78,6 @@ namespace sQzServer1
         {
             btnStop_Click(null, null);
             //todo: check th state to return
-            bool printerTest = true;
-            if(printerTest)
-            {
-                mState = NetCode.Srvr1DatRetriving;
-                mBrd = CreateFakeData();
-                ClntBufHndl(null);
-                return;
-            }
             Task.Run(() => { mClnt.ConnectWR(ref mCbMsg); });
         }
 
@@ -118,8 +110,8 @@ namespace sQzServer1
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
             WPopup.s.wpCb = Exit;
-            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_EXIT_CAUT],
-                Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+            WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_EXIT_CAUT),
+                Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), null);
         }
 
         private void Exit()
@@ -142,7 +134,6 @@ namespace sQzServer1
 			NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
             offs += 4;
             QuestSheet qs;
-            int lvid;
             ExamineeA e;
             DateTime dt;
             switch (c)
@@ -150,7 +141,7 @@ namespace sQzServer1
                 case NetCode.Dating:
                     outMsg = new byte[DT.BYTE_COUNT];
                     offs = 0;
-                    DT.ToByte(outMsg, ref offs, mBrd.mDt);
+                    DT.ToByte(outMsg, ref offs, Slot.Dt);
                     return true;
                 case NetCode.Authenticating:
                     e = new ExamineeS1();
@@ -158,8 +149,8 @@ namespace sQzServer1
                     e.ReadByte(buf, ref offs);
                     bool lck = true;
                     bool found = false;
-                    foreach (SortedList<int, bool> l in vfbLock)
-                        if (l.TryGetValue(e.LvId, out lck))
+                    foreach (SortedList<string, bool> l in vfbLock)
+                        if (l.TryGetValue(e.ID, out lck))
                         {
                             found = true;
                             break;
@@ -170,12 +161,11 @@ namespace sQzServer1
                     {
                         ExamineeA o = null;
                         dt = DateTime.Now;
-                        foreach(ExamSlot sl in mBrd.vSl.Values)
-                            if ((o = sl.Signin(e)) != null)
-                            {
-                                dt = sl.Dt;
-                                break;
-                            }
+                        if ((o = Slot.Signin(e)) != null)
+                        {
+                            dt = Slot.Dt;
+                            break;
+                        }
                         
                         if (o != null)
                         {
@@ -186,19 +176,18 @@ namespace sQzServer1
                                 foreach(Op1SlotView vw in tbcSl.Items.OfType<Op1SlotView>())
                                 {
                                     TextBlock t;
-                                    lvid = o.LvId;
-                                    if (vw.vComp.TryGetValue(lvid, out t))
+                                    if (vw.vComp.TryGetValue(o.ID, out t))
                                         t.Text = o.tComp;
-                                    if (vw.vDt1.TryGetValue(lvid, out t))
+                                    if (vw.vDt1.TryGetValue(o.ID, out t))
                                         t.Text = o.dtTim1.ToString("HH:mm");
                                     CheckBox cbx;
-                                    if (vw.vLock.TryGetValue(lvid, out cbx))
+                                    if (vw.vLock.TryGetValue(o.ID, out cbx))
                                     {
                                         cbx.IsChecked = true;
                                         cbx.IsEnabled = true;
                                     }
-                                    if (vw.vbLock.Keys.Contains(lvid))
-                                        vw.vbLock[lvid] = true;
+                                    if (vw.vbLock.Keys.Contains(o.ID))
+                                        vw.vbLock[o.ID] = true;
                                 }
                             });
                             byte[] a;
@@ -218,9 +207,8 @@ namespace sQzServer1
                     else
                     {
                         ExamineeA o = null;
-                        foreach (ExamSlot sl in mBrd.vSl.Values)
-                            if ((o = sl.Find(e.LvId)) != null)
-                                break;
+                        if ((o = Slot.Find(e.ID)) != null)
+                            break;
                         if (o == null)
                             o = new ExamineeC();
                         if (o.tComp == null)
@@ -250,27 +238,25 @@ namespace sQzServer1
                     return true;
                 case NetCode.ExamRetrieving:
                     outMsg = null;
-                    lvid = BitConverter.ToInt32(buf, offs);
-                    ExamSlot slo = null;
-                    foreach (ExamSlot s in mBrd.vSl.Values)
-                        foreach(ExamRoom r in s.vRoom.Values)
-                            if(r.vExaminee.ContainsKey(lvid))
-                            {
-                                slo = s;
-                                break;
-                            }
-                    if(slo == null)
+                    string nee_id = Utils.ReadBytesOfString(buf, ref offs);
+                    bool nee_not_found = true;
+                    foreach(ExamRoom r in Slot.vRoom.Values)
+                        if(r.vExaminee.ContainsKey(nee_id))
+                        {
+                            nee_not_found = true;
+                            break;
+                        }
+                    if(nee_not_found)
                     {
                         outMsg = new byte[4];
                         Array.Copy(BitConverter.GetBytes((int)TxI.NEEID_NF), 0, outMsg, 0, 4);
                         break;
                     }
-                    ExamLv lv = (lvid < ExamineeA.LV_CAP) ? ExamLv.A : ExamLv.B;
                     offs += 4;
                     int qsid = BitConverter.ToInt32(buf, offs);
                     if (qsid == ExamineeA.LV_CAP)
                     {
-                        byte[] a = slo.ToByteNextQS(lv);
+                        byte[] a = Slot.ToByteNextQS();
                         if (a != null)
                         {
                             outMsg = new byte[a.Length + 4];
@@ -278,7 +264,7 @@ namespace sQzServer1
                             Array.Copy(a, 0, outMsg, 4, a.Length);
                         }
                     }
-                    else if (slo.vQPack[lv].vSheet.TryGetValue(qsid, out qs))
+                    else if (Slot.QuestionPack.vSheet.TryGetValue(qsid, out qs))
                     {
                         outMsg = new byte[qs.aQuest.Length + 4];
                         Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
@@ -286,7 +272,7 @@ namespace sQzServer1
                     }
                     if (outMsg == null)
                     {
-                        mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + (qsid);
+                        mCbMsg += Txt.s._((int)TxI.QS_NFOUND) + (qsid);
                         outMsg = new byte[8];
                         Array.Copy(BitConverter.GetBytes((int)TxI.QS_NFOUND), 0, outMsg, 0, 4);
                         Array.Copy(BitConverter.GetBytes(qsid), 0, outMsg, 4, 4);
@@ -299,49 +285,46 @@ namespace sQzServer1
                     {
                         AnsSheet keySh = null;
                         found = false;
-                        foreach(ExamSlot sl in mBrd.vSl.Values)
-                            if(sl.mKeyPack.vSheet.TryGetValue(e.mAnsSh.uQSLvId, out keySh))
-                            {
-                                found = true;
-                                break;
-                            }
+                        if(Slot.mKeyPack.vSheet.TryGetValue(e.mAnsSh.questSheetID, out keySh))
+                        {
+                            found = true;
+                            break;
+                        }
                         if (!found)
                         {
                             outMsg = BitConverter.GetBytes(101);//todo
                             break;
                         }
                         ExamineeA o = null;
-                        lvid = e.LvId;
                         found = false;
-                        foreach (ExamSlot sl in mBrd.vSl.Values)
-                            if ((o = sl.Find(lvid)) != null)
-                                break;
+                        if ((o = Slot.Find(e.ID)) != null)
+                            break;
                         if (o != null)
                         {
                             o.eStt = NeeStt.Finished;
                             o.mAnsSh = e.mAnsSh;
-                            o.uGrade = keySh.Grade(e.mAnsSh.aAns);
+                            o.Grade = keySh.Grade(e.mAnsSh.aAns);
                             o.dtTim2 = DateTime.Now;
-                            foreach (SortedList<int, bool> sl in vfbLock)
-                                if (sl.ContainsKey(lvid))
-                                    sl[lvid] = true;
+                            foreach (SortedList<string, bool> sl in vfbLock)
+                                if (sl.ContainsKey(e.ID))
+                                    sl[e.ID] = true;
                             Dispatcher.InvokeAsync(() =>
                             {
                                 bool toSubm = true;
                                 foreach (Op1SlotView vw in tbcSl.Items.OfType<Op1SlotView>())
                                 {
                                     TextBlock t = null;
-                                    if (vw.vDt2.TryGetValue(lvid, out t))
+                                    if (vw.vDt2.TryGetValue(e.ID, out t))
                                         t.Text = o.dtTim2.ToString("HH:mm");
-                                    if (vw.vMark.TryGetValue(lvid, out t))
+                                    if (vw.vMark.TryGetValue(e.ID, out t))
                                         t.Text = o.Grade.ToString();
                                     CheckBox cbx;
-                                    if (vw.vLock.TryGetValue(lvid, out cbx))
+                                    if (vw.vLock.TryGetValue(e.ID, out cbx))
                                     {
                                         cbx.IsChecked = true;
                                         cbx.IsEnabled = false;
                                     }
-                                    if(vw.vAbsen.TryGetValue(lvid, out cbx))
+                                    if(vw.vAbsen.TryGetValue(e.ID, out cbx))
                                         cbx.IsChecked = cbx.IsEnabled = false;
                                     if (!vw.ToSubmit())
                                         toSubm = false;
@@ -353,13 +336,13 @@ namespace sQzServer1
                         }
                         else
                         {
-                            mCbMsg += Txt.s._[(int)TxI.NEEID_NF] + ' ' + lvid;
+                            mCbMsg += Txt.s._((int)TxI.NEEID_NF) + ' ' + e.ID;
                             outMsg = BitConverter.GetBytes((int)TxI.NEEID_NF);
                         }
                     }
                     else
                     {
-                        mCbMsg += Txt.s._[(int)TxI.RECV_DAT_ER];
+                        mCbMsg += Txt.s._((int)TxI.RECV_DAT_ER);
                         outMsg = BitConverter.GetBytes((int)TxI.RECV_DAT_ER);
                     }
                     break;
@@ -372,20 +355,18 @@ namespace sQzServer1
 
         public bool ClntBufHndl(byte[] buf)
         {
-            bool isProduction = false;
             int offs = 0;
             switch (mState)
             {
                 case NetCode.Srvr1DatRetriving:
-                    if (isProduction && mBrd.ReadByteSl1(buf, ref offs))
+                    if (Slot.ReadByteR1(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
-                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_DT_NOK]));
+                            WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_DT_NOK)));
                         break;
                     }
                     Dispatcher.InvokeAsync(() => LoadSl());
-                    if(isProduction)
-                        mState = NetCode.QuestRetrieving;
+                    mState = NetCode.QuestRetrieving;
                     return true;
                 case NetCode.QuestRetrieving:
                     if (mBrd.ReadByteQPack(buf, ref offs))
