@@ -138,20 +138,28 @@ namespace sQzLib
                 return true;
             }
             eMsg = null;
-            string cond1 = "dt='" + mDt.ToString(DT._) +
-                    "' AND qsid=";
-            string cond2 = "dt='" + mDt.ToString(DT._) +
-                    "' AND id=";
+            StringBuilder cond1 = new StringBuilder();
+            cond1.Append("dt='" + mDt.ToString(DT._) +
+                    "' AND qsid IN (");
+            StringBuilder cond2 = new StringBuilder();
+            cond2.Append("dt='" + mDt.ToString(DT._) +
+                    "' AND id IN (");
             foreach (QuestSheet qs in vSheet.Values)
             {
                 //int n = DBConnect.Count(conn, "sqz_nee_qsheet", "qsid", cond1 + qs.uId, out eMsg);
                 //if (0 < n)
                 //    continue;
-                if (DBConnect.Delete(conn, "sqz_qsheet_quest", cond1 + qs.ID, out eMsg) < 0)
-                    return true;
-                if (DBConnect.Delete(conn, "sqz_qsheet", cond2 + qs.ID, out eMsg) < 0)
-                    return true;
+                cond1.Append(qs.ID + ",");
+                cond2.Append(qs.ID + ",");
             }
+            cond1.Remove(cond1.Length - 1, 1);//remove last comma
+            cond1.Append(")");
+            cond2.Remove(cond2.Length - 1, 1);//remove last comma
+            cond2.Append(")");
+            if (DBConnect.Delete(conn, "sqz_qsheet_quest", cond1.ToString(), out eMsg) < 0)
+                return true;
+            if (DBConnect.Delete(conn, "sqz_qsheet", cond2.ToString(), out eMsg) < 0)
+                return true;
             return false;
         }
 
@@ -160,7 +168,7 @@ namespace sQzLib
             string emsg;
             List<QuestSheet> sheets = new List<QuestSheet>();
             QuestSheet originSheet = new QuestSheet();
-            originSheet.DBSelect();
+            originSheet.DBSelectNondeletedQuestions();
             Random rand = new Random();
             while (0 < numberOfSheet)
             {

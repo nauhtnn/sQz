@@ -237,7 +237,7 @@ namespace sQzServer0
 
         private void LoadAndShowQuestionFromDB()
         {
-            mDBQS.DBSelect();
+            mDBQS.DBSelectNondeletedQuestions();
             ShowDBQ();
         }
 

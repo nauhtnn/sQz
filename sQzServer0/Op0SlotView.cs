@@ -14,7 +14,7 @@ namespace sQzServer0
     public class Op0SlotView: TabItem
     {
         TabControl tbcQ;
-        TabControl tbcQAlt;
+        //TabControl tbcQAlt;
         public SortedList<string, TextBlock> vGrade;
         public SortedList<string, TextBlock> vDt1;
         public SortedList<string, TextBlock> vDt2;
@@ -178,12 +178,12 @@ namespace sQzServer0
             i.Header = Txt.s._((int)TxI.OP_Q_PRI);
             i.Content = tbcQ;
             tbc.Items.Add(i);
-            tbcQAlt = new TabControl();
-            tbcQAlt.Width = refTbc.Width;
-            i = new TabItem();
-            i.Header = Txt.s._((int)TxI.OP_Q_ALT);
-            i.Content = tbcQAlt;
-            tbc.Items.Add(i);
+            //tbcQAlt = new TabControl();
+            //tbcQAlt.Width = refTbc.Width;
+            //i = new TabItem();
+            //i.Header = Txt.s._((int)TxI.OP_Q_ALT);
+            //i.Content = tbcQAlt;
+            //tbc.Items.Add(i);
             Content = tbc;
         }
 
