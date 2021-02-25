@@ -49,7 +49,7 @@ FOREIGN KEY(`pid`) REFERENCES `sqz_passage`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATETIME,
 `qsid`INT, `qid` INT UNSIGNED, `asort` CHAR(4) CHARACTER SET `ascii`,
-`idx` TINYINT,
+`idx` INT,
 PRIMARY KEY(`dt`, `qsid`, `qid`),
 FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`),
 FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`));

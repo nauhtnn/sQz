@@ -187,7 +187,7 @@ namespace sQzLib
             StringBuilder vals = new StringBuilder();
             string prefx = "('" + dt.ToString(DT._) + "',";
             foreach (QuestSheet qs in l)
-                vals.Append(prefx + "," + qs.ID + "),");
+                vals.Append(prefx + qs.ID + "),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
             if(DBConnect.Ins(conn, "sqz_qsheet", "dt,id", vals.ToString(), out eMsg) < 0)
