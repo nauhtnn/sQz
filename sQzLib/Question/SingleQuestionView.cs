@@ -18,7 +18,7 @@ namespace sQzLib
             Label idxView = new Label();//to optimize: use Border
             idxView.HorizontalAlignment = HorizontalAlignment.Left;
             idxView.VerticalAlignment = VerticalAlignment.Top;
-            idxView.Content = idx;
+            idxView.Content = (++idx).ToString();
             idxView.Background = Theme.s._[(int)BrushId.QID_BG];
             idxView.Foreground = Theme.s._[(int)BrushId.QID_Color];
             idxView.Width = idxView.Height = IdxWidth;
@@ -44,7 +44,7 @@ namespace sQzLib
             return stemView;
         }
 
-        public SingleQuestionView(Question question, int idx, bool[] answerArray)
+        public SingleQuestionView(Question question, int idx, bool[] optionStatusArray)
         {
             Orientation = Orientation.Horizontal;
             Margin = staticMargin;
@@ -53,7 +53,7 @@ namespace sQzLib
 
             StackPanel stemAndOptionsView = new StackPanel();
             stemAndOptionsView.Children.Add(CreateStemView(question.Stem));
-            optionsView = CreateOptionsView(question.vAns, answerArray, idx);
+            optionsView = CreateOptionsView(question.vAns, optionStatusArray, idx);
 
             
             stemAndOptionsView.Children.Add(optionsView);
@@ -61,7 +61,7 @@ namespace sQzLib
             Background = Theme.s._[(int)BrushId.BG];
         }
 
-        public ListBox CreateOptionsView(string[] options, bool[] answerArray, int questionIdx)
+        public ListBox CreateOptionsView(string[] options, bool[] optionStatusArray, int questionIdx)
         {
             ListBox optionsView = new ListBox();
             optionsView.Width = StemWidth;
@@ -72,8 +72,7 @@ namespace sQzLib
             foreach(string text in options)
             {
                 OptionView option = new OptionView(text, idx++, StemWidth);
-                ++answerIdx;//update view from log
-                if (answerArray[answerIdx] == true)
+                if (optionStatusArray[answerIdx++] == true)//update view from log
                     option.IsSelected = true;
                 optionsView.Items.Add(option);
             }

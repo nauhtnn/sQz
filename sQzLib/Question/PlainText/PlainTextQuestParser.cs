@@ -8,11 +8,11 @@ namespace sQzLib
 {
     class PlainTextQuestParser
     {
-        public Tuple<List<Question>, List<PassageQuestion>> ParseTokens(Queue<string> tokens)
+        public Tuple<List<Question>, List<PassageWithQuestions>> ParseTokens(Queue<string> tokens)
         {
             List<Question> independentQuestions = ParseQuestions(tokens);
-            List<PassageQuestion> passageQuestions = ParsePassages(tokens);
-            return new Tuple<List<Question>, List<PassageQuestion>>(independentQuestions, passageQuestions);
+            List<PassageWithQuestions> passageQuestions = ParsePassages(tokens);
+            return new Tuple<List<Question>, List<PassageWithQuestions>>(independentQuestions, passageQuestions);
         }
 
         List<Question> ParseQuestions(Queue<string> tokens)
@@ -20,7 +20,7 @@ namespace sQzLib
             List<Question> questions = new List<Question>();
             while (tokens.Count > 0)
             {
-                if (sQzLib.Utils.CleanFront(tokens.Peek()).IndexOf(PassageQuestion.MAGIC_WORD) == 0)
+                if (sQzLib.Utils.CleanFront(tokens.Peek()).IndexOf(PassageWithQuestions.MAGIC_WORD) == 0)
                     break;
 
                 Question question = Parse1Question(tokens);
@@ -35,12 +35,12 @@ namespace sQzLib
             return questions;
         }
 
-        List<PassageQuestion> ParsePassages(Queue<string> tokens)
+        List<PassageWithQuestions> ParsePassages(Queue<string> tokens)
         {
-            List<PassageQuestion> passageQuestions = new List<PassageQuestion>();
+            List<PassageWithQuestions> passageQuestions = new List<PassageWithQuestions>();
             while (tokens.Count > 0)
             {
-                PassageQuestion passageQuestion = Parse1Passage(tokens);
+                PassageWithQuestions passageQuestion = Parse1Passage(tokens);
                 if (passageQuestion == null)
                 {
                     System.Windows.MessageBox.Show("Stop at passage question " + passageQuestions.Count);
@@ -93,13 +93,13 @@ namespace sQzLib
             return question;
         }
 
-        PassageQuestion Parse1Passage(Queue<string> tokens)
+        PassageWithQuestions Parse1Passage(Queue<string> tokens)
         {
             if (tokens.Count == 0)
                 return null;
-            if (sQzLib.Utils.CleanFront(tokens.Dequeue()).IndexOf(PassageQuestion.MAGIC_WORD) != 0)
+            if (sQzLib.Utils.CleanFront(tokens.Dequeue()).IndexOf(PassageWithQuestions.MAGIC_WORD) != 0)
                 return null;
-            PassageQuestion passageQuest = new PassageQuestion();
+            PassageWithQuestions passageQuest = new PassageWithQuestions();
             passageQuest.Passage = tokens.Dequeue();
             passageQuest.Questions = ParseQuestions(tokens);
             return passageQuest;

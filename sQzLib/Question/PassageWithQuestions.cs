@@ -7,7 +7,7 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    public class PassageQuestion
+    public class PassageWithQuestions
     {
         public static int globalMaxID = -1;
         public const string MAGIC_WORD = "<PASSAGE>";
@@ -16,12 +16,12 @@ namespace sQzLib
         public int ID { get { return _ID; } }
         public List<Question> Questions = new List<Question>();
 
-        public PassageQuestion()
+        public PassageWithQuestions()
         {
             _ID = -1;
         }
 
-        public PassageQuestion(int id)
+        public PassageWithQuestions(int id)
         {
             _ID = id;
         }

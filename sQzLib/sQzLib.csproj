@@ -59,8 +59,9 @@
     <Compile Include="ExamineeS1.cs" />
     <Compile Include="ExamRoom.cs" />
     <Compile Include="ExamSlot.cs" />
-    <Compile Include="PassageQuestion.cs" />
+    <Compile Include="Question\PassageWithQuestions.cs" />
     <Compile Include="Question\OptionView.cs" />
+    <Compile Include="Question\PassageWithQuesionsView.cs" />
     <Compile Include="Question\PlainText\PlainTextQuestParser.cs" />
     <Compile Include="Question\QuestParser.cs" />
     <Compile Include="Question\QuestSheetDocxPrinter.cs" />

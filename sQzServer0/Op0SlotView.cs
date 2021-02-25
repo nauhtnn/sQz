@@ -357,6 +357,8 @@ namespace sQzServer0
             return tbi;
         }
 
+        static readonly bool[] noSelectedOptionArray = new bool[1024];
+
         private void tbiQ_GotFocus(object sender, RoutedEventArgs e)
         {;
             TabItem tbi = sender as TabItem;
@@ -373,39 +375,17 @@ namespace sQzServer0
                 return;
             ScrollViewer svwr = new ScrollViewer();
             svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            if(SingleQuestionView.StemWidth < 1)
+                SingleQuestionView.StemWidth = tbi.Width;
+            if (SingleQuestionView.IdxWidth < 1)
+                SingleQuestionView.IdxWidth = FontSize * 2;
             StackPanel sp = new StackPanel();
-            int x = 0;
-            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
-            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
-            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
-            SolidColorBrush bg;
-            bool even = false;
-
+            int questionIdx = 0;
             foreach (Question q in qs.ShallowCopyIndependentQuestions())
-            {
-                if (even)
-                    bg = evenbg;
-                else
-                    bg = oddbg;
-                even = !even;
-                TextBlock i = new TextBlock();
-                i.Width = tbc.Width - SystemParameters.ScrollWidth;
-                i.TextWrapping = TextWrapping.Wrap;
-                i.Text = ++x + ". " + q.Stem;
-                i.Background = bg;
-                sp.Children.Add(i);
-                for (int idx = 0; idx < Question.NUMBER_OF_OPTIONS; ++idx)
-                {
-                    TextBlock j = new TextBlock();
-                    j.Width = tbc.Width - SystemParameters.ScrollWidth;
-                    j.TextWrapping = TextWrapping.Wrap;
-                    j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
-                    j.Background = bg;
-                    if (q.vKeys[idx])
-                        j.FontWeight = FontWeights.Bold;
-                    sp.Children.Add(j);
-                }
-            }
+                sp.Children.Add(new SingleQuestionView(q, questionIdx++, noSelectedOptionArray));
+            int passageIdx = 0;
+            foreach (PassageWithQuestions p in qs.Passages.Values)
+                sp.Children.Add(new PassageWithQuestionsView(p, passageIdx, ref questionIdx, noSelectedOptionArray));
             svwr.Content = sp;
             svwr.Height = 560;
             tbi.Content = svwr;

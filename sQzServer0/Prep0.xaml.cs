@@ -138,7 +138,7 @@ namespace sQzServer0
             foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
                 AddSingleQuestionToDBView(q, ++x);
 
-            foreach (PassageQuestion p in mDBQS.ShallowCopyPassages())
+            foreach (PassageWithQuestions p in mDBQS.ShallowCopyPassages())
             {
                 AddPassageTextToDBView(p.Passage, ++x, SingleQuestionView.StemWidth);
                 foreach (Question q in p.Questions)
@@ -163,11 +163,11 @@ namespace sQzServer0
             gDBQuest.Children.Add(passageText);
         }
 
-        static readonly bool[] noAnswerArray = new bool[1024];
+        static readonly bool[] noSeletectedOptionArray = new bool[1024];
 
         private void AddSingleQuestionToDBView(Question q, int x)
         {
-            SingleQuestionView questionView = new SingleQuestionView(q, x, noAnswerArray);
+            SingleQuestionView questionView = new SingleQuestionView(q, x, noSeletectedOptionArray);
             RowDefinition rd = new RowDefinition();
             gDBQuest.RowDefinitions.Add(rd);
             Grid.SetRow(questionView, x);
@@ -197,10 +197,10 @@ namespace sQzServer0
             SingleQuestionView.IdxWidth = FontSize * 2;
             SingleQuestionView.StemWidth = svwrTmpQ.Width - 30 - SingleQuestionView.IdxWidth;
             foreach (Question q in questions)
-                panel.Children.Add(new SingleQuestionView(q, idx++, noAnswerArray));
+                panel.Children.Add(new SingleQuestionView(q, idx++, noSeletectedOptionArray));
         }
 
-        private void AddListOfPassageQuestionsToPanel(List<PassageQuestion> passages, int index, StackPanel panel)
+        private void AddListOfPassageQuestionsToPanel(List<PassageWithQuestions> passages, int index, StackPanel panel)
         {
             SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
             SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
@@ -209,7 +209,7 @@ namespace sQzServer0
             bool even = false;
             int idx = index;
             double w = svwrTmpQ.Width - 30;
-            foreach (PassageQuestion p in passages)
+            foreach (PassageWithQuestions p in passages)
             {
                 TextBlock passageText = new TextBlock();
                 passageText.Text = "\n\n" + p.Passage + "\n\n";
