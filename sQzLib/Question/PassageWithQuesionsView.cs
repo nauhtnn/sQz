@@ -17,6 +17,8 @@ namespace sQzLib
         UIElement CreatePassageView(string passage)
         {
             TextBlock passageView = new TextBlock();
+            passageView.TextWrapping = TextWrapping.Wrap;
+            passageView.TextAlignment = TextAlignment.Justify;
             passageView.Text = passage;
             return passageView;
         }

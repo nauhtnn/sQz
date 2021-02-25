@@ -293,6 +293,7 @@ namespace sQzLib
             foreach(PassageWithQuestions p in Passages.Values)
             {
                 PassageWithQuestions passage = new PassageWithQuestions(p.ID);
+                passage.Passage = p.Passage;
                 passage.Questions = RandomizeDeepCopy(rand, p.Questions);
                 sheet.Passages.Add(passage.ID, passage);
             }
