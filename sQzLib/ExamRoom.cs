@@ -71,7 +71,7 @@ namespace sQzLib
             foreach (ExamineeA e in vExaminee.Values)
             {
                 qry = DBConnect.mkQrySelect("sqz_nee_qsheet",
-                    "t1,t2,grade,comp", "dt='" + e.mDt.ToString(DT.SYSTEM_DT_FMT) +
+                    "t1,t2,grade,comp", "dt='" + e.mDt.ToString(DT._) +
                     "' AND neeid='" + e.ID + "'");
                 reader = DBConnect.exeQrySelect(conn, qry, out emsg);
                 if (reader != null)
