@@ -135,26 +135,126 @@ namespace sQzLib
                     anssh.aAns[++i] = Convert.ToByte(x);
         }
 
+        private string ReadBytesOfString(byte[] buf, ref int offs)
+        {
+            int l = buf.Length - offs;
+            if (l < 4)
+                return null;
+            int sz = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+            if (l < sz)
+                return null;
+            string text = Encoding.UTF8.GetString(buf, offs, sz);
+            //l -= sz;
+            offs += sz;
+            return text;
+        }
+
+        private void AppendBytesOf(string text, List<byte[]> byteList)
+        {
+            byte[] b = Encoding.UTF8.GetBytes(text);
+            byteList.Add(BitConverter.GetBytes(b.Length));
+            byteList.Add(b);
+        }
+
+        private Question ReadBytesOfQuestion(byte[] buf, ref int offs)
+        {
+            Question q = new Question();
+            q.Stem = ReadBytesOfString(buf, ref offs);
+            if (q.Stem == null)
+                return null;
+            //ans
+            q.vAns = new string[Question.NUMBER_OF_OPTIONS];
+            for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
+            {
+                q.vAns[j] = ReadBytesOfString(buf, ref offs);
+                if (q.vAns[j] == null)
+                    return null;
+            }
+            return q;
+        }
+
+        private void AppendBytesOf(Question q, List<byte[]> byteList)
+        {
+            AppendBytesOf(q.Stem, byteList);
+            foreach (string option in q.vAns)
+                AppendBytesOf(option, byteList);
+        }
+
+        private List<Question> ReadBytesOfQuestions(byte[] buf, ref int offs)
+        {
+            int l = buf.Length - offs;
+            if (l < 4)
+                return null;
+            int n = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            //l -= 4;
+            List<Question> questions = new List<Question>();
+            while (0 < n)
+            {
+                Question q = ReadBytesOfQuestion(buf, ref offs);
+                if (q == null)
+                    return null;
+                --n;
+                questions.Add(q);
+            }
+            return questions;
+        }
+
+        private PassageWithQuestions ReadBytesOfPassage(byte[] buf, ref int offs)
+        {
+            if (buf.Length < offs + 4)
+                return null;
+            PassageWithQuestions p = new PassageWithQuestions(BitConverter.ToInt32(buf, offs));
+            offs += 4;
+            p.Passage = ReadBytesOfString(buf, ref offs);
+            if (p.Passage == null)
+                return null;
+            p.Questions = ReadBytesOfQuestions(buf, ref offs);
+            if (p.Questions == null)
+                return null;
+            return p;
+        }
+
+        private Dictionary<int, PassageWithQuestions> ReadBytesOfPassages(byte[] buf, ref int offs)
+        {
+            int l = buf.Length - offs;
+            if (l < 4)
+                return null;
+            int n = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            //l -= 4;
+            Dictionary<int, PassageWithQuestions> passages = new Dictionary<int, PassageWithQuestions>();
+            while (0 < n)
+            {
+                PassageWithQuestions p = ReadBytesOfPassage(buf, ref offs);
+                if (p == null)
+                    return null;
+                --n;
+                passages.Add(p.ID, p);
+            }
+            return passages;
+        }
+
+        private void AppendBytesOf(PassageWithQuestions p, List<byte[]> byteList)
+        {
+            AppendBytesOf(p.Passage, byteList);
+            byteList.Add(BitConverter.GetBytes(p.Questions.Count));
+            foreach (Question q in p.Questions)
+                AppendBytesOf(q, byteList);
+        }
+
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(ID));
             l.Add(BitConverter.GetBytes(IndependentQuestions.Count));
             foreach (Question q in IndependentQuestions)
-            {
-                //stmt
-                byte[] b = Encoding.UTF8.GetBytes(q.Stem);
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(b);
-                //ans
-                for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
-                {
-                    //each ans
-                    b = Encoding.UTF8.GetBytes(q.vAns[j]);
-                    l.Add(BitConverter.GetBytes(b.Length));
-                    l.Add(b);
-                }
-            }
+                AppendBytesOf(q, l);
+            l.Add(BitConverter.GetBytes(Passages.Count));
+            foreach (PassageWithQuestions p in Passages.Values)
+                AppendBytesOf(p, l);
             return l;
         }
 
@@ -165,49 +265,17 @@ namespace sQzLib
             int offs0 = offs;
             int l = buf.Length - offs;
             //
-            if (l < 8)
+            if (l < 4)
                 return true;
             ID = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            l -= 4;
-            int nq = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            l -= 4;
-            //
-            IndependentQuestions = new List<Question>();
-            while (0 < nq)
-            {
-                Question q = new Question();
-                //stmt
-                if (l < 4)
-                    return true;
-                int sz = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                if (l < sz)
-                    return true;
-                q.Stem = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-                //ans
-                q.vAns = new string[Question.NUMBER_OF_OPTIONS];
-                for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
-                {
-                    //each ans
-                    if (l < 4)
-                        return true;
-                    sz = BitConverter.ToInt32(buf, offs);
-                    l -= 4;
-                    offs += 4;
-                    if (l < sz)
-                        return true;
-                    q.vAns[j] = Encoding.UTF8.GetString(buf, offs, sz);
-                    l -= sz;
-                    offs += sz;
-                }
-                --nq;
-                IndependentQuestions.Add(q);
-            }
+            //l -= 4;
+            IndependentQuestions = ReadBytesOfQuestions(buf, ref offs);
+            if (IndependentQuestions == null)
+                return true;
+            Passages = ReadBytesOfPassages(buf, ref offs);
+            if (Passages == null)
+                return true;
             if (!Array.Equals(buf, aQuest))
             {
                 int sz = offs - offs0;

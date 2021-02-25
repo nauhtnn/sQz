@@ -569,10 +569,10 @@ namespace sQzLib
             l.Add(DT.ToByteh(mDt));
             l.InsertRange(l.Count, QuestionPack.ToByte());
 
-            return ListOfByte_ToArray(l);
+            return ListOfBytes_ToArray(l);
         }
 
-        private byte[] ListOfByte_ToArray(List<byte[]> l)
+        private byte[] ListOfBytes_ToArray(List<byte[]> l)
         {
             int sz = DT.BYTE_COUNT;
             foreach (byte[] x in l)
@@ -604,7 +604,7 @@ namespace sQzLib
         {
             List<byte[]> l = mKeyPack.ToByte();
             l.Insert(0, DT.ToByteh(mDt));
-            return ListOfByte_ToArray(l);
+            return ListOfBytes_ToArray(l);
         }
 
         public bool ReadByteKey(byte[] buf, ref int offs)
