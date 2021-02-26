@@ -136,7 +136,7 @@ namespace sQzLib
                 return true;
             if (0 < sz)
             {
-                Birthdate = Encoding.UTF8.GetString(buf, offs, sz);
+                ID = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
             }
@@ -190,33 +190,20 @@ namespace sQzLib
                 return false;
             bNRecd = false;
             //
-            if (l < 24)
+            if (l < sizeof(long))
                 return true;
-            int h = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            int m = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim1))
-            {
-                dtTim1 = DT.INV_;
+            if (DT.ReadByte(buf, ref offs, out dtTim1))
                 return true;
-            }
-            h = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            m = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim2))
-            {
-                dtTim2 = DT.INV_;
+            l -= sizeof(long);
+
+            if (l < 4)
                 return true;
-            }
             Grade = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
+
+            if (l < 4)
+                return true;
             sz = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;

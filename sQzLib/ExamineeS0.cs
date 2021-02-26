@@ -18,7 +18,7 @@ namespace sQzLib
         public override List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            byte[] b = Encoding.UTF8.GetBytes(Birthdate);
+            byte[] b = Encoding.UTF8.GetBytes(ID);
             l.Add(BitConverter.GetBytes(b.Length));
             l.Add(b);
             l.Add(BitConverter.GetBytes((int)eStt));
@@ -37,17 +37,15 @@ namespace sQzLib
             if (eStt < NeeStt.Finished)
                 return l;
 
-            l.Add(BitConverter.GetBytes(dtTim1.Hour));
-            l.Add(BitConverter.GetBytes(dtTim1.Minute));
+            l.Add(DT.GetBytes(dtTim1));
 
-            l.Add(BitConverter.GetBytes(dtTim2.Hour));
-            l.Add(BitConverter.GetBytes(dtTim2.Minute));
+            l.Add(DT.GetBytes(dtTim2));
             l.Add(BitConverter.GetBytes(Grade));
             if(0 < tComp.Length)
             {
-                byte[] x = Encoding.UTF8.GetBytes(tComp);
-                l.Add(BitConverter.GetBytes(x.Length));
-                l.Add(x);
+                b = Encoding.UTF8.GetBytes(tComp);
+                l.Add(BitConverter.GetBytes(b.Length));
+                l.Add(b);
             }
             else
                 l.Add(BitConverter.GetBytes(0));
