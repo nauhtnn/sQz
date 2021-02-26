@@ -65,7 +65,7 @@ namespace sQzServer1
             else
                 Dispatcher.InvokeAsync(() =>
                 {
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP_AUTH_NOK]);
+                    WPopup.s.ShowDialog(Txt.s._((int)TxI.OP_AUTH_NOK));
                 });
             return false;
         }
@@ -73,18 +73,18 @@ namespace sQzServer1
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            txtLalgitc.Text = t._[(int)TxI.LALGITC];
-            txtsQz.Text = t._[(int)TxI.SQZ];
-            txtPw.Text = t._[(int)TxI.OP_PW];
-            btnAuth.Content = t._[(int)TxI.OP_AUTH];
-            btnExit.Content = t._[(int)TxI.EXIT];
+            txtLalgitc.Text = t._((int)TxI.LALGITC);
+            txtsQz.Text = t._((int)TxI.SQZ);
+            txtPw.Text = t._((int)TxI.OP_PW);
+            btnAuth.Content = t._((int)TxI.OP_AUTH);
+            btnExit.Content = t._((int)TxI.EXIT);
         }
 
         private void btnAuth_Click(object sender, RoutedEventArgs e)
         {
             if (tbxPw.Text.Length != 8)
             {
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP_PW_NOK]);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.OP_PW_NOK));
                 return;
             }
             tPw = tbxPw.Text;

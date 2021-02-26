@@ -410,22 +410,21 @@ namespace sQzLib
             return rid;
         }
 
-        public byte[] ToByteR1(int rId)
+        public byte[] GetBytes_S0SendingToS1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(DT.ToByteh(mDt));
             ExamRoom r;
             if (vRoom.TryGetValue(rId, out r))
-                l.InsertRange(l.Count, r.ToByte1());
+                l.InsertRange(l.Count, r.GetBytes_S0SendingToS1());
             else
-                l.Add(BitConverter.GetBytes(-1));
+                l.Add(BitConverter.GetBytes(-1));//should raise error message box here
 
-            int sz = DT.BYTE_COUNT;
+            int sz = sizeof(long);
             foreach (byte[] x in l)
                 sz += x.Length;
             byte[] buf = new byte[sz];
             sz = 0;
-            DT.ToByte(buf, ref sz, mDt);
+            DT.CopyBytesToBuffer(buf, ref sz, mDt);
             foreach (byte[] x in l)
             {
                 Buffer.BlockCopy(x, 0, buf, sz, x.Length);
@@ -434,9 +433,9 @@ namespace sQzLib
             return buf;
         }
 
-        public bool ReadByteR1(byte[] buf, ref int offs)
+        public bool ReadBytes_S1RecevingFromS0(byte[] buf, ref int offs)
         {
-            if (DT.ReadByteh(buf, ref offs, out mDt))
+            if (DT.ReadByte(buf, ref offs, out mDt))
                 return true;
             if (buf.Length - offs < 4)
                 return true;
@@ -447,14 +446,14 @@ namespace sQzLib
             ExamRoom r;
             if (vRoom.TryGetValue(rId, out r))
             {
-                if (r.ReadByte1(buf, ref offs))
+                if (r.ReadBytes_S1ReceivingFromS0(buf, ref offs))
                     return true;
             }
             else
             {
                 r = new ExamRoom();
                 r.uId = rId;
-                if (r.ReadByte1(buf, ref offs))
+                if (r.ReadBytes_S1ReceivingFromS0(buf, ref offs))
                     return true;
                 vRoom.Add(rId, r);
             }
@@ -566,7 +565,7 @@ namespace sQzLib
         public byte[] ToByteQPack(int rid)
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(DT.ToByteh(mDt));
+            l.Add(DT.GetBytes(mDt));
             l.InsertRange(l.Count, QuestionPack.ToByte());
 
             return ListOfBytes_ToArray(l);
@@ -574,12 +573,11 @@ namespace sQzLib
 
         private byte[] ListOfBytes_ToArray(List<byte[]> l)
         {
-            int sz = DT.BYTE_COUNT;
+            int sz = 0;
             foreach (byte[] x in l)
                 sz += x.Length;
             byte[] buf = new byte[sz];
             sz = 0;
-            DT.ToByte(buf, ref sz, mDt);
             foreach (byte[] x in l)
             {
                 Buffer.BlockCopy(x, 0, buf, sz, x.Length);
@@ -603,7 +601,7 @@ namespace sQzLib
         public byte[] ToByteKey()
         {
             List<byte[]> l = mKeyPack.ToByte();
-            l.Insert(0, DT.ToByteh(mDt));
+            l.Insert(0, DT.GetBytes(mDt));
             return ListOfBytes_ToArray(l);
         }
 
@@ -633,7 +631,7 @@ namespace sQzLib
         public List<byte[]> ToByteR0()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(DT.ToByteh(mDt));
+            l.Add(DT.GetBytes(mDt));
             if(vRoom.Values.Count == 1)//either 0 or 1
             {
                 foreach(ExamRoom r in vRoom.Values)

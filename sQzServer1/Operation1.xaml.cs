@@ -139,9 +139,7 @@ namespace sQzServer1
             switch (c)
             {
                 case NetCode.Dating:
-                    outMsg = new byte[DT.BYTE_COUNT];
-                    offs = 0;
-                    DT.ToByte(outMsg, ref offs, Slot.Dt);
+                    outMsg = DT.GetBytes(Slot.Dt);
                     return true;
                 case NetCode.Authenticating:
                     e = new ExamineeS1();
@@ -359,7 +357,7 @@ namespace sQzServer1
             switch (mState)
             {
                 case NetCode.Srvr1DatRetriving:
-                    if (Slot.ReadByteR1(buf, ref offs))
+                    if (Slot.ReadBytes_S1RecevingFromS0(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
                             WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_DT_NOK)));
@@ -369,19 +367,19 @@ namespace sQzServer1
                     mState = NetCode.QuestRetrieving;
                     return true;
                 case NetCode.QuestRetrieving:
-                    if (mBrd.ReadByteQPack(buf, ref offs))
+                    if (Slot.ReadByteQPack(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() => 
-                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_Q_NOK]));
+                            WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_Q_NOK)));
                         break;
                     }
                     mState = NetCode.AnsKeyRetrieving;
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    if (isProduction && mBrd.ReadByteKey(buf, ref offs))
+                    if (Slot.ReadByteKey(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
-                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_KEY_NOK]));
+                            WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_KEY_NOK)));
                         break;
                     }
                     else
@@ -428,9 +426,9 @@ namespace sQzServer1
                 case NetCode.AnsKeyRetrieving:
                     outMsg = BitConverter.GetBytes((int)mState);
                     break;
-                case NetCode.SrvrSubmitting:
-                    outMsg = mBrd.ToByteSl0(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
-                    break;
+                //case NetCode.SrvrSubmitting:
+                //    outMsg = mBrd.ToByteSl0(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
+                //    break;
             }
             return outMsg;
         }
@@ -445,22 +443,22 @@ namespace sQzServer1
         void LoadTxt()
         {
             Txt s = Txt.s;
-            btnClose.Content = s._[(int)TxI.EXIT];
-            btnConn.Content = s._[(int)TxI.CONN];
-            btnStrt.Content = s._[(int)TxI.STRT_SRVR];
-            btnStop.Content = s._[(int)TxI.STOP_SRVR];
-            btnSubmit.Content = s._[(int)TxI.SUBMIT];
+            btnClose.Content = s._((int)TxI.EXIT);
+            btnConn.Content = s._((int)TxI.CONN);
+            btnStrt.Content = s._((int)TxI.STRT_SRVR);
+            btnStop.Content = s._((int)TxI.STOP_SRVR);
+            btnSubmit.Content = s._((int)TxI.SUBMIT);
 
-            txtId.Text = s._[(int)TxI.NEEID_S];
-            txtName.Text = s._[(int)TxI.NEE_NAME];
-            txtBirdate.Text = s._[(int)TxI.BIRDATE];
-            txtBirpl.Text = s._[(int)TxI.BIRPL];
-            txtComp.Text = s._[(int)TxI.COMP];
-            txtT1.Text = s._[(int)TxI.T1];
-            txtT2.Text = s._[(int)TxI.T2];
-            txtGrade.Text = s._[(int)TxI.MARK];
-            txtLock.Text = s._[(int)TxI.OP_LCK];
-            txtAbsence.Text = s._[(int)TxI.OP_ABSENCE];
+            txtId.Text = s._((int)TxI.NEEID_S);
+            txtName.Text = s._((int)TxI.NEE_NAME);
+            txtBirdate.Text = s._((int)TxI.BIRDATE);
+            txtBirpl.Text = s._((int)TxI.BIRPL);
+            txtComp.Text = s._((int)TxI.COMP);
+            txtT1.Text = s._((int)TxI.T1);
+            txtT2.Text = s._((int)TxI.T2);
+            txtGrade.Text = s._((int)TxI.MARK);
+            txtLock.Text = s._((int)TxI.OP_LCK);
+            txtAbsence.Text = s._((int)TxI.OP_ABSENCE);
         }
 
         void ToSubmit(bool bEnable)
@@ -487,17 +485,15 @@ namespace sQzServer1
             foreach (TabItem t in tbcSl.Items)
                 if (t.Name == "_" + (i.Content as string).Replace(':', '_'))
                     return;
-            ExamSlot sl;
-            if (!mBrd.vSl.TryGetValue(i.Content as string, out sl))
-                return;
+            //todo: check Slot with i.Content
 
             Op1SlotView vw = new Op1SlotView();
-            vw.mSl = sl;
+            vw.mSl = Slot;
             vw.DeepCopyNee(tbiRefNee);
             vw.ShowExaminee();
             vfbLock.Add(vw.vbLock);
             vw.Name = "_" + (i.Content as string).Replace(':', '_');
-            vw.Header = sl.Dt.ToString(DT.hh);
+            vw.Header = Slot.Dt.ToString(DT.hh);
             vw.toSubmCb = ToSubmit;
             tbcSl.Items.Add(vw);
             vw.Focus();
@@ -508,7 +504,7 @@ namespace sQzServer1
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
-            mBrd.vSl.Remove(i.Content as string);
+            //mBrd.vSl.Remove(i.Content as string);
             foreach (TabItem ti in tbcSl.Items)
                 if (ti.Name == "_" + (i.Content as string).Replace(':', '_'))
                 {
@@ -522,7 +518,8 @@ namespace sQzServer1
 
         private void LoadSl()
         {
-            List<DateTime> v = mBrd.ListSl();
+            List<DateTime> v = new List<DateTime>();
+            v.Add(Slot.Dt);
             //bool dark = true;
             //Color c = new Color();
             //c.A = 0xff;
@@ -555,23 +552,6 @@ namespace sQzServer1
                         Theme.s._[(int)BrushId.mSubmit];
                 }
             }
-        }
-
-        private ExamBoard CreateFakeData()
-        {
-            var board = new ExamBoard();
-            board.mDt = DateTime.Now;
-            var slot = new ExamSlot();
-            slot.Dt = board.mDt;
-            board.vSl.Add(slot.mDt.ToString("HH:mm"), slot);
-            for (int i = 0; i < 6; ++i)
-            {
-                ExamRoom r = new ExamRoom();
-                r.uId = i;
-                slot.vRoom.Add(r.uId, r);
-            }
-            slot.ReadF("fake.txt", ref slot);
-            return board;
         }
 
         private void btnPrint_Click(object sender, RoutedEventArgs e)

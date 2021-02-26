@@ -23,8 +23,8 @@ namespace sQzLib
         //public const string _ = "yyyy-M-d";
         //public const string __ = "yyyy-MM-dd";
         //public const string RR = "dd-MM-yyyy";
-        public const int BYTE_COUNT = 12;
-        public const int BYTE_COUNT_h = 8;
+        //public const int BYTE_COUNT = 12;
+        //public const int BYTE_COUNT_h = 8;
 
         public static bool To_(string s, out DateTime dt)
         {
@@ -55,71 +55,68 @@ namespace sQzLib
             return true;
         }
 
-        public static bool ToByte(byte[] buf, ref int offs, DateTime dt)
+        public static byte[] GetBytes(DateTime dt)
         {
-            if (buf.Length < 12)
+            byte[] buf = new byte[sizeof(long)];
+            Array.Copy(BitConverter.GetBytes(dt.ToBinary()), 0, buf, 0, sizeof(long));
+            return buf;
+        }
+
+        public static bool CopyBytesToBuffer(byte[] buf, ref int offs, DateTime dt)
+        {
+            if (buf.Length < sizeof(long))
                 return true;
-            Array.Copy(BitConverter.GetBytes(dt.Year), 0, buf, offs, 4);
-            offs += 4;
-            Array.Copy(BitConverter.GetBytes(dt.Month), 0, buf, offs, 4);
-            offs += 4;
-            Array.Copy(BitConverter.GetBytes(dt.Day), 0, buf, offs, 4);
-            offs += 4;
+            Array.Copy(BitConverter.GetBytes(dt.ToBinary()), 0, buf, offs, sizeof(long));
+            offs += sizeof(long);
             return false;
         }
 
         public static bool ReadByte(byte[] buf, ref int offs, out DateTime dt)
         {
-            if (buf.Length - offs < 12)
+            if (buf.Length - offs < sizeof(long))
             {
                 dt = INV_;
                 return true;
             }
-            int y = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int M = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int d = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            if (To_(y.ToString("d4") + '-' + M.ToString("d2") + '-' + d.ToString("d2"), out dt))
-                return true;
+            dt = DateTime.FromBinary(BitConverter.ToInt64(buf, offs));
+            offs += sizeof(long);
             return false;
         }
 
-        public static bool ToByteh(byte[] buf, ref int offs, DateTime dt)
-        {
-            if (buf.Length < 8)
-                return true;
-            Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, offs, 4);
-            offs += 4;
-            Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, offs, 4);
-            offs += 4;
-            return false;
-        }
+        //public static bool ToByteh(byte[] buf, ref int offs, DateTime dt)
+        //{
+        //    if (buf.Length < 8)
+        //        return true;
+        //    Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, offs, 4);
+        //    offs += 4;
+        //    Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, offs, 4);
+        //    offs += 4;
+        //    return false;
+        //}
 
-        public static byte[] ToByteh(DateTime dt)
-        {
-            byte[] buf = new byte[8];
-            Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, 0, 4);
-            Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, 4, 4);
-            return buf;
-        }
+        //public static byte[] ToByteh(DateTime dt)
+        //{
+        //    byte[] buf = new byte[8];
+        //    Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, 0, 4);
+        //    Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, 4, 4);
+        //    return buf;
+        //}
 
-        public static bool ReadByteh(byte[] buf, ref int offs, out DateTime dt)
-        {
-            if (buf.Length - offs < 8)
-            {
-                dt = INV_;
-                return true;
-            }
-            int H = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            int m = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            if (To_(H.ToString("d2") + ':' + m.ToString("d2"), hh, out dt))
-                return true;
-            return false;
-        }
+        //public static bool ReadByteh(byte[] buf, ref int offs, out DateTime dt)
+        //{
+        //    if (buf.Length - offs < 8)
+        //    {
+        //        dt = INV_;
+        //        return true;
+        //    }
+        //    int H = BitConverter.ToInt32(buf, offs);
+        //    offs += 4;
+        //    int m = BitConverter.ToInt32(buf, offs);
+        //    offs += 4;
+        //    if (To_(H.ToString("d2") + ':' + m.ToString("d2"), hh, out dt))
+        //        return true;
+        //    return false;
+        //}
 
         public static string CreateNameFromDateTime(string dt)
         {

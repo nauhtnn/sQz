@@ -173,7 +173,7 @@ namespace sQzServer0
                     }
                     roomId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
-                    outMsg = Slot.ToByteR1(roomId);
+                    outMsg = Slot.GetBytes_S0SendingToS1(roomId);
                     Dispatcher.InvokeAsync(() =>
                     {
                         foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())

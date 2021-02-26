@@ -122,7 +122,7 @@ namespace sQzLib
             return null;
         }
 
-        public List<byte[]> ToByte1()
+        public List<byte[]> GetBytes_S0SendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uId));
@@ -132,7 +132,7 @@ namespace sQzLib
             return l;
         }
 
-        public bool ReadByte1(byte[] buf, ref int offs)
+        public bool ReadBytes_S1ReceivingFromS0(byte[] buf, ref int offs)
         {
             if (buf == null)
                 return true;
