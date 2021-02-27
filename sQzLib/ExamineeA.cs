@@ -53,13 +53,13 @@ namespace sQzLib
 
         public void Reset()
         {
-            mDt = DT.INV_H;
+            mDt = DT.INVALID;
             Name = null;
             Birthdate = null;
             Birthplace = null;
             eStt = NeeStt.Signing;
             Grade = LV_CAP;
-            dtTim1 = dtTim2 = DT.INV_;
+            dtTim1 = dtTim2 = DT.INVALID;
             tComp = string.Empty;
             mAnsSh = new AnsSheet();
             kDtDuration = new TimeSpan(0, 30, 0);

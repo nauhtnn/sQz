@@ -173,7 +173,7 @@ namespace sQzServer0
                     }
                     roomId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
-                    outMsg = Slot.GetBytes_S0SendingToS1(roomId);
+                    outMsg = Slot.GetBytesRoom_S0SendingToS1(roomId);
                     Dispatcher.InvokeAsync(() =>
                     {
                         foreach (Op0SlotView vw in tbcSl.Items.OfType<Op0SlotView>())
@@ -188,10 +188,10 @@ namespace sQzServer0
                     }
                     roomId = BitConverter.ToInt32(buf, offs);
                     offs += 4;
-                    outMsg = Slot.ToByteQPack(roomId);
+                    outMsg = Slot.GetBytesQPack_WithDateTime(roomId);
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    outMsg = Slot.ToByteKey();
+                    outMsg = Slot.GetBytesKey_WithDateTime();
                     break;
                 case NetCode.SrvrSubmitting:
                     int rid;

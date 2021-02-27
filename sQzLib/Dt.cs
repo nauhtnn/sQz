@@ -11,7 +11,7 @@ namespace sQzLib
         static CultureInfo sCultInfo = null;
         public const int INV = 0;
         public static DateTime INV_H = DateTime.Parse("1000-01-01 00:00:00");//h = m = INVALID
-        public static DateTime INV_ = DateTime.Parse("1000-01-01");
+        public static DateTime INVALID = DateTime.Parse("1000-01-01");
         public static readonly string SYSTEM_DT_FMT = CultureInfo.CurrentCulture.DateTimeFormat.ShortDatePattern + " " +
                 CultureInfo.CurrentCulture.DateTimeFormat.LongTimePattern;
         public const string h = "H:m";
@@ -43,7 +43,7 @@ namespace sQzLib
             DateTime dt;
             if (!To_(s, out dt))
                 return dt.ToString(_);
-            return INV_.ToString(_);
+            return INVALID.ToString(_);
         }
 
         public static bool Toh(string s, string form, out DateTime t)
@@ -71,16 +71,12 @@ namespace sQzLib
             return false;
         }
 
-        public static bool ReadByte(byte[] buf, ref int offs, out DateTime dt)
+        public static DateTime ReadByte(byte[] buf, ref int offs)
         {
             if (buf.Length - offs < sizeof(long))
-            {
-                dt = INV_;
-                return true;
-            }
-            dt = DateTime.FromBinary(BitConverter.ToInt64(buf, offs));
+                return INVALID;
             offs += sizeof(long);
-            return false;
+            return DateTime.FromBinary(BitConverter.ToInt64(buf, offs - sizeof(long)));
         }
 
         //public static bool ToByteh(byte[] buf, ref int offs, DateTime dt)

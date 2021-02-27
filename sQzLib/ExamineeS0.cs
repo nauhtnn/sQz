@@ -18,21 +18,12 @@ namespace sQzLib
         public override List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
-            byte[] b = Encoding.UTF8.GetBytes(ID);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
+            Utils.AppendBytesOfString(ID, l);
             l.Add(BitConverter.GetBytes((int)eStt));
 
-            b = Encoding.UTF8.GetBytes(Birthdate);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
-
-            b = Encoding.UTF8.GetBytes(Name);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
-            b = Encoding.UTF8.GetBytes(Birthplace);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
+            Utils.AppendBytesOfString(Birthdate, l);
+            Utils.AppendBytesOfString(Name, l);
+            Utils.AppendBytesOfString(Birthplace, l);
 
             if (eStt < NeeStt.Finished)
                 return l;
@@ -42,11 +33,7 @@ namespace sQzLib
             l.Add(DT.GetBytes(dtTim2));
             l.Add(BitConverter.GetBytes(Grade));
             if(0 < tComp.Length)
-            {
-                b = Encoding.UTF8.GetBytes(tComp);
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(b);
-            }
+                Utils.AppendBytesOfString(tComp, l);
             else
                 l.Add(BitConverter.GetBytes(0));
 
@@ -96,7 +83,7 @@ namespace sQzLib
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim1))
             {
-                dtTim1 = DT.INV_;
+                dtTim1 = DT.INVALID;
                 return true;
             }
             mAnsSh.questSheetID = BitConverter.ToInt32(buf, offs);
@@ -115,7 +102,7 @@ namespace sQzLib
             offs += 4;
             if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim2))
             {
-                dtTim2 = DT.INV_;
+                dtTim2 = DT.INVALID;
                 return true;
             }
             Grade = BitConverter.ToInt32(buf, offs);

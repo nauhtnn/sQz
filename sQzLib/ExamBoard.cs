@@ -171,7 +171,7 @@ namespace sQzLib
 
         public bool ReadByteSl1(byte[] buf, ref int offs)
         {
-            if (DT.ReadByte(buf, ref offs, out mDt))
+            if (mDt = DT.ReadByte(buf, ref offs) == DT.INVALID)
                 return true;
             if (buf.Length - offs < 4)
                 return true;
@@ -231,8 +231,7 @@ namespace sQzLib
 
         public int ReadByteSl0(byte[] buf, ref int offs)
         {
-            DateTime dt;
-            if (DT.ReadByte(buf, ref offs, out dt) || dt != mDt)
+            if (mDt != DT.ReadByte(buf, ref offs))
                 return -1;
             if (buf.Length - offs < 4)
                 return -1;
@@ -277,8 +276,7 @@ namespace sQzLib
 
         public bool ReadByteQPack(byte[] buf, ref int offs)
         {
-            DateTime dt;
-            if (DT.ReadByte(buf, ref offs, out dt) || dt != mDt)
+            if (mDt != DT.ReadByte(buf, ref offs))
                 return true;
             if (buf.Length - offs < 4)
                 return true;
@@ -322,8 +320,7 @@ namespace sQzLib
 
         public bool ReadByteKey(byte[] buf, ref int offs)
         {
-            DateTime dt;
-            if (DT.ReadByte(buf, ref offs, out dt) || dt != mDt)
+            if (mDt != DT.ReadByte(buf, ref offs))
                 return true;
             if (buf.Length - offs < 4)
                 return true;

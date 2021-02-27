@@ -192,7 +192,13 @@ namespace sQzLib
             //
             if (l < sizeof(long))
                 return true;
-            if (DT.ReadByte(buf, ref offs, out dtTim1))
+            if ((dtTim1 = DT.ReadByte(buf, ref offs)) == DT.INVALID)
+                return true;
+            l -= sizeof(long);
+
+            if (l < sizeof(long))
+                return true;
+            if ((dtTim2 = DT.ReadByte(buf, ref offs)) == DT.INVALID)
                 return true;
             l -= sizeof(long);
 

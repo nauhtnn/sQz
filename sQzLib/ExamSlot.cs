@@ -29,7 +29,7 @@ namespace sQzLib
 
         public ExamSlot()
         {
-            mDt = DT.INV_;
+            mDt = DT.INVALID;
             vRoom = new Dictionary<int, ExamRoom>();
             eStt = ExamStt.Prep;
             QuestionPack = new QuestPack();
@@ -384,8 +384,7 @@ namespace sQzLib
             if (buf.Length - offs < 4)
                 return -1;
 
-            DateTime dt;
-            if (DT.ReadByte(buf, ref offs, out dt) || dt != mDt)
+            if (Dt != DT.ReadByte(buf, ref offs))
                 return -1;
 
             if (buf.Length - offs < 4)
@@ -394,15 +393,14 @@ namespace sQzLib
             offs += 4;
             ExamRoom r;
             if (!vRoom.TryGetValue(rid, out r) ||
-                r.ReadByte0(buf, ref offs))
+                r.ReadBytes(buf, ref offs, new ExamineeS0(), false))
                 return -1;
             return rid;
         }
 
         public int ReadByteSl0(byte[] buf, ref int offs)
         {
-            DateTime dt;
-            if (DT.ReadByte(buf, ref offs, out dt) || dt != mDt)
+            if (Dt != DT.ReadByte(buf, ref offs))
                 return -1;
             int rid = ReadByteR0(buf, ref offs);
             if (rid < 0)
@@ -410,32 +408,22 @@ namespace sQzLib
             return rid;
         }
 
-        public byte[] GetBytes_S0SendingToS1(int rId)
+        public byte[] GetBytesRoom_S0SendingToS1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
+            l.Add(DT.GetBytes(Dt));
             ExamRoom r;
             if (vRoom.TryGetValue(rId, out r))
                 l.InsertRange(l.Count, r.GetBytes_S0SendingToS1());
             else
                 l.Add(BitConverter.GetBytes(-1));//should raise error message box here
 
-            int sz = sizeof(long);
-            foreach (byte[] x in l)
-                sz += x.Length;
-            byte[] buf = new byte[sz];
-            sz = 0;
-            DT.CopyBytesToBuffer(buf, ref sz, mDt);
-            foreach (byte[] x in l)
-            {
-                Buffer.BlockCopy(x, 0, buf, sz, x.Length);
-                sz += x.Length;
-            }
-            return buf;
+            return ListOfBytes_ToArray(l);
         }
 
         public bool ReadBytes_S1RecevingFromS0(byte[] buf, ref int offs)
         {
-            if (DT.ReadByte(buf, ref offs, out mDt))
+            if ((Dt = DT.ReadByte(buf, ref offs)) == DT.INVALID)
                 return true;
             if (buf.Length - offs < 4)
                 return true;
@@ -446,14 +434,14 @@ namespace sQzLib
             ExamRoom r;
             if (vRoom.TryGetValue(rId, out r))
             {
-                if (r.ReadBytes_S1ReceivingFromS0(buf, ref offs))
+                if (r.ReadBytes(buf, ref offs, new ExamineeS1(), true))
                     return true;
             }
             else
             {
                 r = new ExamRoom();
                 r.uId = rId;
-                if (r.ReadBytes_S1ReceivingFromS0(buf, ref offs))
+                if (r.ReadBytes(buf, ref offs, new ExamineeS1(), true))
                     return true;
                 vRoom.Add(rId, r);
             }
@@ -562,7 +550,7 @@ namespace sQzLib
             return false;
         }
 
-        public byte[] ToByteQPack(int rid)
+        public byte[] GetBytesQPack_WithDateTime(int rid)
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.GetBytes(mDt));
@@ -586,7 +574,7 @@ namespace sQzLib
             return buf;
         }
 
-        public bool ReadByteQPack(byte[] buf, ref int offs)
+        public bool ReadBytesQPack_NoDateTime(byte[] buf, ref int offs)
         {
             if (QuestionPack.ReadByte(buf, ref offs))
                 return true;
@@ -598,14 +586,14 @@ namespace sQzLib
             return QuestionPack.ToByteNextQS();
         }
 
-        public byte[] ToByteKey()
+        public byte[] GetBytesKey_WithDateTime()
         {
             List<byte[]> l = mKeyPack.ToByte();
             l.Insert(0, DT.GetBytes(mDt));
             return ListOfBytes_ToArray(l);
         }
 
-        public bool ReadByteKey(byte[] buf, ref int offs)
+        public bool ReadByteKey_NoDateTime(byte[] buf, ref int offs)
         {
             return mKeyPack.ReadByte(buf, ref offs);
         }
@@ -628,15 +616,17 @@ namespace sQzLib
             return null;
         }
 
-        public List<byte[]> ToByteR0()
+        public List<byte[]> GetBytesRoom_S1SendingToS0()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.GetBytes(mDt));
-            if(vRoom.Values.Count == 1)//either 0 or 1
+            if (vRoom.Values.Count == 1)//either 0 or 1
             {
-                foreach(ExamRoom r in vRoom.Values)
-                    l.InsertRange(l.Count, r.ToByte0());
+                foreach (ExamRoom r in vRoom.Values)
+                    l.InsertRange(l.Count, r.GetBytes_S1SendingToS0());
             }
+            else
+                l.Add(BitConverter.GetBytes((int)0));
             return l;
         }
 

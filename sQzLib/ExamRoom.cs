@@ -132,7 +132,7 @@ namespace sQzLib
             return l;
         }
 
-        public bool ReadBytes_S1ReceivingFromS0(byte[] buf, ref int offs)
+        public bool ReadBytes(byte[] buf, ref int offs, ExamineeA newNee, bool addIfNExist)
         {
             if (buf == null)
                 return true;
@@ -140,29 +140,27 @@ namespace sQzLib
                 return true;
             int n = BitConverter.ToInt32(buf, offs);
             offs += 4;
+            if (n < 0)
+                return true;
             while (0 < n)
             {
                 --n;
-                ExamineeS1 e = new ExamineeS1();
-                //e.bFromC = false;
-                if (e.ReadByte(buf, ref offs))
+                //newNee.bFromC = false;
+                if (newNee.ReadByte(buf, ref offs))
                     return true;
                 ExamineeA o;
-                if (vExaminee.TryGetValue(e.ID, out o))
+                if (vExaminee.TryGetValue(newNee.ID, out o))
                 {
                     o.bFromC = false;
-                    o.Merge(e);
+                    o.Merge(newNee);
                 }
-                else
-                    vExaminee.Add(e.ID, e);
+                else if(addIfNExist)
+                    vExaminee.Add(newNee.ID, newNee);
             }
-            if (n == 0)
-                return false;
-            else
-                return true;
+            return false;
         }
 
-        public List<byte[]> ToByte0()
+        public List<byte[]> GetBytes_S1SendingToS0()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uId));
@@ -176,34 +174,6 @@ namespace sQzLib
                 }
             l.Insert(1, BitConverter.GetBytes(n));
             return l;
-        }
-
-        public bool ReadByte0(byte[] buf, ref int offs)
-        {
-            if (buf == null)
-                return true;
-            if (buf.Length - offs < 4)
-                return true;
-            int n = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            while (0 < n)
-            {
-                --n;
-                ExamineeS0 e = new ExamineeS0();
-                //e.bFromC = false;
-                if (e.ReadByte(buf, ref offs))
-                    return true;
-                ExamineeA o;
-                if (vExaminee.TryGetValue(e.ID, out o))
-                {
-                    o.bFromC = false;
-                    o.Merge(e);
-                }
-            }
-            if (n == 0)
-                return false;
-            else
-                return true;
         }
 
         public bool DBSelTimeAndPw(DateTime dt, out string eMsg)
@@ -226,9 +196,9 @@ namespace sQzLib
             {
                 tPw = reader.IsDBNull(0) ? null : reader.GetString(0);
                 if (reader.IsDBNull(1) || DT.Toh(reader.GetString(1), DT.hs, out t1))
-                    t1 = DT.INV_;
+                    t1 = DT.INVALID;
                 if (reader.IsDBNull(2) || DT.Toh(reader.GetString(2), DT.hs, out t2))
-                    t2 = DT.INV_;
+                    t2 = DT.INVALID;
             }
             reader.Close();
             DBConnect.Close(ref conn);

@@ -220,6 +220,7 @@ namespace sQzLib
 
         private void AppendBytesOf(PassageWithQuestions p, List<byte[]> byteList)
         {
+            byteList.Add(BitConverter.GetBytes(p.ID));
             Utils.AppendBytesOfString(p.Passage, byteList);
             byteList.Add(BitConverter.GetBytes(p.Questions.Count));
             foreach (Question q in p.Questions)

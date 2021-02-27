@@ -367,7 +367,13 @@ namespace sQzServer1
                     mState = NetCode.QuestRetrieving;
                     return true;
                 case NetCode.QuestRetrieving:
-                    if (Slot.ReadByteQPack(buf, ref offs))
+                    if(Slot.Dt != DT.ReadByte(buf, ref offs))
+                    {
+                        Dispatcher.InvokeAsync(() =>
+                            WPopup.s.ShowDialog("QuestRetrieving: Date time not match!"));
+                        break;
+                    }
+                    if (Slot.ReadBytesQPack_NoDateTime(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() => 
                             WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_Q_NOK)));
@@ -376,7 +382,13 @@ namespace sQzServer1
                     mState = NetCode.AnsKeyRetrieving;
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    if (Slot.ReadByteKey(buf, ref offs))
+                    if (Slot.Dt != DT.ReadByte(buf, ref offs))
+                    {
+                        Dispatcher.InvokeAsync(() =>
+                            WPopup.s.ShowDialog("AnsKeyRetrieving: Date time not match!"));
+                        break;
+                    }
+                    if (Slot.ReadByteKey_NoDateTime(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
                             WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_KEY_NOK)));
@@ -426,9 +438,9 @@ namespace sQzServer1
                 case NetCode.AnsKeyRetrieving:
                     outMsg = BitConverter.GetBytes((int)mState);
                     break;
-                //case NetCode.SrvrSubmitting:
-                //    outMsg = mBrd.ToByteSl0(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
-                //    break;
+                case NetCode.SrvrSubmitting:
+                    outMsg = mBrd.ToByteSl0(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
+                    break;
             }
             return outMsg;
         }

@@ -15,7 +15,7 @@ namespace sQzLib
         int mMaxQSIdx;
         public QuestPack()
         {
-            mDt = DT.INV_;
+            mDt = DT.INVALID;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
             vSheet = new SortedList<int, QuestSheet>();
