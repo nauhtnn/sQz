@@ -8,7 +8,6 @@ namespace sQzLib
 {
     public sealed class ExamineeS1: ExamineeA
     {
-        public bool bFromC;
         public bool bLog;
 
         bool bNRecd;
@@ -21,24 +20,10 @@ namespace sQzLib
         {
             _Reset();
             bNRecd = true;
-            bFromC = bLog = false;
+            bLog = false;
         }
 
-        public override List<byte[]> GetBytes_ClientSendingToS1()
-        {
-            if (bFromC)
-                return ToByteC();
-            return ToByte_S1SendingToS0();
-        }
-
-        public override bool ReadByte(byte[] buf, ref int offs)
-        {
-            if (bFromC)
-                return ReadByte_FromClient(buf, ref offs);
-            return ReadByteS(buf, ref offs);
-        }
-
-        public List<byte[]> ToByteC()
+        public byte[] GetBytes_S1SendingToClient()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((int)eStt));
@@ -62,7 +47,7 @@ namespace sQzLib
 
             bLog = false;
 
-            return l;
+            return Utils.ListOfBytes_ToArray(l);
         }
 
         public bool ReadByte_FromClient(byte[] buf, ref int offs)
@@ -268,12 +253,12 @@ namespace sQzLib
         public override void Merge(ExamineeA e)
         {
             if (bFromC)
-                MergeWithClient(e as ExamineeC);
+                MergeWithClient(e as ExamineeS1);
             else
                 MergeWithS0(e as ExamineeS0);
         }
 
-        public void MergeWithClient(ExamineeC e)
+        public void MergeWithClient(ExamineeS1 e)
         {
             if (eStt == NeeStt.Finished)
                 return;

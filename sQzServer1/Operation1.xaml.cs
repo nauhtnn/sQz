@@ -134,7 +134,7 @@ namespace sQzServer1
 			NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
             offs += 4;
             QuestSheet qs;
-            ExamineeC e;
+            ExamineeS1 e;
             DateTime dt;
             switch (c)
             {
@@ -144,7 +144,7 @@ namespace sQzServer1
                 case NetCode.Authenticating:
                     e = new ExamineeS1();
                     e.bFromC = true;
-                    e.ReadByte(buf, ref offs);
+                    e.ReadByte_FromClient(buf, ref offs);
                     bool lck = true;
                     bool found = false;
                     foreach (SortedList<string, bool> l in vfbLock)
@@ -188,9 +188,8 @@ namespace sQzServer1
                                         vw.vbLock[o.ID] = true;
                                 }
                             });
-                            byte[] a;
                             o.bFromC = true;
-                            o.ToByte(out a);
+                            byte[] a = o.GetBytes_S1SendingToClient();
                             outMsg = new byte[4 + a.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
                             Buffer.BlockCopy(a, 0, outMsg, 4, a.Length);
@@ -238,7 +237,7 @@ namespace sQzServer1
                     outMsg = null;
                     string nee_id = Utils.ReadBytesOfString(buf, ref offs);
                     bool nee_not_found = true;
-                    foreach(ExamRoomA r in Slot.Rooms.Values)
+                    foreach(ExamRoomS1 r in Slot.Rooms.Values)
                         if(r.Examinees.ContainsKey(nee_id))
                         {
                             nee_not_found = true;

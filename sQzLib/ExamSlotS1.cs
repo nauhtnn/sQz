@@ -15,18 +15,18 @@ namespace sQzLib
             Rooms = new Dictionary<int, ExamRoomS1>();
         }
 
-        public ExamineeA Signin(ExamineeS1 e)
+        public ExamineeS1 Signin(ExamineeS1 e)
         {
-            ExamineeA o;
+            ExamineeS1 o;
             foreach (ExamRoomS1 r in Rooms.Values)
                 if ((o = r.Signin(e)) != null)
                     return o;
             return null;
         }
 
-        public ExamineeA Find(string neeID)
+        public ExamineeS1 Find(string neeID)
         {
-            ExamineeA o;
+            ExamineeS1 o;
             foreach (ExamRoomS1 r in Rooms.Values)
                 if (r.Examinees.TryGetValue(neeID, out o))
                     return o;

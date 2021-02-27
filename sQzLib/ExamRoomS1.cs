@@ -18,7 +18,7 @@ namespace sQzLib
             Examinees = new SortedList<string, ExamineeS1>();
         }
 
-        public ExamineeS1 Signin(ExamineeC e)
+        public ExamineeS1 Signin(ExamineeS1 e)
         {
             ExamineeS1 o;
             if (Examinees.TryGetValue(e.ID, out o) && o.Birthdate == e.Birthdate)

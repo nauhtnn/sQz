@@ -84,7 +84,7 @@ namespace sQzLib
             }
         }
 
-        public abstract bool ReadByte(byte[] buf, ref int offs);
+        //public abstract bool ReadByte(byte[] buf, ref int offs);
 
         public abstract void Merge(ExamineeA e);
 

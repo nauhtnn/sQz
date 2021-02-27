@@ -42,10 +42,6 @@ namespace sQzLib
             {
                 Utils.AppendBytesOfString(Birthdate, l);
                 Utils.AppendBytesOfString(ComputerName, l);
-
-                b = Encoding.UTF8.GetBytes(ComputerName);
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(b);
             }
 
             if (eStt < NeeStt.Examing)
