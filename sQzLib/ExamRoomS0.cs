@@ -7,12 +7,19 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    public class ExamRoomS0: ExamRoomA
+    public class ExamRoomS0
     {
+        public int uId;
+        public SortedList<string, ExamineeS0> Examinees;
+        public DateTime t1, t2;
+
         public string tPw;
 
         public ExamRoomS0()
         {
+            uId = -1;
+            Examinees = new SortedList<string, ExamineeS0>();
+
             tPw = null;
         }
 
@@ -239,15 +246,9 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uId));
-            int n = 0;
-            foreach (ExamineeS1 e in Examinees.Values)
-                if (e.eStt == NeeStt.Finished && e.NRecd)
-                {
-                    ++n;
-                    e.bFromC = false;
-                    l.InsertRange(l.Count, e.ToByte());
-                }
-            l.Insert(1, BitConverter.GetBytes(n));
+            l.Add(BitConverter.GetBytes(Examinees.Count));
+            foreach (ExamineeS0 e in Examinees.Values)
+                l.InsertRange(l.Count, e.GetBytes_ClientSendingToS1());
             return l;
         }
     }

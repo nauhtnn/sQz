@@ -6,18 +6,20 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    class ExamSlotS1: ExamSlotA
+    public class ExamSlotS1: ExamSlotA
     {
+        public Dictionary<int, ExamRoomS1> Rooms;
+
         public ExamSlotS1()
         {
-            
+            Rooms = new Dictionary<int, ExamRoomS1>();
         }
 
-        public ExamineeA Signin(ExamineeA e)
+        public ExamineeA Signin(ExamineeS1 e)
         {
             ExamineeA o;
-            foreach (ExamRoomA r in Rooms.Values)
-                if ((o = (r as ExamRoomS1).Signin(e)) != null)
+            foreach (ExamRoomS1 r in Rooms.Values)
+                if ((o = r.Signin(e)) != null)
                     return o;
             return null;
         }
@@ -25,7 +27,7 @@ namespace sQzLib
         public ExamineeA Find(string neeID)
         {
             ExamineeA o;
-            foreach (ExamRoomA r in Rooms.Values)
+            foreach (ExamRoomS1 r in Rooms.Values)
                 if (r.Examinees.TryGetValue(neeID, out o))
                     return o;
             return null;

@@ -4,11 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using MySql.Data.MySqlClient;
+using System.Windows;
 
 namespace sQzLib
 {
-    class ExamSlotS0: ExamSlotA
+    public class ExamSlotS0: ExamSlotA
     {
+        public Dictionary<int, ExamRoomS0> Rooms;
+
+        public ExamSlotS0()
+        {
+            Rooms = new Dictionary<int, ExamRoomS0>();
+        }
 
         public int InsertSlot(out string eMsg)
         {
@@ -62,12 +69,12 @@ namespace sQzLib
         public string DBSelRoomId()
         {
             string emsg;
-            List<int> rids = ExamRoomA.DBSel(out emsg);
+            List<int> rids = ExamRoomS0.DBSel(out emsg);
             if (rids == null)
                 return emsg;
             foreach (int i in rids)
             {
-                ExamRoomA r = new ExamRoomA();
+                ExamRoomS0 r = new ExamRoomS0();
                 r.uId = i;
                 r.DBSelTimeAndPw(mDt, out emsg);
                 if (!Rooms.ContainsKey(i))
@@ -138,7 +145,7 @@ namespace sQzLib
         public void DBSafeUpdateArchiveStatus()
         {
             bool bArch = true;
-            foreach (ExamRoomA r in Rooms.Values)
+            foreach (ExamRoomS0 r in Rooms.Values)
                 if (0 < r.Examinees.Count && r.t2.Hour == DT.INV)
                 {
                     bArch = false;
@@ -165,7 +172,7 @@ namespace sQzLib
             return emsg;
         }
 
-        public string ReadF(string fp, ref ExamSlotA o)
+        public string ReadF(string fp, ref ExamSlotS0 o)
         {
             string[] vs = System.IO.File.ReadAllLines(fp);
             StringBuilder errorLines = new StringBuilder();
@@ -185,7 +192,7 @@ namespace sQzLib
                     }
                     e.ID = v[0].Trim();
                     bool bCont = false;
-                    foreach (ExamRoomA ro in Rooms.Values)
+                    foreach (ExamRoomS0 ro in Rooms.Values)
                         if (ro.Examinees.ContainsKey(e.ID))
                         {
                             dup.Append(e.ID + ", ");
@@ -193,7 +200,7 @@ namespace sQzLib
                         }
                     if (bCont)
                         continue;
-                    foreach (ExamRoomA ro in o.Rooms.Values)
+                    foreach (ExamRoomS0 ro in o.Rooms.Values)
                         if (ro.Examinees.ContainsKey(e.ID))
                         {
                             dup.Append(e.ID + ", ");
@@ -248,11 +255,11 @@ namespace sQzLib
                 eMsg = Txt.s._((int)TxI.DB_NOK);
                 return -1;
             }
-            string vch = ExamRoomA.PwChars();
+            string vch = ExamRoomS0.PwChars();
             Random rand = new Random();
             int v = 1;
             StringBuilder sb = new StringBuilder();
-            foreach (ExamRoomA r in Rooms.Values)
+            foreach (ExamRoomS0 r in Rooms.Values)
             {
                 int n = 0;
                 bool bNExist = DBConnect.NExist(conn, "sqz_slot_room",
@@ -266,7 +273,7 @@ namespace sQzLib
                 else if (bNExist)
                     n = DBConnect.Ins(conn, "sqz_slot_room",
                         "dt,rid,pw", "('" + mDt.ToString(DT._) +
-                        "'," + r.uId + ",'" + ExamRoomA.GenPw(vch, rand) + "')", out eMsg);
+                        "'," + r.uId + ",'" + ExamRoomS0.GenPw(vch, rand) + "')", out eMsg);
                 if (n < 0)
                 {
                     DBConnect.Close(ref conn);
@@ -287,7 +294,7 @@ namespace sQzLib
 
         public void DelNee()
         {
-            foreach (ExamRoomA r in Rooms.Values)
+            foreach (ExamRoomS0 r in Rooms.Values)
                 r.Examinees.Clear();
         }
 
@@ -330,7 +337,7 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
-            foreach (ExamRoomA r in Rooms.Values)
+            foreach (ExamRoomS0 r in Rooms.Values)
                 r.DBSelNee(conn, mDt);
             DBConnect.Close(ref conn);
         }
@@ -372,7 +379,7 @@ namespace sQzLib
 
         public void DBUpdateRs(int rid, StringBuilder vals)
         {
-            ExamRoomA r;
+            ExamRoomS0 r;
             if (Rooms.TryGetValue(rid, out r))
                 r.DBUpdateRs(vals);
         }
@@ -386,7 +393,7 @@ namespace sQzLib
                 eMsg = Txt.s._((int)TxI.DB_NOK);
                 return true;
             }
-            ExamRoomA r;
+            ExamRoomS0 r;
             if (Rooms.TryGetValue(rid, out r))
             {
                 r.t1 = DateTime.Now;
@@ -401,7 +408,7 @@ namespace sQzLib
         public bool DBUpT2(MySqlConnection conn, int rid,
             out string eMsg)
         {
-            ExamRoomA r;
+            ExamRoomS0 r;
             if (Rooms.TryGetValue(rid, out r))
             {
                 r.t2 = DateTime.Now;
@@ -443,7 +450,58 @@ namespace sQzLib
             l.Add(DT.GetBytes(mDt));
             l.InsertRange(l.Count, QuestionPack.ToByte());
 
-            return ListOfBytes_ToArray(l);
+            return Utils.ListOfBytes_ToArray(l);
+        }
+
+        public int CountQSByRoom()
+        {
+            int n = 0;
+            foreach (ExamRoomS0 r in Rooms.Values)
+                if (n < r.Examinees.Count)
+                    n = r.Examinees.Count;
+            return n;
+        }
+
+        public int ReadByteR0(byte[] buf, ref int offs)
+        {
+            if (buf.Length - offs < 4)
+                return -1;
+
+            if (Dt != DT.ReadByte(buf, ref offs))
+                return -1;
+
+            if (buf.Length - offs < 4)
+                return -1;
+            int rid = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            ExamRoomS0 r;
+            if (!Rooms.TryGetValue(rid, out r) ||
+                r.ReadBytes(buf, ref offs, new ExamineeS0(), false))
+                return -1;
+            return rid;
+        }
+
+        public int ReadByteSl0(byte[] buf, ref int offs)
+        {
+            if (Dt != DT.ReadByte(buf, ref offs))
+                return -1;
+            int rid = ReadByteR0(buf, ref offs);
+            if (rid < 0)
+                return -1;
+            return rid;
+        }
+
+        public byte[] GetBytesRoom_S0SendingToS1(int rId)
+        {
+            List<byte[]> l = new List<byte[]>();
+            l.Add(DT.GetBytes(Dt));
+            ExamRoomS0 r;
+            if (Rooms.TryGetValue(rId, out r))
+                l.InsertRange(l.Count, r.GetBytes_S0SendingToS1());
+            else
+                l.Add(BitConverter.GetBytes(-1));//should raise error message box here
+
+            return Utils.ListOfBytes_ToArray(l);
         }
     }
 }

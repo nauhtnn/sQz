@@ -8,23 +8,33 @@ namespace sQzLib
 {
     public sealed class ExamineeS1: ExamineeA
     {
+        public bool bFromC;
+        public bool bLog;
+
         bool bNRecd;
         public bool NRecd { get { return bNRecd; } }
         public ExamineeS1() {
-            bNRecd = true;
+            Reset();
         }
 
-        public override List<byte[]> ToByte()
+        public override void Reset()
+        {
+            _Reset();
+            bNRecd = true;
+            bFromC = bLog = false;
+        }
+
+        public override List<byte[]> GetBytes_ClientSendingToS1()
         {
             if (bFromC)
                 return ToByteC();
-            return ToByteS();
+            return ToByte_S1SendingToS0();
         }
 
         public override bool ReadByte(byte[] buf, ref int offs)
         {
             if (bFromC)
-                return ReadByteC(buf, ref offs);
+                return ReadByte_FromClient(buf, ref offs);
             return ReadByteS(buf, ref offs);
         }
 
@@ -55,7 +65,7 @@ namespace sQzLib
             return l;
         }
 
-        public bool ReadByteC(byte[] buf, ref int offs)
+        public bool ReadByte_FromClient(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
             //
@@ -70,6 +80,13 @@ namespace sQzLib
             ID = Encoding.UTF8.GetString(buf, offs, sz);
             l -= sz;
             offs += sz;
+
+            if (l < 4)
+                return true;
+            if (Enum.IsDefined(typeof(NeeStt), sz = BitConverter.ToInt32(buf, offs)))
+                eStt = (NeeStt)sz;
+            l -= 4;
+            offs += 4;
 
             if (l < 4)
                 return true;
@@ -223,7 +240,7 @@ namespace sQzLib
             return false;
         }
 
-        public List<byte[]> ToByteS()
+        public List<byte[]> ToByte_S1SendingToS0()
         {
             //suppose eStt == NeeStt.Finished
             List<byte[]> l = new List<byte[]>();
@@ -251,12 +268,12 @@ namespace sQzLib
         public override void Merge(ExamineeA e)
         {
             if (bFromC)
-                MergeC(e);
+                MergeWithClient(e as ExamineeC);
             else
-                MergeS(e);
+                MergeWithS0(e as ExamineeS0);
         }
 
-        public void MergeC(ExamineeA e)
+        public void MergeWithClient(ExamineeC e)
         {
             if (eStt == NeeStt.Finished)
                 return;
@@ -277,7 +294,7 @@ namespace sQzLib
             mAnsSh.aAns = e.mAnsSh.aAns;
         }
 
-        public void MergeS(ExamineeA e)
+        public void MergeWithS0(ExamineeA e)
         {
             //suppose e.eStt = NeeStt.Finished
             eStt = e.eStt;

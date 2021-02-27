@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Windows.Controls;
 using System.Windows.Media;
-using System.Windows;
 using System.Text;
 
 namespace sQzLib
@@ -21,7 +20,6 @@ namespace sQzLib
 
         public AnsPack mKeyPack;
 
-        public Dictionary<int, ExamRoomA> Rooms;
         public Dictionary<int, DateTime> vT1;
         public Dictionary<int, DateTime> vT2;
         public ExamStt eStt;
@@ -29,7 +27,6 @@ namespace sQzLib
         public ExamSlotA()
         {
             mDt = DT.INVALID;
-            Rooms = new Dictionary<int, ExamRoomA>();
             eStt = ExamStt.Prep;
             QuestionPack = new QuestPack();
 
@@ -42,57 +39,6 @@ namespace sQzLib
                 mDt = value;
                 QuestionPack.mDt = value;
             }
-        }
-
-        public int CountQSByRoom()
-        {
-            int n = 0;
-            foreach (ExamRoomA r in Rooms.Values)
-                if (n < r.Examinees.Count)
-                    n = r.Examinees.Count;
-            return n;
-        }
-
-        public int ReadByteR0(byte[] buf, ref int offs)
-        {
-            if (buf.Length - offs < 4)
-                return -1;
-
-            if (Dt != DT.ReadByte(buf, ref offs))
-                return -1;
-
-            if (buf.Length - offs < 4)
-                return -1;
-            int rid = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            ExamRoomA r;
-            if (!Rooms.TryGetValue(rid, out r) ||
-                r.ReadBytes(buf, ref offs, new ExamineeS0(), false))
-                return -1;
-            return rid;
-        }
-
-        public int ReadByteSl0(byte[] buf, ref int offs)
-        {
-            if (Dt != DT.ReadByte(buf, ref offs))
-                return -1;
-            int rid = ReadByteR0(buf, ref offs);
-            if (rid < 0)
-                return -1;
-            return rid;
-        }
-
-        public byte[] GetBytesRoom_S0SendingToS1(int rId)
-        {
-            List<byte[]> l = new List<byte[]>();
-            l.Add(DT.GetBytes(Dt));
-            ExamRoomA r;
-            if (Rooms.TryGetValue(rId, out r))
-                l.InsertRange(l.Count, r.GetBytes_S0SendingToS1());
-            else
-                l.Add(BitConverter.GetBytes(-1));//should raise error message box here
-
-            return Utils.ListOfBytes_ToArray(l);
         }
 
         public bool ReadBytes_S1RecevingFromS0(byte[] buf, ref int offs)

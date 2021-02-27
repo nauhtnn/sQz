@@ -13,10 +13,16 @@ namespace sQzLib
         public bool bToVw;
         public ExamineeS0()
         {
+            Reset();
+        }
+
+        public override void Reset()
+        {
+            _Reset();
             bToVw = bToDB = false;
         }
 
-        public override List<byte[]> ToByte()
+        public override List<byte[]> GetBytes_ClientSendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
             Utils.AppendBytesOfString(ID, l);

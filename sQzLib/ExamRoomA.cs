@@ -17,17 +17,9 @@ namespace sQzLib
             Examinees = new SortedList<string, ExamineeA>();
         }
 
-        public List<byte[]> GetBytes_S0SendingToS1()
-        {
-            List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(uId));
-            l.Add(BitConverter.GetBytes(Examinees.Count));
-            foreach (ExamineeS0 e in Examinees.Values)
-                l.InsertRange(l.Count, e.ToByte());
-            return l;
-        }
+        public abstract bool ReadBytes((byte[] buf, ref int offs);
 
-        protected bool ReadBytes(byte[] buf, ref int offs, ExamineeA newNee, bool addIfNExist)
+        protected bool _ReadBytes(byte[] buf, ref int offs, ExamineeA newNee, bool addIfNExist)
         {
             if (buf == null)
                 return true;

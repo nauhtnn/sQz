@@ -16,13 +16,12 @@ namespace sQzLib
         const string tLOG_DIR = "sQz\\";
         const string tLOG_PRE = "sav";
 
-        public bool bFromC;//used by NeeS1
-        public bool bLog;//used by NeeS1 and NeeC
+        public bool bLog;
 
         public ExamineeC()
         {
             Reset();
-            bFromC = bLog = false;
+            bLog = false;
         }
 
         public override void Reset()
@@ -32,20 +31,17 @@ namespace sQzLib
             tLog = new StringBuilder();
         }
 
-        public override List<byte[]> ToByte()
+        public override List<byte[]> GetBytes_ClientSendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
-            byte[] b = Encoding.UTF8.GetBytes(ID);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
+            Utils.AppendBytesOfString(ID, l);
             l.Add(BitConverter.GetBytes((int)eStt));
 			l.Add(BitConverter.GetBytes(bLog));
 
             if (eStt < NeeStt.Examing || bLog)
             {
-                b = Encoding.UTF8.GetBytes(Birthdate);
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(b);
+                Utils.AppendBytesOfString(Birthdate, l);
+                Utils.AppendBytesOfString(ComputerName, l);
 
                 b = Encoding.UTF8.GetBytes(ComputerName);
                 l.Add(BitConverter.GetBytes(b.Length));

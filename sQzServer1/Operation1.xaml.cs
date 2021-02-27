@@ -28,7 +28,7 @@ namespace sQzServer1
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamSlotA Slot;
+        ExamSlotS1 Slot;
         int uRId;//todo change to enum
         List<SortedList<string, bool>> vfbLock;
 
@@ -43,7 +43,7 @@ namespace sQzServer1
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            Slot = new ExamSlotA();
+            Slot = new ExamSlotS1();
 
             if(!System.IO.File.Exists("Room.txt") ||
                 !int.TryParse(System.IO.File.ReadAllText("Room.txt"), out uRId))
@@ -134,7 +134,7 @@ namespace sQzServer1
 			NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
             offs += 4;
             QuestSheet qs;
-            ExamineeA e;
+            ExamineeC e;
             DateTime dt;
             switch (c)
             {
@@ -157,7 +157,7 @@ namespace sQzServer1
                         lck = false;
                     if (!lck)
                     {
-                        ExamineeA o = null;
+                        ExamineeS1 o = null;
                         dt = DateTime.Now;
                         if ((o = Slot.Signin(e)) != null)
                         {
