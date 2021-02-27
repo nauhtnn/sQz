@@ -25,7 +25,7 @@ namespace sQzServer0
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamSlot Slot;
+        ExamSlotA Slot;
         TabItem tbiSelected;
 
         public Operation0()
@@ -51,7 +51,7 @@ namespace sQzServer0
         private void LoadBrd()
         {
             string emsg;
-            List<DateTime> v = ExamSlot.DBSelectSlotIDs(false, out emsg);
+            List<DateTime> v = ExamSlotA.DBSelectSlotIDs(false, out emsg);
             if (v == null)
             {
                 spMain.Opacity = 0.5;
@@ -156,9 +156,9 @@ namespace sQzServer0
                     offs += 4;
                     string pw = Encoding.ASCII.GetString(buf, offs, 8);
                     offs += 8;
-                    if(Slot.vRoom.ContainsKey(roomId))
+                    if(Slot.Rooms.ContainsKey(roomId))
                     {
-                        if(pw == Slot.vRoom[roomId].tPw)
+                        if(pw == Slot.Rooms[roomId].tPw)
                         {
                             outMsg = BitConverter.GetBytes((int)TxI.OP_AUTH_OK);
                             break;
@@ -282,7 +282,7 @@ namespace sQzServer0
             if (i == null)
                 return;
 
-            Slot = new ExamSlot();
+            Slot = new ExamSlotA();
             DateTime dt;
             DT.To_(i.Content as string, out dt);
             Slot.Dt = dt;

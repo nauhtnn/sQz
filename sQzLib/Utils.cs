@@ -31,6 +31,21 @@ namespace sQzLib
             byteList.Add(b);
         }
 
+        public static byte[] ListOfBytes_ToArray(List<byte[]> l)
+        {
+            int sz = 0;
+            foreach (byte[] x in l)
+                sz += x.Length;
+            byte[] buf = new byte[sz];
+            sz = 0;
+            foreach (byte[] x in l)
+            {
+                Buffer.BlockCopy(x, 0, buf, sz, x.Length);
+                sz += x.Length;
+            }
+            return buf;
+        }
+
         public static string CleanSpace(string buf)
         {
             int i = 0, e = buf.Length;

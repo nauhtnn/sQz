@@ -8,7 +8,30 @@ namespace sQzLib
 {
     public sealed class ExamineeC : ExamineeA
     {
-        public ExamineeC() { }
+
+        public TimeSpan kDtDuration;
+
+        public StringBuilder tLog;
+
+        const string tLOG_DIR = "sQz\\";
+        const string tLOG_PRE = "sav";
+
+        public bool bFromC;//used by NeeS1
+        public bool bLog;//used by NeeS1 and NeeC
+
+        public ExamineeC()
+        {
+            Reset();
+            bFromC = bLog = false;
+        }
+
+        public override void Reset()
+        {
+            _Reset();
+            kDtDuration = new TimeSpan(0, 30, 0);
+            tLog = new StringBuilder();
+        }
+
         public override List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
@@ -24,7 +47,7 @@ namespace sQzLib
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
 
-                b = Encoding.UTF8.GetBytes(tComp);
+                b = Encoding.UTF8.GetBytes(ComputerName);
                 l.Add(BitConverter.GetBytes(b.Length));
                 l.Add(b);
             }
@@ -114,6 +137,99 @@ namespace sQzLib
                 Birthplace = e.Birthplace;
             }
             bLog = false;
+        }
+
+        public bool ToLogFile(int m, int s)
+        {
+            bool err = false;
+            string p = null;
+            try
+            {
+                p = System.IO.Path.Combine(Environment.GetFolderPath(
+                    Environment.SpecialFolder.ApplicationData), tLOG_DIR);
+                if (!System.IO.Directory.Exists(p))
+                    System.IO.Directory.CreateDirectory(p);
+            }
+            catch (System.IO.DirectoryNotFoundException) { err = true; }
+            catch (UnauthorizedAccessException) { err = true; }
+            if (err)
+                return true;
+            var fileName = System.IO.Path.Combine(p, tLOG_PRE +
+                ID + '-' + m.ToString("d2") + s.ToString("d2"));
+            System.IO.BinaryWriter w = null;
+            try
+            {
+                w = new System.IO.BinaryWriter(System.IO.File.OpenWrite(fileName),
+                    Encoding.UTF8);
+            }
+            catch (UnauthorizedAccessException) { err = true; }
+            if (err)
+                return true;
+            w.Write(ID);
+            w.Write((int)eStt);
+            w.Write(mAnsSh.questSheetID);
+            w.Write(mAnsSh.aAns, 0, AnsSheet.LEN);
+            if (eStt == NeeStt.Finished)
+            {
+                w.Write(dtTim1.Hour);
+                w.Write(dtTim1.Minute);
+                w.Write(dtTim2.Hour);
+                w.Write(dtTim2.Minute);
+            }
+            else
+            {
+                w.Write(m);
+                w.Write(s);
+            }
+            w.Close();
+            mAnsSh.bChanged = false;
+            return false;
+        }
+
+        public bool ReadLogFile(string filePath)
+        {
+            System.IO.BinaryReader r = null;
+            if (System.IO.File.Exists(filePath))
+                try
+                {
+                    r = new System.IO.BinaryReader(System.IO.File.OpenRead(filePath));
+                }
+                catch (UnauthorizedAccessException) { r = null; }
+            if (r == null)
+                return false;
+            //uSlId = r.ReadUInt32();
+            int x;
+            //if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
+            //    eLv = (ExamLv)x;
+            //uId = r.ReadInt32();
+            ID = r.ReadString();
+            if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
+                eStt = (NeeStt)x;
+            mAnsSh.questSheetID = r.ReadInt32();
+            mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
+            int h, m;
+            if (eStt == NeeStt.Finished)
+            {
+                h = r.ReadInt32();
+                m = r.ReadInt32();
+                DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim1);
+                h = r.ReadInt32();
+                m = r.ReadInt32();
+                DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim2);
+            }
+            else
+            {
+                h = r.ReadInt32();
+                m = r.ReadInt32();
+                kDtDuration = new TimeSpan(0, h, m);
+            }
+            bLog = true;
+            return true;
+        }
+
+        public void UpdateLogStr(string s)
+        {
+            tLog.Append(s);
         }
     }
 }

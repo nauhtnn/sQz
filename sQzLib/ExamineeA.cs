@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
@@ -31,27 +30,14 @@ namespace sQzLib
         public string Birthplace;
         public int Grade;
 
-        public string tComp;
+        public string ComputerName;
         public DateTime dtTim1;
         public DateTime dtTim2;
         public AnsSheet mAnsSh;
 
-        public TimeSpan kDtDuration;
+        public abstract void Reset();
 
-        public StringBuilder tLog;
-
-        const string tLOG_DIR = "sQz\\";
-        const string tLOG_PRE = "sav";
-
-        public bool bFromC;//used by NeeS1
-        public bool bLog;//used by NeeS1 and NeeC
-
-        public ExamineeA() {
-            bFromC = bLog = false;
-            Reset();
-        }
-
-        public void Reset()
+        protected void _Reset()
         {
             mDt = DT.INVALID;
             Name = null;
@@ -60,104 +46,8 @@ namespace sQzLib
             eStt = NeeStt.Signing;
             Grade = LV_CAP;
             dtTim1 = dtTim2 = DT.INVALID;
-            tComp = string.Empty;
+            ComputerName = string.Empty;
             mAnsSh = new AnsSheet();
-            kDtDuration = new TimeSpan(0, 30, 0);
-            tLog = new StringBuilder();
-        }
-
-        public int DBGetQSId()
-        {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return -1;
-            string qry = DBConnect.mkQrySelect("sqz_examinee", "qsid",
-                "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return -1;
-            }
-            int qsid = -1;
-            if (reader.Read())
-                qsid = reader.GetInt32(0);
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return qsid;
-        }
-
-        public char[] DBGetAns()
-        {
-            char[] noans = new char[AnsSheet.LEN];
-            for (int i = 0; i < AnsSheet.LEN; ++i)
-                noans[i] = Question.C0;
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return noans;
-            string qry = DBConnect.mkQrySelect("sqz_examinee", "ans",
-                "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return noans;
-            }
-            string ans = noans.ToString();
-            if (reader.Read())
-                ans = reader.GetString(0);
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return ans.ToCharArray();
-        }
-
-        public bool DBSelGrade()
-        {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return true;
-            string qry = DBConnect.mkQrySelect("sqz_examinee", "grade",
-                "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-            {
-                DBConnect.Close(ref conn);
-                return true;
-            }
-            if (reader.Read())
-                Grade = reader.GetInt16(0);
-            reader.Close();
-            DBConnect.Close(ref conn);
-            return false;
-        }
-
-        public string DBGetT()
-        {
-            throw new NotImplementedException();
-            //MySqlConnection conn = DBConnect.Init();
-            //string t = DT.INV_H.ToString(DT.hh);
-            //if (conn == null)
-            //    return t;
-            //string qry = DBConnect.mkQrySelect("sqz_examinee",
-            //    "t", "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
-            //    "' AND id=" + uId);
-            //string eMsg;
-            //MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            //if (reader == null)
-            //{
-            //    DBConnect.Close(ref conn);
-            //    return t;
-            //}
-            //if (reader.Read())
-            //{
-            //    t = reader.GetString(0);
-            //}
-            //reader.Close();
-            //DBConnect.Close(ref conn);
-            //return t;
         }
 
         public abstract List<byte[]> ToByte();
@@ -197,99 +87,6 @@ namespace sQzLib
         public abstract bool ReadByte(byte[] buf, ref int offs);
 
         public abstract void Merge(ExamineeA e);
-
-        public bool ToLogFile(int m, int s)
-        {
-            bool err = false;
-            string p = null;
-            try
-            {
-                p = System.IO.Path.Combine(Environment.GetFolderPath(
-                    Environment.SpecialFolder.ApplicationData), tLOG_DIR);
-                if (!System.IO.Directory.Exists(p))
-                    System.IO.Directory.CreateDirectory(p);
-            }
-            catch (System.IO.DirectoryNotFoundException) { err = true; }
-            catch(UnauthorizedAccessException) { err = true; }
-            if (err)
-                return true;
-            var fileName = System.IO.Path.Combine(p, tLOG_PRE +
-                ID + '-' + m.ToString("d2") + s.ToString("d2"));
-            System.IO.BinaryWriter w = null;
-            try
-            {
-                w = new System.IO.BinaryWriter(System.IO.File.OpenWrite(fileName),
-                    Encoding.UTF8);
-            }
-            catch (UnauthorizedAccessException) { err = true; }
-            if (err)
-                return true;
-            w.Write(ID);
-            w.Write((int)eStt);
-            w.Write(mAnsSh.questSheetID);
-            w.Write(mAnsSh.aAns, 0, AnsSheet.LEN);
-            if (eStt == NeeStt.Finished)
-            {
-                w.Write(dtTim1.Hour);
-                w.Write(dtTim1.Minute);
-                w.Write(dtTim2.Hour);
-                w.Write(dtTim2.Minute);
-            }
-            else
-            {
-                w.Write(m);
-                w.Write(s);
-            }
-            w.Close();
-            mAnsSh.bChanged = false;
-            return false;
-        }
-
-        public bool ReadLogFile(string filePath)
-        {
-            System.IO.BinaryReader r = null;
-            if (System.IO.File.Exists(filePath))
-                try
-                {
-                    r = new System.IO.BinaryReader(System.IO.File.OpenRead(filePath));
-                }
-                catch (UnauthorizedAccessException) { r = null; }
-            if (r == null)
-                return false;
-            //uSlId = r.ReadUInt32();
-            int x;
-            //if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
-            //    eLv = (ExamLv)x;
-            //uId = r.ReadInt32();
-            ID = r.ReadString();
-            if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
-                eStt = (NeeStt)x;
-            mAnsSh.questSheetID = r.ReadInt32();
-            mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
-            int h, m;
-            if(eStt == NeeStt.Finished)
-            {
-                h = r.ReadInt32();
-                m = r.ReadInt32();
-                DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim1);
-                h = r.ReadInt32();
-                m = r.ReadInt32();
-                DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim2);
-            }
-            else
-            {
-                h = r.ReadInt32();
-                m = r.ReadInt32();
-                kDtDuration = new TimeSpan(0, h, m);
-            }
-            bLog = true;
-            return true;
-        }
-
-        public void UpdateLogStr(string s)
-        {
-            tLog.Append(s);
-        }
 
         //public string Grade { get { return Math.Round((float)uGrade * 0.333, 1).ToString(); } }
     }

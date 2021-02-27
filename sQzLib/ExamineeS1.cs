@@ -94,7 +94,7 @@ namespace sQzLib
                 offs += 4;
                 if (l < sz)
                     return true;
-                tComp = Encoding.UTF8.GetString(buf, offs, sz);
+                ComputerName = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
             }
@@ -215,7 +215,7 @@ namespace sQzLib
             offs += 4;
             if(0 < sz)
             {
-                tComp = Encoding.UTF8.GetString(buf, offs, sz);
+                ComputerName = Encoding.UTF8.GetString(buf, offs, sz);
                 l -= sz;
                 offs += sz;
             }
@@ -230,9 +230,9 @@ namespace sQzLib
             byte[] x = Encoding.UTF8.GetBytes(ID);
             l.Add(BitConverter.GetBytes(x.Length));
             l.Add(x);
-            if (0 < tComp.Length)
+            if (0 < ComputerName.Length)
             {
-                x = Encoding.UTF8.GetBytes(tComp);
+                x = Encoding.UTF8.GetBytes(ComputerName);
                 l.Add(BitConverter.GetBytes(x.Length));
                 l.Add(x);
             }
@@ -262,7 +262,7 @@ namespace sQzLib
                 return;
             bLog = e.bLog;
             if (eStt < NeeStt.Examing || bLog)
-                tComp = e.tComp;
+                ComputerName = e.ComputerName;
             if (e.eStt < NeeStt.Examing)
                 eStt = NeeStt.Examing;
             else

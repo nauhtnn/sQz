@@ -15,24 +15,24 @@ namespace sQzServer0
     {
         Grid grdDB;
         Grid grdTmp;
-        public ExamSlot mSlDB;
-        public ExamSlot mSlTmp;
+        public ExamSlotA mSlDB;
+        public ExamSlotA mSlTmp;
         TabItem tbiDB, tbiTmp;
 
         public PrepNeeView() { }
-        public PrepNeeView(ExamSlot sl)
+        public PrepNeeView(ExamSlotA sl)
         {
             mSlDB = sl;
             Header = mSlDB.Dt.ToString(DT._);
             Name = DT.CreateNameFromDateTime(Header as string);
-            mSlTmp = new ExamSlot();
+            mSlTmp = new ExamSlotA();
             mSlTmp.Dt = mSlDB.Dt;
-            foreach (ExamRoom rom in mSlDB.vRoom.Values)
-                if (!mSlTmp.vRoom.ContainsKey(rom.uId))
+            foreach (ExamRoomA rom in mSlDB.Rooms.Values)
+                if (!mSlTmp.Rooms.ContainsKey(rom.uId))
                 {
-                    ExamRoom r = new ExamRoom();
+                    ExamRoomA r = new ExamRoomA();
                     r.uId = rom.uId;
-                    mSlTmp.vRoom.Add(r.uId, r);
+                    mSlTmp.Rooms.Add(r.uId, r);
                 }
         }
         public void DeepCopy(StackPanel refSp)
@@ -244,7 +244,7 @@ namespace sQzServer0
             SolidColorBrush br = new SolidColorBrush(c);
             GridLength rh = new GridLength(26);
             Grid g;
-            ExamSlot sl;
+            ExamSlotA sl;
             if (db)
             {
                 sl = mSlDB;
@@ -256,8 +256,8 @@ namespace sQzServer0
                 g = grdTmp;
             }
             int n = 0;
-            foreach (ExamRoom r in sl.vRoom.Values)
-                n += r.vExaminee.Count;
+            foreach (ExamRoomA r in sl.Rooms.Values)
+                n += r.Examinees.Count;
             StringBuilder sb = new StringBuilder();
             if(db)
             {
@@ -271,8 +271,8 @@ namespace sQzServer0
             }
             g.Children.Clear();
             int rid = -1;
-            foreach (ExamRoom r in sl.vRoom.Values)
-                foreach (ExamineeA e in r.vExaminee.Values)
+            foreach (ExamRoomA r in sl.Rooms.Values)
+                foreach (ExamineeA e in r.Examinees.Values)
                 {
                     rid++;
                     RowDefinition rd = new RowDefinition();

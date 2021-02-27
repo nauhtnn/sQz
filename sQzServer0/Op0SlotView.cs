@@ -23,7 +23,7 @@ namespace sQzServer0
         public Dictionary<int, TextBlock> vRT2;
         Dictionary<int, TextBlock> vRPw;
         Grid grdNee;
-        public ExamSlot mSl;
+        public ExamSlotA mSl;
         bool bInitNMod;
 
         public Op0SlotView()
@@ -31,7 +31,7 @@ namespace sQzServer0
             Init();
         }
 
-        public Op0SlotView(ExamSlot sl)
+        public Op0SlotView(ExamSlotA sl)
         {
             Init();
             //
@@ -56,8 +56,8 @@ namespace sQzServer0
             bool even = false;
             int rid = -1;
             GridLength rh = new GridLength(26);
-            foreach (ExamRoom r in mSl.vRoom.Values)
-                foreach (ExamineeA e in r.vExaminee.Values)
+            foreach (ExamRoomA r in mSl.Rooms.Values)
+                foreach (ExamineeA e in r.Examinees.Values)
                 {
                     rid++;
                     if (even)
@@ -131,8 +131,8 @@ namespace sQzServer0
                     t = new TextBlock();
                     t.Background = bg;
                     vComp.Add(e.ID, t);
-                    if (e.tComp != null)
-                        t.Text = e.tComp;
+                    if (e.ComputerName != null)
+                        t.Text = e.ComputerName;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 8);
                     grdNee.Children.Add(t);
@@ -141,12 +141,12 @@ namespace sQzServer0
 
         public void UpdateRsView(int rid)
         {
-            ExamRoom r;
-            if (!mSl.vRoom.TryGetValue(rid, out r))
+            ExamRoomA r;
+            if (!mSl.Rooms.TryGetValue(rid, out r))
                 return;
             if (vRT2.ContainsKey(rid))
                 vRT2[rid].Text = DateTime.Now.ToString(DT._);
-            foreach (ExamineeS0 e in r.vExaminee.Values)
+            foreach (ExamineeS0 e in r.Examinees.Values)
                 if(e.bToVw)
                 {
                     e.bToVw = false;
@@ -157,8 +157,8 @@ namespace sQzServer0
                         t.Text = e.dtTim1.ToString("HH:mm");
                     if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.ID, out t))
                         t.Text = e.dtTim2.ToString("HH:mm");
-                    if (e.tComp != null && vComp.TryGetValue(e.ID, out t))
-                        t.Text = e.tComp;
+                    if (e.ComputerName != null && vComp.TryGetValue(e.ID, out t))
+                        t.Text = e.ComputerName;
                 }
         }
 
@@ -226,7 +226,7 @@ namespace sQzServer0
             int i = 1;
             SolidColorBrush br = new SolidColorBrush(Colors.Black);
             Thickness th = new Thickness(0, 0, 0, 1);
-            foreach (ExamRoom r in mSl.vRoom.Values)
+            foreach (ExamRoomA r in mSl.Rooms.Values)
             {
                 RowDefinition rd = new RowDefinition();
                 rd.Height = h;
@@ -247,7 +247,7 @@ namespace sQzServer0
 
                 t = new TextBlock();
                 t.TextAlignment = TextAlignment.Center;
-                t.Text = r.vExaminee.Count.ToString();
+                t.Text = r.Examinees.Count.ToString();
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 1);
                 g.Children.Add(t);
@@ -298,9 +298,9 @@ namespace sQzServer0
         {
             Button btn = sender as Button;
             int rid = int.Parse(btn.Name.Substring(1));
-            if(mSl.vRoom.ContainsKey(rid) && vRPw.ContainsKey(rid)
-                && !mSl.vRoom[rid].RegenPw())
-                    vRPw[rid].Text = mSl.vRoom[rid].tPw;
+            if(mSl.Rooms.ContainsKey(rid) && vRPw.ContainsKey(rid)
+                && !mSl.Rooms[rid].RegenPw())
+                    vRPw[rid].Text = mSl.Rooms[rid].tPw;
         }
 
         TabItem DeepCopyNee(TabItem refTbi)

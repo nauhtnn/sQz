@@ -51,7 +51,7 @@ namespace sQzServer0
             }
             else
             {
-                ExamSlot slot = new ExamSlot();
+                ExamSlotA slot = new ExamSlotA();
                 slot.mDt = dt;
                 string msg;
                 if(0 < slot.InsertSlot(out msg))
@@ -74,7 +74,7 @@ namespace sQzServer0
         private void LoadSlotView()
         {
             string emsg;
-            List<DateTime> v = ExamSlot.DBSelectSlotIDs(false, out emsg);
+            List<DateTime> v = ExamSlotA.DBSelectSlotIDs(false, out emsg);
             if(v == null)
             {
                 spMain.Opacity = 0.5;
@@ -288,7 +288,7 @@ namespace sQzServer0
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
-            ExamSlot sl = new ExamSlot();
+            ExamSlotA sl = new ExamSlotA();
             DateTime dt;
             DT.To_(i.Content as string, out dt);
             sl.Dt = dt;

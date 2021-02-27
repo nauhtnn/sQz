@@ -23,7 +23,7 @@ namespace sQzServer1
         public SortedList<string, bool> vbLock;
         public SortedList<string, CheckBox> vAbsen;
         Grid grdNee;
-        public ExamSlot mSl;
+        public ExamSlotA mSl;
         bool bQShowed;
         bool bNeeShowed;
         public ToSubmitCb toSubmCb;
@@ -54,8 +54,8 @@ namespace sQzServer1
             vDt1.Clear();
             vDt2.Clear();
             int rid = -1;
-            foreach (ExamRoom r in mSl.vRoom.Values)
-                foreach (ExamineeA e in r.vExaminee.Values)
+            foreach (ExamRoomA r in mSl.Rooms.Values)
+                foreach (ExamineeA e in r.Examinees.Values)
                 {
                     RowDefinition rd = new RowDefinition();
                     rd.Height = new GridLength(20);
@@ -83,8 +83,8 @@ namespace sQzServer1
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.HorizontalAlignment = HorizontalAlignment.Center;
-                    if (e.tComp != null)
-                        t.Text = e.tComp;
+                    if (e.ComputerName != null)
+                        t.Text = e.ComputerName;
                     vComp.Add(e.ID, t);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
@@ -152,11 +152,11 @@ namespace sQzServer1
                 }
         }
 
-        public void UpdateRsView(List<ExamRoom> vRoom)
+        public void UpdateRsView(List<ExamRoomA> vRoom)
         {
             TextBlock t;
-            foreach (ExamRoom r in vRoom)
-                foreach (ExamineeA e in r.vExaminee.Values)
+            foreach (ExamRoomA r in vRoom)
+                foreach (ExamineeA e in r.Examinees.Values)
                 {
                     if (e.Grade != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
                         t.Text = e.Grade.ToString();
@@ -164,8 +164,8 @@ namespace sQzServer1
                         t.Text = e.dtTim1.ToString("HH:mm");
                     if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.ID, out t))
                         t.Text = e.dtTim2.ToString("HH:mm");
-                    if (e.tComp != null && vComp.TryGetValue(e.ID, out t))
-                        t.Text = e.tComp;
+                    if (e.ComputerName != null && vComp.TryGetValue(e.ID, out t))
+                        t.Text = e.ComputerName;
                 }
         }
 
@@ -242,8 +242,8 @@ namespace sQzServer1
         {
             CheckBox cbx = sender as CheckBox;
             ExamineeA nee;
-            foreach (ExamRoom r in mSl.vRoom.Values)
-                if(r.vExaminee.TryGetValue(cbx.Name, out nee) &&
+            foreach (ExamRoomA r in mSl.Rooms.Values)
+                if(r.Examinees.TryGetValue(cbx.Name, out nee) &&
                     nee.eStt != NeeStt.Finished)
                 {
                     toSubmCb?.Invoke(false);
@@ -260,8 +260,8 @@ namespace sQzServer1
         public bool ToSubmit()
         {
             CheckBox cbx;
-            foreach (ExamRoom r in mSl.vRoom.Values)
-                foreach (ExamineeA nee in r.vExaminee.Values)
+            foreach (ExamRoomA r in mSl.Rooms.Values)
+                foreach (ExamineeA nee in r.Examinees.Values)
                     if (nee.eStt != NeeStt.Finished &&
                         (!vAbsen.TryGetValue(nee.ID, out cbx) ||
                         !cbx.IsChecked.HasValue || !cbx.IsChecked.Value))

@@ -7,29 +7,25 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    public class ExamRoom
+    public class ExamRoomS0: ExamRoomA
     {
-        public int uId;
-        public SortedList<string, ExamineeA> vExaminee;
-        public DateTime t1, t2;
         public string tPw;
-        public ExamRoom()
+
+        public ExamRoomS0()
         {
-            uId = -1;
-            vExaminee = new SortedList<string, ExamineeA>();
             tPw = null;
         }
 
         public int DBIns(MySqlConnection conn, out string eMsg)
         {
-            if(vExaminee.Count == 0)
+            if (Examinees.Count == 0)
             {
                 eMsg = null;
                 return 0;
             }
             string attbs = "dt,id,rid,name,birthdate,birthplace";
             StringBuilder vals = new StringBuilder();
-            foreach (ExamineeA e in vExaminee.Values)
+            foreach (ExamineeA e in Examinees.Values)
             {
                 vals.Append("('" + e.mDt.ToString(DT._) + "','");
                 vals.Append(e.ID + "',");
@@ -46,7 +42,7 @@ namespace sQzLib
 
         public void DBSelNee(MySqlConnection conn, DateTime dt)
         {
-            vExaminee.Clear();
+            Examinees.Clear();
             string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
                 "id,name,birthdate,birthplace", "a.rid=" + uId +
                 " AND a.dt='" + dt.ToString(DT._) +
@@ -63,12 +59,12 @@ namespace sQzLib
                 e.Name = reader.GetString(1);
                 e.Birthdate = reader.GetString(2);
                 e.Birthplace = reader.GetString(3);
-                vExaminee.Add(e.ID, e);
+                Examinees.Add(e.ID, e);
             }
             reader.Close();
 
             bool showError = true;
-            foreach (ExamineeA e in vExaminee.Values)
+            foreach (ExamineeA e in Examinees.Values)
             {
                 qry = DBConnect.mkQrySelect("sqz_nee_qsheet",
                     "t1,t2,grade,comp", "dt='" + e.mDt.ToString(DT._) +
@@ -83,12 +79,12 @@ namespace sQzLib
                         if (DT.Toh(reader.GetString(1), DT.hs, out e.dtTim2))
                             break;
                         e.Grade = reader.GetInt16(2);
-                        e.tComp = reader.GetString(3);
+                        e.ComputerName = reader.GetString(3);
                         e.eStt = NeeStt.Finished;
                     }
                     reader.Close();
                 }
-                else if(showError)
+                else if (showError)
                 {
                     showError = false;
                     System.Windows.MessageBox.Show("DBSelNee error\n" + emsg.ToString());
@@ -98,7 +94,7 @@ namespace sQzLib
 
         public void DBUpdateRs(StringBuilder vals)
         {
-            foreach (ExamineeS0 e in vExaminee.Values)
+            foreach (ExamineeS0 e in Examinees.Values)
                 if (e.bToDB)
                 {
                     e.bToDB = false;
@@ -106,74 +102,8 @@ namespace sQzLib
                         e.ID + "'," + (e.mAnsSh.uQSId)
                         + ",'" + e.dtTim1.ToString(DT.hh) +
                         "','" + e.dtTim2.ToString(DT.hh) + "'," + e.Grade + ",'" +
-                        e.tComp + "','" + e.mAnsSh.tAns + "'),");
+                        e.ComputerName + "','" + e.mAnsSh.tAns + "'),");
                 }
-        }
-
-        public ExamineeA Signin(ExamineeA e)
-        {
-            ExamineeA o;
-            if (vExaminee.TryGetValue(e.ID, out o) && o.Birthdate == e.Birthdate)
-            {
-                o.bFromC = true;
-                o.Merge(e);
-                return o;
-            }
-            return null;
-        }
-
-        public List<byte[]> GetBytes_S0SendingToS1()
-        {
-            List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(uId));
-            l.Add(BitConverter.GetBytes(vExaminee.Count));
-            foreach (ExamineeS0 e in vExaminee.Values)
-                l.InsertRange(l.Count, e.ToByte());
-            return l;
-        }
-
-        public bool ReadBytes(byte[] buf, ref int offs, ExamineeA newNee, bool addIfNExist)
-        {
-            if (buf == null)
-                return true;
-            if (buf.Length - offs < 0)
-                return true;
-            int n = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            if (n < 0)
-                return true;
-            while (0 < n)
-            {
-                --n;
-                //newNee.bFromC = false;
-                if (newNee.ReadByte(buf, ref offs))
-                    return true;
-                ExamineeA o;
-                if (vExaminee.TryGetValue(newNee.ID, out o))
-                {
-                    o.bFromC = false;
-                    o.Merge(newNee);
-                }
-                else if(addIfNExist)
-                    vExaminee.Add(newNee.ID, newNee);
-            }
-            return false;
-        }
-
-        public List<byte[]> GetBytes_S1SendingToS0()
-        {
-            List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(uId));
-            int n = 0;
-            foreach (ExamineeS1 e in vExaminee.Values)
-                if (e.eStt == NeeStt.Finished && e.NRecd)
-                {
-                    ++n;
-                    e.bFromC = false;
-                    l.InsertRange(l.Count, e.ToByte());
-                }
-            l.Insert(1, BitConverter.GetBytes(n));
-            return l;
         }
 
         public bool DBSelTimeAndPw(DateTime dt, out string eMsg)
@@ -192,7 +122,7 @@ namespace sQzLib
                 DBConnect.Close(ref conn);
                 return true;
             }
-            if(reader.Read())
+            if (reader.Read())
             {
                 tPw = reader.IsDBNull(0) ? null : reader.GetString(0);
                 if (reader.IsDBNull(1) || DT.Toh(reader.GetString(1), DT.hs, out t1))
@@ -247,6 +177,36 @@ namespace sQzLib
             return r;
         }
 
+        public static string GenPw(string vch, Random r)
+        {
+            int n = vch.Length;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 8; ++i)
+                sb.Append(vch[r.Next() % n]);
+            return sb.ToString();
+        }
+
+        public bool RegenPw()
+        {
+            if (Examinees.Count == 0)
+                return true;
+            string vch = PwChars();
+            Random r = new Random();
+            ExamineeA x = Examinees.Values.First();
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return true;
+            string otPw = tPw;
+            tPw = GenPw(vch, r);
+            string emsg;
+            int n = DBConnect.Update(conn, "sqz_slot_room", "pw='" + tPw + "'",
+                "dt='" + x.mDt.ToString(DT._) + "' AND rid=" + uId, out emsg);
+            if (0 < n)
+                return false;
+            tPw = otPw;
+            return true;
+        }
+
         public static string PwChars()
         {
             StringBuilder sb = new StringBuilder();
@@ -275,34 +235,20 @@ namespace sQzLib
             return sb.ToString();
         }
 
-        public static string GenPw(string vch, Random r)
+        public List<byte[]> GetBytes()
         {
-            int n = vch.Length;
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < 8; ++i)
-                sb.Append(vch[r.Next() % n]);
-            return sb.ToString();
-        }
-
-        public bool RegenPw()
-        {
-            if (vExaminee.Count == 0)
-                return true;
-            string vch = PwChars();
-            Random r = new Random();
-            ExamineeA x = vExaminee.Values.First();
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return true;
-            string otPw = tPw;
-            tPw = GenPw(vch, r);
-            string emsg;
-            int n = DBConnect.Update(conn, "sqz_slot_room", "pw='" + tPw + "'",
-                "dt='" + x.mDt.ToString(DT._) + "' AND rid=" + uId, out emsg);
-            if(0 < n)
-                return false;
-            tPw = otPw;
-            return true;
+            List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(uId));
+            int n = 0;
+            foreach (ExamineeS1 e in Examinees.Values)
+                if (e.eStt == NeeStt.Finished && e.NRecd)
+                {
+                    ++n;
+                    e.bFromC = false;
+                    l.InsertRange(l.Count, e.ToByte());
+                }
+            l.Insert(1, BitConverter.GetBytes(n));
+            return l;
         }
     }
 }

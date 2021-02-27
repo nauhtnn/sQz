@@ -28,7 +28,7 @@ namespace sQzServer1
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamSlot Slot;
+        ExamSlotA Slot;
         int uRId;//todo change to enum
         List<SortedList<string, bool>> vfbLock;
 
@@ -43,7 +43,7 @@ namespace sQzServer1
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            Slot = new ExamSlot();
+            Slot = new ExamSlotA();
 
             if(!System.IO.File.Exists("Room.txt") ||
                 !int.TryParse(System.IO.File.ReadAllText("Room.txt"), out uRId))
@@ -175,7 +175,7 @@ namespace sQzServer1
                                 {
                                     TextBlock t;
                                     if (vw.vComp.TryGetValue(o.ID, out t))
-                                        t.Text = o.tComp;
+                                        t.Text = o.ComputerName;
                                     if (vw.vDt1.TryGetValue(o.ID, out t))
                                         t.Text = o.dtTim1.ToString("HH:mm");
                                     CheckBox cbx;
@@ -209,22 +209,22 @@ namespace sQzServer1
                             break;
                         if (o == null)
                             o = new ExamineeC();
-                        if (o.tComp == null)
+                        if (o.ComputerName == null)
                             outMsg = new byte[16];
                         else
-                            outMsg = new byte[16 + o.tComp.Length];
+                            outMsg = new byte[16 + o.ComputerName.Length];
                         Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL), 0, outMsg, 0, 4);
-                        if (o.tComp == null)
+                        if (o.ComputerName == null)
                         {
                             Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 4, 4);
                             offs = 8;
                         }
                         else
                         {
-                            byte[] comp = Encoding.UTF8.GetBytes(o.tComp);
+                            byte[] comp = Encoding.UTF8.GetBytes(o.ComputerName);
                             Buffer.BlockCopy(BitConverter.GetBytes(comp.Length), 0, outMsg, 4, 4);
                             offs = 8;
-                            Buffer.BlockCopy(comp, 0, outMsg, offs, o.tComp.Length);
+                            Buffer.BlockCopy(comp, 0, outMsg, offs, o.ComputerName.Length);
                             offs += comp.Length;
                         }
 
@@ -238,8 +238,8 @@ namespace sQzServer1
                     outMsg = null;
                     string nee_id = Utils.ReadBytesOfString(buf, ref offs);
                     bool nee_not_found = true;
-                    foreach(ExamRoom r in Slot.vRoom.Values)
-                        if(r.vExaminee.ContainsKey(nee_id))
+                    foreach(ExamRoomA r in Slot.Rooms.Values)
+                        if(r.Examinees.ContainsKey(nee_id))
                         {
                             nee_not_found = true;
                             break;
