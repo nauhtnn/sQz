@@ -35,11 +35,9 @@
                 <TextBox x:Name="tbxId" Grid.Row="1" Width="96" MaxLength="5" TextAlignment="Center" IsEnabled="False"/>
                 <TextBlock x:Name="txtBirdate" Grid.Column="1" TextAlignment="Center" Foreground="#00356b"/>
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
-                    <TextBox x:Name="tbxD" Width="60" MaxLength="2" TextAlignment="Center" Foreground="#00356b" IsEnabled="False" PreviewKeyDown="tbx_PrevwNumberOnly"/>
                     <TextBlock Text="/" Width="16" TextAlignment="Center"/>
-                    <TextBox x:Name="tbxM" Width="60" MaxLength="2" TextAlignment="Center" Foreground="#00356b" IsEnabled="False" PreviewKeyDown="tbx_PrevwNumberOnly"/>
                     <TextBlock Text="/" Width="16" TextAlignment="Center"/>
-                    <TextBox x:Name="tbxY" Width="112" MaxLength="4" TextAlignment="Center" Foreground="#00356b" IsEnabled="False" PreviewKeyDown="tbx_PrevwNumberOnly"/>
+                    <TextBox x:Name="tbxBirthdate" Width="200" MaxLength="4" TextAlignment="Center" Foreground="#00356b" IsEnabled="False" PreviewKeyDown="tbx_PrevwNumberOnly"/>
                 </StackPanel>
                 <Button x:Name="btnSignIn" Grid.Row="3" Width="256" Click="btnSignIn_Click" BorderThickness="0" IsEnabled="False" Background="#1c64e7" Foreground="#fff"/>
                 <Button x:Name="btnOpenLog" Grid.Row="3" Grid.Column="1" Width="256" Click="btnOpenLog_Click" IsEnabled="False" Background="#80cc28" Foreground="#fff"/>

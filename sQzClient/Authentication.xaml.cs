@@ -32,7 +32,7 @@ namespace sQzClient
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            mDt = DT.INV_;
+            mDt = DT.INVALID;
             mNee = new ExamineeC();
 
             mNee.kDtDuration = new TimeSpan(1, 0, 0);
@@ -40,44 +40,37 @@ namespace sQzClient
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            if (mNee.ParseLvId(tbxId.Text))
+            if (tbxId.Text.Length > 8)
             {
                 spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.NEEID_NOK]);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.NEEID_NOK));
                 spMain.Opacity = 1;
                 return;
             }
-            int x, y, z;
-            if(!int.TryParse(tbxD.Text, out x) || !int.TryParse(tbxM.Text, out y)
-                || !int.TryParse(tbxY.Text, out z))
+            if(tbxBirthdate.Text.Length > 10)
             {
-                mNee.tBirdate = null;
+                mNee.Birthdate = null;
                 spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.BIRDATE_NOK));
                 spMain.Opacity = 1;
                 return;
             }
-            mNee.tBirdate = x.ToString("d2") + "-" + y.ToString("d2") + "-" + z.ToString("d2");
-            DateTime dum;
-            if (DT.To_(mNee.tBirdate, DT.RR, out dum))
-            {
-                mNee.tBirdate = null;
-                spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BIRDATE_NOK]);
-                spMain.Opacity = 1;
-                return;
-            }
+            mNee.Birthdate = tbxBirthdate.Text;
             try
             {
-                mNee.tComp = Environment.MachineName;
-            } catch(InvalidOperationException) { mNee.tComp = "unknown"; }//todo
+                mNee.ComputerName = Environment.MachineName;
+            }
+            catch (InvalidOperationException)
+            {
+                mNee.ComputerName = "unknown";
+            }
             DisableControls();
             Thread th = new Thread(() => {
                 if (mClnt.ConnectWR(ref mCbMsg) && bRunning)
                     Dispatcher.Invoke(() =>
                     {
                         spMain.Opacity = 0.5;
-                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
+                        WPopup.s.ShowDialog(Txt.s._((int)TxI.CONN_NOK));
                         spMain.Opacity = 1;
                         DisableControls();
                         btnReconn.IsEnabled = true;
@@ -115,14 +108,14 @@ namespace sQzClient
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            txtLalgitc.Text = t._[(int)TxI.LALGITC];
-            txtWelcome.Text = t._[(int)TxI.WELCOME];
-            txtId.Text = t._[(int)TxI.NEEID];
-            txtBirdate.Text = t._[(int)TxI.BIRDATE] + t._[(int)TxI.BIRDATE_MSG];
-            btnSignIn.Content = t._[(int)TxI.SIGNIN];
-            btnOpenLog.Content = t._[(int)TxI.OPEN_LOG];
-            btnReconn.Content = t._[(int)TxI.CONN];
-            btnExit.Content = t._[(int)TxI.EXIT];
+            txtLalgitc.Text = t._((int)TxI.LALGITC);
+            txtWelcome.Text = t._((int)TxI.WELCOME);
+            txtId.Text = t._((int)TxI.NEEID);
+            txtBirdate.Text = t._((int)TxI.BIRDATE) + t._((int)TxI.BIRDATE_MSG);
+            btnSignIn.Content = t._((int)TxI.SIGNIN);
+            btnOpenLog.Content = t._((int)TxI.OPEN_LOG);
+            btnReconn.Content = t._((int)TxI.CONN);
+            btnExit.Content = t._((int)TxI.EXIT);
         }
 
         public bool ClntBufHndl(byte[] buf)
@@ -132,10 +125,10 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Dating:
-                    if(!DT.ReadByte(buf, ref offs, out mDt) && bRunning)
+                    if((mDt = DT.ReadByte(buf, ref offs)) == DT.INVALID && bRunning)
                     {
                         Dispatcher.Invoke(() => {
-                            txtDate.Text = Txt.s._[(int)TxI.DATE] + mDt.ToString(DT.RR);
+                            txtDate.Text = Txt.s._((int)TxI.DATE) + mDt.ToString(DT.RR);
                             EnableControls();
                             btnReconn.IsEnabled = false;
                         });
@@ -152,11 +145,11 @@ namespace sQzClient
                     {
                         ExamineeC e = new ExamineeC();
                         e.bLog = mNee.bLog;
-                        bool b = e.ReadByte(buf, ref offs);
+                        bool b = e.ReadBytes_FromS1(buf, ref offs);
                         l = buf.Length - offs;
                         if (!b)
                         {
-                            mNee.Merge(e);
+                            mNee.MergeWithS1(e);
                             mState = NetCode.ExamRetrieving;
                             return true;//continue
                         }
@@ -188,16 +181,16 @@ namespace sQzClient
                             offs += 4;
                             l -= 8;
                             StringBuilder sb = new StringBuilder();
-                            sb.AppendFormat(Txt.s._[(int)TxI.SIGNIN_AL], h.ToString() + ':' + m);
+                            sb.AppendFormat(Txt.s._((int)TxI.SIGNIN_AL), h.ToString() + ':' + m);
                             sb.Append(comp + '.');
                             msg = sb.ToString();
                         }
                         else if (errc == (int)TxI.SIGNIN_NOK)
-                            msg = Txt.s._[(int)TxI.SIGNIN_NOK];
+                            msg = Txt.s._((int)TxI.SIGNIN_NOK);
                         else if (errc == (int)TxI.NEEID_NF)
-                            msg = Txt.s._[(int)TxI.NEEID_NF];
+                            msg = Txt.s._((int)TxI.NEEID_NF);
                         else if (errc == (int)TxI.RECV_DAT_ER)
-                            msg = Txt.s._[(int)TxI.RECV_DAT_ER];
+                            msg = Txt.s._((int)TxI.RECV_DAT_ER);
                         if (bRunning && msg != null)
                             Dispatcher.Invoke(() => {
                                 spMain.Opacity = 0.5;
@@ -219,7 +212,7 @@ namespace sQzClient
                             Dispatcher.Invoke(() =>
                             {
                                 spMain.Opacity = 0.5;
-                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_NFOUND] + qsid);
+                                WPopup.s.ShowDialog(Txt.s._((int)TxI.QS_NFOUND) + qsid);
                                 spMain.Opacity = 1;
                                 EnableControls();
                             });

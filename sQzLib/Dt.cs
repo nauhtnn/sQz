@@ -22,7 +22,7 @@ namespace sQzLib
         public const string _ = "yyyy-M-d HH:mm";
         //public const string _ = "yyyy-M-d";
         //public const string __ = "yyyy-MM-dd";
-        //public const string RR = "dd-MM-yyyy";
+        public const string RR = "dd-MM-yyyy";
         //public const int BYTE_COUNT = 12;
         //public const int BYTE_COUNT_h = 8;
 
