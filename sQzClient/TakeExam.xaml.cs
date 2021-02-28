@@ -148,7 +148,7 @@ namespace sQzClient
             Label l = new Label();
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             //int nAns = 4;//hardcode
-            int i = 0, n = QuestionSheet.Count;
+            int n = QuestionSheet.Count;
             thisExaminee.AnswerSheet.Init(QuestionSheet.ID);
             thisExaminee.AnswerSheet.InitView(QuestionSheet, qaWh, null);
             thisExaminee.AnswerSheet.bChanged = false;
@@ -174,7 +174,7 @@ namespace sQzClient
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 Grid.SetRow(l, j);
-                Grid.SetColumn(l, i);
+                Grid.SetColumn(l, 1);
                 gAnsSh.Children.Add(l);
                 SelectedLabels.Add(j, l);
             }
@@ -194,7 +194,7 @@ namespace sQzClient
             l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             Grid.SetRow(l, j);
-            Grid.SetColumn(l, i);
+            Grid.SetColumn(l, 1);
             gAnsSh.Children.Add(l);
             SelectedLabels.Add(j, l);
 
@@ -215,7 +215,7 @@ namespace sQzClient
                 Grid.SetColumn(q, 0);
                 QuestionSheetContainer.Children.Add(q);
                 q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
-                q.Name = "_" + (i - 1).ToString();
+                q.optionsView.Name = "_" + (i - 1).ToString();
             }
             for (int i = 2, j = 0; i <= n; i += 2, ++j)
             {
@@ -223,7 +223,7 @@ namespace sQzClient
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 1);
                 QuestionSheetContainer.Children.Add(q);
-                q.Name = "_" + (i - 1).ToString();
+                q.optionsView.Name = "_" + (i - 1).ToString();
             }
             QuestionSheetContainer.Background = Theme.s._[(int)BrushId.BG];
         }
@@ -244,7 +244,7 @@ namespace sQzClient
                     thisExaminee.AnswerSheet.aAns[qid * 4 + i] = 1;
                     OptionView v = li as OptionView;
                     if (v != null)
-                        SelectedLabels[qid].Content = v.Idx_Label;
+                        SelectedLabels[qid+1].Content = v.Idx_Label;
                 }
                 else
                     thisExaminee.AnswerSheet.aAns[qid * 4 + i] = 0;

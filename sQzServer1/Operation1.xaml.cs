@@ -158,7 +158,7 @@ namespace sQzServer1
                     {
                         ExamineeS1 o = null;
                         dt = DateTime.Now;
-                        if ((o = Slot.Signin(e)) != null)
+                        if ((o = Slot.Signin(e)) == null)//why? check with the old
                         {
                             dt = Slot.Dt;
                             break;
@@ -238,7 +238,7 @@ namespace sQzServer1
                     foreach(ExamRoomS1 r in Slot.Rooms.Values)
                         if(r.Examinees.ContainsKey(nee_id))
                         {
-                            nee_not_found = true;
+                            nee_not_found = false;
                             break;
                         }
                     if(nee_not_found)
@@ -247,7 +247,6 @@ namespace sQzServer1
                         Array.Copy(BitConverter.GetBytes((int)TxI.NEEID_NF), 0, outMsg, 0, 4);
                         break;
                     }
-                    offs += 4;
                     int qsid = BitConverter.ToInt32(buf, offs);
                     if (qsid == ExamineeA.LV_CAP)
                     {
