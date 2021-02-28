@@ -419,7 +419,7 @@ namespace sQzServer0
         public void UpRT1(int rid)
         {
             if (vRT1.ContainsKey(rid))
-                vRT1[rid].Text = DateTime.Now.ToString(DT._);
+                vRT1[rid].Text = DateTime.Now.ToString(DT.hh);
             string emsg;
             mSl.DBUpT1(rid, out emsg);
         }

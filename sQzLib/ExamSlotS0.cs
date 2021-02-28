@@ -467,9 +467,6 @@ namespace sQzLib
             if (buf.Length - offs < 4)
                 return -1;
 
-            if (Dt != DT.ReadByte(buf, ref offs))
-                return -1;
-
             if (buf.Length - offs < 4)
                 return -1;
             int rid = BitConverter.ToInt32(buf, offs);
