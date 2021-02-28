@@ -50,11 +50,9 @@ namespace sQzLib
             mAnsSh = new AnsSheet();
         }
 
-        public abstract List<byte[]> GetBytes_ClientSendingToS1();
-
         public void ToByte(out byte[] buf, int prfx)
         {
-            List<byte[]> l = GetBytes_ClientSendingToS1();
+            List<byte[]> l = new List<byte[]>();// GetBytes_ClientSendingToS1();
             int sz = 4;
             foreach (byte[] i in l)
                 sz += i.Length;
@@ -71,7 +69,7 @@ namespace sQzLib
 
         public void ToByte(out byte[] buf)
         {
-            List<byte[]> l = GetBytes_ClientSendingToS1();
+            List<byte[]> l = new List<byte[]>();// GetBytes_ClientSendingToS1();
             int sz = 0;
             foreach (byte[] i in l)
                 sz += i.Length;

@@ -31,7 +31,7 @@ namespace sQzLib
             tLog = new StringBuilder();
         }
 
-        public override List<byte[]> GetBytes_ClientSendingToS1()
+        public List<byte[]> GetBytes_ClientSendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
             Utils.AppendBytesOfString(ID, l);
@@ -57,7 +57,7 @@ namespace sQzLib
             return l;
         }
 
-        public override bool ReadByte(byte[] buf, ref int offs)
+        public bool ReadBytesFromS1(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
 
@@ -119,16 +119,16 @@ namespace sQzLib
 
         public override void Merge(ExamineeA e)
         {
-            eStt = e.eStt;
-            if (eStt == NeeStt.Finished)
+            if (e.eStt == NeeStt.Finished)
                 Grade = e.Grade;
-            if (eStt < NeeStt.Finished || bLog)
+            if (e.eStt < NeeStt.Finished || bLog)
             {
                 Birthdate = e.Birthdate;
                 Name = e.Name;
                 Birthplace = e.Birthplace;
             }
             bLog = false;
+            eStt = e.eStt;//for safety, set the status last
         }
 
         public bool ToLogFile(int m, int s)
@@ -157,6 +157,7 @@ namespace sQzLib
             catch (UnauthorizedAccessException) { err = true; }
             if (err)
                 return true;
+            w.Write(mDt.ToBinary());
             w.Write(ID);
             w.Write((int)eStt);
             w.Write(mAnsSh.questSheetID);
@@ -186,36 +187,70 @@ namespace sQzLib
                 {
                     r = new System.IO.BinaryReader(System.IO.File.OpenRead(filePath));
                 }
-                catch (UnauthorizedAccessException) { r = null; }
+                catch (UnauthorizedAccessException)
+                {
+                    r = null;
+                }
             if (r == null)
                 return false;
-            //uSlId = r.ReadUInt32();
-            int x;
-            //if (Enum.IsDefined(typeof(ExamLv), x = r.ReadInt32()))
-            //    eLv = (ExamLv)x;
-            //uId = r.ReadInt32();
-            ID = r.ReadString();
-            if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
-                eStt = (NeeStt)x;
-            mAnsSh.questSheetID = r.ReadInt32();
-            mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
-            int h, m;
-            if (eStt == NeeStt.Finished)
+            StringBuilder msg = new StringBuilder();
+            try
             {
-                h = r.ReadInt32();
-                m = r.ReadInt32();
-                DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim1);
-                h = r.ReadInt32();
-                m = r.ReadInt32();
-                DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim2);
+                msg.Append("Read DateTime.\n");
+                mDt = DateTime.FromBinary(r.ReadInt64());
+                msg.Append("Read ID.\n");
+                ID = r.ReadString();
+                msg.Append("Read status.\n");
+                int x;
+                if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
+                    eStt = (NeeStt)x;
+                msg.Append("Read sheet ID.\n");
+                mAnsSh.questSheetID = r.ReadInt32();
+                msg.Append("Read answer.\n");
+                mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
+                int h, m;
+                if (eStt == NeeStt.Finished)
+                {
+                    msg.Append("Read start hour.\n");
+                    h = r.ReadInt32();
+                    msg.Append("Read start minute.\n");
+                    m = r.ReadInt32();
+                    if(DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim1))
+                        msg.Append("Start time invalid " + h + ":" + m + "\n");
+                    h = r.ReadInt32();
+                    msg.Append("Read end hour.\n");
+                    m = r.ReadInt32();
+                    msg.Append("Read end minute.\n");
+                    if(DT.Toh(h.ToString() + ':' + m, DT.h, out dtTim2))
+                        msg.Append("End time invalid " + h + ":" + m + "\n");
+                }
+                else
+                {
+                    msg.Append("Read current hour.\n");
+                    h = r.ReadInt32();
+                    msg.Append("Read current minute.\n");
+                    m = r.ReadInt32();
+                    msg.Append("Set duration " + h + ":" + m + "\n");
+                    kDtDuration = new TimeSpan(0, h, m);
+                }
+                bLog = true;
+                msg.Append("Finish!");
             }
-            else
+            catch (System.IO.EndOfStreamException e)
             {
-                h = r.ReadInt32();
-                m = r.ReadInt32();
-                kDtDuration = new TimeSpan(0, h, m);
+                System.Windows.MessageBox.Show(msg.ToString() + e.ToString());
+                return false;
             }
-            bLog = true;
+            catch (System.IO.IOException e)
+            {
+                System.Windows.MessageBox.Show(msg.ToString() + e.ToString());
+                return false;
+            }
+            catch (System.ArgumentException e)
+            {
+                System.Windows.MessageBox.Show(msg.ToString() + e.ToString());
+                return false;
+            }
             return true;
         }
 
