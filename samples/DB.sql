@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATETIME,
 `neeid` VARCHAR(8) CHARACTER SET `utf8mb4`, `qsid` INT,
 `t1` TIME, `t2` TIME, `grade` INT,
 `comp` VARCHAR(32),
-`ans` VARCHAR(1024),--todo: Use TEXT
+-- todo: Use TEXT
+`ans` VARCHAR(1024),
 FOREIGN KEY(`dt`, `neeid`) REFERENCES `sqz_examinee`(`dt`, `id`),
 FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 
@@ -41,7 +42,8 @@ CREATE TABLE IF NOT EXISTS `sqz_passage`(`id` INT PRIMARY KEY,
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `pid` INT NULL, `deleted` INT,
-`stmt` TEXT CHARACTER SET `utf8mb4`,--todo: change to stem
+-- todo: change to stem
+`stmt` TEXT CHARACTER SET `utf8mb4`,
 `ans0` TEXT CHARACTER SET `utf8mb4`, `ans1` TEXT CHARACTER SET `utf8mb4`,
 `ans2` TEXT CHARACTER SET `utf8mb4`, `ans3` TEXT CHARACTER SET `utf8mb4`,
 `akey` CHAR(4) CHARACTER SET `ascii`,
