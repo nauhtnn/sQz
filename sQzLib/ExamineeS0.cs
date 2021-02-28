@@ -93,11 +93,11 @@ namespace sQzLib
                 dtTim1 = DT.INVALID;
                 return true;
             }
-            mAnsSh.questSheetID = BitConverter.ToInt32(buf, offs);
+            AnswerSheet.questSheetID = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            mAnsSh.aAns = new byte[AnsSheet.LEN];
-            Array.Copy(buf, offs, mAnsSh.aAns, 0, AnsSheet.LEN);
+            AnswerSheet.aAns = new byte[AnsSheet.LEN];
+            Array.Copy(buf, offs, AnswerSheet.aAns, 0, AnsSheet.LEN);
             l -= AnsSheet.LEN;
             offs += AnsSheet.LEN;
 
@@ -127,7 +127,7 @@ namespace sQzLib
             eStt = NeeStt.Finished;
             bToVw = bToDB = true;
             ComputerName = e.ComputerName;
-            mAnsSh = e.mAnsSh;
+            AnswerSheet = e.AnswerSheet;
             dtTim1 = e.dtTim1;
             Grade = e.Grade;
             dtTim2 = e.dtTim2;

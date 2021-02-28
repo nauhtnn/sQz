@@ -279,7 +279,7 @@ namespace sQzServer1
                     {
                         AnsSheet keySh = null;
                         found = false;
-                        if(Slot.mKeyPack.vSheet.TryGetValue(e.mAnsSh.questSheetID, out keySh))
+                        if(Slot.mKeyPack.vSheet.TryGetValue(e.AnswerSheet.questSheetID, out keySh))
                         {
                             found = true;
                             break;
@@ -296,8 +296,8 @@ namespace sQzServer1
                         if (o != null)
                         {
                             o.eStt = NeeStt.Finished;
-                            o.mAnsSh = e.mAnsSh;
-                            o.Grade = keySh.Grade(e.mAnsSh.aAns);
+                            o.AnswerSheet = e.AnswerSheet;
+                            o.Grade = keySh.Grade(e.AnswerSheet.aAns);
                             o.dtTim2 = DateTime.Now;
                             foreach (SortedList<string, bool> sl in vfbLock)
                                 if (sl.ContainsKey(e.ID))

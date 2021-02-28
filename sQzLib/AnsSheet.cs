@@ -11,8 +11,6 @@ namespace sQzLib
     public class AnsSheet
     {
         public const int LEN = 120;
-        public ListBox[] OptionContainers;
-        public AnsItem[][] vAnsItem;
         public int questSheetID;
         public int uQSId { get { return (ExamineeA.LV_CAP < questSheetID) ? questSheetID - ExamineeA.LV_CAP : questSheetID; } }
         public bool bChanged;
@@ -146,33 +144,8 @@ namespace sQzLib
 
         public void Disable()
         {
-            foreach (ListBox lbx in OptionContainers)
-                lbx.IsEnabled = false;
-        }
-
-        private void Ans_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            bChanged = true;
-            ListBox l = sender as ListBox;
-            if (l.SelectedItem == null)
-                return;
-            int qid = Convert.ToInt32(l.Name.Substring(1));
-            int i = -1;
-            foreach(ListBoxItem li in l.Items)
-            {
-                ++i;
-                if (li.IsSelected)
-                {
-                    aAns[qid * 4 + i] = 1;//todo
-                    vAnsItem[qid][i].Selected();
-                }
-                else
-                {
-                    aAns[qid * 4 + i] = 0;//todo
-                    vAnsItem[qid][i].Unselected();
-                }
-            }
-            dgSelChgCB?.Invoke();
+            //foreach (ListBox lbx in OptionContainers)
+            //    lbx.IsEnabled = false;
         }
     }
 }

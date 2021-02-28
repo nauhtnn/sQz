@@ -8,6 +8,7 @@ namespace sQzLib
         public static CornerRadius sCr;
         static double sW;
         Border mB;
+        public string Idx_Label;
 
         public static void Init(double w)
         {
@@ -25,7 +26,8 @@ namespace sQzLib
             mB.CornerRadius = sCr;
             mB.Background = Theme.s._[(int)BrushId.Q_BG];
             TextBlock tb = new TextBlock();
-            tb.Text = "" + (char)('A' + idx);
+            Idx_Label = "" + (char)('A' + idx);
+            tb.Text = Idx_Label;
             tb.Foreground = Theme.s._[(int)BrushId.QID_BG];
             tb.VerticalAlignment = VerticalAlignment.Center;
             tb.HorizontalAlignment = HorizontalAlignment.Center;

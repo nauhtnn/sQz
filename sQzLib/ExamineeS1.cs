@@ -106,7 +106,7 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-            mAnsSh.questSheetID = BitConverter.ToInt32(buf, offs);
+            AnswerSheet.questSheetID = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
 
@@ -115,8 +115,8 @@ namespace sQzLib
 
             if (l < AnsSheet.LEN)
                 return true;
-            mAnsSh.aAns = new byte[AnsSheet.LEN];
-            Buffer.BlockCopy(buf, offs, mAnsSh.aAns, 0, AnsSheet.LEN);
+            AnswerSheet.aAns = new byte[AnsSheet.LEN];
+            Buffer.BlockCopy(buf, offs, AnswerSheet.aAns, 0, AnsSheet.LEN);
             l -= AnsSheet.LEN;
             offs += AnsSheet.LEN;
 
@@ -242,8 +242,8 @@ namespace sQzLib
                 l.Add(BitConverter.GetBytes(0));
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
             l.Add(BitConverter.GetBytes(dtTim1.Minute));
-            l.Add(BitConverter.GetBytes(mAnsSh.uQSId));
-            l.Add(mAnsSh.aAns);
+            l.Add(BitConverter.GetBytes(AnswerSheet.uQSId));
+            l.Add(AnswerSheet.aAns);
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
             l.Add(BitConverter.GetBytes(Grade));
@@ -271,12 +271,12 @@ namespace sQzLib
                 eStt = e.eStt;
             if (eStt < NeeStt.Examing)
                 return;
-            mAnsSh = new AnsSheet();
-            mAnsSh.questSheetID = e.mAnsSh.questSheetID;
+            AnswerSheet = new AnsSheet();
+            AnswerSheet.questSheetID = e.AnswerSheet.questSheetID;
 
             if (eStt < NeeStt.Submitting)
                 return;
-            mAnsSh.aAns = e.mAnsSh.aAns;
+            AnswerSheet.aAns = e.AnswerSheet.aAns;
         }
 
         public void MergeWithS0(ExamineeA e)

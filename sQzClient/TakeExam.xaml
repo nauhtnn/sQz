@@ -11,30 +11,27 @@
 
     <Viewbox>
         <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
-            <Grid x:Name="gQSheet">
+            <Grid x:Name="QuestionAndAnswerContainer">
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="240"/>
-                    <ColumnDefinition Width="1020"/>
+                    <ColumnDefinition Width="96"/>
+                    <ColumnDefinition Width="1164"/>
                 </Grid.ColumnDefinitions>
-                <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="652" Width="240">
+                <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="652" Width="96">
                     <TextBlock x:Name="txtAnsSh" Height="30" FontSize="20" HorizontalAlignment="Center"/>
-                    <ScrollViewer x:Name="svwrASh" Height="622" Width="240" VerticalScrollBarVisibility="Auto" FontSize="14">
+                    <ScrollViewer x:Name="svwrASh" Height="622" Width="96" VerticalScrollBarVisibility="Auto" FontSize="14">
                         <Grid x:Name="gAnsSh">
                             <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
-                                <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
                             </Grid.ColumnDefinitions>
                         </Grid>
                     </ScrollViewer>
                 </StackPanel>
-                <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1020" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
-                    <Grid x:Name="gQuest" Width="1000">
+                <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1164" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
+                    <Grid x:Name="QuestionSheetContainer" Width="1144">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="500"/>
-                            <ColumnDefinition Width="500"/>
+                            <ColumnDefinition Width="577"/>
+                            <ColumnDefinition Width="577"/>
                         </Grid.ColumnDefinitions>
                     </Grid>
                 </ScrollViewer>

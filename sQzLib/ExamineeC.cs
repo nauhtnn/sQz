@@ -47,12 +47,12 @@ namespace sQzLib
             if (eStt < NeeStt.Examing)
                 return l;
 
-            l.Add(BitConverter.GetBytes(mAnsSh.questSheetID));
+            l.Add(BitConverter.GetBytes(AnswerSheet.questSheetID));
 
             if (eStt < NeeStt.Submitting)
                 return l;
 
-            l.Add(mAnsSh.aAns);
+            l.Add(AnswerSheet.aAns);
 
             return l;
         }
@@ -160,8 +160,8 @@ namespace sQzLib
             w.Write(mDt.ToBinary());
             w.Write(ID);
             w.Write((int)eStt);
-            w.Write(mAnsSh.questSheetID);
-            w.Write(mAnsSh.aAns, 0, AnsSheet.LEN);
+            w.Write(AnswerSheet.questSheetID);
+            w.Write(AnswerSheet.aAns, 0, AnsSheet.LEN);
             if (eStt == NeeStt.Finished)
             {
                 w.Write(dtTim1.Hour);
@@ -175,7 +175,7 @@ namespace sQzLib
                 w.Write(s);
             }
             w.Close();
-            mAnsSh.bChanged = false;
+            AnswerSheet.bChanged = false;
             return false;
         }
 
@@ -205,9 +205,9 @@ namespace sQzLib
                 if (Enum.IsDefined(typeof(NeeStt), x = r.ReadInt32()))
                     eStt = (NeeStt)x;
                 msg.Append("Read sheet ID.\n");
-                mAnsSh.questSheetID = r.ReadInt32();
+                AnswerSheet.questSheetID = r.ReadInt32();
                 msg.Append("Read answer.\n");
-                mAnsSh.aAns = r.ReadBytes(AnsSheet.LEN);
+                AnswerSheet.aAns = r.ReadBytes(AnsSheet.LEN);
                 int h, m;
                 if (eStt == NeeStt.Finished)
                 {

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
@@ -21,16 +22,18 @@ namespace sQzClient
         UICbMsg mCbMsg;
         System.Timers.Timer mTimer;
 
+        Dictionary<int, Label> SelectedLabels;
+
         const int SMT_OK_M = 20;
         const int SMT_OK_S = 60;
 
-        public QuestSheet mQSh;
+        public QuestSheet QuestionSheet;
 
         Client2 mClnt;
         NetCode mState;
 
         public static double qaWh;
-        public ExamineeA mNee;//reference to Auth.mNee
+        public ExamineeC thisExaminee;//reference to Auth.mNee
 
         public TakeExam()
         {
@@ -40,7 +43,7 @@ namespace sQzClient
             mCbMsg = new UICbMsg();
             bRunning = true;
 
-            mQSh = new QuestSheet();
+            QuestionSheet = new QuestSheet();
         }
 
         private void LoadTxt()
@@ -61,15 +64,15 @@ namespace sQzClient
 
             double mrg = FontSize / 2;
             SingleQuestionView.IdxWidth = 3 * mrg;
-            SingleQuestionView.Margin = new Thickness(mrg, mrg, 0, mrg);
+            SingleQuestionView.staticMargin = new Thickness(mrg, mrg, 0, mrg);
             SingleQuestionView.StemWidth = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - SingleQuestionView.IdxWidth;
 
-            InitLeftPanel();
-            InitQuestPanel();
+            InitQuesttonSheetView();
+            InitAnswerSheetView();
 
             bBtnBusy = false;
 
-            txtWelcome.Text = mNee.ToString();
+            txtWelcome.Text = thisExaminee.ToString();
 
             LoadTxt();
 
@@ -82,26 +85,26 @@ namespace sQzClient
             kLogIntvl = new TimeSpan(0, 0, 30);
 
             System.Text.StringBuilder msg = new System.Text.StringBuilder();
-            msg.Append(mNee.ID + " (" + mNee.Name + ")");
-            if (mNee.kDtDuration.Minutes == 30)
+            msg.Append(thisExaminee.ID + " (" + thisExaminee.Name + ")");
+            if (thisExaminee.kDtDuration.Minutes == 30)
                 msg.Append(Txt.s._((int)TxI.EXAMING_MSG_1));
             else
                 msg.AppendFormat(Txt.s._((int)TxI.EXAMING_MSG_2),
-                    mNee.kDtDuration.Minutes, mNee.kDtDuration.Seconds);
+                    thisExaminee.kDtDuration.Minutes, thisExaminee.kDtDuration.Seconds);
             WPopup.s.wpCb = ShowQuestion;
             spMain.Opacity = 0.5;
             WPopup.s.ShowDialog(msg.ToString());
             spMain.Opacity = 1;
-            if (mNee.eStt < NeeStt.Examing)
-                mNee.eStt = NeeStt.Examing;
-            else if (mNee.eStt == NeeStt.Submitting)
+            if (thisExaminee.eStt < NeeStt.Examing)
+                thisExaminee.eStt = NeeStt.Examing;
+            else if (thisExaminee.eStt == NeeStt.Submitting)
                 Submit();
         }
 
         private void InitRemainingTime()
         {
             int m = -1, s = -1;
-            if (mNee.eStt < NeeStt.Submitting)
+            if (thisExaminee.eStt < NeeStt.Submitting)
             {
                 string t = null;
                 if (System.IO.File.Exists("Duration.txt"))
@@ -115,11 +118,11 @@ namespace sQzClient
                         int.TryParse(vt[1], out s);
                     }
                     if (-1 < m && -1 < s)
-                        dtRemn = mNee.kDtDuration = new TimeSpan(0, m, s);
+                        dtRemn = thisExaminee.kDtDuration = new TimeSpan(0, m, s);
                 }
             }
             if (m < 0 || s < 0)
-                dtRemn = mNee.kDtDuration;
+                dtRemn = thisExaminee.kDtDuration;
         }
 
         void ShowQuestion()
@@ -136,7 +139,7 @@ namespace sQzClient
             dtLastLog = kDtStart = DateTime.Now;
         }
 
-        void InitLeftPanel()
+        void InitAnswerSheetView()
         {
             //left panel
             spLp.HorizontalAlignment = HorizontalAlignment.Left;
@@ -144,43 +147,15 @@ namespace sQzClient
             //title
             Label l = new Label();
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
-            int nAns = 4;//hardcode
-            int i = 0, n = mQSh.Count;
-            AnsItem.SInit(Window.GetWindow(this).FontSize);
-            mNee.mAnsSh.Init(mQSh.ID);
-            mNee.mAnsSh.InitView(mQSh, qaWh, null);
-            mNee.mAnsSh.bChanged = false;
-            //top line
-            gAnsSh.RowDefinitions.Add(new RowDefinition());
-            l = new Label();
-            Grid.SetRow(l, 0);
-            Grid.SetColumn(l, 0);
-            gAnsSh.Children.Add(l);
+            //int nAns = 4;//hardcode
+            int i = 0, n = QuestionSheet.Count;
+            thisExaminee.AnswerSheet.Init(QuestionSheet.ID);
+            thisExaminee.AnswerSheet.InitView(QuestionSheet, qaWh, null);
+            thisExaminee.AnswerSheet.bChanged = false;
             SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
-            for (i = 1; i < nAns; ++i)
-            {
-                l = new Label();
-                l.Content = (char)('@' + i);
-                l.BorderBrush = brBK;
-                l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
-                l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                l.FontWeight = FontWeights.Bold;
-                Grid.SetRow(l, 0);
-                Grid.SetColumn(l, i);
-                gAnsSh.Children.Add(l);
-
-            }
-            l = new Label();
-            l.BorderBrush = brBK;
-            l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
-            l.HorizontalContentAlignment = HorizontalAlignment.Center;
-            l.Content = (char)('@' + i);
-            l.FontWeight = FontWeights.Bold;
-            Grid.SetRow(l, 0);
-            Grid.SetColumn(l, i);
-            gAnsSh.Children.Add(l);
             //next lines
             //n -= 1;
+            SelectedLabels = new Dictionary<int, Label>();
             int j = 1;
             for (; j < n; ++j)
             {
@@ -194,24 +169,14 @@ namespace sQzClient
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, 0);
                 gAnsSh.Children.Add(l);
-                for (i = 1; i < nAns; ++i)
-                {
-                    l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
-                    l.BorderBrush = brBK;
-                    l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
-                    l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                    l.VerticalContentAlignment = VerticalAlignment.Top;
-                    Grid.SetRow(l, j);
-                    Grid.SetColumn(l, i);
-                    gAnsSh.Children.Add(l);
-                }
-                l = l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+                l = new Label();
                 l.BorderBrush = brBK;
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, i);
                 gAnsSh.Children.Add(l);
+                SelectedLabels.Add(j, l);
             }
             //bottom lines
             gAnsSh.RowDefinitions.Add(new RowDefinition());
@@ -224,51 +189,67 @@ namespace sQzClient
             Grid.SetRow(l, j);
             Grid.SetColumn(l, 0);
             gAnsSh.Children.Add(l);
-            for (i = 1; i < nAns; ++i)
-            {
-                l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
-                l.BorderBrush = brBK;
-                l.BorderThickness = Theme.s.l[(int)ThicknessId.MB];
-                l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                Grid.SetRow(l, j);
-                Grid.SetColumn(l, i);
-                gAnsSh.Children.Add(l);
-            }
-            l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+            l = new Label();
             l.BorderBrush = brBK;
             l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             Grid.SetRow(l, j);
             Grid.SetColumn(l, i);
             gAnsSh.Children.Add(l);
+            SelectedLabels.Add(j, l);
 
             //for (j = Question.svQuest[0].Count; -1 < j; --j)
             //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
         }
 
-        void InitQuestPanel()
+        static bool[] ans_todo = new bool[1024];
+        void InitQuesttonSheetView()
         {
-            gQuest.Background = Theme.s._[(int)BrushId.Q_BG];
-            int n = mQSh.Count;
+            QuestionSheetContainer.Background = Theme.s._[(int)BrushId.Q_BG];
+            int n = QuestionSheet.Count;
             for (int i = 1, j = 0; i <= n; i += 2, ++j)
             {
-                gQuest.RowDefinitions.Add(new RowDefinition());
-                StackPanel q = SingleQuestionView.CreateSingleQuestionView(i, mQSh.Q(i - 1).Stem, mNee.mAnsSh.OptionContainers[i - 1]);
+                QuestionSheetContainer.RowDefinitions.Add(new RowDefinition());
+                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i - 1), i, ans_todo);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 0);
-                gQuest.Children.Add(q);
+                QuestionSheetContainer.Children.Add(q);
+                q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
+                q.Name = "_" + (i - 1).ToString();
             }
             for (int i = 2, j = 0; i <= n; i += 2, ++j)
             {
-                StackPanel q = SingleQuestionView.CreateSingleQuestionView(i, mQSh.Q(i - 1).Stem, mNee.mAnsSh.OptionContainers[i - 1]);
+                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i - 1), i, ans_todo);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 1);
-                gQuest.Children.Add(q);
+                QuestionSheetContainer.Children.Add(q);
+                q.Name = "_" + (i - 1).ToString();
             }
-            gQuest.Background = Theme.s._[(int)BrushId.BG];
+            QuestionSheetContainer.Background = Theme.s._[(int)BrushId.BG];
         }
 
-        
+        private void OptionsView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            thisExaminee.AnswerSheet.bChanged = true;
+            ListBox l = sender as ListBox;
+            if (l.SelectedItem == null)
+                return;
+            int qid = Convert.ToInt32(l.Name.Substring(1));
+            int i = -1;
+            foreach (ListBoxItem li in l.Items)
+            {
+                ++i;
+                if (li.IsSelected)
+                {
+                    thisExaminee.AnswerSheet.aAns[qid * 4 + i] = 1;
+                    OptionView v = li as OptionView;
+                    if (v != null)
+                        SelectedLabels[qid].Content = v.Idx_Label;
+                }
+                else
+                    thisExaminee.AnswerSheet.aAns[qid * 4 + i] = 0;
+            }
+        }
 
         public void Submit()
         {
@@ -278,8 +259,8 @@ namespace sQzClient
             bRunning = false;
             DisableAll();
             mState = NetCode.Submiting;
-            mNee.eStt = NeeStt.Submitting;
-            mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+            thisExaminee.eStt = NeeStt.Submitting;
+            thisExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             if (mClnt.ConnectWR(ref mCbMsg))
                 bBtnBusy = false;
         }
@@ -291,8 +272,8 @@ namespace sQzClient
             bBtnBusy = true;
             WPopup.s.wpCb = Submit;
             spMain.Opacity = 0.5;
-            WPopup.s.ShowDialog(Txt.s._[(int)TxI.SUBMIT_CAUT],
-                Txt.s._[(int)TxI.SUBMIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+            WPopup.s.ShowDialog(Txt.s._((int)TxI.SUBMIT_CAUT),
+                Txt.s._((int)TxI.SUBMIT), Txt.s._((int)TxI.BTN_CNCL), null);
             spMain.Opacity = 1;
         }
 
@@ -308,7 +289,7 @@ namespace sQzClient
                     if(l < 4)
                     {
                         rs = -1;
-                        msg = Txt.s._[(int)TxI.RECV_DAT_ER];
+                        msg = Txt.s._((int)TxI.RECV_DAT_ER);
                     }
                     else
                         rs = BitConverter.ToInt32(buf, offs);
@@ -317,30 +298,30 @@ namespace sQzClient
                     if(rs == 0)
                     {
                         ExamineeC e = new ExamineeC();
-                        if (!e.ReadByte(buf, ref offs))
+                        if (!e.ReadBytes_FromS1(buf, ref offs))
                         {
-                            mNee.Merge(e);
-                            btnSubmit.Content = mNee.Grade;
-                            msg = Txt.s._[(int)TxI.RESULT] + mNee.Grade;
+                            thisExaminee.MergeWithS1(e);
+                            btnSubmit.Content = thisExaminee.Grade;
+                            msg = Txt.s._((int)TxI.RESULT) + thisExaminee.Grade;
                         }
                         else
-                            msg = Txt.s._[(int)TxI.RECV_DAT_ER];
+                            msg = Txt.s._((int)TxI.RECV_DAT_ER);
                     }
                     else if (rs == (int)TxI.NEEID_NF)
-                        msg = Txt.s._[(int)TxI.NEEID_NF];
+                        msg = Txt.s._((int)TxI.NEEID_NF);
                     else if (rs == (int)TxI.RECV_DAT_ER)
-                        msg = Txt.s._[(int)TxI.RECV_DAT_ER];
+                        msg = Txt.s._((int)TxI.RECV_DAT_ER);
                     else if(msg == null)
                     {
                         if(l < 4)
-                            msg = Txt.s._[(int)TxI.RECV_DAT_ER];
+                            msg = Txt.s._((int)TxI.RECV_DAT_ER);
                         else
                         {
                             int sz = BitConverter.ToInt32(buf, offs);
                             l -= 4;
                             offs += 4;
                             if(l < sz)
-                                msg = Txt.s._[(int)TxI.RECV_DAT_ER];
+                                msg = Txt.s._((int)TxI.RECV_DAT_ER);
                             else
                                 msg = System.Text.Encoding.UTF8.GetString(buf, offs, sz);
                         }
@@ -362,7 +343,10 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Submiting:
-                    mNee.ToByte(out outBuf, (int)mState);
+                    List<byte[]> bytes = new List<byte[]>();
+                    bytes.Add(BitConverter.GetBytes((int)mState));
+                    bytes.AddRange(thisExaminee.GetBytes_SendingToS1());
+                    outBuf = Utils.ToArray_FromListOfBytes(bytes);
                     break;
                 default:
                     outBuf = null;
@@ -377,11 +361,11 @@ namespace sQzClient
             {
                 if (0 < dtRemn.Ticks)
                 {
-                    dtRemn = mNee.kDtDuration - (DateTime.Now - kDtStart);
-                    if (mNee.mAnsSh.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
+                    dtRemn = thisExaminee.kDtDuration - (DateTime.Now - kDtStart);
+                    if (thisExaminee.AnswerSheet.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
                     {
                         dtLastLog = DateTime.Now;
-                        mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+                        thisExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
                     }
                     Dispatcher.Invoke(() =>
                     {
@@ -399,7 +383,7 @@ namespace sQzClient
                     {
                         txtRTime.Text = "0 : 0";
                         spMain.Opacity = 0.5;
-                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
+                        WPopup.s.ShowDialog(Txt.s._((int)TxI.TIMEOUT));
                         spMain.Opacity = 1;
                         Submit();
                     });
@@ -411,8 +395,12 @@ namespace sQzClient
         {
             btnSubmit.IsEnabled = false;
             mTimer.Stop();
-            foreach (ListBox l in mNee.mAnsSh.OptionContainers)
-                l.IsEnabled = false;
+            foreach (object child in QuestionSheetContainer.Children)
+            {
+                SingleQuestionView question = child as SingleQuestionView;
+                if(question != null)
+                    question.optionsView.IsEnabled = false;
+            }
             btnExit.IsEnabled = true;
         }
 
@@ -420,8 +408,8 @@ namespace sQzClient
         {
             //WPopup.s.wpCb = null;
             //bBtnBusy = false;
-            if (mNee.mAnsSh.bChanged)
-                mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+            if (thisExaminee.AnswerSheet.bChanged)
+                thisExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
             Window.GetWindow(this).Close();
         }
 
@@ -437,12 +425,12 @@ namespace sQzClient
             bBtnBusy = true;
             WPopup.s.wpCb = Exit;
             spMain.Opacity = 0.5;
-            if (mNee.eStt < NeeStt.Submitting)
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_1],
-                    Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], "exit");
+            if (thisExaminee.eStt < NeeStt.Submitting)
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.EXIT_CAUT_1),
+                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), "exit");
             else
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_2],
-                    Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.EXIT_CAUT_2),
+                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), null);
             spMain.Opacity = 1;
         }
 

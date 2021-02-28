@@ -33,7 +33,7 @@ namespace sQzLib
         public string ComputerName;
         public DateTime dtTim1;
         public DateTime dtTim2;
-        public AnsSheet mAnsSh;
+        public AnsSheet AnswerSheet;
 
         public abstract void Reset();
 
@@ -47,7 +47,7 @@ namespace sQzLib
             Grade = LV_CAP;
             dtTim1 = dtTim2 = DT.INVALID;
             ComputerName = string.Empty;
-            mAnsSh = new AnsSheet();
+            AnswerSheet = new AnsSheet();
         }
 
         //public void ToByte(out byte[] buf, int prfx)

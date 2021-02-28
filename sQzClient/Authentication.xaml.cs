@@ -7,6 +7,7 @@ using System.Windows.Media;
 using System.Threading;
 using System.Windows.Input;
 using sQzLib;
+using System.Collections.Generic;
 
 namespace sQzClient
 {
@@ -20,7 +21,7 @@ namespace sQzClient
         UICbMsg mCbMsg;
         bool bRunning;
         DateTime mDt;
-        ExamineeC mNee;
+        ExamineeC thisExaminee;
         TakeExam pgTkExm;
 
         public Authentication()
@@ -33,9 +34,9 @@ namespace sQzClient
             bRunning = true;
 
             mDt = DT.INVALID;
-            mNee = new ExamineeC();
+            thisExaminee = new ExamineeC();
 
-            mNee.kDtDuration = new TimeSpan(1, 0, 0);
+            thisExaminee.kDtDuration = new TimeSpan(1, 0, 0);
         }
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
@@ -49,20 +50,21 @@ namespace sQzClient
             }
             if(tbxBirthdate.Text.Length > 10)
             {
-                mNee.Birthdate = null;
+                thisExaminee.Birthdate = null;
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.BIRDATE_NOK));
                 spMain.Opacity = 1;
                 return;
             }
-            mNee.Birthdate = tbxBirthdate.Text;
+            thisExaminee.ID = tbxId.Text;
+            thisExaminee.Birthdate = tbxBirthdate.Text;
             try
             {
-                mNee.ComputerName = Environment.MachineName;
+                thisExaminee.ComputerName = Environment.MachineName;
             }
             catch (InvalidOperationException)
             {
-                mNee.ComputerName = "unknown";
+                thisExaminee.ComputerName = "unknown";
             }
             DisableControls();
             Thread th = new Thread(() => {
@@ -125,7 +127,7 @@ namespace sQzClient
             switch (mState)
             {
                 case NetCode.Dating:
-                    if((mDt = DT.ReadByte(buf, ref offs)) == DT.INVALID && bRunning)
+                    if((mDt = DT.ReadByte(buf, ref offs)) != DT.INVALID && bRunning)
                     {
                         Dispatcher.Invoke(() => {
                             txtDate.Text = Txt.s._((int)TxI.DATE) + mDt.ToString(DT.RR);
@@ -144,12 +146,12 @@ namespace sQzClient
                     if(errc == 0)
                     {
                         ExamineeC e = new ExamineeC();
-                        e.bLog = mNee.bLog;
+                        e.bLog = thisExaminee.bLog;
                         bool b = e.ReadBytes_FromS1(buf, ref offs);
                         l = buf.Length - offs;
                         if (!b)
                         {
-                            mNee.MergeWithS1(e);
+                            thisExaminee.MergeWithS1(e);
                             mState = NetCode.ExamRetrieving;
                             return true;//continue
                         }
@@ -226,7 +228,7 @@ namespace sQzClient
                             Dispatcher.Invoke(() =>
                             {
                                 spMain.Opacity = 0.5;
-                                WPopup.s.ShowDialog(Txt.s._[(int)TxI.QS_READ_ER]);
+                                WPopup.s.ShowDialog(Txt.s._((int)TxI.QS_READ_ER));
                                 spMain.Opacity = 1;
                                 EnableControls();
                             });
@@ -236,8 +238,8 @@ namespace sQzClient
                         Dispatcher.Invoke(() =>
                         {
                             pgTkExm = new TakeExam();
-                            pgTkExm.mNee = mNee;
-                            pgTkExm.mQSh = qs;
+                            pgTkExm.thisExaminee = thisExaminee;
+                            pgTkExm.QuestionSheet = qs;
                             NavigationService.Navigate(pgTkExm);
                         });
                     break;
@@ -248,19 +250,24 @@ namespace sQzClient
         public byte[] ClntBufPrep()
         {
             byte[] outBuf;
+            List<byte[]> bytes;
             switch (mState)
             {
                 case NetCode.Dating:
                     outBuf = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.Authenticating:
-                    mNee.ToByte(out outBuf, (int)mState);
+                    bytes = new List<byte[]>();
+                    bytes.Add(BitConverter.GetBytes((int)mState));
+                    bytes.AddRange(thisExaminee.GetBytes_SendingToS1());
+                    outBuf = Utils.ToArray_FromListOfBytes(bytes);
                     break;
                 case NetCode.ExamRetrieving:
-                    outBuf = new byte[12];
-                    Buffer.BlockCopy(BitConverter.GetBytes((int)mState), 0, outBuf, 0, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.LvId), 0, outBuf, 4, 4);
-                    Buffer.BlockCopy(BitConverter.GetBytes(mNee.mAnsSh.uQSId), 0, outBuf, 8, 4);
+                    bytes = new List<byte[]>();
+                    bytes.Add(BitConverter.GetBytes((int)mState));
+                    Utils.AppendBytesOfString(thisExaminee.ID, bytes);
+                    bytes.Add(BitConverter.GetBytes(thisExaminee.AnswerSheet.uQSId));
+                    outBuf = Utils.ToArray_FromListOfBytes(bytes);
                     break;
                 default:
                     outBuf = null;
@@ -291,13 +298,13 @@ namespace sQzClient
                 filePath = dlg.FileName;
             if (filePath != null)
             {
-                if(mNee.ReadLogFile(filePath))
+                if(thisExaminee.ReadLogFile(filePath))
                 {
-                    tbxId.Text = mNee.tId;
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
+                    tbxId.Text = thisExaminee.ID;
+                    WPopup.s.ShowDialog(Txt.s._((int)TxI.OPEN_LOG_OK));
                 }
                 else
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.OPEN_LOG_OK]);
+                    WPopup.s.ShowDialog(Txt.s._((int)TxI.OPEN_LOG_OK));
             }
             spMain.Opacity = 1;
             //EnableControls();
@@ -306,9 +313,7 @@ namespace sQzClient
         private void EnableControls()
         {
             tbxId.IsEnabled =
-            tbxD.IsEnabled =
-            tbxM.IsEnabled =
-            tbxY.IsEnabled =
+            tbxBirthdate.IsEnabled =
             btnOpenLog.IsEnabled =
             btnSignIn.IsEnabled = true;
         }
@@ -316,9 +321,7 @@ namespace sQzClient
         private void DisableControls()
         {
             tbxId.IsEnabled =
-            tbxD.IsEnabled =
-            tbxM.IsEnabled =
-            tbxY.IsEnabled =
+            tbxBirthdate.IsEnabled =
             btnOpenLog.IsEnabled =
             btnSignIn.IsEnabled = false;
         }
@@ -339,7 +342,7 @@ namespace sQzClient
                     Dispatcher.Invoke(() =>
                     {
                         spMain.Opacity = 0.5;
-                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.CONN_NOK]);
+                        WPopup.s.ShowDialog(Txt.s._((int)TxI.CONN_NOK));
                         spMain.Opacity = 1;
                         btnReconn.IsEnabled = true;
                     });
