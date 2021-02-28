@@ -47,7 +47,7 @@ namespace sQzLib
 
             bLog = false;
 
-            return Utils.ListOfBytes_ToArray(l);
+            return Utils.ToArray_FromListOfBytes(l);
         }
 
         public bool ReadBytes_FromClient(byte[] buf, ref int offs)

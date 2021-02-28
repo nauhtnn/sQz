@@ -219,7 +219,7 @@ namespace sQzLib
             return null;
         }
 
-        public byte[] ToByteNextQS()
+        public byte[] GetBytes_NextQSheet()
         {
             if (mMaxQSIdx < 0)
                 return null;
@@ -229,28 +229,6 @@ namespace sQzLib
                 return vSheet.ElementAt(mNextQSIdx++).Value.aQuest;
             else
                 return null;
-        }
-
-        //public List<int[]> GetNMod()
-        //{
-        //    if (vSheet.Values.Count == 0)
-        //        return null;
-        //    return vSheet.First().Value.GetNMod();
-        //}
-
-        public void WriteTxt()
-        {
-            //string extension = ".txt";
-            //foreach (QuestSheet qs in vSheet.Values)
-            //    qs.WriteTxt(qs.eLv.ToString() + qs.uId + extension);
-        }
-
-        public void WriteDocx()
-        {
-            //string extension = ".docx";
-            //foreach (QuestSheet qs in vSheet.Values)
-            //    QuestSheetDocxPrinter.GetInstance().Print(qs.eLv.ToString() + qs.uId + extension,
-            //        qs.ToListOfStrings(), mDt.ToString(DT.RR), qs.tId);
         }
     }
 }

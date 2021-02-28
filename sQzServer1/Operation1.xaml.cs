@@ -251,7 +251,7 @@ namespace sQzServer1
                     int qsid = BitConverter.ToInt32(buf, offs);
                     if (qsid == ExamineeA.LV_CAP)
                     {
-                        byte[] a = Slot.ToByteNextQS();
+                        byte[] a = Slot.GetBytes_NextQSheet();
                         if (a != null)
                         {
                             outMsg = new byte[a.Length + 4];
@@ -372,7 +372,7 @@ namespace sQzServer1
                             WPopup.s.ShowDialog("QuestRetrieving: Date time not match!"));
                         break;
                     }
-                    if (Slot.ReadBytesQPack_NoDateTime(buf, ref offs))
+                    if (Slot.ReadBytes_QPacksNoDateTime(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() => 
                             WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_Q_NOK)));
@@ -440,8 +440,8 @@ namespace sQzServer1
                 case NetCode.SrvrSubmitting:
                     List<byte[]> bytes = new List<byte[]>();
                     bytes.Add(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
-                    bytes.InsertRange(bytes.Count, Slot.GetBytesRoom_SendingToS0());
-                    outMsg = Utils.ListOfBytes_ToArray(bytes);
+                    bytes.InsertRange(bytes.Count, Slot.GetBytes_RoomSendingToS0());
+                    outMsg = Utils.ToArray_FromListOfBytes(bytes);
                     break;
             }
             return outMsg;

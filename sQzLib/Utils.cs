@@ -31,7 +31,7 @@ namespace sQzLib
             byteList.Add(b);
         }
 
-        public static byte[] ListOfBytes_ToArray(List<byte[]> l)
+        public static byte[] ToArray_FromListOfBytes(List<byte[]> l)
         {
             int sz = 0;
             foreach (byte[] x in l)

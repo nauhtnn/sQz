@@ -444,13 +444,13 @@ namespace sQzLib
             return false;
         }
 
-        public byte[] GetBytesQPack_WithDateTime(int rid)
+        public byte[] GetBytes_QPacksWithDateTime(int rid)
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.GetBytes(mDt));
             l.InsertRange(l.Count, QuestionPack.ToByte());
 
-            return Utils.ListOfBytes_ToArray(l);
+            return Utils.ToArray_FromListOfBytes(l);
         }
 
         public int CountQSByRoom()
@@ -478,6 +478,13 @@ namespace sQzLib
             return rid;
         }
 
+        public byte[] GetBytes_KeysWithDateTime()
+        {
+            List<byte[]> l = mKeyPack.ToByte();
+            l.Insert(0, DT.GetBytes(mDt));
+            return Utils.ToArray_FromListOfBytes(l);
+        }
+
         public int ReadBytes_FromS1(byte[] buf, ref int offs)
         {
             if (Dt != DT.ReadByte(buf, ref offs))
@@ -488,7 +495,7 @@ namespace sQzLib
             return rid;
         }
 
-        public byte[] GetBytesRoom_S0SendingToS1(int rId)
+        public byte[] GetBytes_RoomSendingToS1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.GetBytes(Dt));
@@ -498,7 +505,7 @@ namespace sQzLib
             else
                 l.Add(BitConverter.GetBytes(-1));//should raise error message box here
 
-            return Utils.ListOfBytes_ToArray(l);
+            return Utils.ToArray_FromListOfBytes(l);
         }
     }
 }

@@ -60,7 +60,7 @@ namespace sQzLib
             return false;
         }
 
-        public List<byte[]> GetBytesRoom_SendingToS0()
+        public List<byte[]> GetBytes_RoomSendingToS0()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(DT.GetBytes(mDt));
@@ -72,6 +72,23 @@ namespace sQzLib
             else
                 l.Add(BitConverter.GetBytes((int)0));
             return l;
+        }
+
+        public bool ReadBytes_QPacksNoDateTime(byte[] buf, ref int offs)
+        {
+            if (QuestionPack.ReadByte(buf, ref offs))
+                return true;
+            return false;
+        }
+
+        public byte[] GetBytes_NextQSheet()
+        {
+            return QuestionPack.GetBytes_NextQSheet();
+        }
+
+        public bool ReadByteKey_NoDateTime(byte[] buf, ref int offs)
+        {
+            return mKeyPack.ReadByte(buf, ref offs);
         }
     }
 }
