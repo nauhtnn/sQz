@@ -23,7 +23,7 @@ namespace sQzServer1
         public SortedList<string, bool> vbLock;
         public SortedList<string, CheckBox> vAbsen;
         Grid grdNee;
-        public ExamSlotA mSl;
+        public ExamSlotS1 mSl;
         bool bQShowed;
         bool bNeeShowed;
         public ToSubmitCb toSubmCb;
@@ -54,7 +54,7 @@ namespace sQzServer1
             vDt1.Clear();
             vDt2.Clear();
             int rid = -1;
-            foreach (ExamRoomA r in mSl.Rooms.Values)
+            foreach (ExamRoomS1 r in mSl.Rooms.Values)
                 foreach (ExamineeA e in r.Examinees.Values)
                 {
                     RowDefinition rd = new RowDefinition();
@@ -241,8 +241,8 @@ namespace sQzServer1
         private void cbxAbsen_Unchecked(object sender, RoutedEventArgs e)
         {
             CheckBox cbx = sender as CheckBox;
-            ExamineeA nee;
-            foreach (ExamRoomA r in mSl.Rooms.Values)
+            ExamineeS1 nee;
+            foreach (ExamRoomS1 r in mSl.Rooms.Values)
                 if(r.Examinees.TryGetValue(cbx.Name, out nee) &&
                     nee.eStt != NeeStt.Finished)
                 {
@@ -260,7 +260,7 @@ namespace sQzServer1
         public bool ToSubmit()
         {
             CheckBox cbx;
-            foreach (ExamRoomA r in mSl.Rooms.Values)
+            foreach (ExamRoomS1 r in mSl.Rooms.Values)
                 foreach (ExamineeA nee in r.Examinees.Values)
                     if (nee.eStt != NeeStt.Finished &&
                         (!vAbsen.TryGetValue(nee.ID, out cbx) ||

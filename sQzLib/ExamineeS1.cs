@@ -23,7 +23,7 @@ namespace sQzLib
             bLog = false;
         }
 
-        public byte[] GetBytes_S1SendingToClient()
+        public byte[] GetBytes_SendingToClient()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((int)eStt));
@@ -50,7 +50,7 @@ namespace sQzLib
             return Utils.ListOfBytes_ToArray(l);
         }
 
-        public bool ReadByte_FromClient(byte[] buf, ref int offs)
+        public bool ReadBytes_FromClient(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
             //
@@ -123,7 +123,7 @@ namespace sQzLib
             return false;
         }
 
-        public bool ReadByteS(byte[] buf, ref int offs)
+        public bool ReadBytes_FromS0(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
             //
@@ -225,7 +225,7 @@ namespace sQzLib
             return false;
         }
 
-        public List<byte[]> ToByte_S1SendingToS0()
+        public List<byte[]> ToByte_SendingToS0()
         {
             //suppose eStt == NeeStt.Finished
             List<byte[]> l = new List<byte[]>();
@@ -250,13 +250,13 @@ namespace sQzLib
             return l;
         }
 
-        public override void Merge(ExamineeA e)
-        {
-            if (bFromC)
-                MergeWithClient(e as ExamineeS1);
-            else
-                MergeWithS0(e as ExamineeS0);
-        }
+        //public override void Merge(ExamineeA e)
+        //{
+        //    if (bFromC)
+        //        MergeWithClient(e as ExamineeS1);
+        //    else
+        //        MergeWithS0(e as ExamineeS0);
+        //}
 
         public void MergeWithClient(ExamineeS1 e)
         {

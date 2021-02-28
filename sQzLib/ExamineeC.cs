@@ -31,7 +31,7 @@ namespace sQzLib
             tLog = new StringBuilder();
         }
 
-        public List<byte[]> GetBytes_ClientSendingToS1()
+        public List<byte[]> GetBytes_SendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
             Utils.AppendBytesOfString(ID, l);
@@ -57,7 +57,7 @@ namespace sQzLib
             return l;
         }
 
-        public bool ReadBytesFromS1(byte[] buf, ref int offs)
+        public bool ReadBytes_FromS1(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
 
@@ -117,7 +117,7 @@ namespace sQzLib
             return false;
         }
 
-        public override void Merge(ExamineeA e)
+        public void MergeWithS1(ExamineeA e)
         {
             if (e.eStt == NeeStt.Finished)
                 Grade = e.Grade;

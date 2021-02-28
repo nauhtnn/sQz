@@ -50,41 +50,37 @@ namespace sQzLib
             mAnsSh = new AnsSheet();
         }
 
-        public void ToByte(out byte[] buf, int prfx)
-        {
-            List<byte[]> l = new List<byte[]>();// GetBytes_ClientSendingToS1();
-            int sz = 4;
-            foreach (byte[] i in l)
-                sz += i.Length;
-            buf = new byte[sz];
-            sz = 0;
-            Buffer.BlockCopy(BitConverter.GetBytes(prfx), 0, buf, sz, 4);
-            sz += 4;
-            foreach (byte[] i in l)
-            {
-                Buffer.BlockCopy(i, 0, buf, sz, i.Length);
-                sz += i.Length;
-            }
-        }
+        //public void ToByte(out byte[] buf, int prfx)
+        //{
+        //    List<byte[]> l = new List<byte[]>();// GetBytes_ClientSendingToS1();
+        //    int sz = 4;
+        //    foreach (byte[] i in l)
+        //        sz += i.Length;
+        //    buf = new byte[sz];
+        //    sz = 0;
+        //    Buffer.BlockCopy(BitConverter.GetBytes(prfx), 0, buf, sz, 4);
+        //    sz += 4;
+        //    foreach (byte[] i in l)
+        //    {
+        //        Buffer.BlockCopy(i, 0, buf, sz, i.Length);
+        //        sz += i.Length;
+        //    }
+        //}
 
-        public void ToByte(out byte[] buf)
-        {
-            List<byte[]> l = new List<byte[]>();// GetBytes_ClientSendingToS1();
-            int sz = 0;
-            foreach (byte[] i in l)
-                sz += i.Length;
-            buf = new byte[sz];
-            sz = 0;
-            foreach (byte[] i in l)
-            {
-                Buffer.BlockCopy(i, 0, buf, sz, i.Length);
-                sz += i.Length;
-            }
-        }
-
-        //public abstract bool ReadByte(byte[] buf, ref int offs);
-
-        public abstract void Merge(ExamineeA e);
+        //public void ToByte(out byte[] buf)
+        //{
+        //    List<byte[]> l = new List<byte[]>();// GetBytes_ClientSendingToS1();
+        //    int sz = 0;
+        //    foreach (byte[] i in l)
+        //        sz += i.Length;
+        //    buf = new byte[sz];
+        //    sz = 0;
+        //    foreach (byte[] i in l)
+        //    {
+        //        Buffer.BlockCopy(i, 0, buf, sz, i.Length);
+        //        sz += i.Length;
+        //    }
+        //}
 
         //public string Grade { get { return Math.Round((float)uGrade * 0.333, 1).ToString(); } }
     }

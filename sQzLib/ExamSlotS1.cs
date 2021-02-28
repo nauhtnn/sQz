@@ -32,5 +32,46 @@ namespace sQzLib
                     return o;
             return null;
         }
+
+        public bool ReadBytes_FromS0(byte[] buf, ref int offs)
+        {
+            if ((Dt = DT.ReadByte(buf, ref offs)) == DT.INVALID)
+                return true;
+            if (buf.Length - offs < 4)
+                return true;
+            int rId;
+            if ((rId = BitConverter.ToInt32(buf, offs)) < 0)
+                return true;
+            offs += 4;
+            ExamRoomS1 r;
+            if (Rooms.TryGetValue(rId, out r))
+            {
+                if (r.ReadBytes_FromS0(buf, ref offs))
+                    return true;
+            }
+            else
+            {
+                r = new ExamRoomS1();
+                r.uId = rId;
+                if (r.ReadBytes_FromS0(buf, ref offs))
+                    return true;
+                Rooms.Add(rId, r);
+            }
+            return false;
+        }
+
+        public List<byte[]> GetBytesRoom_SendingToS0()
+        {
+            List<byte[]> l = new List<byte[]>();
+            l.Add(DT.GetBytes(mDt));
+            if (Rooms.Values.Count == 1)//either 0 or 1
+            {
+                foreach (ExamRoomS1 r in Rooms.Values)
+                    l.InsertRange(l.Count, r.GetBytes_SendingToS0());
+            }
+            else
+                l.Add(BitConverter.GetBytes((int)0));
+            return l;
+        }
     }
 }

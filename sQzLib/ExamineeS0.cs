@@ -22,7 +22,7 @@ namespace sQzLib
             bToVw = bToDB = false;
         }
 
-        public override List<byte[]> GetBytes_ClientSendingToS1()
+        public List<byte[]> GetBytes_ClientSendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
             Utils.AppendBytesOfString(ID, l);
@@ -47,7 +47,7 @@ namespace sQzLib
             return l;
         }
 
-        public override bool ReadByte(byte[] buf, ref int offs)
+        public bool ReadByte_FromS1(byte[] buf, ref int offs)
         {
             //suppose eStt == NeeStt.Finished
             int l = buf.Length - offs;
@@ -119,7 +119,7 @@ namespace sQzLib
             return false;
         }
 
-        public override void Merge(ExamineeA e)
+        public void MergeWithS1(ExamineeA e)
         {
             if (eStt == NeeStt.Finished)
                 return;

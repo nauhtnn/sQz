@@ -462,7 +462,7 @@ namespace sQzLib
             return n;
         }
 
-        public int ReadByteR0(byte[] buf, ref int offs)
+        private int ReadBytes_RoomFromS1(byte[] buf, ref int offs)
         {
             if (buf.Length - offs < 4)
                 return -1;
@@ -476,16 +476,16 @@ namespace sQzLib
             offs += 4;
             ExamRoomS0 r;
             if (!Rooms.TryGetValue(rid, out r) ||
-                r.ReadBytes(buf, ref offs, new ExamineeS0(), false))
+                r.ReadBytes_FromS1(buf, ref offs))
                 return -1;
             return rid;
         }
 
-        public int ReadByteSl0(byte[] buf, ref int offs)
+        public int ReadBytes_FromS1(byte[] buf, ref int offs)
         {
             if (Dt != DT.ReadByte(buf, ref offs))
                 return -1;
-            int rid = ReadByteR0(buf, ref offs);
+            int rid = ReadBytes_RoomFromS1(buf, ref offs);
             if (rid < 0)
                 return -1;
             return rid;
@@ -497,7 +497,7 @@ namespace sQzLib
             l.Add(DT.GetBytes(Dt));
             ExamRoomS0 r;
             if (Rooms.TryGetValue(rId, out r))
-                l.InsertRange(l.Count, r.GetBytes_S0SendingToS1());
+                l.InsertRange(l.Count, r.GetBytes_SendingToS1());
             else
                 l.Add(BitConverter.GetBytes(-1));//should raise error message box here
 

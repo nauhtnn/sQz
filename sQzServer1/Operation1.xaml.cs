@@ -143,8 +143,7 @@ namespace sQzServer1
                     return true;
                 case NetCode.Authenticating:
                     e = new ExamineeS1();
-                    e.bFromC = true;
-                    e.ReadByte_FromClient(buf, ref offs);
+                    e.ReadBytes_FromClient(buf, ref offs);
                     bool lck = true;
                     bool found = false;
                     foreach (SortedList<string, bool> l in vfbLock)
@@ -188,8 +187,7 @@ namespace sQzServer1
                                         vw.vbLock[o.ID] = true;
                                 }
                             });
-                            o.bFromC = true;
-                            byte[] a = o.GetBytes_S1SendingToClient();
+                            byte[] a = o.GetBytes_SendingToClient();
                             outMsg = new byte[4 + a.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
                             Buffer.BlockCopy(a, 0, outMsg, 4, a.Length);
@@ -277,8 +275,7 @@ namespace sQzServer1
                     break;
                 case NetCode.Submiting:
                     e = new ExamineeS1();
-                    e.bFromC = true;
-                    if (!e.ReadByte(buf, ref offs))
+                    if (!e.ReadBytes_FromClient(buf, ref offs))
                     {
                         AnsSheet keySh = null;
                         found = false;
@@ -292,7 +289,7 @@ namespace sQzServer1
                             outMsg = BitConverter.GetBytes(101);//todo
                             break;
                         }
-                        ExamineeA o = null;
+                        ExamineeS1 o = null;
                         found = false;
                         if ((o = Slot.Find(e.ID)) != null)
                             break;
@@ -329,7 +326,10 @@ namespace sQzServer1
                                 if (toSubm)
                                     ToSubmit(true);
                             });
-                            o.ToByte(out outMsg, 0);
+                            byte[] a = o.GetBytes_SendingToClient();
+                            outMsg = new byte[4 + a.Length];
+                            Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
+                            Buffer.BlockCopy(a, 0, outMsg, 4, a.Length);
                         }
                         else
                         {
@@ -356,7 +356,7 @@ namespace sQzServer1
             switch (mState)
             {
                 case NetCode.Srvr1DatRetriving:
-                    if (Slot.ReadBytes_S1RecevingFromS0(buf, ref offs))
+                    if (Slot.ReadBytes_FromS0(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
                             WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_DT_NOK)));
@@ -438,7 +438,10 @@ namespace sQzServer1
                     outMsg = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.SrvrSubmitting:
-                    outMsg = mBrd.ToByteSl0(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
+                    List<byte[]> bytes = new List<byte[]>();
+                    bytes.Add(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
+                    bytes.InsertRange(bytes.Count, Slot.GetBytesRoom_SendingToS0());
+                    outMsg = Utils.ListOfBytes_ToArray(bytes);
                     break;
             }
             return outMsg;

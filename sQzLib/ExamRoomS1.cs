@@ -29,12 +29,32 @@ namespace sQzLib
             return null;
         }
 
-        public bool ReadBytes(byte[] buf, ref int offs)
+        public bool ReadBytes_FromS0(byte[] buf, ref int offs)
         {
-            return ReadBytes(buf, ref offs, new ExamineeS1(), true);
+            if (buf == null)
+                return true;
+            if (buf.Length - offs < 0)
+                return true;
+            int n = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            if (n < 0)
+                return true;
+            while (0 < n)
+            {
+                --n;
+                ExamineeS1 newNee = new ExamineeS1();
+                if (newNee.ReadBytes_FromS0(buf, ref offs))
+                    return true;
+                ExamineeS1 o;
+                if (Examinees.TryGetValue(newNee.ID, out o))
+                    o.MergeWithS0(newNee);
+                else
+                    Examinees.Add(newNee.ID, newNee);
+            }
+            return false;
         }
 
-        public List<byte[]> GetBytes()
+        public List<byte[]> GetBytes_SendingToS0()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uId));
@@ -43,7 +63,7 @@ namespace sQzLib
                 if (e.eStt == NeeStt.Finished && e.NRecd)
                 {
                     ++n;
-                    l.InsertRange(l.Count, e.ToByte_S1SendingToS0());
+                    l.InsertRange(l.Count, e.ToByte_SendingToS0());
                 }
             l.Insert(1, BitConverter.GetBytes(n));
             return l;

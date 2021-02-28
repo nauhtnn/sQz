@@ -242,7 +242,7 @@ namespace sQzLib
             return sb.ToString();
         }
 
-        public List<byte[]> GetBytes()
+        public List<byte[]> GetBytes_SendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(uId));
@@ -250,6 +250,29 @@ namespace sQzLib
             foreach (ExamineeS0 e in Examinees.Values)
                 l.InsertRange(l.Count, e.GetBytes_ClientSendingToS1());
             return l;
+        }
+
+        public bool ReadBytes_FromS1(byte[] buf, ref int offs)
+        {
+            if (buf == null)
+                return true;
+            if (buf.Length - offs < 0)
+                return true;
+            int n = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            if (n < 0)
+                return true;
+            while (0 < n)
+            {
+                --n;
+                ExamineeS0 newNee = new ExamineeS0();
+                if (newNee.ReadByte_FromS1(buf, ref offs))
+                    return true;
+                ExamineeS0 o;
+                if (Examinees.TryGetValue(newNee.ID, out o))
+                    o.MergeWithS1(newNee);
+            }
+            return false;
         }
     }
 }

@@ -15,22 +15,22 @@ namespace sQzServer0
     {
         Grid grdDB;
         Grid grdTmp;
-        public ExamSlotA mSlDB;
-        public ExamSlotA mSlTmp;
+        public ExamSlotS0 mSlDB;
+        public ExamSlotS0 mSlTmp;
         TabItem tbiDB, tbiTmp;
 
         public PrepNeeView() { }
-        public PrepNeeView(ExamSlotA sl)
+        public PrepNeeView(ExamSlotS0 sl)
         {
             mSlDB = sl;
             Header = mSlDB.Dt.ToString(DT._);
             Name = DT.CreateNameFromDateTime(Header as string);
-            mSlTmp = new ExamSlotA();
+            mSlTmp = new ExamSlotS0();
             mSlTmp.Dt = mSlDB.Dt;
-            foreach (ExamRoomA rom in mSlDB.Rooms.Values)
+            foreach (ExamRoomS0 rom in mSlDB.Rooms.Values)
                 if (!mSlTmp.Rooms.ContainsKey(rom.uId))
                 {
-                    ExamRoomA r = new ExamRoomA();
+                    ExamRoomS0 r = new ExamRoomS0();
                     r.uId = rom.uId;
                     mSlTmp.Rooms.Add(r.uId, r);
                 }
@@ -244,7 +244,7 @@ namespace sQzServer0
             SolidColorBrush br = new SolidColorBrush(c);
             GridLength rh = new GridLength(26);
             Grid g;
-            ExamSlotA sl;
+            ExamSlotS0 sl;
             if (db)
             {
                 sl = mSlDB;
@@ -256,7 +256,7 @@ namespace sQzServer0
                 g = grdTmp;
             }
             int n = 0;
-            foreach (ExamRoomA r in sl.Rooms.Values)
+            foreach (ExamRoomS0 r in sl.Rooms.Values)
                 n += r.Examinees.Count;
             StringBuilder sb = new StringBuilder();
             if(db)
@@ -271,7 +271,7 @@ namespace sQzServer0
             }
             g.Children.Clear();
             int rid = -1;
-            foreach (ExamRoomA r in sl.Rooms.Values)
+            foreach (ExamRoomS0 r in sl.Rooms.Values)
                 foreach (ExamineeA e in r.Examinees.Values)
                 {
                     rid++;

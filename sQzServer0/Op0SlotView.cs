@@ -23,7 +23,7 @@ namespace sQzServer0
         public Dictionary<int, TextBlock> vRT2;
         Dictionary<int, TextBlock> vRPw;
         Grid grdNee;
-        public ExamSlotA mSl;
+        public ExamSlotS0 mSl;
         bool bInitNMod;
 
         public Op0SlotView()
@@ -31,7 +31,7 @@ namespace sQzServer0
             Init();
         }
 
-        public Op0SlotView(ExamSlotA sl)
+        public Op0SlotView(ExamSlotS0 sl)
         {
             Init();
             //
@@ -56,8 +56,8 @@ namespace sQzServer0
             bool even = false;
             int rid = -1;
             GridLength rh = new GridLength(26);
-            foreach (ExamRoomA r in mSl.Rooms.Values)
-                foreach (ExamineeA e in r.Examinees.Values)
+            foreach (ExamRoomS0 r in mSl.Rooms.Values)
+                foreach (ExamineeS0 e in r.Examinees.Values)
                 {
                     rid++;
                     if (even)
@@ -141,7 +141,7 @@ namespace sQzServer0
 
         public void UpdateRsView(int rid)
         {
-            ExamRoomA r;
+            ExamRoomS0 r;
             if (!mSl.Rooms.TryGetValue(rid, out r))
                 return;
             if (vRT2.ContainsKey(rid))
@@ -226,7 +226,7 @@ namespace sQzServer0
             int i = 1;
             SolidColorBrush br = new SolidColorBrush(Colors.Black);
             Thickness th = new Thickness(0, 0, 0, 1);
-            foreach (ExamRoomA r in mSl.Rooms.Values)
+            foreach (ExamRoomS0 r in mSl.Rooms.Values)
             {
                 RowDefinition rd = new RowDefinition();
                 rd.Height = h;

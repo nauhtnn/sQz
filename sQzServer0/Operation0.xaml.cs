@@ -25,7 +25,7 @@ namespace sQzServer0
         Server2 mServer;
         UICbMsg mCbMsg;
         bool bRunning;
-        ExamSlotA Slot;
+        ExamSlotS0 Slot;
         TabItem tbiSelected;
 
         public Operation0()
@@ -51,7 +51,7 @@ namespace sQzServer0
         private void LoadBrd()
         {
             string emsg;
-            List<DateTime> v = ExamSlotA.DBSelectSlotIDs(false, out emsg);
+            List<DateTime> v = ExamSlotS0.DBSelectSlotIDs(false, out emsg);
             if (v == null)
             {
                 spMain.Opacity = 0.5;
@@ -195,7 +195,7 @@ namespace sQzServer0
                     break;
                 case NetCode.SrvrSubmitting:
                     int rid;
-                    if (-1 < (rid = Slot.ReadByteSl0(buf, ref offs)))
+                    if (-1 < (rid = Slot.ReadBytes_FromS1(buf, ref offs)))
                     {
                         string emsg;
                         if (Slot.DBUpdateRs(rid, out emsg))
@@ -282,7 +282,7 @@ namespace sQzServer0
             if (i == null)
                 return;
 
-            Slot = new ExamSlotA();
+            Slot = new ExamSlotS0();
             DateTime dt;
             DT.To_(i.Content as string, out dt);
             Slot.Dt = dt;
