@@ -151,7 +151,7 @@ namespace sQzClient
             Label l = new Label();
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             //int nAns = 4;//hardcode
-            int n = QuestionSheet.Count;
+            int n = QuestionSheet.CountAllQuestions();
             SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
             //next lines
             //n -= 1;
@@ -180,6 +180,7 @@ namespace sQzClient
                 SelectedLabels.Add(j, l);
             }
             //bottom lines
+            ++j;
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
             l.Content = j;

@@ -28,6 +28,14 @@ namespace sQzLib
                 return sb.ToString();
             } }
 
+        public int CountAllQuestions()
+        {
+            int count = IndependentQuestions.Count;
+            foreach (PassageWithQuestions p in Passages.Values)
+                count += p.Questions.Count;
+            return count;
+        }
+
         public QuestSheet()
         {
             IndependentQuestions = new List<Question>();
