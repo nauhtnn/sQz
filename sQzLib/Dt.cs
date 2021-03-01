@@ -79,41 +79,6 @@ namespace sQzLib
             return DateTime.FromBinary(BitConverter.ToInt64(buf, offs - sizeof(long)));
         }
 
-        //public static bool ToByteh(byte[] buf, ref int offs, DateTime dt)
-        //{
-        //    if (buf.Length < 8)
-        //        return true;
-        //    Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, offs, 4);
-        //    offs += 4;
-        //    Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, offs, 4);
-        //    offs += 4;
-        //    return false;
-        //}
-
-        //public static byte[] ToByteh(DateTime dt)
-        //{
-        //    byte[] buf = new byte[8];
-        //    Array.Copy(BitConverter.GetBytes(dt.Hour), 0, buf, 0, 4);
-        //    Array.Copy(BitConverter.GetBytes(dt.Minute), 0, buf, 4, 4);
-        //    return buf;
-        //}
-
-        //public static bool ReadByteh(byte[] buf, ref int offs, out DateTime dt)
-        //{
-        //    if (buf.Length - offs < 8)
-        //    {
-        //        dt = INV_;
-        //        return true;
-        //    }
-        //    int H = BitConverter.ToInt32(buf, offs);
-        //    offs += 4;
-        //    int m = BitConverter.ToInt32(buf, offs);
-        //    offs += 4;
-        //    if (To_(H.ToString("d2") + ':' + m.ToString("d2"), hh, out dt))
-        //        return true;
-        //    return false;
-        //}
-
         public static string CreateNameFromDateTime(string dt)
         {
             return "_" + dt.Replace(':', '_').Replace('-', '_').Replace(' ', '_');

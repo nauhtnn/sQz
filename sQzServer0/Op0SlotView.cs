@@ -113,7 +113,7 @@ namespace sQzServer0
                     t.Background = bg;
                     vDt1.Add(e.ID, t);
                     if (e.dtTim1.Year != DT.INV)
-                        t.Text = e.dtTim1.ToString("HH:mm");
+                        t.Text = e.dtTim1.ToString(DT.hh);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 6);
                     grdNee.Children.Add(t);
@@ -122,7 +122,7 @@ namespace sQzServer0
                     t.Background = bg;
                     vDt2.Add(e.ID, t);
                     if (e.dtTim2.Year != DT.INV)
-                        t.Text = e.dtTim2.ToString("HH:mm");
+                        t.Text = e.dtTim2.ToString(DT.hh);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 7);
                     grdNee.Children.Add(t);
@@ -144,7 +144,7 @@ namespace sQzServer0
             if (!mSl.Rooms.TryGetValue(rid, out r))
                 return;
             if (vRT2.ContainsKey(rid))
-                vRT2[rid].Text = DateTime.Now.ToString(DT._);
+                vRT2[rid].Text = DateTime.Now.ToString(DT.hh);
             foreach (ExamineeS0 e in r.Examinees.Values)
                 if(e.bToVw)
                 {
@@ -153,9 +153,9 @@ namespace sQzServer0
                     if (e.CorrectCount != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
                         t.Text = e.CorrectCount.ToString();
                     if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.ID, out t))
-                        t.Text = e.dtTim1.ToString("HH:mm");
+                        t.Text = e.dtTim1.ToString(DT.hh);
                     if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.ID, out t))
-                        t.Text = e.dtTim2.ToString("HH:mm");
+                        t.Text = e.dtTim2.ToString(DT.hh);
                     if (e.ComputerName != null && vComp.TryGetValue(e.ID, out t))
                         t.Text = e.ComputerName;
                 }
@@ -254,7 +254,7 @@ namespace sQzServer0
                 t = new TextBlock();
                 vRT1.Add(r.uId, t);
                 if (r.t1.Hour != DT.INV)
-                    t.Text = r.t1.ToString(DT._);
+                    t.Text = r.t1.ToString(DT.hh);
                 t.TextAlignment = TextAlignment.Center;
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 2);
@@ -263,7 +263,7 @@ namespace sQzServer0
                 t = new TextBlock();
                 vRT2.Add(r.uId, t);
                 if (r.t2.Hour != DT.INV)
-                    t.Text = r.t2.ToString(DT._);
+                    t.Text = r.t2.ToString(DT.hh);
                 t.TextAlignment = TextAlignment.Center;
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 3);
