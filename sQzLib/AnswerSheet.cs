@@ -10,17 +10,16 @@ namespace sQzLib
 {
     public class AnswerSheet
     {
-        public const int LEN = 120;
-        public int questSheetID;
-        public int uQSId { get { return (ExamineeA.LV_CAP < questSheetID) ? questSheetID - ExamineeA.LV_CAP : questSheetID; } }
+        public int BytesOfAnswer_Length;
+        public int QuestSheetID;
         public bool bChanged;
-        public byte[] aAns;
+        public byte[] BytesOfAnswer;
         public string tAns
         {
             get
             {
                 StringBuilder sb = new StringBuilder();
-                foreach (byte b in aAns)
+                foreach (byte b in BytesOfAnswer)
                     sb.Append((b == 0) ? Question.C0 : Question.C1);
                 return sb.ToString();
             }
@@ -28,43 +27,51 @@ namespace sQzLib
 
         public AnswerSheet() {
             bChanged = false;
-            aAns = null;
-            questSheetID = ExamineeA.LV_CAP;
+            BytesOfAnswer = null;
+            QuestSheetID = ExamineeA.LV_CAP;
         }
 
-        public void Init(int uqslvid)
+        public void Init(QuestSheet qsheet)
         {
-            questSheetID = uqslvid;
-            if (aAns == null)
+            QuestSheetID = qsheet.ID;
+            BytesOfAnswer_Length = qsheet.Count * Question.NUMBER_OF_OPTIONS;
+            foreach (PassageWithQuestions p in qsheet.Passages.Values)
+                BytesOfAnswer_Length += p.Questions.Count * Question.NUMBER_OF_OPTIONS;
+            if (BytesOfAnswer == null)
             {
-                aAns = new byte[LEN];
-                for(int i = 0; i < LEN; ++i)
-                    aAns[i] = 0;
+                BytesOfAnswer = new byte[BytesOfAnswer_Length];
+                for(int i = 0; i < BytesOfAnswer_Length; ++i)
+                    BytesOfAnswer[i] = 0;
             }
         }
 
         public int GetByteCount()
         {
-            return 4 + LEN;
+            return 8 + BytesOfAnswer_Length;
         }
 
         public void ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
         {
-            Buffer.BlockCopy(BitConverter.GetBytes(questSheetID),
+            Buffer.BlockCopy(BitConverter.GetBytes(QuestSheetID),
                         0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(aAns, 0, buf, offs, LEN);
-            offs += LEN;
+            Buffer.BlockCopy(BitConverter.GetBytes(BytesOfAnswer_Length), 0, buf, offs, 4);
+            offs += 4;
+            Buffer.BlockCopy(BytesOfAnswer, 0, buf, offs, BytesOfAnswer_Length);
+            offs += BytesOfAnswer_Length;
         }
 
         public byte[] ToByte()
         {
-            byte[] buf = new byte[4 + LEN];
+            byte[] buf = new byte[4 + BytesOfAnswer_Length];
             int offs = 0;
-            Buffer.BlockCopy(BitConverter.GetBytes(questSheetID),
+            Buffer.BlockCopy(BitConverter.GetBytes(QuestSheetID),
                         0, buf, offs, 4);
             offs += 4;
-            Buffer.BlockCopy(aAns, 0, buf, offs, LEN);
+            Buffer.BlockCopy(BitConverter.GetBytes(BytesOfAnswer_Length),
+                        0, buf, offs, 4);
+            offs += 4;
+            Buffer.BlockCopy(BytesOfAnswer, 0, buf, offs, BytesOfAnswer_Length);
             return buf;
         }
 
@@ -73,14 +80,14 @@ namespace sQzLib
             int l = buf.Length - offs;
             if (l < 4)
                 return true;
-            questSheetID = BitConverter.ToInt32(buf, offs);
+            QuestSheetID = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
-            if (l < LEN)
+            if (l < BytesOfAnswer_Length)
                 return true;
-            aAns = new byte[LEN];
-            Buffer.BlockCopy(buf, offs, aAns, 0, LEN);
-            offs += LEN;
+            BytesOfAnswer = new byte[BytesOfAnswer_Length];
+            Buffer.BlockCopy(buf, offs, BytesOfAnswer, 0, BytesOfAnswer_Length);
+            offs += BytesOfAnswer_Length;
             return false;
         }
 
@@ -88,17 +95,17 @@ namespace sQzLib
         {
             if (ans == null)
                 return 101;
-            if (aAns == null)
+            if (BytesOfAnswer == null)
                 return 102;
-            if (ans.Length != aAns.Length)
+            if (ans.Length != BytesOfAnswer.Length)
                 return 103;
             int grade = 0;
             int offs = 0;
-            while(offs < aAns.Length)
+            while(offs < BytesOfAnswer.Length)
             {
                 int offs4 = offs + 4;
                 for(; offs < offs4; ++offs)
-                    if (ans[offs] != aAns[offs])
+                    if (ans[offs] != BytesOfAnswer[offs])
                         break;
                 if (offs == offs4)
                     ++grade;

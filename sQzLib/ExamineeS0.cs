@@ -80,7 +80,7 @@ namespace sQzLib
                 offs += x;
             }
             //
-            if (l < AnswerSheet.LEN + 24)
+            if (l < AnswerSheet.BytesOfAnswer_Length + 24)
                 return true;
             int h = BitConverter.ToInt32(buf, offs);
             l -= 4;
@@ -93,13 +93,13 @@ namespace sQzLib
                 dtTim1 = DT.INVALID;
                 return true;
             }
-            AnswerSheet.questSheetID = BitConverter.ToInt32(buf, offs);
+            AnswerSheet.QuestSheetID = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            AnswerSheet.aAns = new byte[AnswerSheet.LEN];
-            Array.Copy(buf, offs, AnswerSheet.aAns, 0, AnswerSheet.LEN);
-            l -= AnswerSheet.LEN;
-            offs += AnswerSheet.LEN;
+            AnswerSheet.BytesOfAnswer = new byte[AnswerSheet.BytesOfAnswer_Length];
+            Array.Copy(buf, offs, AnswerSheet.BytesOfAnswer, 0, AnswerSheet.BytesOfAnswer_Length);
+            l -= AnswerSheet.BytesOfAnswer_Length;
+            offs += AnswerSheet.BytesOfAnswer_Length;
 
             h = BitConverter.ToInt32(buf, offs);
             l -= 4;
@@ -157,8 +157,8 @@ namespace sQzLib
 
         public char[] DBGetAns()
         {
-            char[] noans = new char[AnswerSheet.LEN];
-            for (int i = 0; i < AnswerSheet.LEN; ++i)
+            char[] noans = new char[AnswerSheet.BytesOfAnswer_Length];
+            for (int i = 0; i < AnswerSheet.BytesOfAnswer_Length; ++i)
                 noans[i] = Question.C0;
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)

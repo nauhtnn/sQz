@@ -106,19 +106,19 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-            AnswerSheet.questSheetID = BitConverter.ToInt32(buf, offs);
+            AnswerSheet.QuestSheetID = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
 
             if (eStt < NeeStt.Submitting)
                 return false;
 
-            if (l < AnswerSheet.LEN)
+            if (l < AnswerSheet.BytesOfAnswer_Length)
                 return true;
-            AnswerSheet.aAns = new byte[AnswerSheet.LEN];
-            Buffer.BlockCopy(buf, offs, AnswerSheet.aAns, 0, AnswerSheet.LEN);
-            l -= AnswerSheet.LEN;
-            offs += AnswerSheet.LEN;
+            AnswerSheet.BytesOfAnswer = new byte[AnswerSheet.BytesOfAnswer_Length];
+            Buffer.BlockCopy(buf, offs, AnswerSheet.BytesOfAnswer, 0, AnswerSheet.BytesOfAnswer_Length);
+            l -= AnswerSheet.BytesOfAnswer_Length;
+            offs += AnswerSheet.BytesOfAnswer_Length;
 
             return false;
         }
@@ -242,8 +242,8 @@ namespace sQzLib
                 l.Add(BitConverter.GetBytes(0));
             l.Add(BitConverter.GetBytes(dtTim1.Hour));
             l.Add(BitConverter.GetBytes(dtTim1.Minute));
-            l.Add(BitConverter.GetBytes(AnswerSheet.uQSId));
-            l.Add(AnswerSheet.aAns);
+            l.Add(BitConverter.GetBytes(AnswerSheet.QuestSheetID));
+            l.Add(AnswerSheet.BytesOfAnswer);
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
             l.Add(BitConverter.GetBytes(Grade));
@@ -272,11 +272,11 @@ namespace sQzLib
             if (eStt < NeeStt.Examing)
                 return;
             AnswerSheet = new AnswerSheet();
-            AnswerSheet.questSheetID = e.AnswerSheet.questSheetID;
+            AnswerSheet.QuestSheetID = e.AnswerSheet.QuestSheetID;
 
             if (eStt < NeeStt.Submitting)
                 return;
-            AnswerSheet.aAns = e.AnswerSheet.aAns;
+            AnswerSheet.BytesOfAnswer = e.AnswerSheet.BytesOfAnswer;
         }
 
         public void MergeWithS0(ExamineeA e)

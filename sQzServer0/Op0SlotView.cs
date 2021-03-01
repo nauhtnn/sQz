@@ -24,7 +24,6 @@ namespace sQzServer0
         Dictionary<int, TextBlock> vRPw;
         Grid grdNee;
         public ExamSlotS0 mSl;
-        bool bInitNMod;
 
         public Op0SlotView()
         {
@@ -357,8 +356,6 @@ namespace sQzServer0
             return tbi;
         }
 
-        static readonly bool[] noSelectedOptionArray = new bool[1024];
-
         private void tbiQ_GotFocus(object sender, RoutedEventArgs e)
         {;
             TabItem tbi = sender as TabItem;
@@ -382,10 +379,10 @@ namespace sQzServer0
             StackPanel sp = new StackPanel();
             int questionIdx = 0;
             foreach (Question q in qs.ShallowCopyIndependentQuestions())
-                sp.Children.Add(new SingleQuestionView(q, questionIdx++, noSelectedOptionArray));
+                sp.Children.Add(new SingleQuestionView(q, questionIdx++, null));
             int passageIdx = 0;
             foreach (PassageWithQuestions p in qs.Passages.Values)
-                sp.Children.Add(new PassageWithQuestionsView(p, passageIdx, ref questionIdx, noSelectedOptionArray));
+                sp.Children.Add(new PassageWithQuestionsView(p, passageIdx, ref questionIdx, null));
             svwr.Content = sp;
             svwr.Height = 560;
             tbi.Content = svwr;

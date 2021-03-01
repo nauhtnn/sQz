@@ -106,7 +106,7 @@ namespace sQzLib
                 {
                     e.bToDB = false;
                     vals.Append("('" + e.mDt.ToString(DT._) + "','" +
-                        e.ID + "'," + (e.AnswerSheet.uQSId)
+                        e.ID + "'," + (e.AnswerSheet.QuestSheetID)
                         + ",'" + e.dtTim1.ToString(DT.hh) +
                         "','" + e.dtTim2.ToString(DT.hh) + "'," + e.Grade + ",'" +
                         e.ComputerName + "','" + e.AnswerSheet.tAns + "'),");

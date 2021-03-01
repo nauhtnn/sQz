@@ -68,7 +68,7 @@ namespace sQzClient
             SingleQuestionView.StemWidth = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - SingleQuestionView.IdxWidth;
 
             InitQuesttonSheetView();
-            InitAnswerSheetView();
+            InitAnswerSheet();
 
             bBtnBusy = false;
 
@@ -139,8 +139,11 @@ namespace sQzClient
             dtLastLog = kDtStart = DateTime.Now;
         }
 
-        void InitAnswerSheetView()
+        void InitAnswerSheet()
         {
+            thisExaminee.AnswerSheet.Init(QuestionSheet);
+            thisExaminee.AnswerSheet.bChanged = false;
+
             //left panel
             spLp.HorizontalAlignment = HorizontalAlignment.Left;
             spLp.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
@@ -149,8 +152,6 @@ namespace sQzClient
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             //int nAns = 4;//hardcode
             int n = QuestionSheet.Count;
-            thisExaminee.AnswerSheet.Init(QuestionSheet.ID);
-            thisExaminee.AnswerSheet.bChanged = false;
             SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
             //next lines
             //n -= 1;
@@ -203,7 +204,6 @@ namespace sQzClient
             //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
         }
 
-        static bool[] ans_todo = new bool[1024];
         void InitQuesttonSheetView()
         {
             QuestionSheetContainer.Background = Theme.s._[(int)BrushId.Q_BG];
@@ -211,7 +211,7 @@ namespace sQzClient
             for (int i = 0, j = 0; i < n; i += 2, ++j)
             {
                 QuestionSheetContainer.RowDefinitions.Add(new RowDefinition());
-                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, ans_todo);
+                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, thisExaminee.AnswerSheet.BytesOfAnswer);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 0);
                 QuestionSheetContainer.Children.Add(q);
@@ -220,7 +220,7 @@ namespace sQzClient
             }
             for (int i = 1, j = 0; i < n; i += 2, ++j)
             {
-                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, ans_todo);
+                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, thisExaminee.AnswerSheet.BytesOfAnswer);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 1);
                 QuestionSheetContainer.Children.Add(q);
@@ -243,13 +243,13 @@ namespace sQzClient
                 ++i;
                 if (li.IsSelected)
                 {
-                    thisExaminee.AnswerSheet.aAns[qid * 4 + i] = 1;
+                    thisExaminee.AnswerSheet.BytesOfAnswer[qid * 4 + i] = 1;
                     OptionView v = li as OptionView;
                     if (v != null)
                         SelectedLabels[qid+1].Content = v.Idx_Label;
                 }
                 else
-                    thisExaminee.AnswerSheet.aAns[qid * 4 + i] = 0;
+                    thisExaminee.AnswerSheet.BytesOfAnswer[qid * 4 + i] = 0;
             }
         }
 

@@ -23,7 +23,7 @@ namespace sQzLib
             return passageView;
         }
 
-        public PassageWithQuestionsView(PassageWithQuestions passage, int passageIdx, ref int questionIdx, bool[] optionStatusArray)
+        public PassageWithQuestionsView(PassageWithQuestions passage, int passageIdx, ref int questionIdx, byte[] optionStatusArray)
         {
             Children.Add(CreateIdxView(passageIdx));
             Children.Add(CreatePassageView(passage.Passage));

@@ -165,7 +165,6 @@ namespace sQzLib
 
         public List<QuestSheet> GenQPack3(int numberOfSheet)
         {
-            string emsg;
             List<QuestSheet> sheets = new List<QuestSheet>();
             QuestSheet originSheet = new QuestSheet();
             originSheet.DBSelectNondeletedQuestions();

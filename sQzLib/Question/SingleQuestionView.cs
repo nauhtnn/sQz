@@ -44,7 +44,7 @@ namespace sQzLib
             return stemView;
         }
 
-        public SingleQuestionView(Question question, int idx, bool[] optionStatusArray)
+        public SingleQuestionView(Question question, int idx, byte[] optionStatusArray)
         {
             Orientation = Orientation.Horizontal;
             Margin = staticMargin;
@@ -61,7 +61,7 @@ namespace sQzLib
             Background = Theme.s._[(int)BrushId.BG];
         }
 
-        public ListBox CreateOptionsView(string[] options, bool[] optionStatusArray, int questionIdx)
+        public ListBox CreateOptionsView(string[] options, byte[] optionStatusArray, int questionIdx)
         {
             ListBox optionsView = new ListBox();
             optionsView.Width = StemWidth;
@@ -72,7 +72,7 @@ namespace sQzLib
             foreach(string text in options)
             {
                 OptionView option = new OptionView(text, idx++, StemWidth);
-                if (optionStatusArray[answerIdx++] == true)//update view from log
+                if (optionStatusArray != null && optionStatusArray[answerIdx++] != 0)//update view from log
                     option.IsSelected = true;
                 optionsView.Items.Add(option);
             }

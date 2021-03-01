@@ -15,13 +15,13 @@ namespace sQzLib
             vSheet = new SortedList<int, AnswerSheet>();
         }
 
-        public int GetByteCount()
-        {
-            int sz = 4;
-            foreach (AnswerSheet s in vSheet.Values)
-                sz += s.GetByteCount();
-            return sz;
-        }
+        //public int GetByteCount()
+        //{
+        //    int sz = 4;
+        //    foreach (AnswerSheet s in vSheet.Values)
+        //        sz += s.GetByteCount();
+        //    return sz;
+        //}
 
         //only Operation0 uses this.
         public bool ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
@@ -54,10 +54,10 @@ namespace sQzLib
             {
                 AnswerSheet i = new AnswerSheet();
                 qs.ExtractKey(i);
-                if (!vSheet.ContainsKey(i.questSheetID))
-                    vSheet.Add(i.questSheetID, i);
+                if (!vSheet.ContainsKey(i.QuestSheetID))
+                    vSheet.Add(i.QuestSheetID, i);
                 else
-                    vSheet[i.questSheetID] = i;
+                    vSheet[i.QuestSheetID] = i;
             }
         }
 
@@ -65,9 +65,9 @@ namespace sQzLib
         {
             AnswerSheet i = new AnswerSheet();
             qs.ExtractKey(i);
-            if (!vSheet.ContainsKey(i.questSheetID))
+            if (!vSheet.ContainsKey(i.QuestSheetID))
             {
-                vSheet.Add(i.questSheetID, i);
+                vSheet.Add(i.QuestSheetID, i);
                 return i;
             }
             return null;
@@ -90,9 +90,9 @@ namespace sQzLib
             while (0 < nSh)
             {
                 AnswerSheet i = new AnswerSheet();
-                if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.questSheetID))
+                if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.QuestSheetID))
                     return true;
-                vSheet.Add(i.questSheetID, i);
+                vSheet.Add(i.QuestSheetID, i);
                 --nSh;
             }
             return false;

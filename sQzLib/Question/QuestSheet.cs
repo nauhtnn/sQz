@@ -124,15 +124,15 @@ namespace sQzLib
         //only Operation0 uses this.
         public void ExtractKey(AnswerSheet anssh)
         {
-            anssh.questSheetID = ID;
+            anssh.QuestSheetID = ID;
             if (0 < IndependentQuestions.Count)
-                anssh.aAns = new byte[IndependentQuestions.Count * Question.NUMBER_OF_OPTIONS];
+                anssh.BytesOfAnswer = new byte[IndependentQuestions.Count * Question.NUMBER_OF_OPTIONS];
             else
                 return;
             int i = -1;
             foreach (Question q in IndependentQuestions)
                 foreach (bool x in q.vKeys)
-                    anssh.aAns[++i] = Convert.ToByte(x);
+                    anssh.BytesOfAnswer[++i] = Convert.ToByte(x);
         }
 
         

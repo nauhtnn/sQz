@@ -163,11 +163,9 @@ namespace sQzServer0
             gDBQuest.Children.Add(passageText);
         }
 
-        static readonly bool[] noSeletectedOptionArray = new bool[1024];
-
         private void AddSingleQuestionToDBView(Question q, int x)
         {
-            SingleQuestionView questionView = new SingleQuestionView(q, x, noSeletectedOptionArray);
+            SingleQuestionView questionView = new SingleQuestionView(q, x, null);
             RowDefinition rd = new RowDefinition();
             gDBQuest.RowDefinitions.Add(rd);
             Grid.SetRow(questionView, x);
@@ -197,7 +195,7 @@ namespace sQzServer0
             SingleQuestionView.IdxWidth = FontSize * 2;
             SingleQuestionView.StemWidth = svwrTmpQ.Width - 30 - SingleQuestionView.IdxWidth;
             foreach (Question q in questions)
-                panel.Children.Add(new SingleQuestionView(q, idx++, noSeletectedOptionArray));
+                panel.Children.Add(new SingleQuestionView(q, idx++, null));
         }
 
         private void AddListOfPassageQuestionsToPanel(List<PassageWithQuestions> passages, int index, StackPanel panel)

@@ -268,7 +268,7 @@ namespace sQzClient
                     bytes = new List<byte[]>();
                     bytes.Add(BitConverter.GetBytes((int)mState));
                     Utils.AppendBytesOfString(thisExaminee.ID, bytes);
-                    bytes.Add(BitConverter.GetBytes(thisExaminee.AnswerSheet.uQSId));
+                    bytes.Add(BitConverter.GetBytes(thisExaminee.AnswerSheet.QuestSheetID));
                     outBuf = Utils.ToArray_FromListOfBytes(bytes);
                     break;
                 default:
