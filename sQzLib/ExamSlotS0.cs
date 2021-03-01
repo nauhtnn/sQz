@@ -480,7 +480,7 @@ namespace sQzLib
 
         public byte[] GetBytes_KeysWithDateTime()
         {
-            List<byte[]> l = mKeyPack.ToByte();
+            List<byte[]> l = mKeyPack.GetBytes_S0SendingToS1();
             l.Insert(0, DT.GetBytes(mDt));
             return Utils.ToArray_FromListOfBytes(l);
         }

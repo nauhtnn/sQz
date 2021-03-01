@@ -15,35 +15,27 @@ namespace sQzLib
             vSheet = new SortedList<int, AnswerSheet>();
         }
 
-        //public int GetByteCount()
+        //only Operation0 uses this.
+        //public bool ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
         //{
-        //    int sz = 4;
-        //    foreach (AnswerSheet s in vSheet.Values)
-        //        sz += s.GetByteCount();
-        //    return sz;
+        //    int l = buf.Length - offs;
+        //    if (l < 4)
+        //        return true;
+        //    Buffer.BlockCopy(BitConverter.GetBytes(vSheet.Values.Count), 0, buf, offs, 4);
+        //    offs += 4;
+        //    //l -= 4;
+        //    foreach (AnswerSheet i in vSheet.Values)
+        //        i.ToByte(ref buf, ref offs);
+        //    l = buf.Length - offs;
+        //    return false;
         //}
 
-        //only Operation0 uses this.
-        public bool ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
-        {
-            int l = buf.Length - offs;
-            if (l < 4)
-                return true;
-            Buffer.BlockCopy(BitConverter.GetBytes(vSheet.Values.Count), 0, buf, offs, 4);
-            offs += 4;
-            //l -= 4;
-            foreach (AnswerSheet i in vSheet.Values)
-                i.ToByte(ref buf, ref offs);
-            l = buf.Length - offs;
-            return false;
-        }
-
-        public List<byte[]> ToByte()
+        public List<byte[]> GetBytes_S0SendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(vSheet.Values.Count));
             foreach (AnswerSheet i in vSheet.Values)
-                l.Add(i.ToByte());
+                l.Add(i.GetBytes_S0SendingToS1());
             return l;
         }
 
@@ -74,7 +66,7 @@ namespace sQzLib
         }
 
         //only Operation1 uses this.
-        public bool ReadByte(byte[] buf, ref int offs)
+        public bool ReadBytes_S1ReceivingFromS0(byte[] buf, ref int offs)
         {
             vSheet.Clear();
             if (buf == null)
@@ -90,7 +82,7 @@ namespace sQzLib
             while (0 < nSh)
             {
                 AnswerSheet i = new AnswerSheet();
-                if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.QuestSheetID))
+                if (i.ReadBytes_S1ReceivingFromS0(buf, ref offs) || vSheet.ContainsKey(i.QuestSheetID))
                     return true;
                 vSheet.Add(i.QuestSheetID, i);
                 --nSh;

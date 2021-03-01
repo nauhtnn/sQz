@@ -45,25 +45,9 @@ namespace sQzLib
             }
         }
 
-        public int GetByteCount()
+        public byte[] GetBytes_S0SendingToS1()
         {
-            return 8 + BytesOfAnswer_Length;
-        }
-
-        public void ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
-        {
-            Buffer.BlockCopy(BitConverter.GetBytes(QuestSheetID),
-                        0, buf, offs, 4);
-            offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes(BytesOfAnswer_Length), 0, buf, offs, 4);
-            offs += 4;
-            Buffer.BlockCopy(BytesOfAnswer, 0, buf, offs, BytesOfAnswer_Length);
-            offs += BytesOfAnswer_Length;
-        }
-
-        public byte[] ToByte()
-        {
-            byte[] buf = new byte[4 + BytesOfAnswer_Length];
+            byte[] buf = new byte[8 + BytesOfAnswer_Length];
             int offs = 0;
             Buffer.BlockCopy(BitConverter.GetBytes(QuestSheetID),
                         0, buf, offs, 4);
@@ -75,7 +59,7 @@ namespace sQzLib
             return buf;
         }
 
-        public bool ReadByte(byte[] buf, ref int offs)
+        public bool ReadBytes_S1ReceivingFromS0(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
             if (l < 4)
@@ -83,6 +67,13 @@ namespace sQzLib
             QuestSheetID = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
+
+            if (l < 4)
+                return true;
+            BytesOfAnswer_Length = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            l -= 4;
+
             if (l < BytesOfAnswer_Length)
                 return true;
             BytesOfAnswer = new byte[BytesOfAnswer_Length];

@@ -88,7 +88,7 @@ namespace sQzLib
 
         public bool ReadByteKey_NoDateTime(byte[] buf, ref int offs)
         {
-            return mKeyPack.ReadByte(buf, ref offs);
+            return mKeyPack.ReadBytes_S1ReceivingFromS0(buf, ref offs);
         }
     }
 }
