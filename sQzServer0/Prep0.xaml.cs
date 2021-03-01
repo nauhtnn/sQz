@@ -132,7 +132,7 @@ namespace sQzServer0
             gDBQuest.Children.Clear();
             gDBQuest.RowDefinitions.Clear();
             vChk.Clear();
-            SingleQuestionView.staticMargin = new Thickness(FontSize);
+            //SingleQuestionView.staticMargin = new Thickness(FontSize);
             SingleQuestionView.IdxWidth = FontSize * 2;
             SingleQuestionView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleQuestionView.IdxWidth;
             foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
@@ -181,10 +181,11 @@ namespace sQzServer0
 
         private void ShowTmpQ()
         {
-            StackPanel sp = new StackPanel();
-            AddListOfSingleQuestionsToPanel(mTmpQS.ShallowCopyIndependentQuestions(), 0, sp);
-            AddListOfPassageQuestionsToPanel(mTmpQS.ShallowCopyPassages(), 0, sp);
-            svwrTmpQ.Content = sp;
+            //StackPanel sp = new StackPanel();
+            //AddListOfSingleQuestionsToPanel(mTmpQS.ShallowCopyIndependentQuestions(), 0, sp);
+            //AddListOfPassageQuestionsToPanel(mTmpQS.ShallowCopyPassages(), 0, sp);
+            //svwrTmpQ.Content = sp;
+            svwrTmpQ.Content = new QuestionSheetView(mTmpQS, null, FontSize * 2, svwrTmpQ.Width - FontSize * 2 - SystemParameters.ScrollWidth * 2);
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountPassage);
             tbiTmpQ.Header = sb.ToString();
@@ -200,11 +201,6 @@ namespace sQzServer0
 
         private void AddListOfPassageQuestionsToPanel(List<PassageWithQuestions> passages, int index, StackPanel panel)
         {
-            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
-            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
-            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
-            SolidColorBrush bg;
-            bool even = false;
             int idx = index;
             double w = svwrTmpQ.Width - 30;
             foreach (PassageWithQuestions p in passages)

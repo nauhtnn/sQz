@@ -36,7 +36,7 @@ namespace sQzLib
             TextBlock ansTxt = new TextBlock();
             ansTxt.Text = txt;
             ansTxt.TextWrapping = TextWrapping.Wrap;
-            ansTxt.Width = w - mB.Width;
+            ansTxt.Width = w - mB.Width - 8;//todo: remove hard-code
             ansTxt.VerticalAlignment = VerticalAlignment.Center;
             view.Children.Add(ansTxt);
 

@@ -66,8 +66,9 @@
     <Compile Include="Question\OptionView.cs" />
     <Compile Include="Question\PassageWithQuesionsView.cs" />
     <Compile Include="Question\PlainText\PlainTextQuestParser.cs" />
+    <Compile Include="Question\QuestionSheetView.cs" />
     <Compile Include="Question\QuestParser.cs" />
-    <Compile Include="Question\QuestSheetDocxPrinter.cs" />
+    <None Include="Question\QuestSheetDocxPrinter.cs" />
     <Compile Include="Question\QuestPack.cs" />
     <Compile Include="Question\QuestSheet.cs" />
     <Compile Include="FirewallHandler.cs" />
