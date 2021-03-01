@@ -276,7 +276,7 @@ namespace sQzServer1
                     e = new ExamineeS1();
                     if (!e.ReadBytes_FromClient(buf, ref offs))
                     {
-                        AnsSheet keySh = null;
+                        AnswerSheet keySh = null;
                         found = false;
                         if(Slot.mKeyPack.vSheet.TryGetValue(e.AnswerSheet.questSheetID, out keySh))
                         {

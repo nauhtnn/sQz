@@ -8,13 +8,12 @@ using System.Windows.Controls;
 
 namespace sQzLib
 {
-    public class AnsSheet
+    public class AnswerSheet
     {
         public const int LEN = 120;
         public int questSheetID;
         public int uQSId { get { return (ExamineeA.LV_CAP < questSheetID) ? questSheetID - ExamineeA.LV_CAP : questSheetID; } }
         public bool bChanged;
-        DgEvntCB dgSelChgCB;
         public byte[] aAns;
         public string tAns
         {
@@ -27,11 +26,10 @@ namespace sQzLib
             }
         }
 
-        public AnsSheet() {
+        public AnswerSheet() {
             bChanged = false;
             aAns = null;
             questSheetID = ExamineeA.LV_CAP;
-            dgSelChgCB = null;
         }
 
         public void Init(int uqslvid)
@@ -43,39 +41,6 @@ namespace sQzLib
                 for(int i = 0; i < LEN; ++i)
                     aAns[i] = 0;
             }
-        }
-
-        public void InitView(QuestSheet qs, double w, DgEvntCB cb)
-        {
-            //if (cb != null)
-            //    dgSelChgCB = cb;
-
-            //OptionContainers = new ListBox[qs.Count];
-            //vAnsItem = new AnsItem[qs.Count][];
-            
-            //int idx = -1;
-            //int j = -1;
-            //foreach (Question q in qs.ShallowCopyIndependentQuestions())
-            //{
-            //    ++idx;
-            //    SingleQuestionView questView = new SingleQuestionView(q, idx);
-            //    questView.optionsView.Name = "_" + idx;
-            //    questView.optionsView.SelectionChanged += Ans_SelectionChanged;
-            //    OptionContainers[idx] = questView.optionsView;
-            //    vAnsItem[idx] = new AnsItem[q.vAns.Length];
-            //    for (int i = 0; i < q.vAns.Length; ++i)
-            //    {
-            //        AnsItem ai = new AnsItem(q.vAns[i], i, w);
-            //        ++j;//update view from log
-            //        if (aAns[j] == Convert.ToByte(true))
-            //        {
-            //            ai.mLbl.Content = 'X';
-            //            ai.mLbxItem.IsSelected = true;
-            //        }
-            //        vAnsItem[idx][i] = ai;
-            //        optionsContainer.Items.Add(ai.lbxi);
-            //    }
-            //}
         }
 
         public int GetByteCount()

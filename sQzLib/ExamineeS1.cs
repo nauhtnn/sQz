@@ -113,12 +113,12 @@ namespace sQzLib
             if (eStt < NeeStt.Submitting)
                 return false;
 
-            if (l < AnsSheet.LEN)
+            if (l < AnswerSheet.LEN)
                 return true;
-            AnswerSheet.aAns = new byte[AnsSheet.LEN];
-            Buffer.BlockCopy(buf, offs, AnswerSheet.aAns, 0, AnsSheet.LEN);
-            l -= AnsSheet.LEN;
-            offs += AnsSheet.LEN;
+            AnswerSheet.aAns = new byte[AnswerSheet.LEN];
+            Buffer.BlockCopy(buf, offs, AnswerSheet.aAns, 0, AnswerSheet.LEN);
+            l -= AnswerSheet.LEN;
+            offs += AnswerSheet.LEN;
 
             return false;
         }
@@ -271,7 +271,7 @@ namespace sQzLib
                 eStt = e.eStt;
             if (eStt < NeeStt.Examing)
                 return;
-            AnswerSheet = new AnsSheet();
+            AnswerSheet = new AnswerSheet();
             AnswerSheet.questSheetID = e.AnswerSheet.questSheetID;
 
             if (eStt < NeeStt.Submitting)

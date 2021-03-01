@@ -122,7 +122,7 @@ namespace sQzLib
         }
 
         //only Operation0 uses this.
-        public void ExtractKey(AnsSheet anssh)
+        public void ExtractKey(AnswerSheet anssh)
         {
             anssh.questSheetID = ID;
             if (0 < IndependentQuestions.Count)

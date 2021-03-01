@@ -161,7 +161,7 @@ namespace sQzLib
             w.Write(ID);
             w.Write((int)eStt);
             w.Write(AnswerSheet.questSheetID);
-            w.Write(AnswerSheet.aAns, 0, AnsSheet.LEN);
+            w.Write(AnswerSheet.aAns, 0, AnswerSheet.LEN);
             if (eStt == NeeStt.Finished)
             {
                 w.Write(dtTim1.Hour);
@@ -207,7 +207,7 @@ namespace sQzLib
                 msg.Append("Read sheet ID.\n");
                 AnswerSheet.questSheetID = r.ReadInt32();
                 msg.Append("Read answer.\n");
-                AnswerSheet.aAns = r.ReadBytes(AnsSheet.LEN);
+                AnswerSheet.aAns = r.ReadBytes(AnswerSheet.LEN);
                 int h, m;
                 if (eStt == NeeStt.Finished)
                 {

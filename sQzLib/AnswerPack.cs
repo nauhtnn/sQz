@@ -7,18 +7,18 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    public class AnsPack
+    public class AnswerPack
     {
-        public SortedList<int, AnsSheet> vSheet;
-        public AnsPack()
+        public SortedList<int, AnswerSheet> vSheet;
+        public AnswerPack()
         {
-            vSheet = new SortedList<int, AnsSheet>();
+            vSheet = new SortedList<int, AnswerSheet>();
         }
 
         public int GetByteCount()
         {
             int sz = 4;
-            foreach (AnsSheet s in vSheet.Values)
+            foreach (AnswerSheet s in vSheet.Values)
                 sz += s.GetByteCount();
             return sz;
         }
@@ -32,7 +32,7 @@ namespace sQzLib
             Buffer.BlockCopy(BitConverter.GetBytes(vSheet.Values.Count), 0, buf, offs, 4);
             offs += 4;
             //l -= 4;
-            foreach (AnsSheet i in vSheet.Values)
+            foreach (AnswerSheet i in vSheet.Values)
                 i.ToByte(ref buf, ref offs);
             l = buf.Length - offs;
             return false;
@@ -42,7 +42,7 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes(vSheet.Values.Count));
-            foreach (AnsSheet i in vSheet.Values)
+            foreach (AnswerSheet i in vSheet.Values)
                 l.Add(i.ToByte());
             return l;
         }
@@ -52,7 +52,7 @@ namespace sQzLib
         {
             foreach(QuestSheet qs in l)
             {
-                AnsSheet i = new AnsSheet();
+                AnswerSheet i = new AnswerSheet();
                 qs.ExtractKey(i);
                 if (!vSheet.ContainsKey(i.questSheetID))
                     vSheet.Add(i.questSheetID, i);
@@ -61,9 +61,9 @@ namespace sQzLib
             }
         }
 
-        public AnsSheet ExtractKey(QuestSheet qs)
+        public AnswerSheet ExtractKey(QuestSheet qs)
         {
-            AnsSheet i = new AnsSheet();
+            AnswerSheet i = new AnswerSheet();
             qs.ExtractKey(i);
             if (!vSheet.ContainsKey(i.questSheetID))
             {
@@ -89,7 +89,7 @@ namespace sQzLib
                 return true;
             while (0 < nSh)
             {
-                AnsSheet i = new AnsSheet();
+                AnswerSheet i = new AnswerSheet();
                 if (i.ReadByte(buf, ref offs) || vSheet.ContainsKey(i.questSheetID))
                     return true;
                 vSheet.Add(i.questSheetID, i);

@@ -150,7 +150,6 @@ namespace sQzClient
             //int nAns = 4;//hardcode
             int n = QuestionSheet.Count;
             thisExaminee.AnswerSheet.Init(QuestionSheet.ID);
-            thisExaminee.AnswerSheet.InitView(QuestionSheet, qaWh, null);
             thisExaminee.AnswerSheet.bChanged = false;
             SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
             //next lines
