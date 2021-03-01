@@ -162,6 +162,7 @@ namespace sQzLib
             w.Write(ID);
             w.Write((int)eStt);
             w.Write(AnswerSheet.QuestSheetID);
+            w.Write(AnswerSheet.BytesOfAnswer_Length);
             w.Write(AnswerSheet.BytesOfAnswer, 0, AnswerSheet.BytesOfAnswer_Length);
             if (eStt == NeeStt.Finished)
             {
@@ -207,7 +208,9 @@ namespace sQzLib
                     eStt = (NeeStt)x;
                 msg.Append("Read sheet ID.\n");
                 AnswerSheet.QuestSheetID = r.ReadInt32();
-                msg.Append("Read answer.\n");
+                msg.Append("Read answer length.\n");
+                AnswerSheet.QuestSheetID = r.ReadInt32();
+                msg.Append("Read answer array.\n");
                 AnswerSheet.BytesOfAnswer = r.ReadBytes(AnswerSheet.BytesOfAnswer_Length);
                 int h, m;
                 if (eStt == NeeStt.Finished)

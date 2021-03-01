@@ -125,14 +125,23 @@ namespace sQzLib
         public void ExtractKey(AnswerSheet anssh)
         {
             anssh.QuestSheetID = ID;
+            int bytes_length;
             if (0 < IndependentQuestions.Count)
-                anssh.BytesOfAnswer = new byte[IndependentQuestions.Count * Question.NUMBER_OF_OPTIONS];
+                bytes_length = IndependentQuestions.Count * Question.NUMBER_OF_OPTIONS;
             else
-                return;
+                bytes_length = 0;
+            foreach (PassageWithQuestions p in Passages.Values)
+                bytes_length += p.Questions.Count * Question.NUMBER_OF_OPTIONS;
+            anssh.BytesOfAnswer_Length = bytes_length;
+            anssh.BytesOfAnswer = new byte[bytes_length];
             int i = -1;
             foreach (Question q in IndependentQuestions)
                 foreach (bool x in q.vKeys)
                     anssh.BytesOfAnswer[++i] = Convert.ToByte(x);
+            foreach (PassageWithQuestions p in Passages.Values)
+                foreach (Question q in p.Questions)
+                    foreach (bool x in q.vKeys)
+                        anssh.BytesOfAnswer[++i] = Convert.ToByte(x);
         }
 
         
