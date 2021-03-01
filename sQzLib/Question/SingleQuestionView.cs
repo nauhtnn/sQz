@@ -11,6 +11,8 @@ namespace sQzLib
         public static double IdxWidth;
         public static double StemWidth;
 
+        public int Idx { get; private set; }
+
         public ListBox optionsView;
 
         private Label CreateIdxView(int idx_start0)
@@ -46,13 +48,14 @@ namespace sQzLib
 
         public SingleQuestionView(Question question, int idx_start0, byte[] optionStatusArray)
         {
+            Idx = idx_start0;
             Orientation = Orientation.Horizontal;
             Margin = staticMargin;
 
             Children.Add(CreateIdxView(idx_start0));
 
             StackPanel stemAndOptionsView = new StackPanel();
-            //stemAndOptionsView.Children.Add(CreateStemView(question.Stem));
+            stemAndOptionsView.Children.Add(CreateStemView(question.Stem));
             optionsView = CreateOptionsView(question.vAns, optionStatusArray, idx_start0);
 
             

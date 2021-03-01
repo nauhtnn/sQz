@@ -371,19 +371,7 @@ namespace sQzServer0
             if (qs == null)
                 return;
             ScrollViewer svwr = new ScrollViewer();
-            svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            if(SingleQuestionView.StemWidth < 1)
-                SingleQuestionView.StemWidth = tbi.Width;
-            if (SingleQuestionView.IdxWidth < 1)
-                SingleQuestionView.IdxWidth = FontSize * 2;
-            StackPanel sp = new StackPanel();
-            int questionIdx = 0;
-            foreach (Question q in qs.ShallowCopyIndependentQuestions())
-                sp.Children.Add(new SingleQuestionView(q, questionIdx++, null));
-            int passageIdx = 0;
-            foreach (PassageWithQuestions p in qs.Passages.Values)
-                sp.Children.Add(new PassageWithQuestionsView(p, passageIdx, ref questionIdx, null));
-            svwr.Content = sp;
+            svwr.Content = new QuestionSheetView(qs, null, FontSize * 2, tbc.Width - FontSize * 2 - SystemParameters.ScrollWidth);
             svwr.Height = 560;
             tbi.Content = svwr;
         }

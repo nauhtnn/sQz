@@ -28,12 +28,12 @@
                     </ScrollViewer>
                 </StackPanel>
                 <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1164" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
-                    <Grid x:Name="QuestionSheetContainer" Width="1144">
+                    <!--<Grid x:Name="QuestionSheetContainer" Width="1144">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="577"/>
                             <ColumnDefinition Width="577"/>
                         </Grid.ColumnDefinitions>
-                    </Grid>
+                    </Grid>-->
                 </ScrollViewer>
             </Grid>
             <Grid Height="48">

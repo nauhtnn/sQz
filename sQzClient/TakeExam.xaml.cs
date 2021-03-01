@@ -204,30 +204,46 @@ namespace sQzClient
             //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
         }
 
+        //void InitQuesttonSheetView()
+        //{
+        //    QuestionSheetContainer.Background = Theme.s._[(int)BrushId.Q_BG];
+        //    int n = QuestionSheet.Count;
+        //    for (int i = 0, j = 0; i < n; i += 2, ++j)
+        //    {
+        //        QuestionSheetContainer.RowDefinitions.Add(new RowDefinition());
+        //        SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, thisExaminee.AnswerSheet.BytesOfAnswer);
+        //        Grid.SetRow(q, j);
+        //        Grid.SetColumn(q, 0);
+        //        QuestionSheetContainer.Children.Add(q);
+        //        q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
+        //        q.optionsView.Name = "_" + i.ToString();
+        //    }
+        //    for (int i = 1, j = 0; i < n; i += 2, ++j)
+        //    {
+        //        SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, thisExaminee.AnswerSheet.BytesOfAnswer);
+        //        Grid.SetRow(q, j);
+        //        Grid.SetColumn(q, 1);
+        //        QuestionSheetContainer.Children.Add(q);
+        //        q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
+        //        q.optionsView.Name = "_" + i.ToString();
+        //    }
+        //    QuestionSheetContainer.Background = Theme.s._[(int)BrushId.BG];
+        //}
+
         void InitQuesttonSheetView()
         {
-            QuestionSheetContainer.Background = Theme.s._[(int)BrushId.Q_BG];
-            int n = QuestionSheet.Count;
-            for (int i = 0, j = 0; i < n; i += 2, ++j)
+            QuestionSheetView qsheetView = new QuestionSheetView(QuestionSheet, thisExaminee.AnswerSheet.BytesOfAnswer, FontSize * 2,
+                svwrQSh.Width - FontSize * 2 - SystemParameters.ScrollWidth * 2);
+            foreach(object i in qsheetView.Children)
             {
-                QuestionSheetContainer.RowDefinitions.Add(new RowDefinition());
-                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, thisExaminee.AnswerSheet.BytesOfAnswer);
-                Grid.SetRow(q, j);
-                Grid.SetColumn(q, 0);
-                QuestionSheetContainer.Children.Add(q);
-                q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
-                q.optionsView.Name = "_" + i.ToString();
+                SingleQuestionView q = i as SingleQuestionView;
+                if(q != null)
+                {
+                    q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
+                    q.optionsView.Name = "_" + q.Idx.ToString();
+                }
             }
-            for (int i = 1, j = 0; i < n; i += 2, ++j)
-            {
-                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, thisExaminee.AnswerSheet.BytesOfAnswer);
-                Grid.SetRow(q, j);
-                Grid.SetColumn(q, 1);
-                QuestionSheetContainer.Children.Add(q);
-                q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
-                q.optionsView.Name = "_" + i.ToString();
-            }
-            QuestionSheetContainer.Background = Theme.s._[(int)BrushId.BG];
+            svwrQSh.Content = qsheetView;
         }
 
         private void OptionsView_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -397,13 +413,17 @@ namespace sQzClient
         {
             btnSubmit.IsEnabled = false;
             mTimer.Stop();
-            foreach (object child in QuestionSheetContainer.Children)
+            btnExit.IsEnabled = true;
+            QuestionSheetView qs = svwrQSh.Content as QuestionSheetView;
+            if (qs == null)
+                return;
+            //foreach (object child in QuestionSheetContainer.Children)
+            foreach (object child in qs.Children)
             {
                 SingleQuestionView question = child as SingleQuestionView;
                 if(question != null)
                     question.optionsView.IsEnabled = false;
             }
-            btnExit.IsEnabled = true;
         }
 
         void Exit()
