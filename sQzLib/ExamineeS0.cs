@@ -38,7 +38,7 @@ namespace sQzLib
             l.Add(DT.GetBytes(dtTim1));
 
             l.Add(DT.GetBytes(dtTim2));
-            l.Add(BitConverter.GetBytes(Grade));
+            l.Add(BitConverter.GetBytes(CorrectCount));
             if(0 < ComputerName.Length)
                 Utils.AppendBytesOfString(ComputerName, l);
             else
@@ -112,7 +112,7 @@ namespace sQzLib
                 dtTim2 = DT.INVALID;
                 return true;
             }
-            Grade = BitConverter.ToInt32(buf, offs);
+            CorrectCount = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
             //
@@ -129,7 +129,7 @@ namespace sQzLib
             ComputerName = e.ComputerName;
             AnswerSheet = e.AnswerSheet;
             dtTim1 = e.dtTim1;
-            Grade = e.Grade;
+            CorrectCount = e.CorrectCount;
             dtTim2 = e.dtTim2;
         }
 
@@ -195,7 +195,7 @@ namespace sQzLib
                 return true;
             }
             if (reader.Read())
-                Grade = reader.GetInt16(0);
+                CorrectCount = reader.GetInt16(0);
             reader.Close();
             DBConnect.Close(ref conn);
             return false;

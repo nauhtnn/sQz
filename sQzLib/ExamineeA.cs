@@ -28,7 +28,7 @@ namespace sQzLib
         public string Name;
         public string Birthdate;
         public string Birthplace;
-        public int Grade;
+        public int CorrectCount;
 
         public string ComputerName;
         public DateTime dtTim1;
@@ -44,44 +44,13 @@ namespace sQzLib
             Birthdate = null;
             Birthplace = null;
             eStt = NeeStt.Signing;
-            Grade = LV_CAP;
+            CorrectCount = LV_CAP;
             dtTim1 = dtTim2 = DT.INVALID;
             ComputerName = string.Empty;
             AnswerSheet = new AnswerSheet();
         }
 
-        //public void ToByte(out byte[] buf, int prfx)
-        //{
-        //    List<byte[]> l = new List<byte[]>();// GetBytes_ClientSendingToS1();
-        //    int sz = 4;
-        //    foreach (byte[] i in l)
-        //        sz += i.Length;
-        //    buf = new byte[sz];
-        //    sz = 0;
-        //    Buffer.BlockCopy(BitConverter.GetBytes(prfx), 0, buf, sz, 4);
-        //    sz += 4;
-        //    foreach (byte[] i in l)
-        //    {
-        //        Buffer.BlockCopy(i, 0, buf, sz, i.Length);
-        //        sz += i.Length;
-        //    }
-        //}
-
-        //public void ToByte(out byte[] buf)
-        //{
-        //    List<byte[]> l = new List<byte[]>();// GetBytes_ClientSendingToS1();
-        //    int sz = 0;
-        //    foreach (byte[] i in l)
-        //        sz += i.Length;
-        //    buf = new byte[sz];
-        //    sz = 0;
-        //    foreach (byte[] i in l)
-        //    {
-        //        Buffer.BlockCopy(i, 0, buf, sz, i.Length);
-        //        sz += i.Length;
-        //    }
-        //}
-
-        //public string Grade { get { return Math.Round((float)uGrade * 0.333, 1).ToString(); } }
+        public string Grade { get { return Math.Round((double)CorrectCount * 100 * Question.NUMBER_OF_OPTIONS /
+            AnswerSheet.BytesOfAnswer.Length, 2).ToString(); } }
     }
 }

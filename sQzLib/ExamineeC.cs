@@ -72,7 +72,7 @@ namespace sQzLib
 
             if (eStt == NeeStt.Finished)
             {
-                Grade = BitConverter.ToInt32(buf, offs);
+                CorrectCount = BitConverter.ToInt32(buf, offs);
                 l -= 4;
                 offs += 4;
             }
@@ -121,7 +121,7 @@ namespace sQzLib
         public void MergeWithS1(ExamineeA e)
         {
             if (e.eStt == NeeStt.Finished)
-                Grade = e.Grade;
+                CorrectCount = e.CorrectCount;
             if (e.eStt < NeeStt.Finished || bLog)
             {
                 Birthdate = e.Birthdate;

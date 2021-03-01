@@ -28,7 +28,7 @@ namespace sQzLib
             List<byte[]> l = new List<byte[]>();
             l.Add(BitConverter.GetBytes((int)eStt));
             if (eStt == NeeStt.Finished)
-                l.Add(BitConverter.GetBytes(Grade));
+                l.Add(BitConverter.GetBytes(CorrectCount));
 
             if (eStt < NeeStt.Finished || bLog)
             {
@@ -212,7 +212,7 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-            Grade = BitConverter.ToInt32(buf, offs);
+            CorrectCount = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
 
@@ -252,7 +252,7 @@ namespace sQzLib
             l.Add(AnswerSheet.BytesOfAnswer);
             l.Add(BitConverter.GetBytes(dtTim2.Hour));
             l.Add(BitConverter.GetBytes(dtTim2.Minute));
-            l.Add(BitConverter.GetBytes(Grade));
+            l.Add(BitConverter.GetBytes(CorrectCount));
             return l;
         }
 
@@ -291,7 +291,7 @@ namespace sQzLib
             eStt = e.eStt;
             dtTim1 = e.dtTim1;
             dtTim2 = e.dtTim2;
-            Grade = e.Grade;
+            CorrectCount = e.CorrectCount;
         }
     }
 }

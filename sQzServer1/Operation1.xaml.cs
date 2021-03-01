@@ -293,7 +293,7 @@ namespace sQzServer1
                         {
                             o.eStt = NeeStt.Finished;
                             o.AnswerSheet = e.AnswerSheet;
-                            o.Grade = keySh.Grade(e.AnswerSheet.BytesOfAnswer);
+                            o.CorrectCount = keySh.Grade(e.AnswerSheet.BytesOfAnswer);
                             o.dtTim2 = DateTime.Now;
                             foreach (SortedList<string, bool> sl in vfbLock)
                                 if (sl.ContainsKey(e.ID))
@@ -307,7 +307,7 @@ namespace sQzServer1
                                     if (vw.vDt2.TryGetValue(e.ID, out t))
                                         t.Text = o.dtTim2.ToString("HH:mm");
                                     if (vw.vMark.TryGetValue(e.ID, out t))
-                                        t.Text = o.Grade.ToString();
+                                        t.Text = o.CorrectCount.ToString();
                                     CheckBox cbx;
                                     if (vw.vLock.TryGetValue(e.ID, out cbx))
                                     {

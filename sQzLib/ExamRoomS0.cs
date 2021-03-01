@@ -85,7 +85,7 @@ namespace sQzLib
                             break;
                         if (DT.Toh(reader.GetString(1), DT.hs, out e.dtTim2))
                             break;
-                        e.Grade = reader.GetInt16(2);
+                        e.CorrectCount = reader.GetInt16(2);
                         e.ComputerName = reader.GetString(3);
                         e.eStt = NeeStt.Finished;
                     }
@@ -108,7 +108,7 @@ namespace sQzLib
                     vals.Append("('" + e.mDt.ToString(DT._) + "','" +
                         e.ID + "'," + (e.AnswerSheet.QuestSheetID)
                         + ",'" + e.dtTim1.ToString(DT.hh) +
-                        "','" + e.dtTim2.ToString(DT.hh) + "'," + e.Grade + ",'" +
+                        "','" + e.dtTim2.ToString(DT.hh) + "'," + e.CorrectCount + ",'" +
                         e.ComputerName + "','" + e.AnswerSheet.tAns + "'),");
                 }
         }
