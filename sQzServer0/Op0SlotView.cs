@@ -104,7 +104,7 @@ namespace sQzServer0
                     t.Background = bg;
                     vGrade.Add(e.ID, t);
                     if (e.CorrectCount != ExamineeA.LV_CAP)
-                        t.Text = e.CorrectCount.ToString();
+                        t.Text = e.Grade;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 5);
                     grdNee.Children.Add(t);

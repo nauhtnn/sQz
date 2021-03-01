@@ -231,27 +231,20 @@ namespace sQzLib
             return false;
         }
 
-        public List<byte[]> ToByte_SendingToS0()
+        public List<byte[]> GetBytes_SendingToS0()
         {
             //suppose eStt == NeeStt.Finished
             List<byte[]> l = new List<byte[]>();
-            byte[] x = Encoding.UTF8.GetBytes(ID);
-            l.Add(BitConverter.GetBytes(x.Length));
-            l.Add(x);
+            Utils.AppendBytesOfString(ID, l);
             if (0 < ComputerName.Length)
-            {
-                x = Encoding.UTF8.GetBytes(ComputerName);
-                l.Add(BitConverter.GetBytes(x.Length));
-                l.Add(x);
-            }
+                Utils.AppendBytesOfString(ComputerName, l);
             else
                 l.Add(BitConverter.GetBytes(0));
-            l.Add(BitConverter.GetBytes(dtTim1.Hour));
-            l.Add(BitConverter.GetBytes(dtTim1.Minute));
+            l.Add(BitConverter.GetBytes(dtTim1.ToBinary()));
             l.Add(BitConverter.GetBytes(AnswerSheet.QuestSheetID));
+            l.Add(BitConverter.GetBytes(AnswerSheet.BytesOfAnswer.Length));
             l.Add(AnswerSheet.BytesOfAnswer);
-            l.Add(BitConverter.GetBytes(dtTim2.Hour));
-            l.Add(BitConverter.GetBytes(dtTim2.Minute));
+            l.Add(BitConverter.GetBytes(dtTim2.ToBinary()));
             l.Add(BitConverter.GetBytes(CorrectCount));
             return l;
         }

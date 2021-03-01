@@ -80,41 +80,40 @@ namespace sQzLib
                 offs += x;
             }
             //
-            if (l < AnswerSheet.BytesOfAnswer_Length + 24)
+            if (l < sizeof(long))
                 return true;
-            int h = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            int m = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim1))
-            {
-                dtTim1 = DT.INVALID;
+            dtTim1 = DateTime.FromBinary(BitConverter.ToInt64(buf, offs));
+            l -= sizeof(long);
+            offs += sizeof(long);
+
+            if (l < 4)
                 return true;
-            }
             AnswerSheet.QuestSheetID = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            AnswerSheet.BytesOfAnswer = new byte[AnswerSheet.BytesOfAnswer_Length];
-            Array.Copy(buf, offs, AnswerSheet.BytesOfAnswer, 0, AnswerSheet.BytesOfAnswer_Length);
-            l -= AnswerSheet.BytesOfAnswer_Length;
-            offs += AnswerSheet.BytesOfAnswer_Length;
 
-            h = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            m = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim2))
-            {
-                dtTim2 = DT.INVALID;
+            if (l < 4)
                 return true;
-            }
-            CorrectCount = BitConverter.ToInt32(buf, offs);
+            AnswerSheet.BytesOfAnswer_Length = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
+
+            if (l < AnswerSheet.BytesOfAnswer_Length)
+                return true;
+            AnswerSheet.BytesOfAnswer = new byte[AnswerSheet.BytesOfAnswer_Length];
+            Array.Copy(buf, offs, AnswerSheet.BytesOfAnswer, 0, AnswerSheet.BytesOfAnswer.Length);
+            l -= AnswerSheet.BytesOfAnswer.Length;
+            offs += AnswerSheet.BytesOfAnswer.Length;
+
+            if (l < sizeof(long))
+                return true;
+            dtTim2 = DateTime.FromBinary(BitConverter.ToInt64(buf, offs));
+            l -= sizeof(long);
+            offs += sizeof(long);
+
+            if (l < 4)
+                return true;
+            CorrectCount = BitConverter.ToInt32(buf, offs);
             //
             return false;
         }

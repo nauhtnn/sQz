@@ -50,7 +50,12 @@ namespace sQzLib
             AnswerSheet = new AnswerSheet();
         }
 
-        public string Grade { get { return Math.Round((double)CorrectCount * 100 * Question.NUMBER_OF_OPTIONS /
-            AnswerSheet.BytesOfAnswer.Length, 2).ToString(); } }
+        public string Grade {
+            get
+            {
+                return Math.Round((double)CorrectCount * 100 * Question.NUMBER_OF_OPTIONS /
+                    AnswerSheet.BytesOfAnswer.Length, 2).ToString() + " / 100";
+            }
+        }
     }
 }
