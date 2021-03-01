@@ -113,6 +113,12 @@ namespace sQzLib
             if (eStt < NeeStt.Submitting)
                 return false;
 
+            if (l < 4)
+                return true;
+            AnswerSheet.BytesOfAnswer_Length = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+
             if (l < AnswerSheet.BytesOfAnswer_Length)
                 return true;
             AnswerSheet.BytesOfAnswer = new byte[AnswerSheet.BytesOfAnswer_Length];

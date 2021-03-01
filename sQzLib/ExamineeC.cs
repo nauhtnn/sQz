@@ -52,6 +52,7 @@ namespace sQzLib
             if (eStt < NeeStt.Submitting)
                 return l;
 
+            l.Add(BitConverter.GetBytes(AnswerSheet.BytesOfAnswer_Length));
             l.Add(AnswerSheet.BytesOfAnswer);
 
             return l;

@@ -279,10 +279,7 @@ namespace sQzServer1
                         AnswerSheet keySh = null;
                         found = false;
                         if(Slot.mKeyPack.vSheet.TryGetValue(e.AnswerSheet.QuestSheetID, out keySh))
-                        {
                             found = true;
-                            break;
-                        }
                         if (!found)
                         {
                             outMsg = BitConverter.GetBytes(101);//todo
@@ -290,7 +287,7 @@ namespace sQzServer1
                         }
                         ExamineeS1 o = null;
                         found = false;
-                        if ((o = Slot.Find(e.ID)) != null)
+                        if ((o = Slot.Find(e.ID)) == null)
                             break;
                         if (o != null)
                         {
