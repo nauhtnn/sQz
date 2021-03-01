@@ -41,14 +41,16 @@ namespace sQzClient
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
         {
-            if (tbxId.Text.Length > 8)
+            string trim_ID = tbxId.Text.Trim();
+            if (trim_ID.Length > 8)
             {
                 spMain.Opacity = 0.5;
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.NEEID_NOK));
                 spMain.Opacity = 1;
                 return;
             }
-            if(tbxBirthdate.Text.Length > 10)
+            string trim_birthdate = tbxBirthdate.Text.Trim();
+            if (trim_birthdate.Length > 10)
             {
                 thisExaminee.Birthdate = null;
                 spMain.Opacity = 0.5;
@@ -56,8 +58,8 @@ namespace sQzClient
                 spMain.Opacity = 1;
                 return;
             }
-            thisExaminee.ID = tbxId.Text;
-            thisExaminee.Birthdate = tbxBirthdate.Text;
+            thisExaminee.ID = trim_ID;
+            thisExaminee.Birthdate = trim_birthdate;
             try
             {
                 thisExaminee.ComputerName = Environment.MachineName;

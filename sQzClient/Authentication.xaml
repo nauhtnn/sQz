@@ -32,12 +32,10 @@
                     <RowDefinition Height="80"/>
                 </Grid.RowDefinitions>
                 <TextBlock x:Name="txtId" TextAlignment="Center" Foreground="#00356b"/>
-                <TextBox x:Name="tbxId" Grid.Row="1" Width="96" MaxLength="5" TextAlignment="Center" IsEnabled="False"/>
+                <TextBox x:Name="tbxId" Grid.Row="1" Width="200" MaxLength="16" TextAlignment="Center" IsEnabled="False"/>
                 <TextBlock x:Name="txtBirdate" Grid.Column="1" TextAlignment="Center" Foreground="#00356b"/>
                 <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1" HorizontalAlignment="Center">
-                    <TextBlock Text="/" Width="16" TextAlignment="Center"/>
-                    <TextBlock Text="/" Width="16" TextAlignment="Center"/>
-                    <TextBox x:Name="tbxBirthdate" Width="200" MaxLength="4" TextAlignment="Center" Foreground="#00356b" IsEnabled="False" PreviewKeyDown="tbx_PrevwNumberOnly"/>
+                    <TextBox x:Name="tbxBirthdate" Width="200" MaxLength="16" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
                 </StackPanel>
                 <Button x:Name="btnSignIn" Grid.Row="3" Width="256" Click="btnSignIn_Click" BorderThickness="0" IsEnabled="False" Background="#1c64e7" Foreground="#fff"/>
                 <Button x:Name="btnOpenLog" Grid.Row="3" Grid.Column="1" Width="256" Click="btnOpenLog_Click" IsEnabled="False" Background="#80cc28" Foreground="#fff"/>
