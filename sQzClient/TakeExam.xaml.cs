@@ -86,7 +86,7 @@ namespace sQzClient
 
             System.Text.StringBuilder msg = new System.Text.StringBuilder();
             msg.Append(thisExaminee.ID + " (" + thisExaminee.Name + ")");
-            if (thisExaminee.kDtDuration.Minutes == 30)
+            if (thisExaminee.kDtDuration.Seconds == 0)
                 msg.Append(Txt.s._((int)TxI.EXAMING_MSG_1));
             else
                 msg.AppendFormat(Txt.s._((int)TxI.EXAMING_MSG_2),
