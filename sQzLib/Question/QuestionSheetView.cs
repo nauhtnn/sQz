@@ -6,7 +6,7 @@ namespace sQzLib
 {
     public class QuestionSheetView: StackPanel
     {
-        public QuestionSheetView(QuestSheet qsheet, byte[] optionStatusArray, double idxWidth, double stemWidth)
+        public QuestionSheetView(QuestSheet qsheet, byte[] optionStatusArray, double idxWidth, double stemWidth, bool isEnabled = true)
         {
             SingleQuestionView.IdxWidth = idxWidth;
             SingleQuestionView.StemWidth = stemWidth;
@@ -24,10 +24,10 @@ namespace sQzLib
             }
         }
 
-        void AddListOfSingleQuestions(List<Question> questions, ref int idx_start0)
+        void AddListOfSingleQuestions(List<Question> questions, ref int idx_start0, byte[] optionStatusArray = null, bool isEnabled = true)
         {
             foreach (Question q in questions)
-                Children.Add(new SingleQuestionView(q, ++idx_start0, null));
+                Children.Add(new SingleQuestionView(q, ++idx_start0, optionStatusArray));
         }
     }
 }
