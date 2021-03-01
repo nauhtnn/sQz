@@ -33,7 +33,7 @@ namespace sQzClient
         NetCode mState;
 
         public static double qaWh;
-        public ExamineeC thisExaminee;//reference to Auth.mNee
+        public ExamineeC thisExaminee;//reference to Auth.thisExaminee
 
         public TakeExam()
         {
@@ -72,7 +72,7 @@ namespace sQzClient
 
             bBtnBusy = false;
 
-            txtWelcome.Text = thisExaminee.ToString();
+            txtExamineeInfo.Text = thisExaminee.ToString();
 
             LoadTxt();
 
@@ -173,6 +173,7 @@ namespace sQzClient
                 l.BorderBrush = brBK;
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
+                l.FontWeight = FontWeights.Bold;
                 Grid.SetRow(l, j);
                 Grid.SetColumn(l, 1);
                 gAnsSh.Children.Add(l);
@@ -193,6 +194,7 @@ namespace sQzClient
             l.BorderBrush = brBK;
             l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
+            l.FontWeight = FontWeights.Bold;
             Grid.SetRow(l, j);
             Grid.SetColumn(l, 1);
             gAnsSh.Children.Add(l);
@@ -207,23 +209,24 @@ namespace sQzClient
         {
             QuestionSheetContainer.Background = Theme.s._[(int)BrushId.Q_BG];
             int n = QuestionSheet.Count;
-            for (int i = 1, j = 0; i <= n; i += 2, ++j)
+            for (int i = 0, j = 0; i < n; i += 2, ++j)
             {
                 QuestionSheetContainer.RowDefinitions.Add(new RowDefinition());
-                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i - 1), i, ans_todo);
+                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, ans_todo);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 0);
                 QuestionSheetContainer.Children.Add(q);
                 q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
-                q.optionsView.Name = "_" + (i - 1).ToString();
+                q.optionsView.Name = "_" + i.ToString();
             }
-            for (int i = 2, j = 0; i <= n; i += 2, ++j)
+            for (int i = 1, j = 0; i < n; i += 2, ++j)
             {
-                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i - 1), i, ans_todo);
+                SingleQuestionView q = new SingleQuestionView(QuestionSheet.Q(i), i, ans_todo);
                 Grid.SetRow(q, j);
                 Grid.SetColumn(q, 1);
                 QuestionSheetContainer.Children.Add(q);
-                q.optionsView.Name = "_" + (i - 1).ToString();
+                q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
+                q.optionsView.Name = "_" + i.ToString();
             }
             QuestionSheetContainer.Background = Theme.s._[(int)BrushId.BG];
         }

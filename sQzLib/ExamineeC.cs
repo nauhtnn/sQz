@@ -258,5 +258,10 @@ namespace sQzLib
         {
             tLog.Append(s);
         }
+
+        public override string ToString()
+        {
+            return ID + ", " + Name + ", " + Birthdate;
+        }
     }
 }
