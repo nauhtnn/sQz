@@ -14,13 +14,9 @@ namespace sQzLib
             AddListOfSingleQuestions(qsheet.ShallowCopyIndependentQuestions(), ref idx);
             foreach (PassageWithQuestions p in qsheet.Passages.Values)
             {
-                TextBlock passageText = new TextBlock();
-                passageText.Text = "\n\n" + p.Passage + "\n\n";
-                passageText.Width = stemWidth;
-                passageText.TextWrapping = TextWrapping.Wrap;
-                passageText.TextAlignment = TextAlignment.Justify;
-                Children.Add(passageText);
-                AddListOfSingleQuestions(p.Questions, ref idx);
+                PassageWithQuestionsView view = new PassageWithQuestionsView(p, ref idx, null);
+                Children.Add(view.IdxBarView);
+                Children.Add(view);
             }
         }
 

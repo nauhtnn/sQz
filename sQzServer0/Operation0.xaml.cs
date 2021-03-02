@@ -272,9 +272,6 @@ namespace sQzServer0
 
             txtDate.Text = DT._;
 
-            txtMod.Text = t._((int)TxI.MODULE);
-            txtNEsyDif.Text = t._((int)TxI.N_ESY_DIF);
-            txtNDiff.Text = t._((int)TxI.N_DIFF);
             txtnQs.Text = t._((int)TxI.QS_N);
             txtnQ.Text = t._((int)TxI.Q_N);
             txtBirdate.Text = t._((int)TxI.BIRDATE);
