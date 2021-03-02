@@ -86,9 +86,9 @@ namespace sQzClient
 
             System.Text.StringBuilder msg = new System.Text.StringBuilder();
             msg.Append(thisExaminee.ID + " (" + thisExaminee.Name + ")");
-            if (thisExaminee.kDtDuration.Seconds == 0)
+            if (thisExaminee.kDtDuration.Equals(thisExaminee.FullTestDuration))
                 msg.AppendFormat(Txt.s._((int)TxI.EXAMING_MSG_1),
-                    thisExaminee.kDtDuration.Minutes);
+                    thisExaminee.kDtDuration.Minutes, thisExaminee.kDtDuration.Seconds);
             else
                 msg.AppendFormat(Txt.s._((int)TxI.EXAMING_MSG_2),
                     thisExaminee.kDtDuration.Minutes, thisExaminee.kDtDuration.Seconds);

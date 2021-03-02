@@ -11,6 +11,7 @@
 
     <Viewbox>
         <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
+            <TextBlock x:Name="txtSubject_TestDuration" Text="Subject - Test Duration" HorizontalAlignment="Center" />
             <StackPanel Orientation="Horizontal">
                 <StackPanel>
                     <Button x:Name="btnConn" Width="120" Height="40" Click="btnConn_Click" Background="#80cc28" Foreground="#fff"

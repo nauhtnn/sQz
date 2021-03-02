@@ -447,7 +447,7 @@ namespace sQzLib
         public byte[] GetBytes_QPacksWithDateTime(int rid)
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(DT.GetBytes(mDt));
+            l.Add(BitConverter.GetBytes(mDt.ToBinary()));
             l.InsertRange(l.Count, QuestionPack.ToByte());
 
             return Utils.ToArray_FromListOfBytes(l);
@@ -481,7 +481,7 @@ namespace sQzLib
         public byte[] GetBytes_KeysWithDateTime()
         {
             List<byte[]> l = mKeyPack.GetBytes_S0SendingToS1();
-            l.Insert(0, DT.GetBytes(mDt));
+            l.Insert(0, BitConverter.GetBytes(mDt.ToBinary()));
             return Utils.ToArray_FromListOfBytes(l);
         }
 
@@ -498,7 +498,7 @@ namespace sQzLib
         public byte[] GetBytes_RoomSendingToS1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(DT.GetBytes(Dt));
+            l.Add(BitConverter.GetBytes(Dt.ToBinary()));
             ExamRoomS0 r;
             if (Rooms.TryGetValue(rId, out r))
                 l.InsertRange(l.Count, r.GetBytes_SendingToS1());

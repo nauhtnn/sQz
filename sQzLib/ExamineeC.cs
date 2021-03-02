@@ -10,6 +10,7 @@ namespace sQzLib
     {
 
         public TimeSpan kDtDuration;
+        public TimeSpan FullTestDuration;
 
         public StringBuilder tLog;
 
@@ -27,7 +28,8 @@ namespace sQzLib
         public override void Reset()
         {
             _Reset();
-            kDtDuration = new TimeSpan(0, 30, 0);
+            FullTestDuration = new TimeSpan(0, 59, 59);
+            kDtDuration = new TimeSpan(0, 59, 59);
             tLog = new StringBuilder();
         }
 

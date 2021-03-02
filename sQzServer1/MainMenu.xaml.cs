@@ -51,22 +51,36 @@ namespace sQzServer1
         {
             int offs = 0;
             if (buf.Length - offs < 4)
+            {
+                MessageBox.Show("Error data!");
                 return false;
+            }
             int rs = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            if (rs == (int)TxI.OP_AUTH_OK)
+            if (rs != (int)TxI.OP_AUTH_OK)
             {
-                Dispatcher.InvokeAsync(() =>
-                {
-                    Page op1 = new Operation1();
-                    NavigationService.Navigate(op1);
-                });
-            }
-            else
                 Dispatcher.InvokeAsync(() =>
                 {
                     WPopup.s.ShowDialog(Txt.s._((int)TxI.OP_AUTH_NOK));
                 });
+                return false;
+            }
+            if(buf.Length - offs < sizeof(long))
+            {
+                MessageBox.Show("Error data!");
+                return false;
+            }
+            TimeSpan testDuration = new TimeSpan(BitConverter.ToInt64(buf, offs));
+            offs += sizeof(long);
+
+            string subject = Utils.ReadBytesOfString(buf, ref offs);
+            if (subject == null)
+                subject = string.Empty;
+            Dispatcher.InvokeAsync(() =>
+            {
+                Page op1 = new Operation1(testDuration, subject);
+                NavigationService.Navigate(op1);
+            });   
             return false;
         }
 

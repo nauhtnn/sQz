@@ -35,9 +35,9 @@ namespace sQzLib
             if (eStt < NeeStt.Finished)
                 return l;
 
-            l.Add(DT.GetBytes(dtTim1));
+            l.Add(BitConverter.GetBytes(dtTim1.ToBinary()));
 
-            l.Add(DT.GetBytes(dtTim2));
+            l.Add(BitConverter.GetBytes(dtTim2.ToBinary()));
             l.Add(BitConverter.GetBytes(CorrectCount));
             if(0 < ComputerName.Length)
                 Utils.AppendBytesOfString(ComputerName, l);

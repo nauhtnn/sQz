@@ -19,16 +19,25 @@ namespace sQzLib
             offs += 4;
             if (l < sz)
                 return null;
-            string text = Encoding.UTF8.GetString(buf, offs, sz);
+            string text;
+            if (sz == 0)
+                text = string.Empty;
+            else
+                text = Encoding.UTF8.GetString(buf, offs, sz);
             offs += sz;
             return text;
         }
 
         public static void AppendBytesOfString(string text, List<byte[]> byteList)
         {
-            byte[] b = Encoding.UTF8.GetBytes(text);
-            byteList.Add(BitConverter.GetBytes(b.Length));
-            byteList.Add(b);
+            if (text == null || text.Length == 0)
+                byteList.Add(BitConverter.GetBytes((int)0));
+            else
+            {
+                byte[] b = Encoding.UTF8.GetBytes(text);
+                byteList.Add(BitConverter.GetBytes(b.Length));
+                byteList.Add(b);
+            }
         }
 
         public static byte[] ToArray_FromListOfBytes(List<byte[]> l)

@@ -55,22 +55,6 @@ namespace sQzLib
             return true;
         }
 
-        public static byte[] GetBytes(DateTime dt)
-        {
-            byte[] buf = new byte[sizeof(long)];
-            Array.Copy(BitConverter.GetBytes(dt.ToBinary()), 0, buf, 0, sizeof(long));
-            return buf;
-        }
-
-        public static bool CopyBytesToBuffer(byte[] buf, ref int offs, DateTime dt)
-        {
-            if (buf.Length < sizeof(long))
-                return true;
-            Array.Copy(BitConverter.GetBytes(dt.ToBinary()), 0, buf, offs, sizeof(long));
-            offs += sizeof(long);
-            return false;
-        }
-
         public static DateTime ReadByte(byte[] buf, ref int offs)
         {
             if (buf.Length - offs < sizeof(long))

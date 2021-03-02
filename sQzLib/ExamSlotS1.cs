@@ -63,7 +63,7 @@ namespace sQzLib
         public List<byte[]> GetBytes_RoomSendingToS0()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(DT.GetBytes(mDt));
+            l.Add(BitConverter.GetBytes(mDt.ToBinary()));
             if (Rooms.Values.Count == 1)//either 0 or 1
             {
                 foreach (ExamRoomS1 r in Rooms.Values)

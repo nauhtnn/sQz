@@ -31,10 +31,15 @@ namespace sQzServer1
         ExamSlotS1 Slot;
         int uRId;//todo change to enum
         List<SortedList<string, bool>> vfbLock;
+        TimeSpan TestDuration;
+        string Subject;
 
-        public Operation1()
+        public Operation1(TimeSpan testDuration, string subject)
         {
             InitializeComponent();
+
+            TestDuration = testDuration;
+            Subject = subject;
 
             mState = NetCode.Srvr1DatRetriving;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, true);
@@ -66,6 +71,8 @@ namespace sQzServer1
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
             w.FontSize = 13;
+
+            txtSubject_TestDuration.Text = "Subject: " + Subject + " - Duration: " + TestDuration.ToString();
 
             WPopup.nwIns(w);
 
@@ -139,7 +146,11 @@ namespace sQzServer1
             switch (c)
             {
                 case NetCode.Dating:
-                    outMsg = DT.GetBytes(Slot.Dt);
+                    List<byte[]> bytes = new List<byte[]>();
+                    bytes.Add(BitConverter.GetBytes(Slot.Dt.ToBinary()));
+                    bytes.Add(BitConverter.GetBytes(TestDuration.Ticks));
+                    Utils.AppendBytesOfString(Subject, bytes);
+                    outMsg = Utils.ToArray_FromListOfBytes(bytes);
                     return true;
                 case NetCode.Authenticating:
                     e = new ExamineeS1();

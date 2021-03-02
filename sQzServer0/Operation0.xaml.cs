@@ -27,6 +27,8 @@ namespace sQzServer0
         bool bRunning;
         ExamSlotS0 Slot;
         TabItem tbiSelected;
+        TimeSpan TestDuration;
+        string Subject;
 
         public Operation0()
         {
@@ -92,9 +94,43 @@ namespace sQzServer0
             aTimer.Enabled = true;
         }
 
+        private bool SetTestDuration()
+        {
+            if (tbxDuration.Text == null || tbxDuration.Text.Length == 0)
+                return false;
+            string[] parts = tbxDuration.Text.Split(':');
+            if (parts.Length != 3 || parts[0].Length == 0
+                || parts[1].Length == 0 || parts[2].Length == 0)
+                return false;
+            int hours;
+            if (!int.TryParse(parts[0], out hours))
+                return false;
+            int minutes;
+            if (!int.TryParse(parts[1], out minutes))
+                return false;
+            int seconds;
+            if (!int.TryParse(parts[2], out seconds))
+                return false;
+            TestDuration = new TimeSpan(hours, minutes, seconds);
+            tbxDuration.IsEnabled = false;
+            return true;
+        }
+
         private void btnStart_Click(object sender, RoutedEventArgs e)
         {
-            foreach(TabItem i in tbcSl.Items)
+            if(!SetTestDuration())
+            {
+                MessageBox.Show("Command is stopped! Please correct test duration!");
+                return;
+            }
+            if (tbxSubject.Text == null || tbxSubject.Text.Length == 0
+                || tbxSubject.Text.Trim().Length == 0)
+            {
+                MessageBox.Show("Command is stopped! Subject is empty!");
+                return;
+            }
+            Subject = tbxSubject.Text;
+            foreach (TabItem i in tbcSl.Items)
             {
                 Op0SlotView vw = i as Op0SlotView;
                 if (vw == null)
@@ -160,7 +196,11 @@ namespace sQzServer0
                     {
                         if(pw == Slot.Rooms[roomId].tPw)
                         {
-                            outMsg = BitConverter.GetBytes((int)TxI.OP_AUTH_OK);
+                            List<byte[]> bytes = new List<byte[]>();
+                            bytes.Add(BitConverter.GetBytes((int)TxI.OP_AUTH_OK));
+                            bytes.Add(BitConverter.GetBytes(TestDuration.Ticks));
+                            Utils.AppendBytesOfString(Subject, bytes);
+                            outMsg = Utils.ToArray_FromListOfBytes(bytes);
                             break;
                         }
                     }

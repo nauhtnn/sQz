@@ -36,7 +36,7 @@ namespace sQzClient
             mDt = DT.INVALID;
             thisExaminee = new ExamineeC();
 
-            thisExaminee.kDtDuration = new TimeSpan(1, 0, 0);
+            thisExaminee.kDtDuration = new TimeSpan(0, 59, 59);
         }
 
         private void btnSignIn_Click(object sender, RoutedEventArgs e)
@@ -131,8 +131,23 @@ namespace sQzClient
                 case NetCode.Dating:
                     if((mDt = DT.ReadByte(buf, ref offs)) != DT.INVALID && bRunning)
                     {
+                        if (buf.Length - offs < sizeof(long))
+                        {
+                            MessageBox.Show("Error data!");
+                            return false;
+                        }
+                        thisExaminee.FullTestDuration = new TimeSpan(BitConverter.ToInt64(buf, offs));
+                        offs += sizeof(long);
+
+                        string subject = Utils.ReadBytesOfString(buf, ref offs);
+
                         Dispatcher.Invoke(() => {
-                            txtDate.Text = Txt.s._((int)TxI.DATE) + mDt.ToString(DT.RR);
+                            StringBuilder sb = new StringBuilder();
+                            sb.Append(Txt.s._((int)TxI.DATE) + mDt.ToString(DT.RR));
+                            if (subject != null)
+                                sb.Append(", subject: " + subject);
+                            sb.Append(", duration: " + thisExaminee.FullTestDuration.ToString());
+                            txtDate.Text = sb.ToString();
                             EnableControls();
                             btnReconn.IsEnabled = false;
                         });
@@ -154,6 +169,8 @@ namespace sQzClient
                         if (!b)
                         {
                             thisExaminee.MergeWithS1(e);
+                            if (!thisExaminee.bLog)
+                                thisExaminee.kDtDuration = thisExaminee.FullTestDuration;
                             mState = NetCode.ExamRetrieving;
                             return true;//continue
                         }
