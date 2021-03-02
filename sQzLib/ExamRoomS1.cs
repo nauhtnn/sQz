@@ -63,7 +63,7 @@ namespace sQzLib
                 if (e.eStt == NeeStt.Finished && e.NRecd)
                 {
                     ++n;
-                    l.InsertRange(l.Count, e.ToByte_SendingToS0());
+                    l.InsertRange(l.Count, e.GetBytes_SendingToS0());
                 }
             l.Insert(1, BitConverter.GetBytes(n));
             return l;
