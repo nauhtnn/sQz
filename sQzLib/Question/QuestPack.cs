@@ -131,6 +131,11 @@ namespace sQzLib
 
         public bool DBDelete(out string eMsg)
         {
+            if (vSheet.Count == 0)
+            {
+                eMsg = string.Empty;
+                return false;
+            }
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {

@@ -305,9 +305,9 @@ namespace sQzServer1
                                 {
                                     TextBlock t = null;
                                     if (vw.vDt2.TryGetValue(e.ID, out t))
-                                        t.Text = o.dtTim2.ToString("HH:mm");
+                                        t.Text = o.dtTim2.ToString(DT.hh);
                                     if (vw.vMark.TryGetValue(e.ID, out t))
-                                        t.Text = o.CorrectCount.ToString();
+                                        t.Text = o.Grade;
                                     CheckBox cbx;
                                     if (vw.vLock.TryGetValue(e.ID, out cbx))
                                     {

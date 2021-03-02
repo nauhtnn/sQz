@@ -151,7 +151,7 @@ namespace sQzServer0
                     e.bToVw = false;
                     TextBlock t;
                     if (e.CorrectCount != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
-                        t.Text = e.CorrectCount.ToString();
+                        t.Text = e.Grade;
                     if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.ID, out t))
                         t.Text = e.dtTim1.ToString(DT.hh);
                     if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.ID, out t))
