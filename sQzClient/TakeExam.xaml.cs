@@ -165,7 +165,7 @@ namespace sQzClient
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 l.FontWeight = FontWeights.Bold;
-                Grid.SetRow(l, j);
+                Grid.SetRow(l, j - 1);
                 Grid.SetColumn(l, 0);
                 gAnsSh.Children.Add(l);
                 l = new Label();
@@ -173,7 +173,7 @@ namespace sQzClient
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
                 l.HorizontalContentAlignment = HorizontalAlignment.Center;
                 l.FontWeight = FontWeights.Bold;
-                Grid.SetRow(l, j);
+                Grid.SetRow(l, j - 1);
                 Grid.SetColumn(l, 1);
                 gAnsSh.Children.Add(l);
                 SelectedLabels.Add(j, l);
@@ -186,7 +186,7 @@ namespace sQzClient
             l.BorderThickness = Theme.s.l[(int)ThicknessId.LB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.FontWeight = FontWeights.Bold;
-            Grid.SetRow(l, j);
+            Grid.SetRow(l, j - 1);
             Grid.SetColumn(l, 0);
             gAnsSh.Children.Add(l);
             l = new Label();
@@ -194,7 +194,7 @@ namespace sQzClient
             l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
             l.HorizontalContentAlignment = HorizontalAlignment.Center;
             l.FontWeight = FontWeights.Bold;
-            Grid.SetRow(l, j);
+            Grid.SetRow(l, j - 1);
             Grid.SetColumn(l, 1);
             gAnsSh.Children.Add(l);
             SelectedLabels.Add(j, l);

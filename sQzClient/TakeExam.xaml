@@ -17,7 +17,7 @@
                     <ColumnDefinition Width="1164"/>
                 </Grid.ColumnDefinitions>
                 <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="652" Width="96">
-                    <TextBlock x:Name="txtAnsSh" Height="30" FontSize="20" HorizontalAlignment="Center"/>
+                    <TextBlock x:Name="txtAnsSh" Height="30" FontSize="15" HorizontalAlignment="Center"/>
                     <ScrollViewer x:Name="svwrASh" Height="622" Width="96" VerticalScrollBarVisibility="Auto" FontSize="14">
                         <Grid x:Name="gAnsSh">
                             <Grid.ColumnDefinitions>
