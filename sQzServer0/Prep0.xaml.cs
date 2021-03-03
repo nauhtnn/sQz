@@ -137,13 +137,14 @@ namespace sQzServer0
             mDBQS.ExtractKey(ansSheet);
             int rowIdx = -1;
             foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
-                AddSingleQuestionToDBView(q, ++rowIdx, ansSheet.BytesOfAnswer);
+                AddSingleQuestionToDBView(q, ++rowIdx, rowIdx, ansSheet.BytesOfAnswer);
 
+            int questionIdx = rowIdx;
             foreach (PassageWithQuestions p in mDBQS.ShallowCopyPassages())
             {
-                AddPassageTextToDBView(p.Passage, rowIdx + 1, SingleQuestionView.StemWidth);
+                AddPassageTextToDBView(p.Passage, ++rowIdx, SingleQuestionView.StemWidth);
                 foreach (Question q in p.Questions)
-                    AddSingleQuestionToDBView(q, ++rowIdx, ansSheet.BytesOfAnswer);
+                    AddSingleQuestionToDBView(q, ++questionIdx, ++rowIdx, ansSheet.BytesOfAnswer);
             }
             
             StringBuilder sb = new StringBuilder();
@@ -164,18 +165,18 @@ namespace sQzServer0
             gDBQuest.Children.Add(passageText);
         }
 
-        private void AddSingleQuestionToDBView(Question q, int x, byte[] optionStatusArray)
+        private void AddSingleQuestionToDBView(Question q, int qIdx, int rowIdx, byte[] optionStatusArray)
         {
-            SingleQuestionView questionView = new SingleQuestionView(q, x, optionStatusArray);
+            SingleQuestionView questionView = new SingleQuestionView(q, qIdx, optionStatusArray, false);
             RowDefinition rd = new RowDefinition();
             gDBQuest.RowDefinitions.Add(rd);
-            Grid.SetRow(questionView, x);
+            Grid.SetRow(questionView, rowIdx);
             gDBQuest.Children.Add(questionView);
             CheckBox chk = new CheckBox();
             chk.Name = "c" + q.uId;
             chk.VerticalAlignment = VerticalAlignment.Center;
             Grid.SetColumn(chk, 1);
-            Grid.SetRow(chk, x);
+            Grid.SetRow(chk, rowIdx);
             gDBQuest.Children.Add(chk);
             vChk.Add(chk);
         }

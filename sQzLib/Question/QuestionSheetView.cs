@@ -11,7 +11,7 @@ namespace sQzLib
             SingleQuestionView.IdxWidth = idxWidth;
             SingleQuestionView.StemWidth = stemWidth;
             int idx = -1;
-            AddListOfSingleQuestions(qsheet.ShallowCopyIndependentQuestions(), ref idx);
+            AddListOfSingleQuestions(qsheet.ShallowCopyIndependentQuestions(), ref idx, optionStatusArray, isEnabled);
             ++idx;
             foreach (PassageWithQuestions p in qsheet.Passages.Values)
             {
