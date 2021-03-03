@@ -32,7 +32,7 @@ namespace sQzLib
             return passageView;
         }
 
-        public PassageWithQuestionsView(PassageWithQuestions passage, ref int questionIdx, byte[] optionStatusArray)
+        public PassageWithQuestionsView(PassageWithQuestions passage, ref int questionIdx, byte[] optionStatusArray, bool isEnabled = true)
         {
             CreateIdxView(questionIdx + 1, questionIdx + passage.Questions.Count);
             Orientation = Orientation.Horizontal;
@@ -53,7 +53,7 @@ namespace sQzLib
             StackPanel questions_panel = new StackPanel();
             foreach (Question q in passage.Questions)
             {
-                SingleQuestionView qView = new SingleQuestionView(q, questionIdx++, optionStatusArray);
+                SingleQuestionView qView = new SingleQuestionView(q, questionIdx++, optionStatusArray, isEnabled);
                 questions_panel.Children.Add(qView);
                 QuestionsViews.Add(qView);
             }

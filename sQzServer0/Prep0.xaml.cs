@@ -180,7 +180,10 @@ namespace sQzServer0
 
         private void ShowTmpQ()
         {
-            svwrTmpQ.Content = new QuestionSheetView(mTmpQS, null, FontSize * 2, svwrTmpQ.Width - FontSize * 2 - SystemParameters.ScrollWidth);
+            AnswerSheet ansSheet = new AnswerSheet();
+            mTmpQS.ExtractKey(ansSheet);
+            svwrTmpQ.Content = new QuestionSheetView(mTmpQS, ansSheet.BytesOfAnswer, FontSize * 2,
+                svwrTmpQ.Width - FontSize * 2 - SystemParameters.ScrollWidth, false);
             StringBuilder sb = new StringBuilder();
             sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountPassage);
             tbiTmpQ.Header = sb.ToString();

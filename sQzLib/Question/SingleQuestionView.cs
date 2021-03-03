@@ -46,7 +46,7 @@ namespace sQzLib
             return stemView;
         }
 
-        public SingleQuestionView(Question question, int idx_start0, byte[] optionStatusArray)
+        public SingleQuestionView(Question question, int idx_start0, byte[] optionStatusArray, bool isEnabled = true)
         {
             Idx = idx_start0;
             Orientation = Orientation.Horizontal;
@@ -57,7 +57,7 @@ namespace sQzLib
             StackPanel stemAndOptionsView = new StackPanel();
             stemAndOptionsView.Children.Add(CreateStemView(question.Stem));
             optionsView = CreateOptionsView(question.vAns, optionStatusArray, idx_start0);
-
+            optionsView.IsEnabled = isEnabled;
             
             stemAndOptionsView.Children.Add(optionsView);
             Children.Add(stemAndOptionsView);

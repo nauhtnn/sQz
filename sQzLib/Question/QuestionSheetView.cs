@@ -15,7 +15,7 @@ namespace sQzLib
             ++idx;
             foreach (PassageWithQuestions p in qsheet.Passages.Values)
             {
-                PassageWithQuestionsView view = new PassageWithQuestionsView(p, ref idx, null);
+                PassageWithQuestionsView view = new PassageWithQuestionsView(p, ref idx, null, isEnabled);
                 Children.Add(view.IdxBarView);
                 Children.Add(view);
             }
@@ -24,7 +24,7 @@ namespace sQzLib
         void AddListOfSingleQuestions(List<Question> questions, ref int idx_start0, byte[] optionStatusArray = null, bool isEnabled = true)
         {
             foreach (Question q in questions)
-                Children.Add(new SingleQuestionView(q, ++idx_start0, optionStatusArray));
+                Children.Add(new SingleQuestionView(q, ++idx_start0, optionStatusArray, isEnabled));
         }
     }
 }
