@@ -51,34 +51,13 @@ namespace sQzLib
         {
             //suppose eStt == NeeStt.Finished
             int l = buf.Length - offs;
+            int x;
             //
-            if (l < 4)
-                return true;
-            int x = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            //
-            if (l < x || x < 1)
-                return true;
-            ID = Encoding.UTF8.GetString(buf, offs, x);
-            l -= x;
-            offs += x;
-
-            if (l < 4)
+            ID = Utils.ReadBytesOfString(buf, ref offs, ref l);
+            if (ID.Length == 0)
                 return true;
 
-            x = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            //
-            if (l < x)
-                return true;
-            if (0 < x)
-            {
-                ComputerName = Encoding.UTF8.GetString(buf, offs, x);
-                l -= x;
-                offs += x;
-            }
+            ComputerName = Utils.ReadBytesOfString(buf, ref offs, ref l);
             //
             if (l < sizeof(long))
                 return true;
@@ -114,6 +93,7 @@ namespace sQzLib
             if (l < 4)
                 return true;
             CorrectCount = BitConverter.ToInt32(buf, offs);
+            offs += 4;
             //
             return false;
         }

@@ -11,13 +11,18 @@ namespace sQzLib
 
         public static string ReadBytesOfString(byte[] buf, ref int offs)
         {
-            int l = buf.Length - offs;
-            if (l < 4)
+            int remainLength = buf.Length - offs;
+            return ReadBytesOfString(buf, ref offs, ref remainLength);
+        }
+
+        public static string ReadBytesOfString(byte[] buf, ref int offs, ref int remainLenth)
+        {
+            if (remainLenth < 4)
                 return null;
             int sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
+            remainLenth -= 4;
             offs += 4;
-            if (l < sz)
+            if (remainLenth < sz)
                 return null;
             string text;
             if (sz == 0)
