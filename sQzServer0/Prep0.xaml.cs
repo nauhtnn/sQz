@@ -128,20 +128,22 @@ namespace sQzServer0
 
         private void ShowDBQ()
         {
-            int x = -1;
             gDBQuest.Children.Clear();
             gDBQuest.RowDefinitions.Clear();
             vChk.Clear();
             SingleQuestionView.IdxWidth = FontSize * 2;
             SingleQuestionView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleQuestionView.IdxWidth;
+            AnswerSheet ansSheet = new AnswerSheet();
+            mDBQS.ExtractKey(ansSheet);
+            int rowIdx = -1;
             foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
-                AddSingleQuestionToDBView(q, ++x);
+                AddSingleQuestionToDBView(q, ++rowIdx, ansSheet.BytesOfAnswer);
 
             foreach (PassageWithQuestions p in mDBQS.ShallowCopyPassages())
             {
-                AddPassageTextToDBView(p.Passage, ++x, SingleQuestionView.StemWidth);
+                AddPassageTextToDBView(p.Passage, rowIdx + 1, SingleQuestionView.StemWidth);
                 foreach (Question q in p.Questions)
-                    AddSingleQuestionToDBView(q, ++x);
+                    AddSingleQuestionToDBView(q, ++rowIdx, ansSheet.BytesOfAnswer);
             }
             
             StringBuilder sb = new StringBuilder();
@@ -149,7 +151,7 @@ namespace sQzServer0
             tbiDBQ.Header = sb.ToString();
         }
 
-        private void AddPassageTextToDBView(string text, int x, double w)
+        private void AddPassageTextToDBView(string text, int rowIdx, double w)
         {
             TextBlock passageText = new TextBlock();
             passageText.Text = "\n\n" + text + "\n\n";
@@ -158,13 +160,13 @@ namespace sQzServer0
             passageText.TextAlignment = TextAlignment.Justify;
             RowDefinition rd = new RowDefinition();
             gDBQuest.RowDefinitions.Add(rd);
-            Grid.SetRow(passageText, x);
+            Grid.SetRow(passageText, rowIdx);
             gDBQuest.Children.Add(passageText);
         }
 
-        private void AddSingleQuestionToDBView(Question q, int x)
+        private void AddSingleQuestionToDBView(Question q, int x, byte[] optionStatusArray)
         {
-            SingleQuestionView questionView = new SingleQuestionView(q, x, null);
+            SingleQuestionView questionView = new SingleQuestionView(q, x, optionStatusArray);
             RowDefinition rd = new RowDefinition();
             gDBQuest.RowDefinitions.Add(rd);
             Grid.SetRow(questionView, x);

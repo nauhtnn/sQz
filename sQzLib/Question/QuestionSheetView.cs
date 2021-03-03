@@ -15,7 +15,7 @@ namespace sQzLib
             ++idx;
             foreach (PassageWithQuestions p in qsheet.Passages.Values)
             {
-                PassageWithQuestionsView view = new PassageWithQuestionsView(p, ref idx, null, isEnabled);
+                PassageWithQuestionsView view = new PassageWithQuestionsView(p, ref idx, optionStatusArray, isEnabled);
                 Children.Add(view.IdxBarView);
                 Children.Add(view);
             }
