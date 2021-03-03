@@ -151,11 +151,9 @@ namespace sQzClient
             //title
             Label l = new Label();
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
-            //int nAns = 4;//hardcode
             int n = QuestionSheet.CountAllQuestions();
             SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
             //next lines
-            //n -= 1;
             SelectedLabels = new Dictionary<int, Label>();
             int j = 1;
             for (; j < n; ++j)
@@ -181,7 +179,6 @@ namespace sQzClient
                 SelectedLabels.Add(j, l);
             }
             //bottom lines
-            ++j;
             gAnsSh.RowDefinitions.Add(new RowDefinition());
             l = new Label();
             l.Content = j;
@@ -243,6 +240,18 @@ namespace sQzClient
                 {
                     q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
                     q.optionsView.Name = "_" + q.Idx.ToString();
+                }
+                else
+                {
+                    PassageWithQuestionsView p = i as PassageWithQuestionsView;
+                    if(p != null)
+                    {
+                        foreach(SingleQuestionView q_in_p in p.QuestionsViews)
+                        {
+                            q_in_p.optionsView.SelectionChanged += OptionsView_SelectionChanged;
+                            q_in_p.optionsView.Name = "_" + q_in_p.Idx.ToString();
+                        }
+                    }
                 }
             }
             svwrQSh.Content = qsheetView;

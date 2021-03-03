@@ -12,6 +12,7 @@ namespace sQzLib
             SingleQuestionView.StemWidth = stemWidth;
             int idx = -1;
             AddListOfSingleQuestions(qsheet.ShallowCopyIndependentQuestions(), ref idx);
+            ++idx;
             foreach (PassageWithQuestions p in qsheet.Passages.Values)
             {
                 PassageWithQuestionsView view = new PassageWithQuestionsView(p, ref idx, null);

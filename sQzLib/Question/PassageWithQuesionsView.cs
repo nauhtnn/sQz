@@ -2,12 +2,14 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Collections.Generic;
 
 namespace sQzLib
 {
     public class PassageWithQuestionsView: StackPanel
     {
         public TextBlock IdxBarView { get; private set; }
+        public List<SingleQuestionView> QuestionsViews;
 
         void CreateIdxView(int startQuestionIdx, int endQuestionIdx)
         {
@@ -47,9 +49,14 @@ namespace sQzLib
             sw.Width = SingleQuestionView.StemWidth + SingleQuestionView.IdxWidth + SystemParameters.ScrollWidth;
             sw.MaxHeight = 500;
             sw.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
+            QuestionsViews = new List<SingleQuestionView>();
             StackPanel questions_panel = new StackPanel();
             foreach (Question q in passage.Questions)
-                questions_panel.Children.Add(new SingleQuestionView(q, questionIdx++, optionStatusArray));
+            {
+                SingleQuestionView qView = new SingleQuestionView(q, questionIdx++, optionStatusArray);
+                questions_panel.Children.Add(qView);
+                QuestionsViews.Add(qView);
+            }
             sw.Content = questions_panel;
             Children.Add(sw);
             SingleQuestionView.StemWidth = outsideStemWidth;
