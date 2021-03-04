@@ -211,7 +211,7 @@ namespace sQzLib
                 msg.Append("Read sheet ID.\n");
                 AnswerSheet.QuestSheetID = r.ReadInt32();
                 msg.Append("Read answer length.\n");
-                AnswerSheet.QuestSheetID = r.ReadInt32();
+                AnswerSheet.BytesOfAnswer_Length = r.ReadInt32();
                 msg.Append("Read answer array.\n");
                 AnswerSheet.BytesOfAnswer = r.ReadBytes(AnswerSheet.BytesOfAnswer_Length);
                 int h, m;
