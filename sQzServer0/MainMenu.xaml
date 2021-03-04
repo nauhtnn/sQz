@@ -19,7 +19,7 @@
             <TextBlock x:Name="txtsQz" Background="#fff" Foreground="#8c1515" Height="60" VerticalAlignment="Center" TextAlignment="Center" FontSize="30" Padding="0,6,0,0"/>
             <Button x:Name="btnPrep" Click="btnPrep_Click" Width="256" Height="80" Margin="0,80,0,20" Background="#80cc28" Foreground="#fff" FontWeight="Bold"/>
             <Button x:Name="btnOp" Click="btnOp_Click" Width="256" Height="80" Margin="0,20,0,20" Background="#1c64e7" Foreground="#fff" FontWeight="Bold"/>
-            <Button x:Name="btnArchv" Click="btnArchv_Click" Width="256" Height="80" Margin="0,20,0,20" Background="#fbbc09" Foreground="#fff" FontWeight="Bold"/>
+            <Button Visibility="Collapsed" x:Name="btnArchv" Click="btnArchv_Click" Width="256" Height="80" Margin="0,20,0,20" Background="#fbbc09" Foreground="#fff" FontWeight="Bold"/>
             <Button x:Name="btnExit" Click="btnExit_Click" Width="256" Height="80" Margin="0,20,0,20" Background="#f15a23" Foreground="#fff" FontWeight="Bold"/>
         </StackPanel>
     </Viewbox>

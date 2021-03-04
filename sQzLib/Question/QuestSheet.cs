@@ -370,11 +370,19 @@ namespace sQzLib
             {
                 PassageWithQuestions passage = new PassageWithQuestions(p.ID);
                 passage.Passage = p.Passage;
-                passage.Questions = RandomizeDeepCopy(rand, p.Questions);
+                passage.Questions = RandomizeDeepCopy_KeepQuestionOrder(rand, p.Questions);
                 sheet.Passages.Add(passage.ID, passage);
             }
 
             return sheet;
+        }
+
+        private List<Question> RandomizeDeepCopy_KeepQuestionOrder(Random rand, List<Question> originalList)
+        {
+            List<Question> newList = new List<Question>();
+            foreach (Question q in originalList)
+                newList.Add(q.RandomizeDeepCopy(rand));
+            return newList;
         }
 
         private List<Question> RandomizeDeepCopy(Random rand, List<Question> originalList)
