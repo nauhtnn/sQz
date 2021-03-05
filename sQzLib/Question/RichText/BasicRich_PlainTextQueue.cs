@@ -6,21 +6,21 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Packaging;
 using System.Windows.Controls;
 
-namespace WpfApplication1
+namespace RichTextPractice
 {
     public class BasicRich_PlainTextQueue
     {
-		public static Queue<string> GetTextQueue(string filePath)
+		public static Queue<BasicRich_PlainText> GetTextQueue(string filePath)
 		{
-			Queue<string> lines = ReadTrimLines(filePath);
-            Queue<string> tokens = new Queue<string>();
+			Queue<BasicRich_PlainText> lines = ReadTrimLines(filePath);
+            Queue<BasicRich_PlainText> tokens = new Queue<BasicRich_PlainText>();
 			while(lines.Count > 0)
 			{
                 if (lines.Peek().ElementAt(0) != '{')
                     tokens.Enqueue(lines.Dequeue());
                 else if (lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
                 {
-                    string s = lines.Dequeue();
+                    BasicRich_PlainText s = lines.Dequeue();
                     if(s.Length > 2)
                         tokens.Enqueue(s.Substring(1, s.Length - 2));
                 }
@@ -30,26 +30,25 @@ namespace WpfApplication1
 			return tokens;
 		}
 		
-		static string JoinLinesTo1Token(Queue<string> lines)
+		static BasicRich_PlainText JoinLinesTo1Token(Queue<BasicRich_PlainText> lines)
 		{
-			StringBuilder token = new StringBuilder();
-			token.Append(lines.Dequeue().Substring(1));
+			BasicRich_PlainText token = lines.Dequeue().Substring(1);
 			while(lines.Count > 0)
 			{
 				if(lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
 				{
-                    string s = lines.Dequeue();
+                    BasicRich_PlainText s = lines.Dequeue();
                     if (s.Length > 1)
-                        token.Append("\n" + s.Substring(0, s.Length - 1));
+                        token.AppendNewParagraphs(s.Substring(0, s.Length - 1));
 					break;
 				}
 				else
-					token.Append("\n" + lines.Dequeue());
+					token.AppendNewParagraphs(lines.Dequeue());
 			}
-			return token.ToString();
+			return token;
 		}
 		
-		static Queue<string> ReadTrimLines(string filePath)
+		static Queue<BasicRich_PlainText> ReadTrimLines(string filePath)
 		{
 			if(System.IO.Path.GetExtension(filePath) == ".docx")
 				return ReadTrimDocx(filePath);
@@ -57,9 +56,9 @@ namespace WpfApplication1
 				return ReadTrimTxt(filePath);
 		}
 		
-		static Queue<string> ReadTrimTxt(string filePath)
+		static Queue<BasicRich_PlainText> ReadTrimTxt(string filePath)
 		{
-            Queue<string> lines = new Queue<string>();
+            Queue<BasicRich_PlainText> lines = new Queue<BasicRich_PlainText>();
             string[] rawLines;
             try
             {
@@ -73,14 +72,14 @@ namespace WpfApplication1
 			foreach(string line in rawLines)
 			{
 				if (0 < line.Trim().Length)
-					lines.Enqueue(line);
+					lines.Enqueue(new BasicRich_PlainText(line));
 			}
 			return lines;
 		}
 
-        static Queue<string> ReadTrimDocx(string fpath)
+        static Queue<BasicRich_PlainText> ReadTrimDocx(string fpath)
         {
-            Queue<string> lines = new Queue<string>();
+            Queue<BasicRich_PlainText> lines = new Queue<BasicRich_PlainText>();
             WordprocessingDocument doc = null;
             try
             {
@@ -106,15 +105,20 @@ namespace WpfApplication1
                     if(IsBoldItalicUnderline(p))
                     {
                         RichTextBox richText = new RichTextBox();
-                        richText.Document = new System.Windows.Documents.FlowDocument();
+                        System.Windows.Documents.Paragraph para = new System.Windows.Documents.Paragraph();
                         foreach(Run run in p.ChildElements.OfType<Run>())
                         {
-                            if(IsBoldItalicUnderline(run))
-                            {
-                                //System.Windows.Documents.Run richText_run = new System.Windows.Documents.Run(run.InnerText);
-                                //richText_run.TextDecorations.Add(new System.Windows.TextDecorations())
-                            }
+                            System.Windows.Documents.Run richText_run = new System.Windows.Documents.Run(run.InnerText);
+                            if (IsBoldItalicUnderline(run))
+                                richText_run.TextDecorations.Add(System.Windows.TextDecorations.Underline);
+                            para.Inlines.Add(richText_run);
+                            int x = para.Inlines.Count();
+                            Console.Write(x + " ");
+                            x = para.Inlines.OfType<System.Windows.Documents.Run>().Count();
+                            Console.Write(x + " ");
                         }
+                        richText.Document.Blocks.Add(para);
+                        lines.Enqueue(new BasicRich_PlainText(richText));
                     }
                 }
                 else
