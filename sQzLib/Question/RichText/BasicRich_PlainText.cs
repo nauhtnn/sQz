@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Documents;
 
-namespace RichTextPractice
+namespace WpfApp1
 {
     public class BasicRich_PlainText: ICloneable
     {
@@ -20,21 +20,16 @@ namespace RichTextPractice
             PlainText = null;
             Length = GetTextOfRichText().Length;
         }
+
         private string GetTextOfRichText()
         {
-            return GetTextOfRichText(RichText);
-        }
-
-        private string GetTextOfRichText(RichTextBox rtb)
-        {
-            IEnumerable<Paragraph> paragraphs = rtb.Document.Blocks.OfType<Paragraph>().Last();
-            int n = paragraphs.Count();
-            Console.Write("n=" + n + " ");
-            Paragraph p = paragraphs.Last();
-            IEnumerable<Run> runs = p.Inlines.OfType<Run>();
             StringBuilder text = new StringBuilder();
-            foreach(Run run in runs)
-                text.Append(run.Text);
+            foreach (Paragraph p in RichText.Document.Blocks.OfType<Paragraph>())
+            {
+                foreach (Run run in p.Inlines.OfType<Run>())
+                    text.Append(run.Text);
+                text.Append("\n");
+            }
             return text.ToString();
         }
 
