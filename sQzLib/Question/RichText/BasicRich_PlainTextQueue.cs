@@ -112,10 +112,6 @@ namespace sQzLib
                             if (IsBoldItalicUnderline(run))
                                 richText_run.TextDecorations.Add(System.Windows.TextDecorations.Underline);
                             para.Inlines.Add(richText_run);
-                            int x = para.Inlines.Count();
-                            Console.Write(x + " ");
-                            x = para.Inlines.OfType<System.Windows.Documents.Run>().Count();
-                            Console.Write(x + " ");
                         }
                         richText.Document.Blocks.Add(para);
                         lines.Enqueue(new BasicRich_PlainText(richText));

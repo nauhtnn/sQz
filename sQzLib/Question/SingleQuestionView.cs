@@ -2,6 +2,7 @@
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
+using System.Windows.Documents;
 
 namespace sQzLib
 {
@@ -30,7 +31,43 @@ namespace sQzLib
             return idxView;
         }
 
-        private Label CreateStemView(string text)
+        private UIElement CreateStemView(string text)
+        {
+            if (IsRichText(text))
+                return CreateStemView_RichText(text);
+            return CreateStemView_PlainText(text);
+        }
+
+        private bool IsRichText(string text)
+        {
+            if (text.Length < 5 || !text.StartsWith("{\\rtf"))
+                return false;
+            else
+                return true;
+        }
+
+        private RichTextBox CreateStemView_RichText(string text)
+        {
+            RichTextBox richText = new RichTextBox();
+            richText.Width = StemWidth;
+            richText.Background = Theme.s._[(int)BrushId.Q_BG];
+            richText.BorderBrush = Theme.s._[(int)BrushId.QID_BG];
+            richText.BorderThickness = new Thickness(0, 4, 0, 0);
+            Thickness zero = new Thickness(0);
+            richText.Margin = richText.Padding = zero;
+            byte[] bytes = new byte[text.Length];
+            char[] chars = text.ToCharArray();
+            for (int i = 0; i < text.Length; ++i)
+                bytes[i] = (byte)chars[i];
+            System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
+            TextRange range = new TextRange(richText.Document.ContentStart, richText.Document.ContentEnd);
+            range.Load(stream, DataFormats.Rtf);
+            range.ApplyPropertyValue(RichTextBox.FontSizeProperty, (double)16);
+
+            return richText;
+        }
+
+        private Label CreateStemView_PlainText(string text)
         {
             TextBlock insideText = new TextBlock();
             insideText.Text = text;

@@ -51,7 +51,6 @@ namespace sQzLib
         {
             //suppose eStt == NeeStt.Finished
             int l = buf.Length - offs;
-            int x;
             //
             ID = Utils.ReadBytesOfString(buf, ref offs, ref l);
             if (ID.Length == 0)
