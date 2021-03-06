@@ -264,7 +264,7 @@ namespace sQzLib
 
         public static string SafeSQL_Text(string unsafeText)
         {
-            return unsafeText.Replace("'", "\\'");
+            return unsafeText.Replace("\\", "\\\\").Replace("'", "\\'");
         }
 
         public static string mkQrySelect(string tb, string attbs, string cond)
