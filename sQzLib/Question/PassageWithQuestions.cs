@@ -10,7 +10,6 @@ namespace sQzLib
     public class PassageWithQuestions
     {
         public static int globalMaxID = -1;
-        List<string> MagicKeywords;
         public string Requirements;
         public string Passage;
         protected int _ID;

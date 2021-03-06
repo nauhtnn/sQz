@@ -21,7 +21,7 @@ namespace sQzLib
         {
             RichText = richTextBox;
             PlainText = null;
-            Length = GetInlineTextOfRichText().Length;
+            Length = GetInnerTextOfRichText().Length;
         }
 
         public int IndexOf(string value)
@@ -29,10 +29,10 @@ namespace sQzLib
             if (PlainText != null)
                 return PlainText.IndexOf(value);
             else
-                return GetInlineTextOfRichText().IndexOf(value);
+                return GetInnerTextOfRichText().IndexOf(value);
         }
 
-        private string GetInlineTextOfRichText()
+        private string GetInnerTextOfRichText()
         {
             StringBuilder text = new StringBuilder();
             foreach (Paragraph p in RichText.Document.Blocks.OfType<Paragraph>())
@@ -42,6 +42,14 @@ namespace sQzLib
                 text.Append("\n");
             }
             return text.ToString();
+        }
+
+        public bool StartsWith(string text)
+        {
+            if (PlainText != null)
+                return PlainText.StartsWith(text);
+            else
+                return GetInnerTextOfRichText().StartsWith(text);
         }
 
         public BasicRich_PlainText(string plainText)
@@ -57,7 +65,7 @@ namespace sQzLib
                 return PlainText.ElementAt(index);
             else
             {
-                return GetInlineTextOfRichText().ElementAt(index);
+                return GetInnerTextOfRichText().ElementAt(index);
             }
         }
 
