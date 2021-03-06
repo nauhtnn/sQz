@@ -10,9 +10,10 @@ namespace sQzLib
     public class PassageWithQuestions
     {
         public static int globalMaxID = -1;
-        public const string MAGIC_WORD = "<PASSAGE>";
+        List<string> MagicKeywords;
+        public string Requirements;
         public string Passage;
-        private int _ID;
+        protected int _ID;
         public int ID { get { return _ID; } }
         public List<Question> Questions = new List<Question>();
 
