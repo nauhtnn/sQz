@@ -6,21 +6,22 @@ using System.Threading.Tasks;
 
 namespace sQzLib
 {
-    class PlainTextQuestParser
+    class BasicRich_PlainTextQuestParser
     {
-        public static Tuple<List<Question>, List<PassageWithQuestions>> ParseTokens(Queue<string> tokens)
+        public static Tuple<List<Question>, List<PassageWithQuestions>> ParseTokens(Queue<BasicRich_PlainText> tokens)
         {
             List<Question> independentQuestions = ParseQuestions(tokens);
             List<PassageWithQuestions> passageQuestions = ParsePassages(tokens);
             return new Tuple<List<Question>, List<PassageWithQuestions>>(independentQuestions, passageQuestions);
         }
 
-        private static List<Question> ParseQuestions(Queue<string> tokens)
+        private static List<Question> ParseQuestions(Queue<BasicRich_PlainText> tokens)
         {
             List<Question> questions = new List<Question>();
             while (tokens.Count > 0)
             {
-                if (sQzLib.Utils.CleanFront(tokens.Peek()).IndexOf(PassageWithQuestions.MAGIC_WORD) == 0)
+                if (//sQzLib.Utils.CleanFront(
+                    tokens.Peek().IndexOf(PassageWithQuestions.MAGIC_WORD) == 0)
                     break;
 
                 Question question = Parse1Question(tokens);
@@ -35,7 +36,7 @@ namespace sQzLib
             return questions;
         }
 
-        private static List<PassageWithQuestions> ParsePassages(Queue<string> tokens)
+        private static List<PassageWithQuestions> ParsePassages(Queue<BasicRich_PlainText> tokens)
         {
             List<PassageWithQuestions> passageQuestions = new List<PassageWithQuestions>();
             while (tokens.Count > 0)
@@ -51,56 +52,41 @@ namespace sQzLib
             return passageQuestions;
         }
 
-        private static Question Parse1Question(Queue<string> tokens)
+        private static Question Parse1Question(Queue<BasicRich_PlainText> tokens)
         {
-            if (tokens.Count < Question.NUMBER_OF_OPTIONS + 1)
+            if (tokens.Count < Question.NUMBER_OF_OPTIONS + 2)//+ stem, answer
             {
-                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " doesn't have 1 stem 4 options!");
+                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " doesn't have 1 stem 4 options 1 answer!");
                 return null;
             }
 
             Question question = new Question();
-            question.Stem = tokens.Dequeue();
+            question.Stem = tokens.Dequeue().ToString();
             question.vAns = new string[Question.NUMBER_OF_OPTIONS];
             for (int j = 0; j < Question.NUMBER_OF_OPTIONS;)
-                question.vAns[j++] = tokens.Dequeue();
+                question.vAns[j++] = tokens.Dequeue().ToString();
+            char key_label = tokens.Dequeue().Last();
+            if(key_label < 'A' || 'D' < key_label)
+            {
+                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has key: " + key_label);
+                return null;
+            }
             question.vKeys = new bool[Question.NUMBER_OF_OPTIONS];
             for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
                 question.vKeys[j] = false;
-            if (question.Stem[0] == '\\' && 1 < question.Stem.Length
-                && (question.Stem[1] == '*' || question.Stem[1] == '\\'))
-                question.Stem = question.Stem.Substring(1);
-            int nKey = 0;
-            for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
-            {
-                if (question.vAns[j][0] == '\\' && 1 < question.vAns[j].Length)
-                {
-                    if (question.vAns[j][1] != '\\')
-                    {
-                        question.vKeys[j] = true;
-                        question.vAns[j] = Utils.CleanFront(question.vAns[j].Substring(1));
-                        ++nKey;
-                    }
-                    else
-                        question.vAns[j] = question.vAns[j].Substring(1);
-                }
-            }
-            if (nKey != 1)
-            {
-                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has " + nKey + " key!");
-                return null;
-            }
+            question.vKeys[key_label - 'A'] = true;
             return question;
         }
 
-        private static PassageWithQuestions Parse1Passage(Queue<string> tokens)
+        private static PassageWithQuestions Parse1Passage(Queue<BasicRich_PlainText> tokens)
         {
             if (tokens.Count == 0)
                 return null;
-            if (sQzLib.Utils.CleanFront(tokens.Dequeue()).IndexOf(PassageWithQuestions.MAGIC_WORD) != 0)
+            if (//sQzLib.Utils.CleanFront(
+                tokens.Dequeue().IndexOf(PassageWithQuestions.MAGIC_WORD) != 0)
                 return null;
             PassageWithQuestions passageQuest = new PassageWithQuestions();
-            passageQuest.Passage = tokens.Dequeue();
+            passageQuest.Passage = tokens.Dequeue().ToString();
             passageQuest.Questions = ParseQuestions(tokens);
             return passageQuest;
         }

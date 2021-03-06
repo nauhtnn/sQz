@@ -293,8 +293,8 @@ namespace sQzLib
         public void LoadFromFile(string filePath)
         {
             IndependentQuestions.Clear();
-            PlainTextQuestParser p = new PlainTextQuestParser();
-            Tuple<List<Question>, List<PassageWithQuestions>> tuple = p.ParseTokens(PlainTextQueue.GetTextQueue(filePath));
+            Tuple<List<Question>, List<PassageWithQuestions>> tuple =
+                BasicRich_PlainTextQuestParser.ParseTokens(BasicRich_PlainTextQueue.GetTextQueue(filePath));
             IndependentQuestions = tuple.Item1;
             Passages = new Dictionary<int, PassageWithQuestions>();
             int tempt_ID = -1;

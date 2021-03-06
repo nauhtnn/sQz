@@ -5,11 +5,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Documents;
+using System.IO;
+using System.Windows;
 
-namespace WpfApp1
+namespace sQzLib
 {
     public class BasicRich_PlainText: ICloneable
     {
+        const int MAX_RTF_TEXT_LENGTH = 2^17;//mySQL data type TEXT max length = 2^16
         public RichTextBox RichText { get; private set; }
         public string PlainText { get; private set; }
         public int Length { get; }
@@ -18,10 +21,18 @@ namespace WpfApp1
         {
             RichText = richTextBox;
             PlainText = null;
-            Length = GetTextOfRichText().Length;
+            Length = GetInlineTextOfRichText().Length;
         }
 
-        private string GetTextOfRichText()
+        public int IndexOf(string value)
+        {
+            if (PlainText != null)
+                return PlainText.IndexOf(value);
+            else
+                return GetInlineTextOfRichText().IndexOf(value);
+        }
+
+        private string GetInlineTextOfRichText()
         {
             StringBuilder text = new StringBuilder();
             foreach (Paragraph p in RichText.Document.Blocks.OfType<Paragraph>())
@@ -46,7 +57,24 @@ namespace WpfApp1
                 return PlainText.ElementAt(index);
             else
             {
-                return GetTextOfRichText().ElementAt(index);
+                return GetInlineTextOfRichText().ElementAt(index);
+            }
+        }
+
+        public char Last()
+        {
+            if (PlainText != null)
+                return PlainText.Last();
+            else
+            {
+                char lastChar = (char)0;
+                foreach (Paragraph p in RichText.Document.Blocks.OfType<Paragraph>())
+                {
+                    foreach (Run run in p.Inlines.OfType<Run>())
+                        if(run.Text.Length > 0)
+                            lastChar = run.Text.Last();
+                }
+                return lastChar;
             }
         }
 
@@ -85,7 +113,7 @@ namespace WpfApp1
         public BasicRich_PlainText Substring(int startIndex, int length)
         {
             if (PlainText != null)
-                return Substring(startIndex, length);
+                return new BasicRich_PlainText(PlainText.Substring(startIndex, length));
             else
                 return SubstringOfRichText(startIndex, length);
         }
@@ -127,6 +155,23 @@ namespace WpfApp1
                 return new BasicRich_PlainText(PlainText);
             else
                 return new BasicRich_PlainText(RichText);
+        }
+
+        public override string ToString()
+        {
+            if (PlainText != null)
+                return PlainText;
+            else
+            {
+                using (MemoryStream stream = new MemoryStream(MAX_RTF_TEXT_LENGTH))
+                {
+                    TextRange range = new TextRange(RichText.Document.ContentStart, RichText.Document.ContentEnd);
+                    if (range.CanSave(DataFormats.Rtf) && stream.CanWrite)
+                        range.Save(stream, DataFormats.Rtf);
+                    string Rtf_text = Encoding.UTF8.GetString(stream.ToArray());
+                    return Rtf_text;
+                }
+            }
         }
     }
 }

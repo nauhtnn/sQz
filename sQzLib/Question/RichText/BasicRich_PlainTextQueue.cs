@@ -6,7 +6,7 @@ using DocumentFormat.OpenXml.Wordprocessing;
 using DocumentFormat.OpenXml.Packaging;
 using System.Windows.Controls;
 
-namespace RichTextPractice
+namespace sQzLib
 {
     public class BasicRich_PlainTextQueue
     {
@@ -102,7 +102,7 @@ namespace RichTextPractice
                     p.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
                 if (bl == null)
                 {
-                    if(IsBoldItalicUnderline(p))
+                    if(IsUnderlined(p))
                     {
                         RichTextBox richText = new RichTextBox();
                         System.Windows.Documents.Paragraph para = new System.Windows.Documents.Paragraph();
@@ -120,6 +120,8 @@ namespace RichTextPractice
                         richText.Document.Blocks.Add(para);
                         lines.Enqueue(new BasicRich_PlainText(richText));
                     }
+                    else if(0 < Utils.CleanSpace(p.InnerText).Length)
+                        lines.Enqueue(new BasicRich_PlainText(p.InnerText));
                 }
                 else
                 {
@@ -137,7 +139,7 @@ namespace RichTextPractice
             return lines;
         }
 
-        private static bool IsBoldItalicUnderline(Paragraph para)
+        private static bool IsUnderlined(Paragraph para)
         {
             foreach (Run run in para.ChildElements.OfType<Run>())
             {
@@ -149,7 +151,8 @@ namespace RichTextPractice
 
         private static bool IsBoldItalicUnderline(Run run)
         {
-            if (run.RunProperties.Underline == null || run.RunProperties.Underline.Val == UnderlineValues.None)
+            if (run.RunProperties == null ||
+                run.RunProperties.Underline == null || run.RunProperties.Underline.Val == UnderlineValues.None)
                 return false;
             return true;
         }
