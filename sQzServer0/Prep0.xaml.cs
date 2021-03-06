@@ -194,8 +194,11 @@ namespace sQzServer0
 
         private void btnImpQ_Click(object sender, RoutedEventArgs e)
         {
-            if (mTmpQS.Count == 0)
+            if (mTmpQS.CountAllQuestions() == 0)
+            {
+                MessageBox.Show("No question to import!");
                 return;
+            }
             gDBQuest.Children.Clear();
             svwrTmpQ.Content = null;
             mTmpQS.DBIns();

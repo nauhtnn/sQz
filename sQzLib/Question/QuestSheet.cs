@@ -518,19 +518,19 @@ namespace sQzLib
                     AppendQuestionInsertQuery(q, questionVals);
             }
             string eMsg;
+            if (passageVals.Length > 0)
+            {
+                passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
+                if (DBConnect.Ins(conn, "sqz_passage", "id,psg",
+                passageVals.ToString(), out eMsg) < 0)
+                    System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
+            }
             if (questionVals.Length > 0)
             {
                 questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
                 if (DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
                 questionVals.ToString(), out eMsg) < 0)
                     System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
-            }
-            if(passageVals.Length > 0)
-            {
-                passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
-                if (DBConnect.Ins(conn, "sqz_passage", "id,psg",
-                passageVals.ToString(), out eMsg) < 0)
-                    System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
             }
             
             DBConnect.Close(ref conn);
