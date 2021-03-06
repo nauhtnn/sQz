@@ -517,21 +517,22 @@ namespace sQzLib
                 foreach (Question q in p.Questions)
                     AppendQuestionInsertQuery(q, questionVals);
             }
-            questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
-            passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
             string eMsg;
-            if (DBConnect.Ins(conn, "sqz_passage", "id,psg",
-                passageVals.ToString(), out eMsg) < 0)
+            if (questionVals.Length > 0)
             {
-                System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
-                return;
-            }
-            if (DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
+                questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
+                if (DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
                 questionVals.ToString(), out eMsg) < 0)
-            {
-                System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
-                return;
+                    System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
             }
+            if(passageVals.Length > 0)
+            {
+                passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
+                if (DBConnect.Ins(conn, "sqz_passage", "id,psg",
+                passageVals.ToString(), out eMsg) < 0)
+                    System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
+            }
+            
             DBConnect.Close(ref conn);
         }
 
