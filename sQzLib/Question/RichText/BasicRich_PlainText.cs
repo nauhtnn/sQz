@@ -32,6 +32,14 @@ namespace sQzLib
                 return GetInnerTextOfRichText().IndexOf(value);
         }
 
+        public string GetInnerText()
+        {
+            if (PlainText != null)
+                return PlainText;
+            else
+                return GetInnerTextOfRichText();
+        }
+
         public string GetInnerTextOfRichText()
         {
             StringBuilder text = new StringBuilder();

@@ -6,7 +6,7 @@ using System.Collections.Generic;
 
 namespace sQzLib
 {
-    public class PassageWithQuestionsView: StackPanel
+    public class BasicPassageSectionView: StackPanel
     {
         public TextBlock IdxBarView { get; private set; }
         public List<SingleQuestionView> QuestionsViews;
@@ -32,7 +32,7 @@ namespace sQzLib
             return passageView;
         }
 
-        public PassageWithQuestionsView(BasicPassageSection passage, ref int questionIdx, byte[] optionStatusArray, bool isEnabled = true)
+        public BasicPassageSectionView(BasicPassageSection passage, ref int questionIdx, byte[] optionStatusArray, bool isEnabled = true)
         {
             CreateIdxView(questionIdx + 1, questionIdx + passage.Questions.Count);
             Orientation = Orientation.Horizontal;

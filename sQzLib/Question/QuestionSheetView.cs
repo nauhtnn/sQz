@@ -11,17 +11,22 @@ namespace sQzLib
             SingleQuestionView.IdxWidth = idxWidth;
             SingleQuestionView.StemWidth = stemWidth;
             int idx = -1;
-            foreach(QSheetSection section in qsheet.Sections)
+            foreach(QSheetSection s in qsheet.Sections)
             {
-                if(section.ischildof indePen)
-            }
-            AddListOfSingleQuestions(qsheet.ShallowCopyIndependentQuestions(), ref idx, optionStatusArray, isEnabled);
-            ++idx;
-            foreach (BasicPassageSection p in qsheet.Passages.Values)
-            {
-                PassageWithQuestionsView view = new PassageWithQuestionsView(p, ref idx, optionStatusArray, isEnabled);
-                Children.Add(view.IdxBarView);
-                Children.Add(view);
+                IndependentQSection ind_section = s as IndependentQSection;
+                if (ind_section != null)
+                    AddListOfSingleQuestions(ind_section.Questions, ref idx, optionStatusArray, isEnabled);//todo: shallow copy questions
+                else
+                {
+                    BasicPassageSection passage_section = s as BasicPassageSection;
+                    if (passage_section != null)
+                    {
+                        BasicPassageSectionView view = new BasicPassageSectionView(passage_section, ref idx, optionStatusArray, isEnabled);
+                        Children.Add(view.IdxBarView);
+                        Children.Add(view);
+                    }
+                }
+                ++idx;
             }
         }
 

@@ -128,28 +128,28 @@ namespace sQzServer0
 
         private void ShowDBQ()
         {
-            gDBQuest.Children.Clear();
-            gDBQuest.RowDefinitions.Clear();
-            vChk.Clear();
-            SingleQuestionView.IdxWidth = FontSize * 2;
-            SingleQuestionView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleQuestionView.IdxWidth;
-            AnswerSheet ansSheet = new AnswerSheet();
-            mDBQS.ExtractKey(ansSheet);
-            int rowIdx = -1;
-            foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
-                AddSingleQuestionToDBView(q, ++rowIdx, rowIdx, ansSheet.BytesOfAnswer);
+            //gDBQuest.Children.Clear();
+            //gDBQuest.RowDefinitions.Clear();
+            //vChk.Clear();
+            //SingleQuestionView.IdxWidth = FontSize * 2;
+            //SingleQuestionView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleQuestionView.IdxWidth;
+            //AnswerSheet ansSheet = new AnswerSheet();
+            //mDBQS.ExtractKey(ansSheet);
+            //int rowIdx = -1;
+            //foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
+            //    AddSingleQuestionToDBView(q, ++rowIdx, rowIdx, ansSheet.BytesOfAnswer);
 
-            int questionIdx = rowIdx;
-            foreach (BasicPassageSection p in mDBQS.ShallowCopyPassages())
-            {
-                AddPassageTextToDBView(p.Passage, ++rowIdx, SingleQuestionView.StemWidth);
-                foreach (Question q in p.Questions)
-                    AddSingleQuestionToDBView(q, ++questionIdx, ++rowIdx, ansSheet.BytesOfAnswer);
-            }
+            //int questionIdx = rowIdx;
+            //foreach (BasicPassageSection p in mDBQS.ShallowCopyPassages())
+            //{
+            //    AddPassageTextToDBView(p.Passage, ++rowIdx, SingleQuestionView.StemWidth);
+            //    foreach (Question q in p.Questions)
+            //        AddSingleQuestionToDBView(q, ++questionIdx, ++rowIdx, ansSheet.BytesOfAnswer);
+            //}
             
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, mDBQS.CountPassage);
-            tbiDBQ.Header = sb.ToString();
+            //StringBuilder sb = new StringBuilder();
+            //sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, mDBQS.CountPassage);
+            //tbiDBQ.Header = sb.ToString();
         }
 
         private void AddPassageTextToDBView(string text, int rowIdx, double w)
@@ -188,7 +188,7 @@ namespace sQzServer0
             svwrTmpQ.Content = new QuestionSheetView(mTmpQS, ansSheet.BytesOfAnswer, FontSize * 2,
                 svwrTmpQ.Width - FontSize * 2 - SystemParameters.ScrollWidth, false);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountPassage);
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), "todo", "todo"); //mTmpQS.Count, mTmpQS.CountPassage);
             tbiTmpQ.Header = sb.ToString();
         }
 
@@ -202,17 +202,17 @@ namespace sQzServer0
             gDBQuest.Children.Clear();
             svwrTmpQ.Content = null;
             mTmpQS.DBIns();
-            mTmpQS.Clear();
+            //mTmpQS.Clear();todo
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountPassage);
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), "todo", "todo");// mTmpQS.Count, mTmpQS.CountPassage);
             tbiTmpQ.Header = sb.ToString();
             LoadAndShowQuestionFromDB();
         }
 
         private void LoadAndShowQuestionFromDB()
         {
-            mDBQS.DBSelectNondeletedQuestions();
-            ShowDBQ();
+            //mDBQS.DBSelectNondeletedQuestions();
+            //ShowDBQ();
         }
 
         private void LoadTxt()
@@ -231,7 +231,7 @@ namespace sQzServer0
             btnDelQ.Content = t._((int)TxI.PREP_DEL_SEL);
             btnImpQ.Content = t._((int)TxI.PREP_IMP);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), mTmpQS.Count, mTmpQS.CountPassage);
+            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), "todo", "todo");// mTmpQS.Count, mTmpQS.CountPassage);
             tbiTmpQ.Header = sb.ToString();
         }
 

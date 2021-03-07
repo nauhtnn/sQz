@@ -10,14 +10,28 @@ namespace sQzLib
     {
         public override bool Parse(Queue<BasicRich_PlainText> tokens)
         {
-            if(tokens.Count < 3 + Question.NUMBER_OF_OPTIONS)
+            if(QSheetSection.SECTION_MAGIC_PREFIX.Length > 0)
             {
-                System.Windows.MessageBox.Show("IndependentQSection: From the end, line " +
-                    tokens.Count + " doesn't have 1 requirement 1 stem 4 options 1 answer!");
-                return false;
-            }
+                if (tokens.Count < 3 + Question.NUMBER_OF_OPTIONS)
+                {
+                    System.Windows.MessageBox.Show("IndependentQSection: From the end, line " +
+                        tokens.Count + " doesn't have 1 requirement 1 stem 4 options 1 answer!");
+                    return false;
+                }
 
-            Requirements = tokens.Dequeue().ToString();
+                Requirements = tokens.Dequeue().ToString();
+            }
+            else
+            {
+                if (tokens.Count < 2 + Question.NUMBER_OF_OPTIONS)
+                {
+                    System.Windows.MessageBox.Show("IndependentQSection: From the end, line " +
+                        tokens.Count + " doesn't have 0 requirement 1 stem 4 options 1 answer!");
+                    return false;
+                }
+
+                Requirements = string.Empty;
+            }
 
             return ParseQuestions(tokens);
         }

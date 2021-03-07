@@ -20,13 +20,14 @@ namespace sQzLib
             QSheetSection.TrimToFirstSection(tokens);
             while(tokens.Count > 0)
             {
-                if (!tokens.Dequeue().StartsWith(QSheetSection.SECTION_MAGIC_PREFIX))
+                if(QSheetSection.SECTION_MAGIC_PREFIX.Length > 0 &&
+                    !tokens.Dequeue().StartsWith(QSheetSection.SECTION_MAGIC_PREFIX))
                 {
                     System.Windows.MessageBox.Show("BasicPassageSection: From the end, line " +
                     tokens.Count + " doesn't have section magic prefix " + QSheetSection.SECTION_MAGIC_PREFIX);
                     return sections;
                 }
-                QSheetSection section = SelectSection(tokens.Peek().GetInnerTextOfRichText());
+                QSheetSection section = SelectSection(tokens.Peek().GetInnerText());
                 if(!section.Parse(tokens))
                 {
                     sections.Add(section);
