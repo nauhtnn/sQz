@@ -16,14 +16,17 @@ namespace sQzLib
             {
                 IndependentQSection ind_section = s as IndependentQSection;
                 if (ind_section != null)
+                {
+                    Children.Add(QSheetSection.CreateRequirementTextBlock(ind_section.Requirements));
                     AddListOfSingleQuestions(ind_section.Questions, ref idx, optionStatusArray, isEnabled);//todo: shallow copy questions
+                }
                 else
                 {
                     BasicPassageSection passage_section = s as BasicPassageSection;
                     if (passage_section != null)
                     {
+                        Children.Add(QSheetSection.CreateRequirementTextBlock(passage_section.Requirements));
                         BasicPassageSectionView view = new BasicPassageSectionView(passage_section, ref idx, optionStatusArray, isEnabled);
-                        Children.Add(view.RequirementTextBlock);
                         Children.Add(view);
                     }
                 }

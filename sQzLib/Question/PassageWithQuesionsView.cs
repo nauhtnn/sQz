@@ -8,19 +8,7 @@ namespace sQzLib
 {
     public class BasicPassageSectionView: StackPanel
     {
-        public TextBlock RequirementTextBlock { get; private set; }
         public List<SingleQuestionView> QuestionsViews;
-
-        void CreateRequirementTextBlock(string requirements)
-        {
-            RequirementTextBlock = new TextBlock();
-            RequirementTextBlock.Text = requirements;
-            RequirementTextBlock.Foreground = Theme.s._[(int)BrushId.QID_Color];
-            RequirementTextBlock.Background = Theme.s._[(int)BrushId.QID_BG];
-            RequirementTextBlock.TextWrapping = TextWrapping.Wrap;
-            RequirementTextBlock.TextAlignment = TextAlignment.Center;
-            RequirementTextBlock.Margin = new Thickness(0, SystemParameters.ScrollWidth, 0, SystemParameters.ScrollWidth);
-        }
 
         UIElement CreatePassageView(string passage)
         {
@@ -33,7 +21,6 @@ namespace sQzLib
 
         public BasicPassageSectionView(BasicPassageSection passage, ref int questionIdx, byte[] optionStatusArray, bool isEnabled = true)
         {
-            CreateRequirementTextBlock(passage.Requirements);
             Orientation = Orientation.Horizontal;
             double outsideStemWidth = SingleQuestionView.StemWidth;
             SingleQuestionView.StemWidth = outsideStemWidth / 2 - SystemParameters.ScrollWidth;

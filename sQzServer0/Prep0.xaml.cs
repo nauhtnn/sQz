@@ -187,12 +187,19 @@ namespace sQzServer0
             mTmpQS.ExtractKey(ansSheet);
             svwrTmpQ.Content = new QuestionSheetView(mTmpQS, ansSheet.BytesOfAnswer, FontSize * 2,
                 svwrTmpQ.Width - FontSize * 2 - SystemParameters.ScrollWidth, false);
+            tbiTmpQ.Header = CreateQuestSheetHeader(mTmpQS);
+        }
+
+        private string CreateQuestSheetHeader(QuestSheet qs)
+        {
             StringBuilder sb = new StringBuilder();
             sb.Append("(");
-            foreach (QSheetSection section in mTmpQS.Sections)
+            foreach (QSheetSection section in qs.Sections)
                 sb.AppendFormat(section.Questions.Count + ", ");
+            if (sb.Length > 2)
+                sb.Remove(sb.Length - 2, 2);
             sb.Append(")");
-            tbiTmpQ.Header = sb.ToString();
+            return sb.ToString();
         }
 
         private void btnImpQ_Click(object sender, RoutedEventArgs e)
@@ -206,12 +213,7 @@ namespace sQzServer0
             svwrTmpQ.Content = null;
             mTmpQS.DBIns();
             mTmpQS.Clear();
-            StringBuilder sb = new StringBuilder();
-            sb.Append("(");
-            foreach (QSheetSection section in mTmpQS.Sections)
-                sb.AppendFormat(section.Questions.Count + ", ");
-            sb.Append(")");
-            tbiTmpQ.Header = sb.ToString();
+            tbiTmpQ.Header = CreateQuestSheetHeader(mTmpQS);
             LoadAndShowQuestionFromDB();
         }
 
@@ -236,9 +238,7 @@ namespace sQzServer0
             btnImp.Content = t._((int)TxI.PREP_IMP);
             btnDelQ.Content = t._((int)TxI.PREP_DEL_SEL);
             btnImpQ.Content = t._((int)TxI.PREP_IMP);
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), "todo", "todo");// mTmpQS.Count, mTmpQS.CountPassage);
-            tbiTmpQ.Header = sb.ToString();
+            tbiTmpQ.Header = CreateQuestSheetHeader(mTmpQS);
         }
 
         private void btnDelQ_Click(object sender, RoutedEventArgs e)

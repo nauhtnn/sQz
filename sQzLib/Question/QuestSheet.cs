@@ -505,41 +505,42 @@ namespace sQzLib
 
         public void DBIns()
         {
-            //MySqlConnection conn = DBConnect.Init();
-            //if (conn == null)
-            //    return;
-            //StringBuilder questionVals = new StringBuilder();
-            //foreach (Question q in IndependentQuestions)
-            //    AppendQuestionInsertQuery(q, questionVals);
-            //if (BasicPassageSection.GetMaxID_inDB() &&
-            //    System.Windows.MessageBox.Show("Cannot get PassageQuestion.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!",
-            //    System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
-            //    return;
-            //StringBuilder passageVals = new StringBuilder();
-            //foreach (BasicPassageSection p in Passages.Values)
-            //{
-            //    p.AccquireGlobalMaxID();
-            //    passageVals.Append("(" + p.ID + ",'" + DBConnect.SafeSQL_Text(p.Passage) + "'),");
-            //    foreach (Question q in p.Questions)
-            //        AppendQuestionInsertQuery(q, questionVals);
-            //}
-            //string eMsg;
-            //if (passageVals.Length > 0)
-            //{
-            //    passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
-            //    if (DBConnect.Ins(conn, "sqz_passage", "id,psg",
-            //    passageVals.ToString(), out eMsg) < 0)
-            //        System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
-            //}
-            //if (questionVals.Length > 0)
-            //{
-            //    questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
-            //    if (DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
-            //    questionVals.ToString(), out eMsg) < 0)
-            //        System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
-            //}
-            
-            //DBConnect.Close(ref conn);
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return;
+            StringBuilder questionVals = new StringBuilder();
+            foreach(IndependentQSection section in Sections.OfType<IndependentQSection>())
+                foreach (Question q in section.Questions)
+                    AppendQuestionInsertQuery(q, questionVals);
+            if (BasicPassageSection.GetMaxID_inDB() &&
+                System.Windows.MessageBox.Show("Cannot get PassageQuestion.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!",
+                System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
+                return;
+            StringBuilder passageVals = new StringBuilder();
+            foreach (BasicPassageSection p in Sections.OfType<BasicPassageSection>())
+            {
+                p.AccquireGlobalMaxID();
+                passageVals.Append("(" + p.ID + ",'" + DBConnect.SafeSQL_Text(p.Passage) + "'),");
+                foreach (Question q in p.Questions)
+                    AppendQuestionInsertQuery(q, questionVals);
+            }
+            string eMsg;
+            if (passageVals.Length > 0)
+            {
+                passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
+                if (DBConnect.Ins(conn, "sqz_passage", "id,psg",
+                passageVals.ToString(), out eMsg) < 0)
+                    System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
+            }
+            if (questionVals.Length > 0)
+            {
+                questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
+                if (DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
+                questionVals.ToString(), out eMsg) < 0)
+                    System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
+            }
+
+            DBConnect.Close(ref conn);
         }
 
         private void AppendQuestionInsertQuery(Question q, StringBuilder query)

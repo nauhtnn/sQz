@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace sQzLib
 {
@@ -192,6 +194,18 @@ namespace sQzLib
                 Questions.Add(question);
             }
             return true;
+        }
+
+        public static TextBlock CreateRequirementTextBlock(string requirements)
+        {
+            TextBlock requirementTextBlock = new TextBlock();
+            requirementTextBlock.Text = requirements;
+            requirementTextBlock.Foreground = Theme.s._[(int)BrushId.QID_Color];
+            requirementTextBlock.Background = Theme.s._[(int)BrushId.QID_BG];
+            requirementTextBlock.TextWrapping = TextWrapping.Wrap;
+            requirementTextBlock.TextAlignment = TextAlignment.Center;
+            requirementTextBlock.Margin = new Thickness(0, SystemParameters.ScrollWidth, 0, SystemParameters.ScrollWidth);
+            return requirementTextBlock;
         }
     }
 }
