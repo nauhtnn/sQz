@@ -33,7 +33,6 @@ namespace sQzLib
 
         public BasicPassageSectionView(BasicPassageSection passage, ref int questionIdx, byte[] optionStatusArray, bool isEnabled = true)
         {
-            ++questionIdx;
             CreateRequirementTextBlock(passage.Requirements);
             Orientation = Orientation.Horizontal;
             double outsideStemWidth = SingleQuestionView.StemWidth;
@@ -53,7 +52,7 @@ namespace sQzLib
             StackPanel questions_panel = new StackPanel();
             foreach (Question q in passage.Questions)
             {
-                SingleQuestionView qView = new SingleQuestionView(q, questionIdx, optionStatusArray, isEnabled);
+                SingleQuestionView qView = new SingleQuestionView(q, ++questionIdx, optionStatusArray, isEnabled);
                 questions_panel.Children.Add(qView);
                 QuestionsViews.Add(qView);
             }

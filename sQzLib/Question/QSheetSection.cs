@@ -90,7 +90,7 @@ namespace sQzLib
                 matches[0].Value.Equals(matches[1].Value))
             {
                 StringBuilder msg = new StringBuilder();
-                msg.Append("Cannot AutoDetectQuestIdxLabel_in_Req! Number of matches: " +
+                msg.Append("AutoDetectQuestIdxLabel_in_Req! Number of matches: " +
                     matches.Count + "\n");
                 foreach (Match m in matches)
                     msg.Append(m.Value + ", ");
