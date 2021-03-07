@@ -52,7 +52,11 @@ namespace sQzLib
                 List<string> keywords = new List<string>();
                 for (int j = 1; j < words.Length; ++j)
                     keywords.Add(words[j]);
-                SectionMagicKeywords.Add((SectionID)Enum.Parse(typeof(SectionID), words[0]), keywords);
+                SectionID key = (SectionID)Enum.Parse(typeof(SectionID), words[0]);
+                if (SectionMagicKeywords.ContainsKey(key))
+                    SectionMagicKeywords[key] = keywords;
+                else
+                    SectionMagicKeywords.Add(key, keywords);
             }
         }
 

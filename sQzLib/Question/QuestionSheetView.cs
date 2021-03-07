@@ -26,7 +26,6 @@ namespace sQzLib
                         Children.Add(view);
                     }
                 }
-                ++idx;
             }
         }
 
