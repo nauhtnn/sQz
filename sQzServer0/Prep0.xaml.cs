@@ -188,7 +188,10 @@ namespace sQzServer0
             svwrTmpQ.Content = new QuestionSheetView(mTmpQS, ansSheet.BytesOfAnswer, FontSize * 2,
                 svwrTmpQ.Width - FontSize * 2 - SystemParameters.ScrollWidth, false);
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), "todo", "todo"); //mTmpQS.Count, mTmpQS.CountPassage);
+            sb.Append("(");
+            foreach (QSheetSection section in mTmpQS.Sections)
+                sb.AppendFormat(section.Questions.Count + ", ");
+            sb.Append(")");
             tbiTmpQ.Header = sb.ToString();
         }
 
@@ -202,9 +205,12 @@ namespace sQzServer0
             gDBQuest.Children.Clear();
             svwrTmpQ.Content = null;
             mTmpQS.DBIns();
-            //mTmpQS.Clear();todo
+            mTmpQS.Clear();
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._((int)TxI.Q_TMP), "todo", "todo");// mTmpQS.Count, mTmpQS.CountPassage);
+            sb.Append("(");
+            foreach (QSheetSection section in mTmpQS.Sections)
+                sb.AppendFormat(section.Questions.Count + ", ");
+            sb.Append(")");
             tbiTmpQ.Header = sb.ToString();
             LoadAndShowQuestionFromDB();
         }

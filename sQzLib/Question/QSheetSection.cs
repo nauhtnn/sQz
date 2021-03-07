@@ -109,10 +109,10 @@ namespace sQzLib
             return new Tuple<string, string>(matches[0].Value, matches[1].Value);
         }
 
-        protected void InitDefaultEmpty()
+        public void Clear()
         {
             Requirements = string.Empty;
-            Questions = new List<Question>();
+            Questions.Clear();
         }
 
         public static void InitDefaultMagicKeywords()

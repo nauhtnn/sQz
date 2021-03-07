@@ -62,10 +62,11 @@ namespace sQzLib
         //    IndependentQuestions.Add(q);
         //}
 
-        //public void Clear()
-        //{
-        //    IndependentQuestions.Clear();
-        //}
+        public void Clear()
+        {
+            foreach (QSheetSection section in Sections)
+                section.Clear();
+        }
 
         //public static List<int[]> DBGetNMod(ExamLv lv)
         //{
