@@ -22,12 +22,12 @@ namespace sQzLib
             return ParseQuestions(tokens);
         }
 
-        public override void DBAppendQryIns(string prefx, ref int idx, StringBuilder vals)
+        public override void DBAppendQryIns(string prefx, ref int idx, int qSheetID, StringBuilder vals)
         {
             foreach (Question q in Questions)
             {
                 vals.Append(prefx +
-                    ID + "," + q.uId + ",'");
+                    qSheetID + "," + q.uId + ",'");
                 foreach (int i in q.vAnsSort)
                     vals.Append(i.ToString());
                 vals.Append("'," + ++idx + "),");

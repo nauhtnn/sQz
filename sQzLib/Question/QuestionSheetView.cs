@@ -11,6 +11,10 @@ namespace sQzLib
             SingleQuestionView.IdxWidth = idxWidth;
             SingleQuestionView.StemWidth = stemWidth;
             int idx = -1;
+            foreach(QSheetSection section in qsheet.Sections)
+            {
+                if(section.ischildof indePen)
+            }
             AddListOfSingleQuestions(qsheet.ShallowCopyIndependentQuestions(), ref idx, optionStatusArray, isEnabled);
             ++idx;
             foreach (BasicPassageSection p in qsheet.Passages.Values)

@@ -11,7 +11,7 @@ namespace sQzLib
     {
         public static int globalMaxID = -1;
         public int ID;
-        List<QSheetSection> Sections;
+        public List<QSheetSection> Sections;
         public byte[] aQuest;
         //public int Count { get { return IndependentQuestions.Count; } }
         //public string CountPassage {
@@ -109,7 +109,7 @@ namespace sQzLib
         {
             int idx = -1;
             foreach (QSheetSection section in Sections)
-                section.DBAppendQryIns(prefx, ref idx, vals);
+                section.DBAppendQryIns(prefx, ref idx, ID, vals);
         }
 
         //only Operation0 uses this.
@@ -117,20 +117,20 @@ namespace sQzLib
         {
             anssh.QuestSheetID = ID;
             int bytes_length;
-            if (0 < IndependentQuestions.Count)
-                bytes_length = IndependentQuestions.Count * Question.NUMBER_OF_OPTIONS;
+            int question_count = 0;
+            if (0 < Sections.Count)
+            {
+                foreach (QSheetSection section in Sections)
+                    question_count += section.CountQuestions();
+                bytes_length = question_count * Question.NUMBER_OF_OPTIONS;
+            }
             else
                 bytes_length = 0;
-            foreach (BasicPassageSection p in Passages.Values)
-                bytes_length += p.Questions.Count * Question.NUMBER_OF_OPTIONS;
             anssh.BytesOfAnswer_Length = bytes_length;
             anssh.BytesOfAnswer = new byte[bytes_length];
             int i = -1;
-            foreach (Question q in IndependentQuestions)
-                foreach (bool x in q.vKeys)
-                    anssh.BytesOfAnswer[++i] = Convert.ToByte(x);
-            foreach (BasicPassageSection p in Passages.Values)
-                foreach (Question q in p.Questions)
+            foreach(QSheetSection section in Sections)
+                foreach (Question q in section.Questions)
                     foreach (bool x in q.vKeys)
                         anssh.BytesOfAnswer[++i] = Convert.ToByte(x);
         }
@@ -229,64 +229,68 @@ namespace sQzLib
 
         public List<byte[]> ToByte()
         {
-            List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(ID));
-            l.Add(BitConverter.GetBytes(IndependentQuestions.Count));
-            foreach (Question q in IndependentQuestions)
-                AppendBytesOf(q, l);
-            l.Add(BitConverter.GetBytes(Passages.Count));
-            foreach (BasicPassageSection p in Passages.Values)
-                AppendBytesOf(p, l);
-            return l;
+            throw new NotImplementedException();
+            //List<byte[]> l = new List<byte[]>();
+            //l.Add(BitConverter.GetBytes(ID));
+            //l.Add(BitConverter.GetBytes(IndependentQuestions.Count));
+            //foreach (Question q in IndependentQuestions)
+            //    AppendBytesOf(q, l);
+            //l.Add(BitConverter.GetBytes(Passages.Count));
+            //foreach (BasicPassageSection p in Passages.Values)
+            //    AppendBytesOf(p, l);
+            //return l;
         }
 
         public bool ReadByte(byte[] buf, ref int offs)
         {
-            if (buf == null)
-                return true;
-            int offs0 = offs;
-            int l = buf.Length - offs;
-            //
-            if (l < 4)
-                return true;
-            ID = BitConverter.ToInt32(buf, offs);
-            offs += 4;
-            //l -= 4;
-            IndependentQuestions = ReadBytesOfQuestions(buf, ref offs);
-            if (IndependentQuestions == null)
-                return true;
-            Passages = ReadBytesOfPassages(buf, ref offs);
-            if (Passages == null)
-                return true;
-            if (!Array.Equals(buf, aQuest))
-            {
-                int sz = offs - offs0;
-                if (sz == buf.Length)
-                    aQuest = buf.Clone() as byte[];
-                else
-                {
-                    aQuest = new byte[sz];
-                    Buffer.BlockCopy(buf, offs0, aQuest, 0, sz);
-                }
-            }
-            return false;
+            throw new NotImplementedException();
+            //if (buf == null)
+            //    return true;
+            //int offs0 = offs;
+            //int l = buf.Length - offs;
+            ////
+            //if (l < 4)
+            //    return true;
+            //ID = BitConverter.ToInt32(buf, offs);
+            //offs += 4;
+            ////l -= 4;
+            //IndependentQuestions = ReadBytesOfQuestions(buf, ref offs);
+            //if (IndependentQuestions == null)
+            //    return true;
+            //Passages = ReadBytesOfPassages(buf, ref offs);
+            //if (Passages == null)
+            //    return true;
+            //if (!Array.Equals(buf, aQuest))
+            //{
+            //    int sz = offs - offs0;
+            //    if (sz == buf.Length)
+            //        aQuest = buf.Clone() as byte[];
+            //    else
+            //    {
+            //        aQuest = new byte[sz];
+            //        Buffer.BlockCopy(buf, offs0, aQuest, 0, sz);
+            //    }
+            //}
+            //return false;
         }
 
         //only Prep0 uses this.
         public void LoadFromFile(string filePath)
         {
-            IndependentQuestions.Clear();
-            Tuple<List<Question>, List<BasicPassageSection>> tuple =
-                BasicRich_PlainTextParsingMgr.ParseTokens(BasicRich_PlainTextQueue.GetTextQueue(filePath));
-            IndependentQuestions = tuple.Item1;
-            Passages = new Dictionary<int, BasicPassageSection>();
-            int tempt_ID = -1;
-            foreach(BasicPassageSection passage in tuple.Item2)
-            {
-                while (Passages.ContainsKey(tempt_ID))
-                    --tempt_ID;
-                Passages.Add(tempt_ID, passage);
-            }
+            BasicRich_PlainTextParsingMgr parsingMgr = new BasicRich_PlainTextParsingMgr();
+            Sections = parsingMgr.ParseTokens(BasicRich_PlainTextQueue.GetTextQueue(filePath));
+            //IndependentQuestions.Clear();
+            //Tuple<List<Question>, List<BasicPassageSection>> tuple =
+            //    BasicRich_PlainTextParsingMgr.ParseTokens(BasicRich_PlainTextQueue.GetTextQueue(filePath));
+            //IndependentQuestions = tuple.Item1;
+            //Passages = new Dictionary<int, BasicPassageSection>();
+            //int tempt_ID = -1;
+            //foreach(BasicPassageSection passage in tuple.Item2)
+            //{
+            //    while (Passages.ContainsKey(tempt_ID))
+            //        --tempt_ID;
+            //    Passages.Add(tempt_ID, passage);
+            //}
         }
 
         public void WriteTxt(string fpath)
@@ -296,68 +300,74 @@ namespace sQzLib
 
         public IEnumerable<string> ToListOfStrings()
         {
-            IEnumerable<string> s = new LinkedList<string>();
-            foreach (Question q in IndependentQuestions)
-                s = s.Concat(q.ToListOfStrings()) as IEnumerable<string>;
+            throw new NotImplementedException();
+            //IEnumerable<string> s = new LinkedList<string>();
+            //foreach (Question q in IndependentQuestions)
+            //    s = s.Concat(q.ToListOfStrings()) as IEnumerable<string>;
                 
-            return s;
+            //return s;
         }
 
         public List<Question> ShallowCopyIndependentQuestions()
         {
-            List<Question> l = new List<Question>();
-            foreach (Question q in IndependentQuestions)
-                l.Add(q);
-            return l;
+            throw new NotImplementedException();
+            //List<Question> l = new List<Question>();
+            //foreach (Question q in IndependentQuestions)
+            //    l.Add(q);
+            //return l;
         }
 
         public List<BasicPassageSection> ShallowCopyPassages()
         {
-            List<BasicPassageSection> l = new List<BasicPassageSection>();
-            foreach (BasicPassageSection p in Passages.Values)
-                l.Add(p);
-            return l;
+            throw new NotImplementedException();
+            //List<BasicPassageSection> l = new List<BasicPassageSection>();
+            //foreach (BasicPassageSection p in Passages.Values)
+            //    l.Add(p);
+            //return l;
         }
 
         public QuestSheet DeepCopy()
         {
-            QuestSheet qs = new QuestSheet();
-            qs.ID = ID;
-            foreach (Question qi in IndependentQuestions)
-                qs.IndependentQuestions.Add(qi.DeepCopy());
-            return qs;
+            throw new NotImplementedException();
+            //QuestSheet qs = new QuestSheet();
+            //qs.ID = ID;
+            //foreach (Question qi in IndependentQuestions)
+            //    qs.IndependentQuestions.Add(qi.DeepCopy());
+            //return qs;
         }
 
         public void Randomize(Random rand)
         {
-            List<Question> qs = new List<Question>();
-            int n = IndependentQuestions.Count;
-            while (0 < n)
-            {
-                int sel = rand.Next() % n;
-                qs.Add(IndependentQuestions[sel]);
-                IndependentQuestions.RemoveAt(sel);
-                --n;
-            }
-            IndependentQuestions = qs;
-            foreach (Question q in IndependentQuestions)
-                q.Randomize(rand);
+            throw new NotImplementedException();
+            //List<Question> qs = new List<Question>();
+            //int n = IndependentQuestions.Count;
+            //while (0 < n)
+            //{
+            //    int sel = rand.Next() % n;
+            //    qs.Add(IndependentQuestions[sel]);
+            //    IndependentQuestions.RemoveAt(sel);
+            //    --n;
+            //}
+            //IndependentQuestions = qs;
+            //foreach (Question q in IndependentQuestions)
+            //    q.Randomize(rand);
         }
 
         public QuestSheet RandomizeDeepCopy(Random rand)
         {
-            QuestSheet sheet = new QuestSheet();
-            sheet.ID = ID;
-            sheet.IndependentQuestions = RandomizeDeepCopy(rand, IndependentQuestions);
-            foreach(BasicPassageSection p in Passages.Values)
-            {
-                BasicPassageSection passage = new BasicPassageSection(p.ID);
-                passage.Passage = p.Passage;
-                passage.Questions = RandomizeDeepCopy_KeepQuestionOrder(rand, p.Questions);
-                sheet.Passages.Add(passage.ID, passage);
-            }
+            throw new NotImplementedException();
+            //QuestSheet sheet = new QuestSheet();
+            //sheet.ID = ID;
+            //sheet.IndependentQuestions = RandomizeDeepCopy(rand, IndependentQuestions);
+            //foreach(BasicPassageSection p in Passages.Values)
+            //{
+            //    BasicPassageSection passage = new BasicPassageSection(p.ID);
+            //    passage.Passage = p.Passage;
+            //    passage.Questions = RandomizeDeepCopy_KeepQuestionOrder(rand, p.Questions);
+            //    sheet.Passages.Add(passage.ID, passage);
+            //}
 
-            return sheet;
+            //return sheet;
         }
 
         private List<Question> RandomizeDeepCopy_KeepQuestionOrder(Random rand, List<Question> originalList)
@@ -389,57 +399,59 @@ namespace sQzLib
         //only Server0 uses this.
         public void DBSelectNondeletedQuestions()
         {
-            IndependentQuestions.Clear();
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                System.Windows.MessageBox.Show(Txt.s._((int)TxI.DB_NOK));
-                return;
-            }
-            List<Question> allQuestions = DBSelectQuestions(conn, "deleted=0");
-            foreach (Question q in allQuestions)
-                if (q.PassageID == -1)
-                    IndependentQuestions.Add(q);
-            DBSelectPassages(conn, allQuestions);
-            DBConnect.Close(ref conn);
+            throw new NotImplementedException();
+            //IndependentQuestions.Clear();
+            //MySqlConnection conn = DBConnect.Init();
+            //if (conn == null)
+            //{
+            //    System.Windows.MessageBox.Show(Txt.s._((int)TxI.DB_NOK));
+            //    return;
+            //}
+            //List<Question> allQuestions = DBSelectQuestions(conn, "deleted=0");
+            //foreach (Question q in allQuestions)
+            //    if (q.PassageID == -1)
+            //        IndependentQuestions.Add(q);
+            //DBSelectPassages(conn, allQuestions);
+            //DBConnect.Close(ref conn);
         }
 
         private void DBSelectPassages(MySqlConnection conn, List<Question> questions)
         {
-            Passages = new Dictionary<int, BasicPassageSection>();
-            SortedSet<int> passageIDs = new SortedSet<int>();
-            foreach (Question q in questions)
-                if (!passageIDs.Contains(q.PassageID))
-                    passageIDs.Add(q.PassageID);
-            if (passageIDs.Count == 0)
-                return;
-            StringBuilder condition_IDs = new StringBuilder();
-            condition_IDs.Append("(");
-            foreach (int id in passageIDs)
-                condition_IDs.Append(id + ",");
-            condition_IDs.Remove(condition_IDs.Length - 1, 1);//remove last comma
-            condition_IDs.Append(")");
-            string query = DBConnect.mkQrySelect("sqz_passage",
-                "id,psg", "id IN " + condition_IDs);
-            string eMsg;
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
-            if (reader != null)
-            {
-                while (reader.Read())
-                {
-                    BasicPassageSection p = new BasicPassageSection(reader.GetInt32(0));
-                    p.Passage = reader.GetString(1);
-                    Passages.Add(p.ID, p);
-                }
-                reader.Close();
-            }
-            else
-                System.Windows.MessageBox.Show(eMsg.ToString());
-            foreach (Question q in questions)
-            {
-                if (q.PassageID > -1 && Passages.ContainsKey(q.PassageID))
-                    Passages[q.PassageID].Questions.Add(q);
-            }
+            throw new NotImplementedException();
+            //Passages = new Dictionary<int, BasicPassageSection>();
+            //SortedSet<int> passageIDs = new SortedSet<int>();
+            //foreach (Question q in questions)
+            //    if (!passageIDs.Contains(q.PassageID))
+            //        passageIDs.Add(q.PassageID);
+            //if (passageIDs.Count == 0)
+            //    return;
+            //StringBuilder condition_IDs = new StringBuilder();
+            //condition_IDs.Append("(");
+            //foreach (int id in passageIDs)
+            //    condition_IDs.Append(id + ",");
+            //condition_IDs.Remove(condition_IDs.Length - 1, 1);//remove last comma
+            //condition_IDs.Append(")");
+            //string query = DBConnect.mkQrySelect("sqz_passage",
+            //    "id,psg", "id IN " + condition_IDs);
+            //string eMsg;
+            //MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
+            //if (reader != null)
+            //{
+            //    while (reader.Read())
+            //    {
+            //        BasicPassageSection p = new BasicPassageSection(reader.GetInt32(0));
+            //        p.Passage = reader.GetString(1);
+            //        Passages.Add(p.ID, p);
+            //    }
+            //    reader.Close();
+            //}
+            //else
+            //    System.Windows.MessageBox.Show(eMsg.ToString());
+            //foreach (Question q in questions)
+            //{
+            //    if (q.PassageID > -1 && Passages.ContainsKey(q.PassageID))
+            //        Passages[q.PassageID].Questions.Add(q);
+            //}
         }
 
         private Question DBReader_CreateQuestion(MySqlDataReader reader)
@@ -482,41 +494,41 @@ namespace sQzLib
 
         public void DBIns()
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return;
-            StringBuilder questionVals = new StringBuilder();
-            foreach (Question q in IndependentQuestions)
-                AppendQuestionInsertQuery(q, questionVals);
-            if (BasicPassageSection.GetMaxID_inDB() &&
-                System.Windows.MessageBox.Show("Cannot get PassageQuestion.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!",
-                System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
-                return;
-            StringBuilder passageVals = new StringBuilder();
-            foreach (BasicPassageSection p in Passages.Values)
-            {
-                p.AccquireGlobalMaxID();
-                passageVals.Append("(" + p.ID + ",'" + DBConnect.SafeSQL_Text(p.Passage) + "'),");
-                foreach (Question q in p.Questions)
-                    AppendQuestionInsertQuery(q, questionVals);
-            }
-            string eMsg;
-            if (passageVals.Length > 0)
-            {
-                passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
-                if (DBConnect.Ins(conn, "sqz_passage", "id,psg",
-                passageVals.ToString(), out eMsg) < 0)
-                    System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
-            }
-            if (questionVals.Length > 0)
-            {
-                questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
-                if (DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
-                questionVals.ToString(), out eMsg) < 0)
-                    System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
-            }
+            //MySqlConnection conn = DBConnect.Init();
+            //if (conn == null)
+            //    return;
+            //StringBuilder questionVals = new StringBuilder();
+            //foreach (Question q in IndependentQuestions)
+            //    AppendQuestionInsertQuery(q, questionVals);
+            //if (BasicPassageSection.GetMaxID_inDB() &&
+            //    System.Windows.MessageBox.Show("Cannot get PassageQuestion.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!",
+            //    System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
+            //    return;
+            //StringBuilder passageVals = new StringBuilder();
+            //foreach (BasicPassageSection p in Passages.Values)
+            //{
+            //    p.AccquireGlobalMaxID();
+            //    passageVals.Append("(" + p.ID + ",'" + DBConnect.SafeSQL_Text(p.Passage) + "'),");
+            //    foreach (Question q in p.Questions)
+            //        AppendQuestionInsertQuery(q, questionVals);
+            //}
+            //string eMsg;
+            //if (passageVals.Length > 0)
+            //{
+            //    passageVals.Remove(passageVals.Length - 1, 1);//remove the last comma
+            //    if (DBConnect.Ins(conn, "sqz_passage", "id,psg",
+            //    passageVals.ToString(), out eMsg) < 0)
+            //        System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
+            //}
+            //if (questionVals.Length > 0)
+            //{
+            //    questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
+            //    if (DBConnect.Ins(conn, "sqz_question", "pid,deleted,stmt,ans0,ans1,ans2,ans3,akey",
+            //    questionVals.ToString(), out eMsg) < 0)
+            //        System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
+            //}
             
-            DBConnect.Close(ref conn);
+            //DBConnect.Close(ref conn);
         }
 
         private void AppendQuestionInsertQuery(Question q, StringBuilder query)
@@ -538,87 +550,55 @@ namespace sQzLib
 
         public bool DBSelect(MySqlConnection conn, DateTime dt, int sheetID, out string eMsg)
         {
-            IndependentQuestions.Clear();
-            ID = sheetID;
-            string qry = DBConnect.mkQrySelect("sqz_qsheet_quest", "qid,asort,idx",
-                "dt='" + dt.ToString(DT._) +
-                "' AND qsid=" + sheetID);
-            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            if (reader == null)
-                return true;
-            List<uint> questionIDs = new List<uint>();
-            List<string> options_sorts = new List<string>();
-            QIdxComparer<Question> qComparer = new QIdxComparer<Question>();
-            while (reader.Read())
-            {
-                uint qid = reader.GetUInt32(0);
-                questionIDs.Add(qid);
-                options_sorts.Add(reader.GetString(1));
-                qComparer.Add((int)qid, reader.GetInt32(2));
-            }
-            reader.Close();
-            StringBuilder condition_IDs = new StringBuilder();
-            condition_IDs.Append("(");
-            foreach (int id in questionIDs)
-                condition_IDs.Append(id.ToString() + ",");
-            condition_IDs.Remove(condition_IDs.Length - 1, 1); //remove the last comma
-            condition_IDs.Append(")");
+            throw new NotImplementedException();
+            //IndependentQuestions.Clear();
+            //ID = sheetID;
+            //string qry = DBConnect.mkQrySelect("sqz_qsheet_quest", "qid,asort,idx",
+            //    "dt='" + dt.ToString(DT._) +
+            //    "' AND qsid=" + sheetID);
+            //MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            //if (reader == null)
+            //    return true;
+            //List<uint> questionIDs = new List<uint>();
+            //List<string> options_sorts = new List<string>();
+            //QIdxComparer<Question> qComparer = new QIdxComparer<Question>();
+            //while (reader.Read())
+            //{
+            //    uint qid = reader.GetUInt32(0);
+            //    questionIDs.Add(qid);
+            //    options_sorts.Add(reader.GetString(1));
+            //    qComparer.Add((int)qid, reader.GetInt32(2));
+            //}
+            //reader.Close();
+            //StringBuilder condition_IDs = new StringBuilder();
+            //condition_IDs.Append("(");
+            //foreach (int id in questionIDs)
+            //    condition_IDs.Append(id.ToString() + ",");
+            //condition_IDs.Remove(condition_IDs.Length - 1, 1); //remove the last comma
+            //condition_IDs.Append(")");
 
-            List<Question> questions = DBSelectQuestions(conn, "id IN " + condition_IDs);
-            int i = -1;
-            foreach (Question q in questions)
-            {
-                ++i;
-                string[] sorted_answers = new string[Question.NUMBER_OF_OPTIONS];
-                bool[] sorted_keys = new bool[4];
-                for (int j = 0; j < 4; ++j)
-                {
-                    sorted_answers[j] = q.vAns[options_sorts[i][j] - Question.C0];
-                    sorted_keys[j] = q.vKeys[options_sorts[i][j] - Question.C0];
-                }
-                q.vAns = sorted_answers;
-                q.vKeys = sorted_keys;
-            }
-            foreach (Question q in questions)
-                if (q.PassageID == -1)
-                    IndependentQuestions.Add(q);
-            IndependentQuestions.Sort(qComparer);
-            DBSelectPassages(conn, questions);
-
-
-            //foreach (int qid in questionIDs)
+            //List<Question> questions = DBSelectQuestions(conn, "id IN " + condition_IDs);
+            //int i = -1;
+            //foreach (Question q in questions)
             //{
             //    ++i;
-            //    qry = DBConnect.mkQrySelect("sqz_question",
-            //        "stmt,ans0,ans1,ans2,ans3,akey", "id=" + qid);
-            //    reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
-            //    if (reader == null)
-            //        return true;
-            //    while (reader.Read())
+            //    string[] sorted_answers = new string[Question.NUMBER_OF_OPTIONS];
+            //    bool[] sorted_keys = new bool[4];
+            //    for (int j = 0; j < 4; ++j)
             //    {
-            //        Question q = new Question();
-            //        q.uId = qid;
-            //        q.Stem = reader.GetString(0);
-            //        string[] anss = new string[Question.NUMBER_OF_OPTIONS];
-            //        for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
-            //            anss[j] = reader.GetString(1 + j);
-            //        string x = reader.GetString(5);
-            //        bool[] keys = new bool[Question.NUMBER_OF_OPTIONS];
-            //        for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
-            //            keys[j] = (x[j] == Question.C1);
-            //        q.vAns = new string[4];
-            //        q.vKeys = new bool[4];
-            //        for(int j = 0; j < 4; ++j)
-            //        {
-            //            q.vAns[j] = anss[options_sorts[i][j] - Question.C0];
-            //            q.vKeys[j] = keys[options_sorts[i][j] - Question.C0];
-            //        }
-            //        IndependentQuestions.Add(q);
+            //        sorted_answers[j] = q.vAns[options_sorts[i][j] - Question.C0];
+            //        sorted_keys[j] = q.vKeys[options_sorts[i][j] - Question.C0];
             //    }
-            //    reader.Close();
+            //    q.vAns = sorted_answers;
+            //    q.vKeys = sorted_keys;
             //}
+            //foreach (Question q in questions)
+            //    if (q.PassageID == -1)
+            //        IndependentQuestions.Add(q);
             //IndependentQuestions.Sort(qComparer);
-            return false;
+            //DBSelectPassages(conn, questions);
+
+            //return false;
         }
 
         public bool AccquireGlobalMaxID()

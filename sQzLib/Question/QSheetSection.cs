@@ -15,7 +15,7 @@ namespace sQzLib
         public string Requirements;
         public List<Question> Questions;
         abstract public bool Parse(Queue<BasicRich_PlainText> tokens);
-        abstract public void DBAppendQryIns(string prefx, ref int idx, StringBuilder vals);
+        abstract public void DBAppendQryIns(string prefx, ref int idx, int qSheetID, StringBuilder vals);
 
         public static void LoadSectionMagicKeywords()
         {
@@ -54,6 +54,12 @@ namespace sQzLib
                     keywords.Add(words[j]);
                 SectionMagicKeywords.Add((SectionID)Enum.Parse(typeof(SectionID), words[0]), keywords);
             }
+        }
+
+        protected void InitDefaultEmpty()
+        {
+            Requirements = string.Empty;
+            Questions = new List<Question>();
         }
 
         public static void InitDefaultMagicKeywords()
