@@ -11,7 +11,8 @@ namespace sQzLib
     {
         public BasicRich_PlainTextParsingMgr()
         {
-            QSheetSection.LoadSectionMagicKeywords();
+            if (!QSheetSection.LoadSectionMagicKeywords())
+                QSheetSection.InitDefaultMagicKeywords();
         }
 
         public List<QSheetSection> ParseTokens(Queue<BasicRich_PlainText> tokens)

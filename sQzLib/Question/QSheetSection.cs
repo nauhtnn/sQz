@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace sQzLib
@@ -17,11 +18,10 @@ namespace sQzLib
         abstract public bool Parse(Queue<BasicRich_PlainText> tokens);
         abstract public void DBAppendQryIns(string prefx, ref int idx, int qSheetID, StringBuilder vals);
 
-        public static void LoadSectionMagicKeywords()
+        public static bool LoadSectionMagicKeywords()
         {
-            InitDefaultMagicKeywords();
             if (!System.IO.File.Exists(SECTION_MAGIC_CFG_FILEPATH))
-                return;
+                return false;
 
             string[] lines;
             try
@@ -30,14 +30,23 @@ namespace sQzLib
             }
             catch (System.IO.IOException e)
             {
-                System.Windows.MessageBox.Show("LoadSectionMagicKeywords error\n" + e.ToString());
-                return;
+                System.Windows.MessageBox.Show("Read file error: " + SECTION_MAGIC_CFG_FILEPATH +
+                    "\n" + e.ToString());
+                return false;
             }
 
             if (lines.Length == 0)
-                return;
+                return false;
+
+            if(lines[0].Length == 0)
+            {
+                System.Windows.MessageBox.Show("LoadSectionMagicKeywords error: line 0 is empty");
+                return false;
+            }
 
             SECTION_MAGIC_PREFIX = lines[0].Trim();
+
+            SectionMagicKeywords = new Dictionary<SectionID, List<string>>();
 
             for (int i = 1; i < lines.Length; ++i)
             {
@@ -54,10 +63,50 @@ namespace sQzLib
                     keywords.Add(words[j]);
                 SectionID key = (SectionID)Enum.Parse(typeof(SectionID), words[0]);
                 if (SectionMagicKeywords.ContainsKey(key))
-                    SectionMagicKeywords[key] = keywords;
+                {
+                    System.Windows.MessageBox.Show("LoadSectionMagicKeywords error: duplicated section " + key);
+                    return false;
+                }
                 else
                     SectionMagicKeywords.Add(key, keywords);
             }
+            return true;
+        }
+
+        public void UpdateQuestIndices(int startQuestIdxLabel)
+        {
+            Tuple<string, string> replaced_labels = AutoDetectQuestIdxLabel_in_Req();
+            if (replaced_labels == null)
+                return;
+            Requirements = Requirements.Replace(replaced_labels.Item1, startQuestIdxLabel.ToString());
+            Requirements = Requirements.Replace(replaced_labels.Item2,
+                (startQuestIdxLabel + Questions.Count - 1).ToString());
+        }
+
+        protected Tuple<string, string> AutoDetectQuestIdxLabel_in_Req()
+        {
+            MatchCollection matches = Regex.Matches(Requirements, "\\d+");
+            if (matches.Count != 2 ||
+                matches[0].Value.Equals(matches[1].Value))
+            {
+                StringBuilder msg = new StringBuilder();
+                msg.Append("Cannot AutoDetectQuestIdxLabel_in_Req! Number of matches: " +
+                    matches.Count + "\n");
+                foreach (Match m in matches)
+                    msg.Append(m.Value + ", ");
+                System.Windows.MessageBox.Show(msg.ToString());
+                return null;
+            }
+            int start = -1, end = -1;
+            if (!int.TryParse(matches[0].Value, out start) ||
+                !int.TryParse(matches[1].Value, out end) ||
+                end - start + 1 != Questions.Count)
+            {
+                System.Windows.MessageBox.Show("Cannot AutoDetectQuestIdxLabel_in_Req! start = " +
+                    start + ", end = " + end + ", Questions.Count = " + Questions.Count);
+                return null;
+            }
+            return new Tuple<string, string>(matches[0].Value, matches[1].Value);
         }
 
         protected void InitDefaultEmpty()

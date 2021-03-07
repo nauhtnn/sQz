@@ -8,19 +8,18 @@ namespace sQzLib
 {
     public class BasicPassageSectionView: StackPanel
     {
-        public TextBlock IdxBarView { get; private set; }
+        public TextBlock RequirementTextBlock { get; private set; }
         public List<SingleQuestionView> QuestionsViews;
 
-        void CreateIdxView(int startQuestionIdx, int endQuestionIdx)
+        void CreateRequirementTextBlock(string requirements)
         {
-            IdxBarView = new TextBlock();
-            IdxBarView.Text = "Read the following passage and answer question number " +
-                startQuestionIdx + " to " + endQuestionIdx;
-            IdxBarView.Foreground = Theme.s._[(int)BrushId.QID_Color];
-            IdxBarView.Background = Theme.s._[(int)BrushId.QID_BG];
-            IdxBarView.TextWrapping = TextWrapping.Wrap;
-            IdxBarView.TextAlignment = TextAlignment.Center;
-            IdxBarView.Margin = new Thickness(0, SystemParameters.ScrollWidth, 0, SystemParameters.ScrollWidth);
+            RequirementTextBlock = new TextBlock();
+            RequirementTextBlock.Text = requirements;
+            RequirementTextBlock.Foreground = Theme.s._[(int)BrushId.QID_Color];
+            RequirementTextBlock.Background = Theme.s._[(int)BrushId.QID_BG];
+            RequirementTextBlock.TextWrapping = TextWrapping.Wrap;
+            RequirementTextBlock.TextAlignment = TextAlignment.Center;
+            RequirementTextBlock.Margin = new Thickness(0, SystemParameters.ScrollWidth, 0, SystemParameters.ScrollWidth);
         }
 
         UIElement CreatePassageView(string passage)
@@ -35,7 +34,7 @@ namespace sQzLib
         public BasicPassageSectionView(BasicPassageSection passage, ref int questionIdx, byte[] optionStatusArray, bool isEnabled = true)
         {
             ++questionIdx;
-            CreateIdxView(questionIdx + 1, questionIdx + passage.Questions.Count);
+            CreateRequirementTextBlock(passage.Requirements);
             Orientation = Orientation.Horizontal;
             double outsideStemWidth = SingleQuestionView.StemWidth;
             SingleQuestionView.StemWidth = outsideStemWidth / 2 - SystemParameters.ScrollWidth;

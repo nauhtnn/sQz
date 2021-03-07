@@ -10,6 +10,7 @@ namespace sQzLib
         {
             SingleQuestionView.IdxWidth = idxWidth;
             SingleQuestionView.StemWidth = stemWidth;
+            qsheet.UpdateQuestIndicesInRequirementPassage();
             int idx = -1;
             foreach(QSheetSection s in qsheet.Sections)
             {
@@ -22,7 +23,7 @@ namespace sQzLib
                     if (passage_section != null)
                     {
                         BasicPassageSectionView view = new BasicPassageSectionView(passage_section, ref idx, optionStatusArray, isEnabled);
-                        Children.Add(view.IdxBarView);
+                        Children.Add(view.RequirementTextBlock);
                         Children.Add(view);
                     }
                 }

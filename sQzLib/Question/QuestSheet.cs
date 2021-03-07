@@ -27,6 +27,16 @@ namespace sQzLib
         //        return sb.ToString();
         //    } }
 
+        public void UpdateQuestIndicesInRequirementPassage()
+        {
+            int startQuestIdxLabel = 1;
+            foreach(QSheetSection section in Sections)
+            {
+                section.UpdateQuestIndices(startQuestIdxLabel);
+                startQuestIdxLabel += section.Questions.Count;
+            }
+        }
+
         public int CountAllQuestions()
         {
             int count = 0;
