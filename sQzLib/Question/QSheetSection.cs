@@ -109,7 +109,8 @@ namespace sQzLib
             char key_label = tokens.Dequeue().Last();
             if (key_label < 'A' || 'D' < key_label)
             {
-                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has key: " + key_label);
+                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has key: " + key_label +
+                    "\nNeighbor stem: " + question.Stem);
                 return null;
             }
             question.vKeys = new bool[Question.NUMBER_OF_OPTIONS];
@@ -124,7 +125,8 @@ namespace sQzLib
             Questions = new List<Question>();
             while (tokens.Count > 0)
             {
-                if (//sQzLib.Utils.CleanFront(
+                if (SECTION_MAGIC_PREFIX.Length > 0 &&
+                    //sQzLib.Utils.CleanFront(
                     tokens.Peek().StartsWith(SECTION_MAGIC_PREFIX))
                     break;
 
