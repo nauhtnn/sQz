@@ -35,7 +35,7 @@ namespace sQzLib
         {
             QuestSheetID = qsheet.ID;
             BytesOfAnswer_Length = qsheet.Count * Question.NUMBER_OF_OPTIONS;
-            foreach (PassageWithQuestions p in qsheet.Passages.Values)
+            foreach (BasicPassageSection p in qsheet.Passages.Values)
                 BytesOfAnswer_Length += p.Questions.Count * Question.NUMBER_OF_OPTIONS;
             if (BytesOfAnswer == null)
             {

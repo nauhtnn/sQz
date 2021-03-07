@@ -62,10 +62,12 @@
     <Compile Include="ExamSlotA.cs" />
     <Compile Include="ExamSlotS0.cs" />
     <Compile Include="ExamSlotS1.cs" />
-    <Compile Include="Question\PassageWithQuestions.cs" />
+    <Compile Include="Question\IndependentQSection.cs" />
+    <Compile Include="Question\BasicPassageSection.cs" />
     <Compile Include="Question\OptionView.cs" />
     <Compile Include="Question\PassageWithQuesionsView.cs" />
     <Compile Include="Question\PlainText\PlainTextQuestParser.cs" />
+    <Compile Include="Question\QSheetSection.cs" />
     <Compile Include="Question\QuestionSheetView.cs" />
     <Compile Include="Question\QuestParser.cs" />
     <None Include="Question\QuestSheetDocxPrinter.cs" />
@@ -77,8 +79,7 @@
     <Compile Include="Question\Question.cs" />
     <Compile Include="Question\RichText\BasicRich_PlainText.cs" />
     <Compile Include="Question\RichText\BasicRich_PlainTextQueue.cs" />
-    <Compile Include="Question\RichText\BasicRich_PlainTextQuestParser.cs" />
-    <Compile Include="Question\RichText\Class1.cs" />
+    <Compile Include="Question\RichText\BasicRich_PlainTextQtParsingMgr.cs" />
     <Compile Include="Question\SingleQuestionView.cs" />
     <Compile Include="Server2.cs" />
     <Compile Include="Settings.cs" />

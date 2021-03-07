@@ -11,53 +11,51 @@ namespace sQzLib
     {
         public static int globalMaxID = -1;
         public int ID;
-        List<Question> IndependentQuestions;
-        public Dictionary<int, PassageWithQuestions> Passages;
+        List<QSheetSection> Sections;
         public byte[] aQuest;
-        public int Count { get { return IndependentQuestions.Count; } }
-        public string CountPassage {
-            get {
-                if (Passages.Count == 0)
-                    return "()";
-                StringBuilder sb = new StringBuilder();
-                sb.Append("(");
-                foreach (PassageWithQuestions p in Passages.Values)
-                    sb.Append(p.Questions.Count + ", ");
-                sb.Remove(sb.Length - 2, 2);//remove last comma and space
-                sb.Append(')');
-                return sb.ToString();
-            } }
+        //public int Count { get { return IndependentQuestions.Count; } }
+        //public string CountPassage {
+        //    get {
+        //        if (Passages.Count == 0)
+        //            return "()";
+        //        StringBuilder sb = new StringBuilder();
+        //        sb.Append("(");
+        //        foreach (BasicPassageSection p in Passages.Values)
+        //            sb.Append(p.Questions.Count + ", ");
+        //        sb.Remove(sb.Length - 2, 2);//remove last comma and space
+        //        sb.Append(')');
+        //        return sb.ToString();
+        //    } }
 
         public int CountAllQuestions()
         {
-            int count = IndependentQuestions.Count;
-            foreach (PassageWithQuestions p in Passages.Values)
-                count += p.Questions.Count;
+            int count = 0;
+            foreach (QSheetSection section in Sections)
+                count += section.CountQuestions();
             return count;
         }
 
         public QuestSheet()
         {
-            IndependentQuestions = new List<Question>();
-            Passages = new Dictionary<int, PassageWithQuestions>();
+            Sections = new List<QSheetSection>();
             aQuest = null;
             ID = -1;
         }
 
-        public Question Q(int idx)
-        {
-            return IndependentQuestions[idx];
-        }
+        //public Question Q(int idx)
+        //{
+        //    return IndependentQuestions[idx];
+        //}
 
-        public void Add(Question q)
-        {
-            IndependentQuestions.Add(q);
-        }
+        //public void Add(Question q)
+        //{
+        //    IndependentQuestions.Add(q);
+        //}
 
-        public void Clear()
-        {
-            IndependentQuestions.Clear();
-        }
+        //public void Clear()
+        //{
+        //    IndependentQuestions.Clear();
+        //}
 
         //public static List<int[]> DBGetNMod(ExamLv lv)
         //{
@@ -94,39 +92,24 @@ namespace sQzLib
         //    return rv;
         //}
 
-        public static int DBGetND(IUx iu)
-        {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-                return 0;
-            string emsg;
-            int n = DBConnect.Count(conn, "sqz_question", "id",
-                    "AND deleted=0", out emsg);
-            if (n < 0)
-                n = 0;
-            return n;
-        }
+        //public static int DBGetND(IUx iu)
+        //{
+        //    MySqlConnection conn = DBConnect.Init();
+        //    if (conn == null)
+        //        return 0;
+        //    string emsg;
+        //    int n = DBConnect.Count(conn, "sqz_question", "id",
+        //            "AND deleted=0", out emsg);
+        //    if (n < 0)
+        //        n = 0;
+        //    return n;
+        //}
 
         public void DBAppendQryIns(string prefx, StringBuilder vals)
         {
             int idx = -1;
-            foreach (Question q in IndependentQuestions)
-            {
-                vals.Append(prefx +
-                    ID + "," + q.uId + ",'");
-                foreach (int i in q.vAnsSort)
-                    vals.Append(i.ToString());
-                vals.Append("'," + ++idx + "),");
-            }
-            foreach(PassageWithQuestions p in Passages.Values)
-                foreach(Question q in p.Questions)
-                {
-                    vals.Append(prefx +
-                        ID + "," + q.uId + ",'");
-                    foreach (int i in q.vAnsSort)
-                        vals.Append(i.ToString());
-                    vals.Append("'," + ++idx + "),");
-                }
+            foreach (QSheetSection section in Sections)
+                section.DBAppendQryIns(prefx, ref idx, vals);
         }
 
         //only Operation0 uses this.
@@ -138,7 +121,7 @@ namespace sQzLib
                 bytes_length = IndependentQuestions.Count * Question.NUMBER_OF_OPTIONS;
             else
                 bytes_length = 0;
-            foreach (PassageWithQuestions p in Passages.Values)
+            foreach (BasicPassageSection p in Passages.Values)
                 bytes_length += p.Questions.Count * Question.NUMBER_OF_OPTIONS;
             anssh.BytesOfAnswer_Length = bytes_length;
             anssh.BytesOfAnswer = new byte[bytes_length];
@@ -146,7 +129,7 @@ namespace sQzLib
             foreach (Question q in IndependentQuestions)
                 foreach (bool x in q.vKeys)
                     anssh.BytesOfAnswer[++i] = Convert.ToByte(x);
-            foreach (PassageWithQuestions p in Passages.Values)
+            foreach (BasicPassageSection p in Passages.Values)
                 foreach (Question q in p.Questions)
                     foreach (bool x in q.vKeys)
                         anssh.BytesOfAnswer[++i] = Convert.ToByte(x);
@@ -200,11 +183,11 @@ namespace sQzLib
             return questions;
         }
 
-        private PassageWithQuestions ReadBytesOfPassage(byte[] buf, ref int offs)
+        private BasicPassageSection ReadBytesOfPassage(byte[] buf, ref int offs)
         {
             if (buf.Length < offs + 4)
                 return null;
-            PassageWithQuestions p = new PassageWithQuestions(BitConverter.ToInt32(buf, offs));
+            BasicPassageSection p = new BasicPassageSection(BitConverter.ToInt32(buf, offs));
             offs += 4;
             p.Passage = Utils.ReadBytesOfString(buf, ref offs);
             if (p.Passage == null)
@@ -215,7 +198,7 @@ namespace sQzLib
             return p;
         }
 
-        private Dictionary<int, PassageWithQuestions> ReadBytesOfPassages(byte[] buf, ref int offs)
+        private Dictionary<int, BasicPassageSection> ReadBytesOfPassages(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
             if (l < 4)
@@ -223,10 +206,10 @@ namespace sQzLib
             int n = BitConverter.ToInt32(buf, offs);
             offs += 4;
             //l -= 4;
-            Dictionary<int, PassageWithQuestions> passages = new Dictionary<int, PassageWithQuestions>();
+            Dictionary<int, BasicPassageSection> passages = new Dictionary<int, BasicPassageSection>();
             while (0 < n)
             {
-                PassageWithQuestions p = ReadBytesOfPassage(buf, ref offs);
+                BasicPassageSection p = ReadBytesOfPassage(buf, ref offs);
                 if (p == null)
                     return null;
                 --n;
@@ -235,7 +218,7 @@ namespace sQzLib
             return passages;
         }
 
-        private void AppendBytesOf(PassageWithQuestions p, List<byte[]> byteList)
+        private void AppendBytesOf(BasicPassageSection p, List<byte[]> byteList)
         {
             byteList.Add(BitConverter.GetBytes(p.ID));
             Utils.AppendBytesOfString(p.Passage, byteList);
@@ -252,7 +235,7 @@ namespace sQzLib
             foreach (Question q in IndependentQuestions)
                 AppendBytesOf(q, l);
             l.Add(BitConverter.GetBytes(Passages.Count));
-            foreach (PassageWithQuestions p in Passages.Values)
+            foreach (BasicPassageSection p in Passages.Values)
                 AppendBytesOf(p, l);
             return l;
         }
@@ -293,12 +276,12 @@ namespace sQzLib
         public void LoadFromFile(string filePath)
         {
             IndependentQuestions.Clear();
-            Tuple<List<Question>, List<PassageWithQuestions>> tuple =
-                BasicRich_PlainTextQuestParser.ParseTokens(BasicRich_PlainTextQueue.GetTextQueue(filePath));
+            Tuple<List<Question>, List<BasicPassageSection>> tuple =
+                BasicRich_PlainTextParsingMgr.ParseTokens(BasicRich_PlainTextQueue.GetTextQueue(filePath));
             IndependentQuestions = tuple.Item1;
-            Passages = new Dictionary<int, PassageWithQuestions>();
+            Passages = new Dictionary<int, BasicPassageSection>();
             int tempt_ID = -1;
-            foreach(PassageWithQuestions passage in tuple.Item2)
+            foreach(BasicPassageSection passage in tuple.Item2)
             {
                 while (Passages.ContainsKey(tempt_ID))
                     --tempt_ID;
@@ -328,10 +311,10 @@ namespace sQzLib
             return l;
         }
 
-        public List<PassageWithQuestions> ShallowCopyPassages()
+        public List<BasicPassageSection> ShallowCopyPassages()
         {
-            List<PassageWithQuestions> l = new List<PassageWithQuestions>();
-            foreach (PassageWithQuestions p in Passages.Values)
+            List<BasicPassageSection> l = new List<BasicPassageSection>();
+            foreach (BasicPassageSection p in Passages.Values)
                 l.Add(p);
             return l;
         }
@@ -366,9 +349,9 @@ namespace sQzLib
             QuestSheet sheet = new QuestSheet();
             sheet.ID = ID;
             sheet.IndependentQuestions = RandomizeDeepCopy(rand, IndependentQuestions);
-            foreach(PassageWithQuestions p in Passages.Values)
+            foreach(BasicPassageSection p in Passages.Values)
             {
-                PassageWithQuestions passage = new PassageWithQuestions(p.ID);
+                BasicPassageSection passage = new BasicPassageSection(p.ID);
                 passage.Passage = p.Passage;
                 passage.Questions = RandomizeDeepCopy_KeepQuestionOrder(rand, p.Questions);
                 sheet.Passages.Add(passage.ID, passage);
@@ -423,7 +406,7 @@ namespace sQzLib
 
         private void DBSelectPassages(MySqlConnection conn, List<Question> questions)
         {
-            Passages = new Dictionary<int, PassageWithQuestions>();
+            Passages = new Dictionary<int, BasicPassageSection>();
             SortedSet<int> passageIDs = new SortedSet<int>();
             foreach (Question q in questions)
                 if (!passageIDs.Contains(q.PassageID))
@@ -444,7 +427,7 @@ namespace sQzLib
             {
                 while (reader.Read())
                 {
-                    PassageWithQuestions p = new PassageWithQuestions(reader.GetInt32(0));
+                    BasicPassageSection p = new BasicPassageSection(reader.GetInt32(0));
                     p.Passage = reader.GetString(1);
                     Passages.Add(p.ID, p);
                 }
@@ -505,12 +488,12 @@ namespace sQzLib
             StringBuilder questionVals = new StringBuilder();
             foreach (Question q in IndependentQuestions)
                 AppendQuestionInsertQuery(q, questionVals);
-            if (PassageWithQuestions.GetMaxID_inDB() &&
+            if (BasicPassageSection.GetMaxID_inDB() &&
                 System.Windows.MessageBox.Show("Cannot get PassageQuestion.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!",
                 System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
                 return;
             StringBuilder passageVals = new StringBuilder();
-            foreach (PassageWithQuestions p in Passages.Values)
+            foreach (BasicPassageSection p in Passages.Values)
             {
                 p.AccquireGlobalMaxID();
                 passageVals.Append("(" + p.ID + ",'" + DBConnect.SafeSQL_Text(p.Passage) + "'),");

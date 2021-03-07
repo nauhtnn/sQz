@@ -13,7 +13,7 @@ namespace sQzLib
             int idx = -1;
             AddListOfSingleQuestions(qsheet.ShallowCopyIndependentQuestions(), ref idx, optionStatusArray, isEnabled);
             ++idx;
-            foreach (PassageWithQuestions p in qsheet.Passages.Values)
+            foreach (BasicPassageSection p in qsheet.Passages.Values)
             {
                 PassageWithQuestionsView view = new PassageWithQuestionsView(p, ref idx, optionStatusArray, isEnabled);
                 Children.Add(view.IdxBarView);

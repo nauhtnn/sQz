@@ -32,7 +32,7 @@ namespace sQzLib
             return passageView;
         }
 
-        public PassageWithQuestionsView(PassageWithQuestions passage, ref int questionIdx, byte[] optionStatusArray, bool isEnabled = true)
+        public PassageWithQuestionsView(BasicPassageSection passage, ref int questionIdx, byte[] optionStatusArray, bool isEnabled = true)
         {
             CreateIdxView(questionIdx + 1, questionIdx + passage.Questions.Count);
             Orientation = Orientation.Horizontal;

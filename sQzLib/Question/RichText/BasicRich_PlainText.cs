@@ -32,7 +32,7 @@ namespace sQzLib
                 return GetInnerTextOfRichText().IndexOf(value);
         }
 
-        private string GetInnerTextOfRichText()
+        public string GetInnerTextOfRichText()
         {
             StringBuilder text = new StringBuilder();
             foreach (Paragraph p in RichText.Document.Blocks.OfType<Paragraph>())

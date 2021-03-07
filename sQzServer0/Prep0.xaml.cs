@@ -140,7 +140,7 @@ namespace sQzServer0
                 AddSingleQuestionToDBView(q, ++rowIdx, rowIdx, ansSheet.BytesOfAnswer);
 
             int questionIdx = rowIdx;
-            foreach (PassageWithQuestions p in mDBQS.ShallowCopyPassages())
+            foreach (BasicPassageSection p in mDBQS.ShallowCopyPassages())
             {
                 AddPassageTextToDBView(p.Passage, ++rowIdx, SingleQuestionView.StemWidth);
                 foreach (Question q in p.Questions)
