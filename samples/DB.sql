@@ -37,17 +37,28 @@ CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATETIME,
 FOREIGN KEY(`dt`, `neeid`) REFERENCES `sqz_examinee`(`dt`, `id`),
 FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 
-CREATE TABLE IF NOT EXISTS `sqz_passage`(`id` INT PRIMARY KEY,
-`psg` TEXT);
+CREATE TABLE IF NOT EXISTS `sqz_sec_type`(`id` INT,
+`name` VARCHAR(32),
+PRIMARY KEY (`sqz_sec_type`, `name`);
+INSERT INTO `sqz_sec_type` VALUES (0, 'DefaultIndependentQuestions'), (1, 'BasicPassage'), (2, 'PassageWithBlanks');
+
+CREATE TABLE IF NOT EXISTS `sqz_section`(`id` INT PRIMARY KEY,
+`s_type` VARCHAR(32), `req` TEXT,
+`psg` TEXT, `config` TEXT,
+FOREIGN KEY(`s_type`) REFERENCES `sqz_sec_type`(`id`));
+
+CREATE TABLE IF NOT EXISTS `sqz_test_type`(`id` INT PRIMARY KEY);
+INSERT INTO `sqz_test_type` VALUES (0);
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`pid` INT NULL, `deleted` INT,
--- todo: change to stem
-`stmt` TEXT CHARACTER SET `utf8mb4`,
+`t_type` INT,
+`secid` INT, `deleted` INT,
+`stem` TEXT CHARACTER SET `utf8mb4`,
 `ans0` TEXT CHARACTER SET `utf8mb4`, `ans1` TEXT CHARACTER SET `utf8mb4`,
 `ans2` TEXT CHARACTER SET `utf8mb4`, `ans3` TEXT CHARACTER SET `utf8mb4`,
 `akey` CHAR(4) CHARACTER SET `ascii`,
-FOREIGN KEY(`pid`) REFERENCES `sqz_passage`(`id`));
+FOREIGN KEY(`t_type`) REFERENCES `sqz_test_type`(`id`),
+FOREIGN KEY(`secid`) REFERENCES `sqz_section`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATETIME,
 `qsid`INT, `qid` INT UNSIGNED, `asort` CHAR(4) CHARACTER SET `ascii`,
