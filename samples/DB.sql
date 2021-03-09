@@ -21,6 +21,8 @@ CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATETIME,
 PRIMARY KEY(`dt`, `id`),
 FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`));
 
+CREATE TABLE IF NOT EXISTS `sqz_test_type`(`id` INT PRIMARY KEY);
+
 CREATE TABLE IF NOT EXISTS `sqz_examinee`(`dt` DATETIME,
 `id` VARCHAR(8) CHARACTER SET `utf8mb4`, `rid` INT,
 `name` VARCHAR(64) CHARACTER SET `utf8mb4`,
@@ -45,9 +47,6 @@ CREATE TABLE IF NOT EXISTS `sqz_section`(`id` INT PRIMARY KEY,
 `s_type` INT, `req` TEXT,
 `psg` TEXT, `config` TEXT,
 FOREIGN KEY(`s_type`) REFERENCES `sqz_sec_type`(`id`));
-
-CREATE TABLE IF NOT EXISTS `sqz_test_type`(`id` INT PRIMARY KEY);
-INSERT INTO `sqz_test_type` VALUES (0);
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `t_type` INT,

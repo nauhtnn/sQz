@@ -322,7 +322,7 @@ namespace sQzServer0
         private void btnImp_Click(object sender, RoutedEventArgs e)
         {
             string emsg;
-            if (mSlTmp.DBInsNee(out emsg) <= 0)
+            if (mSlTmp.DBInsertExaminees(out emsg) < 0)
                 WPopup.s.ShowDialog(emsg);
             mSlTmp.DelNee();
             grdTmp.Children.Clear();

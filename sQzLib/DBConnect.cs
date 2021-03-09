@@ -136,7 +136,7 @@ namespace sQzLib
             } catch(MySqlException e) {
                 if (e.Number == -PRI_KEY_EXISTS)
                 {
-                    eMsg = null;
+                    eMsg = e.ToString();
                     n = PRI_KEY_EXISTS;
                 }
                 else

@@ -252,7 +252,7 @@ namespace sQzLib
                 return Txt.s._((int)TxI.NEE_FERR) + r.ToString();
         }
 
-        public int DBInsNee(out string eMsg)
+        public int DBInsertExaminees(out string eMsg)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -261,41 +261,30 @@ namespace sQzLib
                 return -1;
             }
             DB_InsertTestType_ifNExists(conn);
-            string vch = ExamRoomS0.PwChars();
+            string pwChars = ExamRoomS0.PwChars();
             Random rand = new Random();
-            int v = 1;
-            StringBuilder sb = new StringBuilder();
+            int n = 0;
+            eMsg = null;
             foreach (ExamRoomS0 r in Rooms.Values)
             {
-                int n = 0;
+                
                 bool bNExist = DBConnect.NExist(conn, "sqz_slot_room",
                     "dt='" + mDt.ToString(DT._) +
                     "' AND rid=" + r.uId, out eMsg);
                 if (eMsg != null)
-                {
-                    DBConnect.Close(ref conn);
-                    return -1;
-                }
+                    break;
                 else if (bNExist)
                     n = DBConnect.Ins(conn, "sqz_slot_room",
                         "dt,rid,pw", "('" + mDt.ToString(DT._) +
-                        "'," + r.uId + ",'" + ExamRoomS0.GenPw(vch, rand) + "')", out eMsg);
+                        "'," + r.uId + ",'" + ExamRoomS0.GenPw(pwChars, rand) + "')", out eMsg);
                 if (n < 0)
-                {
-                    DBConnect.Close(ref conn);
-                    return n;
-                }
+                    break;
                 n = r.DBIns(conn, out eMsg);
                 if (n < 0)
-                {
-                    sb.AppendFormat(Txt.s._((int)TxI.ROOM_DB_NOK) + '\n', r.uId,
-                        Txt.s._((int)TxI.NEE_EXIST));
-                    v = 0;
-                }
+                    break;
             }
-            eMsg = sb.ToString();
             DBConnect.Close(ref conn);
-            return v;
+            return n;
         }
 
         private void DB_InsertTestType_ifNExists(MySqlConnection conn)
