@@ -399,6 +399,8 @@ namespace sQzLib
         //only Server0 uses this.
         public void DBSelectNondeletedQuestions(int testType)
         {
+            TestType_in_DB = testType;
+            Sections.Clear();
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
@@ -543,6 +545,7 @@ namespace sQzLib
             }
             if (questionVals.Length > 0)
             {
+                DB_InsertTestType_ifNExists(conn, TestType_in_DB);
                 questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
                 if (DBConnect.Ins(conn, "sqz_question", "t_type,secid,deleted,stem,ans0,ans1,ans2,ans3,akey",
                 questionVals.ToString(), out eMsg) < 0)
@@ -550,6 +553,13 @@ namespace sQzLib
             }
 
             DBConnect.Close(ref conn);
+        }
+
+        private void DB_InsertTestType_ifNExists(MySqlConnection conn, int testType)
+        {
+            string emsg;
+            if (DBConnect.NExist(conn, "sqz_test_type", "id=" + testType, out emsg))
+                DBConnect.Ins(conn, "sqz_test_type", "id", "(" + testType + ")", out emsg);
         }
 
         private void AppendQuestionInsertQuery(Question q, StringBuilder query)

@@ -206,6 +206,9 @@ namespace sQzServer0
                 MessageBox.Show("No question to import!");
                 return;
             }
+            mTmpQS.TestType_in_DB = GetTestType_FromTextBox();
+            if (mTmpQS.TestType_in_DB < 0)
+                return;
             gDBQuest.Children.Clear();
             svwrTmpQ.Content = null;
             mTmpQS.DBIns();
@@ -216,14 +219,22 @@ namespace sQzServer0
 
         private void LoadAndShowQuestionFromDB()
         {
-            int testTypeID;
-            if(!int.TryParse(tbxTestType.Text, out testTypeID))
-            {
-                MessageBox.Show("Test type is not number!");
+            int testTypeID = GetTestType_FromTextBox();
+            if (testTypeID < 0)
                 return;
-            }
             mDBQS.DBSelectNondeletedQuestions(testTypeID);
             ShowDBQ();
+        }
+
+        private int GetTestType_FromTextBox()
+        {
+            int testTypeID;
+            if (!int.TryParse(tbxTestType.Text, out testTypeID))
+            {
+                MessageBox.Show("Test type is not number!");
+                return -1;
+            }
+            return testTypeID;
         }
 
         private void LoadTxt()
@@ -247,17 +258,19 @@ namespace sQzServer0
         private void btnDelQ_Click(object sender, RoutedEventArgs e)
         {
             StringBuilder qids = new StringBuilder();
+            qids.Append("id IN (");
             foreach(CheckBox c in vChk)
                 if(c.IsChecked == true)
                 {
                     int uqid;
                     if (int.TryParse(c.Name.Substring(1), out uqid))
-                        qids.Append("id=" + uqid + " OR ");
+                        qids.Append(uqid.ToString() + ",");
                 }
             bool toUpdate = false;
-            if (0 < qids.Length)
+            if ("id IN (".Length < qids.Length)
             {
-                qids.Remove(qids.Length - 4, 4);//remove the last " OR "
+                qids.Remove(qids.Length - 1, 1);//remove the last " OR "
+                qids.Append(")");
                 Question.DBDelete(qids.ToString());
                 toUpdate = true;
             }
