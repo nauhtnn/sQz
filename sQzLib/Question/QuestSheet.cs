@@ -492,7 +492,7 @@ namespace sQzLib
         private List<Question> DBSelectQuestions(MySqlConnection conn, string condition)
         {
             string query = DBConnect.mkQrySelect("sqz_question",
-                "id,pid,stem,ans0,ans1,ans2,ans3,akey", condition);
+                "id,secid,stem,ans0,ans1,ans2,ans3,akey", condition);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
             List<Question> questions = new List<Question>();
@@ -528,8 +528,8 @@ namespace sQzLib
                 if (passageSection != null)
                     sectionVals.Append("'" + DBConnect.SafeSQL_Text(passageSection.Passage) + "'),");
                 else
-                    sectionVals.Append("NULL,");
-                sectionVals.Append("NULL),");
+                    sectionVals.Append("NULL),");
+                //sectionVals.Append("NULL),"); TODO: manual config later
                 foreach (Question q in section.Questions)
                     AppendQuestionInsertQuery(q, questionVals);
             }

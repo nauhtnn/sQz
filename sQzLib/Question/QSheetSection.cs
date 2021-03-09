@@ -239,12 +239,14 @@ namespace sQzLib
 
         protected void Init()
         {
-            _ID = -1;
+            Init(-1);
         }
 
         protected void Init(int id)
         {
             _ID = id;
+            Requirements = string.Empty;
+            Questions = new List<Question>();
         }
 
         public int GetSectionTypeID()

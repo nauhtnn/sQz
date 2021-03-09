@@ -128,28 +128,25 @@ namespace sQzServer0
 
         private void ShowDBQ()
         {
-            //gDBQuest.Children.Clear();
-            //gDBQuest.RowDefinitions.Clear();
-            //vChk.Clear();
-            //SingleQuestionView.IdxWidth = FontSize * 2;
-            //SingleQuestionView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleQuestionView.IdxWidth;
-            //AnswerSheet ansSheet = new AnswerSheet();
-            //mDBQS.ExtractKey(ansSheet);
-            //int rowIdx = -1;
+            gDBQuest.Children.Clear();
+            gDBQuest.RowDefinitions.Clear();
+            vChk.Clear();
+            SingleQuestionView.IdxWidth = FontSize * 2;
+            SingleQuestionView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleQuestionView.IdxWidth;
+            AnswerSheet ansSheet = new AnswerSheet();
+            mDBQS.ExtractKey(ansSheet);
+            int rowIdx = -1;
             //foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
             //    AddSingleQuestionToDBView(q, ++rowIdx, rowIdx, ansSheet.BytesOfAnswer);
 
-            //int questionIdx = rowIdx;
-            //foreach (BasicPassageSection p in mDBQS.ShallowCopyPassages())
-            //{
-            //    AddPassageTextToDBView(p.Passage, ++rowIdx, SingleQuestionView.StemWidth);
-            //    foreach (Question q in p.Questions)
-            //        AddSingleQuestionToDBView(q, ++questionIdx, ++rowIdx, ansSheet.BytesOfAnswer);
-            //}
-            
-            //StringBuilder sb = new StringBuilder();
-            //sb.AppendFormat(Txt.s._((int)TxI.Q_DB), mDBQS.Count, mDBQS.CountPassage);
-            //tbiDBQ.Header = sb.ToString();
+            int questionIdx = rowIdx;
+            foreach (QSheetSection section in mDBQS.Sections)
+            {
+                AddPassageTextToDBView(section.Requirements, ++rowIdx, SingleQuestionView.StemWidth);
+                foreach (Question q in section.Questions)
+                    AddSingleQuestionToDBView(q, ++questionIdx, ++rowIdx, ansSheet.BytesOfAnswer);
+            }
+            tbiDBQ.Header = CreateQuestSheetHeader(mDBQS);
         }
 
         private void AddPassageTextToDBView(string text, int rowIdx, double w)
@@ -219,8 +216,14 @@ namespace sQzServer0
 
         private void LoadAndShowQuestionFromDB()
         {
-            //mDBQS.DBSelectNondeletedQuestions();
-            //ShowDBQ();
+            int testTypeID;
+            if(!int.TryParse(tbxTestType.Text, out testTypeID))
+            {
+                MessageBox.Show("Test type is not number!");
+                return;
+            }
+            mDBQS.DBSelectNondeletedQuestions(testTypeID);
+            ShowDBQ();
         }
 
         private void LoadTxt()
@@ -308,6 +311,11 @@ namespace sQzServer0
         }
 
         private void tbiDBQ_Loaded(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void btnShowQuestions_Click(object sender, RoutedEventArgs e)
         {
             LoadAndShowQuestionFromDB();
         }
