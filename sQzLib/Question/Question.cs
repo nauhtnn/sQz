@@ -58,6 +58,7 @@ namespace sQzLib
                 return;
             string eMsg;
             DBConnect.Update(conn, "sqz_question", "deleted=1", ids, out eMsg);
+            DBConnect.Close(ref conn);
         }
 
         public Question DeepCopy()
