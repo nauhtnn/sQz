@@ -57,5 +57,32 @@ namespace sQzLib
                 vals.Append("'," + ++idx + "),");
             }
         }
+
+        public void Randomize(Random rand)
+        {
+            List<Question> tempList = new List<Question>();
+            foreach (Question q in Questions)
+                tempList.Add(q.RandomizeDeepCopy(rand));
+            //randomize
+            List<Question> newList = new List<Question>();
+            int n = tempList.Count;
+            while (0 < n)
+            {
+                int idx = rand.Next() % n;
+                newList.Add(tempList.ElementAt(idx));
+                tempList.RemoveAt(idx);
+                --n;
+            }
+            Questions = newList;
+        }
+
+        public override object Clone()
+        {
+            IndependentQSection newSection = new IndependentQSection(ID);
+            newSection.Requirements = Requirements;
+            foreach (Question q in Questions)
+                newSection.Questions.Add(q.DeepCopy());
+            return newSection;
+        }
     }
 }

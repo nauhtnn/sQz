@@ -10,7 +10,7 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    public abstract class QSheetSection
+    public abstract class QSheetSection: ICloneable
     {
         public static Dictionary<SectionTypeID, List<string>> SectionMagicKeywords;
         public static string SECTION_MAGIC_PREFIX;
@@ -254,5 +254,7 @@ namespace sQzLib
         {
             return (int)SectionTypeID.DefaultIndependentQuestions;
         }
+
+        abstract public object Clone();
     }
 }

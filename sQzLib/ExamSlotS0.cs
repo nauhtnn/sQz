@@ -446,6 +446,7 @@ namespace sQzLib
                     WPopup.s.ShowDialog(emsg);
                 p.vSheet.Clear();
             }
+            QuestionPacks.Clear();
             if (!QuestSheet.GetMaxID_inDB(mDt))
                 return true;
             //maybe it's safer for not removing in mKeyPack

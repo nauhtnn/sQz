@@ -13,7 +13,7 @@ namespace sQzLib
         public int ID;
         public List<QSheetSection> Sections;
         public byte[] aQuest;
-        public int TestType_in_DB;
+        public int TestType;
         //public int Count { get { return IndependentQuestions.Count; } }
         //public string CountPassage {
         //    get {
@@ -353,53 +353,54 @@ namespace sQzLib
             //    q.Randomize(rand);
         }
 
-        public QuestSheet RandomizeDeepCopy(Random rand)
+        public QuestSheet RandomizeDeepCopy_SectionsOnly(Random rand)
         {
-            throw new NotImplementedException();
-            //QuestSheet sheet = new QuestSheet();
-            //sheet.ID = ID;
-            //sheet.IndependentQuestions = RandomizeDeepCopy(rand, IndependentQuestions);
-            //foreach(BasicPassageSection p in Passages.Values)
-            //{
-            //    BasicPassageSection passage = new BasicPassageSection(p.ID);
-            //    passage.Passage = p.Passage;
-            //    passage.Questions = RandomizeDeepCopy_KeepQuestionOrder(rand, p.Questions);
-            //    sheet.Passages.Add(passage.ID, passage);
-            //}
+            QuestSheet sheet = new QuestSheet();
+            sheet.ID = ID;
+            sheet.TestType = TestType;
 
-            //return sheet;
-        }
-
-        private List<Question> RandomizeDeepCopy_KeepQuestionOrder(Random rand, List<Question> originalList)
-        {
-            List<Question> newList = new List<Question>();
-            foreach (Question q in originalList)
-                newList.Add(q.RandomizeDeepCopy(rand));
-            return newList;
-        }
-
-        private List<Question> RandomizeDeepCopy(Random rand, List<Question> originalList)
-        {
-            List<Question> tempList = new List<Question>();
-            foreach (Question q in originalList)
-                tempList.Add(q.RandomizeDeepCopy(rand));
-            //randomize
-            List<Question> newList = new List<Question>();
-            int n = tempList.Count;
-            while (0 < n)
+            List<QSheetSection> sections = RandomizeDeepCopy_KeepSectionsOrder(rand);
+            sheet.Sections = new List<QSheetSection>();
+            while (sections.Count > 1)
             {
-                int idx = rand.Next() % n;
-                newList.Add(tempList.ElementAt(idx));
-                tempList.RemoveAt(idx);
-                --n;
+                int idx = rand.Next() % sections.Count;
+                QSheetSection s = sections.ElementAt(idx);
+                sheet.Sections.Add(s);
+                sections.Remove(s);
             }
-            return newList;
+
+            return sheet;
+        }
+
+        private List<QSheetSection> RandomizeDeepCopy_KeepSectionsOrder(Random rand)
+        {
+            List<QSheetSection> sections = new List<QSheetSection>();
+            foreach (QSheetSection section in Sections)
+            {
+                BasicPassageSection p = section as BasicPassageSection;
+                if (p != null)
+                {
+                    BasicPassageSection p2 = p.Clone() as BasicPassageSection;
+                    p2.Randomize_KeepQuestionOrder(rand);
+                    sections.Add(p2);
+                    continue;
+                }
+                IndependentQSection i = section as IndependentQSection;
+                if (i != null)
+                {
+                    IndependentQSection i2 = i.Clone() as IndependentQSection;
+                    i2.Randomize(rand);
+                    sections.Add(i2);
+                    continue;
+                }
+            }
+            return sections;
         }
 
         //only Server0 uses this.
         public void DBSelectNondeletedQuestions(int testType)
         {
-            TestType_in_DB = testType;
+            TestType = testType;
             Sections.Clear();
             MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
@@ -407,7 +408,7 @@ namespace sQzLib
                 System.Windows.MessageBox.Show(Txt.s._((int)TxI.DB_NOK));
                 return;
             }
-            List<Question> allQuestions = DBSelectQuestions(conn, "deleted=0 AND t_type=" + TestType_in_DB);
+            List<Question> allQuestions = DBSelectQuestions(conn, "deleted=0 AND t_type=" + TestType);
             DBSelectSections(conn, allQuestions);
             DBConnect.Close(ref conn);
         }
@@ -543,7 +544,7 @@ namespace sQzLib
             }
             if (questionVals.Length > 0)
             {
-                DB_InsertTestType_ifNExists(conn, TestType_in_DB);
+                DB_InsertTestType_ifNExists(conn, TestType);
                 questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
                 if (DBConnect.Ins(conn, "sqz_question", "t_type,secid,deleted,stem,ans0,ans1,ans2,ans3,akey",
                 questionVals.ToString(), out eMsg) < 0)
@@ -562,7 +563,7 @@ namespace sQzLib
 
         private void AppendQuestionInsertQuery(Question q, StringBuilder query)
         {
-            query.Append("(" + TestType_in_DB + ",");
+            query.Append("(" + TestType + ",");
             if (q.SectionID < 0)
                 query.Append("NULL,0,'");
             else

@@ -206,8 +206,8 @@ namespace sQzServer0
                 MessageBox.Show("No question to import!");
                 return;
             }
-            mTmpQS.TestType_in_DB = GetTestType_FromTextBox();
-            if (mTmpQS.TestType_in_DB < 0)
+            mTmpQS.TestType = GetTestType_FromTextBox();
+            if (mTmpQS.TestType < 0)
                 return;
             gDBQuest.Children.Clear();
             svwrTmpQ.Content = null;

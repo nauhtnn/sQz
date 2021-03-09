@@ -178,9 +178,9 @@ namespace sQzLib
             while (0 < numberOfSheet)
             {
                 --numberOfSheet;
-                QuestSheet qs = originSheet.RandomizeDeepCopy(rand);
+                QuestSheet qs = originSheet.RandomizeDeepCopy_SectionsOnly(rand);
                 qs.AccquireGlobalMaxID();
-                qs.TestType_in_DB = testType;
+                qs.TestType = testType;
                 vSheet.Add(qs.ID, qs);
                 sheets.Add(qs);
             }
@@ -199,7 +199,7 @@ namespace sQzLib
             StringBuilder vals = new StringBuilder();
             string prefx = "('" + dt.ToString(DT._) + "',";
             foreach (QuestSheet qs in l)
-                vals.Append(prefx + qs.ID + ","+ qs.TestType_in_DB + "),");
+                vals.Append(prefx + qs.ID + ","+ qs.TestType + "),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
             if(DBConnect.Ins(conn, "sqz_qsheet", "dt,id,t_type", vals.ToString(), out eMsg) < 0)
