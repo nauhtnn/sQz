@@ -37,13 +37,12 @@ CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATETIME,
 FOREIGN KEY(`dt`, `neeid`) REFERENCES `sqz_examinee`(`dt`, `id`),
 FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 
-CREATE TABLE IF NOT EXISTS `sqz_sec_type`(`id` INT,
-`name` VARCHAR(32),
-PRIMARY KEY (`sqz_sec_type`, `name`);
+CREATE TABLE IF NOT EXISTS `sqz_sec_type`(`id` INT PRIMARY KEY,
+`name` VARCHAR(32));
 INSERT INTO `sqz_sec_type` VALUES (0, 'DefaultIndependentQuestions'), (1, 'BasicPassage'), (2, 'PassageWithBlanks');
 
 CREATE TABLE IF NOT EXISTS `sqz_section`(`id` INT PRIMARY KEY,
-`s_type` VARCHAR(32), `req` TEXT,
+`s_type` INT, `req` TEXT,
 `psg` TEXT, `config` TEXT,
 FOREIGN KEY(`s_type`) REFERENCES `sqz_sec_type`(`id`));
 
