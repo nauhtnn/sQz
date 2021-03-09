@@ -6,14 +6,20 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
     public abstract class QSheetSection
     {
-        public static Dictionary<SectionID, List<string>> SectionMagicKeywords;
+        public static Dictionary<SectionTypeID, List<string>> SectionMagicKeywords;
         public static string SECTION_MAGIC_PREFIX;
         const string SECTION_MAGIC_CFG_FILEPATH = "sectionMagicKeywords.txt";
+
+        public static int globalMaxID = -1;
+
+        protected int _ID;
+        public int ID { get { return _ID; } }
 
         public string Requirements;
         public List<Question> Questions;
@@ -48,7 +54,7 @@ namespace sQzLib
 
             SECTION_MAGIC_PREFIX = lines[0].Trim();
 
-            SectionMagicKeywords = new Dictionary<SectionID, List<string>>();
+            SectionMagicKeywords = new Dictionary<SectionTypeID, List<string>>();
 
             for (int i = 1; i < lines.Length; ++i)
             {
@@ -58,12 +64,12 @@ namespace sQzLib
                 foreach (string w in words)
                     if (w.Trim().Length == 0)
                         continue;
-                if (!Enum.IsDefined(typeof(SectionID), words[0]))
+                if (!Enum.IsDefined(typeof(SectionTypeID), words[0]))
                     continue;
                 List<string> keywords = new List<string>();
                 for (int j = 1; j < words.Length; ++j)
                     keywords.Add(words[j]);
-                SectionID key = (SectionID)Enum.Parse(typeof(SectionID), words[0]);
+                SectionTypeID key = (SectionTypeID)Enum.Parse(typeof(SectionTypeID), words[0]);
                 if (SectionMagicKeywords.ContainsKey(key))
                 {
                     System.Windows.MessageBox.Show("LoadSectionMagicKeywords error: duplicated section " + key);
@@ -120,14 +126,14 @@ namespace sQzLib
         public static void InitDefaultMagicKeywords()
         {
             SECTION_MAGIC_PREFIX = string.Empty;
-            SectionMagicKeywords = new Dictionary<SectionID, List<string>>();
+            SectionMagicKeywords = new Dictionary<SectionTypeID, List<string>>();
             List<string> magicKeywords = new List<string>();
             magicKeywords.Add("following [text|passage]");
             magicKeywords.Add("blank");
-            SectionMagicKeywords.Add(SectionID.PassageWithBlanks, magicKeywords);
+            SectionMagicKeywords.Add(SectionTypeID.PassageWithBlanks, magicKeywords);
             magicKeywords = new List<string>();
             magicKeywords.Add("following [text|passage]");
-            SectionMagicKeywords.Add(SectionID.BasicPassage, magicKeywords);
+            SectionMagicKeywords.Add(SectionTypeID.BasicPassage, magicKeywords);
         }
 
         public static void TrimToFirstSection(Queue<BasicRich_PlainText> tokens)
@@ -206,6 +212,44 @@ namespace sQzLib
             requirementTextBlock.TextAlignment = TextAlignment.Center;
             requirementTextBlock.Margin = new Thickness(0, SystemParameters.ScrollWidth, 0, SystemParameters.ScrollWidth);
             return requirementTextBlock;
+        }
+
+        public void AccquireGlobalMaxID()
+        {
+            _ID = ++globalMaxID;
+            foreach (Question q in Questions)
+                q.SectionID = _ID;
+        }
+
+        public static bool GetMaxID_inDB()
+        {
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return true;
+            int uid = DBConnect.MaxInt(conn, "sqz_section", "id", null);
+            if (uid < 0)
+            {
+                DBConnect.Close(ref conn);
+                return true;
+            }
+            globalMaxID = uid;
+
+            return false;
+        }
+
+        protected void Init()
+        {
+            _ID = -1;
+        }
+
+        protected void Init(int id)
+        {
+            _ID = id;
+        }
+
+        public int GetSectionTypeID()
+        {
+            return (int)SectionTypeID.DefaultIndependentQuestions;
         }
     }
 }

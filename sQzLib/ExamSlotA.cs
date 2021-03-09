@@ -16,7 +16,7 @@ namespace sQzLib
     public abstract class ExamSlotA
     {
         public DateTime mDt;
-        public QuestPack QuestionPack;
+        public Dictionary<int, QuestPack> QuestionPacks;
 
         public AnswerPack mKeyPack;
 
@@ -28,7 +28,7 @@ namespace sQzLib
         {
             mDt = DT.INVALID;
             eStt = ExamStt.Prep;
-            QuestionPack = new QuestPack();
+            QuestionPacks = new Dictionary<int, QuestPack>();
 
             mKeyPack = new AnswerPack();
         }
@@ -37,7 +37,8 @@ namespace sQzLib
             get { return mDt; }
             set {
                 mDt = value;
-                QuestionPack.mDt = value;
+                foreach(QuestPack p in QuestionPacks.Values)
+                    p.mDt = value;
             }
         }
     }

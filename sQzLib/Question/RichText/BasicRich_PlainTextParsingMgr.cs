@@ -41,9 +41,9 @@ namespace sQzLib
 
         private QSheetSection SelectSection(string text)
         {
-            if(RegexIsMatch(text, QSheetSection.SectionMagicKeywords[SectionID.PassageWithBlanks]))
+            if(RegexIsMatch(text, QSheetSection.SectionMagicKeywords[SectionTypeID.PassageWithBlanks]))
                 return new BasicPassageSection();
-            if (RegexIsMatch(text, QSheetSection.SectionMagicKeywords[SectionID.BasicPassage]))
+            if (RegexIsMatch(text, QSheetSection.SectionMagicKeywords[SectionTypeID.BasicPassage]))
                 return new BasicPassageSection();
             return new IndependentQSection();
         }
@@ -63,7 +63,7 @@ namespace sQzLib
         }
     }
 
-    public enum SectionID
+    public enum SectionTypeID
     {
         DefaultIndependentQuestions = 0,
         BasicPassage,

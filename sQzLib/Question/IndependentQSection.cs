@@ -8,6 +8,16 @@ namespace sQzLib
 {
     public class IndependentQSection : QSheetSection
     {
+        public IndependentQSection()
+        {
+            Init();
+        }
+
+        public IndependentQSection(int id)
+        {
+            Init(id);
+        }
+
         public override bool Parse(Queue<BasicRich_PlainText> tokens)
         {
             if(QSheetSection.SECTION_MAGIC_PREFIX.Length > 0)

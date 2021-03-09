@@ -378,7 +378,7 @@ namespace sQzServer0
 
         public void GenQ()
         {
-            mSl.GenQ(mSl.CountQSByRoom());
+            mSl.GenQ(mSl.MaxNumberOfExaminees_PerTestType());
 
             ShowQSHeader();
         }

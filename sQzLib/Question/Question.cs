@@ -11,7 +11,7 @@ namespace sQzLib
         public const char C0 = '0';
         public const char C1 = '1';
         public int uId;
-        public int PassageID;
+        public int SectionID;
         public string Stem;
         public string[] vAns;
         public bool[] vKeys;
@@ -19,7 +19,7 @@ namespace sQzLib
 
         public Question() {
             vAns = null;
-            PassageID = -1;
+            SectionID = -1;
             vAnsSort = new int[NUMBER_OF_OPTIONS];
             for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
                 vAnsSort[i] = i;
@@ -65,7 +65,7 @@ namespace sQzLib
             Question q = new Question();
             q.uId = uId;
             q.Stem = Stem;
-            q.PassageID = PassageID;
+            q.SectionID = SectionID;
             q.vAns = new string[NUMBER_OF_OPTIONS];
             for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
                 q.vAns[i] = vAns[i];
@@ -107,7 +107,7 @@ namespace sQzLib
             Question q = new Question();
             q.uId = uId;
             q.Stem = Stem;
-            q.PassageID = PassageID;
+            q.SectionID = SectionID;
             //randomize
             q.vAns = new string[NUMBER_OF_OPTIONS];
             q.vKeys = new bool[NUMBER_OF_OPTIONS];

@@ -420,46 +420,54 @@ namespace sQzLib
 
         public bool GenQ(int n)
         {
-            string emsg;
-            if (QuestionPack.DBDelete(out emsg))
-                WPopup.s.ShowDialog(emsg);
-            QuestionPack.vSheet.Clear();
-            if (QuestSheet.GetMaxID_inDB(mDt) &&
-                MessageBox.Show("Cannot get QuestSheet.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.No)
-                return true;
-            foreach (QuestSheet qs in QuestionPack.vSheet.Values)
-                mKeyPack.vSheet.Remove(qs.ID);
-            List<QuestSheet> sheets;
-            sheets = QuestionPack.GenQPack3(n);
-            mKeyPack.ExtractKey(sheets);
+            //string emsg;
+            //if (QuestionPack.DBDelete(out emsg))
+            //    WPopup.s.ShowDialog(emsg);
+            //QuestionPack.vSheet.Clear();
+            //if (QuestSheet.GetMaxID_inDB(mDt) &&
+            //    MessageBox.Show("Cannot get QuestSheet.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.No)
+            //    return true;
+            //foreach (QuestSheet qs in QuestionPack.vSheet.Values)
+            //    mKeyPack.vSheet.Remove(qs.ID);
+            //List<QuestSheet> sheets;
+            //sheets = QuestionPacks.GenQPack3(n);
+            //mKeyPack.ExtractKey(sheets);
             return false;
         }
 
         public bool DBSelArchieve(out string eMsg)
         {
-            if (QuestionPack.DBSelectQS(mDt, out eMsg))
-                return true;
-            foreach (QuestSheet qs in QuestionPack.vSheet.Values)
-                mKeyPack.ExtractKey(qs);
-            return false;
+            throw new NotImplementedException();
+            //if (QuestionPack.DBSelectQS(mDt, out eMsg))
+            //    return true;
+            //foreach (QuestSheet qs in QuestionPack.vSheet.Values)
+            //    mKeyPack.ExtractKey(qs);
+            //return false;
         }
 
         public byte[] GetBytes_QPacksWithDateTime(int rid)
         {
-            List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(mDt.ToBinary()));
-            l.InsertRange(l.Count, QuestionPack.ToByte());
+            throw new NotImplementedException();
+            //List<byte[]> l = new List<byte[]>();
+            //l.Add(BitConverter.GetBytes(mDt.ToBinary()));
+            //l.InsertRange(l.Count, QuestionPack.ToByte());
 
-            return Utils.ToArray_FromListOfBytes(l);
+            //return Utils.ToArray_FromListOfBytes(l);
         }
 
-        public int CountQSByRoom()
+        public Dictionary<int, int> MaxNumberOfExaminees_PerTestType()
         {
-            int n = 0;
+            Dictionary<int, int> maxPerTestType = new Dictionary<int, int>();
             foreach (ExamRoomS0 r in Rooms.Values)
-                if (n < r.Examinees.Count)
-                    n = r.Examinees.Count;
-            return n;
+                foreach (ExamineeA nee in r.Examinees.Values)
+                {
+                    if (!maxPerTestType.ContainsKey(nee.TestType))
+                        maxPerTestType.Add(nee.TestType, 1);
+                    else
+                        ++maxPerTestType[nee.TestType];
+                }
+
+            return maxPerTestType;
         }
 
         private int ReadBytes_RoomFromS1(byte[] buf, ref int offs)
