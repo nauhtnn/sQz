@@ -24,16 +24,16 @@ FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`));
 CREATE TABLE IF NOT EXISTS `sqz_examinee`(`dt` DATETIME,
 `id` VARCHAR(8) CHARACTER SET `utf8mb4`, `rid` INT,
 `name` VARCHAR(64) CHARACTER SET `utf8mb4`,
-`birthdate` VARCHAR(10), `birthplace` VARCHAR(96) CHARACTER SET `utf8mb4`,
+`birthdate` VARCHAR(10), `t_type` INT,
 PRIMARY KEY(`dt`, `id`),
-FOREIGN KEY(`dt`, `rid`) REFERENCES `sqz_slot_room`(`dt`, `rid`));
+FOREIGN KEY(`dt`, `rid`) REFERENCES `sqz_slot_room`(`dt`, `rid`),
+FOREIGN KEY(`t_type`) REFERENCES `sqz_test_type`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATETIME,
 `neeid` VARCHAR(8) CHARACTER SET `utf8mb4`, `qsid` INT,
 `t1` TIME, `t2` TIME, `grade` INT,
 `comp` VARCHAR(32),
--- todo: Use TEXT
-`ans` VARCHAR(1024),
+`ans` TEXT,
 FOREIGN KEY(`dt`, `neeid`) REFERENCES `sqz_examinee`(`dt`, `id`),
 FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 

@@ -211,7 +211,7 @@ namespace sQzServer0
                 return;
             gDBQuest.Children.Clear();
             svwrTmpQ.Content = null;
-            mTmpQS.DBIns();
+            mTmpQS.DBInsertOriginQuestions();
             mTmpQS.Clear();
             tbiTmpQ.Header = CreateQuestSheetHeader(mTmpQS);
             LoadAndShowQuestionFromDB();
@@ -247,7 +247,7 @@ namespace sQzServer0
             txtId.Text = t._((int)TxI.NEEID_S);
             txtName.Text = t._((int)TxI.NEE_NAME);
             txtBirdate.Text = t._((int)TxI.BIRDATE);
-            txtBirpl.Text = t._((int)TxI.BIRPL);
+            txtBirpl.Text = "Test type";// t._((int)TxI.BIRPL);
             txtRoom.Text = t._((int)TxI.ROOM);
             btnImp.Content = t._((int)TxI.PREP_IMP);
             btnDelQ.Content = t._((int)TxI.PREP_DEL_SEL);

@@ -172,11 +172,12 @@ namespace sQzLib
             return emsg;
         }
 
-        public string ReadF(string fp, ref ExamSlotS0 o)
+        public string LoadFromFile_Examinees(string fp, ref ExamSlotS0 o)
         {
             string[] vs = System.IO.File.ReadAllLines(fp);
             StringBuilder errorLines = new StringBuilder();
             StringBuilder dup = new StringBuilder();
+            List<int> testTypes = DBSelectTestTypes();
             int i = 0;
             foreach (string s in vs)
             {
@@ -187,38 +188,42 @@ namespace sQzLib
                 {
                     if (v[0].Length < 1)
                     {
-                        errorLines.Append(i.ToString() + ", ");
+                        errorLines.Append("length " + i + ", ");
                         continue;
                     }
                     e.ID = v[0].Trim();
-                    bool bCont = false;
+                    bool jumpToNextLine = false;
                     foreach (ExamRoomS0 ro in Rooms.Values)
                         if (ro.Examinees.ContainsKey(e.ID))
                         {
                             dup.Append(e.ID + ", ");
-                            bCont = true;
+                            jumpToNextLine = true;
                         }
-                    if (bCont)
+                    if (jumpToNextLine)
                         continue;
                     foreach (ExamRoomS0 ro in o.Rooms.Values)
                         if (ro.Examinees.ContainsKey(e.ID))
                         {
                             dup.Append(e.ID + ", ");
-                            bCont = true;
+                            jumpToNextLine = true;
                         }
-                    if (bCont)
+                    if (jumpToNextLine)
                         continue;
                     int roomID = -1;
                     if (!int.TryParse(v[1], out roomID) || !Rooms.ContainsKey(roomID))
                     {
-                        errorLines.Append(i.ToString() + ", ");
+                        errorLines.Append("roomID " + i + ", ");
+                        continue;
+                    }
+                    if (!int.TryParse(v[4].Trim(), out e.TestType))
+                    {
+                        errorLines.Append("testType " + i + ", ");
                         continue;
                     }
                     e.mDt = mDt;
                     e.Name = v[2].Trim();
                     e.Birthdate = v[3].Trim();
-                    e.Birthplace = v[4].Trim();
-                    if (e.Name.Length == 0 || e.Birthdate.Length == 0 || e.Birthplace.Length == 0)
+                    if (e.Name.Length == 0 || e.Birthdate.Length == 0)
                     {
                         errorLines.Append(i.ToString() + ", ");
                         continue;
@@ -255,6 +260,7 @@ namespace sQzLib
                 eMsg = Txt.s._((int)TxI.DB_NOK);
                 return -1;
             }
+            DB_InsertTestType_ifNExists(conn);
             string vch = ExamRoomS0.PwChars();
             Random rand = new Random();
             int v = 1;
@@ -290,6 +296,22 @@ namespace sQzLib
             eMsg = sb.ToString();
             DBConnect.Close(ref conn);
             return v;
+        }
+
+        private void DB_InsertTestType_ifNExists(MySqlConnection conn)
+        {
+            foreach(int testType in GetAllTestTypesInRooms())
+                QuestSheet.DB_InsertTestType_ifNExists(conn, testType);
+        }
+
+        private List<int> GetAllTestTypesInRooms()
+        {
+            List<int> testTypes = new List<int>();
+            foreach (ExamRoomS0 room in Rooms.Values)
+                foreach (ExamineeA nee in room.Examinees.Values)
+                    if (!testTypes.Contains(nee.TestType))
+                        testTypes.Add(nee.TestType);
+            return testTypes;
         }
 
         public void DelNee()
@@ -427,8 +449,7 @@ namespace sQzLib
                     WPopup.s.ShowDialog(emsg);
                 p.vSheet.Clear();
             }
-            if (QuestSheet.GetMaxID_inDB(mDt) &&
-                MessageBox.Show("Cannot get QuestSheet.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.No)
+            if (!QuestSheet.GetMaxID_inDB(mDt))
                 return true;
             //maybe it's safer for not removing in mKeyPack
             //foreach (QuestSheet qs in QuestionPack.vSheet.Values)
@@ -442,14 +463,24 @@ namespace sQzLib
             return false;
         }
 
-        public bool DBSelArchieve(out string eMsg)
+        public bool DBSelArchive(out string eMsg)
         {
-            throw new NotImplementedException();
-            //if (QuestionPack.DBSelectQS(mDt, out eMsg))
-            //    return true;
-            //foreach (QuestSheet qs in QuestionPack.vSheet.Values)
-            //    mKeyPack.ExtractKey(qs);
-            //return false;
+            QuestionPacks.Clear();
+            mKeyPack.Clear();
+            foreach (int testType in GetAllTestTypesInRooms())
+            {
+                QuestPack pack = new QuestPack();
+                pack.TestType = testType;
+                pack.mDt = mDt;
+                if (pack.DBSelectQS(out eMsg))
+                    return true;
+                QuestionPacks.Add(testType, pack);
+            }
+            foreach(QuestPack pack in QuestionPacks.Values)
+                foreach(QuestSheet qs in pack.vSheet.Values)
+                    mKeyPack.ExtractKey(qs);
+            eMsg = string.Empty;
+            return false;
         }
 
         public byte[] GetBytes_QPacksWithDateTime(int rid)
@@ -521,6 +552,28 @@ namespace sQzLib
                 l.Add(BitConverter.GetBytes(-1));//should raise error message box here
 
             return Utils.ToArray_FromListOfBytes(l);
+        }
+
+        private List<int> DBSelectTestTypes()
+        {
+            List<int> testTypes = new List<int>();
+            MySqlConnection conn = DBConnect.Init();
+            if (conn == null)
+                return testTypes;
+            string query = DBConnect.mkQrySelect("sqz_test_type", "id", null);
+            string emsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out emsg);
+            if (reader == null)
+            {
+                MessageBox.Show("DB_SelectTestTypes\n" + emsg.ToString());
+                DBConnect.Close(ref conn);
+                return testTypes;
+            }
+            while (reader.Read())
+                testTypes.Add(reader.GetInt32(0));
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return testTypes;
         }
     }
 }

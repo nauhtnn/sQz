@@ -32,17 +32,8 @@ namespace sQzLib
 
             if (eStt < NeeStt.Finished || bLog)
             {
-                byte[] b = Encoding.UTF8.GetBytes(Birthdate);
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(b);
-
-                b = Encoding.UTF8.GetBytes(Name);
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(b);
-
-                b = Encoding.UTF8.GetBytes(Birthplace);
-                l.Add(BitConverter.GetBytes(b.Length));
-                l.Add(b);
+                Utils.AppendBytesOfString(Birthdate, l);
+                Utils.AppendBytesOfString(Name, l);
             }
 
             bLog = false;
@@ -53,23 +44,16 @@ namespace sQzLib
         public bool ReadBytes_FromClient(byte[] buf, ref int offs)
         {
             int l = buf.Length - offs;
-            //
-            if (l < 4)
-                return true;
-            int sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
 
-            if (l < sz)
+            ID = Utils.ReadBytesOfString(buf, ref offs, ref l);
+            if (ID == null)
                 return true;
-            ID = Encoding.UTF8.GetString(buf, offs, sz);
-            l -= sz;
-            offs += sz;
 
             if (l < 4)
                 return true;
-            if (Enum.IsDefined(typeof(NeeStt), sz = BitConverter.ToInt32(buf, offs)))
-                eStt = (NeeStt)sz;
+            int stt;
+            if (Enum.IsDefined(typeof(NeeStt), stt = BitConverter.ToInt32(buf, offs)))
+                eStt = (NeeStt)stt;
             l -= 4;
             offs += 4;
 
@@ -81,24 +65,12 @@ namespace sQzLib
             //
             if (eStt < NeeStt.Examing || bLog)
             {
-                if (l < 4)
+                Birthdate = Utils.ReadBytesOfString(buf, ref offs, ref l);
+                if (Birthdate == null)
                     return true;
-                sz = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                if (l < sz + 4)
+                ComputerName = Utils.ReadBytesOfString(buf, ref offs, ref l);
+                if (ComputerName == null)
                     return true;
-                Birthdate = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-                sz = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
-                if (l < sz)
-                    return true;
-                ComputerName = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
             }
 
             if (eStt < NeeStt.Examing)
@@ -133,67 +105,30 @@ namespace sQzLib
         {
             int l = buf.Length - offs;
             //
-            if (l < 4)
-                return true;
-
-            int sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            //
-            if (l < sz)
-                return true;
-            if (0 < sz)
-            {
-                ID = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-            }
+            ID = Utils.ReadBytesOfString(buf, ref offs, ref l);
 
             if (l < 4)
                 return true;
-
-            int x;
-            if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
-                eStt = (NeeStt)x;
+            TestType = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
 
-            sz = BitConverter.ToInt32(buf, offs);
+            if (l < 4)
+                return true;
+            int stt;
+            if (Enum.IsDefined(typeof(NeeStt), stt = BitConverter.ToInt32(buf, offs)))
+                eStt = (NeeStt)stt;
             l -= 4;
             offs += 4;
-            //
-            if (l < sz + 4)
+
+            Birthdate = Utils.ReadBytesOfString(buf, ref offs, ref l);
+            if (Birthdate == null)
                 return true;
-            if (0 < sz)
-            {
-                Birthdate = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-            }
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            //
-            if (l < sz + 4)
+            
+            Name = Utils.ReadBytesOfString(buf, ref offs, ref l);
+            if (Name == null)
                 return true;
-            if (0 < sz)
-            {
-                Name = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-            }
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
             //
-            if (l < sz)
-                return true;
-            if (0 < sz)
-            {
-                Birthplace = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-            }
             if (eStt < NeeStt.Finished)
                 return false;
             bNRecd = false;
@@ -216,17 +151,7 @@ namespace sQzLib
             l -= 4;
             offs += 4;
 
-            if (l < 4)
-                return true;
-            sz = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if(0 < sz)
-            {
-                ComputerName = Encoding.UTF8.GetString(buf, offs, sz);
-                l -= sz;
-                offs += sz;
-            }
+            ComputerName = Utils.ReadBytesOfString(buf, ref offs, ref l);
             //
             return false;
         }
@@ -248,14 +173,6 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(CorrectCount));
             return l;
         }
-
-        //public override void Merge(ExamineeA e)
-        //{
-        //    if (bFromC)
-        //        MergeWithClient(e as ExamineeS1);
-        //    else
-        //        MergeWithS0(e as ExamineeS0);
-        //}
 
         public void MergeWithClient(ExamineeS1 e)
         {
@@ -282,6 +199,7 @@ namespace sQzLib
         {
             //suppose e.eStt = NeeStt.Finished
             eStt = e.eStt;
+            TestType = e.TestType;
             dtTim1 = e.dtTim1;
             dtTim2 = e.dtTim2;
             CorrectCount = e.CorrectCount;

@@ -87,7 +87,7 @@ namespace sQzServer0
                     Grid.SetColumn(t, 2);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.Birthplace;
+                    t.Text = e.TestType.ToString();
                     t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);

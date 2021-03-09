@@ -15,20 +15,10 @@ namespace sQzLib
             vSheet = new SortedList<int, AnswerSheet>();
         }
 
-        //only Operation0 uses this.
-        //public bool ToByte(ref byte[] buf, ref int offs)//todo: opt-out?
-        //{
-        //    int l = buf.Length - offs;
-        //    if (l < 4)
-        //        return true;
-        //    Buffer.BlockCopy(BitConverter.GetBytes(vSheet.Values.Count), 0, buf, offs, 4);
-        //    offs += 4;
-        //    //l -= 4;
-        //    foreach (AnswerSheet i in vSheet.Values)
-        //        i.ToByte(ref buf, ref offs);
-        //    l = buf.Length - offs;
-        //    return false;
-        //}
+        public void Clear()
+        {
+            vSheet.Clear();
+        }
 
         public List<byte[]> GetBytes_S0SendingToS1()
         {

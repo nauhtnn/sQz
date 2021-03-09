@@ -214,7 +214,7 @@ namespace sQzServer0
 
             string fp = dlg.FileName;
             mSlTmp.DelNee();
-            string emsg = mSlDB.ReadF(fp, ref mSlTmp);
+            string emsg = mSlDB.LoadFromFile_Examinees(fp, ref mSlTmp);
             if(emsg != null)
             {
                 Window w = Window.GetWindow(this);
@@ -301,7 +301,7 @@ namespace sQzServer0
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     g.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.Birthplace;
+                    t.Text = e.TestType.ToString();
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);

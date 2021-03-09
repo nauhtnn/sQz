@@ -22,15 +22,15 @@ namespace sQzLib
             bToVw = bToDB = false;
         }
 
-        public List<byte[]> GetBytes_ClientSendingToS1()
+        public List<byte[]> GetBytes_SendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
             Utils.AppendBytesOfString(ID, l);
+            l.Add(BitConverter.GetBytes(TestType));
             l.Add(BitConverter.GetBytes((int)eStt));
 
             Utils.AppendBytesOfString(Birthdate, l);
             Utils.AppendBytesOfString(Name, l);
-            Utils.AppendBytesOfString(Birthplace, l);
 
             if (eStt < NeeStt.Finished)
                 return l;

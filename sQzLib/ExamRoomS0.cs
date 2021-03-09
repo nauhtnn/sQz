@@ -30,7 +30,7 @@ namespace sQzLib
                 eMsg = null;
                 return 0;
             }
-            string attbs = "dt,id,rid,name,birthdate,birthplace";
+            string attbs = "dt,id,rid,name,birthdate,t_type";
             StringBuilder vals = new StringBuilder();
             foreach (ExamineeA e in Examinees.Values)
             {
@@ -39,7 +39,7 @@ namespace sQzLib
                 vals.Append(uId + ",");
                 vals.Append("'" + e.Name + "',");
                 vals.Append("'" + e.Birthdate + "',");
-                vals.Append("'" + e.Birthplace + "'),");
+                vals.Append(e.TestType + "),");
             }
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             int n = DBConnect.Ins(conn, "sqz_examinee",
@@ -51,7 +51,7 @@ namespace sQzLib
         {
             Examinees.Clear();
             string qry = DBConnect.mkQrySelect("sqz_slot_room AS a,sqz_examinee AS b",
-                "id,name,birthdate,birthplace", "a.rid=" + uId +
+                "id,name,birthdate,t_type", "a.rid=" + uId +
                 " AND a.dt='" + dt.ToString(DT._) +
                 "' AND a.dt=b.dt AND a.rid=b.rid");
             string emsg;
@@ -65,7 +65,7 @@ namespace sQzLib
                 e.ID = reader.GetString(0);
                 e.Name = reader.GetString(1);
                 e.Birthdate = reader.GetString(2);
-                e.Birthplace = reader.GetString(3);
+                e.TestType = reader.GetInt32(3);
                 Examinees.Add(e.ID, e);
             }
             reader.Close();
@@ -248,7 +248,7 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes(Examinees.Count));
             foreach (ExamineeS0 e in Examinees.Values)
-                l.InsertRange(l.Count, e.GetBytes_ClientSendingToS1());
+                l.InsertRange(l.Count, e.GetBytes_SendingToS1());
             return l;
         }
 

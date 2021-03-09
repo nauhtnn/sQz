@@ -20,7 +20,7 @@ namespace sQzServer0
     /// <summary>
     /// Interaction logic for Operation.xaml
     /// </summary>
-    public partial class Archieve : Page
+    public partial class Archive : Page
     {
         UICbMsg mCbMsg;
         bool bRunning;
@@ -29,7 +29,7 @@ namespace sQzServer0
         Dictionary<ExamLv, TextBox[]> vtxtNDiff;
         TabItem tbiSelected;
 
-        public Archieve()
+        public Archive()
         {
             InitializeComponent();
             mCbMsg = new UICbMsg();
@@ -150,7 +150,7 @@ namespace sQzServer0
             txtnQs.Text = t._((int)TxI.QS_N);
             txtnQ.Text = t._((int)TxI.Q_N);
             txtBirdate.Text = t._((int)TxI.BIRDATE);
-            txtBirpl.Text = t._((int)TxI.BIRPL);
+            txtBirpl.Text = "Test type";//t._((int)TxI.BIRPL);
             txtName.Text = t._((int)TxI.NEE_NAME);
             txtId.Text = t._((int)TxI.NEEID_S);
             txtGrade.Text = t._((int)TxI.MARK);
@@ -282,7 +282,7 @@ namespace sQzServer0
             //sl.DBSelStt();
             //sl.DBSelQPkR();
             //sl.DBSelNee();
-            //if(sl.DBSelArchieve(out emsg))
+            //if(sl.DBSelArchive(out emsg))
             //{
             //    WPopup.s.ShowDialog(emsg);
             //    return;
@@ -368,7 +368,7 @@ namespace sQzServer0
                     sl.DBSelStt();
                     sl.DBSelQPkR();
                     sl.DBSelNee();
-                    if (sl.DBSelArchieve(out emsg))
+                    if (sl.DBSelArchive(out emsg))
                     {
                         WPopup.s.ShowDialog(emsg);
                         return;

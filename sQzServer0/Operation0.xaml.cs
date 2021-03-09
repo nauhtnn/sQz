@@ -275,7 +275,7 @@ namespace sQzServer0
             txtnQs.Text = t._((int)TxI.QS_N);
             txtnQ.Text = t._((int)TxI.Q_N);
             txtBirdate.Text = t._((int)TxI.BIRDATE);
-            txtBirpl.Text = t._((int)TxI.BIRPL);
+            txtBirpl.Text = "Test type";// t._((int)TxI.BIRPL);
             txtName.Text = t._((int)TxI.NEE_NAME);
             txtId.Text = t._((int)TxI.NEEID_S);
             txtGrade.Text = t._((int)TxI.MARK);
@@ -331,7 +331,7 @@ namespace sQzServer0
             }
             Slot.DBSelStt();
             Slot.DBSelNee();
-            if (Slot.DBSelArchieve(out emsg))
+            if (Slot.DBSelArchive(out emsg))
             {
                 WPopup.s.ShowDialog(emsg);
                 return;

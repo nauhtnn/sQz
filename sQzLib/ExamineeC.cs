@@ -66,6 +66,12 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
+            TestType = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
+
+            if (l < 4)
+                return true;
             int x;
             if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
                 eStt = (NeeStt)x;
@@ -81,38 +87,8 @@ namespace sQzLib
 
 			if(eStt < NeeStt.Submitting || bLog)
 			{
-				if (l < 4)
-					return true;
-				int sz = BitConverter.ToInt32(buf, offs);
-				l -= 4;
-				offs += 4;
-				if (l < sz)
-					return true;
-				Birthdate = Encoding.UTF8.GetString(buf, offs, sz);
-				l -= sz;
-				offs += sz;
-
-				if (l < 4)
-					return true;
-				sz = BitConverter.ToInt32(buf, offs);
-				l -= 4;
-				offs += 4;
-				if (l < sz)
-					return true;
-				Name = Encoding.UTF8.GetString(buf, offs, sz);
-				l -= sz;
-				offs += sz;
-
-				if (l < 4)
-					return true;
-				sz = BitConverter.ToInt32(buf, offs);
-				l -= 4;
-				offs += 4;
-				if (l < sz)
-					return true;
-				Birthplace = Encoding.UTF8.GetString(buf, offs, sz);
-				l -= sz;
-				offs += sz;
+				Birthdate = Utils.ReadBytesOfString(buf, ref offs, ref l);
+				Name = Utils.ReadBytesOfString(buf, ref offs, ref l);
             }
 
             bLog = false;
@@ -122,13 +98,14 @@ namespace sQzLib
 
         public void MergeWithS1(ExamineeA e)
         {
+            TestType = e.TestType;
             if (e.eStt == NeeStt.Finished)
                 CorrectCount = e.CorrectCount;
             if (e.eStt < NeeStt.Finished || bLog)
             {
                 Birthdate = e.Birthdate;
                 Name = e.Name;
-                Birthplace = e.Birthplace;
+                TestType = e.TestType;
             }
             bLog = false;
             eStt = e.eStt;//for safety, set the status last

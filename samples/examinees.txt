@@ -1,8 +1,8 @@
-﻿ĐL001	1	Nguyễn Văn A	01/01/1990	Long An
-ĐL002	1	Lê Thị B	15/02/1998	Long An
-ÂN001	1	Trần Văn C	30/3/1985	Tiền Giang
-ÂN002	1	Huỳnh Thị Đ	02/4/1991	Thành phố Hồ Chí Minh
-TOÁN1	1	Ngô Văn E	16/5/1990	Bến Tre
-VĂN01	1	Trịnh Thị G	29/6/1998	Đồng Tháp
-TH001	1	Đinh Văn H	1985	Đắk Lắk
-TD002	1	Lý Thị K	8/1988	Vũng Tàu
+﻿ĐL001	1	Nguyễn Văn A	01/01/1990	0
+ĐL002	1	Lê Thị B	15/02/1998	0
+TOÁN1	1	Ngô Văn E	16/5/1990	0
+TH001	1	Đinh Văn H	1985	0
+ÂN001	1	Trần Văn C	30/3/1985	1
+ÂN002	1	Huỳnh Thị Đ	02/4/1991	1
+VĂN01	1	Trịnh Thị G	29/6/1998	1
+TD001	1	Lý Thị K	8/1988	1

@@ -11,6 +11,7 @@ namespace sQzLib
     {
         public DateTime mDt;
         public SortedList<int, QuestSheet> vSheet;
+        public int TestType;
         int mNextQSIdx;
         int mMaxQSIdx;
         public QuestPack()
@@ -97,7 +98,7 @@ namespace sQzLib
             return l;
         }
 
-        public bool DBSelectQS(DateTime dt, out string eMsg)
+        public bool DBSelectQS(out string eMsg)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -106,7 +107,7 @@ namespace sQzLib
                 return true;
             }
             string qry = DBConnect.mkQrySelect("sqz_qsheet",
-                "id", "dt='" + dt.ToString(DT._) + "'");
+                "id", "dt='" + mDt.ToString(DT._) + "' AND t_type=" + TestType);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             List<int> qsids = new List<int>();
             if (reader != null)
@@ -117,7 +118,7 @@ namespace sQzLib
                 foreach(int qsid in qsids)
                 {
                     QuestSheet qs = new QuestSheet();
-                    if (qs.DBSelect(conn, dt, qsid, out eMsg))
+                    if (qs.DBSelect(conn, mDt, qsid, out eMsg))
                     {
                         DBConnect.Close(ref conn);
                         return true;
@@ -178,18 +179,17 @@ namespace sQzLib
             {
                 --numberOfSheet;
                 QuestSheet qs = originSheet.RandomizeDeepCopy(rand);
-                if (!qs.AccquireGlobalMaxID())//todo: better error handle
-                {
-                    vSheet.Add(qs.ID, qs);
-                    sheets.Add(qs);
-                }
+                qs.AccquireGlobalMaxID();
+                qs.TestType_in_DB = testType;
+                vSheet.Add(qs.ID, qs);
+                sheets.Add(qs);
             }
-            if (DBIns(mDt, sheets) == null)
+            if (DBInsertQSheets(mDt, sheets) == null)
                 return sheets;
             return new List<QuestSheet>();
         }
 
-        public static string DBIns(DateTime dt, List<QuestSheet> l)
+        public static string DBInsertQSheets(DateTime dt, List<QuestSheet> l)
         {
             if (l.Count == 0)
                 return Txt.s._((int)TxI.DB_DAT_NOK);
@@ -199,10 +199,10 @@ namespace sQzLib
             StringBuilder vals = new StringBuilder();
             string prefx = "('" + dt.ToString(DT._) + "',";
             foreach (QuestSheet qs in l)
-                vals.Append(prefx + qs.ID + "),");
+                vals.Append(prefx + qs.ID + ","+ qs.TestType_in_DB + "),");
             vals.Remove(vals.Length - 1, 1);//remove the last comma
             string eMsg;
-            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,id", vals.ToString(), out eMsg) < 0)
+            if(DBConnect.Ins(conn, "sqz_qsheet", "dt,id,t_type", vals.ToString(), out eMsg) < 0)
             {
                 DBConnect.Close(ref conn);
                 if (eMsg == null)

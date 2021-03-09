@@ -225,16 +225,17 @@ namespace sQzLib
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return true;
+                return false;
             int uid = DBConnect.MaxInt(conn, "sqz_section", "id", null);
-            if (uid < 0)
-            {
-                DBConnect.Close(ref conn);
-                return true;
-            }
+            DBConnect.Close(ref conn);
+            if (uid < 0 &&
+                MessageBox.Show("Cannot get QSheetSection.GetMaxID_inDB. Choose Yes to continue and get risky!",
+                    "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                return false;
+
             globalMaxID = uid;
 
-            return false;
+            return true;
         }
 
         protected void Init()

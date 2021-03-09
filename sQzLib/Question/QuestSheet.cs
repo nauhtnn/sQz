@@ -510,15 +510,13 @@ namespace sQzLib
             return questions;
         }
 
-        public void DBIns()
+        public void DBInsertOriginQuestions()
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
                 return;
             StringBuilder questionVals = new StringBuilder();
-            if (QSheetSection.GetMaxID_inDB() &&
-                System.Windows.MessageBox.Show("Cannot get QSheetSection.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!",
-                System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
+            if (!QSheetSection.GetMaxID_inDB())
                 return;
             StringBuilder sectionVals = new StringBuilder();
             foreach (QSheetSection section in Sections)
@@ -555,7 +553,7 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        private void DB_InsertTestType_ifNExists(MySqlConnection conn, int testType)
+        public static void DB_InsertTestType_ifNExists(MySqlConnection conn, int testType)
         {
             string emsg;
             if (DBConnect.NExist(conn, "sqz_test_type", "id=" + testType, out emsg))
@@ -632,31 +630,27 @@ namespace sQzLib
             return false;
         }
 
-        public bool AccquireGlobalMaxID()
+        public void AccquireGlobalMaxID()
         {
-            if (-1 < globalMaxID)
-            {
-                ID = ++globalMaxID;
-                return false;
-            }
-            return true;
+            ID = ++globalMaxID;
         }
 
         public static bool GetMaxID_inDB(DateTime dt)
         {
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
-                return true;
+                return false;
             int uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
                     "dt='" + dt.ToString(DT._) + "'");
-            if (uid < 0)
-            {
-                DBConnect.Close(ref conn);
-                return true;
-            }
+            DBConnect.Close(ref conn);
+            if (uid < 0 &&
+                System.Windows.MessageBox.Show("Cannot get QuestSheet.GetMaxID_inDB. Choose Yes to continue and get risky!",
+                    "Warning!", System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
+                    return false;
+
             globalMaxID = uid;
 
-            return false;
+            return true;
         }
     }
 

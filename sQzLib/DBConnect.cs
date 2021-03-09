@@ -17,6 +17,7 @@ namespace sQzLib
         public const int PRI_KEY_EXISTS = -1062;
         private const string DB_CONF_FILE = "Database.txt";
         //static bool bConnected;
+        static List<MySqlConnection> OpenedConnections = new List<MySqlConnection>();
 
         //Constructor
         public DBConnect() { }
@@ -24,6 +25,9 @@ namespace sQzLib
         //Initialize values
         public static MySqlConnection Init()
         {
+            if (OpenedConnections.Count > 0)
+                System.Windows.MessageBox.Show("Already have " +
+                    OpenedConnections.Count + " opened connections");
             if (server == null)
             {
                 string[] conf = null;
@@ -49,7 +53,10 @@ namespace sQzLib
             //bConnected = false;
             MySqlConnection conn = new MySqlConnection(connStr);
             if (Open(ref conn))
+            {
+                OpenedConnections.Add(conn);
                 return conn;
+            }
             else
                 return null;
         }
@@ -94,6 +101,8 @@ namespace sQzLib
                 //if (bConnected)
                 {
                     conn.Close();
+                    if(OpenedConnections.Count > 0 && OpenedConnections.Contains(conn))
+                        OpenedConnections.Remove(conn);
                     //bConnected = false;
                 }
                 return true;
@@ -275,7 +284,7 @@ namespace sQzLib
             else
                 query += attbs;
             query += " FROM " + tb;
-            if (cond != null)
+            if (cond != null && cond.Length > 0)
                 query += " WHERE " + cond;
 
             return query;

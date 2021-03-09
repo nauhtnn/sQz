@@ -28,7 +28,6 @@ namespace sQzLib
         //public static string gId(ExamLv lv, int id) { return lv.ToString() + id.ToString("d4"); }
         public string Name;
         public string Birthdate;
-        public string Birthplace;
         public int CorrectCount;
 
         public string ComputerName;
@@ -44,7 +43,6 @@ namespace sQzLib
             mDt = DT.INVALID;
             Name = null;
             Birthdate = null;
-            Birthplace = null;
             eStt = NeeStt.Signing;
             CorrectCount = LV_CAP;
             dtTim1 = dtTim2 = DT.INVALID;
