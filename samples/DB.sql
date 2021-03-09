@@ -16,12 +16,13 @@ PRIMARY KEY(`dt`, `rid`),
 FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`),
 FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
 
-CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATETIME,
-`id` INT,
-PRIMARY KEY(`dt`, `id`),
-FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`));
-
 CREATE TABLE IF NOT EXISTS `sqz_test_type`(`id` INT PRIMARY KEY);
+
+CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATETIME,
+`id` INT, `t_type` INT,
+PRIMARY KEY(`dt`, `id`),
+FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`),
+FOREIGN KEY(`t_type`) REFERENCES `sqz_test_type`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_examinee`(`dt` DATETIME,
 `id` VARCHAR(8) CHARACTER SET `utf8mb4`, `rid` INT,

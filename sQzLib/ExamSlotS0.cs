@@ -455,6 +455,7 @@ namespace sQzLib
             foreach(KeyValuePair<int, int> pair in sheetsPerTestType)
             {
                 QuestPack pack = new QuestPack();
+                pack.mDt = mDt;
                 mKeyPack.ExtractKey(pack.GenQPack3(pair.Key, pair.Value));
                 QuestionPacks.Add(pair.Key, pack);
             }
