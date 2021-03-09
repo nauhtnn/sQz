@@ -168,11 +168,11 @@ namespace sQzLib
             return false;
         }
 
-        public List<QuestSheet> GenQPack3(int numberOfSheet)
+        public List<QuestSheet> GenQPack3(int testType, int numberOfSheet)
         {
             List<QuestSheet> sheets = new List<QuestSheet>();
             QuestSheet originSheet = new QuestSheet();
-            originSheet.DBSelectNondeletedQuestions();
+            originSheet.DBSelectNondeletedQuestions(testType);
             Random rand = new Random();
             while (0 < numberOfSheet)
             {

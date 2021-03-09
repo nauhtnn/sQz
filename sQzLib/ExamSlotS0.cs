@@ -418,20 +418,27 @@ namespace sQzLib
             return true;
         }
 
-        public bool GenQ(int n)
+        public bool GenQ(Dictionary<int, int> sheetsPerTestType)
         {
-            //string emsg;
-            //if (QuestionPack.DBDelete(out emsg))
-            //    WPopup.s.ShowDialog(emsg);
-            //QuestionPack.vSheet.Clear();
-            //if (QuestSheet.GetMaxID_inDB(mDt) &&
-            //    MessageBox.Show("Cannot get QuestSheet.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.No)
-            //    return true;
+            string emsg;
+            foreach(QuestPack p in QuestionPacks.Values)
+            {
+                if (p.DBDelete(out emsg))
+                    WPopup.s.ShowDialog(emsg);
+                p.vSheet.Clear();
+            }
+            if (QuestSheet.GetMaxID_inDB(mDt) &&
+                MessageBox.Show("Cannot get QuestSheet.GetMaxID_inDB. Choose Yes to continue and get risky.", "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.No)
+                return true;
+            //maybe it's safer for not removing in mKeyPack
             //foreach (QuestSheet qs in QuestionPack.vSheet.Values)
             //    mKeyPack.vSheet.Remove(qs.ID);
-            //List<QuestSheet> sheets;
-            //sheets = QuestionPacks.GenQPack3(n);
-            //mKeyPack.ExtractKey(sheets);
+            foreach(KeyValuePair<int, int> pair in sheetsPerTestType)
+            {
+                QuestPack pack = new QuestPack();
+                mKeyPack.ExtractKey(pack.GenQPack3(pair.Key, pair.Value));
+                QuestionPacks.Add(pair.Key, pack);
+            }
             return false;
         }
 

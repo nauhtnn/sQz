@@ -366,8 +366,14 @@ namespace sQzServer0
                 return;
             int id = int.Parse((tbi.Header as TextBlock).Text);
             QuestSheet qs = null;
-            if (mSl.QuestionPack.vSheet.ContainsKey(id))
-                qs = mSl.QuestionPack.vSheet[id];
+            foreach(QuestPack pack in mSl.QuestionPacks.Values)
+            {
+                if (pack.vSheet.ContainsKey(id))
+                {
+                    qs = pack.vSheet[id];
+                    break;
+                }
+            }
             if (qs == null)
                 return;
             ScrollViewer svwr = new ScrollViewer();
@@ -386,16 +392,19 @@ namespace sQzServer0
         public void ShowQSHeader()
         {
             tbcQ.Items.Clear();
-            foreach (QuestSheet qs in mSl.QuestionPack.vSheet.Values)
+            foreach(QuestPack pack in mSl.QuestionPacks.Values)
             {
-                TabItem ti = new TabItem();
-                TextBlock t = new TextBlock();
-                t.Text = qs.ID.ToString("d3");
-                t.FontSize = 12;
-                ti.Header = t;
-                ti.GotFocus += tbiQ_GotFocus;
-                        
-                tbcQ.Items.Add(ti);
+                foreach (QuestSheet qs in pack.vSheet.Values)
+                {
+                    TabItem ti = new TabItem();
+                    TextBlock t = new TextBlock();
+                    t.Text = qs.ID.ToString("d3");
+                    t.FontSize = 12;
+                    ti.Header = t;
+                    ti.GotFocus += tbiQ_GotFocus;
+
+                    tbcQ.Items.Add(ti);
+                }
             }
             if (0 < tbcQ.Items.Count)
                 tbiQ_GotFocus(tbcQ.Items[0], null);

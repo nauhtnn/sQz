@@ -76,14 +76,20 @@ namespace sQzLib
 
         public bool ReadBytes_QPacksNoDateTime(byte[] buf, ref int offs)
         {
-            if (QuestionPack.ReadByte(buf, ref offs))
-                return true;
+            //if (QuestionPacks.ReadByte(buf, ref offs))
+            //    return true;
             return false;
         }
 
-        public byte[] GetBytes_NextQSheet()
+        public byte[] GetBytes_NextQSheet(int testType)
         {
-            return QuestionPack.GetBytes_NextQSheet();
+            if(QuestionPacks.ContainsKey(testType))
+                return QuestionPacks[testType].GetBytes_NextQSheet();
+            else
+            {
+                System.Windows.MessageBox.Show("GetBytes_NextQSheet: key not found: " + testType);
+                return null;
+            }
         }
 
         public bool ReadByteKey_NoDateTime(byte[] buf, ref int offs)

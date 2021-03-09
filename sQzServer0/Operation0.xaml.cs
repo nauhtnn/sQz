@@ -368,7 +368,7 @@ namespace sQzServer0
             tbiSelected = tbi;
             Op0SlotView vw;
             if ((vw = tbcSl.SelectedItem as Op0SlotView) != null &&
-                    vw.mSl.eStt == ExamStt.Prep && vw.mSl.MaxNumberOfExaminees_PerTestType() > 0)
+                    vw.mSl.eStt == ExamStt.Prep)// && vw.mSl.MaxNumberOfExaminees_PerTestType() > 0)
                 btnQGen.IsEnabled = true; //EnableQSGen();
             else
                 btnQGen.IsEnabled = false; //DisableQSGen();
