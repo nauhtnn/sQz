@@ -9,21 +9,18 @@ namespace sQzLib
 {
     public class DBConnect
     {
-        //public MySqlConnection connection;
         static string server = null;
         static string database = null;
         static string uid = null;
         static string password = null;
         public const int PRI_KEY_EXISTS = -1062;
         private const string DB_CONF_FILE = "Database.txt";
-        //static bool bConnected;
         static List<MySqlConnection> OpenedConnections = new List<MySqlConnection>();
 
-        //Constructor
         public DBConnect() { }
 
         //Initialize values
-        public static MySqlConnection Init()
+        public static MySqlConnection OpenNewConnection()
         {
             if (OpenedConnections.Count > 0)
                 System.Windows.MessageBox.Show("Already have " +
@@ -50,7 +47,6 @@ namespace sQzLib
             }
             string connStr = "SERVER=" + server + ";" + "DATABASE=" +
                 database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";charset=utf8";
-            //bConnected = false;
             MySqlConnection conn = new MySqlConnection(connStr);
             if (Open(ref conn))
             {
@@ -64,53 +60,48 @@ namespace sQzLib
         //open connection to database
         public static bool Open(ref MySqlConnection conn)
         {
-            //if (bConnected)
-            //    return true;
             try
             {
                 conn.Open();
-                //bConnected = true;
                 return true;
             }
-            catch (MySqlException)
+            catch (MySqlException e)
             {
                 //When handling errors, you can your application's response based 
                 //on the error number.
                 //The two most common error numbers when connecting are as follows:
                 //0: Cannot connect to server.
                 //1045: Invalid user name and/or password.
-                //switch (ex.Number)
-                //{
-                //    case 0:
-                //        Console.Write("Cannot connect to server.  Contact administrator");
-                //        break;
+                switch (e.Number)
+                {
+                    case 0:
+                        System.Windows.MessageBox.Show("Cannot connect to server.  Contact administrator");
+                        break;
 
-                //    case 1045:
-                //        Console.Write("Invalid username/password, please try again");
-                //        break;
-                //}
+                    case 1045:
+                        System.Windows.MessageBox.Show("Invalid username/password, please try again");
+                        break;
+                    default:
+                        System.Windows.MessageBox.Show(e.ToString());
+                        break;
+                }
                 return false;
             }
         }
 
-        //Close connection
-        public static bool Close(ref MySqlConnection conn)
+        public static void Close(ref MySqlConnection conn)
         {
+            if (conn == null)
+                return;
             try
             {
-                //if (bConnected)
-                {
-                    conn.Close();
-                    if(OpenedConnections.Count > 0 && OpenedConnections.Contains(conn))
-                        OpenedConnections.Remove(conn);
-                    //bConnected = false;
-                }
-                return true;
+                conn.Close();
+                if(OpenedConnections.Count > 0 && OpenedConnections.Contains(conn))
+                    OpenedConnections.Remove(conn);
             }
-            catch (MySqlException ex)
+            catch (MySqlException e)
             {
-                Console.Write(ex.Message);
-                return false;
+                System.Windows.MessageBox.Show(e.ToString());
             }
         }
 

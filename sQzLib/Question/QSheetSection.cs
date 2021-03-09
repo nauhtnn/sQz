@@ -223,7 +223,7 @@ namespace sQzLib
 
         public static bool GetMaxID_inDB()
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return false;
             int uid = DBConnect.MaxInt(conn, "sqz_section", "id", null);

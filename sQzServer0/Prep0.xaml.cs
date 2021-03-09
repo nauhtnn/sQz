@@ -288,7 +288,7 @@ namespace sQzServer0
             DateTime dt;
             DT.To_(i.Content as string, out dt);
             sl.Dt = dt;
-            sl.DBSelRoomId();
+            sl.DBSelectRoomInfo();
             sl.DBSelStt();
             sl.DBSelNee();
             PrepNeeView pnv = new PrepNeeView(sl);

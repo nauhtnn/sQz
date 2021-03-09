@@ -113,22 +113,13 @@ namespace sQzLib
                 }
         }
 
-        public bool DBSelTimeAndPw(DateTime dt, out string eMsg)
+        public bool DBSelTimeAndPw(MySqlConnection conn, DateTime dt, out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                eMsg = Txt.s._((int)TxI.DB_NOK);
-                return true;
-            }
             string qry = DBConnect.mkQrySelect("sqz_slot_room", "pw,t1,t2",
                 "dt='" + dt.ToString(DT._) + "' AND rid=" + uId + " LIMIT 1");
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
-            {
-                DBConnect.Close(ref conn);
                 return true;
-            }
             if (reader.Read())
             {
                 tPw = reader.IsDBNull(0) ? null : reader.GetString(0);
@@ -138,7 +129,6 @@ namespace sQzLib
                     t2 = DT.INVALID;
             }
             reader.Close();
-            DBConnect.Close(ref conn);
             return false;
         }
 
@@ -161,26 +151,16 @@ namespace sQzLib
             return false;
         }
 
-        public static List<int> DBSel(out string eMsg)
+        public static List<int> DBSelectRoomIDs(MySqlConnection conn, out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
-            if (conn == null)
-            {
-                eMsg = Txt.s._((int)TxI.DB_NOK);
-                return null;
-            }
             string qry = DBConnect.mkQrySelect("sqz_room", null, null);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
-            {
-                DBConnect.Close(ref conn);
                 return null;
-            }
             List<int> r = new List<int>();
             while (reader.Read())
                 r.Add(reader.GetInt32(0));
             reader.Close();
-            DBConnect.Close(ref conn);
             return r;
         }
 
@@ -200,7 +180,7 @@ namespace sQzLib
             string vch = PwChars();
             Random r = new Random();
             ExamineeA x = Examinees.Values.First();
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return true;
             string otPw = tPw;

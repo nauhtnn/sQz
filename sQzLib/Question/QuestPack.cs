@@ -100,7 +100,7 @@ namespace sQzLib
 
         public bool DBSelectQS(out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_NOK);
@@ -137,7 +137,7 @@ namespace sQzLib
                 eMsg = string.Empty;
                 return false;
             }
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_NOK);
@@ -193,7 +193,7 @@ namespace sQzLib
         {
             if (l.Count == 0)
                 return Txt.s._((int)TxI.DB_DAT_NOK);
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return Txt.s._((int)TxI.DB_NOK);
             StringBuilder vals = new StringBuilder();

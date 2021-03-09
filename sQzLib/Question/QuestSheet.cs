@@ -401,7 +401,7 @@ namespace sQzLib
         {
             TestType_in_DB = testType;
             Sections.Clear();
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 System.Windows.MessageBox.Show(Txt.s._((int)TxI.DB_NOK));
@@ -512,12 +512,12 @@ namespace sQzLib
 
         public void DBInsertOriginQuestions()
         {
-            MySqlConnection conn = DBConnect.Init();
+            if (!QSheetSection.GetMaxID_inDB())
+                return;
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return;
             StringBuilder questionVals = new StringBuilder();
-            if (!QSheetSection.GetMaxID_inDB())
-                return;
             StringBuilder sectionVals = new StringBuilder();
             foreach (QSheetSection section in Sections)
             {
@@ -637,7 +637,7 @@ namespace sQzLib
 
         public static bool GetMaxID_inDB(DateTime dt)
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return false;
             int uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",

@@ -69,7 +69,7 @@ namespace sQzServer0
 
             LoadTxt();
 
-            MySql.Data.MySqlClient.MySqlConnection conn = DBConnect.Init();
+            MySql.Data.MySqlClient.MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 DisableBtns();

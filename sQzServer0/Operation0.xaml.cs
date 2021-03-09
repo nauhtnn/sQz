@@ -324,7 +324,7 @@ namespace sQzServer0
             DT.To_(i.Content as string, out dt);
             Slot.Dt = dt;
             string emsg;
-            if ((emsg = Slot.DBSelRoomId()) != null)
+            if ((emsg = Slot.DBSelectRoomInfo()) != null)
             {
                 WPopup.s.ShowDialog(emsg);
                 return;

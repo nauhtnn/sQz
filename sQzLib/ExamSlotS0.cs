@@ -19,7 +19,7 @@ namespace sQzLib
 
         public int InsertSlot(out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_NOK);
@@ -35,7 +35,7 @@ namespace sQzLib
 
         public static List<DateTime> DBSelectSlotIDs(bool arch, out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_NOK);
@@ -66,27 +66,35 @@ namespace sQzLib
             return r;
         }
 
-        public string DBSelRoomId()
+        public string DBSelectRoomInfo()
         {
+            MySqlConnection conn = DBConnect.OpenNewConnection();
+            if (conn == null)
+                return Txt.s._((int)TxI.DB_NOK);
             string emsg;
-            List<int> rids = ExamRoomS0.DBSel(out emsg);
+            List<int> rids = ExamRoomS0.DBSelectRoomIDs(conn, out emsg);
             if (rids == null)
+            {
+                DBConnect.Close(ref conn);
                 return emsg;
+            }
+
             foreach (int i in rids)
             {
                 ExamRoomS0 r = new ExamRoomS0();
                 r.uId = i;
-                r.DBSelTimeAndPw(mDt, out emsg);
+                r.DBSelTimeAndPw(conn, mDt, out emsg);
                 if (!Rooms.ContainsKey(i))
                     Rooms.Add(i, r);
             }
+            DBConnect.Close(ref conn);
             return null;
         }
 
         public static List<bool> IsSttOper(List<DateTime> l)
         {
             List<bool> v = new List<bool>();
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 int n = l.Count;
@@ -120,7 +128,7 @@ namespace sQzLib
 
         public string DBSelStt()
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return Txt.s._((int)TxI.DB_NOK);
             string qry = DBConnect.mkQrySelect("sqz_slot", "status",
@@ -160,7 +168,7 @@ namespace sQzLib
 
         public string DBUpStt()
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return Txt.s._((int)TxI.DB_NOK);
             string emsg;
@@ -254,7 +262,7 @@ namespace sQzLib
 
         public int DBInsertExaminees(out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_NOK);
@@ -311,7 +319,7 @@ namespace sQzLib
 
         public string DBDelNee()
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return Txt.s._((int)TxI.DB_NOK);
             StringBuilder sb = new StringBuilder();
@@ -345,7 +353,7 @@ namespace sQzLib
 
         public void DBSelNee()
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return;
             foreach (ExamRoomS0 r in Rooms.Values)
@@ -355,7 +363,7 @@ namespace sQzLib
 
         public bool DBUpdateRs(int rid, out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_NOK);
@@ -398,7 +406,7 @@ namespace sQzLib
         public bool DBUpT1(int rid,
             out string eMsg)
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_NOK);
@@ -546,7 +554,7 @@ namespace sQzLib
         private List<int> DBSelectTestTypes()
         {
             List<int> testTypes = new List<int>();
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return testTypes;
             string query = DBConnect.mkQrySelect("sqz_test_type", "id", null);

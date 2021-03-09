@@ -113,7 +113,7 @@ namespace sQzLib
 
         public int DBGetQSId()
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return -1;
             string qry = DBConnect.mkQrySelect("sqz_examinee", "qsid",
@@ -138,7 +138,7 @@ namespace sQzLib
             char[] noans = new char[AnswerSheet.BytesOfAnswer_Length];
             for (int i = 0; i < AnswerSheet.BytesOfAnswer_Length; ++i)
                 noans[i] = Question.C0;
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return noans;
             string qry = DBConnect.mkQrySelect("sqz_examinee", "ans",
@@ -160,7 +160,7 @@ namespace sQzLib
 
         public bool DBSelGrade()
         {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return true;
             string qry = DBConnect.mkQrySelect("sqz_examinee", "grade",

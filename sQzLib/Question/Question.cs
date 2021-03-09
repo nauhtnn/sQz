@@ -53,7 +53,7 @@ namespace sQzLib
         //}
 
         public static void DBDelete(string ids) {
-            MySqlConnection conn = DBConnect.Init();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return;
             string eMsg;
