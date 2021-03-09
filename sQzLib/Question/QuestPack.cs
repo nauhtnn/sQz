@@ -163,9 +163,16 @@ namespace sQzLib
             cond2.Remove(cond2.Length - 1, 1);//remove last comma
             cond2.Append(")");
             if (DBConnect.Delete(conn, "sqz_qsheet_quest", cond1.ToString(), out eMsg) < 0)
+            {
+                DBConnect.Close(ref conn);
                 return true;
+            }
             if (DBConnect.Delete(conn, "sqz_qsheet", cond2.ToString(), out eMsg) < 0)
+            {
+                DBConnect.Close(ref conn);
                 return true;
+            }
+            DBConnect.Close(ref conn);
             return false;
         }
 

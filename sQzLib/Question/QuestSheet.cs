@@ -368,6 +368,8 @@ namespace sQzLib
                 sheet.Sections.Add(s);
                 sections.Remove(s);
             }
+            if (sections.Count == 1)
+                sheet.Sections.Add(sections.ElementAt(0));
 
             return sheet;
         }

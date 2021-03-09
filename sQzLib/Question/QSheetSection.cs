@@ -252,6 +252,8 @@ namespace sQzLib
 
         public int GetSectionTypeID()
         {
+            if (this is BasicPassageSection)
+                return (int)SectionTypeID.BasicPassage;
             return (int)SectionTypeID.DefaultIndependentQuestions;
         }
 
