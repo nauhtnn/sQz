@@ -14,6 +14,7 @@ namespace sQzLib
         public List<QSheetSection> Sections;
         public byte[] aQuest;
         public int TestType;
+        private QIdxComparer<Question> SavedQuestOrderInDB;
         //public int Count { get { return IndependentQuestions.Count; } }
         //public string CountPassage {
         //    get {
@@ -543,6 +544,9 @@ namespace sQzLib
                 if (q.SectionID > -1 && tempSections.ContainsKey(q.SectionID))
                     tempSections[q.SectionID].Questions.Add(q);
             }
+
+            foreach (QSheetSection section in Sections)
+                section.Questions.Sort(SavedQuestOrderInDB);
         }
 
         private void Safe_AddTempSection(Dictionary<int, QSheetSection> tempSections, QSheetSection section)
@@ -671,13 +675,13 @@ namespace sQzLib
                 return true;
             List<uint> questionIDs = new List<uint>();
             List<string> options_sorts = new List<string>();
-            QIdxComparer<Question> qComparer = new QIdxComparer<Question>();
+            SavedQuestOrderInDB = new QIdxComparer<Question>();
             while (reader.Read())
             {
                 uint qid = reader.GetUInt32(0);
                 questionIDs.Add(qid);
                 options_sorts.Add(reader.GetString(1));
-                qComparer.Add((int)qid, reader.GetInt32(2));
+                SavedQuestOrderInDB.Add((int)qid, reader.GetInt32(2));
             }
             reader.Close();
             StringBuilder condition_IDs = new StringBuilder();
