@@ -24,7 +24,7 @@ namespace sQzLib
                 if(QSheetSection.SECTION_MAGIC_PREFIX.Length > 0 &&
                     !tokens.Dequeue().StartsWith(QSheetSection.SECTION_MAGIC_PREFIX))
                 {
-                    System.Windows.MessageBox.Show("BasicPassageSection: From the end, line " +
+                    System.Windows.MessageBox.Show("ParseTokens: From the end, line " +
                     tokens.Count + " doesn't have section magic prefix " + QSheetSection.SECTION_MAGIC_PREFIX);
                     return sections;
                 }
@@ -42,7 +42,7 @@ namespace sQzLib
         private QSheetSection SelectSection(string text)
         {
             if(RegexIsMatch(text, QSheetSection.SectionMagicKeywords[SectionTypeID.PassageWithBlanks]))
-                return new BasicPassageSection();
+                return new PassageWithBlanks();
             if (RegexIsMatch(text, QSheetSection.SectionMagicKeywords[SectionTypeID.BasicPassage]))
                 return new BasicPassageSection();
             return new IndependentQSection();

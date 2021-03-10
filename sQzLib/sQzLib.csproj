@@ -61,11 +61,11 @@
     <Compile Include="ExamSlotA.cs" />
     <Compile Include="ExamSlotS0.cs" />
     <Compile Include="ExamSlotS1.cs" />
+    <Compile Include="Question\PassageWithBlanks.cs" />
     <Compile Include="Question\IndependentQSection.cs" />
     <Compile Include="Question\BasicPassageSection.cs" />
     <Compile Include="Question\OptionView.cs" />
     <Compile Include="Question\BasicPassageSectionView.cs" />
-    <None Include="Question\PlainText\PlainTextQuestParser.cs" />
     <Compile Include="Question\QSheetSection.cs" />
     <Compile Include="Question\QuestionSheetView.cs" />
     <Compile Include="Question\QuestParser.cs" />
@@ -85,7 +85,6 @@
     <Compile Include="Theme.xaml.cs" />
     <Compile Include="TxI.cs" />
     <Compile Include="Txt.cs" />
-    <None Include="Question\PlainText\PlainTextQueue.cs" />
     <Compile Include="Utils.cs" />
     <Compile Include="WPopup.cs" />
   </ItemGroup>

@@ -207,22 +207,18 @@ namespace sQzLib
             return sec;
         }
 
-        private BasicPassageSection ReadBytesOfBasicPassageSection(byte[] buf, ref int offs)
+        private bool ReadBytesOfBasicPassageSection(BasicPassageSection section, byte[] buf, ref int offs)
         {
-            if (buf.Length < offs + 4)
-                return null;
-            BasicPassageSection p = new BasicPassageSection(BitConverter.ToInt32(buf, offs));
-            offs += 4;
-            p.Requirements = Utils.ReadBytesOfString(buf, ref offs);
-            if (p.Requirements == null)
-                return null;
-            p.Passage = Utils.ReadBytesOfString(buf, ref offs);
-            if (p.Passage == null)
-                return null;
-            p.Questions = ReadBytesOfQuestions(buf, ref offs);
-            if (p.Questions == null)
-                return null;
-            return p;
+            section.Requirements = Utils.ReadBytesOfString(buf, ref offs);
+            if (section.Requirements == null)
+                return false;
+            section.Passage = Utils.ReadBytesOfString(buf, ref offs);
+            if (section.Passage == null)
+                return false;
+            section.Questions = ReadBytesOfQuestions(buf, ref offs);
+            if (section.Questions == null)
+                return false;
+            return true;
         }
 
         private bool ReadBytesOfSections(byte[] buf, ref int offs)
@@ -247,11 +243,23 @@ namespace sQzLib
 
                 offs += 4;
 
-                switch(sec_typeID)
+                switch (sec_typeID)
                 {
+                    case SectionTypeID.PassageWithBlanks:
+                        if (buf.Length < offs + 4)
+                            return false;
+                        PassageWithBlanks p_blank = new PassageWithBlanks(BitConverter.ToInt32(buf, offs));
+                        offs += 4;
+                        if (!ReadBytesOfBasicPassageSection(p_blank, buf, ref offs))
+                            return false;
+                        Sections.Add(p_blank);
+                        break;
                     case SectionTypeID.BasicPassage:
-                        BasicPassageSection p = ReadBytesOfBasicPassageSection(buf, ref offs);
-                        if (p == null)
+                        if (buf.Length < offs + 4)
+                            return false;
+                        BasicPassageSection p = new BasicPassageSection(BitConverter.ToInt32(buf, offs));
+                        offs += 4;
+                        if (!ReadBytesOfBasicPassageSection(p, buf, ref offs))
                             return false;
                         Sections.Add(p);
                         break;
@@ -280,7 +288,7 @@ namespace sQzLib
 
         private void AppendBytesOf(BasicPassageSection section, List<byte[]> byteList)
         {
-            byteList.Add(BitConverter.GetBytes((int)SectionTypeID.BasicPassage));
+            byteList.Add(BitConverter.GetBytes((int)section.GetSectionTypeID()));
             byteList.Add(BitConverter.GetBytes(section.ID));
             Utils.AppendBytesOfString(section.Requirements, byteList);
             Utils.AppendBytesOfString(section.Passage, byteList);
@@ -433,6 +441,14 @@ namespace sQzLib
             List<QSheetSection> sections = new List<QSheetSection>();
             foreach (QSheetSection section in Sections)
             {
+                PassageWithBlanks p_blank = section as PassageWithBlanks;
+                if (p_blank != null)
+                {
+                    BasicPassageSection p2 = p_blank.Clone() as PassageWithBlanks;
+                    p2.Randomize_KeepQuestionOrder(rand);
+                    sections.Add(p2);
+                    continue;
+                }
                 BasicPassageSection p = section as BasicPassageSection;
                 if (p != null)
                 {
@@ -500,21 +516,21 @@ namespace sQzLib
                             IndependentQSection ind_section = new IndependentQSection(reader.GetInt32(0));
                             ind_section.Requirements = reader.GetString(2);
                             Sections.Add(ind_section);
-                            if(tempSections[ind_section.ID] == null)
-                                tempSections[ind_section.ID] = ind_section;
-                            else
-                                System.Windows.MessageBox.Show("Warining: DBSelectSections has duplicated section ID: " + ind_section.ID);
+                            Safe_AddTempSection(tempSections, ind_section);
                             break;
                         case SectionTypeID.PassageWithBlanks:
+                            PassageWithBlanks p_blanks = new PassageWithBlanks(reader.GetInt32(0));
+                            p_blanks.Requirements = reader.GetString(2);
+                            p_blanks.Passage = reader.GetString(3);
+                            Sections.Add(p_blanks);
+                            Safe_AddTempSection(tempSections, p_blanks);
+                            break;
                         case SectionTypeID.BasicPassage:
-                            BasicPassageSection passage_section = new BasicPassageSection(reader.GetInt32(0));
-                            passage_section.Requirements = reader.GetString(2);
-                            passage_section.Passage = reader.GetString(3);
-                            Sections.Add(passage_section);
-                            if (tempSections[passage_section.ID] == null)
-                                tempSections[passage_section.ID] = passage_section;
-                            else
-                                System.Windows.MessageBox.Show("Warining: DBSelectSections has duplicated section ID: " + passage_section.ID);
+                            BasicPassageSection basic_passage = new BasicPassageSection(reader.GetInt32(0));
+                            basic_passage.Requirements = reader.GetString(2);
+                            basic_passage.Passage = reader.GetString(3);
+                            Sections.Add(basic_passage);
+                            Safe_AddTempSection(tempSections, basic_passage);
                             break;
                     }
                 }
@@ -527,6 +543,14 @@ namespace sQzLib
                 if (q.SectionID > -1 && tempSections.ContainsKey(q.SectionID))
                     tempSections[q.SectionID].Questions.Add(q);
             }
+        }
+
+        private void Safe_AddTempSection(Dictionary<int, QSheetSection> tempSections, QSheetSection section)
+        {
+            if (tempSections[section.ID] == null)
+                tempSections[section.ID] = section;
+            else
+                System.Windows.MessageBox.Show("Warining: DBSelectSections has duplicated section ID: " + section.ID);
         }
 
         private Question DBReader_CreateQuestion(MySqlDataReader reader)

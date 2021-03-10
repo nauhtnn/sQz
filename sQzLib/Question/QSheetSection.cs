@@ -81,7 +81,7 @@ namespace sQzLib
             return true;
         }
 
-        public void UpdateQuestIndices(int startQuestIdxLabel)
+        virtual public void UpdateQuestIndices(int startQuestIdxLabel)
         {
             Tuple<string, string> replaced_labels = AutoDetectQuestIdxLabel_in_Req();
             if (replaced_labels == null)
@@ -97,12 +97,12 @@ namespace sQzLib
             if (matches.Count != 2 ||
                 matches[0].Value.Equals(matches[1].Value))
             {
-                StringBuilder msg = new StringBuilder();
-                msg.Append("AutoDetectQuestIdxLabel_in_Req! Number of matches: " +
-                    matches.Count + "\n");
-                foreach (Match m in matches)
-                    msg.Append(m.Value + ", ");
-                System.Windows.MessageBox.Show(msg.ToString());
+                //StringBuilder msg = new StringBuilder();
+                //msg.Append("AutoDetectQuestIdxLabel_in_Req! Number of matches: " +
+                //    matches.Count + "\n");
+                //foreach (Match m in matches)
+                //    msg.Append(m.Value + ", ");
+                //System.Windows.MessageBox.Show(msg.ToString());
                 return null;
             }
             int start = -1, end = -1;
@@ -252,6 +252,8 @@ namespace sQzLib
 
         public int GetSectionTypeID()
         {
+            if (this is PassageWithBlanks)
+                return (int)SectionTypeID.PassageWithBlanks;
             if (this is BasicPassageSection)
                 return (int)SectionTypeID.BasicPassage;
             return (int)SectionTypeID.DefaultIndependentQuestions;
