@@ -11,9 +11,9 @@ namespace sQzLib
     {
         public int TestType;
         public SortedList<int, AnswerSheet> vSheet;
-        public AnswerPack()
+        public AnswerPack(int testType)
         {
-            TestType = -1;
+            TestType = testType;
             vSheet = new SortedList<int, AnswerSheet>();
         }
 
@@ -26,6 +26,7 @@ namespace sQzLib
         public List<byte[]> GetBytes_S0SendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(TestType));
             l.Add(BitConverter.GetBytes(vSheet.Values.Count));
             foreach (AnswerSheet i in vSheet.Values)
                 l.Add(i.GetBytes_S0SendingToS1());
@@ -35,9 +36,6 @@ namespace sQzLib
         //only Operation0 uses this.
         public void ExtractKey(IList<QuestSheet> l)
         {
-            if (l.Count == 0)
-                return;
-            TestType = l[0].TestType;
             foreach (QuestSheet qs in l)
             {
                 AnswerSheet i = new AnswerSheet();
@@ -68,6 +66,13 @@ namespace sQzLib
             if (buf == null)
                 return false;
             int l = buf.Length - offs;
+
+            if (l < 4)
+                return false;
+            TestType = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            l -= 4;
+
             if (l < 4)
                 return false;
             int sheetCount = BitConverter.ToInt32(buf, offs);

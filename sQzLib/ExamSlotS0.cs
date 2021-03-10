@@ -437,29 +437,39 @@ namespace sQzLib
             return true;
         }
 
-        public bool GenQ(Dictionary<int, int> sheetsPerTestType)
+        private void Safe_DBClearQPacks_and_AnsPacks()
         {
             string emsg;
-            foreach(QuestPack p in QuestionPacks.Values)
+            foreach (QuestPack p in QuestionPacks.Values)
             {
+                if (AnswerKeyPacks.ContainsKey(p.TestType))
+                {
+                    foreach (QuestSheet qs in p.vSheet.Values)
+                        AnswerKeyPacks[p.TestType].vSheet.Remove(qs.ID);
+                    if (AnswerKeyPacks[p.TestType].vSheet.Count == 0)
+                        AnswerKeyPacks.Remove(p.TestType);
+                }
+
                 if (p.DBDelete(out emsg))
                     WPopup.s.ShowDialog(emsg);
                 p.vSheet.Clear();
             }
             QuestionPacks.Clear();
+        }
+
+        public bool GenQ(Dictionary<int, int> sheetsPerTestType)
+        {
+            Safe_DBClearQPacks_and_AnsPacks();
             if (!QuestSheet.GetMaxID_inDB(mDt))
                 return true;
-            //maybe it's safer for not removing in mKeyPack
-            //foreach (QuestSheet qs in QuestionPack.vSheet.Values)
-            //    mKeyPack.vSheet.Remove(qs.ID);
-            foreach(KeyValuePair<int, int> pair in sheetsPerTestType)
+            foreach (KeyValuePair<int, int> pair in sheetsPerTestType)
             {
-                QuestPack pack = new QuestPack();
+                QuestPack pack = new QuestPack(pair.Key);
                 pack.mDt = mDt;
-                AnswerPack answerPack = new AnswerPack();
-                answerPack.ExtractKey(pack.GenQPack3(pair.Key, pair.Value));
-                QuestionPacks.Add(pair.Key, pack);
-                AnswerKeyPacks.Add(pair.Key, answerPack);
+                AnswerPack answerPack = new AnswerPack(pack.TestType);
+                answerPack.ExtractKey(pack.GenQPack3(pair.Value));
+                Safe_AddToQuestionPacks(pack);
+                Safe_AddToAnswerPacks(answerPack);
             }
             return false;
         }
@@ -467,21 +477,18 @@ namespace sQzLib
         public bool DBSelArchive(out string eMsg)
         {
             QuestionPacks.Clear();
-            AnswerKeyPacks.Clear();
+            //AnswerKeyPacks.Clear();
             foreach (int testType in GetAllTestTypesInRooms())
             {
-                QuestPack pack = new QuestPack();
-                pack.TestType = testType;
+                QuestPack pack = new QuestPack(testType);
                 pack.mDt = mDt;
                 if (pack.DBSelectQS(out eMsg))
                     return true;
-                QuestionPacks.Add(testType, pack);
-            }
-            foreach(QuestPack pack in QuestionPacks.Values)
-            {
-                AnswerPack answerPack = new AnswerPack();
+                Safe_AddToQuestionPacks(pack);
+
+                AnswerPack answerPack = new AnswerPack(pack.TestType);
                 answerPack.ExtractKey(pack.vSheet.Values);
-                AnswerKeyPacks.Add(pack.TestType, answerPack);
+                Safe_AddToAnswerPacks(answerPack);
             }
             eMsg = string.Empty;
             return false;

@@ -14,8 +14,9 @@ namespace sQzLib
         public int TestType;
         int mNextQSIdx;
         int mMaxQSIdx;
-        public QuestPack()
+        public QuestPack(int testType)
         {
+            TestType = testType;
             mDt = DT.INVALID;
             mNextQSIdx = 0;
             mMaxQSIdx = -1;
@@ -185,18 +186,18 @@ namespace sQzLib
             return false;
         }
 
-        public List<QuestSheet> GenQPack3(int testType, int numberOfSheet)
+        public List<QuestSheet> GenQPack3(int numberOfSheet)
         {
             List<QuestSheet> sheets = new List<QuestSheet>();
             QuestSheet originSheet = new QuestSheet();
-            originSheet.DBSelectNondeletedQuestions(testType);
+            originSheet.DBSelectNondeletedQuestions(TestType);
             Random rand = new Random();
             while (0 < numberOfSheet)
             {
                 --numberOfSheet;
                 QuestSheet qs = originSheet.RandomizeDeepCopy_SectionsOnly(rand);
                 qs.AccquireGlobalMaxID();
-                qs.TestType = testType;
+                qs.TestType = TestType;
                 vSheet.Add(qs.ID, qs);
                 sheets.Add(qs);
             }

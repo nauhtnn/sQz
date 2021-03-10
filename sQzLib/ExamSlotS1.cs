@@ -87,10 +87,10 @@ namespace sQzLib
             while (0 < n)
             {
                 --n;
-                QuestPack pack = new QuestPack();
+                QuestPack pack = new QuestPack(-1);
                 if (!pack.ReadByte(buf, ref offs))
                     return false;
-                QuestionPacks.Add(pack.TestType, pack);
+                Safe_AddToQuestionPacks(pack);
             }
             return true;
         }
@@ -109,11 +109,11 @@ namespace sQzLib
         public bool ReadBytesKey_NoDateTime(byte[] buf, ref int offs)
         {
             AnswerKeyPacks.Clear();
-            AnswerPack answerPack = new AnswerPack();
+            AnswerPack answerPack = new AnswerPack(-1);
             while (answerPack.ReadBytes_S1ReceivingFromS0(buf, ref offs))
             {
-                AnswerKeyPacks.Add(answerPack.TestType, answerPack);
-                answerPack = new AnswerPack();
+                Safe_AddToAnswerPacks(answerPack);
+                answerPack = new AnswerPack(-1);
             }
             return AnswerKeyPacks.Count > 0;
         }
