@@ -148,10 +148,6 @@ namespace sQzLib
                         answerSheet.BytesOfAnswer[++i] = Convert.ToByte(x);
         }
 
-        
-
-        
-
         private Question ReadBytesOfQuestion(byte[] buf, ref int offs)
         {
             Question q = new Question();
@@ -196,12 +192,30 @@ namespace sQzLib
             return questions;
         }
 
-        private BasicPassageSection ReadBytesOfPassage(byte[] buf, ref int offs)
+        private IndependentQSection ReadBytesOfIndependentQSection(byte[] buf, ref int offs)
+        {
+            if (buf.Length < offs + 4)
+                return null;
+            IndependentQSection sec = new IndependentQSection(BitConverter.ToInt32(buf, offs));
+            offs += 4;
+            sec.Requirements = Utils.ReadBytesOfString(buf, ref offs);
+            if (sec.Requirements == null)
+                return null;
+            sec.Questions = ReadBytesOfQuestions(buf, ref offs);
+            if (sec.Questions == null)
+                return null;
+            return sec;
+        }
+
+        private BasicPassageSection ReadBytesOfBasicPassageSection(byte[] buf, ref int offs)
         {
             if (buf.Length < offs + 4)
                 return null;
             BasicPassageSection p = new BasicPassageSection(BitConverter.ToInt32(buf, offs));
             offs += 4;
+            p.Requirements = Utils.ReadBytesOfString(buf, ref offs);
+            if (p.Requirements == null)
+                return null;
             p.Passage = Utils.ReadBytesOfString(buf, ref offs);
             if (p.Passage == null)
                 return null;
@@ -211,80 +225,119 @@ namespace sQzLib
             return p;
         }
 
-        private Dictionary<int, BasicPassageSection> ReadBytesOfPassages(byte[] buf, ref int offs)
+        private bool ReadBytesOfSections(byte[] buf, ref int offs)
         {
-            int l = buf.Length - offs;
-            if (l < 4)
-                return null;
+            if (buf.Length - offs < 4)
+                return false;
             int n = BitConverter.ToInt32(buf, offs);
             offs += 4;
-            //l -= 4;
-            Dictionary<int, BasicPassageSection> passages = new Dictionary<int, BasicPassageSection>();
+
+            Sections.Clear();
+
             while (0 < n)
             {
-                BasicPassageSection p = ReadBytesOfPassage(buf, ref offs);
-                if (p == null)
-                    return null;
+                if (buf.Length - offs < 4)
+                    return false;
+
+                SectionTypeID sec_typeID = SectionTypeID.DefaultIndependentQuestions;
+                if (Enum.IsDefined(typeof(SectionTypeID), BitConverter.ToInt32(buf, offs)))
+                    sec_typeID = (SectionTypeID)BitConverter.ToInt32(buf, offs);
+                else
+                    return false;
+
+                offs += 4;
+
+                switch(sec_typeID)
+                {
+                    case SectionTypeID.BasicPassage:
+                        BasicPassageSection p = ReadBytesOfBasicPassageSection(buf, ref offs);
+                        if (p == null)
+                            return false;
+                        Sections.Add(p);
+                        break;
+                    default:
+                        IndependentQSection ind = ReadBytesOfIndependentQSection(buf, ref offs);
+                        if (ind == null)
+                            return false;
+                        Sections.Add(ind);
+                        break;
+                }
+                
                 --n;
-                passages.Add(p.ID, p);
             }
-            return passages;
+            return true;
         }
 
-        private void AppendBytesOf(BasicPassageSection p, List<byte[]> byteList)
+        private void AppendBytesOf(IndependentQSection section, List<byte[]> byteList)
         {
-            byteList.Add(BitConverter.GetBytes(p.ID));
-            Utils.AppendBytesOfString(p.Passage, byteList);
-            byteList.Add(BitConverter.GetBytes(p.Questions.Count));
-            foreach (Question q in p.Questions)
+            byteList.Add(BitConverter.GetBytes((int)SectionTypeID.DefaultIndependentQuestions));
+            byteList.Add(BitConverter.GetBytes(section.ID));
+            Utils.AppendBytesOfString(section.Requirements, byteList);
+            byteList.Add(BitConverter.GetBytes(section.Questions.Count));
+            foreach (Question q in section.Questions)
+                AppendBytesOf(q, byteList);
+        }
+
+        private void AppendBytesOf(BasicPassageSection section, List<byte[]> byteList)
+        {
+            byteList.Add(BitConverter.GetBytes((int)SectionTypeID.BasicPassage));
+            byteList.Add(BitConverter.GetBytes(section.ID));
+            Utils.AppendBytesOfString(section.Requirements, byteList);
+            Utils.AppendBytesOfString(section.Passage, byteList);
+            byteList.Add(BitConverter.GetBytes(section.Questions.Count));
+            foreach (Question q in section.Questions)
                 AppendBytesOf(q, byteList);
         }
 
         public List<byte[]> ToByte()
         {
-            throw new NotImplementedException();
-            //List<byte[]> l = new List<byte[]>();
-            //l.Add(BitConverter.GetBytes(ID));
-            //l.Add(BitConverter.GetBytes(IndependentQuestions.Count));
-            //foreach (Question q in IndependentQuestions)
-            //    AppendBytesOf(q, l);
-            //l.Add(BitConverter.GetBytes(Passages.Count));
-            //foreach (BasicPassageSection p in Passages.Values)
-            //    AppendBytesOf(p, l);
-            //return l;
+            List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(ID));
+            l.Add(BitConverter.GetBytes(Sections.Count));
+            foreach (QSheetSection section in Sections)
+            {
+                BasicPassageSection p_section = section as BasicPassageSection;
+                if(p_section != null)
+                {
+                    AppendBytesOf(p_section, l);
+                    continue;
+                }
+                IndependentQSection i_section = section as IndependentQSection;
+                if (i_section != null)
+                {
+                    AppendBytesOf(i_section, l);
+                    continue;
+                }
+            }
+            return l;
         }
 
         public bool ReadByte(byte[] buf, ref int offs)
         {
-            throw new NotImplementedException();
-            //if (buf == null)
-            //    return true;
-            //int offs0 = offs;
-            //int l = buf.Length - offs;
-            ////
-            //if (l < 4)
-            //    return true;
-            //ID = BitConverter.ToInt32(buf, offs);
-            //offs += 4;
-            ////l -= 4;
-            //IndependentQuestions = ReadBytesOfQuestions(buf, ref offs);
-            //if (IndependentQuestions == null)
-            //    return true;
-            //Passages = ReadBytesOfPassages(buf, ref offs);
-            //if (Passages == null)
-            //    return true;
-            //if (!Array.Equals(buf, aQuest))
-            //{
-            //    int sz = offs - offs0;
-            //    if (sz == buf.Length)
-            //        aQuest = buf.Clone() as byte[];
-            //    else
-            //    {
-            //        aQuest = new byte[sz];
-            //        Buffer.BlockCopy(buf, offs0, aQuest, 0, sz);
-            //    }
-            //}
-            //return false;
+            if (buf == null)
+                return true;
+            int offs0 = offs;
+            //
+            if (buf.Length - offs < 4)
+                return true;
+            ID = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+
+            if (!ReadBytesOfSections(buf, ref offs))
+                return true;
+            
+            if (!Array.Equals(buf, aQuest))
+            {
+                int sz = offs - offs0;
+                if (sz == buf.Length)
+                    aQuest = buf.Clone() as byte[];
+                else
+                {
+                    aQuest = new byte[sz];
+                    Buffer.BlockCopy(buf, offs0, aQuest, 0, sz);
+                }
+            }
+            return false;
         }
 
         //only Prep0 uses this.
