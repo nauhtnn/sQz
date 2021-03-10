@@ -243,7 +243,7 @@ namespace sQzClient
                 }
                 else
                 {
-                    PassageWithQuestionsView p = i as PassageWithQuestionsView;
+                    BasicPassageSectionView p = i as BasicPassageSectionView;
                     if(p != null)
                     {
                         foreach(SingleQuestionView q_in_p in p.QuestionsViews)
@@ -338,6 +338,8 @@ namespace sQzClient
                     }
                     else if (rs == (int)TxI.NEEID_NF)
                         msg = Txt.s._((int)TxI.NEEID_NF);
+                    else if (rs == (int)TxI.QS_NFOUND)
+                        msg = Txt.s._((int)TxI.QS_NFOUND) + thisExaminee.AnswerSheet.QuestSheetID;
                     else if (rs == (int)TxI.RECV_DAT_ER)
                         msg = Txt.s._((int)TxI.RECV_DAT_ER);
                     else if(msg == null)

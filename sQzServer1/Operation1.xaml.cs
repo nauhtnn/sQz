@@ -259,9 +259,10 @@ namespace sQzServer1
                         break;
                     }
                     int qsid = BitConverter.ToInt32(buf, offs);
+                    int testType = Slot.GetTestTypeOfExaminee(nee_id);
                     if (qsid == ExamineeA.LV_CAP)
                     {
-                        byte[] a = Slot.GetBytes_NextQSheet();
+                        byte[] a = Slot.GetBytes_NextQSheet(testType);
                         if (a != null)
                         {
                             outMsg = new byte[a.Length + 4];
@@ -269,8 +270,10 @@ namespace sQzServer1
                             Array.Copy(a, 0, outMsg, 4, a.Length);
                         }
                     }
-                    else if (Slot.QuestionPack.vSheet.TryGetValue(qsid, out qs))
+                    else if (Slot.QuestionPacks.ContainsKey(testType) &&
+                        Slot.QuestionPacks[testType].vSheet.TryGetValue(qsid, out qs))
                     {
+                        
                         outMsg = new byte[qs.aQuest.Length + 4];
                         Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
                         Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
@@ -287,13 +290,15 @@ namespace sQzServer1
                     e = new ExamineeS1();
                     if (!e.ReadBytes_FromClient(buf, ref offs))
                     {
-                        AnswerSheet keySh = null;
+                        AnswerSheet answerKeySheet = null;
                         found = false;
-                        if(Slot.mKeyPack.vSheet.TryGetValue(e.AnswerSheet.QuestSheetID, out keySh))
+                        AnswerPack answerPack;
+                        if(Slot.AnswerKeyPacks.TryGetValue(e.TestType, out answerPack)
+                            && answerPack.vSheet.TryGetValue(e.AnswerSheet.QuestSheetID, out answerKeySheet))
                             found = true;
                         if (!found)
                         {
-                            outMsg = BitConverter.GetBytes(101);//todo
+                            outMsg = BitConverter.GetBytes((int)TxI.QS_NFOUND);
                             break;
                         }
                         ExamineeS1 o = null;
@@ -304,7 +309,7 @@ namespace sQzServer1
                         {
                             o.eStt = NeeStt.Finished;
                             o.AnswerSheet = e.AnswerSheet;
-                            o.CorrectCount = keySh.Grade(e.AnswerSheet.BytesOfAnswer);
+                            o.CorrectCount = answerKeySheet.Grade(e.AnswerSheet.BytesOfAnswer);
                             o.dtTim2 = DateTime.Now;
                             foreach (SortedList<string, bool> sl in vfbLock)
                                 if (sl.ContainsKey(e.ID))
@@ -394,7 +399,7 @@ namespace sQzServer1
                             WPopup.s.ShowDialog("AnsKeyRetrieving: Date time not match!"));
                         break;
                     }
-                    if (Slot.ReadByteKey_NoDateTime(buf, ref offs))
+                    if (Slot.ReadBytesKey_NoDateTime(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
                             WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_KEY_NOK)));
@@ -614,137 +619,137 @@ namespace sQzServer1
             }
         }
 
-    private void PrintFlowDoc()
-        {
-            var document = CreateFlowDocument();
-            // Clone the source document's content into a new FlowDocument.
-            // This is because the pagination for the printer needs to be
-            // done differently than the pagination for the displayed page.
-            // We print the copy, rather that the original FlowDocument.
-            System.IO.MemoryStream s = new System.IO.MemoryStream();
-            TextRange source = new TextRange(document.ContentStart, document.ContentEnd);
-            source.Save(s, DataFormats.Xaml);
-            FlowDocument copy = new FlowDocument();
-            TextRange dest = new TextRange(copy.ContentStart, copy.ContentEnd);
-            dest.Load(s, DataFormats.Xaml);
+    //private void PrintFlowDoc()
+    //    {
+    //        var document = CreateFlowDocument();
+    //        // Clone the source document's content into a new FlowDocument.
+    //        // This is because the pagination for the printer needs to be
+    //        // done differently than the pagination for the displayed page.
+    //        // We print the copy, rather that the original FlowDocument.
+    //        System.IO.MemoryStream s = new System.IO.MemoryStream();
+    //        TextRange source = new TextRange(document.ContentStart, document.ContentEnd);
+    //        source.Save(s, DataFormats.Xaml);
+    //        FlowDocument copy = new FlowDocument();
+    //        TextRange dest = new TextRange(copy.ContentStart, copy.ContentEnd);
+    //        dest.Load(s, DataFormats.Xaml);
 
-            // Create a XpsDocumentWriter object, implicitly opening a Windows common print dialog,
-            // and allowing the user to select a printer.
+    //        // Create a XpsDocumentWriter object, implicitly opening a Windows common print dialog,
+    //        // and allowing the user to select a printer.
 
-            // get information about the dimensions of the seleted printer+media.
-            System.Printing.PrintDocumentImageableArea ia = null;
-            System.Windows.Xps.XpsDocumentWriter docWriter = System.Printing.PrintQueue.CreateXpsDocumentWriter(ref ia);
+    //        // get information about the dimensions of the seleted printer+media.
+    //        System.Printing.PrintDocumentImageableArea ia = null;
+    //        System.Windows.Xps.XpsDocumentWriter docWriter = System.Printing.PrintQueue.CreateXpsDocumentWriter(ref ia);
 
-            if (docWriter != null && ia != null)
-            {
-                DocumentPaginator paginator = ((IDocumentPaginatorSource)copy).DocumentPaginator;
+    //        if (docWriter != null && ia != null)
+    //        {
+    //            DocumentPaginator paginator = ((IDocumentPaginatorSource)copy).DocumentPaginator;
 
-                // Change the PageSize and PagePadding for the document to match the CanvasSize for the printer device.
-                paginator.PageSize = new Size(ia.MediaSizeWidth, ia.MediaSizeHeight);
-                Thickness t = new Thickness(72);  // copy.PagePadding;
-                copy.PagePadding = new Thickness(
-                                 Math.Max(ia.OriginWidth, t.Left),
-                                   Math.Max(ia.OriginHeight, t.Top),
-                                   Math.Max(ia.MediaSizeWidth - (ia.OriginWidth + ia.ExtentWidth), t.Right),
-                                   Math.Max(ia.MediaSizeHeight - (ia.OriginHeight + ia.ExtentHeight), t.Bottom));
+    //            // Change the PageSize and PagePadding for the document to match the CanvasSize for the printer device.
+    //            paginator.PageSize = new Size(ia.MediaSizeWidth, ia.MediaSizeHeight);
+    //            Thickness t = new Thickness(72);  // copy.PagePadding;
+    //            copy.PagePadding = new Thickness(
+    //                             Math.Max(ia.OriginWidth, t.Left),
+    //                               Math.Max(ia.OriginHeight, t.Top),
+    //                               Math.Max(ia.MediaSizeWidth - (ia.OriginWidth + ia.ExtentWidth), t.Right),
+    //                               Math.Max(ia.MediaSizeHeight - (ia.OriginHeight + ia.ExtentHeight), t.Bottom));
 
-                copy.ColumnWidth = double.PositiveInfinity;
-                //copy.PageWidth = 528; // allow the page to be the natural with of the output device
+    //            copy.ColumnWidth = double.PositiveInfinity;
+    //            //copy.PageWidth = 528; // allow the page to be the natural with of the output device
 
-                // Send content to the printer.
-                docWriter.Write(paginator);
-            }
-        }
+    //            // Send content to the printer.
+    //            docWriter.Write(paginator);
+    //        }
+    //    }
 
-        private FlowDocument CreateFlowDocument()
-        {
-            var table1 = new Table();
-            // Create 6 columns and add them to the table's Columns collection.
-            int numberOfColumns = 5;
-            for (int x = 0; x < numberOfColumns; x++)
-            {
-                table1.Columns.Add(new TableColumn());
+        //private FlowDocument CreateFlowDocument()
+        //{
+        //    var table1 = new Table();
+        //    // Create 6 columns and add them to the table's Columns collection.
+        //    int numberOfColumns = 5;
+        //    for (int x = 0; x < numberOfColumns; x++)
+        //    {
+        //        table1.Columns.Add(new TableColumn());
 
-                // Set alternating background colors for the middle colums.
-                if (x % 2 == 0)
-                    table1.Columns[x].Background = Brushes.Beige;
-                else
-                    table1.Columns[x].Background = Brushes.LightSteelBlue;
-            }
+        //        // Set alternating background colors for the middle colums.
+        //        if (x % 2 == 0)
+        //            table1.Columns[x].Background = Brushes.Beige;
+        //        else
+        //            table1.Columns[x].Background = Brushes.LightSteelBlue;
+        //    }
 
-            // Create and add an empty TableRowGroup to hold the table's Rows.
-            table1.RowGroups.Add(new TableRowGroup());
+        //    // Create and add an empty TableRowGroup to hold the table's Rows.
+        //    table1.RowGroups.Add(new TableRowGroup());
 
-            // Add the first (title) row.
-            table1.RowGroups[0].Rows.Add(new TableRow());
+        //    // Add the first (title) row.
+        //    table1.RowGroups[0].Rows.Add(new TableRow());
 
-            // Alias the current working row for easy reference.
-            TableRow currentRow = table1.RowGroups[0].Rows[0];
+        //    // Alias the current working row for easy reference.
+        //    TableRow currentRow = table1.RowGroups[0].Rows[0];
 
-            // Global formatting for the title row.
-            currentRow.Background = Brushes.Silver;
-            currentRow.FontSize = 40;
-            currentRow.FontWeight = System.Windows.FontWeights.Bold;
+        //    // Global formatting for the title row.
+        //    currentRow.Background = Brushes.Silver;
+        //    currentRow.FontSize = 40;
+        //    currentRow.FontWeight = System.Windows.FontWeights.Bold;
 
-            // Add the header row with content,
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("2004 Sales Project"))));
-            // and set the row to span all 6 columns.
-            currentRow.Cells[0].ColumnSpan = 6;
+        //    // Add the header row with content,
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("2004 Sales Project"))));
+        //    // and set the row to span all 6 columns.
+        //    currentRow.Cells[0].ColumnSpan = 6;
 
-            // Add the second (header) row.
-            table1.RowGroups[0].Rows.Add(new TableRow());
-            currentRow = table1.RowGroups[0].Rows[1];
+        //    // Add the second (header) row.
+        //    table1.RowGroups[0].Rows.Add(new TableRow());
+        //    currentRow = table1.RowGroups[0].Rows[1];
 
-            // Global formatting for the header row.
-            currentRow.FontSize = 18;
-            currentRow.FontWeight = FontWeights.Bold;
+        //    // Global formatting for the header row.
+        //    currentRow.FontSize = 18;
+        //    currentRow.FontWeight = FontWeights.Bold;
 
-            // Add cells with content to the second row.
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Product"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 1"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 2"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 3"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 4"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("TOTAL"))));
+        //    // Add cells with content to the second row.
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Product"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 1"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 2"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 3"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 4"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("TOTAL"))));
 
-            // Add the third row.
-            table1.RowGroups[0].Rows.Add(new TableRow());
-            currentRow = table1.RowGroups[0].Rows[2];
+        //    // Add the third row.
+        //    table1.RowGroups[0].Rows.Add(new TableRow());
+        //    currentRow = table1.RowGroups[0].Rows[2];
 
-            // Global formatting for the row.
-            currentRow.FontSize = 12;
-            currentRow.FontWeight = FontWeights.Normal;
+        //    // Global formatting for the row.
+        //    currentRow.FontSize = 12;
+        //    currentRow.FontWeight = FontWeights.Normal;
 
-            // Add cells with content to the third row.
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Widgets"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$50,000"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$55,000"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$60,000"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$65,000"))));
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$230,000"))));
+        //    // Add cells with content to the third row.
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Widgets"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$50,000"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$55,000"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$60,000"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$65,000"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$230,000"))));
 
-            // Bold the first cell.
-            currentRow.Cells[0].FontWeight = FontWeights.Bold;
+        //    // Bold the first cell.
+        //    currentRow.Cells[0].FontWeight = FontWeights.Bold;
 
-            table1.RowGroups[0].Rows.Add(new TableRow());
-            currentRow = table1.RowGroups[0].Rows[3];
+        //    table1.RowGroups[0].Rows.Add(new TableRow());
+        //    currentRow = table1.RowGroups[0].Rows[3];
 
-            // Global formatting for the footer row.
-            currentRow.Background = Brushes.LightGray;
-            currentRow.FontSize = 18;
-            currentRow.FontWeight = System.Windows.FontWeights.Normal;
+        //    // Global formatting for the footer row.
+        //    currentRow.Background = Brushes.LightGray;
+        //    currentRow.FontSize = 18;
+        //    currentRow.FontWeight = System.Windows.FontWeights.Normal;
 
-            // Add the header row with content,
-            currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Projected 2004 Revenue: $810,000"))));
-            // and set the row to span all 6 columns.
-            currentRow.Cells[0].ColumnSpan = 6;
+        //    // Add the header row with content,
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Projected 2004 Revenue: $810,000"))));
+        //    // and set the row to span all 6 columns.
+        //    currentRow.Cells[0].ColumnSpan = 6;
 
 
-            // ...and add it to the FlowDocument Blocks collection.
-            var flowDoc = new FlowDocument();
-            flowDoc.Blocks.Add(table1);
+        //    // ...and add it to the FlowDocument Blocks collection.
+        //    var flowDoc = new FlowDocument();
+        //    flowDoc.Blocks.Add(table1);
 
-            return flowDoc;
-        }
+        //    return flowDoc;
+        //}
     }
 }

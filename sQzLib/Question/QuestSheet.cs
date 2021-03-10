@@ -125,9 +125,10 @@ namespace sQzLib
         }
 
         //only Operation0 uses this.
-        public void ExtractKey(AnswerSheet anssh)
+        public void ExtractKey(AnswerSheet answerSheet)
         {
-            anssh.QuestSheetID = ID;
+            answerSheet.QuestSheetID = ID;
+            answerSheet.TestType = TestType;
             int bytes_length;
             int question_count = 0;
             if (0 < Sections.Count)
@@ -138,13 +139,13 @@ namespace sQzLib
             }
             else
                 bytes_length = 0;
-            anssh.BytesOfAnswer_Length = bytes_length;
-            anssh.BytesOfAnswer = new byte[bytes_length];
+            answerSheet.BytesOfAnswer_Length = bytes_length;
+            answerSheet.BytesOfAnswer = new byte[bytes_length];
             int i = -1;
             foreach(QSheetSection section in Sections)
                 foreach (Question q in section.Questions)
                     foreach (bool x in q.vKeys)
-                        anssh.BytesOfAnswer[++i] = Convert.ToByte(x);
+                        answerSheet.BytesOfAnswer[++i] = Convert.ToByte(x);
         }
 
         

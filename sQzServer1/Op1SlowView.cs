@@ -77,7 +77,7 @@ namespace sQzServer1
                     Grid.SetColumn(t, 2);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.Birthplace;
+                    t.Text = e.TestType.ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
                     grdNee.Children.Add(t);
@@ -152,22 +152,22 @@ namespace sQzServer1
                 }
         }
 
-        public void UpdateRsView(List<ExamRoomA> vRoom)
-        {
-            TextBlock t;
-            foreach (ExamRoomA r in vRoom)
-                foreach (ExamineeA e in r.Examinees.Values)
-                {
-                    if (e.CorrectCount != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
-                        t.Text = e.Grade;
-                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.ID, out t))
-                        t.Text = e.dtTim1.ToString(DT.hh);
-                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.ID, out t))
-                        t.Text = e.dtTim2.ToString(DT.hh);
-                    if (e.ComputerName != null && vComp.TryGetValue(e.ID, out t))
-                        t.Text = e.ComputerName;
-                }
-        }
+        //public void UpdateRsView(List<ExamRoomA> vRoom)
+        //{
+        //    TextBlock t;
+        //    foreach (ExamRoomA r in vRoom)
+        //        foreach (ExamineeA e in r.Examinees.Values)
+        //        {
+        //            if (e.CorrectCount != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
+        //                t.Text = e.Grade;
+        //            if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.ID, out t))
+        //                t.Text = e.dtTim1.ToString(DT.hh);
+        //            if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.ID, out t))
+        //                t.Text = e.dtTim2.ToString(DT.hh);
+        //            if (e.ComputerName != null && vComp.TryGetValue(e.ID, out t))
+        //                t.Text = e.ComputerName;
+        //        }
+        //}
 
         public void DeepCopyNee(TabItem reftbi)
         {

@@ -18,7 +18,7 @@ namespace sQzLib
         public DateTime mDt;
         public Dictionary<int, QuestPack> QuestionPacks;
 
-        public AnswerPack mKeyPack;
+        public Dictionary<int, AnswerPack> AnswerKeyPacks;
 
         public Dictionary<int, DateTime> vT1;
         public Dictionary<int, DateTime> vT2;
@@ -30,7 +30,7 @@ namespace sQzLib
             eStt = ExamStt.Prep;
             QuestionPacks = new Dictionary<int, QuestPack>();
 
-            mKeyPack = new AnswerPack();
+            AnswerKeyPacks = new Dictionary<int, AnswerPack>();
         }
 
         public DateTime Dt {

@@ -26,6 +26,7 @@ namespace sQzLib
         public byte[] GetBytes_SendingToClient()
         {
             List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(TestType));
             l.Add(BitConverter.GetBytes((int)eStt));
             if (eStt == NeeStt.Finished)
                 l.Add(BitConverter.GetBytes(CorrectCount));
@@ -48,6 +49,12 @@ namespace sQzLib
             ID = Utils.ReadBytesOfString(buf, ref offs, ref l);
             if (ID == null)
                 return true;
+
+            if (l < 4)
+                return true;
+            TestType = BitConverter.ToInt32(buf, offs);
+            l -= 4;
+            offs += 4;
 
             if (l < 4)
                 return true;

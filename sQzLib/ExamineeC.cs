@@ -37,6 +37,7 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             Utils.AppendBytesOfString(ID, l);
+            l.Add(BitConverter.GetBytes(TestType));
             l.Add(BitConverter.GetBytes((int)eStt));
 			l.Add(BitConverter.GetBytes(bLog));
 

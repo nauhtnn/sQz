@@ -9,14 +9,17 @@ namespace sQzLib
 {
     public class AnswerPack
     {
+        public int TestType;
         public SortedList<int, AnswerSheet> vSheet;
         public AnswerPack()
         {
+            TestType = -1;
             vSheet = new SortedList<int, AnswerSheet>();
         }
 
         public void Clear()
         {
+            TestType = -1;
             vSheet.Clear();
         }
 
@@ -30,9 +33,12 @@ namespace sQzLib
         }
 
         //only Operation0 uses this.
-        public void ExtractKey(List<QuestSheet> l)
+        public void ExtractKey(IList<QuestSheet> l)
         {
-            foreach(QuestSheet qs in l)
+            if (l.Count == 0)
+                return;
+            TestType = l[0].TestType;
+            foreach (QuestSheet qs in l)
             {
                 AnswerSheet i = new AnswerSheet();
                 qs.ExtractKey(i);
@@ -60,24 +66,24 @@ namespace sQzLib
         {
             vSheet.Clear();
             if (buf == null)
-                return true;
+                return false;
             int l = buf.Length - offs;
             if (l < 4)
-                return true;
-            int nSh = BitConverter.ToInt32(buf, offs);
+                return false;
+            int sheetCount = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
-            if (nSh < 0)
-                return true;
-            while (0 < nSh)
+            if (sheetCount < 0)
+                return false;
+            while (0 < sheetCount)
             {
                 AnswerSheet i = new AnswerSheet();
                 if (i.ReadBytes_S1ReceivingFromS0(buf, ref offs) || vSheet.ContainsKey(i.QuestSheetID))
-                    return true;
+                    return false;
                 vSheet.Add(i.QuestSheetID, i);
-                --nSh;
+                --sheetCount;
             }
-            return false;
+            return true;
         }
     }
 }

@@ -92,9 +92,26 @@ namespace sQzLib
             }
         }
 
-        public bool ReadByteKey_NoDateTime(byte[] buf, ref int offs)
+        public bool ReadBytesKey_NoDateTime(byte[] buf, ref int offs)
         {
-            return mKeyPack.ReadBytes_S1ReceivingFromS0(buf, ref offs);
+            AnswerKeyPacks.Clear();
+            AnswerPack answerPack = new AnswerPack();
+            while (answerPack.ReadBytes_S1ReceivingFromS0(buf, ref offs))
+            {
+                AnswerKeyPacks.Add(answerPack.TestType, answerPack);
+                answerPack = new AnswerPack();
+            }
+            return AnswerKeyPacks.Count > 0;
+        }
+
+        public int GetTestTypeOfExaminee(string neeID)
+        {
+            foreach (ExamRoomS1 room in Rooms.Values)
+            {
+                if (room.Examinees.ContainsKey(neeID))
+                    return room.Examinees[neeID].TestType;
+            }
+            return -1;
         }
     }
 }

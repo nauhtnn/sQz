@@ -456,8 +456,10 @@ namespace sQzLib
             {
                 QuestPack pack = new QuestPack();
                 pack.mDt = mDt;
-                mKeyPack.ExtractKey(pack.GenQPack3(pair.Key, pair.Value));
+                AnswerPack answerPack = new AnswerPack();
+                answerPack.ExtractKey(pack.GenQPack3(pair.Key, pair.Value));
                 QuestionPacks.Add(pair.Key, pack);
+                AnswerKeyPacks.Add(pair.Key, answerPack);
             }
             return false;
         }
@@ -465,7 +467,7 @@ namespace sQzLib
         public bool DBSelArchive(out string eMsg)
         {
             QuestionPacks.Clear();
-            mKeyPack.Clear();
+            AnswerKeyPacks.Clear();
             foreach (int testType in GetAllTestTypesInRooms())
             {
                 QuestPack pack = new QuestPack();
@@ -476,8 +478,13 @@ namespace sQzLib
                 QuestionPacks.Add(testType, pack);
             }
             foreach(QuestPack pack in QuestionPacks.Values)
-                foreach(QuestSheet qs in pack.vSheet.Values)
-                    mKeyPack.ExtractKey(qs);
+            {
+                AnswerPack answerPack = new AnswerPack();
+                answerPack.ExtractKey(pack.vSheet.Values);
+                AnswerKeyPacks.Add(pack.TestType, answerPack);
+            }
+                //foreach(QuestSheet qs in pack.vSheet.Values)
+                //    AnswerKeyPacks.ExtractKey(qs);
             eMsg = string.Empty;
             return false;
         }
@@ -525,9 +532,11 @@ namespace sQzLib
 
         public byte[] GetBytes_KeysWithDateTime()
         {
-            List<byte[]> l = mKeyPack.GetBytes_S0SendingToS1();
-            l.Insert(0, BitConverter.GetBytes(mDt.ToBinary()));
-            return Utils.ToArray_FromListOfBytes(l);
+            List<byte[]> bytes = new List<byte[]>();
+            foreach(AnswerPack ansPack in AnswerKeyPacks.Values)
+                bytes.AddRange(ansPack.GetBytes_S0SendingToS1());
+            bytes.Insert(0, BitConverter.GetBytes(mDt.ToBinary()));
+            return Utils.ToArray_FromListOfBytes(bytes);
         }
 
         public int ReadBytes_FromS1(byte[] buf, ref int offs)

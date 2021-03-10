@@ -11,6 +11,7 @@ namespace sQzLib
     public class AnswerSheet
     {
         public int BytesOfAnswer_Length;
+        public int TestType;
         public int QuestSheetID;
         public bool bChanged;
         public byte[] BytesOfAnswer;
