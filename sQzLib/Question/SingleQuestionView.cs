@@ -92,7 +92,8 @@ namespace sQzLib
             Children.Add(CreateIdxView(idx_start0));
 
             StackPanel stemAndOptionsView = new StackPanel();
-            stemAndOptionsView.Children.Add(CreateStemView(question.Stem));
+            if(question.Stem.Trim().Length > 0)
+                stemAndOptionsView.Children.Add(CreateStemView(question.Stem));
             optionsView = CreateOptionsView(question.vAns, optionStatusArray, idx_start0);
             optionsView.IsEnabled = isEnabled;
             
