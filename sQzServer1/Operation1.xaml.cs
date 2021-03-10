@@ -394,7 +394,7 @@ namespace sQzServer1
                             WPopup.s.ShowDialog("AnsKeyRetrieving: Date time not match!"));
                         break;
                     }
-                    if (Slot.ReadBytesKey_NoDateTime(buf, ref offs))
+                    if (!Slot.ReadBytesKey_NoDateTime(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
                             WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_KEY_NOK)));
