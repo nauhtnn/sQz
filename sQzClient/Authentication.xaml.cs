@@ -115,7 +115,8 @@ namespace sQzClient
             txtLalgitc.Text = t._((int)TxI.LALGITC);
             txtWelcome.Text = t._((int)TxI.WELCOME);
             txtId.Text = t._((int)TxI.NEEID);
-            txtBirdate.Text = t._((int)TxI.BIRDATE) + t._((int)TxI.BIRDATE_MSG);
+            txtBirdate.Text = t._((int)TxI.BIRDATE);
+            txtPassword.Text = t._((int)TxI.OP_PW);
             btnSignIn.Content = t._((int)TxI.SIGNIN);
             btnOpenLog.Content = t._((int)TxI.OPEN_LOG);
             btnReconn.Content = t._((int)TxI.CONN);
@@ -333,6 +334,7 @@ namespace sQzClient
         {
             tbxId.IsEnabled =
             tbxBirthdate.IsEnabled =
+            tbxPassword.IsEnabled =
             btnOpenLog.IsEnabled =
             btnSignIn.IsEnabled = true;
         }
@@ -341,6 +343,7 @@ namespace sQzClient
         {
             tbxId.IsEnabled =
             tbxBirthdate.IsEnabled =
+            tbxPassword.IsEnabled =
             btnOpenLog.IsEnabled =
             btnSignIn.IsEnabled = false;
         }
