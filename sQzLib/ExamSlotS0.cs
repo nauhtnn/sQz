@@ -471,6 +471,9 @@ namespace sQzLib
                 Safe_AddToQuestionPacks(pack);
                 Safe_AddToAnswerPacks(answerPack);
             }
+            foreach (QuestPack pack in QuestionPacks.Values)
+                foreach (QuestSheet qsheet in pack.vSheet.Values)
+                    qsheet.UpdateQuestIndicesInRequirementPassage();
             return false;
         }
 

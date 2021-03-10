@@ -10,7 +10,6 @@ namespace sQzLib
         {
             SingleQuestionView.IdxWidth = idxWidth;
             SingleQuestionView.StemWidth = stemWidth;
-            qsheet.UpdateQuestIndicesInRequirementPassage();
             int idx = -1;
             foreach(QSheetSection s in qsheet.Sections)
             {
