@@ -140,9 +140,6 @@ namespace sQzServer1
             int offs = 0;
 			NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
             offs += 4;
-            QuestSheet qs;
-            ExamineeS1 e;
-            DateTime dt;
             switch (c)
             {
                 case NetCode.Dating:
@@ -153,12 +150,12 @@ namespace sQzServer1
                     outMsg = Utils.ToArray_FromListOfBytes(bytes);
                     return true;
                 case NetCode.Authenticating:
-                    e = new ExamineeS1();
-                    e.ReadBytes_FromClient(buf, ref offs);
+                    ExamineeS1 nee_authenticating = new ExamineeS1();
+                    nee_authenticating.ReadBytes_FromClient(buf, ref offs);
                     bool lck = true;
                     bool found = false;
                     foreach (SortedList<string, bool> l in vfbLock)
-                        if (l.TryGetValue(e.ID, out lck))
+                        if (l.TryGetValue(nee_authenticating.ID, out lck))
                         {
                             found = true;
                             break;
@@ -168,12 +165,8 @@ namespace sQzServer1
                     if (!lck)
                     {
                         ExamineeS1 o = null;
-                        dt = DateTime.Now;
-                        if ((o = Slot.Signin(e)) == null)//why? check with the old
-                        {
-                            dt = Slot.Dt;
+                        if ((o = Slot.Signin(nee_authenticating)) == null)
                             break;
-                        }
                         
                         if (o != null)
                         {
@@ -213,7 +206,7 @@ namespace sQzServer1
                     else
                     {
                         ExamineeA o = null;
-                        if ((o = Slot.Find(e.ID)) != null)
+                        if ((o = Slot.Find(nee_authenticating.ID)) != null)
                             break;
                         if (o == null)
                             o = new ExamineeC();
@@ -244,22 +237,24 @@ namespace sQzServer1
                     return true;
                 case NetCode.ExamRetrieving:
                     outMsg = null;
+                    ExamineeS1 nee_retrivingExam = null;
                     string nee_id = Utils.ReadBytesOfString(buf, ref offs);
                     bool nee_not_found = true;
                     foreach(ExamRoomS1 r in Slot.Rooms.Values)
-                        if(r.Examinees.ContainsKey(nee_id))
+                        if(r.Examinees.TryGetValue(nee_id, out nee_retrivingExam))
                         {
                             nee_not_found = false;
                             break;
                         }
-                    if(nee_not_found)
+                    if(nee_not_found || nee_retrivingExam == null)
                     {
                         outMsg = new byte[4];
                         Array.Copy(BitConverter.GetBytes((int)TxI.NEEID_NF), 0, outMsg, 0, 4);
                         break;
                     }
                     int qsid = BitConverter.ToInt32(buf, offs);
-                    int testType = Slot.GetTestTypeOfExaminee(nee_id);
+                    int testType = nee_retrivingExam.TestType;
+                    QuestSheet sending_qSheet;
                     if (qsid == ExamineeA.LV_CAP)
                     {
                         byte[] a = Slot.GetBytes_NextQSheet(testType);
@@ -271,12 +266,12 @@ namespace sQzServer1
                         }
                     }
                     else if (Slot.QuestionPacks.ContainsKey(testType) &&
-                        Slot.QuestionPacks[testType].vSheet.TryGetValue(qsid, out qs))
+                        Slot.QuestionPacks[testType].vSheet.TryGetValue(qsid, out sending_qSheet))
                     {
                         
-                        outMsg = new byte[qs.aQuest.Length + 4];
+                        outMsg = new byte[sending_qSheet.aQuest.Length + 4];
                         Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
-                        Array.Copy(qs.aQuest, 0, outMsg, 4, qs.aQuest.Length);
+                        Array.Copy(sending_qSheet.aQuest, 0, outMsg, 4, sending_qSheet.aQuest.Length);
                     }
                     if (outMsg == null)
                     {
@@ -287,14 +282,14 @@ namespace sQzServer1
                     }
                     break;
                 case NetCode.Submiting:
-                    e = new ExamineeS1();
-                    if (!e.ReadBytes_FromClient(buf, ref offs))
+                    ExamineeS1 nee_submitting = new ExamineeS1();
+                    if (!nee_submitting.ReadBytes_FromClient(buf, ref offs))
                     {
                         AnswerSheet answerKeySheet = null;
                         found = false;
                         AnswerPack answerPack;
-                        if(Slot.AnswerKeyPacks.TryGetValue(e.TestType, out answerPack)
-                            && answerPack.vSheet.TryGetValue(e.AnswerSheet.QuestSheetID, out answerKeySheet))
+                        if(Slot.AnswerKeyPacks.TryGetValue(nee_submitting.TestType, out answerPack)
+                            && answerPack.vSheet.TryGetValue(nee_submitting.AnswerSheet.QuestSheetID, out answerKeySheet))
                             found = true;
                         if (!found)
                         {
@@ -303,34 +298,34 @@ namespace sQzServer1
                         }
                         ExamineeS1 o = null;
                         found = false;
-                        if ((o = Slot.Find(e.ID)) == null)
+                        if ((o = Slot.Find(nee_submitting.ID)) == null)
                             break;
                         if (o != null)
                         {
                             o.eStt = NeeStt.Finished;
-                            o.AnswerSheet = e.AnswerSheet;
-                            o.CorrectCount = answerKeySheet.Grade(e.AnswerSheet.BytesOfAnswer);
+                            o.AnswerSheet = nee_submitting.AnswerSheet;
+                            o.CorrectCount = answerKeySheet.Grade(nee_submitting.AnswerSheet.BytesOfAnswer);
                             o.dtTim2 = DateTime.Now;
                             foreach (SortedList<string, bool> sl in vfbLock)
-                                if (sl.ContainsKey(e.ID))
-                                    sl[e.ID] = true;
+                                if (sl.ContainsKey(nee_submitting.ID))
+                                    sl[nee_submitting.ID] = true;
                             Dispatcher.InvokeAsync(() =>
                             {
                                 bool toSubm = true;
                                 foreach (Op1SlotView vw in tbcSl.Items.OfType<Op1SlotView>())
                                 {
                                     TextBlock t = null;
-                                    if (vw.vDt2.TryGetValue(e.ID, out t))
+                                    if (vw.vDt2.TryGetValue(nee_submitting.ID, out t))
                                         t.Text = o.dtTim2.ToString(DT.hh);
-                                    if (vw.vMark.TryGetValue(e.ID, out t))
+                                    if (vw.vMark.TryGetValue(nee_submitting.ID, out t))
                                         t.Text = o.Grade;
                                     CheckBox cbx;
-                                    if (vw.vLock.TryGetValue(e.ID, out cbx))
+                                    if (vw.vLock.TryGetValue(nee_submitting.ID, out cbx))
                                     {
                                         cbx.IsChecked = true;
                                         cbx.IsEnabled = false;
                                     }
-                                    if(vw.vAbsen.TryGetValue(e.ID, out cbx))
+                                    if(vw.vAbsen.TryGetValue(nee_submitting.ID, out cbx))
                                         cbx.IsChecked = cbx.IsEnabled = false;
                                     if (!vw.ToSubmit())
                                         toSubm = false;
@@ -345,7 +340,7 @@ namespace sQzServer1
                         }
                         else
                         {
-                            mCbMsg += Txt.s._((int)TxI.NEEID_NF) + ' ' + e.ID;
+                            mCbMsg += Txt.s._((int)TxI.NEEID_NF) + ' ' + nee_submitting.ID;
                             outMsg = BitConverter.GetBytes((int)TxI.NEEID_NF);
                         }
                     }
@@ -384,7 +379,7 @@ namespace sQzServer1
                             WPopup.s.ShowDialog("QuestRetrieving: Date time not match!"));
                         break;
                     }
-                    if (Slot.ReadBytes_QPacksNoDateTime(buf, ref offs))
+                    if (!Slot.ReadBytes_QPacksNoDateTime(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() => 
                             WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_Q_NOK)));

@@ -76,9 +76,23 @@ namespace sQzLib
 
         public bool ReadBytes_QPacksNoDateTime(byte[] buf, ref int offs)
         {
-            //if (QuestionPacks.ReadByte(buf, ref offs))
-            //    return true;
-            return false;
+            if (buf == null)
+                return false;
+            if (buf.Length - offs < 0)
+                return false;
+            int n = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            if (n < 0)
+                return false;
+            while (0 < n)
+            {
+                --n;
+                QuestPack pack = new QuestPack();
+                if (!pack.ReadByte(buf, ref offs))
+                    return false;
+                QuestionPacks.Add(pack.TestType, pack);
+            }
+            return true;
         }
 
         public byte[] GetBytes_NextQSheet(int testType)

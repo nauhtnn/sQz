@@ -27,6 +27,7 @@ namespace sQzLib
         public List<byte[]> ToByte()
         {
             List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(TestType));
             l.Add(BitConverter.GetBytes(vSheet.Values.Count));
             foreach (QuestSheet qs in vSheet.Values)
                 foreach (byte[] i in qs.ToByte())
@@ -39,21 +40,29 @@ namespace sQzLib
         {
             vSheet.Clear();
             if (buf == null)
-                return true;
+                return false;
             int offs0 = offs;
             int l = buf.Length - offs;
+
+
             if (l < 4)
-                return true;
+                return false;
+            TestType = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            l -= 4;
+
+            if (l < 4)
+                return false;
             int nSh = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
             if (nSh < 0)
-                return true;
+                return false;
             while(0 < nSh)
             {
                 QuestSheet qs = new QuestSheet();
                 if(qs.ReadByte(buf, ref offs))
-                    return true;
+                    return false;
                 if (!vSheet.ContainsKey(qs.ID))
                 {
                     vSheet.Add(qs.ID, qs);
@@ -62,7 +71,7 @@ namespace sQzLib
             }
             mNextQSIdx = 0;
             mMaxQSIdx = vSheet.Keys.Count - 1;
-            return false;
+            return true;
         }
 
         //public static List<string> DBSelectQStId(DateTime dt)

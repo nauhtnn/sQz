@@ -483,20 +483,19 @@ namespace sQzLib
                 answerPack.ExtractKey(pack.vSheet.Values);
                 AnswerKeyPacks.Add(pack.TestType, answerPack);
             }
-                //foreach(QuestSheet qs in pack.vSheet.Values)
-                //    AnswerKeyPacks.ExtractKey(qs);
             eMsg = string.Empty;
             return false;
         }
 
         public byte[] GetBytes_QPacksWithDateTime(int rid)
         {
-            throw new NotImplementedException();
-            //List<byte[]> l = new List<byte[]>();
-            //l.Add(BitConverter.GetBytes(mDt.ToBinary()));
-            //l.InsertRange(l.Count, QuestionPack.ToByte());
+            List<byte[]> l = new List<byte[]>();
+            l.Add(BitConverter.GetBytes(mDt.ToBinary()));
+            l.Add(BitConverter.GetBytes(QuestionPacks.Count));
+            foreach(QuestPack pack in QuestionPacks.Values)
+                l.InsertRange(l.Count, pack.ToByte());
 
-            //return Utils.ToArray_FromListOfBytes(l);
+            return Utils.ToArray_FromListOfBytes(l);
         }
 
         public Dictionary<int, int> MaxNumberOfExaminees_PerTestType()
