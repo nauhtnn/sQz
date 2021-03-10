@@ -473,7 +473,7 @@ namespace sQzServer1
             txtId.Text = s._((int)TxI.NEEID_S);
             txtName.Text = s._((int)TxI.NEE_NAME);
             txtBirdate.Text = s._((int)TxI.BIRDATE);
-            txtBirpl.Text = s._((int)TxI.BIRPL);
+            txtBirpl.Text = "Test type";// s._((int)TxI.BIRPL);
             txtComp.Text = s._((int)TxI.COMP);
             txtT1.Text = s._((int)TxI.T1);
             txtT2.Text = s._((int)TxI.T2);

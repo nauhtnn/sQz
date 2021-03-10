@@ -15,6 +15,7 @@ namespace sQzLib
         public byte[] aQuest;
         public int TestType;
         private QIdxComparer<Question> SavedQuestOrderInDB;
+        private QIdxComparer<QSheetSection> SavedSectionOrderInDB;
         //public int Count { get { return IndependentQuestions.Count; } }
         //public string CountPassage {
         //    get {
@@ -545,8 +546,15 @@ namespace sQzLib
                     tempSections[q.SectionID].Questions.Add(q);
             }
 
-            foreach (QSheetSection section in Sections)
-                section.Questions.Sort(SavedQuestOrderInDB);
+            if(SavedQuestOrderInDB != null)
+            {
+                foreach (QSheetSection section in Sections)
+                    section.Questions.Sort(SavedQuestOrderInDB);
+
+                SavedSectionOrderInDB = new QIdxComparer<QSheetSection>();
+                SavedSectionOrderInDB.vIdx = SavedQuestOrderInDB.vIdx;
+                Sections.Sort(SavedSectionOrderInDB);
+            }
         }
 
         private void Safe_AddTempSection(Dictionary<int, QSheetSection> tempSections, QSheetSection section)
@@ -741,7 +749,7 @@ namespace sQzLib
 
     public class QIdxComparer<T> : Comparer<T>
     {
-        SortedList<int, int> vIdx;
+        public SortedList<int, int> vIdx;
 
         public QIdxComparer()
         {
@@ -757,16 +765,34 @@ namespace sQzLib
         {
             Question qx = x as Question;
             if (qx == null)
-                return 0;
+                return CompareSections(x, y);
             Question qy = y as Question;
             if (qy == null)
-                return 0;
+                return CompareSections(x, y);
+            return CompareQuestions(qx, qy);
+        }
+
+        private int CompareQuestions(Question qx, Question qy)
+        {
             if (vIdx[qx.uId] < vIdx[qy.uId])
                 return -1;
             else if (vIdx[qx.uId] == vIdx[qy.uId])
                 return 0;
             return 1;
+        }
 
+        private int CompareSections(T x, T y)
+        {
+            QSheetSection sx = x as QSheetSection;
+            if (sx == null)
+                return 0;
+            QSheetSection sy = y as QSheetSection;
+            if (sy == null)
+                return 0;
+            if (sx.Questions == null || sy.Questions == null ||
+                sx.Questions.Count == 0 || sy.Questions.Count == 0)
+                return 0;
+            return CompareQuestions(sx.Questions.First(), sy.Questions.First());
         }
     }
 

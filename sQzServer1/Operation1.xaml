@@ -24,7 +24,7 @@
                     <Button x:Name="btnSubmit" Width="120" Height="40" Click="btnSubmit_Click" Background="#f4f4f4" Foreground="#838383"
                             Margin="10,10,10,10" IsEnabled="False"/>
                     <Button x:Name="btnPrint" Width="120" Height="40" Click="btnPrint_Click"  Background="#f4f4f4" Foreground="#838383"
-                            Margin="10,10,10,50" IsEnabled="True"/>
+                            Margin="10,10,10,50" IsEnabled="True" Visibility="Hidden"/>
                     <Button x:Name="btnClose" Width="120" Height="40" Click="btnClose_Click" Background="#f15a23" Foreground="#fff"
                         Margin="10,10,10,10"/>
                     <Button Name="btnHck" Width="60" Height="40" Click="btnHck_Click" Background="#f4f4f4" Foreground="#fff"
@@ -38,7 +38,7 @@
                                     <ColumnDefinition Width="60"/>
                                     <ColumnDefinition Width="200"/>
                                     <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="200"/>
+                                    <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="80"/>
                                     <ColumnDefinition Width="80"/>
