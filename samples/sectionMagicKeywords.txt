@@ -1,0 +1,3 @@
+PART 
+PassageWithBlanks	blank	following [text|passage]
+BasicPassage	following [text|passage]
