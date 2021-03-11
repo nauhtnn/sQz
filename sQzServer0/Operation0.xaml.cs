@@ -98,20 +98,10 @@ namespace sQzServer0
         {
             if (tbxDuration.Text == null || tbxDuration.Text.Length == 0)
                 return false;
-            string[] parts = tbxDuration.Text.Split(':');
-            if (parts.Length != 3 || parts[0].Length == 0
-                || parts[1].Length == 0 || parts[2].Length == 0)
-                return false;
-            int hours;
-            if (!int.TryParse(parts[0], out hours))
-                return false;
             int minutes;
-            if (!int.TryParse(parts[1], out minutes))
+            if (!int.TryParse(tbxDuration.Text, out minutes))
                 return false;
-            int seconds;
-            if (!int.TryParse(parts[2], out seconds))
-                return false;
-            TestDuration = new TimeSpan(hours, minutes, seconds);
+            TestDuration = new TimeSpan(0, minutes, 0);
             tbxDuration.IsEnabled = false;
             return true;
         }
@@ -269,6 +259,9 @@ namespace sQzServer0
             btnMMenu.Content = t._((int)TxI.BACK_MMENU);
             btnQGen.Content = t._((int)TxI.QS_GEN);
             //btnQSav.Content = t._((int)TxI.OP_Q_SAV);
+            txtSubject.Text = t._((int)TxI.SUBJECT);
+            txtDuration.Text = t._((int)TxI.DURATION) +
+                "(" + t._((int)TxI.MINUTE) + ")";
 
             txtDate.Text = DT._;
 

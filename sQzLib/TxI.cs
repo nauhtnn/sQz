@@ -152,5 +152,8 @@ namespace sQzLib {
 		OP1_Q_NOK,
 		OP1_KEY_NOK,
 		OP1_EXIT_CAUT,
+		SUBJECT,
+		DURATION,
+		MINUTE,
 	}
 }

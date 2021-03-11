@@ -111,6 +111,11 @@ namespace sQzLib
                 return string.Empty;
             return s.Substring(0, j + 1);
         }
+
+        public static Tuple<int, int> GetMinutesAndSeconds(TimeSpan timeSpan)
+        {
+
+        }
     }
 
     public class UICbMsg
