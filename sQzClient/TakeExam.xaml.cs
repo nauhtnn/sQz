@@ -81,14 +81,14 @@ namespace sQzClient
 
             InitRemainingTime();
 
-            txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
+            txtRTime.Text = "" + Utils.GetMinutes(dtRemn) + " : " + dtRemn.Seconds;
             kLogIntvl = new TimeSpan(0, 0, 30);
 
             System.Text.StringBuilder msg = new System.Text.StringBuilder();
             msg.Append(thisExaminee.ID + " (" + thisExaminee.Name + ")");
             if (thisExaminee.kDtDuration.Equals(thisExaminee.FullTestDuration))
                 msg.AppendFormat(Txt.s._((int)TxI.EXAMING_MSG_1),
-                    thisExaminee.kDtDuration.Minutes, thisExaminee.kDtDuration.Seconds);
+                    Utils.GetMinutes(thisExaminee.kDtDuration));
             else
                 msg.AppendFormat(Txt.s._((int)TxI.EXAMING_MSG_2),
                     thisExaminee.kDtDuration.Minutes, thisExaminee.kDtDuration.Seconds);
@@ -289,7 +289,7 @@ namespace sQzClient
             DisableAll();
             mState = NetCode.Submiting;
             thisExaminee.eStt = NeeStt.Submitting;
-            thisExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+            thisExaminee.ToLogFile(Utils.GetMinutes(dtRemn), dtRemn.Seconds);
             if (mClnt.ConnectWR(ref mCbMsg))
                 bBtnBusy = false;
         }
@@ -396,11 +396,11 @@ namespace sQzClient
                     if (thisExaminee.AnswerSheet.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
                     {
                         dtLastLog = DateTime.Now;
-                        thisExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+                        thisExaminee.ToLogFile(Utils.GetMinutes(dtRemn), dtRemn.Seconds);
                     }
                     Dispatcher.Invoke(() =>
                     {
-                        txtRTime.Text = dtRemn.Minutes.ToString() + " : " + dtRemn.Seconds;
+                        txtRTime.Text = Utils.GetMinutes(dtRemn).ToString() + " : " + dtRemn.Seconds;
                         if (!btnSubmit.IsEnabled && dtRemn.Minutes < SMT_OK_M
                                 && dtRemn.Seconds < SMT_OK_S)
                             btnSubmit.IsEnabled = true;
@@ -444,7 +444,7 @@ namespace sQzClient
             //WPopup.s.wpCb = null;
             //bBtnBusy = false;
             if (thisExaminee.AnswerSheet.bChanged)
-                thisExaminee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+                thisExaminee.ToLogFile(Utils.GetMinutes(dtRemn), dtRemn.Seconds);
             Window.GetWindow(this).Close();
         }
 

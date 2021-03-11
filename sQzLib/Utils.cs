@@ -112,9 +112,9 @@ namespace sQzLib
             return s.Substring(0, j + 1);
         }
 
-        public static Tuple<int, int> GetMinutesAndSeconds(TimeSpan timeSpan)
+        public static int GetMinutes(TimeSpan timeSpan)
         {
-
+            return timeSpan.Hours * 60 + timeSpan.Minutes;
         }
     }
 

@@ -692,6 +692,8 @@ namespace sQzLib
                 SavedQuestOrderInDB.Add((int)qid, reader.GetInt32(2));
             }
             reader.Close();
+            if (questionIDs.Count == 0)
+                return true;
             StringBuilder condition_IDs = new StringBuilder();
             condition_IDs.Append("(");
             foreach (int id in questionIDs)

@@ -146,8 +146,9 @@ namespace sQzClient
                             StringBuilder sb = new StringBuilder();
                             sb.Append(Txt.s._((int)TxI.DATE) + mDt.ToString(DT.RR));
                             if (subject != null)
-                                sb.Append(". " + TxI.SUBJECT + ": " + subject);
-                            sb.Append(". " + TxI.DURATION + ": " + thisExaminee.FullTestDuration.ToString());
+                                sb.Append(". " + Txt.s._((int)TxI.SUBJECT) + ": " + subject + ". ");
+                            sb.Append(Txt.s._((int)TxI.DURATION) + ": " + thisExaminee.FullTestDuration +
+                                " " + Txt.s._((int)TxI.MINUTE));
                             txtDate.Text = sb.ToString();
                             EnableControls();
                             btnReconn.IsEnabled = false;
