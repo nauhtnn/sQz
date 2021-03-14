@@ -175,6 +175,7 @@ namespace sQzLib
             int n = DBConnect.Update(conn, "sqz_slot", "status=" + (int)eStt,
                 "dt='" + mDt.ToString(DT._) + "'",
                 out emsg);
+            DBConnect.Close(ref conn);
             if (0 < n)
                 return null;
             return emsg;
@@ -420,6 +421,7 @@ namespace sQzLib
                 DBConnect.Close(ref conn);
                 return rv;
             }
+            DBConnect.Close(ref conn);
             eMsg = "Room id " + rid + " is not found";
             return true;
         }
