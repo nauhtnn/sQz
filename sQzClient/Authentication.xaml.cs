@@ -86,7 +86,7 @@ namespace sQzClient
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bRunning = false;
-            WPopup.s.cncl = false;
+            WPopup.s.OwnerClosing = true;
             mClnt.Close();
         }
 
@@ -366,7 +366,7 @@ namespace sQzClient
                     Dispatcher.Invoke(() =>
                     {
                         spMain.Opacity = 0.5;
-                        WPopup.s.ShowDialog(Txt.s._((int)TxI.CONN_NOK) + "\n" + mCbMsg.txt);
+                        WPopup.s.ShowDialog(Txt.s._((int)TxI.CONN_NOK));
                         spMain.Opacity = 1;
                         btnReconn.IsEnabled = true;
                     });

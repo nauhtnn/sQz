@@ -116,9 +116,9 @@ namespace sQzServer1
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
-            WPopup.s.wpCb = Exit;
             WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_EXIT_CAUT),
-                Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), null);
+                Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL),
+                null, Exit, null);
         }
 
         private void Exit()

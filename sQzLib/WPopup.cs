@@ -21,26 +21,39 @@ namespace sQzLib
         public PopupCallBack OK_CallBack;
         public PopupCallBack Cancel_CallBack;
         public string Password;
+        public bool IsButtonOK_Clicked;
 
-        public DialogData(string message)
-        {
-            Message = message;
-            ButtonsVisibility = Visibility.Collapsed;
-            OK_CallBack = null;
-            Cancel_CallBack = null;
-            Password = string.Empty;
-        }
-
-        public DialogData(string message, string ok_text, string cancel_text,
+        private void _Init(string message, string ok_text, string cancel_text,
             string password, PopupCallBack OK_callBack, PopupCallBack cancel_CallBack)
         {
             Message = message;
-            ButtonsVisibility = Visibility.Visible;
+            if ((ok_text == null || ok_text.Length == 0) &&
+                (cancel_text == null || cancel_text.Length == 0))
+                ButtonsVisibility = Visibility.Collapsed;
+            else
+                ButtonsVisibility = Visibility.Visible;
             OK_CallBack = OK_callBack;
             Cancel_CallBack = cancel_CallBack;
             buttonOK_text = ok_text;
             buttonCancel_text = cancel_text;
             Password = password;
+            IsButtonOK_Clicked = false;
+        }
+
+        public DialogData(string message)
+        {
+            _Init(message, string.Empty, string.Empty, string.Empty, null, null);
+        }
+
+        public DialogData(string message, PopupCallBack cancel_CallBack)
+        {
+            _Init(message, string.Empty, string.Empty, string.Empty, null, cancel_CallBack);
+        }
+
+        public DialogData(string message, string ok_text, string cancel_text,
+            string password, PopupCallBack OK_callBack, PopupCallBack cancel_CallBack)
+        {
+            _Init(message, ok_text, cancel_text, password, OK_callBack, cancel_CallBack);
         }
     }
 
@@ -48,16 +61,15 @@ namespace sQzLib
     {
         Window mW;
         TextBlock MessageView;
-        TextBox mC;
+        TextBox PasswordTextBox;
         static WPopup _s;
         Button mBtnOk;
         Button mBtnCncl;
         Grid mG;
-        bool bOk;
         Queue<string> Messages;
         Queue<DialogData> dialogDataQueue;
-        bool bCnclEvnt;
-        string mCode;
+        public bool OwnerClosing;
+        string Password;
         WPopup()
         {
             isClose = false;
@@ -91,11 +103,11 @@ namespace sQzLib
             Grid.SetColumnSpan(MessageView, 2);
             mG.Children.Add(MessageView);
 
-            mC = new TextBox();
-            mC.TextAlignment = TextAlignment.Center;
-            Grid.SetRow(mC, 1);
-            Grid.SetColumnSpan(mC, 2);
-            mG.Children.Add(mC);
+            PasswordTextBox = new TextBox();
+            PasswordTextBox.TextAlignment = TextAlignment.Center;
+            Grid.SetRow(PasswordTextBox, 1);
+            Grid.SetColumnSpan(PasswordTextBox, 2);
+            mG.Children.Add(PasswordTextBox);
 
             mBtnOk = new Button();
             mBtnOk.Click += BtnOk_Click;
@@ -112,10 +124,9 @@ namespace sQzLib
 
             dialogDataQueue = new Queue<DialogData>();
 
-            bOk = false;
             Messages = new Queue<string>();
-            bCnclEvnt = true;
-            mCode = null;
+            OwnerClosing = false;
+            Password = null;
         }
 
         private void BtnCncl_Click(object sender, RoutedEventArgs e)
@@ -128,10 +139,11 @@ namespace sQzLib
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            if (mCode == null || mCode == mC.Text)
+            if (Password == null || Password.Length == 0 ||
+                Password == PasswordTextBox.Text)
             {
-                mC.Text = string.Empty;
-                bOk = true;
+                PasswordTextBox.Text = string.Empty;
+                dialogDataQueue.Peek().IsButtonOK_Clicked = true;
                 if (isClose)
                     return;
                 isClose = true;
@@ -177,18 +189,22 @@ namespace sQzLib
 
         public void Exit()
         {
-            cncl = false;
+            OwnerClosing = true;
             if (isClose)
                 return;
             isClose = true;
             mW.Close();
         }
 
-        public bool cncl { set { bCnclEvnt = value; } }
-
-        public void ShowDialog(string msg, PopupCallBack n)
+        public void ShowDialog(string msg)
         {
             dialogDataQueue.Enqueue(new DialogData(msg));
+            ShowDialog();
+        }
+
+        public void ShowDialog(string msg, PopupCallBack cancel_CallBack)
+        {
+            dialogDataQueue.Enqueue(new DialogData(msg, cancel_CallBack));
             ShowDialog();
         }
 
@@ -223,16 +239,16 @@ namespace sQzLib
 
         private void wPopup_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            if (bCnclEvnt)
+            if (!OwnerClosing)
                 e.Cancel = true;
-            if (bOk)
+            if(dialogDataQueue.Count > 0)
             {
-                dialogDataQueue.Peek().OK_CallBack.Invoke();
-                bOk = false;
+                if (dialogDataQueue.Peek().IsButtonOK_Clicked)
+                    dialogDataQueue.Peek().OK_CallBack?.Invoke();
+                else
+                    dialogDataQueue.Peek().Cancel_CallBack?.Invoke();
+                dialogDataQueue.Dequeue();
             }
-            else
-                dialogDataQueue.Peek().Cancel_CallBack.Invoke();
-            dialogDataQueue.Dequeue();
             if (dialogDataQueue.Count == 0)
             {
                 Window s = sender as Window;
