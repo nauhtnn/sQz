@@ -147,7 +147,8 @@ namespace sQzClient
                             sb.Append(Txt.s._((int)TxI.DATE) + mDt.ToString(DT.RR));
                             if (subject != null)
                                 sb.Append(". " + Txt.s._((int)TxI.SUBJECT) + ": " + subject + ". ");
-                            sb.Append(Txt.s._((int)TxI.DURATION) + ": " + thisExaminee.FullTestDuration +
+                            sb.Append(Txt.s._((int)TxI.DURATION) + ": " +
+                                Utils.GetMinutes(thisExaminee.FullTestDuration) +
                                 " " + Txt.s._((int)TxI.MINUTE));
                             txtDate.Text = sb.ToString();
                             EnableControls();
@@ -365,7 +366,7 @@ namespace sQzClient
                     Dispatcher.Invoke(() =>
                     {
                         spMain.Opacity = 0.5;
-                        WPopup.s.ShowDialog(Txt.s._((int)TxI.CONN_NOK));
+                        WPopup.s.ShowDialog(Txt.s._((int)TxI.CONN_NOK) + "\n" + mCbMsg.txt);
                         spMain.Opacity = 1;
                         btnReconn.IsEnabled = true;
                     });
