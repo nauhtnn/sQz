@@ -69,10 +69,9 @@ namespace sQzLib
         Queue<string> Messages;
         Queue<DialogData> dialogDataQueue;
         public bool OwnerClosing;
-        string Password;
         WPopup()
         {
-            isClose = false;
+            IsClosingRequestPending = false;
             mW = new Window();
             mW.Title = Txt.s._((int)TxI.POPUP_TIT);
             mW.Closing += wPopup_Closing;
@@ -126,27 +125,27 @@ namespace sQzLib
 
             Messages = new Queue<string>();
             OwnerClosing = false;
-            Password = null;
         }
 
         private void BtnCncl_Click(object sender, RoutedEventArgs e)
         {
-            if (isClose)
+            if (IsClosingRequestPending)
                 return;
-            isClose = true;
+            IsClosingRequestPending = true;
             mW.Close();
         }
 
         private void BtnOk_Click(object sender, RoutedEventArgs e)
         {
-            if (Password == null || Password.Length == 0 ||
-                Password == PasswordTextBox.Text)
+            string password = dialogDataQueue.Peek().Password;
+            if (password == null || password.Length == 0 ||
+                password == PasswordTextBox.Text)
             {
                 PasswordTextBox.Text = string.Empty;
                 dialogDataQueue.Peek().IsButtonOK_Clicked = true;
-                if (isClose)
+                if (IsClosingRequestPending)
                     return;
-                isClose = true;
+                IsClosingRequestPending = true;
                 mW.Close();
             }
         }
@@ -185,14 +184,14 @@ namespace sQzLib
             }
         }
 
-        private bool isClose;
+        private bool IsClosingRequestPending;
 
         public void Exit()
         {
             OwnerClosing = true;
-            if (isClose)
+            if (IsClosingRequestPending)
                 return;
-            isClose = true;
+            IsClosingRequestPending = true;
             mW.Close();
         }
 
@@ -239,6 +238,7 @@ namespace sQzLib
 
         private void wPopup_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
+            IsClosingRequestPending = false;
             if (!OwnerClosing)
                 e.Cancel = true;
             if(dialogDataQueue.Count > 0)

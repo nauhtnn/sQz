@@ -437,7 +437,7 @@ namespace sQzClient
 
         void Exit()
         {
-            //bBtnBusy = false;
+            bBtnBusy = false;
             if (thisExaminee.AnswerSheet.bChanged)
                 thisExaminee.ToLogFile(Utils.GetMinutes(dtRemn), dtRemn.Seconds);
             Window.GetWindow(this).Close();
