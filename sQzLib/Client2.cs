@@ -66,7 +66,10 @@ namespace sQzLib
         public bool ConnectWR(ref UICbMsg cbMsg)
         {
             if (mTcpClnt != null)
+            {
+                cbMsg += "Client 2 ConnectWR: mTcpClnt != null";
                 return false;
+            }
             mTcpClnt = new TcpClient(AddressFamily.InterNetwork);
             bool bConn = true;//srvr side
             bRW = true;//clnt side

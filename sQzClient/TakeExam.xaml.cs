@@ -77,7 +77,6 @@ namespace sQzClient
             LoadTxt();
 
             WPopup.nwIns(w);
-            WPopup.s.wpCbCncl = WPCancel;
 
             InitRemainingTime();
 
@@ -458,14 +457,13 @@ namespace sQzClient
             if (bBtnBusy)
                 return;
             bBtnBusy = true;
-            WPopup.s.wpCb = Exit;
             spMain.Opacity = 0.5;
             if (thisExaminee.eStt < NeeStt.Submitting)
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.EXIT_CAUT_1),
-                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), "exit");
+                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), "exit", Exit, null);
             else
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.EXIT_CAUT_2),
-                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), null);
+                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), null, null, null);
             spMain.Opacity = 1;
         }
 
