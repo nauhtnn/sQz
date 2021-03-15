@@ -61,6 +61,7 @@
     <Compile Include="ExamSlotA.cs" />
     <Compile Include="ExamSlotS0.cs" />
     <Compile Include="ExamSlotS1.cs" />
+    <Compile Include="QSheetExamineePrinter.cs" />
     <Compile Include="Question\PassageWithBlanks.cs" />
     <Compile Include="Question\IndependentQSection.cs" />
     <Compile Include="Question\BasicPassageSection.cs" />

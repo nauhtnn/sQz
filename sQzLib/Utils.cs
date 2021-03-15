@@ -174,6 +174,14 @@ namespace sQzLib
                         return line;
             return null;
         }
+
+        public static bool IsRichText(string text)
+        {
+            if (text.Length < 5 || !text.StartsWith("{\\rtf"))
+                return false;
+            else
+                return true;
+        }
     }
 
     public class UICbMsg

@@ -33,17 +33,9 @@ namespace sQzLib
 
         private UIElement CreateStemView(string text)
         {
-            if (IsRichText(text))
+            if (Utils.IsRichText(text))
                 return CreateStemView_RichText(text);
             return CreateStemView_PlainText(text);
-        }
-
-        private bool IsRichText(string text)
-        {
-            if (text.Length < 5 || !text.StartsWith("{\\rtf"))
-                return false;
-            else
-                return true;
         }
 
         private RichTextBox CreateStemView_RichText(string text)
