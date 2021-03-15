@@ -433,6 +433,10 @@ namespace sQzClient
                 SingleQuestionView question = child as SingleQuestionView;
                 if(question != null)
                     question.optionsView.IsEnabled = false;
+                BasicPassageSectionView passage = child as BasicPassageSectionView;
+                if (passage != null)
+                    foreach (SingleQuestionView q_view in passage.QuestionsViews)
+                        q_view.optionsView.IsEnabled = false;
             }
         }
 
