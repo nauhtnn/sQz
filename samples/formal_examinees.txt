@@ -1,0 +1,148 @@
+ĐL001	1	Nguyễn Thị Kim Chi	02/10/1998	3
+ĐL002	1	Nguyễn Thị Thu Hiền	30/07/1998	3
+ĐL003	1	Bùi Thị Thúy Huỳnh	1991	3
+ĐL004	1	Trần Thị Như Ngọc	14/03/1998	3
+ĐL005	1	Trần Bình Nguyên	15/04/1997	3
+ĐL006	1	Phạm Cẩm Nhung	15/06/1998	3
+ĐL007	1	Nguyễn Minh Thịnh	18/01/1993	3
+ĐL008	1	Trần Thị Cẩm Thu	10/10/1997	3
+ĐL009	1	Võ Lý Mai Trinh	13/02/1995	3
+ĐL010	1	Nguyễn Thị Thanh Trúc	07/05/1996	3
+CD011	1	Phạm Thị Băng Châu	04/04/1990	3
+CD012	1	Nguyễn Hữu Đang	24/11/1997	3
+CD013	1	Nguyễn Thị Quỳnh Hương	29/10/1997	3
+CD014	1	Nguyễn Văn Nhựt	12/06/1993	3
+CD015	1	Trần Hoa Ni	20/05/1998	3
+QP016	1	Trịnh Thị Hằng	02/08/1996	3
+QP017	1	Đinh Hoàng Phúc	21/05/1995	3
+TD018	1	Nguyễn Quốc Công	21/10/1997	3
+TD019	1	Thân Đông Đông Hồ	29/05/1995	3
+TD020	1	Phạm Thị Thúy Huỳnh	07/07/1998	3
+TD021	1	Nguyễn Minh Nghĩa	03/11/1998	3
+TD022	1	Võ Thành Phát	17/09/1996	3
+TD023	1	Trình Quang Quốc	12/11/1998	3
+TD024	1	Nguyễn Hoàng Sang	21/05/1998	3
+TD025	1	Nguyễn Cao Trí	14/09/1998	3
+TD026	1	Trần Nhựt Trường	12/01/1998	3
+TD027	1	Trần Bình Tuy	24/4/1997	3
+TD028	1	Nguyễn Phước Vinh	24/08/1995	3
+TD029	2	Trần Tấn Vũ	18/02/1996	3
+HH030	2	Phan Thị Lệ Duy	26/10/1997	3
+HH031	2	Nguyễn Long Hải	17/09/1994	3
+HH032	2	Nguyễn Thị Thanh Hương	26/10/1996	3
+HH033	2	Trần Quốc Khánh	25/10/1993	3
+HH034	2	Huỳnh Kim Lợi	12/12/1996	3
+HH035	2	Phạm Thị Trúc Ly	28/05/1995	3
+HH036	2	Nguyễn Thị Xuân Mai	21/05/1997	3
+HH037	2	Lê Thị Hoa Mận	12/04/1995	3
+HH038	2	Nguyễn Thị Kim Ngọc	30/12/1998	3
+HH039	2	Lý Thị Cẩm Nguyên	04/10/1994	3
+HH040	2	Hồ Đào Châu Pha	22/01/1997	3
+HH041	2	Lê Thị Trúc Phương	17/11/1994	3
+HH042	2	Nguyễn Văn Thắng	01/05/1993	3
+HH043	2	Nguyễn Huỳnh Minh Thông	28/08/1996	3
+HH044	2	Phạm Thị Kiều Tiên	15/12/1994	3
+HH045	2	Nguyễn Công Tòa	06/11/1998	3
+HH046	2	Phạm Thanh Toàn	10/05/1996	3
+HH047	2	Phạm Hoàng Trang	20/08/1995	3
+HH048	2	Trần Thị Huyền Trang	17/01/1991	3
+HH049	2	Nguyễn Anh Tuấn	21/04/1992	3
+HH050	2	Văn Khánh Vinh	06/01/1997	3
+HH051	2	Nguyễn Thị Kim Yến	20/02/1992	3
+KT052	4	Lê Ngọc Bích	07/06/1989	0
+KT053	4	Phạm Thị Ngọc Huyền	06/01/1989	0
+KT054	4	Nguyễn Thị Tuyết Loan	24/04/1981	0
+KT055	4	Dương Thị Bích Ngọc	03/11/1987	0
+KT056	4	Trần Thị Tuyết Nhung	25/09/1997	0
+KT057	4	Châu Thị Ngọc Sang	17/03/1987	0
+KT058	4	Nguyễn Thị Thảo Sương	05/02/1988	0
+KT059	4	Nguyễn Thị Thu Thảo	13/09/1995	0
+KT060	4	Nguyễn Thị Minh Thư	15/04/1992	0
+KT061	4	Võ Mai Thy	05/10/1992	0
+NN062	2	Vỏ Thị Thùy Trang	05/08/1997	3
+LS063	2	Nguyễn Thành Đạt	25/08/1995	3
+LS064	2	Nguyễn Hoàng Duy Phương	06/10/1990	3
+LS065	2	Nguyễn Thị Ngọc Trân	29/10/1998	3
+LS066	2	Nguyễn Như Ý	08/02/1997	3
+NV067	3	Nguyễn Lê Nhật Anh	19/11/1996	3
+NV068	3	Trương Thị Xuân Đào	1989	3
+NV069	3	Phạm Thị Thu Hà	28/09/1995	3
+NV070	3	Phạm Văn Hoàng Khoa	19/06/1997	3
+NV071	3	Võ Ngọc Thanh	22/10/1995	3
+NV072	3	Nguyễn Mai Thảo	15/02/1992	3
+NV073	3	Hà Tôn Thiên	27/07/1995	3
+NV074	3	Dương Anh Thư	11/02/1995	3
+NV075	3	Nguyễn Thị Mộng Thùy	10/03/1997	3
+NV076	3	Nguyễn Lê Mỹ Tiên	22/12/1996	3
+NV077	3	Hồ Phước Tiên	02/03/1998	3
+NV078	3	Võ Thị Kiều Trang	15/08/1998	3
+TB079	4	Mai Khánh Hào	12/06/1997	1
+TB080	4	Mai Huyền Linh	25/03/1990	1
+TB081	4	Huỳnh Thị Huyền Trân	22/07/1997	1
+TA082	3	Lê Hải Đăng	23/09/1994	3
+TA083	3	Đỗ Thanh Hải	04/08/1984	3
+TA084	3	Lê Xuân Hương	24/03/1994	3
+TA085	3	Nguyễn Huỳnh Công Lý	12/11/1993	3
+TA086	3	Trần Phước Sang	06/03/1996	3
+TA087	3	Nguyễn Hoàng Tuấn	29/11/1998	3
+TI088	3	Dương Thị Ngọc Trang	26/03/1998	3
+TO089	3	Nguyễn Quốc Bình	18/04/1996	3
+TO090	3	Phan Quốc Cường	03/06/1997	3
+TO091	3	Lê Thanh Hà	01/11/1993	3
+TO092	3	Bùi Thị Ngọc Huệ	15/11/1988	3
+TO093	3	Nguyễn Gia Khiêm	10/10/1997	3
+TO094	3	Đinh Văn Lộc	20/04/1998	3
+TO095	3	Ngô Thị Hồng Nga	15/06/1992	3
+TO096	3	Võ Thị Tuyết Ngân	01/11/1992	3
+TO097	3	Hà Trung Nghĩa	06/08/1997	3
+TO098	5	Trần Trí Nguyên	25/12/1995	3
+TO099	5	Châu Hòa Nhân	05/11/1997	3
+TO100	5	Hà Nguyễn Tuyết Như	02/08/1997	3
+TO101	5	Nguyễn Văn Nhuần	23/08/1993	3
+TO102	5	Trần Thị Thúy Quyên	02/06/1995	3
+TO103	5	Lê Nguyễn Xuân Sinh	21/01/1985	3
+TO104	5	Trần Đức Tài	17/06/1995	3
+TO105	5	Nguyễn Duy Thái	12/02/1997	3
+TO106	5	Trần Thị Hồng Thắm	26/08/1997	3
+TO107	5	Trần Thị Kim Thảo	1994	3
+TO108	5	Phạm Thị Cẩm Thu	05/01/1998	3
+TO109	5	Phạm Thị Hương Trà	24/10/1996	3
+TO110	5	Nguyễn Minh Trí	11/03/1991	3
+TO111	5	Trần Minh Trí	21/05/1993	3
+TO112	5	Huỳnh Ái Triều	15/12/1994	3
+TO113	5	Nguyễn Việt Trinh	11/06/1996	3
+TO114	5	Nguyễn Phước Trường	19/11/1990	3
+VT115	4	Nguyễn Thanh Phương	20/11/1989	2
+VT116	4	Trịnh Thị Thủy	20/06/1990	2
+VT117	4	Trần Thị Ngọc Trinh	09/06/1998	2
+VL118	5	Hồ Thị Thúy Ái	26/11/1990	3
+VL119	5	Huỳnh Thị Thùy An	25/02/1991	3
+VL120	5	Lê Hoài Bảo	06/11/1997	3
+VL121	5	Huỳnh Thị Kim Chi	08/02/1991	3
+VL122	5	Lê Thị Ngọc Chi	22/01/1993	3
+VL123	5	Võ Phạm Thùy Dương	01/10/1991	3
+VL124	5	Trần Nguyễn Hoàng Duy	23/09/1997	3
+VL125	5	Nguyễn Hải Đăng	21/12/1993	3
+VL126	5	Nguyễn Tấn Đạt	10/03/1987	3
+VL127	5	Nguyễn Thị Bé Hà	24/04/1989	3
+VL128	5	Nguyễn Thị Bích Liên	04/12/1998	3
+VL129	5	Nguyễn Hữu Lộc	30/06/1991	3
+VL130	5	Đinh Thị Tuyết Ngân	31/10/1996	3
+VL131	5	Đỗ Hoàng Nhân	11/11/1994	3
+VL132	5	Trần Thị Huế Nhơn	26/06/1992	3
+VL133	5	Huỳnh Như	11/11/1995	3
+VL134	5	Nguyễn Thị Hồng Nhung	06/05/1997	3
+VL135	5	Nguyễn Thành Phát	31/07/1997	3
+VL136	5	Đỗ Hoàng Đông Phương	12/12/1993	3
+VL137	5	Nguyễn Thị Lan Phương	04/01/1994	3
+VL138	5	Nguyễn Hồng Quân	09/03/1995	3
+VL139	5	Hồ Tấn Tài	17/08/1991	3
+VL140	5	Phan Trọng Thanh	01/03/1979	3
+VL141	5	Nguyễn Thị Ngọc Thảo	01/01/1991	3
+VL142	5	Chung Anh Công Thoại	18/06/1995	3
+VL143	5	Nguyễn Hoàng Thương	13/05/1994	3
+VL144	5	Nguyễn Thị Thanh Thúy	18/06/1997	3
+VL145	5	Phạm Thanh Tòng	09/11/1997	3
+VL146	5	Nguyễn Ngọc Trung	15/02/1985	3
+VL147	5	Nguyễn Ngọc Bảo Vi	16/03/1997	3
+VL148	5	Lê Thị Lệ Vy	20/12/1985	3
