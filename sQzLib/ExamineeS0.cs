@@ -111,51 +111,69 @@ namespace sQzLib
             dtTim2 = e.dtTim2;
         }
 
-        public int DBGetQSId()
+        public void DBGetQSId()
         {
             MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
-                return -1;
-            string qry = DBConnect.mkQrySelect("sqz_examinee", "qsid",
-                "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
+            {
+                TestType = -1;
+                AnswerSheet.QuestSheetID = -1;
+                return;
+            }
+            string qry = DBConnect.mkQrySelect("sqz_examinee AS a, sqz_nee_qsheet AS b", "t_type, qsid",
+                "a.dt='" + mDt.ToString(DT._) + "' AND a.id='" + ID + "' AND a.dt=b.dt AND a.id=b.neeid");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
                 DBConnect.Close(ref conn);
-                return -1;
+                TestType = -1;
+                AnswerSheet.QuestSheetID = -1;
+                return;
             }
-            int qsid = -1;
             if (reader.Read())
-                qsid = reader.GetInt32(0);
+            {
+                TestType = reader.GetInt32(0);
+                AnswerSheet.QuestSheetID = reader.GetInt32(1);
+            }
+            else
+            {
+                TestType = -1;
+                AnswerSheet.QuestSheetID = -1;
+            }
             reader.Close();
             DBConnect.Close(ref conn);
-            return qsid;
         }
 
-        public char[] DBGetAns()
+        public void DBGetAns()
         {
-            char[] noans = new char[AnswerSheet.BytesOfAnswer_Length];
-            for (int i = 0; i < AnswerSheet.BytesOfAnswer_Length; ++i)
-                noans[i] = Question.C0;
+            AnswerSheet.BytesOfAnswer = null;
+            AnswerSheet.BytesOfAnswer_Length = 0;
             MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
-                return noans;
-            string qry = DBConnect.mkQrySelect("sqz_examinee", "ans",
-                "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
+                return;
+            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "ans",
+                "dt='" + mDt.ToString(DT._) + "' AND neeid='" + ID + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
                 DBConnect.Close(ref conn);
-                return noans;
+                return;
             }
-            string ans = noans.ToString();
+            char[] ans = null;
             if (reader.Read())
-                ans = reader.GetString(0);
+                ans = reader.GetString(0).ToCharArray();
             reader.Close();
             DBConnect.Close(ref conn);
-            return ans.ToCharArray();
+            if(ans != null && ans.Length > 0)
+            {
+                AnswerSheet.BytesOfAnswer = new byte[ans.Length];
+                AnswerSheet.BytesOfAnswer_Length = AnswerSheet.BytesOfAnswer.Length;
+                for (int i = 0; i < ans.Length; ++i)
+                    if (ans[i] == Question.C1)
+                        AnswerSheet.BytesOfAnswer[i] = 1;
+            }
         }
 
         public bool DBSelGrade()
@@ -163,8 +181,8 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return true;
-            string qry = DBConnect.mkQrySelect("sqz_examinee", "grade",
-                "dt='" + mDt.ToString(DT._) + "' AND id=" + ID);
+            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "grade",
+                "dt='" + mDt.ToString(DT._) + "' AND neeid='" + ID + "'");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)

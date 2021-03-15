@@ -324,7 +324,7 @@ namespace sQzServer0
             }
             Slot.DBSelStt();
             Slot.DBSelNee();
-            if (Slot.DBSelArchive(out emsg))
+            if (Slot.DBSelectArchiveQPacks_and_AnsPack(out emsg))
             {
                 WPopup.s.ShowDialog(emsg);
                 return;

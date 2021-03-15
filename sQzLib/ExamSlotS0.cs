@@ -479,7 +479,7 @@ namespace sQzLib
             return false;
         }
 
-        public bool DBSelArchive(out string eMsg)
+        public bool DBSelectArchiveQPacks_and_AnsPack(out string eMsg)
         {
             QuestionPacks.Clear();
             //AnswerKeyPacks.Clear();
