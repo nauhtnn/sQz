@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Windows.Controls;
 
 namespace sQzLib
 {
@@ -182,6 +183,8 @@ namespace sQzLib
             else
                 return true;
         }
+
+        public static RichTextBox Convert
     }
 
     public class UICbMsg

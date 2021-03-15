@@ -128,5 +128,29 @@ namespace sQzLib
             if (mDocx != null)
                 mDocx.Close();
         }
+
+        private Paragraph WriteRichText(string text)
+        {
+            RichTextBox richText = new RichTextBox();
+            byte[] bytes = new byte[text.Length];
+            char[] chars = text.ToCharArray();
+            for (int i = 0; i < text.Length; ++i)
+                bytes[i] = (byte)chars[i];
+            System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
+            var range = new System.Windows.Documents.TextRange(richText.Document.ContentStart, richText.Document.ContentEnd);
+            range.Load(stream, System.Windows.DataFormats.Rtf);
+            foreach (System.Windows.Documents.Paragraph p in
+                richText.Document.Blocks.OfType<System.Windows.Documents.Paragraph>())
+            {
+                foreach (System.Windows.Documents.Run run
+                    in p.Inlines.OfType<System.Windows.Documents.Run>())
+                    foreach(System.Windows.TextDecoration decor in run.TextDecorations)
+                        if(decor.Equals(System.Windows.TextDecorations.Underline))
+                        {
+
+                        }
+                
+            }
+        }
     }
 }
