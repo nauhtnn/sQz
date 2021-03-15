@@ -40,6 +40,11 @@ namespace sQzLib
             }
         }
 
+        public string GetGlobalID_withTestType()
+        {
+            return (TestType * 100 + ID).ToString("d3");
+        }
+
         public int CountAllQuestions()
         {
             int count = 0;

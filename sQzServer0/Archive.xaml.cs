@@ -291,7 +291,9 @@ namespace sQzServer0
             QuestSheet qs = null;
             if(Slot.QuestionPacks.ContainsKey(nee.TestType) &&
                 Slot.QuestionPacks[nee.TestType].vSheet.ContainsKey(nee.AnswerSheet.QuestSheetID))
+            {
                 qs = Slot.QuestionPacks[nee.TestType].vSheet[nee.AnswerSheet.QuestSheetID];
+            }
             //if (qs == null)
             //{
             //    string t = nee.DBGetT();
@@ -328,10 +330,10 @@ namespace sQzServer0
             nee.DBSelGrade();
             StackPanel spl = new StackPanel();
             TextBlock tx = new TextBlock();
-            tx.Text = Txt.s._((int)TxI.QS_ID) + ' ' + qs.ID + ", ";
+            tx.Text = Txt.s._((int)TxI.QS_ID) + ' ' + qs.GetGlobalID_withTestType() + ", ";
             spl.Children.Add(tx);
             tx = new TextBlock();
-            tx.Text = Txt.s._((int)TxI.MARK) + ' ' + nee.Grade;
+            tx.Text = "Test type: " + nee.TestType + ", " + Txt.s._((int)TxI.MARK) + ' ' + nee.Grade;
             spl.Children.Add(tx);
             ScrollViewer svwr = new ScrollViewer();
             svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;

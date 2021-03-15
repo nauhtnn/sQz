@@ -128,6 +128,7 @@ namespace sQzLib
                 foreach(int qsid in qsids)
                 {
                     QuestSheet qs = new QuestSheet();
+                    qs.TestType = TestType;
                     if (qs.DBSelect(conn, mDt, qsid, out eMsg))
                     {
                         DBConnect.Close(ref conn);
