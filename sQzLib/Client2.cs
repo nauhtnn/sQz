@@ -74,8 +74,14 @@ namespace sQzLib
             bool bConn = true;//srvr side
             bRW = true;//clnt side
             try {
-                mTcpClnt.Connect(mSrvrAddr, mSrvrPort);
-            } catch (SocketException e) {
+                mTcpClnt.ConnectAsync(mSrvrAddr, mSrvrPort).Wait(5000);
+            }
+            catch(AggregateException e)
+            {
+                cbMsg += "\nEx: " + e.Message;
+                bConn = false;
+            }
+            catch (SocketException e) {
                 if (ErrCode2Msg(e.ErrorCode, ref cbMsg))
                     cbMsg += "\nEx: " + e.Message;
                 bConn = false;
