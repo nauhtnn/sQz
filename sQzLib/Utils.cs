@@ -184,7 +184,19 @@ namespace sQzLib
                 return true;
         }
 
-        public static RichTextBox Convert
+        public static RichTextBox GetRichText(string text)
+        {
+            RichTextBox richText = new RichTextBox();
+            byte[] bytes = new byte[text.Length];
+            char[] chars = text.ToCharArray();
+            for (int i = 0; i < text.Length; ++i)
+                bytes[i] = (byte)chars[i];
+            System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
+            var range = new System.Windows.Documents.TextRange(richText.Document.ContentStart, richText.Document.ContentEnd);
+            range.Load(stream, System.Windows.DataFormats.Rtf);
+
+            return richText;
+        }
     }
 
     public class UICbMsg

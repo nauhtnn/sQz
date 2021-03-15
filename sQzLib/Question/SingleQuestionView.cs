@@ -40,7 +40,7 @@ namespace sQzLib
 
         private RichTextBox CreateStemView_RichText(string text)
         {
-            RichTextBox richText = new RichTextBox();
+            RichTextBox richText = Utils.GetRichText(text);
             richText.Focusable = false;
             richText.Width = StemWidth;
             richText.Background = Theme.s._[(int)BrushId.Q_BG];
@@ -48,13 +48,7 @@ namespace sQzLib
             richText.BorderThickness = new Thickness(0, 4, 0, 0);
             Thickness zero = new Thickness(0);
             richText.Margin = richText.Padding = zero;
-            byte[] bytes = new byte[text.Length];
-            char[] chars = text.ToCharArray();
-            for (int i = 0; i < text.Length; ++i)
-                bytes[i] = (byte)chars[i];
-            System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
             TextRange range = new TextRange(richText.Document.ContentStart, richText.Document.ContentEnd);
-            range.Load(stream, DataFormats.Rtf);
             range.ApplyPropertyValue(RichTextBox.FontSizeProperty, (double)16);
 
             return richText;

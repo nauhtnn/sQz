@@ -135,7 +135,7 @@ namespace sQzLib
             return lines;
         }
 
-        private static bool IsUnderlined(Paragraph para)
+        public static bool IsUnderlined(Paragraph para)
         {
             foreach (Run run in para.ChildElements.OfType<Run>())
             {
@@ -145,7 +145,7 @@ namespace sQzLib
             return false;
         }
 
-        private static bool IsBoldItalicUnderline(Run run)
+        public static bool IsBoldItalicUnderline(Run run)
         {
             if (run.RunProperties == null ||
                 run.RunProperties.Underline == null || run.RunProperties.Underline.Val == UnderlineValues.None)

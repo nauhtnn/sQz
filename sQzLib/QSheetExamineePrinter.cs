@@ -39,12 +39,46 @@ namespace sQzLib
             return true;
         }
 
+        public Paragraph LookupUnderlinedParagraph(string text)
+        {
+            foreach (Paragraph p in UnderlinedParagraphs)
+                if (text.Trim().Equals(p.InnerText.Trim()))
+                    return p;
+            return null;
+        }
+
+        public string GetInnerTextOfRichTextSpan(RichTextBox richText)
+        {
+            StringBuilder text = new StringBuilder();
+            foreach (var p in
+                richText.Document.Blocks.OfType<System.Windows.Documents.Paragraph>())
+            {
+                foreach (var span in p.Inlines.OfType<System.Windows.Documents.Span>())
+                    foreach(var run in span.Inlines.OfType< System.Windows.Documents.Run>())
+                    text.Append(run.Text);
+            }
+            return text.ToString();
+        }
+
         private void WriteSingleQuestionWithSeletedLabel(Question question, int questionIdx, byte[] optionStatusArray)
         {
-            StringBuilder stem = new StringBuilder();
-            stem.Append((questionIdx + 1).ToString() + ") ");
-            stem.Append(question.Stem);
-            mDocxBody.AppendChild(new Paragraph(new Run(new Text(stem.ToString()))));
+            if(Utils.IsRichText(question.Stem))
+            {
+                mDocxBody.AppendChild(new Paragraph(new Run(new Text((questionIdx + 1).ToString()))));
+                Paragraph p = LookupUnderlinedParagraph(
+                    GetInnerTextOfRichTextSpan(Utils.GetRichText(question.Stem)));
+                if (p == null)
+                    System.Windows.MessageBox.Show("Cannot find underlined paragraph: " + question.Stem);
+                else
+                    mDocxBody.AppendChild(p.Clone() as Paragraph);
+            }
+            else
+            {
+                StringBuilder stem = new StringBuilder();
+                stem.Append((questionIdx + 1).ToString() + ") ");
+                stem.Append(question.Stem);
+                mDocxBody.AppendChild(new Paragraph(new Run(new Text(stem.ToString()))));
+            }
 
             char optionLabel = 'A';
             char selectedLabel = 'A';
@@ -74,6 +108,7 @@ namespace sQzLib
 
         public void WriteThisExaminee(QuestSheet qsheet, ExamineeS0 examinee)
         {
+            LoadUnderlinedParagraphs("underlined.docx");
             WriteExamineeInfo(examinee);
             WriteQsheetWithSelectedLabel(qsheet, examinee.AnswerSheet.BytesOfAnswer);
             WriteExamineeResult(examinee);
@@ -105,7 +140,106 @@ namespace sQzLib
             }
         }
 
-        private static bool IsUnderlined(Paragraph para)
+        public void Dispose()
+        {
+            if (mDocx != null)
+                mDocx.Close();
+        }
+
+        private bool IsUnderlined(System.Windows.Documents.Paragraph para)
+        {
+            foreach (System.Windows.Documents.Run run in para.Inlines)
+            {
+                if (IsUnderlined(run))
+                    return true;
+            }
+            return false;
+        }
+
+        private bool IsUnderlined(System.Windows.Documents.Run run)
+        {
+            foreach (System.Windows.TextDecoration decor in run.TextDecorations)
+                if (decor.Equals(System.Windows.TextDecorations.Underline))
+                    return true;
+            return false;
+        }
+
+        //private List<Paragraph> WriteRichText(string text)
+        //{
+        //    RichTextBox richText = Utils.GetRichText(text);
+        //    List<Paragraph> paras = new List<Paragraph>();
+        //    foreach (System.Windows.Documents.Paragraph p in
+        //        richText.Document.Blocks.OfType<System.Windows.Documents.Paragraph>())
+        //    {
+        //        Paragraph para = new Paragraph();
+        //        foreach(var x in p.Inlines)
+        //        {
+        //            if (x.GetType() != typeof(System.Windows.Documents.Span))
+        //            {
+        //                int a = 0;
+        //                ++a;
+        //            }
+        //            var s = x as System.Windows.Documents.Span;
+        //            foreach(var r in s.Inlines.OfType<System.Windows.Documents.Run>())
+        //            {
+        //                string t = r.Text;
+        //                foreach (System.Windows.Textlo decor in r.TextDecorations)
+        //                    if (decor.Equals(System.Windows.TextDecorations.Underline))
+        //                    {
+        //                        int b = 0;
+        //                        ++b;
+        //                    }
+        //            }
+        //        }
+        //        foreach (System.Windows.Documents.Run run
+        //            in p.Inlines.OfType<System.Windows.Documents.Run>())
+        //        {
+        //            Run docx_run = new Run(run.Text);
+        //            foreach (System.Windows.TextDecoration decor in run.TextDecorations)
+        //                if (decor.Equals(System.Windows.TextDecorations.Underline))
+        //                    docx_run.AppendChild(new RunProperties(new Underline()));
+        //            para.AppendChild(docx_run);
+        //        }
+        //        paras.Add(para);
+        //    }
+        //    return paras;
+        //}
+
+        List<Paragraph> UnderlinedParagraphs;
+
+        public void LoadUnderlinedParagraphs(string fpath)
+        {
+            UnderlinedParagraphs = new List<Paragraph>();
+            WordprocessingDocument doc = null;
+            try
+            {
+                doc = WordprocessingDocument.Open(fpath, false);
+            }
+            catch (OpenXmlPackageException e)
+            {
+                System.Windows.MessageBox.Show(e.ToString());
+                return;
+            }
+            catch (System.IO.IOException e)
+            {
+                System.Windows.MessageBox.Show(e.ToString());
+                return;
+            }
+            Body body = doc.MainDocumentPart.Document.Body;
+            foreach (Paragraph p in body.ChildElements.OfType<Paragraph>())
+            {
+                DocumentFormat.OpenXml.Drawing.Blip bl =
+                    p.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
+                if (bl == null)
+                {
+                    if (IsUnderlinedDocx(p))
+                        UnderlinedParagraphs.Add(p);
+                }
+            }
+            doc.Close();
+        }
+
+        public static bool IsUnderlinedDocx(Paragraph para)
         {
             foreach (Run run in para.ChildElements.OfType<Run>())
             {
@@ -115,42 +249,12 @@ namespace sQzLib
             return false;
         }
 
-        private static bool IsBoldItalicUnderline(Run run)
+        public static bool IsBoldItalicUnderline(Run run)
         {
             if (run.RunProperties == null ||
                 run.RunProperties.Underline == null || run.RunProperties.Underline.Val == UnderlineValues.None)
                 return false;
             return true;
-        }
-
-        public void Dispose()
-        {
-            if (mDocx != null)
-                mDocx.Close();
-        }
-
-        private Paragraph WriteRichText(string text)
-        {
-            RichTextBox richText = new RichTextBox();
-            byte[] bytes = new byte[text.Length];
-            char[] chars = text.ToCharArray();
-            for (int i = 0; i < text.Length; ++i)
-                bytes[i] = (byte)chars[i];
-            System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
-            var range = new System.Windows.Documents.TextRange(richText.Document.ContentStart, richText.Document.ContentEnd);
-            range.Load(stream, System.Windows.DataFormats.Rtf);
-            foreach (System.Windows.Documents.Paragraph p in
-                richText.Document.Blocks.OfType<System.Windows.Documents.Paragraph>())
-            {
-                foreach (System.Windows.Documents.Run run
-                    in p.Inlines.OfType<System.Windows.Documents.Run>())
-                    foreach(System.Windows.TextDecoration decor in run.TextDecorations)
-                        if(decor.Equals(System.Windows.TextDecorations.Underline))
-                        {
-
-                        }
-                
-            }
         }
     }
 }
