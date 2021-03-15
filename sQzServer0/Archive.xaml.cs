@@ -379,7 +379,7 @@ namespace sQzServer0
             //        sp.Children.Add(j);
             //    }
             //}
-            svwr.Content = new QuestionSheetView(qs, nee.AnswerSheet.BytesOfAnswer, FontSize * 2, svwr.Width - 2 * FontSize, false);
+            svwr.Content = new QuestionSheetView(qs, nee.AnswerSheet.BytesOfAnswer, FontSize * 2, 820, false);
             svwr.Height = 560;
             spl.Children.Add(svwr);
             tbi.Content = spl;

@@ -61,7 +61,7 @@ namespace sQzClient
             w.WindowState = WindowState.Maximized;
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
-            w.FontSize = 16;
+            w.FontSize = 15;
 
             double mrg = FontSize / 2;
             SingleQuestionView.IdxWidth = 3 * mrg;
@@ -230,7 +230,7 @@ namespace sQzClient
         void InitQuesttonSheetView()
         {
             QuestionSheetView qsheetView = new QuestionSheetView(QuestionSheet, thisExaminee.AnswerSheet.BytesOfAnswer, FontSize * 2,
-                svwrQSh.Width - FontSize * 2 - SystemParameters.ScrollWidth * 2);
+                svwrQSh.Width - FontSize * 2 - SystemParameters.ScrollWidth * 4);
             foreach(object i in qsheetView.Children)
             {
                 SingleQuestionView q = i as SingleQuestionView;
