@@ -27,6 +27,8 @@ namespace sQzClient
 
         public Authentication()
         {
+            App.EnableHookKeys(false);
+
             InitializeComponent();
 
             mState = NetCode.Dating;

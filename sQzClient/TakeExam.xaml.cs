@@ -37,6 +37,7 @@ namespace sQzClient
 
         public TakeExam()
         {
+            App.EnableHookKeys(true);
             InitializeComponent();
             mState = NetCode.Dating;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
