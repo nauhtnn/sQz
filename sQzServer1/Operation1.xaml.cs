@@ -27,12 +27,13 @@ namespace sQzServer1
         NetCode mState;
         Server2 mServer;
         UICbMsg mCbMsg;
-        bool bRunning;
+        //bool bRunning;
         ExamSlotS1 Slot;
         int uRId;//todo change to enum
         List<SortedList<string, bool>> vfbLock;
         TimeSpan TestDuration;
         string Subject;
+        string RoomPassword;
 
         public Operation1(TimeSpan testDuration, string subject)
         {
@@ -46,7 +47,7 @@ namespace sQzServer1
             mServer = new Server2(SrvrBufHndl);
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
-            bRunning = true;
+            //bRunning = true;
 
             Slot = new ExamSlotS1();
 
@@ -128,7 +129,7 @@ namespace sQzServer1
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            bRunning = false;
+            //bRunning = false;
             UICbMsg dummy = new UICbMsg();
             mServer.Stop(ref dummy);
             WPopup.s.Exit();
@@ -160,7 +161,7 @@ namespace sQzServer1
 
                     string roomPassword = Utils.ReadBytesOfString(buf, ref offs);
 
-                    if(roomPassword == null || !roomPassword.Equals(txtRoomPassword.Text))
+                    if(roomPassword == null || !roomPassword.Equals(RoomPassword))
                     {
                         outMsg = SignInNotOKMessage();
                         break;
@@ -501,7 +502,8 @@ namespace sQzServer1
             txtLock.Text = s._((int)TxI.OP_LCK);
             txtAbsence.Text = s._((int)TxI.OP_ABSENCE);
 
-            txtRoomPassword.Text = Utils.GeneratePassword(Utils.GetPasswordCharset(), new Random());
+            RoomPassword = Utils.GeneratePassword(Utils.GetPasswordCharset(), new Random());
+            txtRoomPassword.Text = RoomPassword;
         }
 
         void ToSubmit(bool bEnable)

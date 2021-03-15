@@ -292,7 +292,7 @@ namespace sQzClient
                 case NetCode.Authenticating:
                     bytes = new List<byte[]>();
                     bytes.Add(BitConverter.GetBytes((int)mState));
-                    Utils.AppendBytesOfString(tbxRoomPassword.Text, bytes);
+                    Utils.AppendBytesOfString(RoomPassword, bytes);
                     bytes.AddRange(thisExaminee.GetBytes_SendingToS1());
                     outBuf = Utils.ToArray_FromListOfBytes(bytes);
                     break;

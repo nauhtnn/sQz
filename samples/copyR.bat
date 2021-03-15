@@ -4,3 +4,4 @@ copy GUI-vi.bin ..\sQzClient\bin\Release
 copy theme.txt ..\sQzServer0\bin\Release
 copy theme.txt ..\sQzServer1\bin\Release
 copy theme.txt ..\sQzClient\bin\Release
+copy sectionMagicKeywords.txt ..\sQzServer0\bin\Debug
