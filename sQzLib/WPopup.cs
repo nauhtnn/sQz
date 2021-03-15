@@ -69,6 +69,7 @@ namespace sQzLib
         Queue<string> Messages;
         Queue<DialogData> dialogDataQueue;
         public bool OwnerClosing;
+        private bool IsClosing;
         WPopup()
         {
             IsClosingRequestPending = false;
@@ -125,6 +126,7 @@ namespace sQzLib
 
             Messages = new Queue<string>();
             OwnerClosing = false;
+            IsClosing = false;
         }
 
         private void BtnCncl_Click(object sender, RoutedEventArgs e)
@@ -192,7 +194,8 @@ namespace sQzLib
             if (IsClosingRequestPending)
                 return;
             IsClosingRequestPending = true;
-            mW.Close();
+            if(!IsClosing)
+                mW.Close();
         }
 
         public void ShowDialog(string msg)
@@ -239,9 +242,10 @@ namespace sQzLib
         private void wPopup_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             IsClosingRequestPending = false;
+            IsClosing = true;
             if (!OwnerClosing)
                 e.Cancel = true;
-            if(dialogDataQueue.Count > 0)
+            if (dialogDataQueue.Count > 0)
             {
                 if (dialogDataQueue.Peek().IsButtonOK_Clicked)
                     dialogDataQueue.Peek().OK_CallBack?.Invoke();
@@ -255,7 +259,10 @@ namespace sQzLib
                 s.Visibility = Visibility.Collapsed;
             }
             else
+            {
                 ShowDialog();
+            }
+            IsClosing = false;
         }
     }
 }

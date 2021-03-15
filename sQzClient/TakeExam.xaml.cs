@@ -459,7 +459,7 @@ namespace sQzClient
                     Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), "exit", Exit, WPopupCancel);
             else
                 WPopup.s.ShowDialog(Txt.s._((int)TxI.EXIT_CAUT_2),
-                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), null, null, WPopupCancel);
+                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), null, Exit, WPopupCancel);
             spMain.Opacity = 1;
         }
 
