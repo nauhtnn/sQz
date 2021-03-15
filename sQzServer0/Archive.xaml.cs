@@ -380,6 +380,13 @@ namespace sQzServer0
             //    }
             //}
             svwr.Content = new QuestionSheetView(qs, nee.AnswerSheet.BytesOfAnswer, FontSize * 2, 820, false);
+            using (QSheetExamineePrinter printer = new QSheetExamineePrinter())
+            {
+                if(printer.CreateDocx("all_examinees.docx"))
+                {
+                    printer.WriteThisExaminee(qs, nee);
+                }
+            }
             svwr.Height = 560;
             spl.Children.Add(svwr);
             tbi.Content = spl;

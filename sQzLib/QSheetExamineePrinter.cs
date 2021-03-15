@@ -9,7 +9,7 @@ using System.Windows.Controls;
 
 namespace sQzLib
 {
-    class QSheetExamineePrinter: IDisposable
+    public class QSheetExamineePrinter: IDisposable
     {
         WordprocessingDocument mDocx;
         Body mDocxBody;
@@ -18,7 +18,9 @@ namespace sQzLib
             try
             {
                 mDocx = WordprocessingDocument.Create(fpath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document);
-                mDocxBody = mDocx.MainDocumentPart.Document.Body;
+                MainDocumentPart mainPart = mDocx.AddMainDocumentPart();
+                mainPart.Document = new Document();
+                mDocxBody = mainPart.Document.AppendChild(new Body());
             }
             catch (OpenXmlPackageException e)
             {
@@ -70,11 +72,27 @@ namespace sQzLib
                 mDocxBody.AppendChild(new Paragraph(new Run(new Text("Selected: " + selectedLabel))));
         }
 
-        public void WriteExamineeQuestionAnswerSheet(QuestSheet qsheet, byte[] optionStatusArray)
+        public void WriteThisExaminee(QuestSheet qsheet, ExamineeS0 examinee)
         {
-            if (mDocxBody == null)
-                return;
+            WriteExamineeInfo(examinee);
+            WriteQsheetWithSelectedLabel(qsheet, examinee.AnswerSheet.BytesOfAnswer);
+            WriteExamineeResult(examinee);
+        }
 
+        public void WriteExamineeInfo(ExamineeS0 examinee)
+        {
+            mDocxBody.AppendChild(new Paragraph(new Run(new Text("<ID> " + examinee.ID))));
+            mDocxBody.AppendChild(new Paragraph(new Run(new Text("<Name> " + examinee.Name))));
+            mDocxBody.AppendChild(new Paragraph(new Run(new Text("<Birthdate> " + examinee.Birthdate))));
+        }
+
+        public void WriteExamineeResult(ExamineeS0 examinee)
+        {
+            mDocxBody.AppendChild(new Paragraph(new Run(new Text("<CorrectCount> " + examinee.CorrectCount))));
+        }
+
+        public void WriteQsheetWithSelectedLabel(QuestSheet qsheet, byte[] bytesOfAnswer)
+        {
             int questionIdx = -1;
             foreach (QSheetSection s in qsheet.Sections)
             {
@@ -83,7 +101,7 @@ namespace sQzLib
                 if (passage_section != null)
                     mDocxBody.AppendChild(new Paragraph(new Run(new Text(passage_section.Passage))));
                 foreach (Question q in s.Questions)
-                    WriteSingleQuestionWithSeletedLabel(q, ++questionIdx, optionStatusArray);
+                    WriteSingleQuestionWithSeletedLabel(q, ++questionIdx, bytesOfAnswer);
             }
         }
 
