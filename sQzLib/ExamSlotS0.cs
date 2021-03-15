@@ -270,7 +270,7 @@ namespace sQzLib
                 return -1;
             }
             DB_InsertTestType_ifNExists(conn);
-            string pwChars = ExamRoomS0.PwChars();
+            string pwChars = Utils.GetPasswordCharset();
             Random rand = new Random();
             int n = 0;
             eMsg = null;
@@ -285,7 +285,7 @@ namespace sQzLib
                 else if (bNExist)
                     n = DBConnect.Ins(conn, "sqz_slot_room",
                         "dt,rid,pw", "('" + mDt.ToString(DT._) +
-                        "'," + r.uId + ",'" + ExamRoomS0.GenPw(pwChars, rand) + "')", out eMsg);
+                        "'," + r.uId + ",'" + Utils.GeneratePassword(pwChars, rand) + "')", out eMsg);
                 if (n < 0)
                     break;
                 n = r.DBIns(conn, out eMsg);

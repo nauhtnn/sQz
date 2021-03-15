@@ -116,6 +116,43 @@ namespace sQzLib
         {
             return timeSpan.Hours * 60 + timeSpan.Minutes;
         }
+
+        public static string GetPasswordCharset()
+        {
+            StringBuilder sb = new StringBuilder();
+            for (char i = '0'; i <= '9'; ++i)
+                sb.Append(i);
+            //for (char i = 'A'; i < 'I'; ++i)
+            //    sb.Append(i);
+            //for (char i = 'J'; i <= 'Z'; ++i)
+            //    sb.Append(i);
+            //for (char i = 'a'; i < 'l'; ++i)
+            //    sb.Append(i);
+            //for (char i = 'm'; i <= 'z'; ++i)
+            //    sb.Append(i);
+            //sb.Append('!');
+            //sb.Append('@');
+            //sb.Append('#');
+            //sb.Append('$');
+            //sb.Append('%');
+            //sb.Append('^');
+            //sb.Append('&');
+            //sb.Append('*');
+            //sb.Append('(');
+            //sb.Append(')');
+            //sb.Append('-');
+            //sb.Append('_');
+            return sb.ToString();
+        }
+
+        public static string GeneratePassword(string vch, Random r)
+        {
+            int n = vch.Length;
+            StringBuilder sb = new StringBuilder();
+            for (int i = 0; i < 8; ++i)
+                sb.Append(vch[r.Next() % n]);
+            return sb.ToString();
+        }
     }
 
     public class UICbMsg

@@ -164,27 +164,18 @@ namespace sQzLib
             return r;
         }
 
-        public static string GenPw(string vch, Random r)
-        {
-            int n = vch.Length;
-            StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < 8; ++i)
-                sb.Append(vch[r.Next() % n]);
-            return sb.ToString();
-        }
-
         public bool RegenPw()
         {
             if (Examinees.Count == 0)
                 return true;
-            string vch = PwChars();
+            string vch = Utils.GetPasswordCharset();
             Random r = new Random();
             ExamineeA x = Examinees.Values.First();
             MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return true;
             string otPw = tPw;
-            tPw = GenPw(vch, r);
+            tPw = Utils.GeneratePassword(vch, r);
             string emsg;
             int n = DBConnect.Update(conn, "sqz_slot_room", "pw='" + tPw + "'",
                 "dt='" + x.mDt.ToString(DT._) + "' AND rid=" + uId, out emsg);
@@ -192,34 +183,6 @@ namespace sQzLib
                 return false;
             tPw = otPw;
             return true;
-        }
-
-        public static string PwChars()
-        {
-            StringBuilder sb = new StringBuilder();
-            for (char i = '0'; i <= '9'; ++i)
-                sb.Append(i);
-            //for (char i = 'A'; i < 'I'; ++i)
-            //    sb.Append(i);
-            //for (char i = 'J'; i <= 'Z'; ++i)
-            //    sb.Append(i);
-            //for (char i = 'a'; i < 'l'; ++i)
-            //    sb.Append(i);
-            //for (char i = 'm'; i <= 'z'; ++i)
-            //    sb.Append(i);
-            //sb.Append('!');
-            //sb.Append('@');
-            //sb.Append('#');
-            //sb.Append('$');
-            //sb.Append('%');
-            //sb.Append('^');
-            //sb.Append('&');
-            //sb.Append('*');
-            //sb.Append('(');
-            //sb.Append(')');
-            //sb.Append('-');
-            //sb.Append('_');
-            return sb.ToString();
         }
 
         public List<byte[]> GetBytes_SendingToS1()
