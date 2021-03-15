@@ -33,13 +33,19 @@ namespace sQzServer1
             tPw = "dummypwd";
             mCbMsg = new UICbMsg();
 
-            if (!System.IO.File.Exists("Room.txt") ||
-                !int.TryParse(System.IO.File.ReadAllText("Room.txt"), out uRId))
+            uRId = 0;
+        }
+
+        private void GetRoomIDFromFile()
+        {
+            string first_line = Utils.GetFirstNonBlankLine("Room.txt");
+            if (!int.TryParse(first_line, out uRId))
                 uRId = 0;
         }
 
         public byte[] ClntBufPrep()
         {
+            GetRoomIDFromFile();
             byte[] outMsg = new byte[16];
             Array.Copy(BitConverter.GetBytes((int)NetCode.Srvr1Auth), 0, outMsg, 0, 4);
             Array.Copy(BitConverter.GetBytes(uRId), 0, outMsg, 4, 4);
@@ -88,7 +94,7 @@ namespace sQzServer1
         {
             Txt t = Txt.s;
             txtLalgitc.Text = t._((int)TxI.LALGITC);
-            txtsQz.Text = t._((int)TxI.SQZ);
+            txtsQz.Text = t._((int)TxI.SQZ) + " " + t._((int)TxI.UPPER_CASE_ROOM) + uRId;
             txtPw.Text = t._((int)TxI.OP_PW);
             btnAuth.Content = t._((int)TxI.OP_AUTH);
             btnExit.Content = t._((int)TxI.EXIT);
@@ -120,6 +126,8 @@ namespace sQzServer1
             w.FontSize = 28;
 
             WPopup.s.owner = w;
+
+            GetRoomIDFromFile();
 
             LoadTxt();
         }

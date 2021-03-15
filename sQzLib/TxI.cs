@@ -75,6 +75,7 @@ namespace sQzLib {
 		MARK,
 		MMARK,
 		ROOM,
+		UPPER_CASE_ROOM,
 		NOK,
 		DATE_ADD,
 		NEE_ADD,

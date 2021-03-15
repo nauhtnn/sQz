@@ -153,6 +153,27 @@ namespace sQzLib
                 sb.Append(vch[r.Next() % n]);
             return sb.ToString();
         }
+
+        public static string GetFirstNonBlankLine(string filePath)
+        {
+            if (!System.IO.File.Exists(filePath))
+                return null;
+            string[] lines;
+            try
+            {
+                lines = System.IO.File.ReadAllLines(filePath);
+            }
+            catch(System.IO.IOException e)
+            {
+                System.Windows.MessageBox.Show("GetFirstNonBlankLine " + filePath + "\n" + e.ToString());
+                return null;
+            }
+            if (lines != null)
+                foreach (string line in lines)
+                    if (line.Trim().Length > 0)
+                        return line;
+            return null;
+        }
     }
 
     public class UICbMsg
