@@ -134,6 +134,13 @@ namespace sQzServer1
             WPopup.s.Exit();
         }
 
+        private byte[] SignInNotOKMessage()
+        {
+            byte[] message = new byte[4];
+            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, message, 0, 4);
+            return message;
+        }
+
         public bool SrvrBufHndl(byte[] buf, out byte[] outMsg)
         {
             outMsg = null;
@@ -150,8 +157,22 @@ namespace sQzServer1
                     outMsg = Utils.ToArray_FromListOfBytes(bytes);
                     return true;
                 case NetCode.Authenticating:
+
+                    string roomPassword = Utils.ReadBytesOfString(buf, ref offs);
+
+                    if(roomPassword == null || !roomPassword.Equals(txtRoomPassword.Text))
+                    {
+                        outMsg = SignInNotOKMessage();
+                        break;
+                    }
+
                     ExamineeS1 nee_authenticating = new ExamineeS1();
-                    nee_authenticating.ReadBytes_FromClient(buf, ref offs);
+                    if(nee_authenticating.ReadBytes_FromClient(buf, ref offs))
+                    {
+                        outMsg = SignInNotOKMessage();
+                        break;
+                    }
+
                     bool lck = true;
                     bool found = false;
                     foreach (SortedList<string, bool> l in vfbLock)
@@ -198,8 +219,7 @@ namespace sQzServer1
                         }
                         else
                         {
-                            outMsg = new byte[4];
-                            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, outMsg, 0, 4);
+                            outMsg = SignInNotOKMessage();
                             return false;//close
                         }
                     }
@@ -480,6 +500,8 @@ namespace sQzServer1
             txtGrade.Text = s._((int)TxI.MARK);
             txtLock.Text = s._((int)TxI.OP_LCK);
             txtAbsence.Text = s._((int)TxI.OP_ABSENCE);
+
+            txtRoomPassword.Text = Utils.GeneratePassword(Utils.GetPasswordCharset(), new Random());
         }
 
         void ToSubmit(bool bEnable)

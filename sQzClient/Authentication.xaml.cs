@@ -23,6 +23,7 @@ namespace sQzClient
         DateTime mDt;
         ExamineeC thisExaminee;
         TakeExam pgTkExm;
+        string RoomPassword;
 
         public Authentication()
         {
@@ -58,6 +59,16 @@ namespace sQzClient
                 spMain.Opacity = 1;
                 return;
             }
+
+            RoomPassword = tbxRoomPassword.Text.Trim();
+            if (RoomPassword.Length != 8)
+            {
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog("Password is incorrect!");
+                spMain.Opacity = 1;
+                return;
+            }
+            
             thisExaminee.ID = trim_ID;
             thisExaminee.Birthdate = trim_birthdate;
             try
@@ -116,7 +127,7 @@ namespace sQzClient
             txtWelcome.Text = t._((int)TxI.WELCOME);
             txtId.Text = t._((int)TxI.NEEID);
             txtBirdate.Text = t._((int)TxI.BIRDATE);
-            txtPassword.Text = t._((int)TxI.OP_PW);
+            txtRoomPassword.Text = t._((int)TxI.OP_PW);
             btnSignIn.Content = t._((int)TxI.SIGNIN);
             btnOpenLog.Content = t._((int)TxI.OPEN_LOG);
             btnReconn.Content = t._((int)TxI.CONN);
@@ -281,6 +292,7 @@ namespace sQzClient
                 case NetCode.Authenticating:
                     bytes = new List<byte[]>();
                     bytes.Add(BitConverter.GetBytes((int)mState));
+                    Utils.AppendBytesOfString(tbxRoomPassword.Text, bytes);
                     bytes.AddRange(thisExaminee.GetBytes_SendingToS1());
                     outBuf = Utils.ToArray_FromListOfBytes(bytes);
                     break;
@@ -336,7 +348,7 @@ namespace sQzClient
         {
             tbxId.IsEnabled =
             tbxBirthdate.IsEnabled =
-            tbxPassword.IsEnabled =
+            tbxRoomPassword.IsEnabled =
             btnOpenLog.IsEnabled =
             btnSignIn.IsEnabled = true;
         }
@@ -345,7 +357,7 @@ namespace sQzClient
         {
             tbxId.IsEnabled =
             tbxBirthdate.IsEnabled =
-            tbxPassword.IsEnabled =
+            tbxRoomPassword.IsEnabled =
             btnOpenLog.IsEnabled =
             btnSignIn.IsEnabled = false;
         }

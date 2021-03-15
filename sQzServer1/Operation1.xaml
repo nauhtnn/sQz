@@ -23,8 +23,8 @@
                         Margin="10,10,10,10" IsEnabled="False"/>
                     <Button x:Name="btnSubmit" Width="120" Height="40" Click="btnSubmit_Click" Background="#f4f4f4" Foreground="#838383"
                             Margin="10,10,10,10" IsEnabled="False"/>
-                    <Button x:Name="btnPrint" Width="120" Height="40" Click="btnPrint_Click"  Background="#f4f4f4" Foreground="#838383"
-                            Margin="10,10,10,50" IsEnabled="True" Visibility="Hidden"/>
+                    <TextBlock x:Name="txtRoomPassword" Text="12345678" FontSize="20" TextAlignment="Center" Width="120" Height="40" Background="#f4f4f4" Foreground="#838383"
+                            Margin="10,10,10,50"/>
                     <Button x:Name="btnClose" Width="120" Height="40" Click="btnClose_Click" Background="#f15a23" Foreground="#fff"
                         Margin="10,10,10,10"/>
                     <Button Name="btnHck" Width="60" Height="40" Click="btnHck_Click" Background="#f4f4f4" Foreground="#fff"

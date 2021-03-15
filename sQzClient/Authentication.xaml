@@ -33,8 +33,8 @@
                 <TextBox x:Name="tbxId" Grid.Row="1" Width="200" MaxLength="16" TextAlignment="Center" IsEnabled="False"/>
                 <TextBlock x:Name="txtBirdate" Grid.Column="1" TextAlignment="Center" Foreground="#00356b"/>
                 <TextBox x:Name="tbxBirthdate" Grid.Row="1" Grid.Column="1" Width="200" MaxLength="16" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
-                <TextBlock x:Name="txtPassword" Grid.Column="2" TextAlignment="Center" Foreground="#00356b"/>
-                <TextBox x:Name="tbxPassword" Grid.Row="1" Grid.Column="2" Width="200" MaxLength="16" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
+                <TextBlock x:Name="txtRoomPassword" Grid.Column="2" TextAlignment="Center" Foreground="#00356b"/>
+                <TextBox x:Name="tbxRoomPassword" Grid.Row="1" Grid.Column="2" Width="200" MaxLength="8" TextAlignment="Center" Foreground="#00356b" IsEnabled="False"/>
             </Grid>
             <Grid HorizontalAlignment="Center" Margin="0,64,0,0">
                 <Grid.ColumnDefinitions>
