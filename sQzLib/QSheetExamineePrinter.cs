@@ -70,7 +70,11 @@ namespace sQzLib
                 if (p == null)
                     System.Windows.MessageBox.Show("Cannot find underlined paragraph: " + question.Stem);
                 else
-                    mDocxBody.AppendChild(p.Clone() as Paragraph);
+                {
+                    var p2 = p.Clone() as Paragraph;
+                    p2.ParagraphProperties.NumberingProperties.NumberingId.Val = 0;
+                    mDocxBody.AppendChild(p2);
+                }
             }
             else
             {
