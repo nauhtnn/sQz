@@ -83,6 +83,7 @@ namespace sQzLib
             WordprocessingDocument doc = null;
             try
             {
+                bool exists = System.IO.File.Exists(fpath);
                 doc = WordprocessingDocument.Open(fpath, false);
             }
             catch(OpenXmlPackageException e)

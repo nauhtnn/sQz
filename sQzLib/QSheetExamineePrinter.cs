@@ -11,14 +11,34 @@ namespace sQzLib
 {
     public class QSheetExamineePrinter: IDisposable
     {
-        WordprocessingDocument mDocx;
-        Body mDocxBody;
-        public bool CreateDocx(string fpath)
+        static WordprocessingDocument mDocx;
+        static Body mDocxBody;
+        static List<Paragraph> UnderlinedParagraphs;
+        static Table DocxTitle;
+
+        public static void CloseDocx()
         {
+            if (mDocx != null)
+                mDocx.Close();
+        }
+
+        static bool DocxCreated = false;
+
+        public static bool CreateDocx(string fpath)
+        {
+            if (DocxCreated)
+                return true;//suppose ok
+            DocxCreated = true;
+
             try
             {
+                bool exist = System.IO.File.Exists(fpath);
                 mDocx = WordprocessingDocument.Create(fpath, DocumentFormat.OpenXml.WordprocessingDocumentType.Document);
-                MainDocumentPart mainPart = mDocx.AddMainDocumentPart();
+                MainDocumentPart mainPart;
+                if (mDocx.MainDocumentPart == null)
+                    mainPart = mDocx.AddMainDocumentPart();
+                else
+                    mainPart = mDocx.MainDocumentPart;
                 mainPart.Document = new Document();
                 mDocxBody = mainPart.Document.AppendChild(new Body());
             }
@@ -36,6 +56,8 @@ namespace sQzLib
                 System.Windows.MessageBox.Show(e.ToString());
                 return false;
             }
+            LoadUnderlinedParagraphs("underlined.docx");
+            LoadDocxTitle("Title_3.docx");
             return true;
         }
 
@@ -60,11 +82,12 @@ namespace sQzLib
             return text.ToString();
         }
 
-        private void WriteSingleQuestionWithSeletedLabel(Question question, int questionIdx, byte[] optionStatusArray)
+        private void WriteSingleQuestionWithSeletedLabel(Question question, int questionIdx, byte[] optionStatusArray,
+            char[] answerKey)
         {
             if(Utils.IsRichText(question.Stem))
             {
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text((questionIdx + 1).ToString()))));
+                mDocxBody.AppendChild(new Paragraph(new Run(new Text((questionIdx + 1).ToString() + ")"))));
                 Paragraph p = LookupUnderlinedParagraph(
                     GetInnerTextOfRichTextSpan(Utils.GetRichText(question.Stem)));
                 if (p == null)
@@ -86,8 +109,10 @@ namespace sQzLib
 
             char optionLabel = 'A';
             char selectedLabel = 'A';
+            char corrected_label = 'A';
             int entireAnswerSheet_optionIdx = questionIdx * Question.NUMBER_OF_OPTIONS;
             bool noSelection = true;
+            bool notReachCorrectAnswer = true;
 
             for(int optionIdx = 0; optionIdx < Question.NUMBER_OF_OPTIONS;
                 ++optionIdx, ++optionLabel, ++entireAnswerSheet_optionIdx)
@@ -95,6 +120,13 @@ namespace sQzLib
                 StringBuilder option = new StringBuilder();
                 option.Append(optionLabel + ") " + question.vAns[optionIdx]);
                 mDocxBody.AppendChild(new Paragraph(new Run(new Text(option.ToString()))));
+                if(notReachCorrectAnswer)
+                {
+                    if (answerKey[entireAnswerSheet_optionIdx] == '0')
+                        ++corrected_label;
+                    else
+                        notReachCorrectAnswer = false;
+                }
                 if (noSelection)
                 {
                     if (optionStatusArray[entireAnswerSheet_optionIdx] == 0)
@@ -103,40 +135,82 @@ namespace sQzLib
                         noSelection = false;
                 }
             }
-            
-            if(noSelection)
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text("No selection."))));
+
+            StringBuilder sb = new StringBuilder();
+            if (noSelection)
+                sb.Append(Txt.s._((int)TxI.PRINT_NO_SELECTED));
             else
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text("Selected: " + selectedLabel))));
+                sb.Append(Txt.s._((int)TxI.PRINT_SELECTED) + selectedLabel);
+            sb.Append("    " + Txt.s._((int)TxI.PRINT_CORRECT_LABEL) + corrected_label);
+            mDocxBody.AppendChild(new Paragraph(new Run(
+                    new Text(sb.ToString()))));
         }
 
-        public void WriteThisExaminee(QuestSheet qsheet, ExamineeS0 examinee)
+        public void WriteThisExaminee(QuestSheet qsheet, ExamineeS0 examinee, char[] answerKey)
         {
-            LoadUnderlinedParagraphs("underlined.docx");
-            WriteExamineeInfo(examinee);
-            WriteQsheetWithSelectedLabel(qsheet, examinee.AnswerSheet.BytesOfAnswer);
+            WriteExamineeInfo(examinee, qsheet.GetGlobalID_withTestType());
+            WriteQsheetWithSelectedLabel(qsheet, examinee.AnswerSheet.BytesOfAnswer, answerKey);
             WriteExamineeResult(examinee);
         }
 
-        public void WriteExamineeInfo(ExamineeS0 examinee)
+        static bool TitleLoaded = false;
+
+        public static void LoadDocxTitle(string filePath)
         {
-            mDocxBody.AppendChild(new Paragraph(new Run(new Text("<ID> " + examinee.ID))));
-            mDocxBody.AppendChild(new Paragraph(new Run(new Text("<Name> " + examinee.Name))));
-            mDocxBody.AppendChild(new Paragraph(new Run(new Text("<Birthdate> " + examinee.Birthdate))));
+            if (TitleLoaded)
+                return;
+            TitleLoaded = true;
+            WordprocessingDocument doc = null;
+            try
+            {
+                doc = WordprocessingDocument.Open(filePath, false);
+            }
+            catch (OpenXmlPackageException e)
+            {
+                System.Windows.MessageBox.Show(e.ToString());
+                return;
+            }
+            catch (System.IO.IOException e)
+            {
+                System.Windows.MessageBox.Show(e.ToString());
+                return;
+            }
+            Body body = doc.MainDocumentPart.Document.Body;
+            foreach (Table p in body.ChildElements.OfType<Table>())
+            {
+                DocxTitle = p.Clone() as Table;
+            }
+            doc.Close();
+        }
+
+        public void WriteDocxTitle()
+        {
+            mDocxBody.AppendChild(DocxTitle.Clone() as Table);
+        }
+
+        public void WriteExamineeInfo(ExamineeS0 examinee, string qSheetID)
+        {
+            WriteDocxTitle();
+            StringBuilder info = new StringBuilder();
+            info.Append(Txt.s._((int)TxI.PRINT_NAME) + examinee.Name +
+                "    " + Txt.s._((int)TxI.PRINT_ID) + examinee.ID +
+                "    " + Txt.s._((int)TxI.PRINT_PAPER_ID) + qSheetID);
+            mDocxBody.AppendChild(new Paragraph(new Run(new Text(info.ToString()))));
         }
 
         public void WriteExamineeResult(ExamineeS0 examinee)
         {
-            mDocxBody.AppendChild(new Paragraph(new Run(new Text("<CorrectCount> " + examinee.CorrectCount))));
+            mDocxBody.AppendChild(new Paragraph(new Run(
+                new Text(Txt.s._((int)TxI.PRINT_CORRECT_COUNT) + examinee.CorrectCount))));
         }
 
-        public void Write2PageBreaks()
+        public void WritePageBreak()
         {
             var PageBreakParagraph = new Paragraph(new Run(new Break() { Type = BreakValues.Page }));
             mDocxBody.AppendChild(PageBreakParagraph);
         }
 
-        public void WriteQsheetWithSelectedLabel(QuestSheet qsheet, byte[] bytesOfAnswer)
+        public void WriteQsheetWithSelectedLabel(QuestSheet qsheet, byte[] bytesOfAnswer, char[] answerKey)
         {
             int questionIdx = -1;
             foreach (QSheetSection s in qsheet.Sections)
@@ -146,7 +220,7 @@ namespace sQzLib
                 if (passage_section != null)
                     mDocxBody.AppendChild(new Paragraph(new Run(new Text(passage_section.Passage))));
                 foreach (Question q in s.Questions)
-                    WriteSingleQuestionWithSeletedLabel(q, ++questionIdx, bytesOfAnswer);
+                    WriteSingleQuestionWithSeletedLabel(q, ++questionIdx, bytesOfAnswer, answerKey);
             }
         }
 
@@ -215,10 +289,13 @@ namespace sQzLib
         //    return paras;
         //}
 
-        List<Paragraph> UnderlinedParagraphs;
+        static bool UnderlinedLoaded = false;
 
-        public void LoadUnderlinedParagraphs(string fpath)
+        public static void LoadUnderlinedParagraphs(string fpath)
         {
+            if (UnderlinedLoaded)
+                return;
+            UnderlinedLoaded = true;
             UnderlinedParagraphs = new List<Paragraph>();
             WordprocessingDocument doc = null;
             try

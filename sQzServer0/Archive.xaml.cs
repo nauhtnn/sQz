@@ -272,7 +272,15 @@ namespace sQzServer0
 
         private void PrintAllExaminees()
         {
-            foreach(ExamRoomS0 room in Slot.Rooms.Values)
+            if(!QSheetExamineePrinter.CreateDocx("all_examinees.docx"))
+            {
+                MessageBox.Show("PrintAllExaminees OpenDocx error");
+                return;
+            }
+
+            QSheetExamineePrinter printer = new QSheetExamineePrinter();
+
+            foreach (ExamRoomS0 room in Slot.Rooms.Values)
                 foreach(ExamineeS0 nee in room.Examinees.Values)
                 {
                     nee.DBGetAns();
@@ -295,16 +303,21 @@ namespace sQzServer0
                         MessageBox.Show("DBGetAns AnswerSheet.BytesOfAnswer = null");
                         return;
                     }
-                    using (QSheetExamineePrinter printer = new QSheetExamineePrinter())
+                    AnswerSheet ansSheet = null;
+                    if(Slot.AnswerKeyPacks.ContainsKey(qs.TestType) &&
+                        Slot.AnswerKeyPacks[qs.TestType].vSheet.ContainsKey(qs.ID))
+                        ansSheet = Slot.AnswerKeyPacks[qs.TestType].vSheet[qs.ID];
+                    if(ansSheet == null)
                     {
-                        if (printer.CreateDocx("all_examinees.docx"))
-                        {
-                            printer.WriteThisExaminee(qs, nee);
-                            printer.Write2PageBreaks();
-                            printer.WriteThisExaminee(qs, nee);
-                        }
+                        MessageBox.Show("answer sheet not found: " + qs.TestType +
+                            " " + qs.ID);
+                        return;
                     }
+
+                    printer.WriteThisExaminee(qs, nee, ansSheet.tAns.ToCharArray());
+                    printer.WritePageBreak();
                 }
+            QSheetExamineePrinter.CloseDocx();
         }
 
         private void lbxNee_Selected(object sender, RoutedEventArgs e)

@@ -42,7 +42,7 @@ namespace sQzLib
 
         public string GetGlobalID_withTestType()
         {
-            return (TestType * 100 + ID).ToString("d3");
+            return (TestType * 1000 + ID).ToString("d4");
         }
 
         public int CountAllQuestions()
