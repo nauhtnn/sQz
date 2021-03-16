@@ -130,6 +130,12 @@ namespace sQzLib
             mDocxBody.AppendChild(new Paragraph(new Run(new Text("<CorrectCount> " + examinee.CorrectCount))));
         }
 
+        public void Write2PageBreaks()
+        {
+            var PageBreakParagraph = new Paragraph(new Run(new Break() { Type = BreakValues.Page }));
+            mDocxBody.AppendChild(PageBreakParagraph);
+        }
+
         public void WriteQsheetWithSelectedLabel(QuestSheet qsheet, byte[] bytesOfAnswer)
         {
             int questionIdx = -1;

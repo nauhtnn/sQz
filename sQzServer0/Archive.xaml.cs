@@ -243,6 +243,7 @@ namespace sQzServer0
                 WPopup.s.ShowDialog(emsg);
                 return;
             }
+            PrintAllExaminees();
             Op0SlotView tbi = new Op0SlotView(Slot);
             tbi.DeepCopy(tbcRefSl);
             tbi.ShowExaminee();
@@ -269,6 +270,43 @@ namespace sQzServer0
                 }
         }
 
+        private void PrintAllExaminees()
+        {
+            foreach(ExamRoomS0 room in Slot.Rooms.Values)
+                foreach(ExamineeS0 nee in room.Examinees.Values)
+                {
+                    nee.DBGetAns();
+                    if (nee.AnswerSheet.BytesOfAnswer == null)
+                        continue;
+                    nee.DBSelGrade();
+                    nee.DBGetQSId();
+                    if (nee.TestType < 0)
+                        return;
+                    QuestSheet qs = null;
+                    if (Slot.QuestionPacks.ContainsKey(nee.TestType) &&
+                        Slot.QuestionPacks[nee.TestType].vSheet.ContainsKey(nee.AnswerSheet.QuestSheetID))
+                    {
+                        qs = Slot.QuestionPacks[nee.TestType].vSheet[nee.AnswerSheet.QuestSheetID];
+                    }
+                    if (qs == null)
+                        return;
+                    if (nee.AnswerSheet.BytesOfAnswer == null)
+                    {
+                        MessageBox.Show("DBGetAns AnswerSheet.BytesOfAnswer = null");
+                        return;
+                    }
+                    using (QSheetExamineePrinter printer = new QSheetExamineePrinter())
+                    {
+                        if (printer.CreateDocx("all_examinees.docx"))
+                        {
+                            printer.WriteThisExaminee(qs, nee);
+                            printer.Write2PageBreaks();
+                            printer.WriteThisExaminee(qs, nee);
+                        }
+                    }
+                }
+        }
+
         private void lbxNee_Selected(object sender, RoutedEventArgs e)
         {
             ListBoxItem i = sender as ListBoxItem;
@@ -284,6 +322,9 @@ namespace sQzServer0
             TabItem tbi = new TabItem();
             tbi.Header = i.Content;
             //
+            foreach (ExamRoomS0 r in Slot.Rooms.Values)
+                if (r.Examinees.ContainsKey(nee.ID))
+                    nee = r.Examinees[nee.ID];
             nee.mDt = Slot.mDt;
             nee.DBGetQSId();
             if (nee.TestType < 0)
@@ -380,13 +421,15 @@ namespace sQzServer0
             //    }
             //}
             svwr.Content = new QuestionSheetView(qs, nee.AnswerSheet.BytesOfAnswer, FontSize * 2, 820, false);
-            using (QSheetExamineePrinter printer = new QSheetExamineePrinter())
-            {
-                if(printer.CreateDocx("all_examinees.docx"))
-                {
-                    printer.WriteThisExaminee(qs, nee);
-                }
-            }
+            //using (QSheetExamineePrinter printer = new QSheetExamineePrinter())
+            //{
+            //    if(printer.CreateDocx("all_examinees.docx"))
+            //    {
+            //        printer.WriteThisExaminee(qs, nee);
+            //        printer.Write2PageBreaks();
+            //        printer.WriteThisExaminee(qs, nee);
+            //    }
+            //}
             svwr.Height = 560;
             spl.Children.Add(svwr);
             tbi.Content = spl;
