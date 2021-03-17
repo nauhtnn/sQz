@@ -243,7 +243,16 @@ namespace sQzServer0
                 WPopup.s.ShowDialog(emsg);
                 return;
             }
-            PrintAllExaminees();
+            StringBuilder sb = new StringBuilder();
+            foreach(QuestPack p in Slot.QuestionPacks.Values)
+            {
+                List<string> indicies = p.GetDuplicatedIdx_in_Passgae();
+                foreach (string s in indicies)
+                    sb.Append(s + ", ");
+            }
+            WPopup.s.ShowDialog("Duplicated in passages: " + sb.ToString());
+            //WPopup.s.ShowDialog("Print all examinee?", "Yes", "No", "ok", PrintAllExaminees, WPopupNothing);
+            //PrintAllExaminees();
             Op0SlotView tbi = new Op0SlotView(Slot);
             tbi.DeepCopy(tbcRefSl);
             tbi.ShowExaminee();

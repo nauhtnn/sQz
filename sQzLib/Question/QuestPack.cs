@@ -252,5 +252,37 @@ namespace sQzLib
             else
                 return null;
         }
+
+        public List<string> GetDuplicatedIdx_in_Passgae()
+        {
+            List<string> duplicated = new List<string>();
+            var regex = new System.Text.RegularExpressions.Regex("\\(\\d+\\)");
+            foreach(QuestSheet qs in vSheet.Values)
+                foreach(QSheetSection sec in qs.Sections)
+                {
+                    BasicPassageSection passage = sec as BasicPassageSection;
+                    if(passage != null)
+                    {
+                        System.Text.RegularExpressions.MatchCollection matches =
+                            regex.Matches(passage.Passage);
+                        bool break1 = false;
+                        for(int i = 0; i < matches.Count; ++i)
+                        {
+                            for (int j = i + 1; j < matches.Count; ++j)
+                            {
+                                if (matches[i].Value.Equals(matches[j].Value))
+                                {
+                                    duplicated.Add(qs.GetGlobalID_withTestType());
+                                    break1 = true;
+                                    break;
+                                }
+                            }
+                            if (break1)
+                                break;
+                        }
+                    }
+                }
+            return duplicated;
+        }
     }
 }
