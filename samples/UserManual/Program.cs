@@ -16,6 +16,7 @@ namespace ConsoleApplication1
         static Dictionary<int, int> cp437_unicode = new Dictionary<int, int>();
         static void Main(string[] args)
         {
+			// CreateCP437Table();
             ReadCP437Table();
             DecodeSQL();
         }
@@ -45,27 +46,41 @@ namespace ConsoleApplication1
                 return;
             }
             byte[] cp437_bytes = System.IO.File.ReadAllBytes(SQL_FILE_PATH);
-            int[] utf16_bytes = new int[cp437_bytes.Length / 2];
-            for(int i = 0, j = 0; i < cp437_bytes.Length - 1; ++i, ++i, ++j)
-                utf16_bytes[j] = cp437_bytes[i] + (cp437_bytes[i + 1] >> 8);
+            int[] utf16_bytes = new int[(cp437_bytes.Length - 2) / 2];
+            for(int i = 2, j = 0; i < cp437_bytes.Length - 1; ++i, ++i, ++j)
+                utf16_bytes[j] = cp437_bytes[i] + (cp437_bytes[i + 1] << 8);
 
-            int[] decoded = new int[utf16_bytes.Length];
+            byte[] decoded = new byte[utf16_bytes.Length];
             for (int i = 0; i < decoded.Length; ++i)
             {
                 if (cp437_unicode.ContainsKey(utf16_bytes[i]))
-                    decoded[i] = (byte)cp437_unicode[utf16_bytes[i]];
+				{
+					if(cp437_unicode[utf16_bytes[i]] > 0xff)
+					{
+						System.Console.WriteLine("Error code: " + cp437_unicode[utf16_bytes[i]]);
+						return;
+					}
+					decoded[i] = (byte)cp437_unicode[utf16_bytes[i]];
+				}
                 else
-                    decoded[i] = utf16_bytes[i];
+				{
+					if(utf16_bytes[i] > 0xff)
+					{
+						System.Console.WriteLine("Error code: " + utf16_bytes[i]);
+						return;
+					}
+					decoded[i] = (byte)utf16_bytes[i];
+				}
             }
-            List<byte> decoded_bytes = new List<byte>();
-            int k = 0;
-            foreach(int code in decoded)
-            {
-                decoded_bytes.Add((byte)(code & 0xff));
-                if((code & 0xff00) > 0)
-                    decoded_bytes.Add((byte)(code & 0xff00));
-            }
-            System.IO.File.WriteAllBytes(DECODED_SQL_FILE_PATH, decoded_bytes.ToArray());
+            // List<byte> decoded_bytes = new List<byte>();
+            // int k = 0;
+            // foreach(int code in decoded)
+            // {
+                // decoded_bytes.Add((byte)(code & 0xff));
+                // if((code & 0xff00) > 0)
+                    // decoded_bytes.Add((byte)(code & 0xff00));
+            // }
+            System.IO.File.WriteAllBytes(DECODED_SQL_FILE_PATH, decoded);// decoded_bytes.ToArray());
         }
 
         static void CreateCP437Table()
@@ -132,7 +147,7 @@ namespace ConsoleApplication1
             {
                 StringBuilder table = new StringBuilder();
                 foreach (KeyValuePair<int, int> p in cp437_unicode)
-                    table.Append(p.Key.ToString() + '\t' + p.Value.ToString() + '\n');
+                    table.Append(p.Key.ToString("X") + '\t' + p.Value.ToString("X") + '\n');
                 System.IO.File.WriteAllText(TABLE_FILE_PATH, table.ToString());
             }
         }
