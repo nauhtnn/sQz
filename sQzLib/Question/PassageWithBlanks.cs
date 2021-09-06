@@ -21,17 +21,27 @@ namespace sQzLib
         public override void UpdateQuestIndices(int startQuestIdxLabel)
         {
             base.UpdateQuestIndices(startQuestIdxLabel);
-            List<string> replaced_labels = AutoDetectQuestIdxLabel_in_Passage();
+            Stack<Tuple<int, int>> replaced_labels = AutoDetectQuestIdxLabel_in_Passage();
             if (replaced_labels == null)
                 return;
-            foreach (string replaced_label in replaced_labels)
+            Stack<string> reversedNewPassage = new Stack<string>();
+            int endQuestIdxLabel = startQuestIdxLabel + Questions.Count - 1;
+            while(replaced_labels.Count > 0)
             {
-                Passage = Passage.Replace(replaced_label, "(" + startQuestIdxLabel + ")");
-                ++startQuestIdxLabel;
+                Tuple<int, int> label = replaced_labels.Pop();
+                if(label.Item1 + label.Item2 < Passage.Length)
+                    reversedNewPassage.Push(Passage.Substring(label.Item1 + label.Item2));
+                reversedNewPassage.Push("(" + endQuestIdxLabel + ")");
+                Passage = Passage.Substring(0, label.Item1);
+                --endQuestIdxLabel;
             }
+            StringBuilder newPassage = new StringBuilder();
+            while (reversedNewPassage.Count > 0)
+                newPassage.Append(reversedNewPassage.Pop());
+            Passage = newPassage.ToString();
         }
 
-        protected List<string> AutoDetectQuestIdxLabel_in_Passage()
+        protected Stack<Tuple<int, int>> AutoDetectQuestIdxLabel_in_Passage()
         {
             MatchCollection matches = Regex.Matches(Passage, "\\(\\d+\\)");
             if (matches.Count != Questions.Count)
@@ -41,10 +51,10 @@ namespace sQzLib
                 return null;
             }
 
-            List<string> replaced_labels = new List<string>();
+            Stack<Tuple<int, int>> replaced_labels = new Stack<Tuple<int, int>>();
             foreach (Match match in matches)
             {
-                replaced_labels.Add(match.Value);
+                replaced_labels.Push(Tuple.Create<int, int>(match.Index, match.Value.Length));
             }
             return replaced_labels;
         }
