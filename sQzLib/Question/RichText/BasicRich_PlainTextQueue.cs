@@ -17,14 +17,24 @@ namespace sQzLib
 			while(lines.Count > 0)
 			{
                 if (lines.Peek().ElementAt(0) != '{')
-                    tokens.Enqueue(lines.Dequeue());
-                else if (lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
                 {
-                    BasicRich_PlainText s = lines.Dequeue();
-                    if(s.Length > 2)
-                        tokens.Enqueue(s.Substring(1, s.Length - 2));
+                    if(lines.Peek().ElementAt(0) == '\\' &&
+                        lines.Peek().Length > 1)
+                    {
+                        tokens.Enqueue(lines.Dequeue().Substring(1));
+                    }
+                    else
+                        tokens.Enqueue(lines.Dequeue());
                 }
-				else
+                else if(lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
+                {
+                    if(lines.Peek().Length > 2)
+                    {
+                        BasicRich_PlainText token = lines.Dequeue();
+                        tokens.Enqueue(token.Substring(1, token.Length - 2));
+                    }
+                }
+                else
 					tokens.Enqueue(JoinLinesTo1Token(lines));
 			}
 			return tokens;
@@ -42,8 +52,14 @@ namespace sQzLib
                         token.AppendNewParagraphs(s.Substring(0, s.Length - 1));
 					break;
 				}
-				else
-					token.AppendNewParagraphs(lines.Dequeue());
+				else if (lines.Peek().ElementAt(lines.Peek().Length - 1) == '\\' &&
+                    lines.Peek().Length > 1)
+                {
+                    BasicRich_PlainText s = lines.Dequeue();
+                    token.AppendNewParagraphs(s.Substring(0, s.Length - 1));
+                }
+                else
+                    token.AppendNewParagraphs(lines.Dequeue());
 			}
 			return token;
 		}
