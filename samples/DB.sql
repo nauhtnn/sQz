@@ -49,6 +49,18 @@ CREATE TABLE IF NOT EXISTS `sqz_section`(`id` INT PRIMARY KEY,
 `psg` TEXT, `config` TEXT,
 FOREIGN KEY(`s_type`) REFERENCES `sqz_sec_type`(`id`));
 
+CREATE TABLE IF NOT EXISTS `sqz_image`(`id` INT PRIMARY KEY,
+`dat` MEDIUMBLOB);
+
+CREATE TABLE IF NOT EXISTS `sqz_fmt_type`(`id` INT PRIMARY KEY,
+`name` VARCHAR(32) CHARACTER SET utf8mb4);
+
+CREATE TABLE IF NOT EXISTS `sqz_richtext`(`id` INT,
+`loc_order`INT, `text` TEXT, `fmt` INT, `img` INT,
+PRIMARY KEY(`id`, `loc_order`),
+FOREIGN KEY(`fmt`) REFERENCES `sqz_fmt_type`(`id`),
+FOREIGN KEY(`img`) REFERENCES `sqz_image`(`id`));
+
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `t_type` INT,
 `secid` INT, `deleted` INT,
@@ -56,6 +68,11 @@ CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMA
 `ans0` TEXT CHARACTER SET `utf8mb4`, `ans1` TEXT CHARACTER SET `utf8mb4`,
 `ans2` TEXT CHARACTER SET `utf8mb4`, `ans3` TEXT CHARACTER SET `utf8mb4`,
 `akey` CHAR(4) CHARACTER SET `ascii`,
+`rt_stem` INT REFERENCES `sqz_richtext`(`id`),
+`rt_opt0` INT REFERENCES `sqz_richtext`(`id`),
+`rt_opt1` INT REFERENCES `sqz_richtext`(`id`),
+`rt_opt2` INT REFERENCES `sqz_richtext`(`id`),
+`rt_opt3` INT REFERENCES `sqz_richtext`(`id`),
 FOREIGN KEY(`t_type`) REFERENCES `sqz_test_type`(`id`),
 FOREIGN KEY(`secid`) REFERENCES `sqz_section`(`id`));
 
@@ -68,3 +85,4 @@ FOREIGN KEY(`qid`) REFERENCES `sqz_question`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_admin`(`name` VARCHAR(32) CHARACTER SET `utf8mb4` PRIMARY KEY,
 `pw` CHAR(64) CHARACTER SET `ascii`);
+
