@@ -10,16 +10,54 @@ using System.Windows;
 
 namespace sQzLib
 {
-    public class BasicRich_PlainText: ICloneable, IText
+    public enum TEXT_FORMAT
     {
-        const int MAX_RTF_TEXT_LENGTH = 2^17;//mySQL data type TEXT max length = 2^16
-        public RichTextBox RichText { get; private set; }
-        public string PlainText { get; private set; }
+        None,
+        Bold,
+        Italic,
+        Underline,
+        Image
+    }
+    public class RunData
+    {
+        public string Text;
+        public TEXT_FORMAT Format;
+        public byte[] ImageData;
+
+        public RunData(string text)
+        {
+            Text = text;
+            Format = TEXT_FORMAT.None;
+            ImageData = null;
+        }
+    }
+
+    public class ParagraphData
+    {
+        public Queue<RunData> Runs;
+
+        public ParagraphData()
+        {
+            Runs = new Queue<RunData>();
+        }
+
+        public ParagraphData(string text)
+        {
+            Runs = new Queue<RunData>();
+            Runs.Enqueue(new RunData(text));
+        }
+    }
+
+    public class Rich_PlainText: IText, ICloneable
+    {
+        public string PlainText;
+        public Queue<ParagraphData> Paragraphs;
+        
         public int Length { get; }
 
-        public BasicRich_PlainText(RichTextBox richTextBox)
+        public Rich_PlainText(Queue<ParagraphData> paragraphs)
         {
-            RichText = richTextBox;
+            Paragraphs = paragraphs;
             PlainText = null;
             Length = GetInnerTextOfRichText().Length;
         }
@@ -43,9 +81,9 @@ namespace sQzLib
         public string GetInnerTextOfRichText()
         {
             StringBuilder text = new StringBuilder();
-            foreach (Paragraph p in RichText.Document.Blocks.OfType<Paragraph>())
+            foreach (ParagraphData p in Paragraphs)
             {
-                foreach (Run run in p.Inlines.OfType<Run>())
+                foreach (RunData run in p.Runs)
                     text.Append(run.Text);
                 text.Append("\n");
             }
@@ -60,9 +98,9 @@ namespace sQzLib
                 return GetInnerTextOfRichText().StartsWith(text);
         }
 
-        public BasicRich_PlainText(string plainText)
+        public Rich_PlainText(string plainText)
         {
-            RichText = null;
+            Paragraphs = null;
             PlainText = plainText;
             Length = PlainText.Length;
         }
@@ -84,9 +122,9 @@ namespace sQzLib
             else
             {
                 char lastChar = (char)0;
-                foreach (Paragraph p in RichText.Document.Blocks.OfType<Paragraph>())
+                foreach (ParagraphData p in Paragraphs)
                 {
-                    foreach (Run run in p.Inlines.OfType<Run>())
+                    foreach (RunData run in p.Runs)
                         if(run.Text.Length > 0)
                             lastChar = run.Text.Last();
                 }
@@ -94,47 +132,47 @@ namespace sQzLib
             }
         }
 
-        public BasicRich_PlainText Substring(int startIndex)
+        public Rich_PlainText Substring(int startIndex)
         {
             if (PlainText != null)
-                return new BasicRich_PlainText(PlainText.Substring(startIndex));
+                return new Rich_PlainText(PlainText.Substring(startIndex));
             else
                 return SubstringOfRichText(startIndex);
         }
 
-        private BasicRich_PlainText SubstringOfRichText(int startIndex)
+        private Rich_PlainText SubstringOfRichText(int startIndex)
         {
             return SubstringOfRichText(startIndex, Length - startIndex);
         }
 
-        private BasicRich_PlainText SubstringOfRichText(int startIndex, int length)
+        private Rich_PlainText SubstringOfRichText(int startIndex, int length)
         {
-            BasicRich_PlainText substring = this.Clone() as BasicRich_PlainText;
-            foreach (Paragraph para in substring.RichText.Document.Blocks.OfType<Paragraph>())
+            Rich_PlainText substring = this.Clone() as Rich_PlainText;
+            foreach (ParagraphData para in substring.Paragraphs)
             {
-                foreach (Run run in para.Inlines.OfType<Run>())
+                foreach (RunData run in para.Runs)
                 {
                     if (run.Text.Length <= startIndex)
                     {
                         startIndex -= run.Text.Length;
-                        para.Inlines.Remove(run);
+                        para.Runs.Dequeue();
                     }
-                    if (para.Inlines.OfType<Run>().Count() == 0)
-                        substring.RichText.Document.Blocks.Remove(para);
+                    if (para.Runs.Count() == 0)
+                        substring.Paragraphs.Dequeue();
                 }
             }
             return null;
         }
 
-        public BasicRich_PlainText Substring(int startIndex, int length)
+        public Rich_PlainText Substring(int startIndex, int length)
         {
             if (PlainText != null)
-                return new BasicRich_PlainText(PlainText.Substring(startIndex, length));
+                return new Rich_PlainText(PlainText.Substring(startIndex, length));
             else
                 return SubstringOfRichText(startIndex, length);
         }
 
-        public void AppendNewParagraphs(BasicRich_PlainText text)
+        public void AppendNewParagraphs(Rich_PlainText text)
         {
             if (PlainText != null && text.PlainText != null)
                     PlainText = PlainText + "\n" + text.PlainText;
@@ -150,44 +188,22 @@ namespace sQzLib
 
         private void ConvertToRichText()
         {
-            Run run = new Run();
-            run.Text = PlainText;
-            Paragraph para = new Paragraph();
-            para.Inlines.Add(run);
-            RichText = new RichTextBox();
-            RichText.Document.Blocks.Add(para);
+            Paragraphs = new Queue<ParagraphData>();
+            Paragraphs.Enqueue(new ParagraphData(PlainText));
             PlainText = null;
         }
 
-        private void AppendNewParagraphsFromRichText(BasicRich_PlainText text)
+        private void AppendNewParagraphsFromRichText(Rich_PlainText text)
         {
-            foreach (Paragraph p in text.RichText.Document.Blocks.OfType<Paragraph>())
-                RichText.Document.Blocks.Add(p);
+            Paragraphs.Concat(text.Paragraphs);
         }
 
         public object Clone()
         {
             if (PlainText != null)
-                return new BasicRich_PlainText(PlainText);
+                return new Rich_PlainText(PlainText);
             else
-                return new BasicRich_PlainText(RichText);
-        }
-
-        public override string ToString()
-        {
-            if (PlainText != null)
-                return PlainText;
-            else
-            {
-                using (MemoryStream stream = new MemoryStream(MAX_RTF_TEXT_LENGTH))
-                {
-                    TextRange range = new TextRange(RichText.Document.ContentStart, RichText.Document.ContentEnd);
-                    if (range.CanSave(DataFormats.Rtf) && stream.CanWrite)
-                        range.Save(stream, DataFormats.Rtf);
-                    string Rtf_text = Encoding.UTF8.GetString(stream.ToArray());
-                    return Rtf_text;
-                }
-            }
+                return new Rich_PlainText(Paragraphs);
         }
     }
 }

@@ -358,8 +358,8 @@ namespace sQzLib
         //only Prep0 uses this.
         public void LoadFromFile(string filePath)
         {
-            BasicRich_PlainTextParsingMgr parsingMgr = new BasicRich_PlainTextParsingMgr();
-            Sections = parsingMgr.ParseTokens(BasicRich_PlainTextQueue.GetTextQueue(filePath));
+            TextQueueParser parsingMgr = new TextQueueParser();
+            Sections = parsingMgr.ParseTokens(Rich_PlainTextQueue.GetTextQueue(filePath));
         }
 
         public void WriteTxt(string fpath)

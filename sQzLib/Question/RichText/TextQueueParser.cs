@@ -7,15 +7,15 @@ using System.Text.RegularExpressions;
 
 namespace sQzLib
 {
-    class BasicRich_PlainTextParsingMgr
+    class TextQueueParser
     {
-        public BasicRich_PlainTextParsingMgr()
+        public TextQueueParser()
         {
             if (!QSheetSection.LoadSectionMagicKeywords())
                 QSheetSection.InitDefaultMagicKeywords();
         }
 
-        public List<QSheetSection> ParseTokens(Queue<BasicRich_PlainText> tokens)
+        public List<QSheetSection> ParseTokens(IEnumerable<IText> tokens)
         {
             List<QSheetSection> sections = new List<QSheetSection>();
             QSheetSection.TrimToFirstSection(tokens);

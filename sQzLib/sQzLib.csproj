@@ -77,9 +77,12 @@
     <Compile Include="HotkeyHandler.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Question\Question.cs" />
+    <Compile Include="Question\RichText\IText.cs" />
+    <Compile Include="Question\RichText\Rich_PlainTextQueue.cs" />
+    <Compile Include="Question\RichText\Rich_PlainText.cs" />
     <Compile Include="Question\RichText\BasicRich_PlainText.cs" />
     <Compile Include="Question\RichText\BasicRich_PlainTextQueue.cs" />
-    <Compile Include="Question\RichText\BasicRich_PlainTextParsingMgr.cs" />
+    <Compile Include="Question\RichText\TextQueueParser.cs" />
     <Compile Include="Question\SingleQuestionView.cs" />
     <Compile Include="Server2.cs" />
     <Compile Include="Settings.cs" />

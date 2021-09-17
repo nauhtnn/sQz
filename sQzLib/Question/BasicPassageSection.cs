@@ -20,7 +20,7 @@ namespace sQzLib
             Init(id);
         }
 
-        public override bool Parse(Queue<BasicRich_PlainText> tokens)
+        public override bool Parse(Queue<IText> tokens)
         {
             if (tokens.Count < 4 + Question.NUMBER_OF_OPTIONS)
             {

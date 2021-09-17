@@ -18,7 +18,7 @@ namespace sQzLib
             Init(id);
         }
 
-        public override bool Parse(Queue<BasicRich_PlainText> tokens)
+        public override bool Parse(Queue<IText> tokens)
         {
             if(QSheetSection.SECTION_MAGIC_PREFIX.Length > 0)
             {

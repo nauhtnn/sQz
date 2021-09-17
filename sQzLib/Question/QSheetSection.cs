@@ -23,7 +23,7 @@ namespace sQzLib
 
         public string Requirements;
         public List<Question> Questions;
-        abstract public bool Parse(Queue<BasicRich_PlainText> tokens);
+        abstract public bool Parse(Queue<IText> tokens);
         abstract public void DBAppendQryIns(string prefx, ref int idx, int qSheetID, StringBuilder vals);
 
         public static bool LoadSectionMagicKeywords()
@@ -136,7 +136,7 @@ namespace sQzLib
             SectionMagicKeywords.Add(SectionTypeID.BasicPassage, magicKeywords);
         }
 
-        public static void TrimToFirstSection(Queue<BasicRich_PlainText> tokens)
+        public static void TrimToFirstSection(Queue<IText> tokens)
         {
             if (SECTION_MAGIC_PREFIX.Length == 0)
                 return;
@@ -154,7 +154,7 @@ namespace sQzLib
             return Questions.Count;
         }
 
-        protected Question Parse1Question(Queue<BasicRich_PlainText> tokens)
+        protected Question Parse1Question(Queue<IText> tokens)
         {
             if (tokens.Count < Question.NUMBER_OF_OPTIONS + 2)//+ stem, answer
             {
@@ -181,7 +181,7 @@ namespace sQzLib
             return question;
         }
 
-        protected bool ParseQuestions(Queue<BasicRich_PlainText> tokens)
+        protected bool ParseQuestions(Queue<IText> tokens)
         {
             Questions = new List<Question>();
             while (tokens.Count > 0)
