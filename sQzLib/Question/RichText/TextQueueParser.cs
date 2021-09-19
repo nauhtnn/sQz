@@ -18,18 +18,19 @@ namespace sQzLib
         public List<QSheetSection> ParseTokens(IEnumerable<IText> tokens)
         {
             List<QSheetSection> sections = new List<QSheetSection>();
-            QSheetSection.TrimToFirstSection(tokens);
-            while(tokens.Count > 0)
+            var itor = tokens.GetEnumerator();
+            QSheetSection.TrimToFirstSection(itor);
+            while(itor.Current != null)
             {
                 if(QSheetSection.SECTION_MAGIC_PREFIX.Length > 0 &&
-                    !tokens.Dequeue().StartsWith(QSheetSection.SECTION_MAGIC_PREFIX))
+                    !itor.Current.StartsWith(QSheetSection.SECTION_MAGIC_PREFIX))
                 {
                     System.Windows.MessageBox.Show("ParseTokens: From the end, line " +
-                    tokens.Count + " doesn't have section magic prefix " + QSheetSection.SECTION_MAGIC_PREFIX);
+                        Utils.CountEnumerator(itor) + " doesn't have section magic prefix " + QSheetSection.SECTION_MAGIC_PREFIX);
                     return sections;
                 }
-                QSheetSection section = SelectSection(tokens.Peek().GetInnerText());
-                if(!section.Parse(tokens))
+                QSheetSection section = SelectSection(itor.Current.GetInnerText());
+                if(!section.Parse(itor))
                 {
                     sections.Add(section);
                     break;

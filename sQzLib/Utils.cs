@@ -197,6 +197,14 @@ namespace sQzLib
 
             return richText;
         }
+
+        public static int CountEnumerator(IEnumerator<object> itor)
+        {
+            int count = 1;
+            while (itor.MoveNext())
+                ++count;
+            return count;
+        }
     }
 
     public class UICbMsg

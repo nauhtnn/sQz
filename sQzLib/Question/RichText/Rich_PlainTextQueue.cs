@@ -10,7 +10,7 @@ namespace sQzLib
 {
     public class Rich_PlainTextQueue
     {
-		public static IEnumerable<object> GetTextQueue(string filePath)
+		public static IEnumerable<IText> GetTextQueue(string filePath)
 		{
 			Queue<Rich_PlainText> lines = ReadTrimLines(filePath);
             Queue<Rich_PlainText> tokens = new Queue<Rich_PlainText>();

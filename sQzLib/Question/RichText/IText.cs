@@ -12,5 +12,6 @@ namespace sQzLib
         string GetInnerText();
 
         char Last();
+        IText Replace(string item1, string v);
     }
 }

@@ -21,9 +21,9 @@ namespace sQzLib
         protected int _ID;
         public int ID { get { return _ID; } }
 
-        public string Requirements;
+        public IText Requirements;
         public List<Question> Questions;
-        abstract public bool Parse(Queue<IText> tokens);
+        abstract public bool Parse(IEnumerator<IText> tokens);
         abstract public void DBAppendQryIns(string prefx, ref int idx, int qSheetID, StringBuilder vals);
 
         public static bool LoadSectionMagicKeywords()
@@ -93,7 +93,7 @@ namespace sQzLib
 
         protected Tuple<string, string> AutoDetectQuestIdxLabel_in_Req()
         {
-            MatchCollection matches = Regex.Matches(Requirements, "\\d+");
+            MatchCollection matches = Regex.Matches(Requirements.GetInnerText(), "\\d+");
             if (matches.Count != 2 ||
                 matches[0].Value.Equals(matches[1].Value))
             {
@@ -119,7 +119,7 @@ namespace sQzLib
 
         public void Clear()
         {
-            Requirements = string.Empty;
+            Requirements = null;
             Questions.Clear();
         }
 
@@ -136,17 +136,12 @@ namespace sQzLib
             SectionMagicKeywords.Add(SectionTypeID.BasicPassage, magicKeywords);
         }
 
-        public static void TrimToFirstSection(Queue<IText> tokens)
+        public static IEnumerator<IText> TrimToFirstSection(IEnumerator<IText> itor)
         {
             if (SECTION_MAGIC_PREFIX.Length == 0)
-                return;
-            while (tokens.Count > 0)
-            {
-                if (!tokens.Peek().StartsWith(SECTION_MAGIC_PREFIX))
-                    tokens.Dequeue();
-                else
-                    return;
-            }
+                return itor;
+            while (itor.MoveNext() && !itor.Current.StartsWith(SECTION_MAGIC_PREFIX)) ;
+            return itor;
         }
 
         public int CountQuestions()
@@ -154,23 +149,36 @@ namespace sQzLib
             return Questions.Count;
         }
 
-        protected Question Parse1Question(Queue<IText> tokens)
+        protected virtual bool CheckEnumeratorQuantity(IEnumerator<object> itor)
         {
-            if (tokens.Count < Question.NUMBER_OF_OPTIONS + 2)//+ stem, answer
+            int count = 2 + Question.NUMBER_OF_OPTIONS;
+            while (--count > 0 && itor.MoveNext()) ;
+            if (count > 0)
             {
-                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " doesn't have 1 stem 4 options 1 answer!");
-                return null;
+                System.Windows.MessageBox.Show("From the end, line " +
+                    (2 + Question.NUMBER_OF_OPTIONS - count) +
+                    " doesn't have 1 stem 4 options 1 answer!");
+                return false;
             }
+            return true;
+        }
+
+        protected Question Parse1Question(IEnumerator<IText> itor)
+        {
+            if (!CheckEnumeratorQuantity(itor))
+                return null;
 
             Question question = new Question();
-            question.Stem = tokens.Dequeue().ToString();
-            question.vAns = new string[Question.NUMBER_OF_OPTIONS];
-            for (int j = 0; j < Question.NUMBER_OF_OPTIONS;)
-                question.vAns[j++] = tokens.Dequeue().ToString();
-            char key_label = tokens.Dequeue().Last();
-            if (key_label < 'A' || 'D' < key_label)
+            question.Stem = itor.Current;
+            itor.MoveNext();
+            question.vAns = new BasicRich_PlainText[Question.NUMBER_OF_OPTIONS];
+            for (int j = 0; j < Question.NUMBER_OF_OPTIONS; itor.MoveNext())
+                question.vAns[j++] = itor.Current;
+            char key_label = itor.Current.Last();
+            if (key_label < 'A' || ('A' + Question.NUMBER_OF_OPTIONS - 1) < key_label)
             {
-                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has key: " + key_label +
+                System.Windows.MessageBox.Show("From the end, line " +
+                    Utils.CountEnumerator(itor) + " has key: " + key_label +
                     "\nNeighbor stem: " + question.Stem);
                 return null;
             }
@@ -181,17 +189,17 @@ namespace sQzLib
             return question;
         }
 
-        protected bool ParseQuestions(Queue<IText> tokens)
+        protected bool ParseQuestions(IEnumerator<IText> itor)
         {
             Questions = new List<Question>();
-            while (tokens.Count > 0)
+            while (itor.MoveNext())
             {
                 if (SECTION_MAGIC_PREFIX.Length > 0 &&
                     //sQzLib.Utils.CleanFront(
-                    tokens.Peek().StartsWith(SECTION_MAGIC_PREFIX))
+                    itor.Current.StartsWith(SECTION_MAGIC_PREFIX))
                     break;
 
-                Question question = Parse1Question(tokens);
+                Question question = Parse1Question(itor);
                 if (question == null)
                 {
                     System.Windows.MessageBox.Show("Stop at question " + Questions.Count);
@@ -246,7 +254,7 @@ namespace sQzLib
         protected void Init(int id)
         {
             _ID = id;
-            Requirements = string.Empty;
+            Requirements = null;
             Questions = new List<Question>();
         }
 

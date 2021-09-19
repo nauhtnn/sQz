@@ -8,7 +8,7 @@ namespace sQzLib
 {
     public class BasicPassageSection: QSheetSection
     {
-        public string Passage;
+        public IText Passage;
 
         public BasicPassageSection()
         {
@@ -20,20 +20,33 @@ namespace sQzLib
             Init(id);
         }
 
-        public override bool Parse(Queue<IText> tokens)
+        protected override bool CheckEnumeratorQuantity(IEnumerator<object> itor)
         {
-            if (tokens.Count < 4 + Question.NUMBER_OF_OPTIONS)
+            int count = 4 + Question.NUMBER_OF_OPTIONS;
+            while (--count > 0 && itor.MoveNext()) ;
+            if (count > 0)
             {
                 System.Windows.MessageBox.Show("BasicPassageSection: From the end, line " +
-                    tokens.Count + " doesn't have 1 requirement 1 passage 1 stem 4 options 1 answer!");
+                    (4 + Question.NUMBER_OF_OPTIONS - count) +
+                    " doesn't have 1 requirement 1 passage 1 stem 4 options 1 answer!");
                 return false;
             }
+            return true;
+        }
 
-            Requirements = tokens.Dequeue().ToString();
+        public override bool Parse(IEnumerator<IText> itor)
+        {
+            if (!CheckEnumeratorQuantity(itor))
+                return false;
 
-            Passage = tokens.Dequeue().ToString();
+            Requirements = itor.Current;
 
-            return ParseQuestions(tokens);
+            if (itor.MoveNext())
+                return false;
+
+            Passage = itor.Current;
+
+            return ParseQuestions(itor);
         }
 
         public override void DBAppendQryIns(string prefx, ref int idx, int qSheetID, StringBuilder vals)

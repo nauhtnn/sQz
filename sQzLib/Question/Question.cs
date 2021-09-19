@@ -12,8 +12,8 @@ namespace sQzLib
         public const char C1 = '1';
         public int uId;
         public int SectionID;
-        public string Stem;
-        public string[] vAns;
+        public IText Stem;
+        public IText[] vAns;
         public bool[] vKeys;
         public int[] vAnsSort;
 
