@@ -18,32 +18,33 @@ namespace sQzLib
             Init(id);
         }
 
-        public override bool Parse(Queue<IText> tokens)
+        public override bool Parse(IEnumerator<IText> itor)
         {
             if(QSheetSection.SECTION_MAGIC_PREFIX.Length > 0)
             {
-                if (tokens.Count < 3 + Question.NUMBER_OF_OPTIONS)
+                if (Utils.CountEnumerator(itor) < 3 + Question.NUMBER_OF_OPTIONS)
                 {
                     System.Windows.MessageBox.Show("IndependentQSection: From the end, line " +
-                        tokens.Count + " doesn't have 1 requirement 1 stem 4 options 1 answer!");
+                        Utils.CountEnumerator(itor) + " doesn't have 1 requirement 1 stem 4 options 1 answer!");
                     return false;
                 }
 
-                Requirements = tokens.Dequeue().ToString();
+                Requirements = itor.Current;
+                itor.MoveNext();
             }
             else
             {
-                if (tokens.Count < 2 + Question.NUMBER_OF_OPTIONS)
+                if (Utils.CountEnumerator(itor) < 2 + Question.NUMBER_OF_OPTIONS)
                 {
                     System.Windows.MessageBox.Show("IndependentQSection: From the end, line " +
-                        tokens.Count + " doesn't have 0 requirement 1 stem 4 options 1 answer!");
+                        Utils.CountEnumerator(itor) + " doesn't have 0 requirement 1 stem 4 options 1 answer!");
                     return false;
                 }
 
-                Requirements = string.Empty;
+                Requirements = null;
             }
 
-            return ParseQuestions(tokens);
+            return ParseQuestions(itor);
         }
 
         public override void DBAppendQryIns(string prefx, ref int idx, int qSheetID, StringBuilder vals)

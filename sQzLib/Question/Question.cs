@@ -29,14 +29,14 @@ namespace sQzLib
             return TokenType.Both;
         }
 
-        public IEnumerable<string> ToListOfStrings()
-        {
-            LinkedList<string> s = new LinkedList<string>();
-            s.AddLast(Stem);
-            foreach (string i in vAns)
-                s.AddLast(i);
-            return s;
-        }
+        //public IEnumerable<string> ToListOfStrings()
+        //{
+        //    LinkedList<string> s = new LinkedList<string>();
+        //    s.AddLast(Stem);
+        //    foreach (string i in vAns)
+        //        s.AddLast(i);
+        //    return s;
+        //}
 
         //public bool Ans(int idx, out string ans)
         //{
@@ -67,7 +67,7 @@ namespace sQzLib
             q.uId = uId;
             q.Stem = Stem;
             q.SectionID = SectionID;
-            q.vAns = new string[NUMBER_OF_OPTIONS];
+            q.vAns = new IText[NUMBER_OF_OPTIONS];
             for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
                 q.vAns[i] = vAns[i];
             q.vKeys = new bool[NUMBER_OF_OPTIONS];
@@ -81,7 +81,7 @@ namespace sQzLib
 
         public void Randomize(Random rand)
         {
-            string[] anss = new string[NUMBER_OF_OPTIONS];
+            IText[] anss = new IText[NUMBER_OF_OPTIONS];
             bool[] keys = new bool[NUMBER_OF_OPTIONS];
             int[] asort = new int[NUMBER_OF_OPTIONS];
             List<int> l = new List<int>();
@@ -110,7 +110,7 @@ namespace sQzLib
             q.Stem = Stem;
             q.SectionID = SectionID;
             //randomize
-            q.vAns = new string[NUMBER_OF_OPTIONS];
+            q.vAns = new IText[NUMBER_OF_OPTIONS];
             q.vKeys = new bool[NUMBER_OF_OPTIONS];
             List<int> l = new List<int>();
             for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)

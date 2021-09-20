@@ -158,14 +158,14 @@ namespace sQzLib
         private Question ReadBytesOfQuestion(byte[] buf, ref int offs)
         {
             Question q = new Question();
-            q.Stem = Utils.ReadBytesOfString(buf, ref offs);
+            q.Stem = ITextFactory.CreateFromBytes(buf, ref offs);
             if (q.Stem == null)
                 return null;
             //ans
-            q.vAns = new string[Question.NUMBER_OF_OPTIONS];
+            q.vAns = new IText[Question.NUMBER_OF_OPTIONS];
             for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
             {
-                q.vAns[j] = Utils.ReadBytesOfString(buf, ref offs);
+                q.vAns[j] = ITextFactory.CreateFromBytes(buf, ref offs);
                 if (q.vAns[j] == null)
                     return null;
             }
@@ -174,9 +174,9 @@ namespace sQzLib
 
         private void AppendBytesOf(Question q, List<byte[]> byteList)
         {
-            Utils.AppendBytesOfString(q.Stem, byteList);
-            foreach (string option in q.vAns)
-                Utils.AppendBytesOfString(option, byteList);
+            q.Stem.AppendBytesOfString(byteList);
+            foreach (IText option in q.vAns)
+                option.AppendBytesOfString(byteList);
         }
 
         private List<Question> ReadBytesOfQuestions(byte[] buf, ref int offs)
@@ -205,7 +205,7 @@ namespace sQzLib
                 return null;
             IndependentQSection sec = new IndependentQSection(BitConverter.ToInt32(buf, offs));
             offs += 4;
-            sec.Requirements = Utils.ReadBytesOfString(buf, ref offs);
+            sec.Requirements = ITextFactory.CreateFromBytes(buf, ref offs);
             if (sec.Requirements == null)
                 return null;
             sec.Questions = ReadBytesOfQuestions(buf, ref offs);
@@ -216,10 +216,10 @@ namespace sQzLib
 
         private bool ReadBytesOfBasicPassageSection(BasicPassageSection section, byte[] buf, ref int offs)
         {
-            section.Requirements = Utils.ReadBytesOfString(buf, ref offs);
+            section.Requirements = ITextFactory.CreateFromBytes(buf, ref offs);
             if (section.Requirements == null)
                 return false;
-            section.Passage = Utils.ReadBytesOfString(buf, ref offs);
+            section.Passage = ITextFactory.CreateFromBytes(buf, ref offs);
             if (section.Passage == null)
                 return false;
             section.Questions = ReadBytesOfQuestions(buf, ref offs);
@@ -287,7 +287,7 @@ namespace sQzLib
         {
             byteList.Add(BitConverter.GetBytes((int)SectionTypeID.DefaultIndependentQuestions));
             byteList.Add(BitConverter.GetBytes(section.ID));
-            Utils.AppendBytesOfString(section.Requirements, byteList);
+            section.Requirements.AppendBytesOfString(byteList);
             byteList.Add(BitConverter.GetBytes(section.Questions.Count));
             foreach (Question q in section.Questions)
                 AppendBytesOf(q, byteList);
@@ -297,8 +297,8 @@ namespace sQzLib
         {
             byteList.Add(BitConverter.GetBytes((int)section.GetSectionTypeID()));
             byteList.Add(BitConverter.GetBytes(section.ID));
-            Utils.AppendBytesOfString(section.Requirements, byteList);
-            Utils.AppendBytesOfString(section.Passage, byteList);
+            section.Requirements.AppendBytesOfString(byteList);
+            section.Passage.AppendBytesOfString(byteList);
             byteList.Add(BitConverter.GetBytes(section.Questions.Count));
             foreach (Question q in section.Questions)
                 AppendBytesOf(q, byteList);
@@ -492,6 +492,20 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
+        Dictionary<int, IText> RichTexts_in_DB;
+
+        private void LoadPlainTextFromDB_or_MarkRichText(MySqlDataReader reader,
+            int plainTextColumn, int richTextColum, out IText text)
+        {
+            if (!reader.IsDBNull(plainTextColumn))
+                text = ITextFactory.CreateFromString(reader.GetString(plainTextColumn));
+            else
+            {
+                RichTexts_in_DB.Add(reader.GetInt32(richTextColum), text);
+                text = null;
+            }
+        }
+
         private void DBSelectSections(MySqlConnection conn, List<Question> questions)
         {
             Dictionary<int, QSheetSection> tempSections = new Dictionary<int, QSheetSection>();
@@ -521,21 +535,21 @@ namespace sQzLib
                     {
                         case SectionTypeID.DefaultIndependentQuestions:
                             IndependentQSection ind_section = new IndependentQSection(reader.GetInt32(0));
-                            ind_section.Requirements = reader.GetString(2);
+                            LoadPlainTextFromDB_or_MarkRichText(reader, 2, 999, out ind_section.Requirements);
                             Sections.Add(ind_section);
                             Safe_AddTempSection(tempSections, ind_section);
                             break;
                         case SectionTypeID.PassageWithBlanks:
                             PassageWithBlanks p_blanks = new PassageWithBlanks(reader.GetInt32(0));
-                            p_blanks.Requirements = reader.GetString(2);
-                            p_blanks.Passage = reader.GetString(3);
+                            LoadPlainTextFromDB_or_MarkRichText(reader, 2, 999, out p_blanks.Requirements);
+                            LoadPlainTextFromDB_or_MarkRichText(reader, 3, 999, out p_blanks.Passage);
                             Sections.Add(p_blanks);
                             Safe_AddTempSection(tempSections, p_blanks);
                             break;
                         case SectionTypeID.BasicPassage:
                             BasicPassageSection basic_passage = new BasicPassageSection(reader.GetInt32(0));
-                            basic_passage.Requirements = reader.GetString(2);
-                            basic_passage.Passage = reader.GetString(3);
+                            LoadPlainTextFromDB_or_MarkRichText(reader, 2, 999, out basic_passage.Requirements);
+                            LoadPlainTextFromDB_or_MarkRichText(reader, 3, 999, out basic_passage.Passage);
                             Sections.Add(basic_passage);
                             Safe_AddTempSection(tempSections, basic_passage);
                             break;
@@ -578,10 +592,10 @@ namespace sQzLib
                 q.SectionID = -1;
             else
                 q.SectionID = reader.GetInt32(1);
-            q.Stem = reader.GetString(2);
-            q.vAns = new string[Question.NUMBER_OF_OPTIONS];
+            LoadPlainTextFromDB_or_MarkRichText(reader, 2, 999, out q.Stem);
+            q.vAns = new IText[Question.NUMBER_OF_OPTIONS];
             for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
-                q.vAns[j] = reader.GetString(3 + j);
+                LoadPlainTextFromDB_or_MarkRichText(reader, 3 + j, 999, out q.vAns[j]);
             string x = reader.GetString(7);
             q.vKeys = new bool[Question.NUMBER_OF_OPTIONS];
             for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)

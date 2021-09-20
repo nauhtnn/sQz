@@ -20,7 +20,7 @@ namespace sQzLib
             Init(id);
         }
 
-        protected override bool CheckEnumeratorQuantity(IEnumerator<object> itor)
+        private bool CheckSectionTokensCount(IEnumerator<object> itor)
         {
             int count = 4 + Question.NUMBER_OF_OPTIONS;
             while (--count > 0 && itor.MoveNext()) ;
@@ -36,7 +36,7 @@ namespace sQzLib
 
         public override bool Parse(IEnumerator<IText> itor)
         {
-            if (!CheckEnumeratorQuantity(itor))
+            if (!CheckSectionTokensCount(itor))
                 return false;
 
             Requirements = itor.Current;

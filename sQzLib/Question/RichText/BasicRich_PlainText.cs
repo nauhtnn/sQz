@@ -189,5 +189,10 @@ namespace sQzLib
                 }
             }
         }
+
+        public void Replace(string item1, string v)
+        {
+            throw new NotImplementedException();
+        }
     }
 }

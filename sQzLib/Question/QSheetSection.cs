@@ -86,8 +86,8 @@ namespace sQzLib
             Tuple<string, string> replaced_labels = AutoDetectQuestIdxLabel_in_Req();
             if (replaced_labels == null)
                 return;
-            Requirements = Requirements.Replace(replaced_labels.Item1, startQuestIdxLabel.ToString());
-            Requirements = Requirements.Replace(replaced_labels.Item2,
+            Requirements.Replace(replaced_labels.Item1, startQuestIdxLabel.ToString());
+            Requirements.Replace(replaced_labels.Item2,
                 (startQuestIdxLabel + Questions.Count - 1).ToString());
         }
 
@@ -149,7 +149,7 @@ namespace sQzLib
             return Questions.Count;
         }
 
-        protected virtual bool CheckEnumeratorQuantity(IEnumerator<object> itor)
+        private bool CheckQuestionTokensCount(IEnumerator<object> itor)
         {
             int count = 2 + Question.NUMBER_OF_OPTIONS;
             while (--count > 0 && itor.MoveNext()) ;
@@ -163,9 +163,9 @@ namespace sQzLib
             return true;
         }
 
-        protected Question Parse1Question(IEnumerator<IText> itor)
+        private Question Parse1Question(IEnumerator<IText> itor)
         {
-            if (!CheckEnumeratorQuantity(itor))
+            if (!CheckQuestionTokensCount(itor))
                 return null;
 
             Question question = new Question();

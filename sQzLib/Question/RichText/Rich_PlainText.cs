@@ -205,5 +205,17 @@ namespace sQzLib
             else
                 return new Rich_PlainText(Paragraphs);
         }
+
+        public void Replace(string item1, string v)
+        {
+            if (PlainText != null)
+                PlainText = PlainText.Replace(item1, v);
+            else
+            {
+                foreach (ParagraphData para in Paragraphs)
+                    foreach (RunData run in para.Runs)
+                        run.Text = run.Text.Replace(item1, v);
+            }
+        }
     }
 }
