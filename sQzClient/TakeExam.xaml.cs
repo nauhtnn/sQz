@@ -288,7 +288,39 @@ namespace sQzClient
             thisExaminee.eStt = NeeStt.Submitting;
             thisExaminee.ToLogFile(Utils.GetMinutes(dtRemn), dtRemn.Seconds);
             if (mClnt.ConnectWR(ref mCbMsg))
+            {
                 bBtnBusy = false;
+                OnSubmitConnectionFail();
+            }
+        }
+
+        private void OnSubmitConnectionFail()
+        {
+            App.EnableHookKeys(false);
+            WPopup.s.ShowDialog("Check network and click reconnect, or exit.",
+                Txt.s._((int)TxI.SUBMIT), "Exit",
+                string.Empty, ResubmitAfterConnectionFail, ShowExitDiaglogBox);
+        }
+
+        private void ResubmitAfterConnectionFail()
+        {
+            bBtnBusy = true;
+            if (mClnt.ConnectWR(ref mCbMsg))
+            {
+                bBtnBusy = false;
+                OnSubmitConnectionFail();
+            }
+        }
+
+        private void ShowExitDiaglogBox()
+        {
+            if (thisExaminee.eStt < NeeStt.Submitting)
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.EXIT_CAUT_1),
+                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), "exit", Exit, WPopupCancel);
+            else
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.EXIT_CAUT_2),
+                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), null, Exit, WPopupCancel);
+
         }
 
         private void btnSubmit_Click(object sender, RoutedEventArgs e)
@@ -459,12 +491,7 @@ namespace sQzClient
                 return;
             bBtnBusy = true;
             spMain.Opacity = 0.5;
-            if (thisExaminee.eStt < NeeStt.Submitting)
-                WPopup.s.ShowDialog(Txt.s._((int)TxI.EXIT_CAUT_1),
-                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), "exit", Exit, WPopupCancel);
-            else
-                WPopup.s.ShowDialog(Txt.s._((int)TxI.EXIT_CAUT_2),
-                    Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL), null, Exit, WPopupCancel);
+            ShowExitDiaglogBox();
             spMain.Opacity = 1;
         }
 
