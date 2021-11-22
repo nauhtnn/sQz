@@ -78,7 +78,6 @@ namespace sQzServer0
             w.FontSize = 16;
 
             LoadTxt();
-            InitQPanel();
 
             LoadBrd();
 
@@ -105,35 +104,10 @@ namespace sQzServer0
         {
             Txt t = Txt.s;
             btnMMenu.Content = t._((int)TxI.BACK_MMENU);
-            rdoA.Content = t._((int)TxI.BASIC);
-            rdoB.Content = t._((int)TxI.ADVAN);
-            txtMod.Text = t._((int)TxI.MODULE);
-            txtNEsyDif.Text = t._((int)TxI.N_ESY_DIF);
-            txtNDiff.Text = t._((int)TxI.N_DIFF);
-            txtnQs.Text = t._((int)TxI.QS_N);
-            txtnQ.Text = t._((int)TxI.Q_N);
-            txtBirdate.Text = t._((int)TxI.BIRDATE);
-            txtBirpl.Text = t._((int)TxI.BIRPL);
-            txtName.Text = t._((int)TxI.NEE_NAME);
-            txtId.Text = t._((int)TxI.NEEID_S);
-            txtGrade.Text = t._((int)TxI.MARK);
-            txtRoom.Text = t._((int)TxI.ROOM);
-            txtT1.Text = t._((int)TxI.T1);
-            txtT2.Text = t._((int)TxI.T2);
-            txtComp.Text = t._((int)TxI.COMP);
-
-            txtRId.Text = t._((int)TxI.ROOM);
-            txtRN.Text = t._((int)TxI.OP_N_NEE);
-            txtRT1.Text = t._((int)TxI.T1);
-            txtRT2.Text = t._((int)TxI.T2);
-            txtRQPack.Text = t._((int)TxI.OP_Q);
-            txtQPackR0.Text = t._((int)TxI.OP_PRI);
-            txtQPackR1.Text = t._((int)TxI.OP_ALT);
         }
 
         private void lbxBrd_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            tbcSl.Items.Clear();
             ListBox l = sender as ListBox;
             ListBoxItem i = l.SelectedItem as ListBoxItem;
             if (i == null)
@@ -150,34 +124,6 @@ namespace sQzServer0
                 LoadNee();
             }
         }
-
-        //private void LoadSl()
-        //{
-        //    string emsg;
-        //    List<DateTime> v = mBrd.DBSelSl(true, out emsg);
-        //    if (v == null)
-        //    {
-        //        spMain.Opacity = 0.5;
-        //        WPopup.s.ShowDialog(emsg);
-        //        spMain.Opacity = 1;
-        //    }
-        //    //bool dark = true;
-        //    //Color c = new Color();
-        //    //c.A = 0xff;
-        //    //c.B = c.G = c.R = 0xf0;
-        //    lbxSl.Items.Clear();
-        //    foreach (DateTime dt in v)
-        //    {
-        //        ListBoxItem it = new ListBoxItem();
-        //        it.Content = dt.ToString(DT._);
-        //        it.Selected += lbxSl_Selected;
-        //        it.Unselected += lbxSl_Unselected;
-        //        //dark = !dark;
-        //        //if (dark)
-        //        //    it.Background = new SolidColorBrush(c);
-        //        lbxSl.Items.Add(it);
-        //    }
-        //}
 
         private void LoadNee()
         {
@@ -203,33 +149,8 @@ namespace sQzServer0
             }
         }
 
-        void DisableQSGen()
-        {
-            //foreach (TextBox[] vt in vtxtNEsyDif.Values)
-            //    foreach(TextBox t in vt)
-            //        t.IsEnabled = false;
-            //foreach (TextBox[] vt in vtxtNDiff.Values)
-            //    foreach (TextBox t in vt)
-            //        t.IsEnabled = false;
-        }
-
-        void EnableQSGen()
-        {
-            //foreach (TextBox[] vt in vtxtNEsyDif.Values)
-            //    foreach (TextBox t in vt)
-            //        t.IsEnabled = true;
-        }
-
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
         {
-            //ListBoxItem i = sender as ListBoxItem;
-            //if (i == null)
-            //    return;
-
-            //Slot = new ExamSlotS0();
-            //DateTime dt;
-            //DT.To_(i.Content as string, out dt);
-            //Slot.Dt = dt;
             string emsg;
             if ((emsg = Slot.DBSelectRoomInfo()) != null)
             {
@@ -243,47 +164,44 @@ namespace sQzServer0
                 WPopup.s.ShowDialog(emsg);
                 return;
             }
-            StringBuilder sb = new StringBuilder();
-            foreach(QuestPack p in Slot.QuestionPacks.Values)
-            {
-                List<string> indicies = p.GetDuplicatedIdx_in_Passgae();
-                foreach (string s in indicies)
-                    sb.Append(s + ", ");
-            }
-            WPopup.s.ShowDialog("Duplicated in passages: " + sb.ToString());
-            //WPopup.s.ShowDialog("Print all examinee?", "Yes", "No", "ok", PrintAllExaminees, WPopupNothing);
-            //PrintAllExaminees();
-            Op0SlotView tbi = new Op0SlotView(Slot);
-            tbi.DeepCopy(tbcRefSl);
-            tbi.ShowExaminee();
-            tbi.ShowQSHeader();
-            tbcSl.Items.Add(tbi);
-            //QuestSheet.DBUpdateCurQSId(mBrd.mDt);
-            if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
-                    tbi.mSl.eStt == ExamStt.Prep)
-                EnableQSGen();
-            else
-                DisableQSGen();
+            //StringBuilder sb = new StringBuilder();
+            //foreach(QuestPack p in Slot.QuestionPacks.Values)
+            //{
+            //    List<string> indicies = p.GetDuplicatedIdx_in_Passgae();
+            //    foreach (string s in indicies)
+            //        sb.Append(s + ", ");
+            //}
+            //WPopup.s.ShowDialog("Duplicated in passages: " + sb.ToString());
         }
 
-        private void lbxSl_Unselected(object sender, RoutedEventArgs e)
+        private void PrintQSheets()
         {
-            ListBoxItem i = sender as ListBoxItem;
-            if (i == null)
+            if (!QSheet2Docx.CreateDocx("all_questionSheets.docx"))
+            {
+                MessageBox.Show("PrintQSheets CreateDocx error");
                 return;
-            foreach (TabItem ti in tbcSl.Items)
-                if (ti.Name == DT.CreateNameFromDateTime(i.Content as string))
-                {
-                    tbcSl.Items.Remove(ti);
-                    break;
-                }
+            }
+
+            QSheet2Docx exporter = new QSheet2Docx();
+            QuestSheet qs = Slot.QuestionPacks.Values.FirstOrDefault().vSheet.Values.FirstOrDefault();
+            AnswerSheet ansSheet = null;
+            if (Slot.AnswerKeyPacks.ContainsKey(qs.TestType) &&
+                Slot.AnswerKeyPacks[qs.TestType].vSheet.ContainsKey(qs.ID))
+                ansSheet = Slot.AnswerKeyPacks[qs.TestType].vSheet[qs.ID];
+            if (ansSheet == null)
+            {
+                MessageBox.Show("answer sheet not found: " + qs.TestType +
+                    " " + qs.ID);
+                return;
+            }
+            exporter.WriteQsheet(qs, ansSheet.tAns.ToCharArray());
         }
 
         private void PrintAllExaminees()
         {
             if(!QSheetExamineePrinter.CreateDocx("all_examinees.docx"))
             {
-                MessageBox.Show("PrintAllExaminees OpenDocx error");
+                MessageBox.Show("PrintAllExaminees CreateDocx error");
                 return;
             }
 
@@ -335,11 +253,6 @@ namespace sQzServer0
             if (i == null)
                 return;
             ExamineeS0 nee = new ExamineeS0();
-            List<TabItem> l = new List<TabItem>();
-            foreach (TabItem ti in tbcSl.Items)
-                l.Add(ti);
-            foreach (TabItem ti in l)
-                tbcSl.Items.Remove(ti);
             nee.ID = i.Content as string;
             TabItem tbi = new TabItem();
             tbi.Header = i.Content;
@@ -456,108 +369,16 @@ namespace sQzServer0
             spl.Children.Add(svwr);
             tbi.Content = spl;
             //
-            tbcSl.Items.Add(tbi);
         }
 
-        public void InitQPanel()
+        private void btnExportSheets_Click(object sender, RoutedEventArgs e)
         {
-            //ExamLv[] l = new ExamLv[2];
-            //l[0] = ExamLv.A;
-            //l[1] = ExamLv.B;
-            //foreach(ExamLv lv in l)
-            //{
-            //    int n = QuestSheet.GetIUs(lv).Count();
-            //    for (int i = 0; i < n; ++i)
-            //    {
-            //        TextBox t = vtxtNEsyDif[lv][i];
-            //        if (t != null)
-            //            t.MaxLength = 2;
-            //        t = vtxtNDiff[lv][i];
-            //        if (t != null)
-            //            t.MaxLength = 2;
-            //    }
-            //}
+            PrintQSheets();
         }
 
-        private void Lv_Checked(object sender, RoutedEventArgs e)
+        private void btnExportExaminees_Click(object sender, RoutedEventArgs e)
         {
-            //ExamSlot sl = (tbcSl.SelectedItem as Op0SlotView).mSl;
-            //if (rdoA.IsChecked.HasValue ? rdoA.IsChecked.Value : false)
-            //{
-            //    grdB.Visibility = Visibility.Collapsed;
-            //    grdA.Visibility = Visibility.Visible;
-            //    txtNqs.Text = sl.CountQSByRoom(ExamLv.A).ToString();
-            //}
-            //else
-            //{
-            //    grdA.Visibility = Visibility.Collapsed;
-            //    grdB.Visibility = Visibility.Visible;
-            //    txtNqs.Text = sl.CountQSByRoom(ExamLv.B).ToString();
-            //}
-        }
-
-        private void tbcSl_SelectionChanged(object sender, SelectionChangedEventArgs e)
-        {
-            //TabControl tbc = sender as TabControl;
-            //if (tbc == null)
-            //    return;
-            //TabItem tbi = tbc.SelectedItem as TabItem;
-            //if (tbi == null || tbiSelected == tbi)
-            //    return;
-            //tbiSelected = tbi;
-            //Op0SlotView vw = tbi as Op0SlotView;
-            //if (vw == null)
-            //{
-            //    rdoA.IsEnabled =
-            //        rdoB.IsEnabled = grdA.IsEnabled =
-            //        grdB.IsEnabled = false;
-            //    return;
-            //}
-            ////vw.InitNMod();
-            //rdoA.IsEnabled = rdoB.IsEnabled =
-            //    grdA.IsEnabled = grdB.IsEnabled = true;
-            //rdoA.IsChecked = true;
-            //ExamLv lv = ExamLv.A;
-            //List<int[]> nmod = vw.GetNMod(lv);
-            //if(nmod != null && nmod.Count == 2)
-            //{
-            //    int i = -1;
-            //    foreach (TextBox t in vtxtNEsyDif[lv])
-            //        t.Text = nmod[0][++i].ToString();
-            //    i = -1;
-            //    foreach (TextBox t in vtxtNDiff[lv])
-            //        t.Text = nmod[1][++i].ToString();
-            //}
-            //else
-            //{
-            //    foreach (TextBox t in vtxtNEsyDif[lv])
-            //        t.Text = string.Empty;
-            //    foreach (TextBox t in vtxtNDiff[lv])
-            //        t.Text = string.Empty;
-            //}
-            //lv = ExamLv.B;
-            //nmod = vw.GetNMod(lv);
-            //if (nmod != null && nmod.Count == 4)
-            //{
-            //    int i = -1;
-            //    foreach (TextBox t in vtxtNEsyDif[lv])
-            //        t.Text = nmod[0][++i].ToString();
-            //    i = -1;
-            //    foreach (TextBox t in vtxtNDiff[lv])
-            //        t.Text = nmod[1][++i].ToString();
-            //}
-            //else
-            //{
-            //    foreach (TextBox t in vtxtNEsyDif[lv])
-            //        t.Text = string.Empty;
-            //    foreach (TextBox t in vtxtNDiff[lv])
-            //        t.Text = string.Empty;
-            //}
-            //if ((vw = tbcSl.SelectedItem as Op0SlotView) != null &&
-            //        vw.mSl.eStt == ExamStt.Prep)
-            //    EnableQSGen();
-            //else
-            //    DisableQSGen();
+            PrintAllExaminees();
         }
     }
 }
