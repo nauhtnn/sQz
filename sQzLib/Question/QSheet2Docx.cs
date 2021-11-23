@@ -157,7 +157,13 @@ namespace sQzLib
             int questionIdx = -1;
             foreach (QSheetSection s in qsheet.Sections)
             {
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text(s.Requirements))));
+                Run run = new Run(new Text(s.Requirements));
+                run.RunProperties = new RunProperties();
+                run.RunProperties.Bold = new Bold();
+                run.RunProperties.Bold.Val = true;
+                run.RunProperties.Italic = new Italic();
+                run.RunProperties.Italic.Val = true;
+                mDocxBody.AppendChild(new Paragraph(run));
                 BasicPassageSection passage_section = s as BasicPassageSection;
                 if (passage_section != null)
                     mDocxBody.AppendChild(new Paragraph(new Run(new Text(passage_section.Passage))));

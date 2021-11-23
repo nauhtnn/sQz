@@ -183,18 +183,25 @@ namespace sQzServer0
             }
 
             QSheet2Docx exporter = new QSheet2Docx();
-            QuestSheet qs = Slot.QuestionPacks.Values.FirstOrDefault().vSheet.Values.FirstOrDefault();
-            AnswerSheet ansSheet = null;
-            if (Slot.AnswerKeyPacks.ContainsKey(qs.TestType) &&
-                Slot.AnswerKeyPacks[qs.TestType].vSheet.ContainsKey(qs.ID))
-                ansSheet = Slot.AnswerKeyPacks[qs.TestType].vSheet[qs.ID];
-            if (ansSheet == null)
+            foreach(QuestPack pack in Slot.QuestionPacks.Values)
             {
-                MessageBox.Show("answer sheet not found: " + qs.TestType +
-                    " " + qs.ID);
-                return;
+                foreach(QuestSheet qs in pack.vSheet.Values)
+                {
+                    AnswerSheet ansSheet = null;
+                    if (Slot.AnswerKeyPacks.ContainsKey(qs.TestType) &&
+                        Slot.AnswerKeyPacks[qs.TestType].vSheet.ContainsKey(qs.ID))
+                        ansSheet = Slot.AnswerKeyPacks[qs.TestType].vSheet[qs.ID];
+                    if (ansSheet == null)
+                    {
+                        MessageBox.Show("answer sheet not found: " + qs.TestType +
+                            " " + qs.ID);
+                        return;
+                    }
+                    exporter.WriteQsheet(qs, ansSheet.tAns.ToCharArray());
+                }
             }
-            exporter.WriteQsheet(qs, ansSheet.tAns.ToCharArray());
+
+            QSheet2Docx.CloseDocx();
         }
 
         private void PrintAllExaminees()
