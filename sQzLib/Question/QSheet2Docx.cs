@@ -19,7 +19,16 @@ namespace sQzLib
         public static void CloseDocx()
         {
             if (mDocx != null)
-                mDocx.Close();
+            {
+                try
+                {
+                    mDocx.Close();
+                }
+                catch(ObjectDisposedException e)
+                {
+                    System.Windows.MessageBox.Show(e.ToString());
+                }
+            }
         }
 
         static bool DocxCreated = false;

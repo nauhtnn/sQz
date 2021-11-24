@@ -36,6 +36,8 @@ namespace sQzLib
                 --endQuestIdxLabel;
             }
             StringBuilder newPassage = new StringBuilder();
+            if (Passage.Length > 0)
+                newPassage.Append(Passage);
             while (reversedNewPassage.Count > 0)
                 newPassage.Append(reversedNewPassage.Pop());
             Passage = newPassage.ToString();
