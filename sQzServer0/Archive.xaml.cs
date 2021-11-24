@@ -164,6 +164,8 @@ namespace sQzServer0
                 WPopup.s.ShowDialog(emsg);
                 return;
             }
+            btnExportExaminees.IsEnabled = true;
+            btnExportSheets.IsEnabled = true;
             //StringBuilder sb = new StringBuilder();
             //foreach(QuestPack p in Slot.QuestionPacks.Values)
             //{
@@ -176,7 +178,7 @@ namespace sQzServer0
 
         private void PrintQSheets()
         {
-            if (!QSheet2Docx.CreateDocx("all_questionSheets.docx"))
+            if (!QSheet2Docx.ForceCreateDocx("exported_question_sheets.docx"))
             {
                 MessageBox.Show("PrintQSheets CreateDocx error");
                 return;
@@ -206,7 +208,7 @@ namespace sQzServer0
 
         private void PrintAllExaminees()
         {
-            if(!QSheetExamineePrinter.CreateDocx("all_examinees.docx"))
+            if(!QSheetExamineePrinter.ForceCreateDocx("exported_examinees.docx"))
             {
                 MessageBox.Show("PrintAllExaminees CreateDocx error");
                 return;

@@ -50,6 +50,7 @@
     <Compile Include="AnswerSheet.cs" />
     <Compile Include="Client2.cs" />
     <Compile Include="DBConnect.cs" />
+    <Compile Include="DocxExporter.cs" />
     <Compile Include="Dt.cs" />
     <None Include="ExamBoard.cs" />
     <Compile Include="ExamineeA.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="Question\BasicPassageSection.cs" />
     <Compile Include="Question\OptionView.cs" />
     <Compile Include="Question\BasicPassageSectionView.cs" />
+    <Compile Include="Question\QSheet2Docx.cs" />
     <Compile Include="Question\QSheetSection.cs" />
     <Compile Include="Question\QuestionSheetView.cs" />
     <Compile Include="Question\QuestParser.cs" />
