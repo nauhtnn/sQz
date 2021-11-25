@@ -24,51 +24,19 @@ namespace sQzLib
             return text.ToString();
         }
 
-        private void WriteSingleQuestionWithSeletedLabel(Question question, int questionIdx, byte[] optionStatusArray,
+        private void WriteSeletedLabel(Question question, int questionIdx, byte[] optionStatusArray,
             char[] answerKey)
         {
-            if(Utils.IsRichText(question.Stem))
-            {
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text((questionIdx + 1).ToString() + ")"))));
-                Paragraph p = LookupUnderlinedParagraph(
-                    GetInnerTextOfRichTextSpan(Utils.GetRichText(question.Stem)));
-                if (p == null)
-                    System.Windows.MessageBox.Show("Cannot find underlined paragraph: " + question.Stem);
-                else
-                {
-                    var p2 = p.Clone() as Paragraph;
-                    p2.ParagraphProperties.NumberingProperties.NumberingId.Val = 0;
-                    mDocxBody.AppendChild(p2);
-                }
-            }
-            else
-            {
-                StringBuilder stem = new StringBuilder();
-                stem.Append((questionIdx + 1).ToString() + ") ");
-                stem.Append(question.Stem);
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text(stem.ToString()))));
-            }
+            mDocxBody.AppendChild(new Paragraph(new Run(new Text(
+                (questionIdx + 1).ToString() + ") "))));
 
-            char optionLabel = 'A';
             char selectedLabel = 'A';
-            char corrected_label = 'A';
             int entireAnswerSheet_optionIdx = questionIdx * Question.NUMBER_OF_OPTIONS;
             bool noSelection = true;
-            bool notReachCorrectAnswer = true;
 
             for(int optionIdx = 0; optionIdx < Question.NUMBER_OF_OPTIONS;
-                ++optionIdx, ++optionLabel, ++entireAnswerSheet_optionIdx)
+                ++optionIdx, ++entireAnswerSheet_optionIdx)
             {
-                StringBuilder option = new StringBuilder();
-                option.Append(optionLabel + ") " + question.vAns[optionIdx]);
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text(option.ToString()))));
-                if(notReachCorrectAnswer)
-                {
-                    if (answerKey[entireAnswerSheet_optionIdx] == '0')
-                        ++corrected_label;
-                    else
-                        notReachCorrectAnswer = false;
-                }
                 if (noSelection)
                 {
                     if (optionStatusArray[entireAnswerSheet_optionIdx] == 0)
@@ -78,20 +46,18 @@ namespace sQzLib
                 }
             }
 
-            StringBuilder sb = new StringBuilder();
             if (noSelection)
-                sb.Append(Txt.s._((int)TxI.PRINT_NO_SELECTED));
+                mDocxBody.AppendChild(new Paragraph(new Run(new Text(
+                    Txt.s._((int)TxI.PRINT_NO_SELECTED)))));
             else
-                sb.Append(Txt.s._((int)TxI.PRINT_SELECTED) + selectedLabel);
-            sb.Append("    " + Txt.s._((int)TxI.PRINT_CORRECT_LABEL) + corrected_label);
-            mDocxBody.AppendChild(new Paragraph(new Run(
-                    new Text(sb.ToString()))));
+                mDocxBody.AppendChild(new Paragraph(new Run(new Text(
+                    Txt.s._((int)TxI.PRINT_SELECTED) + selectedLabel))));
         }
 
         public void WriteThisExaminee(QuestSheet qsheet, ExamineeS0 examinee, char[] answerKey)
         {
             WriteExamineeInfo(examinee, qsheet.GetGlobalID_withTestType());
-            WriteQsheetWithSelectedLabel(qsheet, examinee.AnswerSheet.BytesOfAnswer, answerKey);
+            WriteSelectedLabels(qsheet, examinee.AnswerSheet.BytesOfAnswer, answerKey);
             WriteExamineeResult(examinee);
         }
 
@@ -111,17 +77,16 @@ namespace sQzLib
                 new Text(Txt.s._((int)TxI.PRINT_CORRECT_COUNT) + examinee.CorrectCount))));
         }
 
-        public void WriteQsheetWithSelectedLabel(QuestSheet qsheet, byte[] bytesOfAnswer, char[] answerKey)
+        public void WriteSelectedLabels(QuestSheet qsheet, byte[] bytesOfAnswer, char[] answerKey)
         {
             int questionIdx = -1;
+            char partLabel = '@';
             foreach (QSheetSection s in qsheet.Sections)
             {
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text(s.Requirements))));
-                BasicPassageSection passage_section = s as BasicPassageSection;
-                if (passage_section != null)
-                    mDocxBody.AppendChild(new Paragraph(new Run(new Text(passage_section.Passage))));
+                mDocxBody.AppendChild(new Paragraph(CreateBoldItalicRun(
+                    "PART " + ++partLabel + "\n" + s.Requirements)));
                 foreach (Question q in s.Questions)
-                    WriteSingleQuestionWithSeletedLabel(q, ++questionIdx, bytesOfAnswer, answerKey);
+                    WriteSeletedLabel(q, ++questionIdx, bytesOfAnswer, answerKey);
             }
         }
 

@@ -11,7 +11,7 @@ namespace sQzLib
 {
     public class QSheet2Docx: DocxExporter
     {
-        private void WriteSingleQuestion(Question question, int questionIdx, char[] answerKey)
+        private void WriteSingleQuestion(Question question, int questionIdx)
         {
             if(Utils.IsRichText(question.Stem))
             {
@@ -36,9 +36,7 @@ namespace sQzLib
             }
 
             char optionLabel = 'A';
-            char corrected_label = 'A';
             int entireAnswerSheet_optionIdx = questionIdx * Question.NUMBER_OF_OPTIONS;
-            bool notReachCorrectAnswer = true;
 
             for(int optionIdx = 0; optionIdx < Question.NUMBER_OF_OPTIONS;
                 ++optionIdx, ++optionLabel, ++entireAnswerSheet_optionIdx)
@@ -46,15 +44,21 @@ namespace sQzLib
                 StringBuilder option = new StringBuilder();
                 option.Append(optionLabel + ") " + question.vAns[optionIdx]);
                 mDocxBody.AppendChild(new Paragraph(new Run(new Text(option.ToString()))));
-                if(notReachCorrectAnswer)
+            }
+        }
+
+        public void WriteAnswerKeys(char[] answerKey)
+        {
+            char corrected_label = 'A';
+            for (int optionIdx = 0; optionIdx < Question.NUMBER_OF_OPTIONS;
+             ++optionIdx, ++optionLabel, ++entireAnswerSheet_optionIdx)
+                if (notReachCorrectAnswer)
                 {
                     if (answerKey[entireAnswerSheet_optionIdx] == '0')
                         ++corrected_label;
                     else
                         notReachCorrectAnswer = false;
                 }
-            }
-
             mDocxBody.AppendChild(new Paragraph(new Run(
                 new Text(Txt.s._((int)TxI.PRINT_CORRECT_LABEL) + corrected_label))));
         }
@@ -70,21 +74,18 @@ namespace sQzLib
         {
             WriteQSheetInfo(qsheet.GetGlobalID_withTestType());
             int questionIdx = -1;
+            char partLabel = '@';
             foreach (QSheetSection s in qsheet.Sections)
             {
-                Run run = new Run(new Text(s.Requirements));
-                run.RunProperties = new RunProperties();
-                run.RunProperties.Bold = new Bold();
-                run.RunProperties.Bold.Val = true;
-                run.RunProperties.Italic = new Italic();
-                run.RunProperties.Italic.Val = true;
-                mDocxBody.AppendChild(new Paragraph(run));
+                mDocxBody.AppendChild(new Paragraph(CreateBoldItalicRun(
+                    "PART " + ++partLabel + "\n" + s.Requirements)));
                 BasicPassageSection passage_section = s as BasicPassageSection;
                 if (passage_section != null)
                     mDocxBody.AppendChild(new Paragraph(new Run(new Text(passage_section.Passage))));
                 foreach (Question q in s.Questions)
-                    WriteSingleQuestion(q, ++questionIdx, answerKey);
+                    WriteSingleQuestion(q, ++questionIdx);
             }
+            WriteAnswerKeys(answerKey);
             WritePageBreak();
         }
     }

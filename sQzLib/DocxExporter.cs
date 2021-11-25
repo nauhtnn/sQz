@@ -238,11 +238,21 @@ namespace sQzLib
                 return false;
             return true;
         }
-
         public void WritePageBreak()
         {
             var PageBreakParagraph = new Paragraph(new Run(new Break() { Type = BreakValues.Page }));
             mDocxBody.AppendChild(PageBreakParagraph);
+        }
+
+        public Run CreateBoldItalicRun(string plainText)
+        {
+            Run run = new Run(new Text(plainText));
+            run.RunProperties = new RunProperties();
+            run.RunProperties.Bold = new Bold();
+            run.RunProperties.Bold.Val = true;
+            run.RunProperties.Italic = new Italic();
+            run.RunProperties.Italic.Val = true;
+            return run;
         }
     }
 }
