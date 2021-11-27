@@ -163,5 +163,6 @@ namespace sQzLib {
 		PRINT_NO_SELECTED,
 		PRINT_PAPER_ID,
 		PRINT_CORRECT_LABEL,
+		PART,
 	}
 }

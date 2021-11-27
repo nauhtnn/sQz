@@ -40,7 +40,7 @@ namespace sQzLib
 
         private RichTextBox CreateStemView_RichText(string text)
         {
-            RichTextBox richText = Utils.GetRichText(text);
+            RichTextBox richText = Utils.CreateRichTextBox(text);
             richText.Focusable = false;
             richText.Width = StemWidth;
             richText.Background = Theme.s._[(int)BrushId.Q_BG];

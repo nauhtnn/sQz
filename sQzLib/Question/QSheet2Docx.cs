@@ -15,17 +15,9 @@ namespace sQzLib
         {
             if(Utils.IsRichText(question.Stem))
             {
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text((questionIdx + 1).ToString() + ")"))));
-                Run underlined = new Run(new Text("underlined underlined underlined"));
-                underlined.RunProperties = new RunProperties();
-                underlined.RunProperties.Underline = new Underline();
-                underlined.RunProperties.Underline.Val = UnderlineValues.Single;
-                Paragraph p = new Paragraph(underlined);
-                p.ParagraphProperties = new ParagraphProperties();
-                p.ParagraphProperties.NumberingProperties = new NumberingProperties();
-                p.ParagraphProperties.NumberingProperties.NumberingId = new NumberingId();
-                p.ParagraphProperties.NumberingProperties.NumberingId.Val = 0;
-                mDocxBody.AppendChild(p);
+                foreach(Paragraph p in
+                    Utils.CreateDocxUnderlineParagraphs((questionIdx + 1).ToString() + ") ", question.Stem))
+                    mDocxBody.AppendChild(p);
             }
             else
             {
@@ -49,18 +41,25 @@ namespace sQzLib
 
         public void WriteAnswerKeys(char[] answerKey)
         {
-            char corrected_label = 'A';
-            for (int optionIdx = 0; optionIdx < Question.NUMBER_OF_OPTIONS;
-             ++optionIdx, ++optionLabel, ++entireAnswerSheet_optionIdx)
-                if (notReachCorrectAnswer)
-                {
-                    if (answerKey[entireAnswerSheet_optionIdx] == '0')
-                        ++corrected_label;
-                    else
-                        notReachCorrectAnswer = false;
-                }
-            mDocxBody.AppendChild(new Paragraph(new Run(
-                new Text(Txt.s._((int)TxI.PRINT_CORRECT_LABEL) + corrected_label))));
+            int entireAnswerSheet_optionIdx = 0;
+            int questionIdx = -1;
+            while(entireAnswerSheet_optionIdx < answerKey.Length - Question.NUMBER_OF_OPTIONS)
+            {
+                char corrected_label = 'A';
+                bool notReachCorrectAnswer = true;
+                for (int optionIdx = 0; optionIdx < Question.NUMBER_OF_OPTIONS;
+                    ++optionIdx, ++entireAnswerSheet_optionIdx)
+                    if (notReachCorrectAnswer)
+                    {
+                        if (answerKey[entireAnswerSheet_optionIdx] == '0')
+                            ++corrected_label;
+                        else
+                            notReachCorrectAnswer = false;
+                    }
+                mDocxBody.AppendChild(new Paragraph(new Run(
+                    new Text((++questionIdx).ToString() + ") " +
+                    Txt.s._((int)TxI.PRINT_CORRECT_LABEL) + corrected_label))));
+            }
         }
 
         public void WriteQSheetInfo(string qSheetID)
@@ -78,7 +77,7 @@ namespace sQzLib
             foreach (QSheetSection s in qsheet.Sections)
             {
                 mDocxBody.AppendChild(new Paragraph(CreateBoldItalicRun(
-                    "PART " + ++partLabel + "\n" + s.Requirements)));
+                    Txt.s._((int)TxI.PART) + ++partLabel + "\n" + s.Requirements)));
                 BasicPassageSection passage_section = s as BasicPassageSection;
                 if (passage_section != null)
                     mDocxBody.AppendChild(new Paragraph(new Run(new Text(passage_section.Passage))));

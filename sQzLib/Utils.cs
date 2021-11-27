@@ -184,11 +184,11 @@ namespace sQzLib
                 return true;
         }
 
-        public static RichTextBox GetRichText(string text)
+        public static RichTextBox CreateRichTextBox(string text)
         {
             RichTextBox richText = new RichTextBox();
-            byte[] bytes = new byte[text.Length];
             char[] chars = text.ToCharArray();
+            byte[] bytes = new byte[chars.Length];
             for (int i = 0; i < text.Length; ++i)
                 bytes[i] = (byte)chars[i];
             System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
@@ -196,6 +196,54 @@ namespace sQzLib
             range.Load(stream, System.Windows.DataFormats.Rtf);
 
             return richText;
+        }
+
+        public static System.Windows.Documents.FlowDocument CreateRichText(string text)
+        {
+            char[] chars = text.ToCharArray();
+            byte[] bytes = new byte[chars.Length];
+            for (int i = 0; i < text.Length; ++i)
+                bytes[i] = (byte)chars[i];
+            System.IO.MemoryStream stream = new System.IO.MemoryStream(bytes);
+            var rtDoc = new System.Windows.Documents.FlowDocument();
+            var range = new System.Windows.Documents.TextRange(rtDoc.ContentStart, rtDoc.ContentEnd);
+            range.Load(stream, System.Windows.DataFormats.Rtf);
+
+            return rtDoc;
+        }
+
+        public static Queue<DocumentFormat.OpenXml.Wordprocessing.Paragraph>
+            CreateDocxUnderlineParagraphs(string prefix, string text)
+        {
+            var docxParagraphs = new Queue<DocumentFormat.OpenXml.Wordprocessing.Paragraph>();
+            var rtDoc = CreateRichText(text);
+            foreach(System.Windows.Documents.Paragraph para in rtDoc.Blocks)
+            {
+                var docxPara = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
+                docxPara.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run(
+                    new DocumentFormat.OpenXml.Wordprocessing.Text(prefix)));
+                foreach (System.Windows.Documents.Run run in
+                    para.Inlines.OfType<System.Windows.Documents.Run>())
+                {
+                    bool isUnderLine = true;
+                    foreach(var underlineVal in System.Windows.TextDecorations.Underline)
+                        if (!run.TextDecorations.Contains(underlineVal))
+                        {
+                            isUnderLine = false;
+                            break;
+                        }
+                    var docxRun = new DocumentFormat.OpenXml.Wordprocessing.Run(
+                        new DocumentFormat.OpenXml.Wordprocessing.Text(run.Text));
+                    if (isUnderLine)
+                    {
+                        docxRun.RunProperties.Underline.Val =
+                            DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single;
+                    }
+                    docxPara.AppendChild(docxRun);
+                }
+                docxParagraphs.Enqueue(docxPara);
+            }
+            return docxParagraphs;
         }
     }
 
