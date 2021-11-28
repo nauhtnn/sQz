@@ -39,9 +39,11 @@ namespace sQzLib
 
         public void WriteAnswerKeys(char[] answerKey)
         {
+            mDocxBody.AppendChild(new Paragraph(CreateBoldItalicRun(
+                    Txt.s._((int)TxI.ANSWER_KEY))));
             int entireAnswerSheet_optionIdx = 0;
-            int questionIdx = -1;
-            while(entireAnswerSheet_optionIdx < answerKey.Length - Question.NUMBER_OF_OPTIONS)
+            int questionIdx = 0;
+            while(entireAnswerSheet_optionIdx <= answerKey.Length - Question.NUMBER_OF_OPTIONS)
             {
                 char corrected_label = 'A';
                 bool notReachCorrectAnswer = true;
@@ -55,16 +57,15 @@ namespace sQzLib
                             notReachCorrectAnswer = false;
                     }
                 mDocxBody.AppendChild(new Paragraph(new Run(
-                    new Text((++questionIdx).ToString() + ") " +
-                    Txt.s._((int)TxI.PRINT_CORRECT_LABEL) + corrected_label))));
+                    new Text((++questionIdx).ToString() + ") " + corrected_label))));
             }
         }
 
         public void WriteQSheetInfo(string qSheetID)
         {
             WriteDocxTitle();
-            mDocxBody.AppendChild(new Paragraph(new Run(
-                new Text(Txt.s._((int)TxI.PRINT_PAPER_ID) + qSheetID))));
+            mDocxBody.AppendChild(new Paragraph(CreateBoldItalicRun(
+                Txt.s._((int)TxI.PRINT_PAPER_ID) + qSheetID)));
         }
 
         public void WriteQsheet(QuestSheet qsheet, char[] answerKey)
@@ -74,8 +75,14 @@ namespace sQzLib
             char partLabel = '@';
             foreach (QSheetSection s in qsheet.Sections)
             {
-                mDocxBody.AppendChild(new Paragraph(CreateBoldItalicRun(
-                    Txt.s._((int)TxI.PART) + ++partLabel + "\n" + s.Requirements)));
+                ++partLabel;
+                if (s.Requirements.Trim().Length > 0)
+                {
+                    mDocxBody.AppendChild(new Paragraph(CreateBoldItalicRun(
+                        Txt.s._((int)TxI.PART) + partLabel)));
+                    mDocxBody.AppendChild(new Paragraph(CreateBoldItalicRun(
+                        s.Requirements)));
+                }
                 BasicPassageSection passage_section = s as BasicPassageSection;
                 if (passage_section != null)
                     mDocxBody.AppendChild(new Paragraph(new Run(new Text(passage_section.Passage))));

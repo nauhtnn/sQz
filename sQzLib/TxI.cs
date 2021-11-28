@@ -164,5 +164,6 @@ namespace sQzLib {
 		PRINT_PAPER_ID,
 		PRINT_CORRECT_LABEL,
 		PART,
+		ANSWER_KEY,
 	}
 }

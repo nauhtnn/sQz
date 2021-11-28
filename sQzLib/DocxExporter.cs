@@ -246,7 +246,9 @@ namespace sQzLib
 
         public Run CreateBoldItalicRun(string plainText)
         {
-            Run run = new Run(new Text(plainText));
+            Text text = new Text(plainText);
+            text.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
+            Run run = new Run(text);
             run.RunProperties = new RunProperties();
             run.RunProperties.Bold = new Bold();
             run.RunProperties.Bold.Val = true;
