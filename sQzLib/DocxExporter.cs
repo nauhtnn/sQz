@@ -77,17 +77,22 @@ namespace sQzLib
                 System.Windows.MessageBox.Show(e.ToString());
                 return false;
             }
-            LoadUnderlinedParagraphs("underlined.docx");
+            //LoadUnderlinedParagraphs("underlined.docx");
             LoadDocxTitle("Title_3.docx");
             return true;
         }
 
         static bool TitleLoaded = false;
 
-        public static void LoadDocxTitle(string filePath)
+        public static bool LoadDocxTitle(string filePath)
         {
             if (TitleLoaded)
-                return;
+                return true;
+            if(!System.IO.File.Exists(filePath))
+            {
+                System.Windows.MessageBox.Show("No Title_3.docx");
+                return false;
+            }
             TitleLoaded = true;
             WordprocessingDocument doc = null;
             try
@@ -97,12 +102,12 @@ namespace sQzLib
             catch (OpenXmlPackageException e)
             {
                 System.Windows.MessageBox.Show(e.ToString());
-                return;
+                return false;
             }
             catch (System.IO.IOException e)
             {
                 System.Windows.MessageBox.Show(e.ToString());
-                return;
+                return false;
             }
             Body body = doc.MainDocumentPart.Document.Body;
             foreach (Table p in body.ChildElements.OfType<Table>())
@@ -110,11 +115,13 @@ namespace sQzLib
                 DocxTitle = p.Clone() as Table;
             }
             doc.Close();
+            return true;
         }
 
         public void WriteDocxTitle()
         {
-            mDocxBody.AppendChild(DocxTitle.Clone() as Table);
+            if(TitleLoaded)
+                mDocxBody.AppendChild(DocxTitle.Clone() as Table);
         }
 
         public Paragraph LookupUnderlinedParagraph(string text)
