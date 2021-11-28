@@ -175,6 +175,10 @@ namespace sQzClient
                 Grid.SetColumn(l, 1);
                 gAnsSh.Children.Add(l);
                 SelectedLabels.Add(j, l);
+
+                char labelFromSaveFile;
+                if (LabelFromSaveFile(j - 1, out labelFromSaveFile))
+                    l.Content = labelFromSaveFile;
             }
             //bottom lines
             gAnsSh.RowDefinitions.Add(new RowDefinition());
@@ -197,8 +201,29 @@ namespace sQzClient
             gAnsSh.Children.Add(l);
             SelectedLabels.Add(j, l);
 
+            char lastLabelFromSaveFile;
+            if (LabelFromSaveFile(j - 1, out lastLabelFromSaveFile))
+                l.Content = lastLabelFromSaveFile;
+
             //for (j = Question.svQuest[0].Count; -1 < j; --j)
             //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
+        }
+
+        private bool LabelFromSaveFile(int questionIdx, out char label)
+        {
+            label = 'A';
+            for(int optionIdx = questionIdx * Question.NUMBER_OF_OPTIONS,
+                end = optionIdx + Question.NUMBER_OF_OPTIONS;
+                optionIdx < end; ++optionIdx)
+            {
+                if (thisExaminee.AnswerSheet.BytesOfAnswer[optionIdx] == 0)
+                    ++label;
+                else
+                    break;
+            }
+            if (label < 'A' + Question.NUMBER_OF_OPTIONS)
+                return true;
+            return false;
         }
 
         //void InitQuesttonSheetView()
