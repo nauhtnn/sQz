@@ -36,7 +36,8 @@ namespace sQzLib
 			get{
 				if(_s == null) {
 					_s = new Txt();
-					_s.ReadByte("GUI-vi.bin");
+                    if (!_s.ReadByte("GUI-vi.bin"))
+                        _s.ReadTextFile("GUI-vi.txt");
 				}
 				return _s;
 			}
@@ -107,7 +108,39 @@ namespace sQzLib
             System.IO.File.WriteAllBytes(fp, mBuf);
         }
 
-        public void ReadByte(string fp)
+        public bool ReadTextFile(string fp)
+        {
+            string content;
+            try
+            {
+                content = System.IO.File.ReadAllText(fp);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                return false;
+            }
+
+            Scan(content);
+
+            if (avEnum.Count == 0)
+                return false;
+
+            __ = new string[avEnum.Count];
+
+
+            for(int i = 0; i < avEnum.Count; ++i)
+            {
+                TxI index = 0;
+                if (Enum.TryParse<TxI>(avEnum[i], out index))
+                    __[(int)index] = avTxt[i];
+                else
+                    __[i] = "NO STRING";
+            }
+
+            return true;
+        }
+
+        public bool ReadByte(string fp)
         {
 
             byte[] mBuf;
@@ -117,7 +150,7 @@ namespace sQzLib
             }
             catch(System.IO.FileNotFoundException)
             {
-                return;
+                return false;
             }
             int offs = 0;
             int n = BitConverter.ToInt32(mBuf, offs);
@@ -133,6 +166,7 @@ namespace sQzLib
             //int j = -1;
             //foreach(string s in _)
             //	Console.WriteLine("" + ++j + ") " + s);
+            return true;
         }
     }
 }
