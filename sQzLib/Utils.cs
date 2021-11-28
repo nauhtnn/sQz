@@ -222,33 +222,34 @@ namespace sQzLib
                 if (para.Inlines.Count == 0)
                     continue;
                 var docxPara = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-                docxPara.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(
-                    new DocumentFormat.OpenXml.Wordprocessing.Text(prefix)));
+                var prefixText = new DocumentFormat.OpenXml.Wordprocessing.Text(prefix);
+                prefixText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
+                docxPara.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(prefixText));
                 foreach (var span in para.Inlines.OfType<System.Windows.Documents.Span>())
                 {
-                    foreach(var run in span.Inlines.OfType<System.Windows.Documents.Run>())
-                    {
-                        bool isUnderLine = true;
-                        foreach (var underlineVal in System.Windows.TextDecorations.Underline)
-                            foreach(var decor in run.TextDecorations)
-                            if (decor == underlineVal)
-                            {
-                                isUnderLine = true;
-                                break;
-                            }
-                        var docxRun = new DocumentFormat.OpenXml.Wordprocessing.Run(
-                            new DocumentFormat.OpenXml.Wordprocessing.Text(run.Text));
-                        if (isUnderLine)
+                    bool isUnderLine = false;
+                    foreach(var decor in span.TextDecorations)
+                        if(decor.Location == System.Windows.TextDecorationLocation.Underline)
                         {
-                            docxRun.RunProperties =
-                                new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
-                            docxRun.RunProperties.Underline =
-                                new DocumentFormat.OpenXml.Wordprocessing.Underline();
-                            docxRun.RunProperties.Underline.Val =
-                                DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single;
+                            isUnderLine = true;
+                            break;
                         }
-                        docxPara.Append(docxRun);
+                    StringBuilder spanText = new StringBuilder();
+                    foreach (var run in span.Inlines.OfType<System.Windows.Documents.Run>())
+                        spanText.Append(run.Text);
+                    var docxText = new DocumentFormat.OpenXml.Wordprocessing.Text(spanText.ToString());
+                    docxText.Space = DocumentFormat.OpenXml.SpaceProcessingModeValues.Preserve;
+                    var docxRun = new DocumentFormat.OpenXml.Wordprocessing.Run(docxText);
+                    if (isUnderLine)
+                    {
+                        docxRun.RunProperties =
+                            new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+                        var underline =
+                            new DocumentFormat.OpenXml.Wordprocessing.Underline()
+                            { Val = DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single };
+                        docxRun.RunProperties.Append(underline);
                     }
+                    docxPara.Append(docxRun);
                 }
                 docxParagraphs.Enqueue(docxPara);
             }
