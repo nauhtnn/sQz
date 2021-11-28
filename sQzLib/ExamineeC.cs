@@ -108,7 +108,7 @@ namespace sQzLib
                 Name = e.Name;
                 TestType = e.TestType;
             }
-            bLog = false;
+            //bLog = false;
             eStt = e.eStt;//for safety, set the status last
         }
 

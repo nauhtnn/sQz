@@ -385,6 +385,7 @@ namespace sQzClient
                         {
                             thisExaminee.MergeWithS1(e);
                             btnSubmit.Content = thisExaminee.Grade;
+                            btnSubmit.Foreground = new SolidColorBrush(Colors.Black);
                             msg = Txt.s._((int)TxI.RESULT) + thisExaminee.Grade;
                         }
                         else
