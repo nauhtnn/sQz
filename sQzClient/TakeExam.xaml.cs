@@ -322,8 +322,8 @@ namespace sQzClient
         private void OnSubmitConnectionFail()
         {
             App.EnableHookKeys(false);
-            WPopup.s.ShowDialog("Check network and click reconnect, or exit.",
-                Txt.s._((int)TxI.SUBMIT), "Exit",
+            WPopup.s.ShowDialog(Txt.s._((int)TxI.ON_SUBMIT_NO_CONNECTION),
+                Txt.s._((int)TxI.SUBMIT), Txt.s._((int)TxI.EXIT),
                 string.Empty, ResubmitAfterConnectionFail, ShowExitDiaglogBox);
         }
 

@@ -165,5 +165,6 @@ namespace sQzLib {
 		PRINT_CORRECT_LABEL,
 		PART,
 		ANSWER_KEY,
+		ON_SUBMIT_NO_CONNECTION,
 	}
 }
