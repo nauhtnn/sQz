@@ -217,29 +217,38 @@ namespace sQzLib
         {
             var docxParagraphs = new Queue<DocumentFormat.OpenXml.Wordprocessing.Paragraph>();
             var rtDoc = CreateRichText(text);
-            foreach(System.Windows.Documents.Paragraph para in rtDoc.Blocks)
+            foreach(var para in rtDoc.Blocks.OfType<System.Windows.Documents.Paragraph>())
             {
+                if (para.Inlines.Count == 0)
+                    continue;
                 var docxPara = new DocumentFormat.OpenXml.Wordprocessing.Paragraph();
-                docxPara.AppendChild(new DocumentFormat.OpenXml.Wordprocessing.Run(
+                docxPara.Append(new DocumentFormat.OpenXml.Wordprocessing.Run(
                     new DocumentFormat.OpenXml.Wordprocessing.Text(prefix)));
-                foreach (System.Windows.Documents.Run run in
-                    para.Inlines.OfType<System.Windows.Documents.Run>())
+                foreach (var span in para.Inlines.OfType<System.Windows.Documents.Span>())
                 {
-                    bool isUnderLine = true;
-                    foreach(var underlineVal in System.Windows.TextDecorations.Underline)
-                        if (!run.TextDecorations.Contains(underlineVal))
-                        {
-                            isUnderLine = false;
-                            break;
-                        }
-                    var docxRun = new DocumentFormat.OpenXml.Wordprocessing.Run(
-                        new DocumentFormat.OpenXml.Wordprocessing.Text(run.Text));
-                    if (isUnderLine)
+                    foreach(var run in span.Inlines.OfType<System.Windows.Documents.Run>())
                     {
-                        docxRun.RunProperties.Underline.Val =
-                            DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single;
+                        bool isUnderLine = true;
+                        foreach (var underlineVal in System.Windows.TextDecorations.Underline)
+                            foreach(var decor in run.TextDecorations)
+                            if (decor == underlineVal)
+                            {
+                                isUnderLine = true;
+                                break;
+                            }
+                        var docxRun = new DocumentFormat.OpenXml.Wordprocessing.Run(
+                            new DocumentFormat.OpenXml.Wordprocessing.Text(run.Text));
+                        if (isUnderLine)
+                        {
+                            docxRun.RunProperties =
+                                new DocumentFormat.OpenXml.Wordprocessing.RunProperties();
+                            docxRun.RunProperties.Underline =
+                                new DocumentFormat.OpenXml.Wordprocessing.Underline();
+                            docxRun.RunProperties.Underline.Val =
+                                DocumentFormat.OpenXml.Wordprocessing.UnderlineValues.Single;
+                        }
+                        docxPara.Append(docxRun);
                     }
-                    docxPara.AppendChild(docxRun);
                 }
                 docxParagraphs.Enqueue(docxPara);
             }

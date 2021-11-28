@@ -21,10 +21,8 @@ namespace sQzLib
             }
             else
             {
-                StringBuilder stem = new StringBuilder();
-                stem.Append((questionIdx + 1).ToString() + ") ");
-                stem.Append(question.Stem);
-                mDocxBody.AppendChild(new Paragraph(new Run(new Text(stem.ToString()))));
+                mDocxBody.AppendChild(new Paragraph(new Run(new Text(
+                    (questionIdx + 1).ToString() + ") " + question.Stem))));
             }
 
             char optionLabel = 'A';
