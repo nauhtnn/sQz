@@ -368,7 +368,24 @@ namespace sQzServer0
             QuestSheet qs = null;
             foreach(QuestPack pack in mSl.QuestionPacks.Values)
             {
+<<<<<<< HEAD
                 if (pack.vSheet.ContainsKey(id))
+=======
+                /*if (q.bDiff)
+                    bg = difbg;
+                else*/ if (even)
+                    bg = evenbg;
+                else
+                    bg = oddbg;
+                even = !even;
+                TextBlock i = new TextBlock();
+                i.Width = tbc.Width - SystemParameters.ScrollWidth;
+                i.TextWrapping = TextWrapping.Wrap;
+                i.Text = ++x + ". " + q.Stmt;
+                i.Background = bg;
+                sp.Children.Add(i);
+                for (int idx = 0; idx < Question.N_ANS; ++idx)
+>>>>>>> master
                 {
                     qs = pack.vSheet[id];
                     break;

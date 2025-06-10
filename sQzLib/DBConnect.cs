@@ -13,6 +13,7 @@ namespace sQzLib
         static string database = null;
         static string uid = null;
         static string password = null;
+<<<<<<< HEAD
         public const int PRI_KEY_EXISTS = -1062;
         private const string DB_CONF_FILE = "Database.txt";
         static List<MySqlConnection> OpenedConnections = new List<MySqlConnection>();
@@ -102,22 +103,58 @@ namespace sQzLib
             catch (MySqlException e)
             {
                 System.Windows.MessageBox.Show(e.ToString());
+=======
+
+        public static MySqlConnection Conn
+        {
+            get
+            {
+                if (server == null)
+                {
+                    if (System.IO.File.Exists("Database.txt"))
+                    {
+                        string[] s = System.IO.File.ReadAllLines("Database.txt");
+                        if (s != null && s.Length == 4)
+                        {
+                            server = s[0];
+                            database = s[1];
+                            uid = s[2];
+                            password = s[3];
+                        }
+                    }
+                    if (server == null)
+                    {
+                        server = "localhost";
+                        database = "sQz";
+                        uid = "root";
+                        password = "1234";
+                    }
+                }
+                string connStr = "SERVER=" + server + ";" + "DATABASE=" +
+                    database + ";" + "UID=" + uid + ";" + "PASSWORD=" + password + ";charset=utf8";
+                MySqlConnection conn = new MySqlConnection(connStr);
+                conn.Open();
+                return conn;
+>>>>>>> master
             }
         }
 
         //Insert statement
-        public static int Ins(MySqlConnection conn, string tb,
-            string attbs, string vals, out string eMsg)
+        public static int Ins(string tb, string attbs, string vals)
         {
+<<<<<<< HEAD
             if (attbs == null || vals == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_DAT_NOK);
                 return 0;
             }
+=======
+>>>>>>> master
             StringBuilder qry = new StringBuilder();
             qry.Append("INSERT INTO " + tb + "(" + attbs + ")VALUES");
             qry.Append(vals);
             
+<<<<<<< HEAD
             MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
             int n;
             try
@@ -137,52 +174,34 @@ namespace sQzLib
                 }
             }
             return n;
+=======
+            MySqlCommand cmd = new MySqlCommand(qry.ToString(), Conn);
+            return cmd.ExecuteNonQuery();
+>>>>>>> master
         }
 
-        public static int Update(MySqlConnection conn, string tb, string vals, string cond,
-            out string eMsg)
+        public static int Update(string tb, string vals, string cond)
         {
             StringBuilder qry = new StringBuilder();
             qry.Append("UPDATE " + tb + " SET " + vals);
             if (cond != null)
                 qry.Append(" WHERE " + cond);
-            MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
-            int n;
-            try
-            {
-                n = cmd.ExecuteNonQuery();
-                eMsg = null;
-            }
-            catch (MySqlException e)
-            {
-                n = -1;
-                eMsg = e.ToString();
-            }
-            return n;
+            MySqlCommand cmd = new MySqlCommand(qry.ToString(), Conn);
+            return cmd.ExecuteNonQuery();
         }
 
         //Delete statement
-        public static int Delete(MySqlConnection conn, string tb, string cond, out string eMsg)
+        public static int Delete(string tb, string cond)
         {
             StringBuilder qry = new StringBuilder();
             qry.Append("DELETE FROM " + tb);
             if(cond != null)
                 qry.Append(" WHERE " + cond);
-            MySqlCommand cmd = new MySqlCommand(qry.ToString(), conn);
-            int n;
-            try {
-                n = cmd.ExecuteNonQuery();
-                eMsg = null;
-            }
-            catch (MySqlException e) {
-                n = -1;
-                eMsg = e.ToString();
-            }
-            return n;
+            MySqlCommand cmd = new MySqlCommand(qry.ToString(), Conn);
+            return cmd.ExecuteNonQuery();
         }
 
-        public static int Count(MySqlConnection conn, string tb, string attbs,
-            string cond, out string eMsg)
+        public static int Count(string tb, string attbs, string cond)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("SELECT COUNT(");
@@ -193,6 +212,7 @@ namespace sQzLib
             if(cond != null)
                 sb.Append(" WHERE " + cond);
 
+<<<<<<< HEAD
             int n;
             MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn);
             try {
@@ -210,15 +230,20 @@ namespace sQzLib
             }
 
             return n;
+=======
+            MySqlCommand cmd = new MySqlCommand(sb.ToString(), Conn);
+            return int.Parse(cmd.ExecuteScalar().ToString());
+>>>>>>> master
         }
 
-        public static bool NExist(MySqlConnection conn, string tb, string cond, out string eMsg)
+        public static bool IsExist(string tb, string cond)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("SELECT COUNT(*) FROM(SELECT 1 FROM " + tb);
             if (cond != null)
                 sb.Append(" WHERE " + cond);
             sb.Append(" LIMIT 1) as tb");
+<<<<<<< HEAD
             int n;
             MySqlCommand cmd = new MySqlCommand(sb.ToString(), conn);
             try
@@ -240,6 +265,12 @@ namespace sQzLib
             if (0 < n)
                 return false;
             return true;
+=======
+            MySqlCommand cmd = new MySqlCommand(sb.ToString(), Conn);
+            if(0 < int.Parse(cmd.ExecuteScalar().ToString()))
+                return true;
+            return false;
+>>>>>>> master
         }
 
         //Max statement
@@ -262,12 +293,16 @@ namespace sQzLib
             return n;
         }
 
+<<<<<<< HEAD
         public static string SafeSQL_Text(string unsafeText)
         {
             return unsafeText.Replace("\\", "\\\\").Replace("'", "\\'");
         }
 
         public static string mkQrySelect(string tb, string attbs, string cond)
+=======
+        public static MySqlDataReader exeQrySelect(string tb, string attbs, string cond)
+>>>>>>> master
         {
             string query = "SELECT ";
             if (attbs == null)
@@ -278,6 +313,7 @@ namespace sQzLib
             if (cond != null && cond.Length > 0)
                 query += " WHERE " + cond;
 
+<<<<<<< HEAD
             return query;
         }
 
@@ -293,6 +329,12 @@ namespace sQzLib
                 eMsg = Txt.s._((int)TxI.DB_EXCPT) + e.ToString();
             }
             return d;
+=======
+            MySqlDataReader reader = new MySqlCommand(query, Conn).ExecuteReader();
+            if (reader == null)
+                throw new InvalidOperationException();
+            return reader;
+>>>>>>> master
         }
     }
 }

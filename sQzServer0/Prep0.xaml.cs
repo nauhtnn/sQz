@@ -35,12 +35,16 @@ namespace sQzServer0
             vChk = new List<CheckBox>();
         }
 
-        private void btnMMenu_Click(object sender, RoutedEventArgs e)
+        private void BackToMainMenu(object sender, RoutedEventArgs e)
         {
             NavigationService.Navigate(new Uri("MainMenu.xaml", UriKind.Relative));
         }
 
+<<<<<<< HEAD
         private void InsertSlot(object sender, RoutedEventArgs e)
+=======
+        private void InsertBoard(object sender, RoutedEventArgs e)
+>>>>>>> master
         {
             DateTime dt;
             if (DT.To_(newSlot.Text, DT._, out dt))
@@ -71,7 +75,41 @@ namespace sQzServer0
             }
         }
 
+<<<<<<< HEAD
         private void LoadSlotView()
+=======
+        private void InsertSlot(object sender, RoutedEventArgs e)
+        {
+            DateTime dt;
+            string t = tbxSl.Text;
+            if (DT.To_(t, DT.h, out dt))
+            {
+                spMain.Opacity = 0.5;
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_NOK]);
+                spMain.Opacity = 1;
+            }
+            else
+            {
+                string msg;
+                if(0 < mBrd.DBInsSl(dt, out msg))
+                {
+                    spMain.Opacity = 0.5;
+                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.SLOT_OK]);
+                    spMain.Opacity = 1;
+                    LoadSl();
+                    tbxSl.Text = string.Empty;
+                }
+                else
+                {
+                    spMain.Opacity = 0.5;
+                    WPopup.s.ShowDialog(msg);
+                    spMain.Opacity = 1;
+                }
+            }
+        }
+
+        private void LoadBrd()
+>>>>>>> master
         {
             string emsg;
             List<DateTime> v = ExamSlotS0.DBSelectSlotIDs(false, out emsg);
@@ -108,7 +146,54 @@ namespace sQzServer0
                 w.Closing += W_Closing;
         }
 
+<<<<<<< HEAD
         private void btnFileQ_Click(object sender, RoutedEventArgs e)
+=======
+        void InitLbxQCatgry()
+        {
+            List<string> qCatName = new List<string>();
+            for (int i = (int)TxI.IU01; i <= (int)TxI.IU15; ++i)
+                qCatName.Add(Txt.s._[i]);
+            bool dark = true;
+            Color c = new Color();
+            c.A = 0xff;
+            c.B = c.G = c.R = 0xf0;
+            Brush b = new SolidColorBrush(c);
+            Dispatcher.Invoke(() => {
+                lbxQCatgry.Items.Clear();
+                foreach (string i in qCatName)
+                {
+                    ListBoxItem it = new ListBoxItem();
+                    it.Content = i;
+                    dark = !dark;
+                    if (dark)
+                        it.Background = b;
+                    lbxQCatgry.Items.Add(i);
+                }
+            });
+        }
+
+        private void SelectBoard(object sender, SelectionChangedEventArgs e)
+        {
+            tbcNee.Items.Clear();
+            ListBox l = sender as ListBox;
+            ListBoxItem i = l.SelectedItem as ListBoxItem;
+            if (i == null)
+            {
+                lbxSl.IsEnabled = false;
+                return;
+            }
+            DateTime dt;
+            if(!DT.To_(i.Content as string, DT._, out dt))
+            {
+                mBrd.mDt = dt;
+                lbxSl.IsEnabled = true;
+                LoadSl();
+            }
+        }
+
+        private void OpenRawFile_of_MCItems(object sender, RoutedEventArgs e)
+>>>>>>> master
         {
             OpenFileDialog dlg = new OpenFileDialog();
 
@@ -142,9 +227,47 @@ namespace sQzServer0
             int questionIdx = rowIdx;
             foreach (QSheetSection section in mDBQS.Sections)
             {
+<<<<<<< HEAD
                 AddPassageTextToDBView(section.Requirements, ++rowIdx, SingleQuestionView.StemWidth);
                 foreach (Question q in section.Questions)
                     AddSingleQuestionToDBView(q, ++questionIdx, ++rowIdx, ansSheet.BytesOfAnswer);
+=======
+                TextBlock i = new TextBlock();
+                i.Text = (++x + 1) + ". " + q.Stmt;
+                i.Width = w;
+                i.TextWrapping = TextWrapping.Wrap;
+                StackPanel sp = new StackPanel();
+                sp.Children.Add(i);
+                for (int idx = 0; idx < Question.N_ANS; ++idx)
+                {
+                    TextBlock j = new TextBlock();
+                    j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
+                    j.Width = w;
+                    j.TextWrapping = TextWrapping.Wrap;
+                    if (q.vKeys[idx])
+                        j.FontWeight = FontWeights.Bold;
+                    sp.Children.Add(j);
+                }
+                /*if (q.bDiff)
+                    bg = difbg;
+                else*/ if (even)
+                    bg = evenbg;
+                else
+                    bg = oddbg;
+                even = !even;
+                sp.Background = bg;
+                RowDefinition rd = new RowDefinition();
+                gDBQuest.RowDefinitions.Add(rd);
+                Grid.SetRow(sp, x);
+                gDBQuest.Children.Add(sp);
+                CheckBox chk = new CheckBox();
+                chk.Name = "c" + q.uId;
+                chk.VerticalAlignment = VerticalAlignment.Center;
+                Grid.SetColumn(chk, 1);
+                Grid.SetRow(chk, x);
+                gDBQuest.Children.Add(chk);
+                vChk.Add(chk);
+>>>>>>> master
             }
             tbiDBQ.Header = CreateQuestSheetHeader(mDBQS);
         }
@@ -180,6 +303,7 @@ namespace sQzServer0
 
         private void ShowTmpQ()
         {
+<<<<<<< HEAD
             AnswerSheet ansSheet = new AnswerSheet();
             mTmpQS.ExtractKey(ansSheet);
             svwrTmpQ.Content = new QuestionSheetView(mTmpQS, ansSheet.BytesOfAnswer, FontSize * 2,
@@ -189,6 +313,45 @@ namespace sQzServer0
 
         private string CreateQuestSheetHeader(QuestSheet qs)
         {
+=======
+            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
+            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
+            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
+            SolidColorBrush bg;
+            bool even = false;
+            int x = -1;
+            double w = svwrTmpQ.Width;
+            svwrTmpQ.Content = null;
+            StackPanel sp = new StackPanel();
+            foreach (Question q in mTmpQS.ShallowCopy())
+            {
+                TextBlock i = new TextBlock();
+                i.Text = (++x + 1) + ". " + q.Stmt;
+                i.Width = w;
+                i.TextWrapping = TextWrapping.Wrap;
+                /*if (q.bDiff)
+                    bg = difbg;
+                else*/ if (even)
+                    bg = evenbg;
+                else
+                    bg = oddbg;
+                even = !even;
+                i.Background = bg;
+                sp.Children.Add(i);
+                for (int idx = 0; idx < Question.N_ANS; ++idx)
+                {
+                    TextBlock j = new TextBlock();
+                    j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
+                    j.Width = w;
+                    j.TextWrapping = TextWrapping.Wrap;
+                    if (q.vKeys[idx])
+                        j.FontWeight = FontWeights.Bold;
+                    j.Background = bg;
+                    sp.Children.Add(j);
+                }
+            }
+            svwrTmpQ.Content = sp;
+>>>>>>> master
             StringBuilder sb = new StringBuilder();
             sb.Append("(");
             foreach (QSheetSection section in qs.Sections)
@@ -199,7 +362,7 @@ namespace sQzServer0
             return sb.ToString();
         }
 
-        private void btnImpQ_Click(object sender, RoutedEventArgs e)
+        private void InsertMCItems(object sender, RoutedEventArgs e)
         {
             if (mTmpQS.CountAllQuestions() == 0)
             {
@@ -226,7 +389,11 @@ namespace sQzServer0
             ShowDBQ();
         }
 
+<<<<<<< HEAD
         private int GetTestType_FromTextBox()
+=======
+        private void SelectIUx(object sender, SelectionChangedEventArgs e)
+>>>>>>> master
         {
             int testTypeID;
             if (!int.TryParse(tbxTestType.Text, out testTypeID))
@@ -255,7 +422,7 @@ namespace sQzServer0
             tbiTmpQ.Header = CreateQuestSheetHeader(mTmpQS);
         }
 
-        private void btnDelQ_Click(object sender, RoutedEventArgs e)
+        private void DeleteSelectedMCItems(object sender, RoutedEventArgs e)
         {
             StringBuilder qids = new StringBuilder();
             qids.Append("id IN (");

@@ -4,6 +4,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Effects;
+using System.Collections.Generic;
 using sQzLib;
 
 namespace sQzClient
@@ -13,13 +14,9 @@ namespace sQzClient
     /// </summary>
     public partial class TakeExam : Page
     {
-        DateTime kDtStart;
-        TimeSpan dtRemn;
-        DateTime dtLastLog;
-        TimeSpan kLogIntvl;
-        bool bRunning;
-        bool bBtnBusy;
+		System.Timers.Timer TimeController;
         UICbMsg mCbMsg;
+<<<<<<< HEAD
         System.Timers.Timer mTimer;
 
         Dictionary<int, Label> SelectedLabels;
@@ -35,10 +32,14 @@ namespace sQzClient
         public static double qaWh;
         public ExamineeC thisExaminee;//reference to Auth.thisExaminee
 
+=======
+        
+>>>>>>> master
         public TakeExam()
         {
             App.EnableHookKeys(true);
             InitializeComponent();
+<<<<<<< HEAD
             mState = NetCode.Dating;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
             mCbMsg = new UICbMsg();
@@ -52,10 +53,13 @@ namespace sQzClient
             txtAnsSh.Text = Txt.s._((int)TxI.ANS_SHEET);
             btnSubmit.Content = Txt.s._((int)TxI.SUBMIT);
             btnExit.Content = Txt.s._((int)TxI.EXIT);
+=======
+>>>>>>> master
         }
 
         private void Main_Loaded(object sender, RoutedEventArgs e)
         {
+<<<<<<< HEAD
             Window w = Window.GetWindow(this);
             w.WindowStyle = WindowStyle.None;
             w.WindowState = WindowState.Maximized;
@@ -123,10 +127,20 @@ namespace sQzClient
             }
             if (m < 0 || s < 0)
                 dtRemn = thisExaminee.kDtDuration;
+=======
+			InitModels();
+			InitViews();
+
+            if (mExaminee.mPhase < ExamineePhase.Examing)
+                mExaminee.mPhase = ExamineePhase.Examing;
+            else if (mExaminee.mPhase == ExamineePhase.Submitting)
+                Submit();
+>>>>>>> master
         }
 
         void ShowQuestion()
         {
+<<<<<<< HEAD
             spMain.Effect = null;
             bBtnBusy = false;
             svwrQSh.Visibility = Visibility.Visible;
@@ -302,10 +316,30 @@ namespace sQzClient
                     thisExaminee.AnswerSheet.BytesOfAnswer[qid * 4 + i] = 0;
             }
         }
+=======
+            PopupMgr.Singleton.CbOK = null;
+            AppView.Effect = null;
+            bBtnBusy = false;
+            QuestSheetBG.Visibility = Visibility.Visible;
+			
+			InitTimeController();
+        }
+		
+		void InitTimeController()
+		{
+			TimeController = new System.Timers.Timer(1000);
+            TimeController.Elapsed += TimeControllerUpdate;
+            TimeController.AutoReset = true;
+            TimeController.Enabled = true;
+            StartingTime = DateTime.Now;
+			LastBackupTime = StartingTime;
+		}
+>>>>>>> master
 
         public void Submit()
         {
             bBtnBusy = true;//
+<<<<<<< HEAD
             spMain.Effect = null;
             bRunning = false;
             DisableAll();
@@ -330,6 +364,15 @@ namespace sQzClient
         private void ResubmitAfterConnectionFail()
         {
             bBtnBusy = true;
+=======
+            AppView.Effect = null;
+            PopupMgr.Singleton.CbOK = null;
+            bRunning = false;
+            DisableAll();
+            mState = NetPhase.Submiting;
+            mExaminee.mPhase = ExamineePhase.Submitting;
+            mExaminee.ToLogFile(RemainingTime.Minutes, RemainingTime.Seconds);
+>>>>>>> master
             if (mClnt.ConnectWR(ref mCbMsg))
             {
                 bBtnBusy = false;
@@ -353,6 +396,7 @@ namespace sQzClient
             if (bBtnBusy)
                 return;
             bBtnBusy = true;
+<<<<<<< HEAD
             spMain.Opacity = 0.5;
             WPopup.s.ShowDialog(Txt.s._((int)TxI.SUBMIT_CAUT),
                 Txt.s._((int)TxI.SUBMIT), Txt.s._((int)TxI.BTN_CNCL),
@@ -439,14 +483,22 @@ namespace sQzClient
                     break;
             }
             return outBuf;
+=======
+            PopupMgr.Singleton.CbOK = Submit;
+            AppView.Opacity = 0.5;
+            PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.SUBMIT_CAUT],
+                Txt.s._[(int)TxI.SUBMIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+            AppView.Opacity = 1;
+>>>>>>> master
         }
 
-        private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
+        private void TimeControllerUpdate(object source, System.Timers.ElapsedEventArgs e)
         {
             if (bRunning)
             {
-                if (0 < dtRemn.Ticks)
+                if (0 < RemainingTime.Ticks)
                 {
+<<<<<<< HEAD
                     dtRemn = thisExaminee.kDtDuration - (DateTime.Now - kDtStart);
                     if (thisExaminee.AnswerSheet.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
                     {
@@ -458,19 +510,38 @@ namespace sQzClient
                         txtRTime.Text = Utils.GetMinutes(dtRemn).ToString() + " : " + dtRemn.Seconds;
                         if (!btnSubmit.IsEnabled && dtRemn.Minutes < SMT_OK_M
                                 && dtRemn.Seconds < SMT_OK_S)
+=======
+                    RemainingTime = mExaminee.kDtDuration - (DateTime.Now - StartingTime);
+                    if (mExaminee.mAnsSheet.bChanged && BackupInterval < DateTime.Now - LastBackupTime)
+                    {
+                        LastBackupTime = DateTime.Now;
+                        mExaminee.ToLogFile(RemainingTime.Minutes, RemainingTime.Seconds);
+                    }
+                    Dispatcher.Invoke(() =>
+                    {
+                        txtRTime.Text = RemainingTime.Minutes.ToString() + " : " + RemainingTime.Seconds;
+                        if (!btnSubmit.IsEnabled && RemainingTime.Minutes < SMT_OK_M
+                                && RemainingTime.Seconds < SMT_OK_S)
+>>>>>>> master
                             btnSubmit.IsEnabled = true;
                     });
                 }
                 else
                 {
-                    dtRemn = new TimeSpan(0, 0, 0);
+                    RemainingTime = new TimeSpan(0, 0, 0);
                     bRunning = false;
                     Dispatcher.Invoke(() =>
                     {
                         txtRTime.Text = "0 : 0";
+<<<<<<< HEAD
                         spMain.Opacity = 0.5;
                         WPopup.s.ShowDialog(Txt.s._((int)TxI.TIMEOUT), WPopupCancel);
                         spMain.Opacity = 1;
+=======
+                        AppView.Opacity = 0.5;
+                        PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
+                        AppView.Opacity = 1;
+>>>>>>> master
                         Submit();
                     });
                 }
@@ -480,7 +551,13 @@ namespace sQzClient
         private void DisableAll()
         {
             btnSubmit.IsEnabled = false;
+<<<<<<< HEAD
             mTimer.Stop();
+=======
+            TimeController.Stop();
+            foreach (ListBox l in mExaminee.mAnsSheet.vlbxAns)
+                l.IsEnabled = false;
+>>>>>>> master
             btnExit.IsEnabled = true;
             QuestionSheetView qs = svwrQSh.Content as QuestionSheetView;
             if (qs == null)
@@ -500,9 +577,16 @@ namespace sQzClient
 
         void Exit()
         {
+<<<<<<< HEAD
             bBtnBusy = false;
             if (thisExaminee.AnswerSheet.bChanged)
                 thisExaminee.ToLogFile(Utils.GetMinutes(dtRemn), dtRemn.Seconds);
+=======
+            //WPopup.s.wpCb = null;
+            //bBtnBusy = false;
+            //if (mExaminee.mAnsSheet.bChanged)
+            //    mExaminee.ToLogFile(RemainingTime.Minutes, RemainingTime.Seconds);
+>>>>>>> master
             Window.GetWindow(this).Close();
         }
 
@@ -516,16 +600,53 @@ namespace sQzClient
             if (bBtnBusy)
                 return;
             bBtnBusy = true;
+<<<<<<< HEAD
             spMain.Opacity = 0.5;
             ShowExitDiaglogBox();
             spMain.Opacity = 1;
+=======
+            PopupMgr.Singleton.CbOK = Exit;
+            AppView.Opacity = 0.5;
+            if (mExaminee.mPhase < ExamineePhase.Submitting)
+                PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_1],
+                    Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], "exit");
+            else
+                PopupMgr.Singleton.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_2],
+                    Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+            AppView.Opacity = 1;
+>>>>>>> master
         }
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             bRunning = false;
             mClnt.Close();
-            WPopup.s.Exit();
+            PopupMgr.Singleton.Exit();
+        }
+		
+		public void Options_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            //bChanged = true;
+            ListBox l = sender as ListBox;
+            if (l.SelectedItem == null)
+                return;
+            int qid = Convert.ToInt32(l.Name.Substring(1));
+            int i = -1;
+            foreach (ListBoxItem li in l.Items)
+            {
+                ++i;
+                if (li.IsSelected)
+                {
+                    //aAns[qid * 4 + i] = 1;//todo
+                    //vAnsItem[qid][i].Selected();
+                }
+                else
+                {
+                    //aAns[qid * 4 + i] = 0;//todo
+                    //vAnsItem[qid][i].Unselected();
+                }
+            }
+            //dgSelChgCB?.Invoke();
         }
     }
 }

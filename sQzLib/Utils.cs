@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+<<<<<<< HEAD
 using System.Windows.Controls;
 
+=======
+using DocumentFormat.OpenXml.Wordprocessing;
+using DocumentFormat.OpenXml.Packaging;
+using System.IO;
+>>>>>>> master
 namespace sQzLib
 {
     public class Utils
@@ -16,6 +22,7 @@ namespace sQzLib
             return ReadBytesOfString(buf, ref offs, ref remainLength);
         }
 
+<<<<<<< HEAD
         public static string ReadBytesOfString(byte[] buf, ref int offs, ref int remainLenth)
         {
             if (remainLenth < 4)
@@ -59,6 +66,99 @@ namespace sQzLib
                 sz += x.Length;
             }
             return buf;
+=======
+    public class Utils
+    {
+        static readonly char[] WhiteChars = { ' ', '\t', '\n', '\r' };
+
+        public static Queue<NonnullRichTextBuilder> ReadAllLines(string path)
+        {
+            if (Path.GetExtension(path) == ".docx")
+                return ReadAllLinesDocx(path);
+            else
+                return NonnullRichTextBuilder.NewWith(File.ReadAllLines(path));
+        }
+
+        static Queue<NonnullRichTextBuilder> ReadAllLinesDocx(string path)
+        {
+            Queue<NonnullRichTextBuilder> richTexts = new Queue<NonnullRichTextBuilder>();
+            WordprocessingDocument doc = null;
+            try
+            {
+                doc = WordprocessingDocument.Open(path, false);
+            }
+            catch(OpenXmlPackageException)
+            {
+                return richTexts;
+            }
+            catch (System.IO.IOException)
+            {
+                return richTexts;
+            }
+            Body body = doc.MainDocumentPart.Document.Body;
+            foreach (Paragraph paragraph in body.ChildElements.OfType<Paragraph>())
+            {
+                DocumentFormat.OpenXml.Drawing.Blip hasImage =
+                    paragraph.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
+                if (hasImage == null)
+                {
+                    richTexts.Enqueue(new NonnullRichTextBuilder(paragraph.InnerText));
+                }
+                else
+                {
+                    List<object> runs = new List<object>();
+                    foreach (Run docRun in paragraph.ChildElements.OfType<Run>())
+                    {
+                        DocumentFormat.OpenXml.Drawing.Blip imgContainer =
+                            docRun.Descendants<DocumentFormat.OpenXml.Drawing.Blip>().FirstOrDefault();
+                        if (imgContainer == null)
+                            runs.Add(docRun.InnerText);
+                        else
+                        {
+                            string imgId = imgContainer.Embed.Value;
+                            ImagePart imgPart = doc.MainDocumentPart.GetPartById(imgId) as ImagePart;
+                            System.IO.Stream imgStream = imgPart.GetStream();
+                            byte[] imgInBytes = new byte[imgStream.Length];
+                            imgStream.Read(imgInBytes, 0, (int)imgStream.Length);
+                            runs.Add(imgInBytes);
+                        }
+                    }
+                    NonnullRichTextBuilder richTextRuns = new NonnullRichTextBuilder(CompactRuns(runs));
+                    richTexts.Enqueue(richTextRuns);
+                }
+            }
+            doc.Close();
+            return richTexts;
+        }
+
+        static List<object> CompactRuns(List<object> runs)
+        {
+            List<object> compactRuns = new List<object>();
+            StringBuilder joinTexts = new StringBuilder();
+            foreach(object run in runs)
+            {
+                string s = run as string;
+                if(s == null)
+                {
+                    if(joinTexts.Length > 0)
+                    {
+                        compactRuns.Add(joinTexts.ToString());
+                        joinTexts.Clear();
+                    }
+                    compactRuns.Add(run);
+                }
+                else
+                    joinTexts.Append(s);
+            }
+            if (joinTexts.Length > 0)
+                compactRuns.Add(joinTexts.ToString());
+            return compactRuns;
+        }
+
+        public static int GetImageGUID()
+        {
+            return 0;
+>>>>>>> master
         }
 
         public static string CleanSpace(string buf)
@@ -111,6 +211,7 @@ namespace sQzLib
             if (j < 0)
                 return string.Empty;
             return s.Substring(0, j + 1);
+<<<<<<< HEAD
         }
 
         public static int GetMinutes(TimeSpan timeSpan)
@@ -283,6 +384,8 @@ namespace sQzLib
         public override string ToString()
         {
             return sb.ToString();
+=======
+>>>>>>> master
         }
     }
 }

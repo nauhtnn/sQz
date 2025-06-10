@@ -54,8 +54,13 @@ namespace sQzServer1
             vDt1.Clear();
             vDt2.Clear();
             int rid = -1;
+<<<<<<< HEAD
             foreach (ExamRoomS1 r in mSl.Rooms.Values)
                 foreach (ExamineeA e in r.Examinees.Values)
+=======
+            foreach (ExamRoom r in mSl.Rooms.Values)
+                foreach (ExamineeA e in r.vExaminee.Values)
+>>>>>>> master
                 {
                     RowDefinition rd = new RowDefinition();
                     rd.Height = new GridLength(20);
@@ -127,7 +132,11 @@ namespace sQzServer1
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.HorizontalAlignment = HorizontalAlignment.Center;
+<<<<<<< HEAD
                     if (e.CorrectCount != ExamineeA.LV_CAP)
+=======
+                    if (e.uGrade != (int)Level.MAX_COUNT_EACH_LEVEL)
+>>>>>>> master
                     {
                         t.Text = e.Grade;
                         cbx.IsEnabled = false;
@@ -152,6 +161,7 @@ namespace sQzServer1
                 }
         }
 
+<<<<<<< HEAD
         //public void UpdateRsView(List<ExamRoomA> vRoom)
         //{
         //    TextBlock t;
@@ -168,6 +178,25 @@ namespace sQzServer1
         //                t.Text = e.ComputerName;
         //        }
         //}
+=======
+        public void UpdateRsView(List<ExamRoom> Rooms)
+        {
+            TextBlock t;
+            foreach (ExamRoom r in Rooms)
+                foreach (ExamineeA e in r.vExaminee.Values)
+                {
+                    int lvid = e.LvId;
+                    if (e.uGrade != (int)Level.MAX_COUNT_EACH_LEVEL && vGrade.TryGetValue(lvid, out t))
+                        t.Text = e.Grade;
+                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
+                        t.Text = e.dtTim1.ToString("HH:mm");
+                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))
+                        t.Text = e.dtTim2.ToString("HH:mm");
+                    if (e.tComp != null && vComp.TryGetValue(lvid, out t))
+                        t.Text = e.tComp;
+                }
+        }
+>>>>>>> master
 
         public void DeepCopyNee(TabItem reftbi)
         {
@@ -241,6 +270,7 @@ namespace sQzServer1
         private void cbxAbsen_Unchecked(object sender, RoutedEventArgs e)
         {
             CheckBox cbx = sender as CheckBox;
+<<<<<<< HEAD
             ExamineeS1 nee;
             foreach (ExamRoomS1 r in mSl.Rooms.Values)
                 if(r.Examinees.TryGetValue(cbx.Name, out nee) &&
@@ -249,6 +279,20 @@ namespace sQzServer1
                     toSubmCb?.Invoke(false);
                     return;
                 }
+=======
+            int key;
+            if (int.TryParse(cbx.Name.Substring(1), out key))
+            {
+                ExamineeA nee;
+                foreach (ExamRoom r in mSl.Rooms.Values)
+                    if(r.vExaminee.TryGetValue(key, out nee) &&
+                        nee.eStt != NeeStt.Finished)
+                    {
+                        toSubmCb?.Invoke(false);
+                        return;
+                    }
+            }
+>>>>>>> master
             toSubmCb?.Invoke(ToSubmit());
         }
 
@@ -260,8 +304,13 @@ namespace sQzServer1
         public bool ToSubmit()
         {
             CheckBox cbx;
+<<<<<<< HEAD
             foreach (ExamRoomS1 r in mSl.Rooms.Values)
                 foreach (ExamineeA nee in r.Examinees.Values)
+=======
+            foreach (ExamRoom r in mSl.Rooms.Values)
+                foreach (ExamineeA nee in r.vExaminee.Values)
+>>>>>>> master
                     if (nee.eStt != NeeStt.Finished &&
                         (!vAbsen.TryGetValue(nee.ID, out cbx) ||
                         !cbx.IsChecked.HasValue || !cbx.IsChecked.Value))

@@ -1,0 +1,430 @@
+﻿using System;
+using System.Windows;
+using System.Windows.Controls;
+using System.Windows.Media;
+using System.Windows.Media.Effects;
+using sQzLib;
+
+namespace sQzStandalone
+{
+    /// <summary>
+    /// Interaction logic for MainWindow.xaml
+    /// </summary>
+    public partial class ExamPage : Page
+    {
+        DateTime kDtStart;
+        TimeSpan dtRemn;
+        DateTime dtLastLog;
+        TimeSpan kLogIntvl;
+        bool bRunning;
+        bool bBtnBusy;
+        UICbMsg mCbMsg;
+        System.Timers.Timer mTimer;
+
+        const int SMT_OK_M = 20;
+        const int SMT_OK_S = 60;
+
+        public QuestSheet mQSh;
+
+        Client2 mClnt;
+        NetCode mState;
+
+        public static double qaWh;
+        double qiWh;
+        Thickness qMrg;
+        public ExamineeA mNee;//reference to Auth.mNee
+
+        public ExamPage()
+        {
+            InitializeComponent();
+            mState = NetCode.Dating;
+            mClnt = new Client2(ClntBufHndl, ClntBufPrep, false);
+            mCbMsg = new UICbMsg();
+            bRunning = true;
+
+            mQSh = new QuestSheet();
+        }
+
+        private void LoadTxt()
+        {
+            txtAnsSh.Text = Txt.s._[(int)TxI.ANS_SHEET];
+            btnSubmit.Content = Txt.s._[(int)TxI.SUBMIT];
+            btnExit.Content = Txt.s._[(int)TxI.EXIT];
+        }
+
+        private void Main_Loaded(object sender, RoutedEventArgs e)
+        {
+            Window w = Window.GetWindow(this);
+            w.WindowStyle = WindowStyle.None;
+            w.WindowState = WindowState.Maximized;
+            w.ResizeMode = ResizeMode.NoResize;
+            w.Closing += W_Closing;
+            w.FontSize = 16;
+
+            double mrg = FontSize / 2;
+            qiWh = 3 * mrg;
+            qMrg = new Thickness(mrg, mrg, 0, mrg);
+            qaWh = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - qiWh;
+
+            InitLeftPanel();
+            InitQuestPanel();
+
+            bBtnBusy = false;
+
+            txtWelcome.Text = mNee.ToString();
+
+            LoadTxt();
+
+            WPopup.nwIns(w);
+            WPopup.s.CbNOK = WPCollapse;
+
+            int m = -1, s = -1;
+            if (mNee.eStt < NeeStt.Submitting)
+            {
+                string t = Utils.ReadAllLines("Duration.txt")[0];
+                if (t != null)
+                {
+                    string[] vt = t.Split('\t');
+                    if (vt.Length == 2)
+                    {
+                        int.TryParse(vt[0], out m);
+                        int.TryParse(vt[1], out s);
+                    }
+                    if (-1 < m && -1 < s)
+                        dtRemn = mNee.kDtDuration = new TimeSpan(0, m, s);
+                }
+            }
+            if (m < 0 || s < 0)
+                dtRemn = mNee.kDtDuration;
+            txtRTime.Text = "" + dtRemn.Minutes + " : " + dtRemn.Seconds;
+            kLogIntvl = new TimeSpan(0, 0, 30);
+
+            System.Text.StringBuilder msg = new System.Text.StringBuilder();
+            msg.Append(mNee.tId + " (" + mNee.tName + ")");
+            if (mNee.kDtDuration.Minutes == 30)
+                msg.Append(Txt.s._[(int)TxI.EXAMING_MSG_1]);
+            else
+                msg.AppendFormat(Txt.s._[(int)TxI.EXAMING_MSG_2],
+                    mNee.kDtDuration.Minutes, mNee.kDtDuration.Seconds);
+            WPopup.s.CbOK = WPopup.s.CbNOK = ShowQuestion;
+            spMain.Opacity = 0.5;
+            WPopup.s.ShowDialog(msg.ToString());
+            spMain.Opacity = 1;
+            if (mNee.eStt < NeeStt.Examing)
+                mNee.eStt = NeeStt.Examing;
+            else if (mNee.eStt == NeeStt.Submitting)
+                Submit();
+        }
+
+        void ShowQuestion()
+        {
+            WPopup.s.CbOK = null;
+            spMain.Effect = null;
+            bBtnBusy = false;
+            svwrQSh.Visibility = Visibility.Visible;
+
+            mTimer = new System.Timers.Timer(1000);
+            mTimer.Elapsed += UpdateSrvrMsg;
+            mTimer.AutoReset = true;
+            mTimer.Enabled = true;
+            dtLastLog = kDtStart = DateTime.Now;
+        }
+
+        void InitLeftPanel()
+        {
+            //left panel
+            spLp.HorizontalAlignment = HorizontalAlignment.Left;
+            spLp.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
+            //title
+            Label l = new Label();
+            gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
+            int nAns = 4;//hardcode
+            int i = 0, n = mQSh.Items.Count;
+            AnsItem.SInit(Window.GetWindow(this).FontSize);
+            mNee.mAnsSh.Init(mQSh.LvId);
+            mNee.mAnsSh.InitView(mQSh, qaWh, null);
+            mNee.mAnsSh.bChanged = false;
+            //top line
+            gAnsSh.RowDefinitions.Add(new RowDefinition());
+            l = new Label();
+            Grid.SetRow(l, 0);
+            Grid.SetColumn(l, 0);
+            gAnsSh.Children.Add(l);
+            SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
+            for (i = 1; i < nAns; ++i)
+            {
+                l = new Label();
+                l.Content = (char)('@' + i);
+                l.BorderBrush = brBK;
+                l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
+                l.HorizontalContentAlignment = HorizontalAlignment.Center;
+                l.FontWeight = FontWeights.Bold;
+                Grid.SetRow(l, 0);
+                Grid.SetColumn(l, i);
+                gAnsSh.Children.Add(l);
+
+            }
+            l = new Label();
+            l.BorderBrush = brBK;
+            l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
+            l.HorizontalContentAlignment = HorizontalAlignment.Center;
+            l.Content = (char)('@' + i);
+            l.FontWeight = FontWeights.Bold;
+            Grid.SetRow(l, 0);
+            Grid.SetColumn(l, i);
+            gAnsSh.Children.Add(l);
+            //next lines
+            //n -= 1;
+            int j = 1;
+            for (; j < n; ++j)
+            {
+                gAnsSh.RowDefinitions.Add(new RowDefinition());
+                l = new Label();
+                l.Content = j;
+                l.BorderBrush = brBK;
+                l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
+                l.HorizontalContentAlignment = HorizontalAlignment.Center;
+                l.FontWeight = FontWeights.Bold;
+                Grid.SetRow(l, j);
+                Grid.SetColumn(l, 0);
+                gAnsSh.Children.Add(l);
+                for (i = 1; i < nAns; ++i)
+                {
+                    l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+                    l.BorderBrush = brBK;
+                    l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
+                    l.HorizontalContentAlignment = HorizontalAlignment.Center;
+                    l.VerticalContentAlignment = VerticalAlignment.Top;
+                    Grid.SetRow(l, j);
+                    Grid.SetColumn(l, i);
+                    gAnsSh.Children.Add(l);
+                }
+                l = l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+                l.BorderBrush = brBK;
+                l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
+                l.HorizontalContentAlignment = HorizontalAlignment.Center;
+                Grid.SetRow(l, j);
+                Grid.SetColumn(l, i);
+                gAnsSh.Children.Add(l);
+            }
+            //bottom lines
+            gAnsSh.RowDefinitions.Add(new RowDefinition());
+            l = new Label();
+            l.Content = j;
+            l.BorderBrush = brBK;
+            l.BorderThickness = Theme.s.l[(int)ThicknessId.LB];
+            l.HorizontalContentAlignment = HorizontalAlignment.Center;
+            l.FontWeight = FontWeights.Bold;
+            Grid.SetRow(l, j);
+            Grid.SetColumn(l, 0);
+            gAnsSh.Children.Add(l);
+            for (i = 1; i < nAns; ++i)
+            {
+                l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+                l.BorderBrush = brBK;
+                l.BorderThickness = Theme.s.l[(int)ThicknessId.MB];
+                l.HorizontalContentAlignment = HorizontalAlignment.Center;
+                Grid.SetRow(l, j);
+                Grid.SetColumn(l, i);
+                gAnsSh.Children.Add(l);
+            }
+            l = mNee.mAnsSh.vAnsItem[j - 1][i - 1].lbl;
+            l.BorderBrush = brBK;
+            l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
+            l.HorizontalContentAlignment = HorizontalAlignment.Center;
+            Grid.SetRow(l, j);
+            Grid.SetColumn(l, i);
+            gAnsSh.Children.Add(l);
+
+            //for (j = Question.svQuest[0].Count; -1 < j; --j)
+            //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
+        }
+
+        void InitQuestPanel()
+        {
+            gQuest.Background = Theme.s._[(int)BrushId.Q_BG];
+            int n = mQSh.Items.Count;
+            for (int i = 1, j = 0; i <= n; i += 2, ++j)
+            {
+                gQuest.RowDefinitions.Add(new RowDefinition());
+                StackPanel q = CreateQuestion(i);
+                Grid.SetRow(q, j);
+                Grid.SetColumn(q, 0);
+                gQuest.Children.Add(q);
+            }
+            for (int i = 2, j = 0; i <= n; i += 2, ++j)
+            {
+                StackPanel q = CreateQuestion(i);
+                Grid.SetRow(q, j);
+                Grid.SetColumn(q, 1);
+                gQuest.Children.Add(q);
+            }
+            gQuest.Background = Theme.s._[(int)BrushId.BG];
+        }
+
+        StackPanel CreateQuestion(int idx)
+        {
+            StackPanel q = new StackPanel();
+            q.Orientation = Orientation.Horizontal;
+            q.Margin = qMrg;
+            Label l = new Label();
+            l.HorizontalAlignment = HorizontalAlignment.Left;
+            l.VerticalAlignment = VerticalAlignment.Top;
+            l.Content = idx;
+            l.Background = Theme.s._[(int)BrushId.QID_BG];
+            l.Foreground = Theme.s._[(int)BrushId.QID_Color];
+            l.Width = qiWh;
+            l.Height = qiWh;
+            l.HorizontalContentAlignment = HorizontalAlignment.Center;
+            l.VerticalContentAlignment = VerticalAlignment.Center;
+            l.Padding = new Thickness(0);
+            q.Children.Add(l);
+            StackPanel con = new StackPanel();
+            TextBlock stmt = new TextBlock();
+            MultiChoiceItem quest = mQSh.Q(idx - 1);
+            stmt.Text = quest.Stem;
+            stmt.TextWrapping = TextWrapping.Wrap;
+            stmt.Width = qaWh;
+            stmt.Background = Theme.s._[(int)BrushId.Q_BG];
+            Label stmtCon = new Label();
+            stmtCon.Content = stmt;
+            stmtCon.BorderBrush = Theme.s._[(int)BrushId.QID_BG];
+            stmtCon.BorderThickness = new Thickness(0, 4, 0, 0);
+            Thickness zero = new Thickness(0);
+            stmtCon.Margin = stmtCon.Padding = zero;
+            con.Children.Add(stmtCon);
+            con.Children.Add(mNee.mAnsSh.vlbxAns[idx-1]);
+            q.Children.Add(con);
+            q.Background = Theme.s._[(int)BrushId.BG];
+            return q;
+        }
+
+        public void Submit()
+        {
+            bBtnBusy = true;//
+            spMain.Effect = null;
+            WPopup.s.CbOK = null;
+            bRunning = false;
+            DisableAll();
+            mState = NetCode.Submiting;
+            mNee.eStt = NeeStt.Submitting;
+            mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+            if (mClnt.ConnectWR(ref mCbMsg))
+                bBtnBusy = false;
+        }
+
+        private void btnSubmit_Click(object sender, RoutedEventArgs e)
+        {
+            if (bBtnBusy)
+                return;
+            bBtnBusy = true;
+            WPopup.s.CbOK = Submit;
+            spMain.Opacity = 0.5;
+            WPopup.s.ShowDialog(Txt.s._[(int)TxI.SUBMIT_CAUT],
+                Txt.s._[(int)TxI.SUBMIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+            spMain.Opacity = 1;
+        }
+
+        public bool ClntBufHndl(byte[] buf)
+        {
+            return false;
+        }
+
+        public byte[] ClntBufPrep()
+        {
+            byte[] outBuf;
+            switch (mState)
+            {
+                case NetCode.Submiting:
+                    mNee.ToByte(out outBuf, (int)mState);
+                    break;
+                default:
+                    outBuf = null;
+                    break;
+            }
+            return outBuf;
+        }
+
+        private void UpdateSrvrMsg(object source, System.Timers.ElapsedEventArgs e)
+        {
+            if (bRunning)
+            {
+                if (0 < dtRemn.Ticks)
+                {
+                    dtRemn = mNee.kDtDuration - (DateTime.Now - kDtStart);
+                    if (mNee.mAnsSh.bChanged && kLogIntvl < DateTime.Now - dtLastLog)
+                    {
+                        dtLastLog = DateTime.Now;
+                        mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+                    }
+                    Dispatcher.Invoke(() =>
+                    {
+                        txtRTime.Text = dtRemn.Minutes.ToString() + " : " + dtRemn.Seconds;
+                        if (!btnSubmit.IsEnabled && dtRemn.Minutes < SMT_OK_M
+                                && dtRemn.Seconds < SMT_OK_S)
+                            btnSubmit.IsEnabled = true;
+                    });
+                }
+                else
+                {
+                    dtRemn = new TimeSpan(0, 0, 0);
+                    bRunning = false;
+                    Dispatcher.Invoke(() =>
+                    {
+                        txtRTime.Text = "0 : 0";
+                        spMain.Opacity = 0.5;
+                        WPopup.s.ShowDialog(Txt.s._[(int)TxI.TIMEOUT]);
+                        spMain.Opacity = 1;
+                        Submit();
+                    });
+                }
+            }
+        }
+
+        private void DisableAll()
+        {
+            btnSubmit.IsEnabled = false;
+            mTimer.Stop();
+            foreach (ListBox l in mNee.mAnsSh.vlbxAns)
+                l.IsEnabled = false;
+            btnExit.IsEnabled = true;
+        }
+
+        void Exit()
+        {
+            //WPopup.s.wpCb = null;
+            //bBtnBusy = false;
+            if (mNee.mAnsSh.bChanged)
+                mNee.ToLogFile(dtRemn.Minutes, dtRemn.Seconds);
+            Window.GetWindow(this).Close();
+        }
+
+        void WPCollapse()
+        {
+            bBtnBusy = false;
+        }
+
+        private void btnExit_Click(object sender, RoutedEventArgs e)
+        {
+            if (bBtnBusy)
+                return;
+            bBtnBusy = true;
+            WPopup.s.CbOK = Exit;
+            spMain.Opacity = 0.5;
+            if (mNee.eStt < NeeStt.Submitting)
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_1],
+                    Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], "exit");
+            else
+                WPopup.s.ShowDialog(Txt.s._[(int)TxI.EXIT_CAUT_2],
+                    Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+            spMain.Opacity = 1;
+        }
+
+        private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        {
+            bRunning = false;
+            mClnt.Close();
+            WPopup.s.Exit();
+        }
+    }
+}

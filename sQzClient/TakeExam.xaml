@@ -10,6 +10,7 @@
       Title="TakeExam">
 
     <Viewbox>
+<<<<<<< HEAD
         <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
             <Grid x:Name="QuestionAndAnswerContainer">
                 <Grid.ColumnDefinitions>
@@ -20,6 +21,18 @@
                     <TextBlock x:Name="txtAnsSh" Height="30" FontSize="15" HorizontalAlignment="Center"/>
                     <ScrollViewer x:Name="svwrASh" Height="622" Width="96" VerticalScrollBarVisibility="Auto" FontSize="14">
                         <Grid x:Name="gAnsSh">
+=======
+        <StackPanel x:Name="AppView" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="144"/>
+                    <ColumnDefinition Width="1116"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel x:Name="AnswerSheetBG" HorizontalAlignment="Left" Height="652" Width="144">
+                    <TextBlock x:Name="AnswerTitle" Height="30" FontSize="20" HorizontalAlignment="Center"/>
+                    <ScrollViewer Height="622" Width="144" VerticalScrollBarVisibility="Auto" FontSize="14">
+                        <Grid x:Name="AnswerCells">
+>>>>>>> master
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
@@ -27,6 +40,7 @@
                         </Grid>
                     </ScrollViewer>
                 </StackPanel>
+<<<<<<< HEAD
                 <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1164" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
                     <!--<Grid x:Name="QuestionSheetContainer" Width="1144">
                         <Grid.ColumnDefinitions>
@@ -34,6 +48,10 @@
                             <ColumnDefinition Width="577"/>
                         </Grid.ColumnDefinitions>
                     </Grid>-->
+=======
+                <ScrollViewer Grid.Column="1" x:Name="QuestSheetBG" Width="1020" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
+                    <StackPanel x:Name="QuestionsView" Width="1000"/>
+>>>>>>> master
                 </ScrollViewer>
             </Grid>
             <Grid Height="48">

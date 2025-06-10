@@ -403,9 +403,9 @@ namespace sQzServer0
             int k = -1;
             foreach (Question q in qs.ShallowCopy())
             {
-                if (q.bDiff)
+                /*if (q.bDiff)
                     bg = difbg;
-                else if (even)
+                else*/ if (even)
                     bg = evenbg;
                 else
                     bg = oddbg;

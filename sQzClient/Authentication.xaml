@@ -10,7 +10,7 @@
       Title="Authentication">
 
     <Viewbox>
-        <StackPanel x:Name="spMain" Loaded="Main_Loaded" Height="720" Width="1280">
+        <StackPanel x:Name="AppView" Loaded="Main_Loaded" Height="720" Width="1280">
             <StackPanel.Background>
                 <!--<ImageBrush ImageSource="tech.jpg" Stretch="None"/>-->
                 <SolidColorBrush Color="#009ddc"/>
