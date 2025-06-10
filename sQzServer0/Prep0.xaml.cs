@@ -24,18 +24,14 @@ namespace sQzServer0
     public partial class Prep0 : Page
     {
         List<CheckBox> vChk;
-        IUx mSelQCat;
         QuestSheet mDBQS;
         QuestSheet mTmpQS;
-        ExamBoard mBrd;
 
         public Prep0()
         {
             InitializeComponent();
-            mSelQCat = IUx._0;
             mDBQS = new QuestSheet();
             mTmpQS = new QuestSheet();
-            mBrd = new ExamBoard();
             vChk = new List<CheckBox>();
         }
 
@@ -44,27 +40,31 @@ namespace sQzServer0
             NavigationService.Navigate(new Uri("MainMenu.xaml", UriKind.Relative));
         }
 
+<<<<<<< HEAD
+        private void InsertSlot(object sender, RoutedEventArgs e)
+=======
         private void InsertBoard(object sender, RoutedEventArgs e)
+>>>>>>> master
         {
             DateTime dt;
-            if (DT.To_(tbxBrd.Text, DT._, out dt))
+            if (DT.To_(newSlot.Text, DT._, out dt))
             {
                 spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.BOARD_NOK]);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.BOARD_NOK));
                 spMain.Opacity = 1;
             }
             else
             {
-                ExamBoard eb = new ExamBoard();
-                eb.mDt = dt;
+                ExamSlotS0 slot = new ExamSlotS0();
+                slot.mDt = dt;
                 string msg;
-                if(0 < eb.DBIns(out msg))
+                if(0 < slot.InsertSlot(out msg))
                 {
                     spMain.Opacity = 0.5;
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.BOARD_OK]);
+                    WPopup.s.ShowDialog(Txt.s._((int)TxI.BOARD_OK));
                     spMain.Opacity = 1;
-                    LoadBrd();
-                    tbxBrd.Text = string.Empty;
+                    LoadSlotView();
+                    newSlot.Text = string.Empty;
                 }
                 else
                 {
@@ -75,6 +75,9 @@ namespace sQzServer0
             }
         }
 
+<<<<<<< HEAD
+        private void LoadSlotView()
+=======
         private void InsertSlot(object sender, RoutedEventArgs e)
         {
             DateTime dt;
@@ -106,9 +109,10 @@ namespace sQzServer0
         }
 
         private void LoadBrd()
+>>>>>>> master
         {
             string emsg;
-            List<DateTime> v = ExamBoard.DBSel(out emsg);
+            List<DateTime> v = ExamSlotS0.DBSelectSlotIDs(false, out emsg);
             if(v == null)
             {
                 spMain.Opacity = 0.5;
@@ -116,41 +120,14 @@ namespace sQzServer0
                 spMain.Opacity = 1;
                 return;
             }
-            lbxBrd.Items.Clear();
-            foreach(DateTime dt in v)
-            {
-                ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT.__);
-                lbxBrd.Items.Add(it);
-            }
-        }
-
-        private void LoadSl()
-        {
-            string emsg;
-            List<DateTime> v = mBrd.DBSelSl(false, out emsg);
-            if(v == null)
-            {
-                spMain.Opacity = 0.5;
-                WPopup.s.ShowDialog(emsg);
-                spMain.Opacity = 1;
-                return;
-            }
-            //bool dark = true;
-            //Color c = new Color();
-            //c.A = 0xff;
-            //c.B = c.G = c.R = 0xf0;
-            lbxSl.Items.Clear();
+            SlotsView.Items.Clear();
             foreach (DateTime dt in v)
             {
                 ListBoxItem it = new ListBoxItem();
-                it.Content = dt.ToString(DT.hh);
-                it.Selected += lbxSl_Selected;
-                it.Unselected += lbxSl_Unselected;
-                //dark = !dark;
-                //if (dark)
-                //    it.Background = new SolidColorBrush(c);
-                lbxSl.Items.Add(it);
+                it.Content = dt.ToString(DT._);
+                it.Selected += SlotsView_Selected;
+                it.Unselected += SlotsView_Unselected;
+                SlotsView.Items.Add(it);
             }
         }
 
@@ -163,13 +140,15 @@ namespace sQzServer0
 
             LoadTxt();
 
-            InitLbxQCatgry();
-            LoadBrd();
+            LoadSlotView();
             Window w = Window.GetWindow(this);
             if(w != null)
                 w.Closing += W_Closing;
         }
 
+<<<<<<< HEAD
+        private void btnFileQ_Click(object sender, RoutedEventArgs e)
+=======
         void InitLbxQCatgry()
         {
             List<string> qCatName = new List<string>();
@@ -214,6 +193,7 @@ namespace sQzServer0
         }
 
         private void OpenRawFile_of_MCItems(object sender, RoutedEventArgs e)
+>>>>>>> master
         {
             OpenFileDialog dlg = new OpenFileDialog();
 
@@ -227,27 +207,31 @@ namespace sQzServer0
                 fpath = dlg.FileName;
             else
                 return;
-            if (fpath.EndsWith(".docx"))
-                mTmpQS.ReadDocx(fpath);
-            else
-                mTmpQS.ReadTxt(fpath);
+            mTmpQS.LoadFromFile(fpath);
             ShowTmpQ();
         }
 
         private void ShowDBQ()
         {
-            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
-            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
-            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
-            SolidColorBrush bg;
-            bool even = false;
-            int x = -1;
             gDBQuest.Children.Clear();
             gDBQuest.RowDefinitions.Clear();
             vChk.Clear();
-            double w = gDBQuest.ColumnDefinitions.First().Width.Value;
-            foreach (Question q in mDBQS.ShallowCopy())
+            SingleQuestionView.IdxWidth = FontSize * 2;
+            SingleQuestionView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleQuestionView.IdxWidth;
+            AnswerSheet ansSheet = new AnswerSheet();
+            mDBQS.ExtractKey(ansSheet);
+            int rowIdx = -1;
+            //foreach (Question q in mDBQS.ShallowCopyIndependentQuestions())
+            //    AddSingleQuestionToDBView(q, ++rowIdx, rowIdx, ansSheet.BytesOfAnswer);
+
+            int questionIdx = rowIdx;
+            foreach (QSheetSection section in mDBQS.Sections)
             {
+<<<<<<< HEAD
+                AddPassageTextToDBView(section.Requirements, ++rowIdx, SingleQuestionView.StemWidth);
+                foreach (Question q in section.Questions)
+                    AddSingleQuestionToDBView(q, ++questionIdx, ++rowIdx, ansSheet.BytesOfAnswer);
+=======
                 TextBlock i = new TextBlock();
                 i.Text = (++x + 1) + ". " + q.Stmt;
                 i.Width = w;
@@ -283,14 +267,53 @@ namespace sQzServer0
                 Grid.SetRow(chk, x);
                 gDBQuest.Children.Add(chk);
                 vChk.Add(chk);
+>>>>>>> master
             }
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], mDBQS.Count, QuestSheet.DBGetND(mSelQCat));
-            tbiDBQ.Header = sb.ToString();
+            tbiDBQ.Header = CreateQuestSheetHeader(mDBQS);
+        }
+
+        private void AddPassageTextToDBView(string text, int rowIdx, double w)
+        {
+            TextBlock passageText = new TextBlock();
+            passageText.Text = "\n\n" + text + "\n\n";
+            passageText.Width = w;
+            passageText.TextWrapping = TextWrapping.Wrap;
+            passageText.TextAlignment = TextAlignment.Justify;
+            RowDefinition rd = new RowDefinition();
+            gDBQuest.RowDefinitions.Add(rd);
+            Grid.SetRow(passageText, rowIdx);
+            gDBQuest.Children.Add(passageText);
+        }
+
+        private void AddSingleQuestionToDBView(Question q, int qIdx, int rowIdx, byte[] optionStatusArray)
+        {
+            SingleQuestionView questionView = new SingleQuestionView(q, qIdx, optionStatusArray, false);
+            RowDefinition rd = new RowDefinition();
+            gDBQuest.RowDefinitions.Add(rd);
+            Grid.SetRow(questionView, rowIdx);
+            gDBQuest.Children.Add(questionView);
+            CheckBox chk = new CheckBox();
+            chk.Name = "c" + q.uId;
+            chk.VerticalAlignment = VerticalAlignment.Center;
+            Grid.SetColumn(chk, 1);
+            Grid.SetRow(chk, rowIdx);
+            gDBQuest.Children.Add(chk);
+            vChk.Add(chk);
         }
 
         private void ShowTmpQ()
         {
+<<<<<<< HEAD
+            AnswerSheet ansSheet = new AnswerSheet();
+            mTmpQS.ExtractKey(ansSheet);
+            svwrTmpQ.Content = new QuestionSheetView(mTmpQS, ansSheet.BytesOfAnswer, FontSize * 2,
+                svwrTmpQ.Width - FontSize * 2 - SystemParameters.ScrollWidth, false);
+            tbiTmpQ.Header = CreateQuestSheetHeader(mTmpQS);
+        }
+
+        private string CreateQuestSheetHeader(QuestSheet qs)
+        {
+=======
             SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
             SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
             SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
@@ -328,102 +351,111 @@ namespace sQzServer0
                 }
             }
             svwrTmpQ.Content = sp;
+>>>>>>> master
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], mTmpQS.Count, mTmpQS.CountD);
-            tbiTmpQ.Header = sb.ToString();
+            sb.Append("(");
+            foreach (QSheetSection section in qs.Sections)
+                sb.AppendFormat(section.Questions.Count + ", ");
+            if (sb.Length > 2)
+                sb.Remove(sb.Length - 2, 2);
+            sb.Append(")");
+            return sb.ToString();
         }
 
         private void InsertMCItems(object sender, RoutedEventArgs e)
         {
-            if (mSelQCat == IUx._0)
+            if (mTmpQS.CountAllQuestions() == 0)
             {
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.PREP_IU15]);
+                MessageBox.Show("No question to import!");
                 return;
             }
-            if (mTmpQS.Count == 0)
+            mTmpQS.TestType = GetTestType_FromTextBox();
+            if (mTmpQS.TestType < 0)
                 return;
             gDBQuest.Children.Clear();
             svwrTmpQ.Content = null;
-            mTmpQS.DBIns(mSelQCat);
+            mTmpQS.DBInsertOriginQuestions();
             mTmpQS.Clear();
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0, mTmpQS.CountD);
-            tbiTmpQ.Header = sb.ToString();
-            mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
+            tbiTmpQ.Header = CreateQuestSheetHeader(mTmpQS);
+            LoadAndShowQuestionFromDB();
+        }
+
+        private void LoadAndShowQuestionFromDB()
+        {
+            int testTypeID = GetTestType_FromTextBox();
+            if (testTypeID < 0)
+                return;
+            mDBQS.DBSelectNondeletedQuestions(testTypeID);
             ShowDBQ();
         }
 
+<<<<<<< HEAD
+        private int GetTestType_FromTextBox()
+=======
         private void SelectIUx(object sender, SelectionChangedEventArgs e)
+>>>>>>> master
         {
-            ListBox l = (ListBox)sender;
-            if (Enum.IsDefined(typeof(IUx), l.SelectedIndex))
+            int testTypeID;
+            if (!int.TryParse(tbxTestType.Text, out testTypeID))
             {
-                mSelQCat = (IUx)l.SelectedIndex;
-                mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
-                ShowDBQ();
+                MessageBox.Show("Test type is not number!");
+                return -1;
             }
+            return testTypeID;
         }
 
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            btnMMenu.Content = t._[(int)TxI.BACK_MMENU];
-            txtDt.Text = t._[(int)TxI.DATE_L];
-            txtHm.Text = t._[(int)TxI.TIME_L];
-            txtIU.Text = t._[(int)TxI.IUS];
-            tbi1.Header = t._[(int)TxI.PREP_NEE];
-            tbi2.Header = t._[(int)TxI.PREP_Q];
-            txtId.Text = t._[(int)TxI.NEEID_S];
-            txtName.Text = t._[(int)TxI.NEE_NAME];
-            txtBirdate.Text = t._[(int)TxI.BIRDATE];
-            txtBirpl.Text = t._[(int)TxI.BIRPL];
-            txtRoom.Text = t._[(int)TxI.ROOM];
-            btnImp.Content = t._[(int)TxI.PREP_IMP];
-            btnDelQ.Content = t._[(int)TxI.PREP_DEL_SEL];
-            btnImpQ.Content = t._[(int)TxI.PREP_IMP];
-            StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_DB], 0, QuestSheet.DBGetND(mSelQCat));
-            tbiDBQ.Header = sb.ToString();
-            sb.Clear();
-            sb.AppendFormat(Txt.s._[(int)TxI.Q_TMP], 0, mTmpQS.CountD);
-            tbiTmpQ.Header = sb.ToString();
+            btnMMenu.Content = t._((int)TxI.BACK_MMENU);
+            txtDt.Text = DT._;
+            tbi1.Header = t._((int)TxI.PREP_NEE);
+            tbi2.Header = t._((int)TxI.PREP_Q);
+            txtId.Text = t._((int)TxI.NEEID_S);
+            txtName.Text = t._((int)TxI.NEE_NAME);
+            txtBirdate.Text = t._((int)TxI.BIRDATE);
+            txtBirpl.Text = "Test type";// t._((int)TxI.BIRPL);
+            txtRoom.Text = t._((int)TxI.ROOM);
+            btnImp.Content = t._((int)TxI.PREP_IMP);
+            btnDelQ.Content = t._((int)TxI.PREP_DEL_SEL);
+            btnImpQ.Content = t._((int)TxI.PREP_IMP);
+            tbiTmpQ.Header = CreateQuestSheetHeader(mTmpQS);
         }
 
         private void DeleteSelectedMCItems(object sender, RoutedEventArgs e)
         {
             StringBuilder qids = new StringBuilder();
+            qids.Append("id IN (");
             foreach(CheckBox c in vChk)
                 if(c.IsChecked == true)
                 {
                     int uqid;
                     if (int.TryParse(c.Name.Substring(1), out uqid))
-                        qids.Append("id=" + uqid + " OR ");
+                        qids.Append(uqid.ToString() + ",");
                 }
             bool toUpdate = false;
-            if (0 < qids.Length)
+            if ("id IN (".Length < qids.Length)
             {
-                qids.Remove(qids.Length - 4, 4);//remove the last " OR "
-                Question.DBDelete(mSelQCat, qids.ToString());
+                qids.Remove(qids.Length - 1, 1);//remove the last " OR "
+                qids.Append(")");
+                Question.DBDelete(qids.ToString());
                 toUpdate = true;
             }
             if (toUpdate)
-            {
-                mDBQS.DBSelect(mSelQCat, QuestDiff.Both);
-                ShowDBQ();
-            }
+                LoadAndShowQuestionFromDB();
             chkAll.IsChecked = false;
         }
 
-        private void lbxSl_Selected(object sender, RoutedEventArgs e)
+        private void SlotsView_Selected(object sender, RoutedEventArgs e)
         {
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
-            ExamSlot sl = new ExamSlot();
+            ExamSlotS0 sl = new ExamSlotS0();
             DateTime dt;
-            DT.To_(mBrd.mDt.ToString(DT._) + ' ' + i.Content as string, DT.H, out dt);
+            DT.To_(i.Content as string, out dt);
             sl.Dt = dt;
-            sl.DBSelRoomId();
+            sl.DBSelectRoomInfo();
             sl.DBSelStt();
             sl.DBSelNee();
             PrepNeeView pnv = new PrepNeeView(sl);
@@ -433,13 +465,13 @@ namespace sQzServer0
             pnv.Focus();
         }
 
-        private void lbxSl_Unselected(object sender, RoutedEventArgs e)
+        private void SlotsView_Unselected(object sender, RoutedEventArgs e)
         {
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
             foreach(TabItem ti in tbcNee.Items)
-                if(ti.Name == "_" + (i.Content as string).Replace(':', '_'))
+                if(ti.Name == DT.CreateNameFromDateTime(i.Content as string))
                 {
                     tbcNee.Items.Remove(ti);
                     break;
@@ -456,6 +488,16 @@ namespace sQzServer0
         {
             foreach (CheckBox c in vChk)
                 c.IsChecked = false;
+        }
+
+        private void tbiDBQ_Loaded(object sender, RoutedEventArgs e)
+        {
+            
+        }
+
+        private void btnShowQuestions_Click(object sender, RoutedEventArgs e)
+        {
+            LoadAndShowQuestionFromDB();
         }
     }
 }

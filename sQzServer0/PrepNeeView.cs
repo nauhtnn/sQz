@@ -15,24 +15,24 @@ namespace sQzServer0
     {
         Grid grdDB;
         Grid grdTmp;
-        public ExamSlot mSlDB;
-        public ExamSlot mSlTmp;
+        public ExamSlotS0 mSlDB;
+        public ExamSlotS0 mSlTmp;
         TabItem tbiDB, tbiTmp;
 
         public PrepNeeView() { }
-        public PrepNeeView(ExamSlot sl)
+        public PrepNeeView(ExamSlotS0 sl)
         {
             mSlDB = sl;
-            Header = mSlDB.Dt.ToString(DT.hh);
-            Name = "_" + (Header as string).Replace(':', '_');
-            mSlTmp = new ExamSlot();
+            Header = mSlDB.Dt.ToString(DT._);
+            Name = DT.CreateNameFromDateTime(Header as string);
+            mSlTmp = new ExamSlotS0();
             mSlTmp.Dt = mSlDB.Dt;
-            foreach (ExamRoom rom in mSlDB.vRoom.Values)
-                if (!mSlTmp.vRoom.ContainsKey(rom.uId))
+            foreach (ExamRoomS0 rom in mSlDB.Rooms.Values)
+                if (!mSlTmp.Rooms.ContainsKey(rom.uId))
                 {
-                    ExamRoom r = new ExamRoom();
+                    ExamRoomS0 r = new ExamRoomS0();
                     r.uId = rom.uId;
-                    mSlTmp.vRoom.Add(r.uId, r);
+                    mSlTmp.Rooms.Add(r.uId, r);
                 }
         }
         public void DeepCopy(StackPanel refSp)
@@ -50,7 +50,7 @@ namespace sQzServer0
             btnDel.Width = 120;
             btnDel.Height = 40;
             btnDel.Margin = new Thickness(0, 10, 0, 10);
-            btnDel.Content = Txt.s._[(int)TxI.PREP_DEL];
+            btnDel.Content = Txt.s._((int)TxI.PREP_DEL);
             if (mSlDB.eStt == ExamStt.Prep)
             {
                 btnDel.IsEnabled = true;
@@ -74,7 +74,7 @@ namespace sQzServer0
             sp.Children.Add(vwr);
             tbiDB = new TabItem();
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_DB], 0);
+            sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_DB), 0);
             tbiDB.Header = sb.ToString();
             tbiDB.Content = sp;
             tbc.Items.Add(tbiDB);
@@ -98,7 +98,7 @@ namespace sQzServer0
             sp.Children.Add(vwr);
             tbiTmp = new TabItem();
             sb.Clear();
-            sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_TMP], 0);
+            sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_TMP), 0);
             tbiTmp.Header = sb.ToString(); ;
             tbiTmp.Content = sp;
             tbc.Items.Add(tbiTmp);
@@ -153,7 +153,7 @@ namespace sQzServer0
                 Grid.SetColumn(b, Grid.GetColumn(btn));
                 if (btn.Name == "btnImp")
                 {
-                    b.Content = Txt.s._[(int)TxI.PREP_IMP];
+                    b.Content = Txt.s._((int)TxI.PREP_IMP);
                     b.Click += btnImp_Click;
                 }
                 else if (btn.Name == "btnFile")
@@ -214,7 +214,7 @@ namespace sQzServer0
 
             string fp = dlg.FileName;
             mSlTmp.DelNee();
-            string emsg = mSlDB.ReadF(fp, ref mSlTmp);
+            string emsg = mSlDB.LoadFromFile_Examinees(fp, ref mSlTmp);
             if(emsg != null)
             {
                 Window w = Window.GetWindow(this);
@@ -244,7 +244,7 @@ namespace sQzServer0
             SolidColorBrush br = new SolidColorBrush(c);
             GridLength rh = new GridLength(26);
             Grid g;
-            ExamSlot sl;
+            ExamSlotS0 sl;
             if (db)
             {
                 sl = mSlDB;
@@ -256,44 +256,44 @@ namespace sQzServer0
                 g = grdTmp;
             }
             int n = 0;
-            foreach (ExamRoom r in sl.vRoom.Values)
-                n += r.vExaminee.Count;
+            foreach (ExamRoomS0 r in sl.Rooms.Values)
+                n += r.Examinees.Count;
             StringBuilder sb = new StringBuilder();
             if(db)
             {
-                sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_DB], n);
+                sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_DB), n);
                 tbiDB.Header = sb.ToString();
             }
             else
             {
-                sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_TMP], n);
+                sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_TMP), n);
                 tbiTmp.Header = sb.ToString();
             }
             g.Children.Clear();
             int rid = -1;
-            foreach (ExamRoom r in sl.vRoom.Values)
-                foreach (ExamineeA e in r.vExaminee.Values)
+            foreach (ExamRoomS0 r in sl.Rooms.Values)
+                foreach (ExamineeA e in r.Examinees.Values)
                 {
                     rid++;
                     RowDefinition rd = new RowDefinition();
                     rd.Height = rh;
                     g.RowDefinitions.Add(rd);
                     TextBlock t = new TextBlock();
-                    t.Text = e.tId;
+                    t.Text = e.ID;
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     g.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tName;
+                    t.Text = e.Name;
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
                     g.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tBirdate;
+                    t.Text = e.Birthdate;
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);
@@ -301,7 +301,7 @@ namespace sQzServer0
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     g.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tBirthplace;
+                    t.Text = e.TestType.ToString();
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);
@@ -310,7 +310,7 @@ namespace sQzServer0
                     t = new TextBlock();
                     if (dark)
                         t.Background = br;
-                    t.Text = (r.uId + 1).ToString();
+                    t.Text = r.uId.ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
                     t.HorizontalAlignment = HorizontalAlignment.Center;
@@ -322,12 +322,12 @@ namespace sQzServer0
         private void btnImp_Click(object sender, RoutedEventArgs e)
         {
             string emsg;
-            if (mSlTmp.DBInsNee(out emsg) <= 0)
+            if (mSlTmp.DBInsertExaminees(out emsg) < 0)
                 WPopup.s.ShowDialog(emsg);
             mSlTmp.DelNee();
             grdTmp.Children.Clear();
             StringBuilder sb = new StringBuilder();
-            sb.AppendFormat(Txt.s._[(int)TxI.NEE_LS_TMP], 0);
+            sb.AppendFormat(Txt.s._((int)TxI.NEE_LS_TMP), 0);
             tbiTmp.Header = sb.ToString();
             mSlDB.DBSelNee();
             Show(true);

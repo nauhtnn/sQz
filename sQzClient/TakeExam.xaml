@@ -10,6 +10,18 @@
       Title="TakeExam">
 
     <Viewbox>
+<<<<<<< HEAD
+        <StackPanel x:Name="spMain" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
+            <Grid x:Name="QuestionAndAnswerContainer">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="96"/>
+                    <ColumnDefinition Width="1164"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel x:Name="spLp" HorizontalAlignment="Left" Height="652" Width="96">
+                    <TextBlock x:Name="txtAnsSh" Height="30" FontSize="15" HorizontalAlignment="Center"/>
+                    <ScrollViewer x:Name="svwrASh" Height="622" Width="96" VerticalScrollBarVisibility="Auto" FontSize="14">
+                        <Grid x:Name="gAnsSh">
+=======
         <StackPanel x:Name="AppView" Loaded="Main_Loaded" Margin="10" Height="720" Width="1280">
             <Grid>
                 <Grid.ColumnDefinitions>
@@ -20,6 +32,7 @@
                     <TextBlock x:Name="AnswerTitle" Height="30" FontSize="20" HorizontalAlignment="Center"/>
                     <ScrollViewer Height="622" Width="144" VerticalScrollBarVisibility="Auto" FontSize="14">
                         <Grid x:Name="AnswerCells">
+>>>>>>> master
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*"/>
                                 <ColumnDefinition Width="*"/>
@@ -27,8 +40,18 @@
                         </Grid>
                     </ScrollViewer>
                 </StackPanel>
+<<<<<<< HEAD
+                <ScrollViewer Grid.Column="1" x:Name="svwrQSh" Width="1164" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
+                    <!--<Grid x:Name="QuestionSheetContainer" Width="1144">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="577"/>
+                            <ColumnDefinition Width="577"/>
+                        </Grid.ColumnDefinitions>
+                    </Grid>-->
+=======
                 <ScrollViewer Grid.Column="1" x:Name="QuestSheetBG" Width="1020" Height="652" VerticalScrollBarVisibility="Auto" HorizontalAlignment="Left" VerticalAlignment="Top" Visibility="Hidden">
                     <StackPanel x:Name="QuestionsView" Width="1000"/>
+>>>>>>> master
                 </ScrollViewer>
             </Grid>
             <Grid Height="48">
@@ -41,8 +64,8 @@
                 <Grid.RowDefinitions>
                     <RowDefinition Height="48"/>
                 </Grid.RowDefinitions>
-                <TextBlock x:Name="txtWelcome" Background="#ffffbb" Foreground="#00356b" FontSize="22" TextAlignment="Center" Padding="0,6,0,0"/>
-                <Button x:Name="btnSubmit" Grid.Column="1" FontSize="20" Click="btnSubmit_Click" Background="#1c64e7" Foreground="White" BorderThickness="0" IsEnabled="False"/>
+                <TextBlock x:Name="txtExamineeInfo" Background="#ffffbb" Foreground="#00356b" FontSize="22" TextAlignment="Center" Padding="0,6,0,0"/>
+                <Button x:Name="btnSubmit" Grid.Column="1" FontSize="20" Click="btnSubmit_Click" Background="#1c64e7" Foreground="White" BorderThickness="0" />
                 <TextBlock x:Name="txtRTime" Background="#ffffbb" Foreground="#00356b" Grid.Column="2" FontSize="28" TextAlignment="Center" Text="0:0" Padding="0,4,0,0"/>
                 <Button x:Name="btnExit" Background="#f15a23" Foreground="White" Grid.Column="3" Content="Close" Click="btnExit_Click" FontSize="20" BorderThickness="0" />
             </Grid>

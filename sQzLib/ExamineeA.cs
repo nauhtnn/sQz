@@ -1,11 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
-using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
+<<<<<<< HEAD
+    public enum NeeStt
+=======
     public enum ExamineePhase
+>>>>>>> master
     {
          Signing = 0,
          Info,
@@ -18,6 +21,24 @@ namespace sQzLib
     public abstract class ExamineeA
     {
         public DateTime mDt;
+<<<<<<< HEAD
+        public NeeStt eStt;
+        //public ExamLv eLv;
+        //public int uId;
+        public string ID;
+        public int TestType;
+        //public int LvId { get { return (eLv == ExamLv.A) ? uId : uId + LV_CAP; } }
+        //public string tId { get { return eLv.ToString() + uId.ToString("d4"); } }
+        //public static string gId(ExamLv lv, int id) { return lv.ToString() + id.ToString("d4"); }
+        public string Name;
+        public string Birthdate;
+        public int CorrectCount;
+
+        public string ComputerName;
+        public DateTime dtTim1;
+        public DateTime dtTim2;
+        public AnswerSheet AnswerSheet;
+=======
         public ExamineePhase mPhase;
         public Level Lv;
         public int uId;
@@ -35,9 +56,31 @@ namespace sQzLib
         public AnsSheet mAnsSheet;
 
         public TimeSpan kDtDuration;
+>>>>>>> master
 
-        public StringBuilder tLog;
+        public abstract void Reset();
 
+<<<<<<< HEAD
+        protected void _Reset()
+        {
+            TestType = 0;
+            mDt = DT.INVALID;
+            Name = null;
+            Birthdate = null;
+            eStt = NeeStt.Signing;
+            CorrectCount = LV_CAP;
+            dtTim1 = dtTim2 = DT.INVALID;
+            ComputerName = string.Empty;
+            AnswerSheet = new AnswerSheet();
+        }
+
+        public string Grade {
+            get
+            {
+                return CorrectCount.ToString();
+            }
+        }
+=======
         const string tLOG_DIR = "sQz\\";
         const string tLOG_PRE = "sav";
 
@@ -297,5 +340,6 @@ namespace sQzLib
         }
 
         public string Grade { get { return Math.Round((float)uGrade * 0.333, 1).ToString(); } }
+>>>>>>> master
     }
 }

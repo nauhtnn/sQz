@@ -57,7 +57,7 @@ namespace sQzLib
         {
             if (code == 10061)
             {
-                cbm += Txt.s._[(int)TxI.CONN_NOK];
+                cbm += Txt.s._((int)TxI.CONN_NOK);
                 return false;
             }
             return true;
@@ -66,13 +66,22 @@ namespace sQzLib
         public bool ConnectWR(ref UICbMsg cbMsg)
         {
             if (mTcpClnt != null)
+            {
+                cbMsg += "Client 2 ConnectWR: mTcpClnt != null";
                 return false;
+            }
             mTcpClnt = new TcpClient(AddressFamily.InterNetwork);
             bool bConn = true;//srvr side
             bRW = true;//clnt side
             try {
-                mTcpClnt.Connect(mSrvrAddr, mSrvrPort);
-            } catch (SocketException e) {
+                mTcpClnt.ConnectAsync(mSrvrAddr, mSrvrPort).Wait(5000);
+            }
+            catch(AggregateException e)
+            {
+                cbMsg += "\nEx: " + e.Message;
+                bConn = false;
+            }
+            catch (SocketException e) {
                 if (ErrCode2Msg(e.ErrorCode, ref cbMsg))
                     cbMsg += "\nEx: " + e.Message;
                 bConn = false;
@@ -168,7 +177,7 @@ namespace sQzLib
                     bRW = dgBufHndl(recvMsg);
             }
             if (bCbMsg)
-                cbMsg += Txt.s._[(int)TxI.CONN_CLNT_CE];
+                cbMsg += Txt.s._((int)TxI.CONN_CLNT_CE);
             mTcpClnt.Close();
             mTcpClnt = null;
             return !bConn;

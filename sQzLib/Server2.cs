@@ -36,7 +36,7 @@ namespace sQzLib
             if (mTcpListr != null)
                 return;
             bListning = true;
-            cbMsg += Txt.s._[(int)TxI.CONN_SRVR_ST];
+            cbMsg += Txt.s._((int)TxI.CONN_SRVR_ST);
             mTcpListr = new TcpListener(IPAddress.Any, mPort);
             try {
                 mTcpListr.Start();
@@ -160,20 +160,20 @@ namespace sQzLib
                             bRW1 = false;
                     }
                     cli.Close();
-                    cbMsg += Txt.s._[(int)TxI.CONN_CLNT_CE];
+                    cbMsg += Txt.s._((int)TxI.CONN_CLNT_CE);
                 }
             }
             bListning = false;
             try { mTcpListr.Stop(); }
             catch (SocketException e) { cbMsg += "\nEx: " + e.Message; }
             mTcpListr = null;
-            cbMsg += Txt.s._[(int)TxI.CONN_SRVR_CE];
+            cbMsg += Txt.s._((int)TxI.CONN_SRVR_CE);
         }
 
         public void Stop(ref UICbMsg cbMsg)
         {
             if (bListning)
-                cbMsg += Txt.s._[(int)TxI.CONN_SRVR_CG];
+                cbMsg += Txt.s._((int)TxI.CONN_SRVR_CG);
             bRW1 = bListning = false;
         }
     }

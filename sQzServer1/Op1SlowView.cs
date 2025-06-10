@@ -14,29 +14,29 @@ namespace sQzServer1
     public delegate void ToSubmitCb(bool bEnable);
     public class Op1SlotView : TabItem
     {
-        public Dictionary<int, TextBlock> vGrade;
-        public Dictionary<int, TextBlock> vDt1;
-        public Dictionary<int, TextBlock> vDt2;
-        public Dictionary<int, TextBlock> vMark;
-        public Dictionary<int, TextBlock> vComp;
-        public SortedList<int, CheckBox> vLock;
-        public SortedList<int, bool> vbLock;
-        public SortedList<int, CheckBox> vAbsen;
+        public Dictionary<string, TextBlock> vGrade;
+        public Dictionary<string, TextBlock> vDt1;
+        public Dictionary<string, TextBlock> vDt2;
+        public Dictionary<string, TextBlock> vMark;
+        public Dictionary<string, TextBlock> vComp;
+        public SortedList<string, CheckBox> vLock;
+        public SortedList<string, bool> vbLock;
+        public SortedList<string, CheckBox> vAbsen;
         Grid grdNee;
-        public ExamSlot mSl;
+        public ExamSlotS1 mSl;
         bool bQShowed;
         bool bNeeShowed;
         public ToSubmitCb toSubmCb;
 
         public Op1SlotView()
         {
-            vComp = new Dictionary<int, TextBlock>();
-            vDt1 = new Dictionary<int, TextBlock>();
-            vDt2 = new Dictionary<int, TextBlock>();
-            vMark = new Dictionary<int, TextBlock>();
-            vLock = new SortedList<int, CheckBox>();
-            vbLock = new SortedList<int, bool>();
-            vAbsen = new SortedList<int, CheckBox>();
+            vComp = new Dictionary<string, TextBlock>();
+            vDt1 = new Dictionary<string, TextBlock>();
+            vDt2 = new Dictionary<string, TextBlock>();
+            vMark = new Dictionary<string, TextBlock>();
+            vLock = new SortedList<string, CheckBox>();
+            vbLock = new SortedList<string, bool>();
+            vAbsen = new SortedList<string, CheckBox>();
             bQShowed = bNeeShowed = false;
             TabControl tbc = new TabControl();
             Content = tbc;
@@ -54,67 +54,71 @@ namespace sQzServer1
             vDt1.Clear();
             vDt2.Clear();
             int rid = -1;
+<<<<<<< HEAD
+            foreach (ExamRoomS1 r in mSl.Rooms.Values)
+                foreach (ExamineeA e in r.Examinees.Values)
+=======
             foreach (ExamRoom r in mSl.Rooms.Values)
                 foreach (ExamineeA e in r.vExaminee.Values)
+>>>>>>> master
                 {
                     RowDefinition rd = new RowDefinition();
                     rd.Height = new GridLength(20);
                     grdNee.RowDefinitions.Add(rd);
                     TextBlock t = new TextBlock();
-                    t.Text = e.tId;
+                    t.Text = e.ID;
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     Grid.SetRow(t, ++rid);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tName;
+                    t.Text = e.Name;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tBirdate;
+                    t.Text = e.Birthdate;
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 2);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tBirthplace;
+                    t.Text = e.TestType.ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.HorizontalAlignment = HorizontalAlignment.Center;
-                    if (e.tComp != null)
-                        t.Text = e.tComp;
-                    int lvid = e.LvId;
-                    vComp.Add(lvid, t);
+                    if (e.ComputerName != null)
+                        t.Text = e.ComputerName;
+                    vComp.Add(e.ID, t);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
                     grdNee.Children.Add(t);
                     CheckBox cbx = new CheckBox();
                     cbx.HorizontalAlignment = HorizontalAlignment.Center;
-                    cbx.Name = "_" + lvid;
+                    cbx.Name = e.ID;
                     cbx.HorizontalAlignment = HorizontalAlignment.Center;
                     cbx.Unchecked += cbxLock_Unchecked;
                     cbx.Checked += cbxLock_Checked;
                     cbx.IsEnabled = true;//default value empowers supervisors
                     Grid.SetRow(cbx, rid);
                     Grid.SetColumn(cbx, 8);
-                    vLock.Add(lvid, cbx);
+                    vLock.Add(e.ID, cbx);
                     grdNee.Children.Add(cbx);
                     t = new TextBlock();
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     if (e.dtTim1.Hour != DT.INV)
                     {
                         t.Text = e.dtTim1.ToString("HH:mm");
-                        vbLock.Add(lvid, true);
+                        vbLock.Add(e.ID, true);
                         cbx.IsChecked = true;
                     }
                     else
                     {
-                        vbLock.Add(lvid, false);
+                        vbLock.Add(e.ID, false);
                         cbx.IsEnabled = false;
                     }
-                    vDt1.Add(lvid, t);
+                    vDt1.Add(e.ID, t);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 5);
                     grdNee.Children.Add(t);
@@ -122,25 +126,29 @@ namespace sQzServer1
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     if (e.dtTim2.Hour != DT.INV)
                         t.Text = e.dtTim2.ToString("HH:mm");
-                    vDt2.Add(lvid, t);
+                    vDt2.Add(e.ID, t);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 6);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.HorizontalAlignment = HorizontalAlignment.Center;
+<<<<<<< HEAD
+                    if (e.CorrectCount != ExamineeA.LV_CAP)
+=======
                     if (e.uGrade != (int)Level.MAX_COUNT_EACH_LEVEL)
+>>>>>>> master
                     {
                         t.Text = e.Grade;
                         cbx.IsEnabled = false;
                     }
-                    vMark.Add(lvid, t);
+                    vMark.Add(e.ID, t);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 7);
                     grdNee.Children.Add(t);
                     //
                     cbx = new CheckBox();
                     cbx.HorizontalAlignment = HorizontalAlignment.Center;
-                    cbx.Name = "b" + lvid;
+                    cbx.Name = "b" + e.ID;
                     cbx.HorizontalAlignment = HorizontalAlignment.Center;
                     cbx.Unchecked += cbxAbsen_Unchecked;
                     cbx.Checked += cbxAbsen_Checked;
@@ -148,11 +156,29 @@ namespace sQzServer1
                         cbx.IsEnabled = false;
                     Grid.SetRow(cbx, rid);
                     Grid.SetColumn(cbx, 9);
-                    vAbsen.Add(lvid, cbx);
+                    vAbsen.Add(e.ID, cbx);
                     grdNee.Children.Add(cbx);
                 }
         }
 
+<<<<<<< HEAD
+        //public void UpdateRsView(List<ExamRoomA> vRoom)
+        //{
+        //    TextBlock t;
+        //    foreach (ExamRoomA r in vRoom)
+        //        foreach (ExamineeA e in r.Examinees.Values)
+        //        {
+        //            if (e.CorrectCount != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
+        //                t.Text = e.Grade;
+        //            if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.ID, out t))
+        //                t.Text = e.dtTim1.ToString(DT.hh);
+        //            if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.ID, out t))
+        //                t.Text = e.dtTim2.ToString(DT.hh);
+        //            if (e.ComputerName != null && vComp.TryGetValue(e.ID, out t))
+        //                t.Text = e.ComputerName;
+        //        }
+        //}
+=======
         public void UpdateRsView(List<ExamRoom> Rooms)
         {
             TextBlock t;
@@ -170,6 +196,7 @@ namespace sQzServer1
                         t.Text = e.tComp;
                 }
         }
+>>>>>>> master
 
         public void DeepCopyNee(TabItem reftbi)
         {
@@ -229,24 +256,30 @@ namespace sQzServer1
         private void cbxLock_Unchecked(object sender, RoutedEventArgs e)
         {
             CheckBox cbx = sender as CheckBox;
-            int key;
-            if (int.TryParse(cbx.Name.Substring(1), out key) &&
-                vbLock.ContainsKey(key))
-                vbLock[key] = false;
+            if (vbLock.ContainsKey(cbx.Name))
+                vbLock[cbx.Name] = false;
         }
 
         private void cbxLock_Checked(object sender, RoutedEventArgs e)
         {
             CheckBox cbx = sender as CheckBox;
-            int key;
-            if (int.TryParse(cbx.Name.Substring(1), out key) &&
-                vbLock.ContainsKey(key))
-                vbLock[key] = true;
+            if (vbLock.ContainsKey(cbx.Name))
+                vbLock[cbx.Name] = true;
         }
 
         private void cbxAbsen_Unchecked(object sender, RoutedEventArgs e)
         {
             CheckBox cbx = sender as CheckBox;
+<<<<<<< HEAD
+            ExamineeS1 nee;
+            foreach (ExamRoomS1 r in mSl.Rooms.Values)
+                if(r.Examinees.TryGetValue(cbx.Name, out nee) &&
+                    nee.eStt != NeeStt.Finished)
+                {
+                    toSubmCb?.Invoke(false);
+                    return;
+                }
+=======
             int key;
             if (int.TryParse(cbx.Name.Substring(1), out key))
             {
@@ -259,6 +292,7 @@ namespace sQzServer1
                         return;
                     }
             }
+>>>>>>> master
             toSubmCb?.Invoke(ToSubmit());
         }
 
@@ -270,10 +304,15 @@ namespace sQzServer1
         public bool ToSubmit()
         {
             CheckBox cbx;
+<<<<<<< HEAD
+            foreach (ExamRoomS1 r in mSl.Rooms.Values)
+                foreach (ExamineeA nee in r.Examinees.Values)
+=======
             foreach (ExamRoom r in mSl.Rooms.Values)
                 foreach (ExamineeA nee in r.vExaminee.Values)
+>>>>>>> master
                     if (nee.eStt != NeeStt.Finished &&
-                        (!vAbsen.TryGetValue(nee.LvId, out cbx) ||
+                        (!vAbsen.TryGetValue(nee.ID, out cbx) ||
                         !cbx.IsChecked.HasValue || !cbx.IsChecked.Value))
                         return false;
             return true;

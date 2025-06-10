@@ -12,7 +12,14 @@ namespace sQzLib
         List<string> avTxt;
         byte[] mBuf;
         int mSz;
-        public string[] _;
+        public string[] __;
+
+        public string _(int str_idx)
+        {
+            if (__ != null && __.Length > str_idx && __[str_idx] != null)
+                return __[str_idx];
+            return "NO STRING";
+        }
 
         static Txt _s = null;
 
@@ -21,7 +28,7 @@ namespace sQzLib
             avEnum = new List<string>();
             avTxt = new List<string>();
             mBuf = null;
-            _ = null;
+            __ = null;
             mSz = 0;
         }
 		
@@ -29,7 +36,8 @@ namespace sQzLib
 			get{
 				if(_s == null) {
 					_s = new Txt();
-					_s.ReadByte("GUI-vi.bin");
+                    if (!_s.ReadByte("GUI-vi.bin"))
+                        _s.ReadTextFile("GUI-vi.txt");
 				}
 				return _s;
 			}
@@ -100,23 +108,65 @@ namespace sQzLib
             System.IO.File.WriteAllBytes(fp, mBuf);
         }
 
-        public void ReadByte(string fp)
+        public bool ReadTextFile(string fp)
         {
+            string content;
+            try
+            {
+                content = System.IO.File.ReadAllText(fp);
+            }
+            catch (System.IO.FileNotFoundException)
+            {
+                return false;
+            }
+
+            Scan(content);
+
+            if (avEnum.Count == 0)
+                return false;
+
+            __ = new string[avEnum.Count];
+
+
+            for(int i = 0; i < avEnum.Count; ++i)
+            {
+                TxI index = 0;
+                if (Enum.TryParse<TxI>(avEnum[i], out index))
+                    __[(int)index] = avTxt[i];
+                else
+                    __[i] = "NO STRING";
+            }
+
+            return true;
+        }
+
+        public bool ReadByte(string fp)
+        {
+
+            byte[] mBuf;
+            try
+            {
+                mBuf = System.IO.File.ReadAllBytes(fp);
+            }
+            catch(System.IO.FileNotFoundException)
+            {
+                return false;
+            }
             int offs = 0;
-            byte[] mBuf = System.IO.File.ReadAllBytes(fp);
             int n = BitConverter.ToInt32(mBuf, offs);
             offs += 4;
-            _ = new string[n];
+            __ = new string[n];
             for (int i = 0; i < n; ++i)
             {
                 int l = BitConverter.ToInt32(mBuf, offs);
                 offs += 4;
-                _[i] = Encoding.UTF8.GetString(mBuf, offs, l);
+                __[i] = Encoding.UTF8.GetString(mBuf, offs, l);
                 offs += l;
             }
             //int j = -1;
             //foreach(string s in _)
             //	Console.WriteLine("" + ++j + ") " + s);
+            return true;
         }
     }
 }

@@ -27,29 +27,35 @@ namespace sQzServer1
         NetCode mState;
         Server2 mServer;
         UICbMsg mCbMsg;
-        bool bRunning;
-        ExamBoard mBrd;
+        //bool bRunning;
+        ExamSlotS1 Slot;
         int uRId;//todo change to enum
-        List<SortedList<int, bool>> vfbLock;
+        List<SortedList<string, bool>> vfbLock;
+        TimeSpan TestDuration;
+        string Subject;
+        string RoomPassword;
 
-        public Operation1()
+        public Operation1(TimeSpan testDuration, string subject)
         {
             InitializeComponent();
+
+            TestDuration = testDuration;
+            Subject = subject;
 
             mState = NetCode.Srvr1DatRetriving;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, true);
             mServer = new Server2(SrvrBufHndl);
             mServer.SrvrPort = 23821;
             mCbMsg = new UICbMsg();
-            bRunning = true;
+            //bRunning = true;
 
-            mBrd = new ExamBoard();
+            Slot = new ExamSlotS1();
 
             if(!System.IO.File.Exists("Room.txt") ||
                 !int.TryParse(System.IO.File.ReadAllText("Room.txt"), out uRId))
                 uRId = 0;
 
-            vfbLock = new List<SortedList<int, bool>>();
+            vfbLock = new List<SortedList<string, bool>>();
 
             System.Timers.Timer aTimer = new System.Timers.Timer(2000);
             // Hook up the Elapsed event for the timer. 
@@ -66,6 +72,8 @@ namespace sQzServer1
             w.ResizeMode = ResizeMode.NoResize;
             w.Closing += W_Closing;
             w.FontSize = 13;
+
+            txtSubject_TestDuration.Text = "Subject: " + Subject + " - Duration: " + TestDuration.ToString();
 
             WPopup.nwIns(w);
 
@@ -109,9 +117,15 @@ namespace sQzServer1
 
         private void btnClose_Click(object sender, RoutedEventArgs e)
         {
+<<<<<<< HEAD
+            WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_EXIT_CAUT),
+                Txt.s._((int)TxI.EXIT), Txt.s._((int)TxI.BTN_CNCL),
+                null, Exit, null);
+=======
             WPopup.s.CbOK = Exit;
             WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_EXIT_CAUT],
                 Txt.s._[(int)TxI.EXIT], Txt.s._[(int)TxI.BTN_CNCL], null);
+>>>>>>> master
         }
 
         private void Exit()
@@ -121,37 +135,55 @@ namespace sQzServer1
 
         private void W_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            bRunning = false;
+            //bRunning = false;
             UICbMsg dummy = new UICbMsg();
             mServer.Stop(ref dummy);
             WPopup.s.Exit();
+        }
+
+        private byte[] SignInNotOKMessage()
+        {
+            byte[] message = new byte[4];
+            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, message, 0, 4);
+            return message;
         }
 
         public bool SrvrBufHndl(byte[] buf, out byte[] outMsg)
         {
             outMsg = null;
             int offs = 0;
-            NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
+			NetCode c = (NetCode)BitConverter.ToInt32(buf, offs);
             offs += 4;
-            QuestSheet qs;
-            int lvid;
-            ExamineeA e;
-            DateTime dt;
             switch (c)
             {
                 case NetCode.Dating:
-                    outMsg = new byte[DT.BYTE_COUNT];
-                    offs = 0;
-                    DT.ToByte(outMsg, ref offs, mBrd.mDt);
+                    List<byte[]> bytes = new List<byte[]>();
+                    bytes.Add(BitConverter.GetBytes(Slot.Dt.ToBinary()));
+                    bytes.Add(BitConverter.GetBytes(TestDuration.Ticks));
+                    Utils.AppendBytesOfString(Subject, bytes);
+                    outMsg = Utils.ToArray_FromListOfBytes(bytes);
                     return true;
                 case NetCode.Authenticating:
-                    e = new ExamineeS1();
-                    e.bFromC = true;
-                    e.ReadByte(buf, ref offs);
+
+                    string roomPassword = Utils.ReadBytesOfString(buf, ref offs);
+
+                    if(roomPassword == null || !roomPassword.Equals(RoomPassword))
+                    {
+                        outMsg = SignInNotOKMessage();
+                        break;
+                    }
+
+                    ExamineeS1 nee_authenticating = new ExamineeS1();
+                    if(nee_authenticating.ReadBytes_FromClient(buf, ref offs))
+                    {
+                        outMsg = SignInNotOKMessage();
+                        break;
+                    }
+
                     bool lck = true;
                     bool found = false;
-                    foreach (SortedList<int, bool> l in vfbLock)
-                        if (l.TryGetValue(e.LvId, out lck))
+                    foreach (SortedList<string, bool> l in vfbLock)
+                        if (l.TryGetValue(nee_authenticating.ID, out lck))
                         {
                             found = true;
                             break;
@@ -160,6 +192,11 @@ namespace sQzServer1
                         lck = false;
                     if (!lck)
                     {
+<<<<<<< HEAD
+                        ExamineeS1 o = null;
+                        if ((o = Slot.Signin(nee_authenticating)) == null)
+                            break;
+=======
                         ExamineeA o = null;
                         dt = DateTime.Now;
                         foreach(ExamSlot sl in mBrd.Slots.Values)
@@ -168,6 +205,7 @@ namespace sQzServer1
                                 dt = sl.Dt;
                                 break;
                             }
+>>>>>>> master
                         
                         if (o != null)
                         {
@@ -178,59 +216,63 @@ namespace sQzServer1
                                 foreach(Op1SlotView vw in tbcSl.Items.OfType<Op1SlotView>())
                                 {
                                     TextBlock t;
-                                    lvid = o.LvId;
-                                    if (vw.vComp.TryGetValue(lvid, out t))
-                                        t.Text = o.tComp;
-                                    if (vw.vDt1.TryGetValue(lvid, out t))
+                                    if (vw.vComp.TryGetValue(o.ID, out t))
+                                        t.Text = o.ComputerName;
+                                    if (vw.vDt1.TryGetValue(o.ID, out t))
                                         t.Text = o.dtTim1.ToString("HH:mm");
                                     CheckBox cbx;
-                                    if (vw.vLock.TryGetValue(lvid, out cbx))
+                                    if (vw.vLock.TryGetValue(o.ID, out cbx))
                                     {
                                         cbx.IsChecked = true;
                                         cbx.IsEnabled = true;
                                     }
-                                    if (vw.vbLock.Keys.Contains(lvid))
-                                        vw.vbLock[lvid] = true;
+                                    if (vw.vbLock.Keys.Contains(o.ID))
+                                        vw.vbLock[o.ID] = true;
                                 }
                             });
-                            byte[] a;
-                            o.bFromC = true;
-                            o.ToByte(out a);
+                            byte[] a = o.GetBytes_SendingToClient();
                             outMsg = new byte[4 + a.Length];
                             Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
                             Buffer.BlockCopy(a, 0, outMsg, 4, a.Length);
                         }
                         else
                         {
-                            outMsg = new byte[4];
-                            Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_NOK), 0, outMsg, 0, 4);
+                            outMsg = SignInNotOKMessage();
                             return false;//close
                         }
                     }
                     else
                     {
                         ExamineeA o = null;
+<<<<<<< HEAD
+                        if ((o = Slot.Find(nee_authenticating.ID)) != null)
+                            break;
+                        if (o == null)
+                            o = new ExamineeC();
+                        if (o.ComputerName == null)
+=======
                         foreach (ExamSlot sl in mBrd.Slots.Values)
                             if ((o = sl.Find(e.LvId)) != null)
                                 break;
                         if (o == null)
                             o = new ExamineeC(e.tId);
                         if (o.tComp == null)
+>>>>>>> master
                             outMsg = new byte[16];
                         else
-                            outMsg = new byte[16 + o.tComp.Length];
+                            outMsg = new byte[16 + o.ComputerName.Length];
                         Buffer.BlockCopy(BitConverter.GetBytes((int)TxI.SIGNIN_AL), 0, outMsg, 0, 4);
-                        if (o.tComp == null)
+                        if (o.ComputerName == null)
                         {
                             Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 4, 4);
                             offs = 8;
                         }
                         else
                         {
-                            byte[] comp = Encoding.UTF8.GetBytes(o.tComp);
+                            byte[] comp = Encoding.UTF8.GetBytes(o.ComputerName);
                             Buffer.BlockCopy(BitConverter.GetBytes(comp.Length), 0, outMsg, 4, 4);
                             offs = 8;
-                            Buffer.BlockCopy(comp, 0, outMsg, offs, o.tComp.Length);
+                            Buffer.BlockCopy(comp, 0, outMsg, offs, o.ComputerName.Length);
                             offs += comp.Length;
                         }
 
@@ -242,6 +284,18 @@ namespace sQzServer1
                     return true;
                 case NetCode.ExamRetrieving:
                     outMsg = null;
+<<<<<<< HEAD
+                    ExamineeS1 nee_retrivingExam = null;
+                    string nee_id = Utils.ReadBytesOfString(buf, ref offs);
+                    bool nee_not_found = true;
+                    foreach(ExamRoomS1 r in Slot.Rooms.Values)
+                        if(r.Examinees.TryGetValue(nee_id, out nee_retrivingExam))
+                        {
+                            nee_not_found = false;
+                            break;
+                        }
+                    if(nee_not_found || nee_retrivingExam == null)
+=======
                     lvid = BitConverter.ToInt32(buf, offs);
                     ExamSlot slo = null;
                     foreach (ExamSlot s in mBrd.Slots.Values)
@@ -252,17 +306,25 @@ namespace sQzServer1
                                 break;
                             }
                     if(slo == null)
+>>>>>>> master
                     {
                         outMsg = new byte[4];
                         Array.Copy(BitConverter.GetBytes((int)TxI.NEEID_NF), 0, outMsg, 0, 4);
                         break;
                     }
+<<<<<<< HEAD
+                    int qsid = BitConverter.ToInt32(buf, offs);
+                    int testType = nee_retrivingExam.TestType;
+                    QuestSheet sending_qSheet;
+                    if (qsid == ExamineeA.LV_CAP)
+=======
                     Level lv = (lvid < (int)Level.MAX_COUNT_EACH_LEVEL) ? Level.A : Level.B;
                     offs += 4;
                     int qsid = BitConverter.ToInt32(buf, offs);
                     if (qsid == (int)Level.MAX_COUNT_EACH_LEVEL)
+>>>>>>> master
                     {
-                        byte[] a = slo.ToByteNextQS(lv);
+                        byte[] a = Slot.GetBytes_NextQSheet(testType);
                         if (a != null)
                         {
                             outMsg = new byte[a.Length + 4];
@@ -270,70 +332,90 @@ namespace sQzServer1
                             Array.Copy(a, 0, outMsg, 4, a.Length);
                         }
                     }
+<<<<<<< HEAD
+                    else if (Slot.QuestionPacks.ContainsKey(testType) &&
+                        Slot.QuestionPacks[testType].vSheet.TryGetValue(qsid, out sending_qSheet))
+                    {
+                        
+                        outMsg = new byte[sending_qSheet.aQuest.Length + 4];
+                        Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
+                        Array.Copy(sending_qSheet.aQuest, 0, outMsg, 4, sending_qSheet.aQuest.Length);
+=======
                     else if (slo.MainPacks[lv].Sheets.TryGetValue(qsid, out qs))
                     {
                         outMsg = new byte[qs.ItemsInBytes.Length + 4];
                         Array.Copy(BitConverter.GetBytes(0), outMsg, 4);
                         Array.Copy(qs.ItemsInBytes, 0, outMsg, 4, qs.ItemsInBytes.Length);
+>>>>>>> master
                     }
                     if (outMsg == null)
                     {
-                        mCbMsg += Txt.s._[(int)TxI.QS_NFOUND] + (qsid);
+                        mCbMsg += Txt.s._((int)TxI.QS_NFOUND) + (qsid);
                         outMsg = new byte[8];
                         Array.Copy(BitConverter.GetBytes((int)TxI.QS_NFOUND), 0, outMsg, 0, 4);
                         Array.Copy(BitConverter.GetBytes(qsid), 0, outMsg, 4, 4);
                     }
                     break;
                 case NetCode.Submiting:
-                    e = new ExamineeS1();
-                    e.bFromC = true;
-                    if (!e.ReadByte(buf, ref offs))
+                    ExamineeS1 nee_submitting = new ExamineeS1();
+                    if (!nee_submitting.ReadBytes_FromClient(buf, ref offs))
                     {
-                        AnsSheet keySh = null;
+                        AnswerSheet answerKeySheet = null;
                         found = false;
+<<<<<<< HEAD
+                        AnswerPack answerPack;
+                        if(Slot.AnswerKeyPacks.TryGetValue(nee_submitting.TestType, out answerPack)
+                            && answerPack.vSheet.TryGetValue(nee_submitting.AnswerSheet.QuestSheetID, out answerKeySheet))
+                            found = true;
+=======
                         foreach(ExamSlot sl in mBrd.Slots.Values)
                             if(sl.mKeyPack.Sheets.TryGetValue(e.mAnsSh.uQSLvId, out keySh))
                             {
                                 found = true;
                                 break;
                             }
+>>>>>>> master
                         if (!found)
                         {
-                            outMsg = BitConverter.GetBytes(101);//todo
+                            outMsg = BitConverter.GetBytes((int)TxI.QS_NFOUND);
                             break;
                         }
-                        ExamineeA o = null;
-                        lvid = e.LvId;
+                        ExamineeS1 o = null;
                         found = false;
+<<<<<<< HEAD
+                        if ((o = Slot.Find(nee_submitting.ID)) == null)
+                            break;
+=======
                         foreach (ExamSlot sl in mBrd.Slots.Values)
                             if ((o = sl.Find(lvid)) != null)
                                 break;
+>>>>>>> master
                         if (o != null)
                         {
                             o.eStt = NeeStt.Finished;
-                            o.mAnsSh = e.mAnsSh;
-                            o.uGrade = keySh.Grade(e.mAnsSh.aAns);
+                            o.AnswerSheet = nee_submitting.AnswerSheet;
+                            o.CorrectCount = answerKeySheet.Grade(nee_submitting.AnswerSheet.BytesOfAnswer);
                             o.dtTim2 = DateTime.Now;
-                            foreach (SortedList<int, bool> sl in vfbLock)
-                                if (sl.ContainsKey(lvid))
-                                    sl[lvid] = true;
+                            foreach (SortedList<string, bool> sl in vfbLock)
+                                if (sl.ContainsKey(nee_submitting.ID))
+                                    sl[nee_submitting.ID] = true;
                             Dispatcher.InvokeAsync(() =>
                             {
                                 bool toSubm = true;
                                 foreach (Op1SlotView vw in tbcSl.Items.OfType<Op1SlotView>())
                                 {
                                     TextBlock t = null;
-                                    if (vw.vDt2.TryGetValue(lvid, out t))
-                                        t.Text = o.dtTim2.ToString("HH:mm");
-                                    if (vw.vMark.TryGetValue(lvid, out t))
-                                        t.Text = o.Grade.ToString();
+                                    if (vw.vDt2.TryGetValue(nee_submitting.ID, out t))
+                                        t.Text = o.dtTim2.ToString(DT.hh);
+                                    if (vw.vMark.TryGetValue(nee_submitting.ID, out t))
+                                        t.Text = o.Grade;
                                     CheckBox cbx;
-                                    if (vw.vLock.TryGetValue(lvid, out cbx))
+                                    if (vw.vLock.TryGetValue(nee_submitting.ID, out cbx))
                                     {
                                         cbx.IsChecked = true;
                                         cbx.IsEnabled = false;
                                     }
-                                    if(vw.vAbsen.TryGetValue(lvid, out cbx))
+                                    if(vw.vAbsen.TryGetValue(nee_submitting.ID, out cbx))
                                         cbx.IsChecked = cbx.IsEnabled = false;
                                     if (!vw.ToSubmit())
                                         toSubm = false;
@@ -341,17 +423,20 @@ namespace sQzServer1
                                 if (toSubm)
                                     ToSubmit(true);
                             });
-                            o.ToByte(out outMsg, 0);
+                            byte[] a = o.GetBytes_SendingToClient();
+                            outMsg = new byte[4 + a.Length];
+                            Buffer.BlockCopy(BitConverter.GetBytes(0), 0, outMsg, 0, 4);
+                            Buffer.BlockCopy(a, 0, outMsg, 4, a.Length);
                         }
                         else
                         {
-                            mCbMsg += Txt.s._[(int)TxI.NEEID_NF] + ' ' + lvid;
+                            mCbMsg += Txt.s._((int)TxI.NEEID_NF) + ' ' + nee_submitting.ID;
                             outMsg = BitConverter.GetBytes((int)TxI.NEEID_NF);
                         }
                     }
                     else
                     {
-                        mCbMsg += Txt.s._[(int)TxI.RECV_DAT_ER];
+                        mCbMsg += Txt.s._((int)TxI.RECV_DAT_ER);
                         outMsg = BitConverter.GetBytes((int)TxI.RECV_DAT_ER);
                     }
                     break;
@@ -368,29 +453,41 @@ namespace sQzServer1
             switch (mState)
             {
                 case NetCode.Srvr1DatRetriving:
-                    if (mBrd.ReadByteSl1(buf, ref offs))
+                    if (Slot.ReadBytes_FromS0(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
-                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_DT_NOK]));
+                            WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_DT_NOK)));
                         break;
                     }
                     Dispatcher.InvokeAsync(() => LoadSl());
                     mState = NetCode.QuestRetrieving;
                     return true;
                 case NetCode.QuestRetrieving:
-                    if (mBrd.ReadByteQPack(buf, ref offs))
+                    if(Slot.Dt != DT.ReadByte(buf, ref offs))
+                    {
+                        Dispatcher.InvokeAsync(() =>
+                            WPopup.s.ShowDialog("QuestRetrieving: Date time not match!"));
+                        break;
+                    }
+                    if (!Slot.ReadBytes_QPacksNoDateTime(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() => 
-                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_Q_NOK]));
+                            WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_Q_NOK)));
                         break;
                     }
                     mState = NetCode.AnsKeyRetrieving;
                     return true;
                 case NetCode.AnsKeyRetrieving:
-                    if (mBrd.ReadByteKey(buf, ref offs))
+                    if (Slot.Dt != DT.ReadByte(buf, ref offs))
                     {
                         Dispatcher.InvokeAsync(() =>
-                            WPopup.s.ShowDialog(Txt.s._[(int)TxI.OP1_KEY_NOK]));
+                            WPopup.s.ShowDialog("AnsKeyRetrieving: Date time not match!"));
+                        break;
+                    }
+                    if (!Slot.ReadBytesKey_NoDateTime(buf, ref offs))
+                    {
+                        Dispatcher.InvokeAsync(() =>
+                            WPopup.s.ShowDialog(Txt.s._((int)TxI.OP1_KEY_NOK)));
                         break;
                     }
                     else
@@ -438,7 +535,10 @@ namespace sQzServer1
                     outMsg = BitConverter.GetBytes((int)mState);
                     break;
                 case NetCode.SrvrSubmitting:
-                    outMsg = mBrd.ToByteSl0(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
+                    List<byte[]> bytes = new List<byte[]>();
+                    bytes.Add(BitConverter.GetBytes((int)NetCode.SrvrSubmitting));
+                    bytes.InsertRange(bytes.Count, Slot.GetBytes_RoomSendingToS0());
+                    outMsg = Utils.ToArray_FromListOfBytes(bytes);
                     break;
             }
             return outMsg;
@@ -454,22 +554,25 @@ namespace sQzServer1
         void LoadTxt()
         {
             Txt s = Txt.s;
-            btnClose.Content = s._[(int)TxI.EXIT];
-            btnConn.Content = s._[(int)TxI.CONN];
-            btnStrt.Content = s._[(int)TxI.STRT_SRVR];
-            btnStop.Content = s._[(int)TxI.STOP_SRVR];
-            btnSubmit.Content = s._[(int)TxI.SUBMIT];
+            btnClose.Content = s._((int)TxI.EXIT);
+            btnConn.Content = s._((int)TxI.CONN);
+            btnStrt.Content = s._((int)TxI.STRT_SRVR);
+            btnStop.Content = s._((int)TxI.STOP_SRVR);
+            btnSubmit.Content = s._((int)TxI.SUBMIT);
 
-            txtId.Text = s._[(int)TxI.NEEID_S];
-            txtName.Text = s._[(int)TxI.NEE_NAME];
-            txtBirdate.Text = s._[(int)TxI.BIRDATE];
-            txtBirpl.Text = s._[(int)TxI.BIRPL];
-            txtComp.Text = s._[(int)TxI.COMP];
-            txtT1.Text = s._[(int)TxI.T1];
-            txtT2.Text = s._[(int)TxI.T2];
-            txtGrade.Text = s._[(int)TxI.MARK];
-            txtLock.Text = s._[(int)TxI.OP_LCK];
-            txtAbsence.Text = s._[(int)TxI.OP_ABSENCE];
+            txtId.Text = s._((int)TxI.NEEID_S);
+            txtName.Text = s._((int)TxI.NEE_NAME);
+            txtBirdate.Text = s._((int)TxI.BIRDATE);
+            txtBirpl.Text = "Test type";// s._((int)TxI.BIRPL);
+            txtComp.Text = s._((int)TxI.COMP);
+            txtT1.Text = s._((int)TxI.T1);
+            txtT2.Text = s._((int)TxI.T2);
+            txtGrade.Text = s._((int)TxI.MARK);
+            txtLock.Text = s._((int)TxI.OP_LCK);
+            txtAbsence.Text = s._((int)TxI.OP_ABSENCE);
+
+            RoomPassword = Utils.GeneratePassword(Utils.GetPasswordCharset(), new Random());
+            txtRoomPassword.Text = RoomPassword;
         }
 
         void ToSubmit(bool bEnable)
@@ -496,17 +599,21 @@ namespace sQzServer1
             foreach (TabItem t in tbcSl.Items)
                 if (t.Name == "_" + (i.Content as string).Replace(':', '_'))
                     return;
+<<<<<<< HEAD
+            //todo: check Slot with i.Content
+=======
             ExamSlot sl;
             if (!mBrd.Slots.TryGetValue(i.Content as string, out sl))
                 return;
+>>>>>>> master
 
             Op1SlotView vw = new Op1SlotView();
-            vw.mSl = sl;
+            vw.mSl = Slot;
             vw.DeepCopyNee(tbiRefNee);
             vw.ShowExaminee();
             vfbLock.Add(vw.vbLock);
             vw.Name = "_" + (i.Content as string).Replace(':', '_');
-            vw.Header = sl.Dt.ToString(DT.hh);
+            vw.Header = Slot.Dt.ToString(DT.hh);
             vw.toSubmCb = ToSubmit;
             tbcSl.Items.Add(vw);
             vw.Focus();
@@ -517,7 +624,11 @@ namespace sQzServer1
             ListBoxItem i = sender as ListBoxItem;
             if (i == null)
                 return;
+<<<<<<< HEAD
+            //mBrd.vSl.Remove(i.Content as string);
+=======
             mBrd.Slots.Remove(i.Content as string);
+>>>>>>> master
             foreach (TabItem ti in tbcSl.Items)
                 if (ti.Name == "_" + (i.Content as string).Replace(':', '_'))
                 {
@@ -531,7 +642,8 @@ namespace sQzServer1
 
         private void LoadSl()
         {
-            List<DateTime> v = mBrd.ListSl();
+            List<DateTime> v = new List<DateTime>();
+            v.Add(Slot.Dt);
             //bool dark = true;
             //Color c = new Color();
             //c.A = 0xff;
@@ -565,5 +677,177 @@ namespace sQzServer1
                 }
             }
         }
+
+        private void btnPrint_Click(object sender, RoutedEventArgs e)
+        {
+                // where did you get this file name?
+        string filePath = System.IO.Directory.GetCurrentDirectory() +
+                "/sqz_server1_";
+
+            if (!System.IO.File.Exists(filePath + "template.docx"))
+            {
+                MessageBox.Show("No template!");
+                return;
+            }
+
+            int i;
+            for (i = 0; i < 100; ++i)
+                if (!System.IO.File.Exists(filePath + i + ".docx"))
+                    break;
+            if(i == 100)
+            {
+                MessageBox.Show("Out of index to print. 99 slots have been taken!");
+                return;
+            }
+            var word = new Microsoft.Office.Interop.Word.Application { Visible = true };
+            var doc = word.Documents.Open(filePath + "template.docx", ReadOnly: true, Visible: true);
+            doc.SaveAs2(filePath + i + ".docx");
+            DocxReplaceDate(doc);
+        }
+
+        private void DocxReplaceDate(Microsoft.Office.Interop.Word.Document doc)
+        {
+            foreach(Microsoft.Office.Interop.Word.Range i in doc.Words)
+            {
+                if(i.Text.Contains("DDMMYYYY"))
+                {
+                    i.Text = i.Text.Replace("DDMMYYYY", DateTime.Now.ToString("dd/MM/yyyy"));
+                    return;
+                }
+            }
+        }
+
+    //private void PrintFlowDoc()
+    //    {
+    //        var document = CreateFlowDocument();
+    //        // Clone the source document's content into a new FlowDocument.
+    //        // This is because the pagination for the printer needs to be
+    //        // done differently than the pagination for the displayed page.
+    //        // We print the copy, rather that the original FlowDocument.
+    //        System.IO.MemoryStream s = new System.IO.MemoryStream();
+    //        TextRange source = new TextRange(document.ContentStart, document.ContentEnd);
+    //        source.Save(s, DataFormats.Xaml);
+    //        FlowDocument copy = new FlowDocument();
+    //        TextRange dest = new TextRange(copy.ContentStart, copy.ContentEnd);
+    //        dest.Load(s, DataFormats.Xaml);
+
+    //        // Create a XpsDocumentWriter object, implicitly opening a Windows common print dialog,
+    //        // and allowing the user to select a printer.
+
+    //        // get information about the dimensions of the seleted printer+media.
+    //        System.Printing.PrintDocumentImageableArea ia = null;
+    //        System.Windows.Xps.XpsDocumentWriter docWriter = System.Printing.PrintQueue.CreateXpsDocumentWriter(ref ia);
+
+    //        if (docWriter != null && ia != null)
+    //        {
+    //            DocumentPaginator paginator = ((IDocumentPaginatorSource)copy).DocumentPaginator;
+
+    //            // Change the PageSize and PagePadding for the document to match the CanvasSize for the printer device.
+    //            paginator.PageSize = new Size(ia.MediaSizeWidth, ia.MediaSizeHeight);
+    //            Thickness t = new Thickness(72);  // copy.PagePadding;
+    //            copy.PagePadding = new Thickness(
+    //                             Math.Max(ia.OriginWidth, t.Left),
+    //                               Math.Max(ia.OriginHeight, t.Top),
+    //                               Math.Max(ia.MediaSizeWidth - (ia.OriginWidth + ia.ExtentWidth), t.Right),
+    //                               Math.Max(ia.MediaSizeHeight - (ia.OriginHeight + ia.ExtentHeight), t.Bottom));
+
+    //            copy.ColumnWidth = double.PositiveInfinity;
+    //            //copy.PageWidth = 528; // allow the page to be the natural with of the output device
+
+    //            // Send content to the printer.
+    //            docWriter.Write(paginator);
+    //        }
+    //    }
+
+        //private FlowDocument CreateFlowDocument()
+        //{
+        //    var table1 = new Table();
+        //    // Create 6 columns and add them to the table's Columns collection.
+        //    int numberOfColumns = 5;
+        //    for (int x = 0; x < numberOfColumns; x++)
+        //    {
+        //        table1.Columns.Add(new TableColumn());
+
+        //        // Set alternating background colors for the middle colums.
+        //        if (x % 2 == 0)
+        //            table1.Columns[x].Background = Brushes.Beige;
+        //        else
+        //            table1.Columns[x].Background = Brushes.LightSteelBlue;
+        //    }
+
+        //    // Create and add an empty TableRowGroup to hold the table's Rows.
+        //    table1.RowGroups.Add(new TableRowGroup());
+
+        //    // Add the first (title) row.
+        //    table1.RowGroups[0].Rows.Add(new TableRow());
+
+        //    // Alias the current working row for easy reference.
+        //    TableRow currentRow = table1.RowGroups[0].Rows[0];
+
+        //    // Global formatting for the title row.
+        //    currentRow.Background = Brushes.Silver;
+        //    currentRow.FontSize = 40;
+        //    currentRow.FontWeight = System.Windows.FontWeights.Bold;
+
+        //    // Add the header row with content,
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("2004 Sales Project"))));
+        //    // and set the row to span all 6 columns.
+        //    currentRow.Cells[0].ColumnSpan = 6;
+
+        //    // Add the second (header) row.
+        //    table1.RowGroups[0].Rows.Add(new TableRow());
+        //    currentRow = table1.RowGroups[0].Rows[1];
+
+        //    // Global formatting for the header row.
+        //    currentRow.FontSize = 18;
+        //    currentRow.FontWeight = FontWeights.Bold;
+
+        //    // Add cells with content to the second row.
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Product"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 1"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 2"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 3"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Quarter 4"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("TOTAL"))));
+
+        //    // Add the third row.
+        //    table1.RowGroups[0].Rows.Add(new TableRow());
+        //    currentRow = table1.RowGroups[0].Rows[2];
+
+        //    // Global formatting for the row.
+        //    currentRow.FontSize = 12;
+        //    currentRow.FontWeight = FontWeights.Normal;
+
+        //    // Add cells with content to the third row.
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Widgets"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$50,000"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$55,000"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$60,000"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$65,000"))));
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("$230,000"))));
+
+        //    // Bold the first cell.
+        //    currentRow.Cells[0].FontWeight = FontWeights.Bold;
+
+        //    table1.RowGroups[0].Rows.Add(new TableRow());
+        //    currentRow = table1.RowGroups[0].Rows[3];
+
+        //    // Global formatting for the footer row.
+        //    currentRow.Background = Brushes.LightGray;
+        //    currentRow.FontSize = 18;
+        //    currentRow.FontWeight = System.Windows.FontWeights.Normal;
+
+        //    // Add the header row with content,
+        //    currentRow.Cells.Add(new TableCell(new Paragraph(new Run("Projected 2004 Revenue: $810,000"))));
+        //    // and set the row to span all 6 columns.
+        //    currentRow.Cells[0].ColumnSpan = 6;
+
+
+        //    // ...and add it to the FlowDocument Blocks collection.
+        //    var flowDoc = new FlowDocument();
+        //    flowDoc.Blocks.Add(table1);
+
+        //    return flowDoc;
+        //}
     }
 }

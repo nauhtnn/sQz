@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
@@ -12,91 +13,86 @@ namespace sQzLib
         public bool bToVw;
         public ExamineeS0()
         {
+            Reset();
+        }
+
+        public override void Reset()
+        {
+            _Reset();
             bToVw = bToDB = false;
         }
 
-        public override List<byte[]> ToByte()
+        public List<byte[]> GetBytes_SendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
+<<<<<<< HEAD
+            Utils.AppendBytesOfString(ID, l);
+            l.Add(BitConverter.GetBytes(TestType));
+            l.Add(BitConverter.GetBytes((int)eStt));
+=======
             l.Add(BitConverter.GetBytes((int)Lv));
             l.Add(BitConverter.GetBytes(uId));
             l.Add(BitConverter.GetBytes((int)mPhase));
             byte[] b;
+>>>>>>> master
 
-            b = Encoding.UTF8.GetBytes(tBirdate);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
-
-            b = Encoding.UTF8.GetBytes(tName);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
-            b = Encoding.UTF8.GetBytes(tBirthplace);
-            l.Add(BitConverter.GetBytes(b.Length));
-            l.Add(b);
+            Utils.AppendBytesOfString(Birthdate, l);
+            Utils.AppendBytesOfString(Name, l);
 
             if (mPhase < ExamineePhase.Finished)
                 return l;
 
-            l.Add(BitConverter.GetBytes(dtTim1.Hour));
-            l.Add(BitConverter.GetBytes(dtTim1.Minute));
+            l.Add(BitConverter.GetBytes(dtTim1.ToBinary()));
 
-            l.Add(BitConverter.GetBytes(dtTim2.Hour));
-            l.Add(BitConverter.GetBytes(dtTim2.Minute));
-            l.Add(BitConverter.GetBytes(uGrade));
-            if(0 < tComp.Length)
-            {
-                byte[] x = Encoding.UTF8.GetBytes(tComp);
-                l.Add(BitConverter.GetBytes(x.Length));
-                l.Add(x);
-            }
+            l.Add(BitConverter.GetBytes(dtTim2.ToBinary()));
+            l.Add(BitConverter.GetBytes(CorrectCount));
+            if(0 < ComputerName.Length)
+                Utils.AppendBytesOfString(ComputerName, l);
             else
                 l.Add(BitConverter.GetBytes(0));
 
             return l;
         }
 
-        public override bool ReadByte(byte[] buf, ref int offs)
+        public bool ReadByte_FromS1(byte[] buf, ref int offs)
         {
             //suppose eStt == NeeStt.Finished
             int l = buf.Length - offs;
             //
+<<<<<<< HEAD
+            ID = Utils.ReadBytesOfString(buf, ref offs, ref l);
+            if (ID.Length == 0)
+=======
             if (l < 12)
                 return true;
             int x;
             if (Enum.IsDefined(typeof(Level), x = BitConverter.ToInt32(buf, offs)))
                 Lv = (Level)x;
             else
+>>>>>>> master
                 return true;
-            l -= 4;
-            offs += 4;
-            uId = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            x = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
+
+            ComputerName = Utils.ReadBytesOfString(buf, ref offs, ref l);
             //
-            if (l < x)
+            if (l < sizeof(long))
                 return true;
-            if (0 < x)
-            {
-                tComp = Encoding.UTF8.GetString(buf, offs, x);
-                l -= x;
-                offs += x;
-            }
-            //
-            if (l < AnsSheet.LEN + 24)
+            dtTim1 = DateTime.FromBinary(BitConverter.ToInt64(buf, offs));
+            l -= sizeof(long);
+            offs += sizeof(long);
+
+            if (l < 4)
                 return true;
-            int h = BitConverter.ToInt32(buf, offs);
+            AnswerSheet.QuestSheetID = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            int m = BitConverter.ToInt32(buf, offs);
+
+            if (l < 4)
+                return true;
+<<<<<<< HEAD
+            AnswerSheet.BytesOfAnswer_Length = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-            if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim1))
-            {
-                dtTim1 = DT.INV_;
-                return true;
+=======
             }
             mAnsSheet.uQSLvId = BitConverter.ToInt32(buf, offs);
             l -= 4;
@@ -105,37 +101,158 @@ namespace sQzLib
             Array.Copy(buf, offs, mAnsSheet.aAns, 0, AnsSheet.LEN);
             l -= AnsSheet.LEN;
             offs += AnsSheet.LEN;
+>>>>>>> master
 
-            h = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            m = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            if (!DateTime.TryParse(h.ToString() + ':' + m, out dtTim2))
-            {
-                dtTim2 = DT.INV_;
+            if (l < AnswerSheet.BytesOfAnswer_Length)
                 return true;
-            }
-            uGrade = BitConverter.ToInt32(buf, offs);
-            l -= 4;
+            AnswerSheet.BytesOfAnswer = new byte[AnswerSheet.BytesOfAnswer_Length];
+            Array.Copy(buf, offs, AnswerSheet.BytesOfAnswer, 0, AnswerSheet.BytesOfAnswer.Length);
+            l -= AnswerSheet.BytesOfAnswer.Length;
+            offs += AnswerSheet.BytesOfAnswer.Length;
+
+            if (l < sizeof(long))
+                return true;
+            dtTim2 = DateTime.FromBinary(BitConverter.ToInt64(buf, offs));
+            l -= sizeof(long);
+            offs += sizeof(long);
+
+            if (l < 4)
+                return true;
+            CorrectCount = BitConverter.ToInt32(buf, offs);
             offs += 4;
             //
             return false;
         }
 
-        public override void Merge(ExamineeA e)
+        public void MergeWithS1(ExamineeA e)
         {
             if (mPhase == ExamineePhase.Finished)
                 return;
             //suppose eStt = eINFO and e.eStt = NeeStt.Finished
             mPhase = ExamineePhase.Finished;
             bToVw = bToDB = true;
+<<<<<<< HEAD
+            ComputerName = e.ComputerName;
+            AnswerSheet = e.AnswerSheet;
+=======
             tComp = e.tComp;
             mAnsSheet = e.mAnsSheet;
+>>>>>>> master
             dtTim1 = e.dtTim1;
-            uGrade = e.uGrade;
+            CorrectCount = e.CorrectCount;
             dtTim2 = e.dtTim2;
+        }
+
+        public void DBGetQSId()
+        {
+            MySqlConnection conn = DBConnect.OpenNewConnection();
+            if (conn == null)
+            {
+                TestType = -1;
+                AnswerSheet.QuestSheetID = -1;
+                return;
+            }
+            string qry = DBConnect.mkQrySelect("sqz_examinee AS a, sqz_nee_qsheet AS b", "t_type, qsid",
+                "a.dt='" + mDt.ToString(DT._) + "' AND a.id='" + ID + "' AND a.dt=b.dt AND a.id=b.neeid");
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                TestType = -1;
+                AnswerSheet.QuestSheetID = -1;
+                return;
+            }
+            if (reader.Read())
+            {
+                TestType = reader.GetInt32(0);
+                AnswerSheet.QuestSheetID = reader.GetInt32(1);
+            }
+            else
+            {
+                TestType = -1;
+                AnswerSheet.QuestSheetID = -1;
+            }
+            reader.Close();
+            DBConnect.Close(ref conn);
+        }
+
+        public void DBGetAns()
+        {
+            AnswerSheet.BytesOfAnswer = null;
+            AnswerSheet.BytesOfAnswer_Length = 0;
+            MySqlConnection conn = DBConnect.OpenNewConnection();
+            if (conn == null)
+                return;
+            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "ans",
+                "dt='" + mDt.ToString(DT._) + "' AND neeid='" + ID + "'");
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return;
+            }
+            char[] ans = null;
+            if (reader.Read())
+                ans = reader.GetString(0).ToCharArray();
+            reader.Close();
+            DBConnect.Close(ref conn);
+            if(ans != null && ans.Length > 0)
+            {
+                AnswerSheet.BytesOfAnswer = new byte[ans.Length];
+                AnswerSheet.BytesOfAnswer_Length = AnswerSheet.BytesOfAnswer.Length;
+                for (int i = 0; i < ans.Length; ++i)
+                    if (ans[i] == Question.C1)
+                        AnswerSheet.BytesOfAnswer[i] = 1;
+            }
+        }
+
+        public bool DBSelGrade()
+        {
+            MySqlConnection conn = DBConnect.OpenNewConnection();
+            if (conn == null)
+                return true;
+            string qry = DBConnect.mkQrySelect("sqz_nee_qsheet", "grade",
+                "dt='" + mDt.ToString(DT._) + "' AND neeid='" + ID + "'");
+            string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return true;
+            }
+            if (reader.Read())
+                CorrectCount = reader.GetInt16(0);
+            reader.Close();
+            DBConnect.Close(ref conn);
+            return false;
+        }
+
+        public string DBGetT()
+        {
+            throw new NotImplementedException();
+            //MySqlConnection conn = DBConnect.Init();
+            //string t = DT.INV_H.ToString(DT.hh);
+            //if (conn == null)
+            //    return t;
+            //string qry = DBConnect.mkQrySelect("sqz_examinee",
+            //    "t", "dt='" + mDt.ToString(DT._) + "' AND lv='" + eLv.ToString() +
+            //    "' AND id=" + uId);
+            //string eMsg;
+            //MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            //if (reader == null)
+            //{
+            //    DBConnect.Close(ref conn);
+            //    return t;
+            //}
+            //if (reader.Read())
+            //{
+            //    t = reader.GetString(0);
+            //}
+            //reader.Close();
+            //DBConnect.Close(ref conn);
+            //return t;
         }
     }
 }

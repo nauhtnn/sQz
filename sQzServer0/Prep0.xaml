@@ -15,6 +15,18 @@
                 <Button x:Name="btnMMenu"  Width="120" Height="40" Click="BackToMainMenu" Background="#f15a23" Foreground="#fff"
                         Margin="0,10,0,0"/>
                 <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
+<<<<<<< HEAD
+                <TextBlock Name="txtDt" Margin="25,0,0,0" FontSize="14" Text="system format"/>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <TextBox Name="newSlot" Height="30" Width="170" />
+                        <Button Name="btnInsSlot"  Content="+" Height="30" Width="30" Click="InsertSlot" Background="#1c64e7" Foreground="#fff"/>
+                    </StackPanel>
+                <ListBox x:Name="SlotsView" Width="200" Height="120" SelectionMode="Single"/>
+                <TextBlock Text="Test type" Margin="0,60,0,0" HorizontalAlignment="Center"/>
+                <TextBox x:Name="tbxTestType" Width="100" Height="30" MaxLength="4" Text="0" />
+                <Button x:Name="btnShowQuestions" Width="120" Height="40" Click="btnShowQuestions_Click" Content="Show questions" Background="Blue" Foreground="#fff"
+                        Margin="0,10,0,0"/>
+=======
                 <StackPanel Orientation="Horizontal">
                     <StackPanel>
                         <TextBlock Name="txtDt" TextAlignment="Center" FontSize="14"/>
@@ -36,6 +48,7 @@
                 <Border BorderBrush="Black" BorderThickness="0,1,0,0" Margin="0,10,0,10"/>
                 <TextBlock Name="txtIU" Margin="0,0,0,10" HorizontalAlignment="Center"/>
                 <ListBox x:Name="lbxQCatgry" Width="220" Height="390" SelectionChanged="SelectIUx"/>
+>>>>>>> master
             </StackPanel>
             <TabControl Margin="10,0,0,0">
                 <TabItem Name="tbi1">
@@ -43,7 +56,7 @@
                 </TabItem>
                 <TabItem Name="tbi2">
                     <TabControl>
-                        <TabItem Name="tbiDBQ">
+                        <TabItem Name="tbiDBQ" Loaded="tbiDBQ_Loaded">
                             <StackPanel>
                                 <Grid>
                                     <Grid.ColumnDefinitions>

@@ -14,46 +14,37 @@ namespace sQzServer0
     public class Op0SlotView: TabItem
     {
         TabControl tbcQ;
-        TabControl tbcQAlt;
-        public SortedList<int, TextBlock> vGrade;
-        public SortedList<int, TextBlock> vDt1;
-        public SortedList<int, TextBlock> vDt2;
-        public SortedList<int, TextBlock> vComp;
+        //TabControl tbcQAlt;
+        public SortedList<string, TextBlock> vGrade;
+        public SortedList<string, TextBlock> vDt1;
+        public SortedList<string, TextBlock> vDt2;
+        public SortedList<string, TextBlock> vComp;
         public Dictionary<int, TextBlock> vRT1;
         public Dictionary<int, TextBlock> vRT2;
         Dictionary<int, TextBlock> vRPw;
         Grid grdNee;
-        public ExamSlot mSl;
-        Dictionary<ExamLv, int[]> vNEsyDif, vNDiff;
-        bool bInitNMod;
+        public ExamSlotS0 mSl;
 
         public Op0SlotView()
         {
             Init();
         }
 
-        public Op0SlotView(ExamSlot sl)
+        public Op0SlotView(ExamSlotS0 sl)
         {
             Init();
             //
             mSl = sl;
-            Header = mSl.Dt.ToString(DT.hh);
-            Name = "_" + (Header as string).Replace(':', '_');
+            Header = mSl.Dt.ToString(DT._);
+            Name = DT.CreateNameFromDateTime(Header as string);
         }
 
         void Init()
         {
-            vGrade = new SortedList<int, TextBlock>();
-            vDt1 = new SortedList<int, TextBlock>();
-            vDt2 = new SortedList<int, TextBlock>();
-            vComp = new SortedList<int, TextBlock>();
-            vNEsyDif = new Dictionary<ExamLv, int[]>();
-            vNDiff = new Dictionary<ExamLv, int[]>();
-            vNEsyDif.Add(ExamLv.A, null);
-            vNDiff.Add(ExamLv.A, null);
-            vNEsyDif.Add(ExamLv.B, null);
-            vNDiff.Add(ExamLv.B, null);
-            bInitNMod = false;
+            vGrade = new SortedList<string, TextBlock>();
+            vDt1 = new SortedList<string, TextBlock>();
+            vDt2 = new SortedList<string, TextBlock>();
+            vComp = new SortedList<string, TextBlock>();
         }
 
         public void ShowExaminee()
@@ -64,8 +55,8 @@ namespace sQzServer0
             bool even = false;
             int rid = -1;
             GridLength rh = new GridLength(26);
-            foreach (ExamRoom r in mSl.vRoom.Values)
-                foreach (ExamineeA e in r.vExaminee.Values)
+            foreach (ExamRoomS0 r in mSl.Rooms.Values)
+                foreach (ExamineeS0 e in r.Examinees.Values)
                 {
                     rid++;
                     if (even)
@@ -78,25 +69,25 @@ namespace sQzServer0
                     grdNee.RowDefinitions.Add(rd);
                     //
                     TextBlock t = new TextBlock();
-                    t.Text = e.tId;
+                    t.Text = e.ID;
                     t.Background = bg;
                     Grid.SetRow(t, rid);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tName;
+                    t.Text = e.Name;
                     t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 1);
                     grdNee.Children.Add(t);
                     //
                     t = new TextBlock();
-                    t.Text = e.tBirdate;
+                    t.Text = e.Birthdate;
                     t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 2);
                     grdNee.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.tBirthplace;
+                    t.Text = e.TestType.ToString();
                     t.Background = bg;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 3);
@@ -104,16 +95,15 @@ namespace sQzServer0
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    t.Text = (r.uId + 1).ToString();
+                    t.Text = r.uId.ToString();
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 4);
                     grdNee.Children.Add(t);
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    int lvid = e.LvId;
-                    vGrade.Add(lvid, t);
-                    if (e.uGrade != ExamineeA.LV_CAP)
+                    vGrade.Add(e.ID, t);
+                    if (e.CorrectCount != ExamineeA.LV_CAP)
                         t.Text = e.Grade;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 5);
@@ -121,27 +111,27 @@ namespace sQzServer0
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    vDt1.Add(lvid, t);
+                    vDt1.Add(e.ID, t);
                     if (e.dtTim1.Year != DT.INV)
-                        t.Text = e.dtTim1.ToString("HH:mm");
+                        t.Text = e.dtTim1.ToString(DT.hh);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 6);
                     grdNee.Children.Add(t);
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    vDt2.Add(lvid, t);
+                    vDt2.Add(e.ID, t);
                     if (e.dtTim2.Year != DT.INV)
-                        t.Text = e.dtTim2.ToString("HH:mm");
+                        t.Text = e.dtTim2.ToString(DT.hh);
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 7);
                     grdNee.Children.Add(t);
                     //
                     t = new TextBlock();
                     t.Background = bg;
-                    vComp.Add(lvid, t);
-                    if (e.tComp != null)
-                        t.Text = e.tComp;
+                    vComp.Add(e.ID, t);
+                    if (e.ComputerName != null)
+                        t.Text = e.ComputerName;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 8);
                     grdNee.Children.Add(t);
@@ -150,25 +140,24 @@ namespace sQzServer0
 
         public void UpdateRsView(int rid)
         {
-            ExamRoom r;
-            if (!mSl.vRoom.TryGetValue(rid, out r))
+            ExamRoomS0 r;
+            if (!mSl.Rooms.TryGetValue(rid, out r))
                 return;
             if (vRT2.ContainsKey(rid))
                 vRT2[rid].Text = DateTime.Now.ToString(DT.hh);
-            foreach (ExamineeS0 e in r.vExaminee.Values)
+            foreach (ExamineeS0 e in r.Examinees.Values)
                 if(e.bToVw)
                 {
                     e.bToVw = false;
-                    int lvid = e.LvId;
                     TextBlock t;
-                    if (e.uGrade != ExamineeA.LV_CAP && vGrade.TryGetValue(lvid, out t))
+                    if (e.CorrectCount != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
                         t.Text = e.Grade;
-                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(lvid, out t))
-                        t.Text = e.dtTim1.ToString("HH:mm");
-                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(lvid, out t))
-                        t.Text = e.dtTim2.ToString("HH:mm");
-                    if (e.tComp != null && vComp.TryGetValue(lvid, out t))
-                        t.Text = e.tComp;
+                    if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.ID, out t))
+                        t.Text = e.dtTim1.ToString(DT.hh);
+                    if (e.dtTim2.Hour != DT.INV && vDt2.TryGetValue(e.ID, out t))
+                        t.Text = e.dtTim2.ToString(DT.hh);
+                    if (e.ComputerName != null && vComp.TryGetValue(e.ID, out t))
+                        t.Text = e.ComputerName;
                 }
         }
 
@@ -185,15 +174,15 @@ namespace sQzServer0
             tbcQ = new TabControl();
             tbcQ.Width = refTbc.Width;
             TabItem i = new TabItem();
-            i.Header = Txt.s._[(int)TxI.OP_Q_PRI];
+            i.Header = Txt.s._((int)TxI.OP_Q_PRI);
             i.Content = tbcQ;
             tbc.Items.Add(i);
-            tbcQAlt = new TabControl();
-            tbcQAlt.Width = refTbc.Width;
-            i = new TabItem();
-            i.Header = Txt.s._[(int)TxI.OP_Q_ALT];
-            i.Content = tbcQAlt;
-            tbc.Items.Add(i);
+            //tbcQAlt = new TabControl();
+            //tbcQAlt.Width = refTbc.Width;
+            //i = new TabItem();
+            //i.Header = Txt.s._((int)TxI.OP_Q_ALT);
+            //i.Content = tbcQAlt;
+            //tbc.Items.Add(i);
             Content = tbc;
         }
 
@@ -236,7 +225,7 @@ namespace sQzServer0
             int i = 1;
             SolidColorBrush br = new SolidColorBrush(Colors.Black);
             Thickness th = new Thickness(0, 0, 0, 1);
-            foreach (ExamRoom r in mSl.vRoom.Values)
+            foreach (ExamRoomS0 r in mSl.Rooms.Values)
             {
                 RowDefinition rd = new RowDefinition();
                 rd.Height = h;
@@ -250,14 +239,14 @@ namespace sQzServer0
 
                 TextBlock t = new TextBlock();
                 t.TextAlignment = TextAlignment.Center;
-                t.Text = (r.uId + 1).ToString();
+                t.Text = r.uId.ToString();
                 Grid.SetRow(t, ++i);
                 Grid.SetColumn(t, 0);
                 g.Children.Add(t);
 
                 t = new TextBlock();
                 t.TextAlignment = TextAlignment.Center;
-                t.Text = r.vExaminee.Count.ToString();
+                t.Text = r.Examinees.Count.ToString();
                 Grid.SetRow(t, i);
                 Grid.SetColumn(t, 1);
                 g.Children.Add(t);
@@ -280,25 +269,6 @@ namespace sQzServer0
                 Grid.SetColumn(t, 3);
                 g.Children.Add(t);
 
-                RadioButton rdo = new RadioButton();
-                rdo.GroupName = "_" + r.uId;
-                rdo.IsChecked = true;
-                rdo.IsEnabled = false;
-                Grid.SetRow(rdo, i);
-                Grid.SetColumn(rdo, 4);
-                rdo.HorizontalAlignment = HorizontalAlignment.Center;
-                g.Children.Add(rdo);
-
-                rdo = new RadioButton();
-                rdo.GroupName = "_" + r.uId;
-                if (mSl.vbQPkAlt.ContainsKey(r.uId) && mSl.vbQPkAlt[r.uId])
-                    rdo.IsChecked = true;
-                rdo.Checked += Alt_Checked;
-                Grid.SetRow(rdo, i);
-                Grid.SetColumn(rdo, 5);
-                rdo.HorizontalAlignment = HorizontalAlignment.Center;
-                g.Children.Add(rdo);
-
                 t = new TextBlock();
                 vRPw.Add(r.uId, t);
                 t.Text = r.tPw;
@@ -307,7 +277,7 @@ namespace sQzServer0
                 g.Children.Add(t);
 
                 Button btn = new Button();
-                btn.Content = Txt.s._[(int)TxI.OP_GEN_PW];
+                btn.Content = Txt.s._((int)TxI.OP_GEN_PW);
                 btn.Name = "b" + r.uId;
                 btn.Click += btnGenPw_Click;
                 btn.Background = Theme.s._[(int)BrushId.Button_Hover];
@@ -319,7 +289,7 @@ namespace sQzServer0
             //
             TabItem tbi = new TabItem();
             tbi.Content = g;
-            tbi.Header = Txt.s._[(int)TxI.OP_STT];
+            tbi.Header = Txt.s._((int)TxI.OP_STT);
             return tbi;
         }
 
@@ -327,22 +297,9 @@ namespace sQzServer0
         {
             Button btn = sender as Button;
             int rid = int.Parse(btn.Name.Substring(1));
-            if(mSl.vRoom.ContainsKey(rid) && vRPw.ContainsKey(rid)
-                && !mSl.vRoom[rid].RegenPw())
-                    vRPw[rid].Text = mSl.vRoom[rid].tPw;
-        }
-
-        private void Alt_Checked(object sender, RoutedEventArgs e)
-        {
-            RadioButton rdo = sender as RadioButton;
-            if (rdo == null)
-                return;
-            int rid = int.Parse(rdo.GroupName.Substring(1));
-            if (mSl.vbQPkAlt.ContainsKey(rid) && !mSl.vbQPkAlt[rid])
-            {
-                mSl.vbQPkAlt[rid] = true;
-                mSl.DBUpQPAlt(rid);
-            }
+            if(mSl.Rooms.ContainsKey(rid) && vRPw.ContainsKey(rid)
+                && !mSl.Rooms[rid].RegenPw())
+                    vRPw[rid].Text = mSl.Rooms[rid].tPw;
         }
 
         TabItem DeepCopyNee(TabItem refTbi)
@@ -395,41 +352,25 @@ namespace sQzServer0
             }
             TabItem tbi = new TabItem();
             tbi.Content = sp;
-            tbi.Header = Txt.s._[(int)TxI.OP_NEE];
+            tbi.Header = Txt.s._((int)TxI.OP_NEE);
             return tbi;
         }
 
         private void tbiQ_GotFocus(object sender, RoutedEventArgs e)
-        {
+        {;
             TabItem tbi = sender as TabItem;
             if (tbi == null || tbi.Content != null)
                 return;
             TabControl tbc = tbi.Parent as TabControl;
             if (tbc == null)
                 return;
-            ExamLv lv;
-            int id;
-            if (QuestSheet.ParseLvId((tbi.Header as TextBlock).Text, out lv, out id))
-                return;
+            int id = int.Parse((tbi.Header as TextBlock).Text);
             QuestSheet qs = null;
-            if (mSl.vQPack[lv].vSheet.ContainsKey(id))
-                qs = mSl.vQPack[lv].vSheet[id];
-            else if (mSl.vQPackAlt[lv].vSheet.ContainsKey(id))
-                qs = mSl.vQPackAlt[lv].vSheet[id];
-            if (qs == null)
-                return;
-            ScrollViewer svwr = new ScrollViewer();
-            svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
-            StackPanel sp = new StackPanel();
-            int x = 0;
-            SolidColorBrush evenbg = Theme.s._[(int)BrushId.BG];
-            SolidColorBrush oddbg = Theme.s._[(int)BrushId.Q_BG];
-            SolidColorBrush difbg = Theme.s._[(int)BrushId.Ans_TopLine];
-            SolidColorBrush bg;
-            bool even = false;
-
-            foreach (Question q in qs.ShallowCopy())
+            foreach(QuestPack pack in mSl.QuestionPacks.Values)
             {
+<<<<<<< HEAD
+                if (pack.vSheet.ContainsKey(id))
+=======
                 /*if (q.bDiff)
                     bg = difbg;
                 else*/ if (even)
@@ -444,53 +385,23 @@ namespace sQzServer0
                 i.Background = bg;
                 sp.Children.Add(i);
                 for (int idx = 0; idx < Question.N_ANS; ++idx)
+>>>>>>> master
                 {
-                    TextBlock j = new TextBlock();
-                    j.Width = tbc.Width - SystemParameters.ScrollWidth;
-                    j.TextWrapping = TextWrapping.Wrap;
-                    j.Text = ((char)('A' + idx)).ToString() + ") " + q.vAns[idx];
-                    j.Background = bg;
-                    if (q.vKeys[idx])
-                        j.FontWeight = FontWeights.Bold;
-                    sp.Children.Add(j);
+                    qs = pack.vSheet[id];
+                    break;
                 }
             }
-            svwr.Content = sp;
+            if (qs == null)
+                return;
+            ScrollViewer svwr = new ScrollViewer();
+            svwr.Content = new QuestionSheetView(qs, null, FontSize * 2, tbc.Width - FontSize * 2 - SystemParameters.ScrollWidth);
             svwr.Height = 560;
             tbi.Content = svwr;
         }
 
-        public void InitNMod()
+        public void GenQ()
         {
-            if (bInitNMod)
-                return;
-            bInitNMod = true;
-            foreach (QuestPack p in mSl.vQPack.Values)
-            {
-                List<int[]> l = p.GetNMod();
-                if(l != null && l.Count == 2)
-                {
-                    vNEsyDif[p.eLv] = l[0];
-                    vNDiff[p.eLv] = l[1];
-                }
-            }
-        }
-
-        public List<int[]> GetNMod(ExamLv lv)
-        {
-            if (vNEsyDif[lv] == null)
-                return null;
-            List<int[]> rv = new List<int[]>();
-            rv.Add(vNEsyDif[lv]);
-            rv.Add(vNDiff[lv]);
-            return rv;
-        }
-
-        public void GenQ(ExamLv lv, int[] vnesydif, int[] vndiff)
-        {
-            vNEsyDif[lv] = vnesydif;
-            vNDiff[lv] = vndiff;
-            mSl.GenQ(mSl.CountQSByRoom(lv), lv, vnesydif, vndiff);
+            mSl.GenQ(mSl.MaxNumberOfExaminees_PerTestType());
 
             ShowQSHeader();
         }
@@ -498,35 +409,22 @@ namespace sQzServer0
         public void ShowQSHeader()
         {
             tbcQ.Items.Clear();
-            foreach (QuestPack p in mSl.vQPack.Values)
-                foreach (QuestSheet qs in p.vSheet.Values)
+            foreach(QuestPack pack in mSl.QuestionPacks.Values)
+            {
+                foreach (QuestSheet qs in pack.vSheet.Values)
                 {
                     TabItem ti = new TabItem();
                     TextBlock t = new TextBlock();
-                    t.Text = qs.eLv.ToString() + qs.uId.ToString("d3");
-                    t.FontSize = 12;
-                    ti.Header = t;
-                    ti.GotFocus += tbiQ_GotFocus;
-                        
-                    tbcQ.Items.Add(ti);
-                }
-            if (0 < tbcQ.Items.Count)
-                tbiQ_GotFocus(tbcQ.Items[0], null);
-            tbcQAlt.Items.Clear();
-            foreach (QuestPack p in mSl.vQPackAlt.Values)
-                foreach (QuestSheet qs in p.vSheet.Values)
-                {
-                    TabItem ti = new TabItem();
-                    TextBlock t = new TextBlock();
-                    t.Text = qs.eLv.ToString() + qs.uId.ToString("d3");
+                    t.Text = qs.ID.ToString("d3");
                     t.FontSize = 12;
                     ti.Header = t;
                     ti.GotFocus += tbiQ_GotFocus;
 
-                    tbcQAlt.Items.Add(ti);
+                    tbcQ.Items.Add(ti);
                 }
-            if (0 < tbcQAlt.Items.Count)
-                tbiQ_GotFocus(tbcQAlt.Items[0], null);
+            }
+            if (0 < tbcQ.Items.Count)
+                tbiQ_GotFocus(tbcQ.Items[0], null);
         }
 
         public void UpRT1(int rid)

@@ -62,7 +62,7 @@ namespace sQzClient
 
         private static int _hookHandle;
         private static HookProc _altTabCallBack;
-        private static bool bHookEnabled = true;
+        public static bool bHookEnabled = true;
 
         #endregion
 
@@ -127,13 +127,20 @@ namespace sQzClient
                 /// event data.</param>
         protected override void OnStartup(StartupEventArgs e)
         {
-            if (System.IO.File.Exists("DisableHook.txt"))
-                bHookEnabled = false;
+            EnableHookKeys(true);
             // Startup
             SetAltTabHook();
 
             // Base
             base.OnStartup(e);
+        }
+
+        public static void EnableHookKeys(bool enabled)
+        {
+            if (System.IO.File.Exists("DisableHook.txt"))
+                bHookEnabled = false;
+            else
+                bHookEnabled = enabled;
         }
 
         /// <summary>

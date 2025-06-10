@@ -21,7 +21,7 @@ namespace sQzServer0
     /// </summary>
     public partial class MainMenu : Page
     {
-        int uVer = 9;
+        int uVer = 100;
         public MainMenu()
         {
             InitializeComponent();
@@ -30,12 +30,12 @@ namespace sQzServer0
         private void LoadTxt()
         {
             Txt t = Txt.s;
-            txtLalgitc.Text = t._[(int)TxI.LALGITC];
-            txtsQz.Text = t._[(int)TxI.SQZ];
-            btnPrep.Content = t._[(int)TxI.PREP];
-            btnOp.Content = t._[(int)TxI.OPER];
-            btnArchv.Content = t._[(int)TxI.ARCH];
-            btnExit.Content = t._[(int)TxI.EXIT];
+            txtLalgitc.Text = t._((int)TxI.LALGITC);
+            txtsQz.Text = t._((int)TxI.SQZ);
+            btnPrep.Content = t._((int)TxI.PREP);
+            btnOp.Content = t._((int)TxI.OPER);
+            btnArchv.Content = t._((int)TxI.ARCH);
+            btnExit.Content = t._((int)TxI.EXIT);
         }
 
         private void btnPrep_Click(object sender, RoutedEventArgs e)
@@ -45,7 +45,7 @@ namespace sQzServer0
 
         private void btnArchv_Click(object sender, RoutedEventArgs e)
         {
-            NavigationService.Navigate(new Uri("Archieve.xaml", UriKind.Relative));
+            NavigationService.Navigate(new Uri("Archive.xaml", UriKind.Relative));
         }
 
         private void btnOp_Click(object sender, RoutedEventArgs e)
@@ -69,14 +69,14 @@ namespace sQzServer0
 
             LoadTxt();
 
-            MySql.Data.MySqlClient.MySqlConnection conn = DBConnect.Init();
+            MySql.Data.MySqlClient.MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
                 DisableBtns();
-                WPopup.s.ShowDialog(Txt.s._[(int)TxI.DB_NOK]);
+                WPopup.s.ShowDialog(Txt.s._((int)TxI.DB_NOK));
                 return;
             }
-            string qry = DBConnect.mkQrySelect("sqz_ver", "id", null);
+            string qry = DBConnect.mkQrySelect("sqz_version", "ver", null);
             string emsg;
             MySql.Data.MySqlClient.MySqlDataReader reader =
                 DBConnect.exeQrySelect(conn, qry, out emsg);
@@ -100,7 +100,7 @@ namespace sQzServer0
                 if (bNVer)
                 {
                     DisableBtns();
-                    WPopup.s.ShowDialog(Txt.s._[(int)TxI.DB_VER_NOK] +
+                    WPopup.s.ShowDialog(Txt.s._((int)TxI.DB_VER_NOK) +
                         (uVer / 100) + '.' + (uVer % 100 / 10) + '.' + (uVer % 10));
                 }
             }
