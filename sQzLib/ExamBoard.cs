@@ -20,16 +20,15 @@ namespace sQzLib
     public class ExamBoard
     {
         public DateTime mDt;
-        public Dictionary<string, ExamSlot> Slots;
+        public Dictionary<string, ExamSlot> vSl;
 
         public ExamBoard()
         {
-            Slots = new Dictionary<string, ExamSlot>();
+            vSl = new Dictionary<string, ExamSlot>();
         }
 
-        public int DBIns()
+        public int DBIns(out string eMsg)
         {
-<<<<<<< HEAD
             string v = "('" + mDt.ToString(DT._) + "')";
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
@@ -42,14 +41,10 @@ namespace sQzLib
             if (n == -1062)
                 eMsg = Txt.s._((int)TxI.DB_EXCPT) + Txt.s._((int)TxI.BOARD_EXIST);
             return n;
-=======
-            return DBConnect.Ins("sqz_board", "dt", "('" + mDt.ToString(DT._) + "')");
->>>>>>> master
         }
 
-        public static List<DateTime> DBSel()
+        public static List<DateTime> DBSel(out string eMsg)
         {
-<<<<<<< HEAD
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
@@ -64,19 +59,15 @@ namespace sQzLib
                 return null;
             }
             List<DateTime> r = new List<DateTime>();
-=======
-            MySqlDataReader reader = DBConnect.exeQrySelect("sqz_board", null, null);
-            List<DateTime> dt = new List<DateTime>();
->>>>>>> master
             while (reader.Read())
-                dt.Add(reader.GetDateTime(0));
+                r.Add(reader.GetDateTime(0));
             reader.Close();
-            return dt;
+            DBConnect.Close(ref conn);
+            return r;
         }
 
-        public List<DateTime> DBSelectSlot(bool isArchive)
+        public List<DateTime> DBSelSl(bool arch, out string eMsg)
         {
-<<<<<<< HEAD
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
@@ -86,15 +77,16 @@ namespace sQzLib
             string qry = "dt='" + mDt.ToString(DT._) + "' AND stt";
             if (arch)
                 qry = qry + "=" + (int)ExamStt.Arch;
-=======
-            string cond = "dt='" + mDt.ToString(DT._) + "' AND stt";
-            if (isArchive)
-                cond = cond + "=" + (int)ExamStt.Archive;
->>>>>>> master
             else
-                cond = cond + "!=" + (int)ExamStt.Archive;
-            MySqlDataReader reader = DBConnect.exeQrySelect("sqz_slot", "t", cond);
-            List <DateTime> r = new List<DateTime>();
+                qry = qry + "!=" + (int)ExamStt.Arch;
+            qry = DBConnect.mkQrySelect("sqz_slot", "t", qry);
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
+            if (reader == null)
+            {
+                DBConnect.Close(ref conn);
+                return null;
+            }
+            List<DateTime> r = new List<DateTime>();
             while (reader.Read())
             {
                 string s = reader.GetString(0);
@@ -104,12 +96,12 @@ namespace sQzLib
                 r.Add(dt);
             }
             reader.Close();
+            DBConnect.Close(ref conn);
             return r;
         }
 
-        public int DBInsSlot(DateTime t)
+        public int DBInsSl(DateTime t, out string eMsg)
         {
-<<<<<<< HEAD
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
@@ -123,24 +115,18 @@ namespace sQzLib
             if (n == -1062)
                 eMsg = Txt.s._((int)TxI.DB_EXCPT) + Txt.s._((int)TxI.SLOT_EXIST);
             return n;
-=======
-            string v = "('" + mDt.ToString(DT._) + "','"
-                + t.ToString(DT.h) + "'," + (int)ExamStt.Prep + ")";
-            return DBConnect.Ins("sqz_slot", "dt,t,stt", v);
->>>>>>> master
         }
 
         public List<DateTime> ListSl()
         {
             List<DateTime> r = new List<DateTime>();
-            foreach (ExamSlot sl in Slots.Values)
+            foreach (ExamSlot sl in vSl.Values)
                 r.Add(sl.Dt);
             return r;
         }
 
-        public List<string> DBSelectExaminee()
+        public List<string> DBSelNee(out string eMsg)
         {
-<<<<<<< HEAD
             MySqlConnection conn = DBConnect.Init();
             if (conn == null)
             {
@@ -155,22 +141,19 @@ namespace sQzLib
                 DBConnect.Close(ref conn);
                 return null;
             }
-=======
-            string cond = "dt='" + mDt.ToString(DT._) + "'";
-            MySqlDataReader reader = DBConnect.exeQrySelect("sqz_examinee", "lv,id", cond);
->>>>>>> master
             List<string> r = new List<string>();
             while (reader.Read())
                 r.Add(reader.GetChar(0).ToString() + reader.GetUInt16(1).ToString("d4"));
             reader.Close();
+            DBConnect.Close(ref conn);
             return r;
         }
 
         public byte[] ToByteSl1(int rId)
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(Slots.Count));
-            foreach (ExamSlot sl in Slots.Values)
+            l.Add(BitConverter.GetBytes(vSl.Count));
+            foreach (ExamSlot sl in vSl.Values)
                 l.InsertRange(l.Count, sl.ToByteR1(rId));
             int sz = DT.BYTE_COUNT;
             foreach (byte[] x in l)
@@ -201,7 +184,7 @@ namespace sQzLib
                 if (DT.ReadByteh(buf, ref offs, out dt))
                     return true;
                 ExamSlot sl;
-                if(Slots.TryGetValue(dt.ToString(DT.hh), out sl))
+                if(vSl.TryGetValue(dt.ToString(DT.hh), out sl))
                 {
                     if (sl.ReadByteR1(buf, ref offs))
                         return true;
@@ -212,7 +195,7 @@ namespace sQzLib
                     sl.Dt = dt;
                     if (sl.ReadByteR1(buf, ref offs))
                         return true;
-                    Slots.Add(sl.Dt.ToString(DT.hh), sl);
+                    vSl.Add(sl.Dt.ToString(DT.hh), sl);
                 }
             }
             if (n == 0)
@@ -224,8 +207,8 @@ namespace sQzLib
         public byte[] ToByteSl0(byte[] prefx)
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(Slots.Count));
-            foreach (ExamSlot sl in Slots.Values)
+            l.Add(BitConverter.GetBytes(vSl.Count));
+            foreach (ExamSlot sl in vSl.Values)
                 l.InsertRange(l.Count, sl.ToByteR0());
             int sz = prefx.Length + DT.BYTE_COUNT;
             foreach (byte[] x in l)
@@ -261,7 +244,7 @@ namespace sQzLib
                 if (DT.ReadByteh(buf, ref offs, out dt))
                     return -1;
                 ExamSlot sl;
-                if (Slots.TryGetValue(dt.ToString(DT.hh), out sl) &&
+                if (vSl.TryGetValue(dt.ToString(DT.hh), out sl) &&
                     (rid = sl.ReadByteR0(buf, ref offs)) < 0)
                         return -1;
             }
@@ -274,8 +257,8 @@ namespace sQzLib
         public byte[] ToByteQPack(int rid)
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(Slots.Count));
-            foreach (ExamSlot sl in Slots.Values)
+            l.Add(BitConverter.GetBytes(vSl.Count));
+            foreach (ExamSlot sl in vSl.Values)
                 l.InsertRange(l.Count, sl.ToByteQPack(rid));
             int sz = DT.BYTE_COUNT;
             foreach (byte[] x in l)
@@ -305,7 +288,7 @@ namespace sQzLib
                 if (DT.ReadByteh(buf, ref offs, out dt))
                     return true;
                 ExamSlot sl;
-                if(!Slots.TryGetValue(dt.ToString(DT.hh), out sl) ||
+                if(!vSl.TryGetValue(dt.ToString(DT.hh), out sl) ||
                     sl.ReadByteQPack(buf, ref offs))
                     return true;
             }
@@ -318,8 +301,8 @@ namespace sQzLib
         public byte[] ToByteKey()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(Slots.Count));
-            foreach (ExamSlot sl in Slots.Values)
+            l.Add(BitConverter.GetBytes(vSl.Count));
+            foreach (ExamSlot sl in vSl.Values)
                 l.InsertRange(l.Count, sl.ToByteKey());
             int sz = DT.BYTE_COUNT;
             foreach (byte[] a in l)
@@ -349,7 +332,7 @@ namespace sQzLib
                 if (DT.ReadByteh(buf, ref offs, out dt))
                     return true;
                 ExamSlot sl;
-                if (!Slots.TryGetValue(dt.ToString(DT.hh), out sl) ||
+                if (!vSl.TryGetValue(dt.ToString(DT.hh), out sl) ||
                     sl.ReadByteKey(buf, ref offs))
                     return true;
             }
@@ -359,56 +342,47 @@ namespace sQzLib
                 return true;
         }
 
-        public bool DBInsResult(int rid)
+        public bool DBUpdateRs(int rid, out string eMsg)
         {
-<<<<<<< HEAD
             MySqlConnection conn = DBConnect.Init();
             if(conn == null)
             {
                 eMsg = Txt.s._((int)TxI.DB_NOK);
                 return true;
             }
-=======
->>>>>>> master
             StringBuilder vals = new StringBuilder();
-            foreach (ExamSlot sl in Slots.Values)
+            foreach (ExamSlot sl in vSl.Values)
                 sl.DBUpdateRs(rid, vals);
             bool rval;
             if (0 < vals.Length)
             {
                 vals.Remove(vals.Length - 1, 1);//remove the last comma
                 int rs;
-<<<<<<< HEAD
                 rval = (rs = DBConnect.Ins(conn, "sqz_nee_qsheet",
                     "dt,lv,neeid,qsid,t1,t2,grade,comp,ans", vals.ToString(), out eMsg)) < 0;
                 if (rs == DBConnect.PRI_KEY_EXISTS)
                     eMsg = Txt.s._((int)TxI.RS_UP_EXISTS);
-=======
-                rval = (rs = DBConnect.Ins("sqz_nee_qsheet",
-                    "dt,lv,neeid,qsid,t1,t2,grade,comp,ans", vals.ToString())) < 0;
->>>>>>> master
             }
             else
+            {
                 rval = true;
-<<<<<<< HEAD
                 eMsg = Txt.s._((int)TxI.RS_UP_NOTHING);
             }
-=======
->>>>>>> master
             if(!rval)
             {
-                foreach (ExamSlot sl in Slots.Values)
-                    sl.SaveCommitTime(rid);
+                foreach (ExamSlot sl in vSl.Values)
+                    sl.DBUpT2(conn, rid, out eMsg);
             }
+            DBConnect.Close(ref conn);
             return rval;
         }
 
         public void DBUpStt()
         {
-            foreach(ExamSlot sl in Slots.Values)
+            foreach(ExamSlot sl in vSl.Values)
             {
                 bool bArch = true;
-                foreach (ExamRoom r in sl.Rooms.Values)
+                foreach (ExamRoom r in sl.vRoom.Values)
                     if (0 < r.vExaminee.Count && r.t2.Hour == DT.INV)
                     {
                         bArch = false;
@@ -416,7 +390,7 @@ namespace sQzLib
                     }
                 if (bArch)
                 {
-                    sl.eStt = ExamStt.Archive;
+                    sl.eStt = ExamStt.Arch;
                     sl.DBUpStt();
                 }
             }

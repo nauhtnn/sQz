@@ -8,7 +8,6 @@ namespace sQzLib
 {
     public sealed class ExamineeC : ExamineeA
     {
-<<<<<<< HEAD
 
         public TimeSpan kDtDuration;
         public TimeSpan FullTestDuration;
@@ -40,44 +39,24 @@ namespace sQzLib
             Utils.AppendBytesOfString(ID, l);
             l.Add(BitConverter.GetBytes(TestType));
             l.Add(BitConverter.GetBytes((int)eStt));
-=======
-        public ExamineeC():base() { }
-        public ExamineeC(string id)
-        {
-            ParseLvID(id);
-        }
-        public override List<byte[]> ToByte()
-        {
-            List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(LvId));
-            l.Add(BitConverter.GetBytes((int)mPhase));
->>>>>>> master
 			l.Add(BitConverter.GetBytes(bLog));
 
-            if (mPhase < ExamineePhase.Examing || bLog)
+            if (eStt < NeeStt.Examing || bLog)
             {
                 Utils.AppendBytesOfString(Birthdate, l);
                 Utils.AppendBytesOfString(ComputerName, l);
             }
 
-            if (mPhase < ExamineePhase.Examing)
+            if (eStt < NeeStt.Examing)
                 return l;
 
-<<<<<<< HEAD
             l.Add(BitConverter.GetBytes(AnswerSheet.QuestSheetID));
-=======
-            l.Add(BitConverter.GetBytes(mAnsSheet.uQSLvId));
->>>>>>> master
 
-            if (mPhase < ExamineePhase.Submitting)
+            if (eStt < NeeStt.Submitting)
                 return l;
 
-<<<<<<< HEAD
             l.Add(BitConverter.GetBytes(AnswerSheet.BytesOfAnswer_Length));
             l.Add(AnswerSheet.BytesOfAnswer);
-=======
-            l.Add(mAnsSheet.aAns);
->>>>>>> master
 
             return l;
         }
@@ -95,19 +74,19 @@ namespace sQzLib
             if (l < 4)
                 return true;
             int x;
-            if (Enum.IsDefined(typeof(ExamineePhase), x = BitConverter.ToInt32(buf, offs)))
-                mPhase = (ExamineePhase)x;
+            if (Enum.IsDefined(typeof(NeeStt), x = BitConverter.ToInt32(buf, offs)))
+                eStt = (NeeStt)x;
             l -= 4;
             offs += 4;
 
-            if (mPhase == ExamineePhase.Finished)
+            if (eStt == NeeStt.Finished)
             {
                 CorrectCount = BitConverter.ToInt32(buf, offs);
                 l -= 4;
                 offs += 4;
             }
 
-			if(mPhase < ExamineePhase.Submitting || bLog)
+			if(eStt < NeeStt.Submitting || bLog)
 			{
 				Birthdate = Utils.ReadBytesOfString(buf, ref offs, ref l);
 				Name = Utils.ReadBytesOfString(buf, ref offs, ref l);
@@ -135,7 +114,6 @@ namespace sQzLib
 
         public bool ToLogFile(int m, int s)
         {
-<<<<<<< HEAD
             bool err = false;
             string p = null;
             try
@@ -167,12 +145,6 @@ namespace sQzLib
             w.Write(AnswerSheet.BytesOfAnswer_Length);
             w.Write(AnswerSheet.BytesOfAnswer, 0, AnswerSheet.BytesOfAnswer_Length);
             if (eStt == NeeStt.Finished)
-=======
-            mPhase = e.mPhase;
-            if (mPhase == ExamineePhase.Finished)
-                uGrade = e.uGrade;
-            if (mPhase < ExamineePhase.Finished || bLog)
->>>>>>> master
             {
                 w.Write(dtTim1.Hour);
                 w.Write(dtTim1.Minute);

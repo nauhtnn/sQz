@@ -25,21 +25,14 @@ namespace sQzLib
         public List<byte[]> GetBytes_SendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
-<<<<<<< HEAD
             Utils.AppendBytesOfString(ID, l);
             l.Add(BitConverter.GetBytes(TestType));
             l.Add(BitConverter.GetBytes((int)eStt));
-=======
-            l.Add(BitConverter.GetBytes((int)Lv));
-            l.Add(BitConverter.GetBytes(uId));
-            l.Add(BitConverter.GetBytes((int)mPhase));
-            byte[] b;
->>>>>>> master
 
             Utils.AppendBytesOfString(Birthdate, l);
             Utils.AppendBytesOfString(Name, l);
 
-            if (mPhase < ExamineePhase.Finished)
+            if (eStt < NeeStt.Finished)
                 return l;
 
             l.Add(BitConverter.GetBytes(dtTim1.ToBinary()));
@@ -59,17 +52,8 @@ namespace sQzLib
             //suppose eStt == NeeStt.Finished
             int l = buf.Length - offs;
             //
-<<<<<<< HEAD
             ID = Utils.ReadBytesOfString(buf, ref offs, ref l);
             if (ID.Length == 0)
-=======
-            if (l < 12)
-                return true;
-            int x;
-            if (Enum.IsDefined(typeof(Level), x = BitConverter.ToInt32(buf, offs)))
-                Lv = (Level)x;
-            else
->>>>>>> master
                 return true;
 
             ComputerName = Utils.ReadBytesOfString(buf, ref offs, ref l);
@@ -88,20 +72,9 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-<<<<<<< HEAD
             AnswerSheet.BytesOfAnswer_Length = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
-=======
-            }
-            mAnsSheet.uQSLvId = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
-            mAnsSheet.aAns = new byte[AnsSheet.LEN];
-            Array.Copy(buf, offs, mAnsSheet.aAns, 0, AnsSheet.LEN);
-            l -= AnsSheet.LEN;
-            offs += AnsSheet.LEN;
->>>>>>> master
 
             if (l < AnswerSheet.BytesOfAnswer_Length)
                 return true;
@@ -126,18 +99,13 @@ namespace sQzLib
 
         public void MergeWithS1(ExamineeA e)
         {
-            if (mPhase == ExamineePhase.Finished)
+            if (eStt == NeeStt.Finished)
                 return;
             //suppose eStt = eINFO and e.eStt = NeeStt.Finished
-            mPhase = ExamineePhase.Finished;
+            eStt = NeeStt.Finished;
             bToVw = bToDB = true;
-<<<<<<< HEAD
             ComputerName = e.ComputerName;
             AnswerSheet = e.AnswerSheet;
-=======
-            tComp = e.tComp;
-            mAnsSheet = e.mAnsSheet;
->>>>>>> master
             dtTim1 = e.dtTim1;
             CorrectCount = e.CorrectCount;
             dtTim2 = e.dtTim2;

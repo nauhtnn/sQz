@@ -58,8 +58,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="TakeExamModel.cs" />
-    <Compile Include="Views\TakeExamView.cs" />
     <Compile Include="TakeExam.xaml.cs" />
     <Page Include="Authentication.xaml">
       <Generator>MSBuild:Compile</Generator>
@@ -101,7 +99,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <None Include="ClassDiagram1.cd" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
