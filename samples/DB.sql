@@ -45,8 +45,8 @@ CREATE TABLE IF NOT EXISTS `sqz_sec_type`(`id` INT PRIMARY KEY,
 INSERT INTO `sqz_sec_type` VALUES (0, 'DefaultIndependentQuestions'), (1, 'BasicPassage'), (2, 'PassageWithBlanks');
 
 CREATE TABLE IF NOT EXISTS `sqz_section`(`id` INT PRIMARY KEY,
-`s_type` INT, `req` TEXT,
-`psg` TEXT, `config` TEXT,
+`s_type` INT, `req` TEXT CHARACTER SET `utf8mb4`,
+`psg` TEXT CHARACTER SET `utf8mb4`, `config` TEXT CHARACTER SET `utf8mb4`,
 FOREIGN KEY(`s_type`) REFERENCES `sqz_sec_type`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
