@@ -42,7 +42,7 @@ namespace sQzLib
             if (System.IO.File.Exists(filePath))
                 mSrvrPort = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
             else
-                mSrvrPort = 23821;
+                mSrvrPort = 23823;
             dgBufHndl = hndl;
             dgBufPrep = prep;
             bRW = false;

@@ -22,7 +22,7 @@ namespace sQzLib
         public Server2(DgSrvrBufHndl dg)
         {
             string filePath = "ServerPort2.txt";
-            mPort = 23820;
+            mPort = 23822;
             if (System.IO.File.Exists(filePath))
                 mPort = Convert.ToInt32(System.IO.File.ReadAllText(filePath));
             bRW1 = bListning = false;
