@@ -11,10 +11,10 @@ namespace sQzLib
 {
     public class FirewallHandler
     {
-        private int portSrvr0 = 23820;
-        private int portSrvr1 = 23821;
-        private string portNameSrvr0 = "sQz Server 0";
-        private string portNameSrvr1 = "sQz Server 1";
+        private int portSrvr0 = 23822;
+        private int portSrvr1 = 23823;
+        private string portNameSrvr0 = "Simple Quiz Server 0";
+        private string portNameSrvr1 = "Simple Quiz Server 1";
         private int[] portsSocket;
         private string[] portsName;
         private INetFwProfile fwProfile = null;

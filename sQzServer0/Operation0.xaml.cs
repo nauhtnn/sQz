@@ -229,7 +229,13 @@ namespace sQzServer0
                     {
                         string emsg;
                         if (Slot.DBUpdateRs(rid, out emsg))
+                        {
                             mCbMsg += emsg;
+                            Dispatcher.InvokeAsync(() =>
+                            {
+                                MessageBox.Show(mCbMsg.txt);
+                            });
+                        }
                         else if (emsg == null)
                         {
                             mCbMsg += Txt.s._((int)TxI.SRVR_DB_OK);

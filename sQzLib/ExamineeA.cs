@@ -28,7 +28,7 @@ namespace sQzLib
         //public static string gId(ExamLv lv, int id) { return lv.ToString() + id.ToString("d4"); }
         public string Name;
         public string Birthdate;
-        public int CorrectCount;
+        public double Grade2Decimal;
 
         public string ComputerName;
         public DateTime dtTim1;
@@ -44,7 +44,7 @@ namespace sQzLib
             Name = null;
             Birthdate = null;
             eStt = NeeStt.Signing;
-            CorrectCount = LV_CAP;
+            Grade2Decimal = LV_CAP;
             dtTim1 = dtTim2 = DT.INVALID;
             ComputerName = string.Empty;
             AnswerSheet = new AnswerSheet();
@@ -53,7 +53,7 @@ namespace sQzLib
         public string Grade {
             get
             {
-                return CorrectCount.ToString();
+                return Grade2Decimal.ToString();
             }
         }
     }

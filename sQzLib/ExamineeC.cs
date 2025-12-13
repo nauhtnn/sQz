@@ -81,9 +81,9 @@ namespace sQzLib
 
             if (eStt == NeeStt.Finished)
             {
-                CorrectCount = BitConverter.ToInt32(buf, offs);
-                l -= 4;
-                offs += 4;
+                Grade2Decimal = BitConverter.ToDouble(buf, offs);
+                l -= 8;
+                offs += 8;
             }
 
 			if(eStt < NeeStt.Submitting || bLog)
@@ -101,7 +101,7 @@ namespace sQzLib
         {
             TestType = e.TestType;
             if (e.eStt == NeeStt.Finished)
-                CorrectCount = e.CorrectCount;
+                Grade2Decimal = e.Grade2Decimal;
             if (e.eStt < NeeStt.Finished || bLog)
             {
                 Birthdate = e.Birthdate;

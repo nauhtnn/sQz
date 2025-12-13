@@ -83,7 +83,7 @@ namespace sQzLib
         public void WriteExamineeResult(ExamineeS0 examinee)
         {
             mDocxBody.AppendChild(new Paragraph(CreateBoldItalicRun(
-                Txt.s._((int)TxI.PRINT_CORRECT_COUNT) + examinee.CorrectCount)));
+                Txt.s._((int)TxI.PRINT_CORRECT_COUNT) + examinee.Grade2Decimal)));
         }
 
         public void WriteSelectedLabels(QuestSheet qsheet, byte[] bytesOfAnswer, char[] answerKey)

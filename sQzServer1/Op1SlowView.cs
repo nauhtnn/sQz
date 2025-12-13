@@ -127,7 +127,7 @@ namespace sQzServer1
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.HorizontalAlignment = HorizontalAlignment.Center;
-                    if (e.CorrectCount != ExamineeA.LV_CAP)
+                    if (e.Grade2Decimal != ExamineeA.LV_CAP)
                     {
                         t.Text = e.Grade;
                         cbx.IsEnabled = false;
@@ -158,7 +158,7 @@ namespace sQzServer1
         //    foreach (ExamRoomA r in vRoom)
         //        foreach (ExamineeA e in r.Examinees.Values)
         //        {
-        //            if (e.CorrectCount != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
+        //            if (e.Grade2Decimal != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
         //                t.Text = e.Grade;
         //            if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.ID, out t))
         //                t.Text = e.dtTim1.ToString(DT.hh);

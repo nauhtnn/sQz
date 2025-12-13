@@ -81,7 +81,7 @@ namespace sQzLib
             return false;
         }
 
-        public int Grade(byte[] ans)
+        public double Grade(byte[] ans)
         {
             if (ans == null)
                 return 101;
@@ -101,7 +101,7 @@ namespace sQzLib
                     ++grade;
                 offs = offs4;
             }
-            return grade;
+            return grade * 0.25;
         }
 
         public void Disable()

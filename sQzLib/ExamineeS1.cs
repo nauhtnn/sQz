@@ -29,7 +29,7 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(TestType));
             l.Add(BitConverter.GetBytes((int)eStt));
             if (eStt == NeeStt.Finished)
-                l.Add(BitConverter.GetBytes(CorrectCount));
+                l.Add(BitConverter.GetBytes(Grade2Decimal));
 
             if (eStt < NeeStt.Finished || bLog)
             {
@@ -152,11 +152,11 @@ namespace sQzLib
                 return true;
             l -= sizeof(long);
 
-            if (l < 4)
+            if (l < 8)
                 return true;
-            CorrectCount = BitConverter.ToInt32(buf, offs);
-            l -= 4;
-            offs += 4;
+            Grade2Decimal = BitConverter.ToDouble(buf, offs);
+            l -= 8;
+            offs += 8;
 
             ComputerName = Utils.ReadBytesOfString(buf, ref offs, ref l);
             //
@@ -177,7 +177,7 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(AnswerSheet.BytesOfAnswer.Length));
             l.Add(AnswerSheet.BytesOfAnswer);
             l.Add(BitConverter.GetBytes(dtTim2.ToBinary()));
-            l.Add(BitConverter.GetBytes(CorrectCount));
+            l.Add(BitConverter.GetBytes(Grade2Decimal));
             return l;
         }
 
@@ -209,7 +209,7 @@ namespace sQzLib
             TestType = e.TestType;
             dtTim1 = e.dtTim1;
             dtTim2 = e.dtTim2;
-            CorrectCount = e.CorrectCount;
+            Grade2Decimal = e.Grade2Decimal;
         }
     }
 }

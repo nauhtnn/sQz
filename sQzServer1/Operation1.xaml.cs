@@ -45,7 +45,7 @@ namespace sQzServer1
             mState = NetCode.Srvr1DatRetriving;
             mClnt = new Client2(ClntBufHndl, ClntBufPrep, true);
             mServer = new Server2(SrvrBufHndl);
-            mServer.SrvrPort = 23821;
+            mServer.SrvrPort = 23823;
             mCbMsg = new UICbMsg();
             //bRunning = true;
 
@@ -325,7 +325,7 @@ namespace sQzServer1
                         {
                             o.eStt = NeeStt.Finished;
                             o.AnswerSheet = nee_submitting.AnswerSheet;
-                            o.CorrectCount = answerKeySheet.Grade(nee_submitting.AnswerSheet.BytesOfAnswer);
+                            o.Grade2Decimal = answerKeySheet.Grade(nee_submitting.AnswerSheet.BytesOfAnswer);
                             o.dtTim2 = DateTime.Now;
                             foreach (SortedList<string, bool> sl in vfbLock)
                                 if (sl.ContainsKey(nee_submitting.ID))

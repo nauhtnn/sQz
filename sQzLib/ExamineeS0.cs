@@ -38,7 +38,7 @@ namespace sQzLib
             l.Add(BitConverter.GetBytes(dtTim1.ToBinary()));
 
             l.Add(BitConverter.GetBytes(dtTim2.ToBinary()));
-            l.Add(BitConverter.GetBytes(CorrectCount));
+            l.Add(BitConverter.GetBytes(Grade2Decimal));
             if(0 < ComputerName.Length)
                 Utils.AppendBytesOfString(ComputerName, l);
             else
@@ -89,10 +89,10 @@ namespace sQzLib
             l -= sizeof(long);
             offs += sizeof(long);
 
-            if (l < 4)
+            if (l < 8)
                 return true;
-            CorrectCount = BitConverter.ToInt32(buf, offs);
-            offs += 4;
+            Grade2Decimal = BitConverter.ToDouble(buf, offs);
+            offs += 8;
             //
             return false;
         }
@@ -107,7 +107,7 @@ namespace sQzLib
             ComputerName = e.ComputerName;
             AnswerSheet = e.AnswerSheet;
             dtTim1 = e.dtTim1;
-            CorrectCount = e.CorrectCount;
+            Grade2Decimal = e.Grade2Decimal;
             dtTim2 = e.dtTim2;
         }
 
@@ -191,7 +191,7 @@ namespace sQzLib
                 return true;
             }
             if (reader.Read())
-                CorrectCount = reader.GetInt16(0);
+                Grade2Decimal = reader.GetDouble(0);
             reader.Close();
             DBConnect.Close(ref conn);
             return false;

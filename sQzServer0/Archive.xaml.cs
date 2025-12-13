@@ -256,6 +256,25 @@ namespace sQzServer0
             QSheetExamineePrinter.CloseDocx();
         }
 
+        private void ExportExamineeCsv()
+        {
+            StringBuilder resultCsv = new StringBuilder();
+
+            foreach (ExamRoomS0 room in Slot.Rooms.Values)
+                foreach (ExamineeS0 nee in room.Examinees.Values)
+                {
+                    nee.DBSelGrade();
+                    resultCsv.AppendLine(nee.ID + ',' +
+                        nee.Birthdate + ',' +
+                        nee.Grade2Decimal.ToString("F2",
+                            System.Globalization.CultureInfo.InvariantCulture) + ',' +
+                        nee.dtTim1 + ',' +
+                        nee.dtTim2);
+                }
+            System.IO.File.WriteAllText("Result.csv", resultCsv.ToString(),
+                System.Text.Encoding.UTF8);
+        }
+
         private void lbxNee_Selected(object sender, RoutedEventArgs e)
         {
             ListBoxItem i = sender as ListBoxItem;
@@ -387,7 +406,8 @@ namespace sQzServer0
 
         private void btnExportExaminees_Click(object sender, RoutedEventArgs e)
         {
-            PrintAllExaminees();
+            ExportExamineeCsv();
+            //PrintAllExaminees();
         }
     }
 }
