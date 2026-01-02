@@ -26,7 +26,7 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             Utils.AppendBytesOfString(ID, l);
-            l.Add(BitConverter.GetBytes(TestType));
+            l.Add(BitConverter.GetBytes(Subject));
             l.Add(BitConverter.GetBytes((int)eStt));
 
             Utils.AppendBytesOfString(Birthdate, l);
@@ -116,29 +116,29 @@ namespace sQzLib
             MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
             {
-                TestType = -1;
+                Subject = -1;
                 AnswerSheet.QuestSheetID = -1;
                 return;
             }
-            string qry = DBConnect.mkQrySelect("sqz_examinee AS a, sqz_nee_qsheet AS b", "t_type, qsid",
+            string qry = DBConnect.mkQrySelect("sqz_examinee AS a, sqz_nee_qsheet AS b", "subj_id, qsid",
                 "a.dt='" + mDt.ToString(DT._) + "' AND a.id='" + ID + "' AND a.dt=b.dt AND a.id=b.neeid");
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
                 DBConnect.Close(ref conn);
-                TestType = -1;
+                Subject = -1;
                 AnswerSheet.QuestSheetID = -1;
                 return;
             }
             if (reader.Read())
             {
-                TestType = reader.GetInt32(0);
+                Subject = reader.GetInt32(0);
                 AnswerSheet.QuestSheetID = reader.GetInt32(1);
             }
             else
             {
-                TestType = -1;
+                Subject = -1;
                 AnswerSheet.QuestSheetID = -1;
             }
             reader.Close();
@@ -171,7 +171,7 @@ namespace sQzLib
                 AnswerSheet.BytesOfAnswer = new byte[ans.Length];
                 AnswerSheet.BytesOfAnswer_Length = AnswerSheet.BytesOfAnswer.Length;
                 for (int i = 0; i < ans.Length; ++i)
-                    if (ans[i] == Question.C1)
+                    if (ans[i] == QuestionAnswer.TRUE)
                         AnswerSheet.BytesOfAnswer[i] = 1;
             }
         }

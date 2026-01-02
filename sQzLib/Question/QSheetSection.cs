@@ -12,7 +12,7 @@ namespace sQzLib
 {
     public abstract class QSheetSection: ICloneable
     {
-        public static Dictionary<SectionTypeID, List<string>> SectionMagicKeywords;
+        public static Dictionary<SectionTypeID, List<string>> SectionClassifyingKeywords;
         public static string SECTION_MAGIC_PREFIX;
         const string SECTION_MAGIC_CFG_FILEPATH = "sectionMagicKeywords.txt";
 
@@ -54,7 +54,7 @@ namespace sQzLib
 
             SECTION_MAGIC_PREFIX = lines[0].Trim();
 
-            SectionMagicKeywords = new Dictionary<SectionTypeID, List<string>>();
+            SectionClassifyingKeywords = new Dictionary<SectionTypeID, List<string>>();
 
             for (int i = 1; i < lines.Length; ++i)
             {
@@ -70,13 +70,13 @@ namespace sQzLib
                 for (int j = 1; j < words.Length; ++j)
                     keywords.Add(words[j]);
                 SectionTypeID key = (SectionTypeID)Enum.Parse(typeof(SectionTypeID), words[0]);
-                if (SectionMagicKeywords.ContainsKey(key))
+                if (SectionClassifyingKeywords.ContainsKey(key))
                 {
                     System.Windows.MessageBox.Show("LoadSectionMagicKeywords error: duplicated section " + key);
                     return false;
                 }
                 else
-                    SectionMagicKeywords.Add(key, keywords);
+                    SectionClassifyingKeywords.Add(key, keywords);
             }
             return true;
         }
@@ -126,14 +126,14 @@ namespace sQzLib
         public static void InitDefaultMagicKeywords()
         {
             SECTION_MAGIC_PREFIX = string.Empty;
-            SectionMagicKeywords = new Dictionary<SectionTypeID, List<string>>();
+            SectionClassifyingKeywords = new Dictionary<SectionTypeID, List<string>>();
             List<string> magicKeywords = new List<string>();
             magicKeywords.Add("following [text|passage]");
             magicKeywords.Add("blank");
-            SectionMagicKeywords.Add(SectionTypeID.PassageWithBlanks, magicKeywords);
+            SectionClassifyingKeywords.Add(SectionTypeID.PassageWithBlanks, magicKeywords);
             magicKeywords = new List<string>();
             magicKeywords.Add("following [text|passage]");
-            SectionMagicKeywords.Add(SectionTypeID.BasicPassage, magicKeywords);
+            SectionClassifyingKeywords.Add(SectionTypeID.BasicPassage, magicKeywords);
         }
 
         public static void TrimToFirstSection(Queue<BasicRich_PlainText> tokens)
@@ -156,7 +156,7 @@ namespace sQzLib
 
         protected Question Parse1Question(Queue<BasicRich_PlainText> tokens)
         {
-            if (tokens.Count < Question.NUMBER_OF_OPTIONS + 2)//+ stem, answer
+            if (tokens.Count < OptionSelectAnswer.OPTION_COUNT + 2)//+ stem, answer
             {
                 System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " doesn't have 1 stem 4 options 1 answer!");
                 return null;
@@ -164,21 +164,43 @@ namespace sQzLib
 
             Question question = new Question();
             question.Stem = tokens.Dequeue().ToString();
-            question.vAns = new string[Question.NUMBER_OF_OPTIONS];
-            for (int j = 0; j < Question.NUMBER_OF_OPTIONS;)
-                question.vAns[j++] = tokens.Dequeue().ToString();
-            char key_label = tokens.Dequeue().Last();
-            if (key_label < 'A' || 'D' < key_label)
+            question.Options = new string[OptionSelectAnswer.OPTION_COUNT];
+            for (int j = 0; j < OptionSelectAnswer.OPTION_COUNT;)
+                question.Options[j++] = tokens.Dequeue().ToString();
+            
+            question.Answer = ParseQuestionAnswer(tokens);
+            if (question.Answer == null)
+                return null;
+            return question;
+        }
+
+        public byte[] ParseQuestionAnswer(Queue<BasicRich_PlainText> tokens)
+        {
+            string rawAnswerKey = tokens.Dequeue().GetInnerText();
+            int colon = rawAnswerKey.IndexOf(':');
+            if(colon < 0 || colon == rawAnswerKey.Length - 1)
             {
-                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has key: " + key_label +
-                    "\nNeighbor stem: " + question.Stem);
+                System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has error." +
+                    "\nAnswer key is not valid: " + rawAnswerKey);
                 return null;
             }
-            question.vKeys = new bool[Question.NUMBER_OF_OPTIONS];
-            for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
-                question.vKeys[j] = false;
-            question.vKeys[key_label - 'A'] = true;
-            return question;
+            
+            char[] letters = rawAnswerKey.Substring(colon + 1).ToCharArray();
+
+            byte[] answerKey = SingleAnswer.S().ParseAnswerKey(letters);
+
+            if (answerKey == null)
+            {
+                answerKey = MTFAnswer.S().ParseAnswerKey(letters);
+                if(answerKey == null)
+                {
+                    System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has error." +
+                        "\nAnswer key is not valid: " + rawAnswerKey);
+                    return null;
+                }
+            }
+
+            return answerKey;
         }
 
         protected bool ParseQuestions(Queue<BasicRich_PlainText> tokens)

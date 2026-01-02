@@ -16,21 +16,21 @@ PRIMARY KEY(`dt`, `rid`),
 FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`),
 FOREIGN KEY(`rid`) REFERENCES `sqz_room`(`id`));
 
-CREATE TABLE IF NOT EXISTS `sqz_test_type`(`id` INT PRIMARY KEY);
+CREATE TABLE IF NOT EXISTS `sqz_subject`(`id` INT PRIMARY KEY);
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet`(`dt` DATETIME,
-`id` INT, `t_type` INT,
+`id` INT, `subj_id` INT,
 PRIMARY KEY(`dt`, `id`),
 FOREIGN KEY(`dt`) REFERENCES `sqz_slot`(`dt`),
-FOREIGN KEY(`t_type`) REFERENCES `sqz_test_type`(`id`));
+FOREIGN KEY(`subj_id`) REFERENCES `sqz_subject`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_examinee`(`dt` DATETIME,
 `id` VARCHAR(8) CHARACTER SET `utf8mb4`, `rid` INT,
 `name` VARCHAR(64) CHARACTER SET `utf8mb4`,
-`birthdate` VARCHAR(10), `t_type` INT,
+`birthdate` VARCHAR(10), `subj_id` INT,
 PRIMARY KEY(`dt`, `id`),
 FOREIGN KEY(`dt`, `rid`) REFERENCES `sqz_slot_room`(`dt`, `rid`),
-FOREIGN KEY(`t_type`) REFERENCES `sqz_test_type`(`id`));
+FOREIGN KEY(`subj_id`) REFERENCES `sqz_subject`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATETIME,
 `neeid` VARCHAR(8) CHARACTER SET `utf8mb4`, `qsid` INT,
@@ -50,13 +50,13 @@ CREATE TABLE IF NOT EXISTS `sqz_section`(`id` INT PRIMARY KEY,
 FOREIGN KEY(`s_type`) REFERENCES `sqz_sec_type`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-`t_type` INT,
+`subj_id` INT,
 `secid` INT, `deleted` INT,
 `stem` TEXT CHARACTER SET `utf8mb4`,
 `ans0` TEXT CHARACTER SET `utf8mb4`, `ans1` TEXT CHARACTER SET `utf8mb4`,
 `ans2` TEXT CHARACTER SET `utf8mb4`, `ans3` TEXT CHARACTER SET `utf8mb4`,
 `akey` CHAR(4) CHARACTER SET `ascii`,
-FOREIGN KEY(`t_type`) REFERENCES `sqz_test_type`(`id`),
+FOREIGN KEY(`subj_id`) REFERENCES `sqz_subject`(`id`),
 FOREIGN KEY(`secid`) REFERENCES `sqz_section`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_qsheet_quest`(`dt` DATETIME,

@@ -37,7 +37,7 @@ namespace sQzLib
         {
             List<byte[]> l = new List<byte[]>();
             Utils.AppendBytesOfString(ID, l);
-            l.Add(BitConverter.GetBytes(TestType));
+            l.Add(BitConverter.GetBytes(Subject));
             l.Add(BitConverter.GetBytes((int)eStt));
 			l.Add(BitConverter.GetBytes(bLog));
 
@@ -67,7 +67,7 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-            TestType = BitConverter.ToInt32(buf, offs);
+            Subject = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
 
@@ -99,14 +99,14 @@ namespace sQzLib
 
         public void MergeWithS1(ExamineeA e)
         {
-            TestType = e.TestType;
+            Subject = e.Subject;
             if (e.eStt == NeeStt.Finished)
                 Grade2Decimal = e.Grade2Decimal;
             if (e.eStt < NeeStt.Finished || bLog)
             {
                 Birthdate = e.Birthdate;
                 Name = e.Name;
-                TestType = e.TestType;
+                Subject = e.Subject;
             }
             //bLog = false;
             eStt = e.eStt;//for safety, set the status last

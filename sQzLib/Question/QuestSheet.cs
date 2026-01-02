@@ -13,7 +13,7 @@ namespace sQzLib
         public int ID;
         public List<QSheetSection> Sections;
         public byte[] aQuest;
-        public int TestType;
+        public int Subject;
         private QIdxComparer<Question> SavedQuestOrderInDB;
         private QIdxComparer<QSheetSection> SavedSectionOrderInDB;
         //public int Count { get { return IndependentQuestions.Count; } }
@@ -42,7 +42,7 @@ namespace sQzLib
 
         public string GetGlobalID_withTestType()
         {
-            return (TestType * 1000 + ID).ToString("d4");
+            return (Subject * 1000 + ID).ToString("d4");
         }
 
         public int CountAllQuestions()
@@ -135,14 +135,14 @@ namespace sQzLib
         public void ExtractKey(AnswerSheet answerSheet)
         {
             answerSheet.QuestSheetID = ID;
-            answerSheet.TestType = TestType;
+            answerSheet.Subject = Subject;
             int bytes_length;
             int question_count = 0;
             if (0 < Sections.Count)
             {
                 foreach (QSheetSection section in Sections)
                     question_count += section.CountQuestions();
-                bytes_length = question_count * Question.NUMBER_OF_OPTIONS;
+                bytes_length = question_count * OptionSelectAnswer.OPTION_COUNT;
             }
             else
                 bytes_length = 0;
@@ -151,7 +151,7 @@ namespace sQzLib
             int i = -1;
             foreach(QSheetSection section in Sections)
                 foreach (Question q in section.Questions)
-                    foreach (bool x in q.vKeys)
+                    foreach (char x in q.Answer)
                         answerSheet.BytesOfAnswer[++i] = Convert.ToByte(x);
         }
 
@@ -162,11 +162,11 @@ namespace sQzLib
             if (q.Stem == null)
                 return null;
             //ans
-            q.vAns = new string[Question.NUMBER_OF_OPTIONS];
-            for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
+            q.Options = new string[OptionSelectAnswer.OPTION_COUNT];
+            for (int j = 0; j < OptionSelectAnswer.OPTION_COUNT; ++j)
             {
-                q.vAns[j] = Utils.ReadBytesOfString(buf, ref offs);
-                if (q.vAns[j] == null)
+                q.Options[j] = Utils.ReadBytesOfString(buf, ref offs);
+                if (q.Options[j] == null)
                     return null;
             }
             return q;
@@ -175,7 +175,7 @@ namespace sQzLib
         private void AppendBytesOf(Question q, List<byte[]> byteList)
         {
             Utils.AppendBytesOfString(q.Stem, byteList);
-            foreach (string option in q.vAns)
+            foreach (string option in q.Options)
                 Utils.AppendBytesOfString(option, byteList);
         }
 
@@ -426,7 +426,7 @@ namespace sQzLib
         {
             QuestSheet sheet = new QuestSheet();
             sheet.ID = ID;
-            sheet.TestType = TestType;
+            sheet.Subject = Subject;
 
             List<QSheetSection> sections = RandomizeDeepCopy_KeepSectionsOrder(rand);
             sheet.Sections = new List<QSheetSection>();
@@ -477,9 +477,9 @@ namespace sQzLib
         }
 
         //only Server0 uses this.
-        public void DBSelectNondeletedQuestions(int testType)
+        public void DBSelectNondeletedQuestions(int subject)
         {
-            TestType = testType;
+            Subject = subject;
             Sections.Clear();
             MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
@@ -487,7 +487,7 @@ namespace sQzLib
                 System.Windows.MessageBox.Show(Txt.s._((int)TxI.DB_NOK));
                 return;
             }
-            List<Question> allQuestions = DBSelectQuestions(conn, "deleted=0 AND t_type=" + TestType);
+            List<Question> allQuestions = DBSelectQuestions(conn, "deleted=0 AND subj_id=" + Subject);
             DBSelectSections(conn, allQuestions);
             DBConnect.Close(ref conn);
         }
@@ -579,13 +579,13 @@ namespace sQzLib
             else
                 q.SectionID = reader.GetInt32(1);
             q.Stem = reader.GetString(2);
-            q.vAns = new string[Question.NUMBER_OF_OPTIONS];
-            for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
-                q.vAns[j] = reader.GetString(3 + j);
+            q.Options = new string[OptionSelectAnswer.OPTION_COUNT];
+            for (int j = 0; j < OptionSelectAnswer.OPTION_COUNT; ++j)
+                q.Options[j] = reader.GetString(3 + j);
             string x = reader.GetString(7);
-            q.vKeys = new bool[Question.NUMBER_OF_OPTIONS];
-            for (int j = 0; j < Question.NUMBER_OF_OPTIONS; ++j)
-                q.vKeys[j] = (x[j] == Question.C1);
+            q.Answer = new byte[OptionSelectAnswer.OPTION_COUNT];
+            for (int j = 0; j < OptionSelectAnswer.OPTION_COUNT; ++j)
+                q.Answer[j] = (x[j] == QuestionAnswer.TRUE) ? QuestionAnswer.TRUE : QuestionAnswer.FALSE;
             return q;
         }
 
@@ -641,9 +641,9 @@ namespace sQzLib
             }
             if (questionVals.Length > 0)
             {
-                DB_InsertTestType_ifNExists(conn, TestType);
+                DB_InsertTestType_ifNExists(conn, Subject);
                 questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
-                if (DBConnect.Ins(conn, "sqz_question", "t_type,secid,deleted,stem,ans0,ans1,ans2,ans3,akey",
+                if (DBConnect.Ins(conn, "sqz_question", "subj_id,secid,deleted,stem,ans0,ans1,ans2,ans3,akey",
                 questionVals.ToString(), out eMsg) < 0)
                     System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
             }
@@ -660,19 +660,16 @@ namespace sQzLib
 
         private void AppendQuestionInsertQuery(Question q, StringBuilder query)
         {
-            query.Append("(" + TestType + ",");
+            query.Append("(" + Subject + ",");
             if (q.SectionID < 0)
                 query.Append("NULL,0,'");
             else
                 query.Append(q.SectionID + ",0,'");
             query.Append(DBConnect.SafeSQL_Text(q.Stem) + "','");
-            for (int i = 0; i < Question.NUMBER_OF_OPTIONS; ++i)
-                query.Append(DBConnect.SafeSQL_Text(q.vAns[i]) + "','");
-            for (int i = 0; i < Question.NUMBER_OF_OPTIONS; ++i)
-                if (q.vKeys[i])
-                    query.Append(Question.C1);
-                else
-                    query.Append(Question.C0);
+            for (int i = 0; i < OptionSelectAnswer.OPTION_COUNT; ++i)
+                query.Append(DBConnect.SafeSQL_Text(q.Options[i]) + "','");
+            for (int i = 0; i < OptionSelectAnswer.OPTION_COUNT; ++i)
+                query.Append(q.Answer);
             query.Append("'),");
         }
 
@@ -711,15 +708,15 @@ namespace sQzLib
             foreach (Question q in questions)
             {
                 ++i;
-                string[] sorted_answers = new string[Question.NUMBER_OF_OPTIONS];
-                bool[] sorted_keys = new bool[4];
+                var sorted_answers = new string[OptionSelectAnswer.OPTION_COUNT];
+                var sorted_keys = new byte[4];
                 for (int j = 0; j < 4; ++j)
                 {
-                    sorted_answers[j] = q.vAns[options_sorts[i][j] - Question.C0];
-                    sorted_keys[j] = q.vKeys[options_sorts[i][j] - Question.C0];
+                    sorted_answers[j] = q.Options[options_sorts[i][j] - '0'];
+                    sorted_keys[j] = q.Answer[options_sorts[i][j] - '0'];
                 }
-                q.vAns = sorted_answers;
-                q.vKeys = sorted_keys;
+                q.Options = sorted_answers;
+                q.Answer = sorted_keys;
             }
             //foreach (Question q in questions)
             //    if (q.PassageID == -1)

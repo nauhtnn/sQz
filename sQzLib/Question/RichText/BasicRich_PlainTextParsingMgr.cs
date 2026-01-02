@@ -41,9 +41,9 @@ namespace sQzLib
 
         private QSheetSection SelectSection(string text)
         {
-            if(RegexIsMatch(text, QSheetSection.SectionMagicKeywords[SectionTypeID.PassageWithBlanks]))
+            if(RegexIsMatch(text, QSheetSection.SectionClassifyingKeywords[SectionTypeID.PassageWithBlanks]))
                 return new PassageWithBlanks();
-            if (RegexIsMatch(text, QSheetSection.SectionMagicKeywords[SectionTypeID.BasicPassage]))
+            if (RegexIsMatch(text, QSheetSection.SectionClassifyingKeywords[SectionTypeID.BasicPassage]))
                 return new BasicPassageSection();
             return new IndependentQSection();
         }

@@ -7,22 +7,19 @@ namespace sQzLib
 {
     public class Question
     {
-        public const int NUMBER_OF_OPTIONS = 4;
-        public const char C0 = '0';
-        public const char C1 = '1';
         public int uId;
         public int SectionID;
         public string Stem;
-        public string[] vAns;
-        public bool[] vKeys;
-        public int[] vAnsSort;
+        public string[] Options;
+        public byte[] Answer;
+        public int[] OptionShuffle;
 
         public Question() {
-            vAns = null;
+            Options = null;
             SectionID = -1;
-            vAnsSort = new int[NUMBER_OF_OPTIONS];
-            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
-                vAnsSort[i] = i;
+            OptionShuffle = new int[OptionSelectAnswer.OPTION_COUNT];
+            for (int i = 0; i < OptionSelectAnswer.OPTION_COUNT; ++i)
+                OptionShuffle[i] = i;
         }
 
         TokenType classify(string s) {
@@ -33,7 +30,7 @@ namespace sQzLib
         {
             LinkedList<string> s = new LinkedList<string>();
             s.AddLast(Stem);
-            foreach (string i in vAns)
+            foreach (string i in Options)
                 s.AddLast(i);
             return s;
         }
@@ -63,100 +60,70 @@ namespace sQzLib
 
         public Question DeepCopy()
         {
-            Question q = new Question();
-            q.uId = uId;
-            q.Stem = Stem;
-            q.SectionID = SectionID;
-            q.vAns = new string[NUMBER_OF_OPTIONS];
-            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
-                q.vAns[i] = vAns[i];
-            q.vKeys = new bool[NUMBER_OF_OPTIONS];
-            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
-                q.vKeys[i] = vKeys[i];
-            q.vAnsSort = new int[NUMBER_OF_OPTIONS];
-            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
-                q.vAnsSort[i] = vAnsSort[i];
-            return q;
+            Question newQuestion = new Question();
+            newQuestion.uId = uId;
+            newQuestion.Stem = Stem;
+            newQuestion.SectionID = SectionID;
+            newQuestion.Options = new string[OptionSelectAnswer.OPTION_COUNT];
+            newQuestion.OptionShuffle = new int[OptionSelectAnswer.OPTION_COUNT];
+            newQuestion.Answer = new byte[OptionSelectAnswer.OPTION_COUNT];
+            for (int i = 0; i < OptionSelectAnswer.OPTION_COUNT; ++i)
+            {
+                newQuestion.Options[i] = Options[i];
+                newQuestion.OptionShuffle[i] = OptionShuffle[i];
+                newQuestion.Answer[i] = Answer[i];
+            }
+                
+            return newQuestion;
         }
 
-        public void Randomize(Random rand)
-        {
-            string[] anss = new string[NUMBER_OF_OPTIONS];
-            bool[] keys = new bool[NUMBER_OF_OPTIONS];
-            int[] asort = new int[NUMBER_OF_OPTIONS];
-            List<int> l = new List<int>();
-            int n = NUMBER_OF_OPTIONS;
-            for (int i = 0; i < n; ++i)
-                l.Add(i);
-            while (0 < n)
-            {
-                int lidx = rand.Next() % n;
-                int idx = l[lidx];
-                l.RemoveAt(lidx);
-                --n;
-                anss[n] = vAns[idx];
-                keys[n] = vKeys[idx];
-                asort[n] = idx;
-            }
-            vAns = anss;
-            vKeys = keys;
-            vAnsSort = asort;
-        }
+        //public void Randomize(Random rand)
+        //{
+        //    string[] newOptions = new string[OptionSelectAnswer.OPTION_COUNT];
+        //    int[] optionShuffle = new int[OptionSelectAnswer.OPTION_COUNT];
+        //    List<int> l = new List<int>();
+        //    int n = OptionSelectAnswer.OPTION_COUNT;
+        //    for (int i = 0; i < n; ++i)
+        //        l.Add(i);
+        //    while (0 < n)
+        //    {
+        //        int lidx = rand.Next() % n;
+        //        int idx = l[lidx];
+        //        l.RemoveAt(lidx);
+        //        --n;
+        //        newOptions[n] = Options[idx];
+        //        optionShuffle[n] = idx;
+        //    }
+        //    Options = newOptions;
+        //    Answer = newAnswerKey;
+        //    OptionShuffle = optionShuffle;
+        //}
 
         public Question RandomizeDeepCopy(Random rand)
         {
-            Question q = new Question();
-            q.uId = uId;
-            q.Stem = Stem;
-            q.SectionID = SectionID;
+            Question newQuestion = new Question();
+            newQuestion.uId = uId;
+            newQuestion.Stem = Stem;
+            newQuestion.SectionID = SectionID;
             //randomize
-            q.vAns = new string[NUMBER_OF_OPTIONS];
-            q.vKeys = new bool[NUMBER_OF_OPTIONS];
-            List<int> l = new List<int>();
-            for (int i = 0; i < NUMBER_OF_OPTIONS; ++i)
-                l.Add(i);
-            int n = NUMBER_OF_OPTIONS;
-            while (0 < n)
+            newQuestion.Options = new string[OptionSelectAnswer.OPTION_COUNT];
+            newQuestion.Answer = new byte[OptionSelectAnswer.OPTION_COUNT];
+            List<int> idxPool = new List<int>();
+            for (int i = 0; i < OptionSelectAnswer.OPTION_COUNT; ++i)
+                idxPool.Add(i);
+            int poolCount = OptionSelectAnswer.OPTION_COUNT;
+            while (0 < poolCount)
             {
-                int lidx = rand.Next() % n;
-                int idx = l[lidx];
-                l.RemoveAt(lidx);
-                --n;
-                q.vAns[n] = vAns[idx];
-                q.vKeys[n] = vKeys[idx];
-                q.vAnsSort[n] = idx;
+                int pickedLocation = rand.Next() % poolCount;
+                int pickedIdx = idxPool[pickedLocation];
+                idxPool.RemoveAt(pickedLocation);
+                --poolCount;
+                newQuestion.OptionShuffle[poolCount] = pickedIdx;
+                newQuestion.Options[poolCount] = Options[pickedIdx];
+                newQuestion.Answer[poolCount] = Answer[poolCount];
             }
-            return q;
+
+            return newQuestion;
         }
-    }
-
-    public enum QuestType
-    {
-        Single = 1,
-        Multiple = 2,
-        Insertion = 4,
-        Selection = 8,
-        Matching = 16
-    }
-
-    public enum ContentType
-    {
-        Raw = 1,
-        Image = 2,
-        Audio = 4,
-        Video = 8
-    }
-
-    public enum TokenType
-    {
-        Requirement = 0,
-        Stem = 1,
-        Ans = 2,
-        Both = 3
-    }
-
-    public enum IUx
-    {
-        _1 = 0, _2, _3, _4, _5, _6, _7, _8, _9, _10, _11, _12, _13, _14, _15, _0
     }
 }

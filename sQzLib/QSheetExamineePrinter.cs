@@ -27,12 +27,12 @@ namespace sQzLib
         private void WriteSeletedLabel(Question question, int questionIdx, byte[] optionStatusArray, char[] answerKeys)
         {
             char selectedLabel = 'A';
-            int entireAnswerSheet_optionIdx = questionIdx * Question.NUMBER_OF_OPTIONS;
+            int entireAnswerSheet_optionIdx = questionIdx * OptionSelectAnswer.OPTION_COUNT;
             bool noSelection = true;
             char correctLabel = 'A';
             bool notFoundCorrect = true;
 
-            for(int optionIdx = 0; optionIdx < Question.NUMBER_OF_OPTIONS;
+            for(int optionIdx = 0; optionIdx < OptionSelectAnswer.OPTION_COUNT;
                 ++optionIdx, ++entireAnswerSheet_optionIdx)
             {
                 if (noSelection)

@@ -26,7 +26,7 @@ namespace sQzLib
         public byte[] GetBytes_SendingToClient()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(TestType));
+            l.Add(BitConverter.GetBytes(Subject));
             l.Add(BitConverter.GetBytes((int)eStt));
             if (eStt == NeeStt.Finished)
                 l.Add(BitConverter.GetBytes(Grade2Decimal));
@@ -52,7 +52,7 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-            TestType = BitConverter.ToInt32(buf, offs);
+            Subject = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
 
@@ -116,7 +116,7 @@ namespace sQzLib
 
             if (l < 4)
                 return true;
-            TestType = BitConverter.ToInt32(buf, offs);
+            Subject = BitConverter.ToInt32(buf, offs);
             l -= 4;
             offs += 4;
 
@@ -206,7 +206,7 @@ namespace sQzLib
         {
             //suppose e.eStt = NeeStt.Finished
             eStt = e.eStt;
-            TestType = e.TestType;
+            Subject = e.Subject;
             dtTim1 = e.dtTim1;
             dtTim2 = e.dtTim2;
             Grade2Decimal = e.Grade2Decimal;

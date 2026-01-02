@@ -301,7 +301,7 @@ namespace sQzServer0
                     t.HorizontalAlignment = HorizontalAlignment.Center;
                     g.Children.Add(t);
                     t = new TextBlock();
-                    t.Text = e.TestType.ToString();
+                    t.Text = e.Subject.ToString();
                     if (dark)
                         t.Background = br;
                     Grid.SetRow(t, rid);

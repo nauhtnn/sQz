@@ -64,9 +64,10 @@ namespace sQzClient
             w.FontSize = 15;
 
             double mrg = FontSize / 2;
-            SingleQuestionView.IdxWidth = 3 * mrg;
-            SingleQuestionView.staticMargin = new Thickness(mrg, mrg, 0, mrg);
-            SingleQuestionView.StemWidth = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - SingleQuestionView.IdxWidth;
+            SingleAnswerMCQView.IdxWidth = 3 * mrg;
+            SingleAnswerMCQView.staticMargin = new Thickness(mrg, mrg, 0, mrg);
+            //SingleQuestionView.StemWidth = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - SingleQuestionView.IdxWidth;
+            OptionViewFactory.S().StemWidth = (svwrQSh.Width - SystemParameters.ScrollWidth) / 2 - mrg - mrg - SingleAnswerMCQView.IdxWidth;
 
             InitQuesttonSheetView();
             InitAnswerSheet();
@@ -212,8 +213,8 @@ namespace sQzClient
         private bool LabelFromSaveFile(int questionIdx, out char label)
         {
             label = 'A';
-            for(int optionIdx = questionIdx * Question.NUMBER_OF_OPTIONS,
-                end = optionIdx + Question.NUMBER_OF_OPTIONS;
+            for(int optionIdx = questionIdx * OptionSelectAnswer.OPTION_COUNT,
+                end = optionIdx + OptionSelectAnswer.OPTION_COUNT;
                 optionIdx < end; ++optionIdx)
             {
                 if (thisExaminee.AnswerSheet.BytesOfAnswer[optionIdx] == 0)
@@ -221,7 +222,7 @@ namespace sQzClient
                 else
                     break;
             }
-            if (label < 'A' + Question.NUMBER_OF_OPTIONS)
+            if (label < 'A' + OptionSelectAnswer.OPTION_COUNT)
                 return true;
             return false;
         }
@@ -258,21 +259,23 @@ namespace sQzClient
                 svwrQSh.Width - FontSize * 2 - SystemParameters.ScrollWidth * 4);
             foreach(object i in qsheetView.Children)
             {
-                SingleQuestionView q = i as SingleQuestionView;
+                SingleAnswerMCQView q = i as SingleAnswerMCQView;
                 if(q != null)
                 {
+                    /*temporary rem to test, MUST unrem later
                     q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
-                    q.optionsView.Name = "_" + q.Idx.ToString();
+                    q.optionsView.Name = "_" + q.Idx.ToString();*/
                 }
                 else
                 {
                     BasicPassageSectionView p = i as BasicPassageSectionView;
                     if(p != null)
                     {
-                        foreach(SingleQuestionView q_in_p in p.QuestionsViews)
+                        foreach(SingleAnswerMCQView q_in_p in p.QuestionsViews)
                         {
+                            /*temporary rem to test, MUST unrem later
                             q_in_p.optionsView.SelectionChanged += OptionsView_SelectionChanged;
-                            q_in_p.optionsView.Name = "_" + q_in_p.Idx.ToString();
+                            q_in_p.optionsView.Name = "_" + q_in_p.Idx.ToString();*/
                         }
                     }
                 }
@@ -488,12 +491,12 @@ namespace sQzClient
             //foreach (object child in QuestionSheetContainer.Children)
             foreach (object child in qs.Children)
             {
-                SingleQuestionView question = child as SingleQuestionView;
+                SingleAnswerMCQView question = child as SingleAnswerMCQView;
                 if(question != null)
                     question.optionsView.IsEnabled = false;
                 BasicPassageSectionView passage = child as BasicPassageSectionView;
                 if (passage != null)
-                    foreach (SingleQuestionView q_view in passage.QuestionsViews)
+                    foreach (SingleAnswerMCQView q_view in passage.QuestionsViews)
                         q_view.optionsView.IsEnabled = false;
             }
         }

@@ -11,7 +11,7 @@ namespace sQzLib
     public class AnswerSheet
     {
         public int BytesOfAnswer_Length;
-        public int TestType;
+        public int Subject;
         public int QuestSheetID;
         public bool bChanged;
         public byte[] BytesOfAnswer;
@@ -21,7 +21,8 @@ namespace sQzLib
             {
                 StringBuilder sb = new StringBuilder();
                 foreach (byte b in BytesOfAnswer)
-                    sb.Append((b == 0) ? Question.C0 : Question.C1);
+                    sb.Append(Convert.ToChar(b));
+
                 return sb.ToString();
             }
         }
@@ -35,7 +36,7 @@ namespace sQzLib
         public void Init(QuestSheet qsheet)
         {
             QuestSheetID = qsheet.ID;
-            BytesOfAnswer_Length = qsheet.CountAllQuestions() * Question.NUMBER_OF_OPTIONS;
+            BytesOfAnswer_Length = qsheet.CountAllQuestions() * OptionSelectAnswer.OPTION_COUNT;
             if (BytesOfAnswer == null)
             {
                 BytesOfAnswer = new byte[BytesOfAnswer_Length];
@@ -89,19 +90,22 @@ namespace sQzLib
                 return 102;
             if (ans.Length != BytesOfAnswer.Length)
                 return 103;
-            int grade = 0;
+            double grade = 0;
             int offs = 0;
+            int part1QuestionCount = 22;
             while(offs < BytesOfAnswer.Length)
             {
                 int offs4 = offs + 4;
-                for(; offs < offs4; ++offs)
-                    if (ans[offs] != BytesOfAnswer[offs])
-                        break;
-                if (offs == offs4)
-                    ++grade;
+                if (part1QuestionCount > 0)
+                {
+                    grade += SingleAnswer.S().Grade(ans, BytesOfAnswer, offs);
+                    part1QuestionCount--;
+                }
+                else
+                    grade += MTFAnswer.S().Grade(ans, BytesOfAnswer, offs);
                 offs = offs4;
             }
-            return grade * 0.25;
+            return grade;
         }
 
         public void Disable()

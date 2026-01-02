@@ -22,7 +22,7 @@ namespace sQzLib
         {
             if(QSheetSection.SECTION_MAGIC_PREFIX.Length > 0)
             {
-                if (tokens.Count < 3 + Question.NUMBER_OF_OPTIONS)
+                if (tokens.Count < 3 + OptionSelectAnswer.OPTION_COUNT)
                 {
                     System.Windows.MessageBox.Show("IndependentQSection: From the end, line " +
                         tokens.Count + " doesn't have 1 requirement 1 stem 4 options 1 answer!");
@@ -33,7 +33,7 @@ namespace sQzLib
             }
             else
             {
-                if (tokens.Count < 2 + Question.NUMBER_OF_OPTIONS)
+                if (tokens.Count < 2 + OptionSelectAnswer.OPTION_COUNT)
                 {
                     System.Windows.MessageBox.Show("IndependentQSection: From the end, line " +
                         tokens.Count + " doesn't have 0 requirement 1 stem 4 options 1 answer!");
@@ -52,7 +52,7 @@ namespace sQzLib
             {
                 vals.Append(prefx +
                     qSheetID + "," + q.uId + ",'");
-                foreach (int i in q.vAnsSort)
+                foreach (int i in q.OptionShuffle)
                     vals.Append(i.ToString());
                 vals.Append("'," + ++idx + "),");
             }

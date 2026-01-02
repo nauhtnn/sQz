@@ -109,11 +109,11 @@ namespace sQzLib
         public bool ReadBytesKey_NoDateTime(byte[] buf, ref int offs)
         {
             AnswerKeyPacks.Clear();
-            AnswerPack answerPack = new AnswerPack(-1);
-            while (answerPack.ReadBytes_S1ReceivingFromS0(buf, ref offs))
+            AnswerKeyPack keyPack = new AnswerKeyPack(-1);
+            while (keyPack.ReadBytes_S1ReceivingFromS0(buf, ref offs))
             {
-                Safe_AddToAnswerPacks(answerPack);
-                answerPack = new AnswerPack(-1);
+                Safe_AddToAnswerPacks(keyPack);
+                keyPack = new AnswerKeyPack(-1);
             }
             return AnswerKeyPacks.Count > 0;
         }
@@ -123,7 +123,7 @@ namespace sQzLib
             foreach (ExamRoomS1 room in Rooms.Values)
             {
                 if (room.Examinees.ContainsKey(neeID))
-                    return room.Examinees[neeID].TestType;
+                    return room.Examinees[neeID].Subject;
             }
             return -1;
         }

@@ -46,7 +46,7 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="AnswerPack.cs" />
+    <Compile Include="AnswerKeyPack.cs" />
     <Compile Include="AnswerSheet.cs" />
     <Compile Include="Client2.cs" />
     <Compile Include="DBConnect.cs" />
@@ -66,11 +66,14 @@
     <Compile Include="Question\PassageWithBlanks.cs" />
     <Compile Include="Question\IndependentQSection.cs" />
     <Compile Include="Question\BasicPassageSection.cs" />
-    <Compile Include="Question\OptionView.cs" />
-    <Compile Include="Question\BasicPassageSectionView.cs" />
+    <Compile Include="Question\QuestionAnswer.cs" />
+    <Compile Include="Question\AnswerType.cs" />
+    <Compile Include="Question\View\OptionView.cs" />
+    <Compile Include="Question\View\BasicPassageSectionView.cs" />
     <Compile Include="Question\QSheet2Docx.cs" />
     <Compile Include="Question\QSheetSection.cs" />
-    <Compile Include="Question\QuestionSheetView.cs" />
+    <Compile Include="Question\View\OptionViewFactory.cs" />
+    <Compile Include="Question\View\QuestionSheetView.cs" />
     <Compile Include="Question\QuestParser.cs" />
     <Compile Include="Question\QuestPack.cs" />
     <Compile Include="Question\QuestSheet.cs" />
@@ -81,7 +84,7 @@
     <Compile Include="Question\RichText\BasicRich_PlainText.cs" />
     <Compile Include="Question\RichText\BasicRich_PlainTextQueue.cs" />
     <Compile Include="Question\RichText\BasicRich_PlainTextParsingMgr.cs" />
-    <Compile Include="Question\SingleQuestionView.cs" />
+    <Compile Include="Question\View\SingleAnswerMCQView.cs" />
     <Compile Include="Server2.cs" />
     <Compile Include="Settings.cs" />
     <Compile Include="Theme.xaml.cs" />

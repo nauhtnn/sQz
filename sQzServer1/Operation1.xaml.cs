@@ -274,7 +274,7 @@ namespace sQzServer1
                         break;
                     }
                     int qsid = BitConverter.ToInt32(buf, offs);
-                    int testType = nee_retrivingExam.TestType;
+                    int testType = nee_retrivingExam.Subject;
                     QuestSheet sending_qSheet;
                     if (qsid == ExamineeA.LV_CAP)
                     {
@@ -308,8 +308,8 @@ namespace sQzServer1
                     {
                         AnswerSheet answerKeySheet = null;
                         found = false;
-                        AnswerPack answerPack;
-                        if(Slot.AnswerKeyPacks.TryGetValue(nee_submitting.TestType, out answerPack)
+                        AnswerKeyPack answerPack;
+                        if(Slot.AnswerKeyPacks.TryGetValue(nee_submitting.Subject, out answerPack)
                             && answerPack.vSheet.TryGetValue(nee_submitting.AnswerSheet.QuestSheetID, out answerKeySheet))
                             found = true;
                         if (!found)

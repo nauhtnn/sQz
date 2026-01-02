@@ -224,7 +224,7 @@ namespace sQzLib
                         errorLines.Append("roomID " + i + ", ");
                         continue;
                     }
-                    if (!int.TryParse(v[4].Trim(), out e.TestType))
+                    if (!int.TryParse(v[4].Trim(), out e.Subject))
                     {
                         errorLines.Append("testType " + i + ", ");
                         continue;
@@ -307,8 +307,8 @@ namespace sQzLib
             List<int> testTypes = new List<int>();
             foreach (ExamRoomS0 room in Rooms.Values)
                 foreach (ExamineeA nee in room.Examinees.Values)
-                    if (!testTypes.Contains(nee.TestType))
-                        testTypes.Add(nee.TestType);
+                    if (!testTypes.Contains(nee.Subject))
+                        testTypes.Add(nee.Subject);
             return testTypes;
         }
 
@@ -444,12 +444,12 @@ namespace sQzLib
             string emsg;
             foreach (QuestPack p in QuestionPacks.Values)
             {
-                if (AnswerKeyPacks.ContainsKey(p.TestType))
+                if (AnswerKeyPacks.ContainsKey(p.Subject))
                 {
                     foreach (QuestSheet qs in p.vSheet.Values)
-                        AnswerKeyPacks[p.TestType].vSheet.Remove(qs.ID);
-                    if (AnswerKeyPacks[p.TestType].vSheet.Count == 0)
-                        AnswerKeyPacks.Remove(p.TestType);
+                        AnswerKeyPacks[p.Subject].vSheet.Remove(qs.ID);
+                    if (AnswerKeyPacks[p.Subject].vSheet.Count == 0)
+                        AnswerKeyPacks.Remove(p.Subject);
                 }
 
                 if (p.DBDelete(out emsg))
@@ -459,17 +459,17 @@ namespace sQzLib
             QuestionPacks.Clear();
         }
 
-        public bool GenQ(Dictionary<int, int> sheetsPerTestType)
+        public bool GenQ(Dictionary<int, int> subject_sheetCounts)
         {
             Safe_DBClearQPacks_and_AnsPacks();
             if (!QuestSheet.GetMaxID_inDB(mDt))
                 return true;
-            foreach (KeyValuePair<int, int> pair in sheetsPerTestType)
+            foreach (KeyValuePair<int, int> subject_sheetCount in subject_sheetCounts)
             {
-                QuestPack pack = new QuestPack(pair.Key);
+                QuestPack pack = new QuestPack(subject_sheetCount.Key);
                 pack.mDt = mDt;
-                AnswerPack answerPack = new AnswerPack(pack.TestType);
-                answerPack.ExtractKey(pack.GenQPack3(pair.Value));
+                AnswerKeyPack answerPack = new AnswerKeyPack(pack.Subject);
+                answerPack.ExtractKey(pack.GenQPack3(subject_sheetCount.Value));
                 Safe_AddToQuestionPacks(pack);
                 Safe_AddToAnswerPacks(answerPack);
             }
@@ -491,7 +491,7 @@ namespace sQzLib
                     return true;
                 Safe_AddToQuestionPacks(pack);
 
-                AnswerPack answerPack = new AnswerPack(pack.TestType);
+                AnswerKeyPack answerPack = new AnswerKeyPack(pack.Subject);
                 answerPack.ExtractKey(pack.vSheet.Values);
                 Safe_AddToAnswerPacks(answerPack);
             }
@@ -519,10 +519,10 @@ namespace sQzLib
             foreach (ExamRoomS0 r in Rooms.Values)
                 foreach (ExamineeA nee in r.Examinees.Values)
                 {
-                    if (!maxPerTestType.ContainsKey(nee.TestType))
-                        maxPerTestType.Add(nee.TestType, 1);
+                    if (!maxPerTestType.ContainsKey(nee.Subject))
+                        maxPerTestType.Add(nee.Subject, 1);
                     else
-                        ++maxPerTestType[nee.TestType];
+                        ++maxPerTestType[nee.Subject];
                 }
 
             return maxPerTestType;
@@ -547,7 +547,7 @@ namespace sQzLib
         public byte[] GetBytes_KeysWithDateTime()
         {
             List<byte[]> bytes = new List<byte[]>();
-            foreach(AnswerPack ansPack in AnswerKeyPacks.Values)
+            foreach(AnswerKeyPack ansPack in AnswerKeyPacks.Values)
                 bytes.AddRange(ansPack.GetBytes_S0SendingToS1());
             bytes.Insert(0, BitConverter.GetBytes(mDt.ToBinary()));
             return Utils.ToArray_FromListOfBytes(bytes);

@@ -26,13 +26,13 @@ namespace sQzLib
             }
 
             char optionLabel = 'A';
-            int entireAnswerSheet_optionIdx = questionIdx * Question.NUMBER_OF_OPTIONS;
+            int entireAnswerSheet_optionIdx = questionIdx * OptionSelectAnswer.OPTION_COUNT;
 
-            for(int optionIdx = 0; optionIdx < Question.NUMBER_OF_OPTIONS;
+            for(int optionIdx = 0; optionIdx < OptionSelectAnswer.OPTION_COUNT;
                 ++optionIdx, ++optionLabel, ++entireAnswerSheet_optionIdx)
             {
                 StringBuilder option = new StringBuilder();
-                option.Append(optionLabel + ") " + question.vAns[optionIdx]);
+                option.Append(optionLabel + ") " + question.Options[optionIdx]);
                 mDocxBody.AppendChild(new Paragraph(new Run(new Text(option.ToString()))));
             }
         }
@@ -43,11 +43,11 @@ namespace sQzLib
                     Txt.s._((int)TxI.ANSWER_KEY))));
             int entireAnswerSheet_optionIdx = 0;
             int questionIdx = 0;
-            while(entireAnswerSheet_optionIdx <= answerKey.Length - Question.NUMBER_OF_OPTIONS)
+            while(entireAnswerSheet_optionIdx <= answerKey.Length - OptionSelectAnswer.OPTION_COUNT)
             {
                 char corrected_label = 'A';
                 bool notReachCorrectAnswer = true;
-                for (int optionIdx = 0; optionIdx < Question.NUMBER_OF_OPTIONS;
+                for (int optionIdx = 0; optionIdx < OptionSelectAnswer.OPTION_COUNT;
                     ++optionIdx, ++entireAnswerSheet_optionIdx)
                     if (notReachCorrectAnswer)
                     {

@@ -7,26 +7,26 @@ using MySql.Data.MySqlClient;
 
 namespace sQzLib
 {
-    public class AnswerPack
+    public class AnswerKeyPack
     {
-        public int TestType;
+        public int Subject;
         public SortedList<int, AnswerSheet> vSheet;
-        public AnswerPack(int testType)
+        public AnswerKeyPack(int subject)
         {
-            TestType = testType;
+            Subject = subject;
             vSheet = new SortedList<int, AnswerSheet>();
         }
 
         public void Clear()
         {
-            TestType = -1;
+            Subject = -1;
             vSheet.Clear();
         }
 
         public List<byte[]> GetBytes_S0SendingToS1()
         {
             List<byte[]> l = new List<byte[]>();
-            l.Add(BitConverter.GetBytes(TestType));
+            l.Add(BitConverter.GetBytes(Subject));
             l.Add(BitConverter.GetBytes(vSheet.Values.Count));
             foreach (AnswerSheet i in vSheet.Values)
                 l.Add(i.GetBytes_S0SendingToS1());
@@ -69,7 +69,7 @@ namespace sQzLib
 
             if (l < 4)
                 return false;
-            TestType = BitConverter.ToInt32(buf, offs);
+            Subject = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
 

@@ -190,12 +190,12 @@ namespace sQzServer0
                 foreach(QuestSheet qs in pack.vSheet.Values)
                 {
                     AnswerSheet ansSheet = null;
-                    if (Slot.AnswerKeyPacks.ContainsKey(qs.TestType) &&
-                        Slot.AnswerKeyPacks[qs.TestType].vSheet.ContainsKey(qs.ID))
-                        ansSheet = Slot.AnswerKeyPacks[qs.TestType].vSheet[qs.ID];
+                    if (Slot.AnswerKeyPacks.ContainsKey(qs.Subject) &&
+                        Slot.AnswerKeyPacks[qs.Subject].vSheet.ContainsKey(qs.ID))
+                        ansSheet = Slot.AnswerKeyPacks[qs.Subject].vSheet[qs.ID];
                     if (ansSheet == null)
                     {
-                        MessageBox.Show("answer sheet not found: " + qs.TestType +
+                        MessageBox.Show("answer sheet not found: " + qs.Subject +
                             " " + qs.ID);
                         return;
                     }
@@ -224,13 +224,13 @@ namespace sQzServer0
                         continue;
                     nee.DBSelGrade();
                     nee.DBGetQSId();
-                    if (nee.TestType < 0)
+                    if (nee.Subject < 0)
                         return;
                     QuestSheet qs = null;
-                    if (Slot.QuestionPacks.ContainsKey(nee.TestType) &&
-                        Slot.QuestionPacks[nee.TestType].vSheet.ContainsKey(nee.AnswerSheet.QuestSheetID))
+                    if (Slot.QuestionPacks.ContainsKey(nee.Subject) &&
+                        Slot.QuestionPacks[nee.Subject].vSheet.ContainsKey(nee.AnswerSheet.QuestSheetID))
                     {
-                        qs = Slot.QuestionPacks[nee.TestType].vSheet[nee.AnswerSheet.QuestSheetID];
+                        qs = Slot.QuestionPacks[nee.Subject].vSheet[nee.AnswerSheet.QuestSheetID];
                     }
                     if (qs == null)
                         return;
@@ -240,12 +240,12 @@ namespace sQzServer0
                         return;
                     }
                     AnswerSheet ansSheet = null;
-                    if(Slot.AnswerKeyPacks.ContainsKey(qs.TestType) &&
-                        Slot.AnswerKeyPacks[qs.TestType].vSheet.ContainsKey(qs.ID))
-                        ansSheet = Slot.AnswerKeyPacks[qs.TestType].vSheet[qs.ID];
+                    if(Slot.AnswerKeyPacks.ContainsKey(qs.Subject) &&
+                        Slot.AnswerKeyPacks[qs.Subject].vSheet.ContainsKey(qs.ID))
+                        ansSheet = Slot.AnswerKeyPacks[qs.Subject].vSheet[qs.ID];
                     if(ansSheet == null)
                     {
-                        MessageBox.Show("answer sheet not found: " + qs.TestType +
+                        MessageBox.Show("answer sheet not found: " + qs.Subject +
                             " " + qs.ID);
                         return;
                     }
@@ -290,13 +290,13 @@ namespace sQzServer0
                     nee = r.Examinees[nee.ID];
             nee.mDt = Slot.mDt;
             nee.DBGetQSId();
-            if (nee.TestType < 0)
+            if (nee.Subject < 0)
                 return;
             QuestSheet qs = null;
-            if(Slot.QuestionPacks.ContainsKey(nee.TestType) &&
-                Slot.QuestionPacks[nee.TestType].vSheet.ContainsKey(nee.AnswerSheet.QuestSheetID))
+            if(Slot.QuestionPacks.ContainsKey(nee.Subject) &&
+                Slot.QuestionPacks[nee.Subject].vSheet.ContainsKey(nee.AnswerSheet.QuestSheetID))
             {
-                qs = Slot.QuestionPacks[nee.TestType].vSheet[nee.AnswerSheet.QuestSheetID];
+                qs = Slot.QuestionPacks[nee.Subject].vSheet[nee.AnswerSheet.QuestSheetID];
             }
             //if (qs == null)
             //{
@@ -337,7 +337,7 @@ namespace sQzServer0
             tx.Text = Txt.s._((int)TxI.QS_ID) + ' ' + qs.GetGlobalID_withTestType() + ", ";
             spl.Children.Add(tx);
             tx = new TextBlock();
-            tx.Text = "Test type: " + nee.TestType + ", " + Txt.s._((int)TxI.MARK) + ' ' + nee.Grade;
+            tx.Text = "Test type: " + nee.Subject + ", " + Txt.s._((int)TxI.MARK) + ' ' + nee.Grade;
             spl.Children.Add(tx);
             ScrollViewer svwr = new ScrollViewer();
             svwr.VerticalScrollBarVisibility = ScrollBarVisibility.Auto;
@@ -369,7 +369,7 @@ namespace sQzServer0
             //    j.Text = ++x + ". " + q.Stem;
             //    j.Background = bg;
             //    sp.Children.Add(j);
-            //    for (int idx = 0; idx < Question.NUMBER_OF_OPTIONS; ++idx)
+            //    for (int idx = 0; idx < OptionSelectAnswer.OPTION_COUNT; ++idx)
             //    {
             //        j = new TextBlock();
             //        j.Width = tbcSl.Width - SystemParameters.ScrollWidth;

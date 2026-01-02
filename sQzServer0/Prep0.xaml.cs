@@ -131,8 +131,8 @@ namespace sQzServer0
             gDBQuest.Children.Clear();
             gDBQuest.RowDefinitions.Clear();
             vChk.Clear();
-            SingleQuestionView.IdxWidth = FontSize * 2;
-            SingleQuestionView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleQuestionView.IdxWidth;
+            SingleAnswerMCQView.IdxWidth = FontSize * 2;
+            SingleAnswerMCQView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleAnswerMCQView.IdxWidth;
             AnswerSheet ansSheet = new AnswerSheet();
             mDBQS.ExtractKey(ansSheet);
             int rowIdx = -1;
@@ -142,7 +142,7 @@ namespace sQzServer0
             int questionIdx = rowIdx;
             foreach (QSheetSection section in mDBQS.Sections)
             {
-                AddPassageTextToDBView(section.Requirements, ++rowIdx, SingleQuestionView.StemWidth);
+                AddPassageTextToDBView(section.Requirements, ++rowIdx, SingleAnswerMCQView.StemWidth);
                 foreach (Question q in section.Questions)
                     AddSingleQuestionToDBView(q, ++questionIdx, ++rowIdx, ansSheet.BytesOfAnswer);
             }
@@ -164,7 +164,7 @@ namespace sQzServer0
 
         private void AddSingleQuestionToDBView(Question q, int qIdx, int rowIdx, byte[] optionStatusArray)
         {
-            SingleQuestionView questionView = new SingleQuestionView(q, qIdx, optionStatusArray, false);
+            SingleAnswerMCQView questionView = new SingleAnswerMCQView(q, qIdx, optionStatusArray, false);
             RowDefinition rd = new RowDefinition();
             gDBQuest.RowDefinitions.Add(rd);
             Grid.SetRow(questionView, rowIdx);
@@ -206,8 +206,8 @@ namespace sQzServer0
                 MessageBox.Show("No question to import!");
                 return;
             }
-            mTmpQS.TestType = GetTestType_FromTextBox();
-            if (mTmpQS.TestType < 0)
+            mTmpQS.Subject = GetTestType_FromTextBox();
+            if (mTmpQS.Subject < 0)
                 return;
             gDBQuest.Children.Clear();
             svwrTmpQ.Content = null;

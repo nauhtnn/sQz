@@ -22,7 +22,7 @@ namespace sQzLib
 
         public override bool Parse(Queue<BasicRich_PlainText> tokens)
         {
-            if (tokens.Count < 4 + Question.NUMBER_OF_OPTIONS)
+            if (tokens.Count < 4 + OptionSelectAnswer.OPTION_COUNT)
             {
                 System.Windows.MessageBox.Show("BasicPassageSection: From the end, line " +
                     tokens.Count + " doesn't have 1 requirement 1 passage 1 stem 4 options 1 answer!");
@@ -42,7 +42,7 @@ namespace sQzLib
             {
                 vals.Append(prefx +
                     qSheetID + "," + q.uId + ",'");
-                foreach (int i in q.vAnsSort)
+                foreach (int i in q.OptionShuffle)
                     vals.Append(i.ToString());
                 vals.Append("'," + ++idx + "),");
             }
