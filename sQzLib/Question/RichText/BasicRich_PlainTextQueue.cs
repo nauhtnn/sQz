@@ -46,6 +46,9 @@ namespace sQzLib
 		static BasicRich_PlainText JoinLinesTo1Token(Queue<BasicRich_PlainText> lines)
 		{
 			BasicRich_PlainText token = lines.Dequeue().Substring(1);
+            if (token.ElementAt(token.Length - 1) == '\\')
+                token = token.Substring(0, token.Length - 1);
+
 			while(lines.Count > 0)
 			{
 				if(lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
