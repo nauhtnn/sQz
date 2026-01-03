@@ -40,7 +40,7 @@ namespace sQzLib
             }
         }
 
-        public string GetGlobalID_withTestType()
+        public string GetGlobalID_withSubject()
         {
             return (Subject * 1000 + ID).ToString("d4");
         }
@@ -578,21 +578,28 @@ namespace sQzLib
                 q.SectionID = -1;
             else
                 q.SectionID = reader.GetInt32(1);
-            q.Stem = reader.GetString(2);
+            int questType = reader.GetInt32(2);
+            if(Enum.IsDefined(typeof(AnswerType), questType))
+                q.QuestionType = (AnswerType)questType;
+            q.Stem = reader.GetString(3);
             q.Options = new string[OptionSelectAnswer.OPTION_COUNT];
             for (int j = 0; j < OptionSelectAnswer.OPTION_COUNT; ++j)
-                q.Options[j] = reader.GetString(3 + j);
-            string x = reader.GetString(7);
+                q.Options[j] = reader.GetString(4 + j);
+            string x = reader.GetString(8);
             q.Answer = new byte[OptionSelectAnswer.OPTION_COUNT];
             for (int j = 0; j < OptionSelectAnswer.OPTION_COUNT; ++j)
                 q.Answer[j] = (x[j] == QuestionAnswer.TRUE) ? QuestionAnswer.TRUE : QuestionAnswer.FALSE;
+            if(q.QuestionType == AnswerType.Undefined)
+            {
+                System.Windows.MessageBox.Show("From DB, question type error at stem: " + q.Stem);
+            }
             return q;
         }
 
         private List<Question> DBSelectQuestions(MySqlConnection conn, string condition)
         {
             string query = DBConnect.mkQrySelect("sqz_question",
-                "id,secid,stem,ans0,ans1,ans2,ans3,akey", condition);
+                "id,secid,quest_type,stem,ans0,ans1,ans2,ans3,akey", condition);
             string eMsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
             List<Question> questions = new List<Question>();
@@ -641,9 +648,9 @@ namespace sQzLib
             }
             if (questionVals.Length > 0)
             {
-                DB_InsertTestType_ifNExists(conn, Subject);
+                DB_InsertSubject_ifNExists(conn, Subject);
                 questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
-                if (DBConnect.Ins(conn, "sqz_question", "subj_id,secid,deleted,stem,ans0,ans1,ans2,ans3,akey",
+                if (DBConnect.Ins(conn, "sqz_question", "subj_id,secid,deleted,quest_type,stem,ans0,ans1,ans2,ans3,akey",
                 questionVals.ToString(), out eMsg) < 0)
                     System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
             }
@@ -651,25 +658,26 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
-        public static void DB_InsertTestType_ifNExists(MySqlConnection conn, int testType)
+        public static void DB_InsertSubject_ifNExists(MySqlConnection conn, int subject)
         {
             string emsg;
-            if (DBConnect.NExist(conn, "sqz_test_type", "id=" + testType, out emsg))
-                DBConnect.Ins(conn, "sqz_test_type", "id", "(" + testType + ")", out emsg);
+            if (DBConnect.NExist(conn, "sqz_subject", "id=" + subject, out emsg))
+                DBConnect.Ins(conn, "sqz_subject", "id", "(" + subject + ")", out emsg);
         }
 
         private void AppendQuestionInsertQuery(Question q, StringBuilder query)
         {
             query.Append("(" + Subject + ",");
             if (q.SectionID < 0)
-                query.Append("NULL,0,'");
+                query.Append("NULL,0,");
             else
-                query.Append(q.SectionID + ",0,'");
+                query.Append(q.SectionID + ",0,");
+            query.Append((int)q.QuestionType + ",'");
             query.Append(DBConnect.SafeSQL_Text(q.Stem) + "','");
             for (int i = 0; i < OptionSelectAnswer.OPTION_COUNT; ++i)
                 query.Append(DBConnect.SafeSQL_Text(q.Options[i]) + "','");
             for (int i = 0; i < OptionSelectAnswer.OPTION_COUNT; ++i)
-                query.Append(q.Answer);
+                query.Append((char)q.Answer[i]);
             query.Append("'),");
         }
 

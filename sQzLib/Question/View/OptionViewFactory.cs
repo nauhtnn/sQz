@@ -50,34 +50,44 @@ namespace sQzLib
             foreach (string text in options)
             {
                 OptionView option = new OptionView(text, idx++, StemWidth);
-                if (optionStatusArray != null && optionStatusArray[answerIdx++] != 0)//update view from log
+                if (optionStatusArray != null && optionStatusArray[answerIdx++] == OptionSelectAnswer.TRUE)//update view from log
                     option.IsSelected = true;
                 optionsView.Items.Add(option);
             }
             return optionsView;
         }
 
-        public StackPanel CreateOptionsView_MTF(string[] options, byte[] optionStatusArray, int questionIdx_start0)
+        public StackPanel CreateOptionsView_MTF(string[] options, byte[] choiceCodes, int questionIdx_start0)
         {
             StackPanel optionsView = new StackPanel();
             optionsView.Width = StemWidth;
-            int idx = 0;
-            int answerIdx = questionIdx_start0 * OptionSelectAnswer.OPTION_COUNT;
+            int answerIdx = -1;
+            int choiceCodeIdx = questionIdx_start0 * OptionSelectAnswer.OPTION_COUNT - 1;
             foreach (string text in options)
             {
+                answerIdx++;
+                choiceCodeIdx++;
+
                 TextBlock option = new TextBlock();
                 option.Text = text;
                 optionsView.Children.Add(option);
-                RadioButton trueSelect = new RadioButton();
-                trueSelect.GroupName = questionIdx_start0.ToString() + "_TrueFalse";
-                trueSelect.Content = "Đúng";
-                trueSelect.Name = "True";
-                optionsView.Children.Add(trueSelect);
-                RadioButton falseSelect = new RadioButton();
-                falseSelect.GroupName = questionIdx_start0.ToString() + "_TrueFalse";
-                falseSelect.Content = "Sai";
-                falseSelect.Name = "False";
-                optionsView.Children.Add(falseSelect);
+                
+                RadioButton trueButton = new RadioButton();
+                trueButton.GroupName = questionIdx_start0.ToString() + "_" + answerIdx + "_TrueFalse";
+                trueButton.Content = "Đúng";
+                trueButton.Name = "True";
+                optionsView.Children.Add(trueButton);
+                
+                RadioButton falseButton = new RadioButton();
+                falseButton.GroupName = questionIdx_start0.ToString() + "_" + answerIdx + "_TrueFalse";
+                falseButton.Content = "Sai";
+                falseButton.Name = "False";
+                optionsView.Children.Add(falseButton);
+
+                if (choiceCodes[choiceCodeIdx] == OptionSelectAnswer.TRUE)
+                    trueButton.IsChecked = true;
+                else if (choiceCodes[choiceCodeIdx] == OptionSelectAnswer.FALSE)
+                    falseButton.IsChecked = true;
             }
             return optionsView;
         }

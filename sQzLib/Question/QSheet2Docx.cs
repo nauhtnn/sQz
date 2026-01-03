@@ -70,7 +70,7 @@ namespace sQzLib
 
         public void WriteQsheet(QuestSheet qsheet, char[] answerKey)
         {
-            WriteQSheetInfo(qsheet.GetGlobalID_withTestType());
+            WriteQSheetInfo(qsheet.GetGlobalID_withSubject());
             int questionIdx = -1;
             char partLabel = '@';
             foreach (QSheetSection s in qsheet.Sections)

@@ -12,7 +12,7 @@ namespace sQzLib
     {
 		public static Queue<BasicRich_PlainText> GetTextQueue(string filePath)
 		{
-			Queue<BasicRich_PlainText> lines = ReadTrimLines(filePath);
+			Queue<BasicRich_PlainText> lines = ReadLines(filePath);
             Queue<BasicRich_PlainText> tokens = new Queue<BasicRich_PlainText>();
 			while(lines.Count > 0)
 			{
@@ -26,16 +26,19 @@ namespace sQzLib
                     else
                         tokens.Enqueue(lines.Dequeue());
                 }
-                else if(lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
-                {
-                    if(lines.Peek().Length > 2)
-                    {
-                        BasicRich_PlainText token = lines.Dequeue();
-                        tokens.Enqueue(token.Substring(1, token.Length - 2));
-                    }
-                }
                 else
-					tokens.Enqueue(JoinLinesTo1Token(lines));
+                {
+                    if (lines.Peek().ElementAt(lines.Peek().Length - 1) == '}')
+                    {
+                        if (lines.Peek().Length > 2)
+                        {
+                            BasicRich_PlainText token = lines.Dequeue();
+                            tokens.Enqueue(token.Substring(1, token.Length - 2));
+                        }
+                    }
+                    else
+                        tokens.Enqueue(JoinLinesTo1Token(lines));
+                }
 			}
 			return tokens;
 		}
@@ -64,15 +67,15 @@ namespace sQzLib
 			return token;
 		}
 		
-		static Queue<BasicRich_PlainText> ReadTrimLines(string filePath)
+		static Queue<BasicRich_PlainText> ReadLines(string filePath)
 		{
 			if(System.IO.Path.GetExtension(filePath) == ".docx")
-				return ReadTrimDocx(filePath);
+				return ReadDocx(filePath);
 			else
-				return ReadTrimTxt(filePath);
+				return ReadTxt(filePath);
 		}
 		
-		static Queue<BasicRich_PlainText> ReadTrimTxt(string filePath)
+		static Queue<BasicRich_PlainText> ReadTxt(string filePath)
 		{
             Queue<BasicRich_PlainText> lines = new Queue<BasicRich_PlainText>();
             string[] rawLines;
@@ -87,13 +90,13 @@ namespace sQzLib
             }
 			foreach(string line in rawLines)
 			{
-				if (0 < line.Trim().Length)
+				if (0 < line.Length)
 					lines.Enqueue(new BasicRich_PlainText(line));
 			}
 			return lines;
 		}
 
-        static Queue<BasicRich_PlainText> ReadTrimDocx(string fpath)
+        static Queue<BasicRich_PlainText> ReadDocx(string fpath)
         {
             Queue<BasicRich_PlainText> lines = new Queue<BasicRich_PlainText>();
             WordprocessingDocument doc = null;

@@ -168,13 +168,13 @@ namespace sQzLib
             for (int j = 0; j < OptionSelectAnswer.OPTION_COUNT;)
                 question.Options[j++] = tokens.Dequeue().ToString();
             
-            question.Answer = ParseQuestionAnswer(tokens);
+            question.Answer = ParseQuestionAnswer(tokens, out question.QuestionType);
             if (question.Answer == null)
                 return null;
             return question;
         }
 
-        public byte[] ParseQuestionAnswer(Queue<BasicRich_PlainText> tokens)
+        public byte[] ParseQuestionAnswer(Queue<BasicRich_PlainText> tokens, out AnswerType questionType)
         {
             string rawAnswerKey = tokens.Dequeue().GetInnerText();
             int colon = rawAnswerKey.IndexOf(':');
@@ -182,16 +182,19 @@ namespace sQzLib
             {
                 System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has error." +
                     "\nAnswer key is not valid: " + rawAnswerKey);
+                questionType = AnswerType.Undefined;
                 return null;
             }
             
             char[] letters = rawAnswerKey.Substring(colon + 1).ToCharArray();
 
             byte[] answerKey = SingleAnswer.S().ParseAnswerKey(letters);
+            questionType = AnswerType.SingleAnswer;
 
             if (answerKey == null)
             {
                 answerKey = MTFAnswer.S().ParseAnswerKey(letters);
+                questionType = AnswerType.MultipleTrueFalse;
                 if(answerKey == null)
                 {
                     System.Windows.MessageBox.Show("From the end, line " + tokens.Count + " has error." +

@@ -9,12 +9,14 @@ namespace sQzLib
     {
         public int uId;
         public int SectionID;
+        public AnswerType QuestionType;
         public string Stem;
         public string[] Options;
         public byte[] Answer;
         public int[] OptionShuffle;
 
         public Question() {
+            QuestionType = AnswerType.Undefined;
             Options = null;
             SectionID = -1;
             OptionShuffle = new int[OptionSelectAnswer.OPTION_COUNT];

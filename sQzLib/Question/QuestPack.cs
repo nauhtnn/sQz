@@ -272,7 +272,7 @@ namespace sQzLib
                             {
                                 if (matches[i].Value.Equals(matches[j].Value))
                                 {
-                                    duplicated.Add(qs.GetGlobalID_withTestType());
+                                    duplicated.Add(qs.GetGlobalID_withSubject());
                                     break1 = true;
                                     break;
                                 }
