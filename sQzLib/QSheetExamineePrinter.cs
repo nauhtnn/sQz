@@ -65,7 +65,7 @@ namespace sQzLib
 
         public void WriteThisExaminee(QuestSheet qsheet, ExamineeS0 examinee, char[] answerKey)
         {
-            WriteExamineeInfo(examinee, qsheet.GetGlobalID_withTestType());
+            WriteExamineeInfo(examinee, qsheet.GetGlobalID_withSubject());
             WriteExamineeResult(examinee);
             WriteSelectedLabels(qsheet, examinee.AnswerSheet.BytesOfAnswer, answerKey);
         }

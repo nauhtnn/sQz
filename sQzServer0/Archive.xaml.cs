@@ -334,7 +334,7 @@ namespace sQzServer0
             nee.DBSelGrade();
             StackPanel spl = new StackPanel();
             TextBlock tx = new TextBlock();
-            tx.Text = Txt.s._((int)TxI.QS_ID) + ' ' + qs.GetGlobalID_withTestType() + ", ";
+            tx.Text = Txt.s._((int)TxI.QS_ID) + ' ' + qs.GetGlobalID_withSubject() + ", ";
             spl.Children.Add(tx);
             tx = new TextBlock();
             tx.Text = "Test type: " + nee.Subject + ", " + Txt.s._((int)TxI.MARK) + ' ' + nee.Grade;

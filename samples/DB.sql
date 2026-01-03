@@ -51,7 +51,9 @@ FOREIGN KEY(`s_type`) REFERENCES `sqz_sec_type`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `subj_id` INT,
-`secid` INT, `deleted` INT,
+`secid` INT,
+`deleted` INT,
+`quest_type` INT,
 `stem` TEXT CHARACTER SET `utf8mb4`,
 `ans0` TEXT CHARACTER SET `utf8mb4`, `ans1` TEXT CHARACTER SET `utf8mb4`,
 `ans2` TEXT CHARACTER SET `utf8mb4`, `ans3` TEXT CHARACTER SET `utf8mb4`,

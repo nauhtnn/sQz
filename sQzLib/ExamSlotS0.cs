@@ -186,7 +186,7 @@ namespace sQzLib
             string[] vs = System.IO.File.ReadAllLines(fp);
             StringBuilder errorLines = new StringBuilder();
             StringBuilder dup = new StringBuilder();
-            List<int> testTypes = DBSelectTestTypes();
+            List<int> subjects = DBSelectSubjects();
             int i = 0;
             foreach (string s in vs)
             {
@@ -226,7 +226,7 @@ namespace sQzLib
                     }
                     if (!int.TryParse(v[4].Trim(), out e.Subject))
                     {
-                        errorLines.Append("testType " + i + ", ");
+                        errorLines.Append("subject " + i + ", ");
                         continue;
                     }
                     e.mDt = mDt;
@@ -269,7 +269,7 @@ namespace sQzLib
                 eMsg = Txt.s._((int)TxI.DB_NOK);
                 return -1;
             }
-            DB_InsertTestType_ifNExists(conn);
+            DB_InsertSubject_ifNExists(conn);
             string pwChars = Utils.GetPasswordCharset();
             Random rand = new Random();
             int n = 0;
@@ -296,20 +296,20 @@ namespace sQzLib
             return n;
         }
 
-        private void DB_InsertTestType_ifNExists(MySqlConnection conn)
+        private void DB_InsertSubject_ifNExists(MySqlConnection conn)
         {
-            foreach(int testType in GetAllTestTypesInRooms())
-                QuestSheet.DB_InsertTestType_ifNExists(conn, testType);
+            foreach(int subject in GetAllSubjectsInRooms())
+                QuestSheet.DB_InsertSubject_ifNExists(conn, subject);
         }
 
-        private List<int> GetAllTestTypesInRooms()
+        private List<int> GetAllSubjectsInRooms()
         {
-            List<int> testTypes = new List<int>();
+            List<int> subjects = new List<int>();
             foreach (ExamRoomS0 room in Rooms.Values)
                 foreach (ExamineeA nee in room.Examinees.Values)
-                    if (!testTypes.Contains(nee.Subject))
-                        testTypes.Add(nee.Subject);
-            return testTypes;
+                    if (!subjects.Contains(nee.Subject))
+                        subjects.Add(nee.Subject);
+            return subjects;
         }
 
         public void DelNee()
@@ -483,9 +483,9 @@ namespace sQzLib
         {
             QuestionPacks.Clear();
             //AnswerKeyPacks.Clear();
-            foreach (int testType in GetAllTestTypesInRooms())
+            foreach (int subject in GetAllSubjectsInRooms())
             {
-                QuestPack pack = new QuestPack(testType);
+                QuestPack pack = new QuestPack(subject);
                 pack.mDt = mDt;
                 if (pack.DBSelectQS(out eMsg))
                     return true;
@@ -513,19 +513,19 @@ namespace sQzLib
             return Utils.ToArray_FromListOfBytes(l);
         }
 
-        public Dictionary<int, int> MaxNumberOfExaminees_PerTestType()
+        public Dictionary<int, int> MaxNumberOfExaminees_PerSubject()
         {
-            Dictionary<int, int> maxPerTestType = new Dictionary<int, int>();
+            Dictionary<int, int> maxPerSubject = new Dictionary<int, int>();
             foreach (ExamRoomS0 r in Rooms.Values)
                 foreach (ExamineeA nee in r.Examinees.Values)
                 {
-                    if (!maxPerTestType.ContainsKey(nee.Subject))
-                        maxPerTestType.Add(nee.Subject, 1);
+                    if (!maxPerSubject.ContainsKey(nee.Subject))
+                        maxPerSubject.Add(nee.Subject, 1);
                     else
-                        ++maxPerTestType[nee.Subject];
+                        ++maxPerSubject[nee.Subject];
                 }
 
-            return maxPerTestType;
+            return maxPerSubject;
         }
 
         private int ReadBytes_RoomFromS1(byte[] buf, ref int offs)
@@ -576,26 +576,26 @@ namespace sQzLib
             return Utils.ToArray_FromListOfBytes(l);
         }
 
-        private List<int> DBSelectTestTypes()
+        private List<int> DBSelectSubjects()
         {
-            List<int> testTypes = new List<int>();
+            List<int> subjects = new List<int>();
             MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
-                return testTypes;
-            string query = DBConnect.mkQrySelect("sqz_test_type", "id", null);
+                return subjects;
+            string query = DBConnect.mkQrySelect("sqz_subject", "id", null);
             string emsg;
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out emsg);
             if (reader == null)
             {
-                MessageBox.Show("DB_SelectTestTypes\n" + emsg.ToString());
+                MessageBox.Show("DB_SelectSubjects\n" + emsg.ToString());
                 DBConnect.Close(ref conn);
-                return testTypes;
+                return subjects;
             }
             while (reader.Read())
-                testTypes.Add(reader.GetInt32(0));
+                subjects.Add(reader.GetInt32(0));
             reader.Close();
             DBConnect.Close(ref conn);
-            return testTypes;
+            return subjects;
         }
     }
 }

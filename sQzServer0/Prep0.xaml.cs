@@ -206,7 +206,7 @@ namespace sQzServer0
                 MessageBox.Show("No question to import!");
                 return;
             }
-            mTmpQS.Subject = GetTestType_FromTextBox();
+            mTmpQS.Subject = GetSubject_FromTextBox();
             if (mTmpQS.Subject < 0)
                 return;
             gDBQuest.Children.Clear();
@@ -219,22 +219,22 @@ namespace sQzServer0
 
         private void LoadAndShowQuestionFromDB()
         {
-            int testTypeID = GetTestType_FromTextBox();
-            if (testTypeID < 0)
+            int subjectID = GetSubject_FromTextBox();
+            if (subjectID < 0)
                 return;
-            mDBQS.DBSelectNondeletedQuestions(testTypeID);
+            mDBQS.DBSelectNondeletedQuestions(subjectID);
             ShowDBQ();
         }
 
-        private int GetTestType_FromTextBox()
+        private int GetSubject_FromTextBox()
         {
-            int testTypeID;
-            if (!int.TryParse(tbxTestType.Text, out testTypeID))
+            int subjectID;
+            if (!int.TryParse(tbxSubject.Text, out subjectID))
             {
                 MessageBox.Show("Test type is not number!");
                 return -1;
             }
-            return testTypeID;
+            return subjectID;
         }
 
         private void LoadTxt()

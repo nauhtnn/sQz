@@ -274,11 +274,11 @@ namespace sQzServer1
                         break;
                     }
                     int qsid = BitConverter.ToInt32(buf, offs);
-                    int testType = nee_retrivingExam.Subject;
+                    int subject = nee_retrivingExam.Subject;
                     QuestSheet sending_qSheet;
                     if (qsid == ExamineeA.LV_CAP)
                     {
-                        byte[] a = Slot.GetBytes_NextQSheet(testType);
+                        byte[] a = Slot.GetBytes_NextQSheet(subject);
                         if (a != null)
                         {
                             outMsg = new byte[a.Length + 4];
@@ -286,8 +286,8 @@ namespace sQzServer1
                             Array.Copy(a, 0, outMsg, 4, a.Length);
                         }
                     }
-                    else if (Slot.QuestionPacks.ContainsKey(testType) &&
-                        Slot.QuestionPacks[testType].vSheet.TryGetValue(qsid, out sending_qSheet))
+                    else if (Slot.QuestionPacks.ContainsKey(subject) &&
+                        Slot.QuestionPacks[subject].vSheet.TryGetValue(qsid, out sending_qSheet))
                     {
                         
                         outMsg = new byte[sending_qSheet.aQuest.Length + 4];

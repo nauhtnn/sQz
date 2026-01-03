@@ -95,13 +95,13 @@ namespace sQzLib
             return true;
         }
 
-        public byte[] GetBytes_NextQSheet(int testType)
+        public byte[] GetBytes_NextQSheet(int subject)
         {
-            if(QuestionPacks.ContainsKey(testType))
-                return QuestionPacks[testType].GetBytes_NextQSheet();
+            if(QuestionPacks.ContainsKey(subject))
+                return QuestionPacks[subject].GetBytes_NextQSheet();
             else
             {
-                System.Windows.MessageBox.Show("GetBytes_NextQSheet: key not found: " + testType);
+                System.Windows.MessageBox.Show("GetBytes_NextQSheet: key not found: " + subject);
                 return null;
             }
         }
@@ -118,7 +118,7 @@ namespace sQzLib
             return AnswerKeyPacks.Count > 0;
         }
 
-        public int GetTestTypeOfExaminee(string neeID)
+        public int GetSubjectOfExaminee(string neeID)
         {
             foreach (ExamRoomS1 room in Rooms.Values)
             {
