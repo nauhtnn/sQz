@@ -17,5 +17,13 @@ namespace sQzLib
         {
             Init(id);
         }
+        public override object Clone()
+        {
+            MTFIndependentQSection newSection = new MTFIndependentQSection(ID);
+            newSection.Requirements = Requirements;
+            foreach (Question q in Questions)
+                newSection.Questions.Add(q.DeepCopy());
+            return newSection;
+        }
     }
 }

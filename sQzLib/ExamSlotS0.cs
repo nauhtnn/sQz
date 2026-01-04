@@ -459,17 +459,23 @@ namespace sQzLib
             QuestionPacks.Clear();
         }
 
-        public bool GenQ(Dictionary<int, int> subject_sheetCounts)
+        public bool GenQ(Dictionary<int, int> subject_sheetCounts, int singleAnswerCount, int MTF_count)
         {
             Safe_DBClearQPacks_and_AnsPacks();
             if (!QuestSheet.GetMaxID_inDB(mDt))
                 return true;
+            if(subject_sheetCounts.Count > 2)
+            {
+                MessageBox.Show("Chưa hỗ trợ nhiều môn kiểm tra trong 1 ca.");
+                return false;
+            }
+
             foreach (KeyValuePair<int, int> subject_sheetCount in subject_sheetCounts)
             {
                 QuestPack pack = new QuestPack(subject_sheetCount.Key);
                 pack.mDt = mDt;
                 AnswerKeyPack answerPack = new AnswerKeyPack(pack.Subject);
-                answerPack.ExtractKey(pack.GenQPack3(subject_sheetCount.Value));
+                answerPack.ExtractKey(pack.GenQPack4(subject_sheetCount.Value, singleAnswerCount, MTF_count));
                 Safe_AddToQuestionPacks(pack);
                 Safe_AddToAnswerPacks(answerPack);
             }

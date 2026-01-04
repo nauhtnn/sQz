@@ -422,7 +422,7 @@ namespace sQzLib
             //    q.Randomize(rand);
         }
 
-        public QuestSheet RandomizeDeepCopy_SectionsOnly(Random rand)
+        public QuestSheet RandomizeDeepCopy(Random rand)
         {
             QuestSheet sheet = new QuestSheet();
             sheet.ID = ID;
@@ -472,8 +472,50 @@ namespace sQzLib
                     sections.Add(i2);
                     continue;
                 }
+                MTFIndependentQSection m = section as MTFIndependentQSection;
+                if (i != null)
+                {
+                    MTFIndependentQSection m2 = m.Clone() as MTFIndependentQSection;
+                    m2.Randomize(rand);
+                    sections.Add(m2);
+                    continue;
+                }
             }
             return sections;
+        }
+
+        //only Server0 uses this.
+        public void DBSelectNondeletedQuestions(int subject, int singleAnswerCount, int MTF_count)
+        {
+            Subject = subject;
+            Sections.Clear();
+            MySqlConnection conn = DBConnect.OpenNewConnection();
+            if (conn == null)
+            {
+                System.Windows.MessageBox.Show(Txt.s._((int)TxI.DB_NOK));
+                return;
+            }
+
+            Random random = new Random();
+            List<Question> questions =
+                DBSelectQuestions(conn, "deleted=0 AND subj_id=" + Subject +
+                    " AND secid=" + (int)SectionTypeID.DefaultIndependentQuestions,
+                    singleAnswerCount, random);
+            if (questions == null)
+                return;
+            List<Question> moreQuestions =
+                DBSelectQuestions(conn, "deleted=0 AND subj_id=" + Subject +
+                    " AND secid=" + (int)SectionTypeID.MTFIndependentQuestions,
+                    MTF_count, random);
+
+            if (moreQuestions == null)
+                return;
+
+            questions.AddRange(moreQuestions);
+
+            DBSelectSections(conn, questions);
+
+            DBConnect.Close(ref conn);
         }
 
         //only Server0 uses this.
@@ -582,7 +624,7 @@ namespace sQzLib
         private Question DBReader_CreateQuestion(MySqlDataReader reader)
         {
             Question q = new Question();
-            q.uId = reader.GetInt32(0);
+            q.uId = (int)reader.GetUInt32(0);
             if (reader.IsDBNull(1))
                 q.SectionID = -1;
             else
@@ -610,6 +652,79 @@ namespace sQzLib
             string query = DBConnect.mkQrySelect("sqz_question",
                 "id,secid,quest_type,stem,ans0,ans1,ans2,ans3,akey", condition);
             string eMsg;
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
+            List<Question> questions = new List<Question>();
+
+            if (reader != null)
+            {
+                while (reader.Read())
+                    questions.Add(DBReader_CreateQuestion(reader));
+                reader.Close();
+            }
+            else
+                System.Windows.MessageBox.Show(eMsg.ToString());
+            return questions;
+        }
+
+        private List<uint> DBSelectQuestionIds(MySqlConnection conn, string condition)
+        {
+            string eMsg;
+            string query = DBConnect.mkQrySelect("sqz_question",
+                "id", condition);
+            List<uint> questionIds = new List<uint>();
+            MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
+            if (reader != null)
+            {
+                while (reader.Read())
+                    questionIds.Add(reader.GetUInt32(0));
+                reader.Close();
+            }
+            else
+                System.Windows.MessageBox.Show(eMsg.ToString());
+            return questionIds;
+        }
+
+        private List<uint> RandomSubset(List<uint> set, int count, Random random)
+        {
+            if(count > set.Count)
+            {
+                System.Windows.MessageBox.Show("RandomSubset " + count + " > " + set.Count);
+                return null;
+            }
+            if (count == set.Count)
+                return set;
+
+            List<uint> newList = new List<uint>();
+            while (0 < count)
+            {
+                int idx = random.Next() % set.Count;
+                newList.Add(set.ElementAt(idx));
+                set.RemoveAt(idx);
+                count--;
+            }
+
+            return newList;
+        }
+
+        private List<Question> DBSelectQuestions(MySqlConnection conn, string condition, int count, Random random)
+        {
+            List<uint> questionIds = RandomSubset(DBSelectQuestionIds(conn, condition), count, random);
+
+            if (questionIds == null)
+                return null;
+
+            questionIds.Sort();
+
+            StringBuilder id_condition = new StringBuilder();
+            foreach (uint id in questionIds)
+                id_condition.Append(id.ToString() + ',');
+            id_condition.Remove(id_condition.Length - 1, 1);
+
+            condition = condition + " AND id IN (" + id_condition + ")";
+
+            string eMsg;
+            string query = DBConnect.mkQrySelect("sqz_question",
+                "id,secid,quest_type,stem,ans0,ans1,ans2,ans3,akey", condition);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
             List<Question> questions = new List<Question>();
 
@@ -771,7 +886,7 @@ namespace sQzLib
             int uid = DBConnect.MaxInt(conn, "sqz_qsheet", "id",
                     "dt='" + dt.ToString(DT._) + "'");
             DBConnect.Close(ref conn);
-            if (uid < 0 &&
+            if (uid < -1 &&
                 System.Windows.MessageBox.Show("Cannot get QuestSheet.GetMaxID_inDB. Choose Yes to continue and get risky!",
                     "Warning!", System.Windows.MessageBoxButton.YesNo) == System.Windows.MessageBoxResult.No)
                     return false;

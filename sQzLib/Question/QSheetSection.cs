@@ -289,7 +289,7 @@ namespace sQzLib
             int uid = DBConnect.MaxInt(conn, "sqz_section", "id", null);
             if(localConn)
                 DBConnect.Close(ref conn);
-            if (uid < 0 &&
+            if (uid < -1 &&
                 MessageBox.Show("Cannot get QSheetSection.GetMaxID_inDB. Choose Yes to continue and get risky!",
                     "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.No)
                 return false;

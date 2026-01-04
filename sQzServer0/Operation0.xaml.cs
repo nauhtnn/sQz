@@ -352,8 +352,19 @@ namespace sQzServer0
         {
             Op0SlotView vw = tbcSl.SelectedItem as Op0SlotView;
             if (vw == null)
+            {
+                MessageBox.Show("Chọn tab hiển thị phòng thi rồi mới tạo đề.");
                 return;
-            vw.GenQ();
+            }
+            int singleAnswerCount;
+            int MTF_count;
+            if(!int.TryParse(tbxSingleAnswerCount.Text, out singleAnswerCount) ||
+                !int.TryParse(tbxMTFCount.Text, out MTF_count))
+            {
+                MessageBox.Show("Nhập số !");
+                return;
+            }
+            vw.GenQ(singleAnswerCount, MTF_count);
         }
 
         private void tbcSl_SelectionChanged(object sender, SelectionChangedEventArgs e)

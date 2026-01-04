@@ -382,9 +382,9 @@ namespace sQzServer0
             tbi.Content = svwr;
         }
 
-        public void GenQ()
+        public void GenQ(int singleAnswerCount, int MTF_count)
         {
-            mSl.GenQ(mSl.MaxNumberOfExaminees_PerSubject());
+            mSl.GenQ(mSl.MaxNumberOfExaminees_PerSubject(), singleAnswerCount, MTF_count);
 
             ShowQSHeader();
         }

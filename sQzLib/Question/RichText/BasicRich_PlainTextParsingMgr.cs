@@ -71,8 +71,8 @@ namespace sQzLib
     {
         //MUST match DB table `sqz_sec_type`
         DefaultIndependentQuestions = 0,
+        MTFIndependentQuestions,
         BasicPassage,
-        PassageWithBlanks,
-        MTFIndependentQuestions
+        PassageWithBlanks
     }
 }

@@ -196,7 +196,7 @@ namespace sQzLib
             while (0 < sheetCount)
             {
                 --sheetCount;
-                QuestSheet qs = originSheet.RandomizeDeepCopy_SectionsOnly(rand);
+                QuestSheet qs = originSheet.RandomizeDeepCopy(rand);
                 qs.AccquireGlobalMaxID();
                 qs.Subject = Subject;
                 vSheet.Add(qs.ID, qs);
@@ -205,6 +205,26 @@ namespace sQzLib
             if (DBInsertQSheets(mDt, sheets) == null)
                 return sheets;
             return new List<QuestSheet>();
+        }
+
+        public List<QuestSheet> GenQPack4(int sheetCount, int singleAnswerCount, int MTF_count)
+        {
+            List<QuestSheet> sheets = new List<QuestSheet>();
+            QuestSheet originSheet = new QuestSheet();
+            originSheet.DBSelectNondeletedQuestions(Subject, singleAnswerCount, MTF_count);
+            Random rand = new Random();
+            while (0 < sheetCount)
+            {
+                --sheetCount;
+                QuestSheet qs = originSheet.RandomizeDeepCopy(rand);
+                qs.AccquireGlobalMaxID();
+                qs.Subject = Subject;
+                vSheet.Add(qs.ID, qs);
+                sheets.Add(qs);
+            }
+            //if (DBInsertQSheets(mDt, sheets) == null)
+                return sheets;
+            //return new List<QuestSheet>();
         }
 
         public static string DBInsertQSheets(DateTime dt, List<QuestSheet> l)
