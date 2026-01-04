@@ -525,6 +525,12 @@ namespace sQzLib
                             Sections.Add(ind_section);
                             Safe_AddTempSection(tempSections, ind_section);
                             break;
+                        case SectionTypeID.MTFIndependentQuestions:
+                            MTFIndependentQSection MTF_section = new MTFIndependentQSection(reader.GetInt32(0));
+                            MTF_section.Requirements = reader.GetString(2);
+                            Sections.Add(MTF_section);
+                            Safe_AddTempSection(tempSections, MTF_section);
+                            break;
                         case SectionTypeID.PassageWithBlanks:
                             PassageWithBlanks p_blanks = new PassageWithBlanks(reader.GetInt32(0));
                             p_blanks.Requirements = reader.GetString(2);
@@ -538,6 +544,9 @@ namespace sQzLib
                             basic_passage.Passage = reader.GetString(3);
                             Sections.Add(basic_passage);
                             Safe_AddTempSection(tempSections, basic_passage);
+                            break;
+                        default:
+                            System.Windows.MessageBox.Show("Section type ID is not handled: " + sectionTypeID);
                             break;
                     }
                 }
@@ -617,41 +626,55 @@ namespace sQzLib
 
         public void DBInsertOriginQuestions()
         {
-            if (!QSheetSection.GetMaxID_inDB())
-                return;
             MySqlConnection conn = DBConnect.OpenNewConnection();
             if (conn == null)
                 return;
-            StringBuilder questionVals = new StringBuilder();
-            StringBuilder sectionVals = new StringBuilder();
+
+            if (!QSheetSection.GetMaxID_inDB(conn))
+                return;
+
+            StringBuilder questionInsVals = new StringBuilder();
+            StringBuilder sectionInsVals = new StringBuilder();
+            string eMsg;
             foreach (QSheetSection section in Sections)
             {
-                section.AccquireGlobalMaxID();
-                sectionVals.Append("(" + section.ID + "," + section.GetSectionTypeID() +
-                    ",'" + DBConnect.SafeSQL_Text(section.Requirements) + "',");
-                BasicPassageSection passageSection = section as BasicPassageSection;
-                if (passageSection != null)
-                    sectionVals.Append("'" + DBConnect.SafeSQL_Text(passageSection.Passage) + "'),");
+                //TODO: Updating doesn't know insert in sectionInsVals.
+                section.AccquireMaxId(conn);
+
+                if (section.ID < 0)
+                {
+                    section.AccquireGlobalMaxId();
+                    sectionInsVals.Append("(" + section.ID + "," + section.GetSectionTypeID() +
+                        ",'" + DBConnect.SafeSQL_Text(section.Requirements) + "',");
+                    BasicPassageSection passageSection = section as BasicPassageSection;
+                    if (passageSection != null)
+                        sectionInsVals.Append("'" + DBConnect.SafeSQL_Text(passageSection.Passage) + "'),");
+                    else
+                        sectionInsVals.Append("NULL),"); //TODO: manual config later
+                }
                 else
-                    sectionVals.Append("NULL),");
-                //sectionVals.Append("NULL),"); TODO: manual config later
+                {
+                    DBConnect.Update(conn, "sqz_section",
+                        "req='" + DBConnect.SafeSQL_Text(section.Requirements) + "'", "id=" + section.ID, out eMsg);
+                }
+
                 foreach (Question q in section.Questions)
-                    AppendQuestionInsertQuery(q, questionVals);
+                    AppendQuestionInsertQuery(q, questionInsVals);
             }
-            string eMsg;
-            if (sectionVals.Length > 0)
+
+            if (sectionInsVals.Length > 0)
             {
-                sectionVals.Remove(sectionVals.Length - 1, 1);//remove the last comma
+                sectionInsVals.Remove(sectionInsVals.Length - 1, 1);//remove the last comma
                 if (DBConnect.Ins(conn, "sqz_section", "id,s_type,req,psg",
-                sectionVals.ToString(), out eMsg) < 0)
+                    sectionInsVals.ToString(), out eMsg) < 0)
                     System.Windows.MessageBox.Show("Error inserting passages:\n" + eMsg);
             }
-            if (questionVals.Length > 0)
+            if (questionInsVals.Length > 0)
             {
                 DB_InsertSubject_ifNExists(conn, Subject);
-                questionVals.Remove(questionVals.Length - 1, 1);//remove the last comma
+                questionInsVals.Remove(questionInsVals.Length - 1, 1);//remove the last comma
                 if (DBConnect.Ins(conn, "sqz_question", "subj_id,secid,deleted,quest_type,stem,ans0,ans1,ans2,ans3,akey",
-                questionVals.ToString(), out eMsg) < 0)
+                questionInsVals.ToString(), out eMsg) < 0)
                     System.Windows.MessageBox.Show("Error inserting questions:\n" + eMsg);
             }
 

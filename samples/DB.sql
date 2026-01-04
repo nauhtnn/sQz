@@ -42,7 +42,7 @@ FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_sec_type`(`id` INT PRIMARY KEY,
 `name` VARCHAR(32));
-INSERT INTO `sqz_sec_type` VALUES (0, 'DefaultIndependentQuestions'), (1, 'BasicPassage'), (2, 'PassageWithBlanks');
+INSERT INTO `sqz_sec_type` VALUES (0, 'DefaultIndependentQuestions'), (1, 'BasicPassage'), (2, 'PassageWithBlanks'), (3, 'MTFIndependentQuestions');
 
 CREATE TABLE IF NOT EXISTS `sqz_section`(`id` INT PRIMARY KEY,
 `s_type` INT, `req` TEXT CHARACTER SET `utf8mb4`,

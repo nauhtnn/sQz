@@ -18,17 +18,21 @@ namespace sQzLib
         public List<QSheetSection> ParseTokens(Queue<BasicRich_PlainText> tokens)
         {
             List<QSheetSection> sections = new List<QSheetSection>();
-            QSheetSection.TrimToFirstSection(tokens);
+            QSheetSection.DiscardUntilFoundMagicKeyword(tokens);
             while(tokens.Count > 0)
             {
                 if(QSheetSection.SECTION_MAGIC_PREFIX.Length > 0 &&
-                    !tokens.Dequeue().StartsWith(QSheetSection.SECTION_MAGIC_PREFIX))
+                    !tokens.Peek().StartsWith(QSheetSection.SECTION_MAGIC_PREFIX))
                 {
                     System.Windows.MessageBox.Show("ParseTokens: From the end, line " +
                     tokens.Count + " doesn't have section magic prefix " + QSheetSection.SECTION_MAGIC_PREFIX);
                     return sections;
                 }
-                QSheetSection section = SelectSection(tokens.Peek().GetInnerText());
+                QSheetSection section;
+                if(tokens.Dequeue().GetInnerText().Equals("PART 2"))
+                    section = new MTFIndependentQSection();
+                else
+                    section = SelectSection(tokens.Peek().GetInnerText());
                 if(!section.Parse(tokens))
                 {
                     sections.Add(section);
@@ -65,8 +69,10 @@ namespace sQzLib
 
     public enum SectionTypeID
     {
+        //MUST match DB table `sqz_sec_type`
         DefaultIndependentQuestions = 0,
         BasicPassage,
-        PassageWithBlanks
+        PassageWithBlanks,
+        MTFIndependentQuestions
     }
 }

@@ -136,7 +136,7 @@ namespace sQzLib
             SectionClassifyingKeywords.Add(SectionTypeID.BasicPassage, magicKeywords);
         }
 
-        public static void TrimToFirstSection(Queue<BasicRich_PlainText> tokens)
+        public static void DiscardUntilFoundMagicKeyword(Queue<BasicRich_PlainText> tokens)
         {
             if (SECTION_MAGIC_PREFIX.Length == 0)
                 return;
@@ -239,20 +239,56 @@ namespace sQzLib
             return requirementTextBlock;
         }
 
-        public void AccquireGlobalMaxID()
+        public void AccquireGlobalMaxId()
         {
             _ID = ++globalMaxID;
+            UpdateQuestionSectionId();
+        }
+
+        public void AccquireMaxId(MySqlConnection conn = null)
+        {
+            int secTypeID = GetSectionTypeID();
+            if (secTypeID == (int)SectionTypeID.DefaultIndependentQuestions ||
+                secTypeID == (int)SectionTypeID.MTFIndependentQuestions)
+            {
+                bool localConn = false;
+                if(conn == null)
+                {
+                    conn = DBConnect.OpenNewConnection();
+                    localConn = true;
+                }
+                
+                if (conn == null)
+                    return;
+                _ID = DBConnect.MaxInt(conn, "sqz_section", "id", "s_type=" + secTypeID);
+
+                if (localConn)
+                    DBConnect.Close(ref conn);
+            }
+            if(_ID >= 0)
+                UpdateQuestionSectionId();
+        }
+
+        private void UpdateQuestionSectionId()
+        {
             foreach (Question q in Questions)
                 q.SectionID = _ID;
         }
 
-        public static bool GetMaxID_inDB()
+        public static bool GetMaxID_inDB(MySqlConnection conn = null)
         {
-            MySqlConnection conn = DBConnect.OpenNewConnection();
+            bool localConn = false;
+            if(conn == null)
+            {
+                conn = DBConnect.OpenNewConnection();
+                localConn = true;
+            }
+            
             if (conn == null)
                 return false;
             int uid = DBConnect.MaxInt(conn, "sqz_section", "id", null);
-            DBConnect.Close(ref conn);
+            if(localConn)
+                DBConnect.Close(ref conn);
             if (uid < 0 &&
                 MessageBox.Show("Cannot get QSheetSection.GetMaxID_inDB. Choose Yes to continue and get risky!",
                     "Warning!", MessageBoxButton.YesNo) == MessageBoxResult.No)
@@ -281,6 +317,8 @@ namespace sQzLib
                 return (int)SectionTypeID.PassageWithBlanks;
             if (this is BasicPassageSection)
                 return (int)SectionTypeID.BasicPassage;
+            if (this is MTFIndependentQSection)
+                return (int)SectionTypeID.MTFIndependentQuestions;
             return (int)SectionTypeID.DefaultIndependentQuestions;
         }
 
