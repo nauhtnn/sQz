@@ -253,11 +253,11 @@ namespace sQzLib
             try {
                 object i = cmd.ExecuteScalar();
                 if (i is DBNull)
-                    n = 0;
-                else if (!int.TryParse(i.ToString(), out n))
                     n = -1;
+                else if (!int.TryParse(i.ToString(), out n))
+                    n = -2;
             }
-            catch (MySqlException) { n = -1; }
+            catch (MySqlException) { n = -3; }
 
             return n;
         }
