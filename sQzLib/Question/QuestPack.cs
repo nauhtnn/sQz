@@ -196,7 +196,7 @@ namespace sQzLib
             while (0 < sheetCount)
             {
                 --sheetCount;
-                QuestSheet qs = originSheet.RandomizeDeepCopy(rand);
+                QuestSheet qs = originSheet.RandomizeDeepCopy(rand, true);
                 qs.AccquireGlobalMaxID();
                 qs.Subject = Subject;
                 vSheet.Add(qs.ID, qs);
@@ -216,7 +216,7 @@ namespace sQzLib
             while (0 < sheetCount)
             {
                 --sheetCount;
-                QuestSheet qs = originSheet.RandomizeDeepCopy(rand);
+                QuestSheet qs = originSheet.RandomizeDeepCopy(rand, false);
                 qs.AccquireGlobalMaxID();
                 qs.Subject = Subject;
                 vSheet.Add(qs.ID, qs);

@@ -422,23 +422,32 @@ namespace sQzLib
             //    q.Randomize(rand);
         }
 
-        public QuestSheet RandomizeDeepCopy(Random rand)
+        private void ShuffleSection(Random rand)
+        {
+            List<QSheetSection> sections = Sections;
+            Sections = new List<QSheetSection>();
+
+            while (sections.Count > 1)
+            {
+                int idx = rand.Next() % sections.Count;
+                QSheetSection s = sections.ElementAt(idx);
+                Sections.Add(s);
+                sections.Remove(s);
+            }
+            if (sections.Count == 1)
+                Sections.Add(sections.ElementAt(0));
+        }
+
+        public QuestSheet RandomizeDeepCopy(Random rand, bool sectionShuffling)
         {
             QuestSheet sheet = new QuestSheet();
             sheet.ID = ID;
             sheet.Subject = Subject;
 
-            List<QSheetSection> sections = RandomizeDeepCopy_KeepSectionsOrder(rand);
-            sheet.Sections = new List<QSheetSection>();
-            while (sections.Count > 1)
-            {
-                int idx = rand.Next() % sections.Count;
-                QSheetSection s = sections.ElementAt(idx);
-                sheet.Sections.Add(s);
-                sections.Remove(s);
-            }
-            if (sections.Count == 1)
-                sheet.Sections.Add(sections.ElementAt(0));
+            sheet.Sections = RandomizeDeepCopy_KeepSectionsOrder(rand);
+
+            if (sectionShuffling)
+                ShuffleSection(rand);
 
             return sheet;
         }
