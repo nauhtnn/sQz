@@ -158,6 +158,11 @@ namespace sQzLib
         private Question ReadBytesOfQuestion(byte[] buf, ref int offs)
         {
             Question q = new Question();
+            int questionType;
+            if (!Enum.IsDefined(typeof(AnswerType), questionType = BitConverter.ToInt32(buf, offs)))
+                return null;
+            offs += 4;
+            q.QuestionType = (AnswerType) questionType;
             q.Stem = Utils.ReadBytesOfString(buf, ref offs);
             if (q.Stem == null)
                 return null;
@@ -174,6 +179,7 @@ namespace sQzLib
 
         private void AppendBytesOf(Question q, List<byte[]> byteList)
         {
+            byteList.Add(BitConverter.GetBytes((int)q.QuestionType));
             Utils.AppendBytesOfString(q.Stem, byteList);
             foreach (string option in q.Options)
                 Utils.AppendBytesOfString(option, byteList);
