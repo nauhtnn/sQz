@@ -84,10 +84,13 @@ namespace sQzLib
                 falseButton.Name = "False";
                 optionsView.Children.Add(falseButton);
 
-                if (choiceCodes[choiceCodeIdx] == OptionSelectAnswer.TRUE)
-                    trueButton.IsChecked = true;
-                else if (choiceCodes[choiceCodeIdx] == OptionSelectAnswer.FALSE)
-                    falseButton.IsChecked = true;
+                if(choiceCodes != null)
+                {
+                    if (choiceCodes[choiceCodeIdx] == OptionSelectAnswer.TRUE)
+                        trueButton.IsChecked = true;
+                    else if (choiceCodes[choiceCodeIdx] == OptionSelectAnswer.FALSE)
+                        falseButton.IsChecked = true;
+                }
             }
             return optionsView;
         }

@@ -60,12 +60,14 @@ namespace sQzLib
             DBConnect.Close(ref conn);
         }
 
+        //That RandomizeDeepCopy having its own DeepCopy codes created a bug by not setting question type
         public Question DeepCopy()
         {
             Question newQuestion = new Question();
             newQuestion.uId = uId;
-            newQuestion.Stem = Stem;
             newQuestion.SectionID = SectionID;
+            newQuestion.QuestionType = QuestionType;
+            newQuestion.Stem = Stem;
             newQuestion.Options = new string[OptionSelectAnswer.OPTION_COUNT];
             newQuestion.OptionShuffle = new int[OptionSelectAnswer.OPTION_COUNT];
             newQuestion.Answer = new byte[OptionSelectAnswer.OPTION_COUNT];
@@ -101,12 +103,14 @@ namespace sQzLib
         //    OptionShuffle = optionShuffle;
         //}
 
+        //That RandomizeDeepCopy having its own DeepCopy codes created a bug by not setting question type
         public Question RandomizeDeepCopy(Random rand)
         {
             Question newQuestion = new Question();
             newQuestion.uId = uId;
-            newQuestion.Stem = Stem;
             newQuestion.SectionID = SectionID;
+            newQuestion.QuestionType = QuestionType;
+            newQuestion.Stem = Stem;
             //randomize
             newQuestion.Options = new string[OptionSelectAnswer.OPTION_COUNT];
             newQuestion.Answer = new byte[OptionSelectAnswer.OPTION_COUNT];

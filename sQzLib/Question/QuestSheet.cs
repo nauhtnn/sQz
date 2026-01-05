@@ -473,20 +473,20 @@ namespace sQzLib
                     sections.Add(p2);
                     continue;
                 }
+                MTFIndependentQSection m = section as MTFIndependentQSection;
+                if (m != null)
+                {
+                    MTFIndependentQSection m2 = m.Clone() as MTFIndependentQSection;
+                    m2.Randomize(rand);
+                    sections.Add(m2);
+                    continue;
+                }
                 IndependentQSection i = section as IndependentQSection;
                 if (i != null)
                 {
                     IndependentQSection i2 = i.Clone() as IndependentQSection;
                     i2.Randomize(rand);
                     sections.Add(i2);
-                    continue;
-                }
-                MTFIndependentQSection m = section as MTFIndependentQSection;
-                if (i != null)
-                {
-                    MTFIndependentQSection m2 = m.Clone() as MTFIndependentQSection;
-                    m2.Randomize(rand);
-                    sections.Add(m2);
                     continue;
                 }
             }
