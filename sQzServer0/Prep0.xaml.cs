@@ -133,6 +133,7 @@ namespace sQzServer0
             vChk.Clear();
             SingleAnswerMCQView.IdxWidth = FontSize * 2;
             SingleAnswerMCQView.StemWidth = gDBQuest.ColumnDefinitions.First().Width.Value - SingleAnswerMCQView.IdxWidth;
+            OptionViewFactory.S().StemWidth = SingleAnswerMCQView.StemWidth;
             AnswerSheet ansSheet = new AnswerSheet();
             mDBQS.ExtractKey(ansSheet);
             int rowIdx = -1;
