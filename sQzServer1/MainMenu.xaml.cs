@@ -108,7 +108,12 @@ namespace sQzServer1
                 return;
             }
             tPw = tbxPw.Text;
-            Task.Run(() => { mClnt.ConnectWR(ref mCbMsg); });
+            Task.Run(() => {
+                if(mClnt.ConnectWR(ref mCbMsg))
+                {
+                    MessageBox.Show(mCbMsg.txt);
+                }
+            });
         }
 
         private void btnExit_Click(object sender, RoutedEventArgs e)
