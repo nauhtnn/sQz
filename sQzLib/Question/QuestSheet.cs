@@ -516,15 +516,11 @@ namespace sQzLib
                 DBSelectQuestions(conn, "deleted=0 AND subj_id=" + Subject +
                     " AND secid=" + (int)SectionTypeID.DefaultIndependentQuestions,
                     singleAnswerCount, random);
-            if (questions == null)
-                return;
+
             List<Question> moreQuestions =
                 DBSelectQuestions(conn, "deleted=0 AND subj_id=" + Subject +
                     " AND secid=" + (int)SectionTypeID.MTFIndependentQuestions,
                     MTF_count, random);
-
-            if (moreQuestions == null)
-                return;
 
             questions.AddRange(moreQuestions);
 
@@ -725,8 +721,10 @@ namespace sQzLib
         {
             List<uint> questionIds = RandomSubset(DBSelectQuestionIds(conn, condition), count, random);
 
-            if (questionIds == null)
-                return null;
+            List<Question> questions = new List<Question>();
+
+            if (questionIds == null || questionIds.Count == 0)
+                return questions;
 
             questionIds.Sort();
 
@@ -741,7 +739,6 @@ namespace sQzLib
             string query = DBConnect.mkQrySelect("sqz_question",
                 "id,secid,quest_type,stem,ans0,ans1,ans2,ans3,akey", condition);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, query, out eMsg);
-            List<Question> questions = new List<Question>();
 
             if (reader != null)
             {
