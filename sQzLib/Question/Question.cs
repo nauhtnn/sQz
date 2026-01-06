@@ -126,7 +126,7 @@ namespace sQzLib
                 --poolCount;
                 newQuestion.OptionShuffle[poolCount] = pickedIdx;
                 newQuestion.Options[poolCount] = Options[pickedIdx];
-                newQuestion.Answer[poolCount] = Answer[poolCount];
+                newQuestion.Answer[poolCount] = Answer[pickedIdx];
             }
 
             return newQuestion;
