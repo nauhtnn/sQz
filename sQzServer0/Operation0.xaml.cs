@@ -83,6 +83,8 @@ namespace sQzServer0
             w.Closing += W_Closing;
             w.FontSize = 16;
 
+            DisableQS_Gen();
+
             LoadTxt();
 
             LoadBrd();
@@ -132,7 +134,7 @@ namespace sQzServer0
                 }
             }
 
-            btnQGen.IsEnabled = false;
+            DisableQS_Gen();
             Thread th = new Thread(() => {mServer.Start(ref mCbMsg);});
             th.Start();
             btnStop.IsEnabled = true;
@@ -264,7 +266,7 @@ namespace sQzServer0
             btnStop.Content = t._((int)TxI.STOP_SRVR);
             btnMMenu.Content = t._((int)TxI.BACK_MMENU);
             btnQGen.Content = t._((int)TxI.QS_GEN);
-            //btnQSav.Content = t._((int)TxI.OP_Q_SAV);
+            btnQSav.Content = t._((int)TxI.OP_Q_SAV);
             txtSubject.Text = t._((int)TxI.SUBJECT);
             txtDuration.Text = t._((int)TxI.DURATION) +
                 "(" + t._((int)TxI.MINUTE) + ")";
@@ -300,17 +302,24 @@ namespace sQzServer0
                 lbxSl_Selected(lbxBrd.SelectedItem, null);
         }
 
-        //void DisableQSGen()
-        //{
-        //    btnQGen.IsEnabled = false;
-        //    //btnQGen.Foreground = Theme.s._[(int)BrushId.FG_Gray];
-        //    //btnQGen.Background = Theme.s._[(int)BrushId.BG_Gray];
-        //}
+        void DisableQS_Gen()
+        {
+            //rem in developing. MUST unrem in production. btnQGen.IsEnabled = false;
+            //btnQGen.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+            //btnQGen.Background = Theme.s._[(int)BrushId.BG_Gray];
+        }
 
         //void EnableQSGen()
         //{
         //    btnQGen.IsEnabled = true;
         //}
+
+        void DisableQS_Save()
+        {
+            //rem in developing. MUST unrem in production. btnQSave.IsEnabled = false;
+            //btnQSave.Foreground = Theme.s._[(int)BrushId.FG_Gray];
+            //btnQSave.Background = Theme.s._[(int)BrushId.BG_Gray];
+        }
 
         private void lbxSl_Selected(object sender, RoutedEventArgs e)
         {
@@ -381,7 +390,12 @@ namespace sQzServer0
                     vw.mSl.eStt == ExamStt.Prep)// && vw.mSl.MaxNumberOfExaminees_PerSubject() > 0)
                 btnQGen.IsEnabled = true; //EnableQSGen();
             else
-                btnQGen.IsEnabled = false; //DisableQSGen();
+                DisableQS_Gen();
+        }
+
+        private void btnQSav_Click(object sender, RoutedEventArgs e)
+        {
+
         }
     }
 }

@@ -356,6 +356,30 @@ namespace sQzServer0
             return tbi;
         }
 
+        private byte[] FindAnswerKeysById(int id)
+        {
+            foreach (AnswerKeyPack pack in mSl.AnswerKeyPacks.Values)
+            {
+                if (pack.vSheet.ContainsKey(id))
+                {
+                    return pack.vSheet[id].BytesOfAnswer;
+                }
+            }
+            return null;
+        }
+
+        private QuestSheet FindQuestSheetById(int id)
+        {
+            foreach (QuestPack pack in mSl.QuestionPacks.Values)
+            {
+                if (pack.vSheet.ContainsKey(id))
+                {
+                    return pack.vSheet[id];
+                }
+            }
+            return null;
+        }
+
         private void tbiQ_GotFocus(object sender, RoutedEventArgs e)
         {;
             TabItem tbi = sender as TabItem;
@@ -364,20 +388,17 @@ namespace sQzServer0
             TabControl tbc = tbi.Parent as TabControl;
             if (tbc == null)
                 return;
+            
             int id = int.Parse((tbi.Header as TextBlock).Text);
-            QuestSheet qs = null;
-            foreach(QuestPack pack in mSl.QuestionPacks.Values)
-            {
-                if (pack.vSheet.ContainsKey(id))
-                {
-                    qs = pack.vSheet[id];
-                    break;
-                }
-            }
+
+            QuestSheet qs = FindQuestSheetById(id);
             if (qs == null)
                 return;
+
+            byte[] answerKeys = FindAnswerKeysById(id);
+
             ScrollViewer svwr = new ScrollViewer();
-            svwr.Content = new QuestionSheetView(qs, null, FontSize * 2, tbc.Width - FontSize * 2 - SystemParameters.ScrollWidth);
+            svwr.Content = new QuestionSheetView(qs, answerKeys, FontSize * 2, tbc.Width - FontSize * 2 - SystemParameters.ScrollWidth);
             svwr.Height = 560;
             tbi.Content = svwr;
         }
