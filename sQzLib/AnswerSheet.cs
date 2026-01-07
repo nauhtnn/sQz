@@ -41,7 +41,7 @@ namespace sQzLib
             {
                 BytesOfAnswer = new byte[BytesOfAnswer_Length];
                 for(int i = 0; i < BytesOfAnswer_Length; ++i)
-                    BytesOfAnswer[i] = 0;
+                    BytesOfAnswer[i] = QuestionAnswer.NO_CHOICE;
             }
         }
 

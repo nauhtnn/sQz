@@ -50,7 +50,7 @@ namespace sQzLib
             foreach (string text in options)
             {
                 OptionView option = new OptionView(text, idx++, StemWidth);
-                if (optionStatusArray != null && optionStatusArray[answerIdx++] == OptionSelectAnswer.TRUE)//update view from log
+                if (optionStatusArray != null && optionStatusArray[answerIdx++] == QuestionAnswer.TRUE)//update view from log
                     option.IsSelected = true;
                 optionsView.Items.Add(option);
             }
@@ -86,9 +86,9 @@ namespace sQzLib
 
                 if(choiceCodes != null)
                 {
-                    if (choiceCodes[choiceCodeIdx] == OptionSelectAnswer.TRUE)
+                    if (choiceCodes[choiceCodeIdx] == QuestionAnswer.TRUE)
                         trueButton.IsChecked = true;
-                    else if (choiceCodes[choiceCodeIdx] == OptionSelectAnswer.FALSE)
+                    else if (choiceCodes[choiceCodeIdx] == QuestionAnswer.FALSE)
                         falseButton.IsChecked = true;
                 }
             }

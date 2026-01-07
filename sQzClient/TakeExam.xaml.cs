@@ -262,9 +262,12 @@ namespace sQzClient
                 SingleAnswerMCQView q = i as SingleAnswerMCQView;
                 if(q != null)
                 {
-                    /*temporary rem to test, MUST unrem later
-                    q.optionsView.SelectionChanged += OptionsView_SelectionChanged;
-                    q.optionsView.Name = "_" + q.Idx.ToString();*/
+                    ListBox listBox = q.optionsView as ListBox;
+                    if (listBox != null)
+                    {
+                        listBox.SelectionChanged += OptionsView_SelectionChanged;
+                        listBox.Name = "_" + q.Idx.ToString();
+                    }
                 }
                 else
                 {
@@ -273,9 +276,12 @@ namespace sQzClient
                     {
                         foreach(SingleAnswerMCQView q_in_p in p.QuestionsViews)
                         {
-                            /*temporary rem to test, MUST unrem later
-                            q_in_p.optionsView.SelectionChanged += OptionsView_SelectionChanged;
-                            q_in_p.optionsView.Name = "_" + q_in_p.Idx.ToString();*/
+                            ListBox listBox = q_in_p.optionsView as ListBox;
+                            if (listBox != null)
+                            {
+                                listBox.SelectionChanged += OptionsView_SelectionChanged;
+                                listBox.Name = "_" + q_in_p.Idx.ToString();
+                            }
                         }
                     }
                 }
@@ -283,27 +289,41 @@ namespace sQzClient
             svwrQSh.Content = qsheetView;
         }
 
-        private void OptionsView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void OptionListBox_SelectionChanged(ListBox options)
         {
-            thisExaminee.AnswerSheet.bChanged = true;
-            ListBox l = sender as ListBox;
-            if (l.SelectedItem == null)
+            if (options.SelectedItem == null)
                 return;
-            int qid = Convert.ToInt32(l.Name.Substring(1));
+            int qid = Convert.ToInt32(options.Name.Substring(1));
             int i = -1;
-            foreach (ListBoxItem li in l.Items)
+            foreach (ListBoxItem li in options.Items)
             {
                 ++i;
                 if (li.IsSelected)
                 {
-                    thisExaminee.AnswerSheet.BytesOfAnswer[qid * 4 + i] = 1;
+                    thisExaminee.AnswerSheet.BytesOfAnswer[qid * 4 + i] = QuestionAnswer.TRUE;
                     OptionView v = li as OptionView;
                     if (v != null)
-                        SelectedLabels[qid+1].Content = v.Idx_Label;
+                        SelectedLabels[qid + 1].Content = v.Idx_Label;
                 }
                 else
-                    thisExaminee.AnswerSheet.BytesOfAnswer[qid * 4 + i] = 0;
+                    thisExaminee.AnswerSheet.BytesOfAnswer[qid * 4 + i] = QuestionAnswer.FALSE;
             }
+        }
+
+        private void OptionRadio_SelectionChanged(RadioButton optionRadio)
+        {
+            System.Windows.MessageBox.Show("Chưa hỗ trợ câu trả lời đúng / sai.");
+        }
+
+        private void OptionsView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            thisExaminee.AnswerSheet.bChanged = true;
+
+            if (sender is ListBox)
+                OptionListBox_SelectionChanged(sender as ListBox);
+            else if (sender is RadioButton)
+                OptionRadio_SelectionChanged(sender as RadioButton);
+
         }
 
         public void Submit()

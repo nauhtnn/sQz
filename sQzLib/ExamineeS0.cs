@@ -171,8 +171,17 @@ namespace sQzLib
                 AnswerSheet.BytesOfAnswer = new byte[ans.Length];
                 AnswerSheet.BytesOfAnswer_Length = AnswerSheet.BytesOfAnswer.Length;
                 for (int i = 0; i < ans.Length; ++i)
-                    if (ans[i] == QuestionAnswer.TRUE)
-                        AnswerSheet.BytesOfAnswer[i] = 1;
+                {
+                    if (ans[i] == QuestionAnswer.TRUE ||
+                        ans[i] == QuestionAnswer.FALSE ||
+                        ans[i] == QuestionAnswer.NO_CHOICE)
+                        AnswerSheet.BytesOfAnswer[i] = (byte)ans[i];
+                    else
+                    {
+                        System.Windows.MessageBox.Show("DB examinee answer has this unexpected option: " + ans[i]);
+                        AnswerSheet.BytesOfAnswer[i] = QuestionAnswer.NO_CHOICE;
+                    }
+                }
             }
         }
 
