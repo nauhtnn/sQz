@@ -139,6 +139,75 @@ namespace sQzClient
             dtLastLog = kDtStart = DateTime.Now;
         }
 
+        void AnswerSheet_NewCellAtBottomRow(string answerIdx, int column, Brush border, bool isLastRow)
+        {
+            Label cell = new Label();
+            Grid.SetRow(cell, gAnsSh.RowDefinitions.Count - 1);
+            Grid.SetColumn(cell, column);
+            cell.BorderBrush = border;
+            cell.HorizontalContentAlignment = HorizontalAlignment.Center;
+            cell.FontWeight = FontWeights.Bold;
+
+            if(column == 0)
+            {
+                cell.Content = answerIdx;
+                if(isLastRow)
+                    cell.BorderThickness = Theme.s.l[(int)ThicknessId.LB];
+                else
+                    cell.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
+            }
+            else
+            {
+                char labelFromSaveFile;
+                if (LabelFromSaveFile(gAnsSh.RowDefinitions.Count - 1, out labelFromSaveFile))
+                    cell.Content = labelFromSaveFile;
+                if(isLastRow)
+                    cell.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
+                else
+                    cell.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
+
+                SelectedLabels.Add(gAnsSh.RowDefinitions.Count, cell);
+            }
+
+            gAnsSh.Children.Add(cell);
+        }
+
+        void AnswerSheetView_AddSingleAnswer(string questionIdx, Brush border, bool isLastRow)
+        {
+            gAnsSh.RowDefinitions.Add(new RowDefinition());
+
+            AnswerSheet_NewCellAtBottomRow(questionIdx, 0, border, isLastRow);
+            AnswerSheet_NewCellAtBottomRow(questionIdx, 1, border, isLastRow);
+        }
+
+        void AnswerSheetView_AddMTFAnswer(string questionIdx1, Brush border, bool isLastRow)
+        {
+            char option = 'a';
+            int i = 0;
+            while(i < OptionSelectAnswer.OPTION_COUNT)
+            {
+                gAnsSh.RowDefinitions.Add(new RowDefinition());
+
+                AnswerSheet_NewCellAtBottomRow(questionIdx1 + '.' + option, 0, border, isLastRow);
+                AnswerSheet_NewCellAtBottomRow(questionIdx1 + '.' + option, 1, border, isLastRow);
+
+                ++option;
+                ++i;
+            }
+        }
+
+        void AnswerSheetView_AddAtBottomRow(int questionIdx, Brush border, bool isLastRow)
+        {
+            Question question = this.QuestionSheet.ElementAt(questionIdx);
+            if (question == null)
+                return;
+
+            if (question.QuestionType == AnswerType.SingleAnswer)
+                AnswerSheetView_AddSingleAnswer((questionIdx + 1).ToString(), border, isLastRow);
+            else if (question.QuestionType == AnswerType.MultipleTrueFalse)
+                AnswerSheetView_AddMTFAnswer((questionIdx + 1).ToString(), border, isLastRow);
+        }
+
         void InitAnswerSheet()
         {
             thisExaminee.AnswerSheet.Init(QuestionSheet);
@@ -148,17 +217,16 @@ namespace sQzClient
             spLp.HorizontalAlignment = HorizontalAlignment.Left;
             spLp.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
             //title
-            Label l = new Label();
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             int n = QuestionSheet.CountAllQuestions();
             SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
             //next lines
             SelectedLabels = new Dictionary<int, Label>();
-            int j = 1;
-            for (; j < n; ++j)
+            
+            for (int j = 0; j < n; ++j)
             {
-                gAnsSh.RowDefinitions.Add(new RowDefinition());
-                l = new Label();
+                AnswerSheetView_AddAtBottomRow(j, brBK, false);
+                /*l = new Label();
                 l.Content = j;
                 l.BorderBrush = brBK;
                 l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
@@ -179,11 +247,11 @@ namespace sQzClient
 
                 char labelFromSaveFile;
                 if (LabelFromSaveFile(j - 1, out labelFromSaveFile))
-                    l.Content = labelFromSaveFile;
+                    l.Content = labelFromSaveFile;*/
             }
             //bottom lines
-            gAnsSh.RowDefinitions.Add(new RowDefinition());
-            l = new Label();
+            AnswerSheetView_AddAtBottomRow(n -1, brBK, true);
+            /*l = new Label();
             l.Content = j;
             l.BorderBrush = brBK;
             l.BorderThickness = Theme.s.l[(int)ThicknessId.LB];
@@ -204,7 +272,7 @@ namespace sQzClient
 
             char lastLabelFromSaveFile;
             if (LabelFromSaveFile(j - 1, out lastLabelFromSaveFile))
-                l.Content = lastLabelFromSaveFile;
+                l.Content = lastLabelFromSaveFile;*/
 
             //for (j = Question.svQuest[0].Count; -1 < j; --j)
             //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
@@ -212,19 +280,29 @@ namespace sQzClient
 
         private bool LabelFromSaveFile(int questionIdx, out char label)
         {
+            label = ' ';
+            return false;
+            /*MUST DO IT LATER
+            bool noChoice = true;
             label = 'A';
             for(int optionIdx = questionIdx * OptionSelectAnswer.OPTION_COUNT,
                 end = optionIdx + OptionSelectAnswer.OPTION_COUNT;
                 optionIdx < end; ++optionIdx)
             {
-                if (thisExaminee.AnswerSheet.BytesOfAnswer[optionIdx] == 0)
-                    ++label;
-                else
+                if (thisExaminee.AnswerSheet.BytesOfAnswer[optionIdx] == QuestionAnswer.TRUE)
+                {
+                    noChoice = false;
                     break;
+                }
+                ++label;
+                if (thisExaminee.AnswerSheet.BytesOfAnswer[optionIdx] == QuestionAnswer.FALSE)
+                    noChoice = false;
             }
-            if (label < 'A' + OptionSelectAnswer.OPTION_COUNT)
-                return true;
-            return false;
+
+            if (noChoice)
+                return false;
+
+            return true;*/
         }
 
         //void InitQuesttonSheetView()
@@ -312,7 +390,7 @@ namespace sQzClient
 
         private void OptionRadio_SelectionChanged(RadioButton optionRadio)
         {
-            System.Windows.MessageBox.Show("Chưa hỗ trợ câu trả lời đúng / sai.");
+            MessageBox.Show("Chưa hỗ trợ câu trả lời đúng / sai.");
         }
 
         private void OptionsView_SelectionChanged(object sender, SelectionChangedEventArgs e)

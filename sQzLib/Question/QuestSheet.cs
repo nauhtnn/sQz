@@ -60,10 +60,20 @@ namespace sQzLib
             ID = -1;
         }
 
-        //public Question Q(int idx)
-        //{
-        //    return IndependentQuestions[idx];
-        //}
+        public Question ElementAt(int idx)
+        {
+            foreach(QSheetSection section in Sections)
+            {
+                if (idx < section.Questions.Count)
+                    return section.Questions.ElementAt(idx);
+                else
+                    idx -= section.Questions.Count;
+            }
+
+            System.Windows.MessageBox.Show("Question sheet count: " + CountAllQuestions() +
+                ". Get question index out of range: " + idx);
+            return null;
+        }
 
         //public void Add(Question q)
         //{
