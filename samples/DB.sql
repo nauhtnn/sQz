@@ -1,7 +1,7 @@
 -- proposed database name = sqz[port][version]
 -- database name = sqzEN
 CREATE TABLE IF NOT EXISTS `sqz_version`(`ver` INT);
-INSERT INTO `sqz_version` VALUES (100);
+INSERT INTO `sqz_version` VALUES (200);
 
 CREATE TABLE IF NOT EXISTS `sqz_slot`(`dt` DATETIME, `status` INT,
 PRIMARY KEY(`dt`));
@@ -42,12 +42,15 @@ FOREIGN KEY(`dt`, `qsid`) REFERENCES `sqz_qsheet`(`dt`, `id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_sec_type`(`id` INT PRIMARY KEY,
 `name` VARCHAR(32));
-INSERT INTO `sqz_sec_type` VALUES (0, 'DefaultIndependentQuestions'), (1, 'BasicPassage'), (2, 'PassageWithBlanks'), (3, 'MTFIndependentQuestions');
+
+INSERT INTO `sqz_sec_type` VALUES (0, 'DefaultIndependentQuestions'), (1, 'MTFIndependentQuestions'), (2, 'BasicPassage'), (3, 'PassageWithBlanks');
 
 CREATE TABLE IF NOT EXISTS `sqz_section`(`id` INT PRIMARY KEY,
 `s_type` INT, `req` TEXT CHARACTER SET `utf8mb4`,
 `psg` TEXT CHARACTER SET `utf8mb4`, `config` TEXT CHARACTER SET `utf8mb4`,
 FOREIGN KEY(`s_type`) REFERENCES `sqz_sec_type`(`id`));
+
+INSERT INTO `sqz_section` VALUES (0, 0, 'initial req', 'initial psg', 'initial config'), (1, 1, 'initial req', 'initial psg', 'initial config');
 
 CREATE TABLE IF NOT EXISTS `sqz_question`(`id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
 `subj_id` INT,
