@@ -331,77 +331,136 @@ namespace sQzClient
         //    QuestionSheetContainer.Background = Theme.s._[(int)BrushId.BG];
         //}
 
+        void SetOptionViewEventHandler(SingleAnswerMCQView questView)
+        {
+            ListBox listBoxOption = questView.optionsView as ListBox;
+            if (listBoxOption != null)
+            {
+                listBoxOption.SelectionChanged += ListBoxOption_SelectionChanged;
+
+                return;
+            }
+
+            StackPanel radioOption = questView.optionsView as StackPanel;
+            if (radioOption != null)
+            {
+                if (radioOption.Children.Count != 12)
+                    MessageBox.Show("TrueFalseOptions count is out of range: "
+                        + radioOption.Children.Count);
+                else
+                {
+                    foreach(UIElement elem in radioOption.Children)
+                    {
+                        RadioButton TF_option = elem as RadioButton;
+                        if(TF_option != null)
+                        {
+                            TF_option.Checked += RadioOption_Checked;
+                            /*Only need to handle checked event
+                            TF_option.Unchecked += RadioOption_SelectionChanged;*/
+                        }
+                    }
+                }
+            }
+        }
+
         void InitQuesttonSheetView()
         {
-            QuestionSheetView qsheetView = new QuestionSheetView(QuestionSheet, thisExaminee.AnswerSheet.BytesOfAnswer, FontSize * 2,
+            QuestionSheetView qsheetView = new QuestionSheetView(QuestionSheet,
+                thisExaminee.AnswerSheet.BytesOfAnswer, FontSize * 2,
                 svwrQSh.Width - FontSize * 2 - SystemParameters.ScrollWidth * 4);
             foreach(object i in qsheetView.Children)
             {
                 SingleAnswerMCQView q = i as SingleAnswerMCQView;
                 if(q != null)
-                {
-                    ListBox listBox = q.optionsView as ListBox;
-                    if (listBox != null)
-                    {
-                        listBox.SelectionChanged += OptionsView_SelectionChanged;
-                        listBox.Name = "_" + q.Idx.ToString();
-                    }
-                }
+                    SetOptionViewEventHandler(q);
                 else
                 {
                     BasicPassageSectionView p = i as BasicPassageSectionView;
                     if(p != null)
                     {
                         foreach(SingleAnswerMCQView q_in_p in p.QuestionsViews)
-                        {
-                            ListBox listBox = q_in_p.optionsView as ListBox;
-                            if (listBox != null)
-                            {
-                                listBox.SelectionChanged += OptionsView_SelectionChanged;
-                                listBox.Name = "_" + q_in_p.Idx.ToString();
-                            }
-                        }
+                            SetOptionViewEventHandler(q_in_p);
                     }
                 }
             }
             svwrQSh.Content = qsheetView;
         }
 
-        private void OptionListBox_SelectionChanged(ListBox options)
+        int GetBytesOfAnswerIdxByQuesIdx(int questIdx, int optionIdx)
         {
-            if (options.SelectedItem == null)
-                return;
-            int qid = Convert.ToInt32(options.Name.Substring(1));
-            int i = -1;
-            foreach (ListBoxItem li in options.Items)
-            {
-                ++i;
-                if (li.IsSelected)
-                {
-                    thisExaminee.AnswerSheet.BytesOfAnswer[qid * 4 + i] = QuestionAnswer.TRUE;
-                    OptionView v = li as OptionView;
-                    if (v != null)
-                        SelectedLabels[qid + 1].Content = v.Idx_Label;
-                }
-                else
-                    thisExaminee.AnswerSheet.BytesOfAnswer[qid * 4 + i] = QuestionAnswer.FALSE;
-            }
+            return questIdx * 4 + optionIdx;
         }
 
-        private void OptionRadio_SelectionChanged(RadioButton optionRadio)
-        {
-            MessageBox.Show("Chưa hỗ trợ câu trả lời đúng / sai.");
-        }
-
-        private void OptionsView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void RadioOption_Checked(object sender, RoutedEventArgs e)
         {
             thisExaminee.AnswerSheet.bChanged = true;
 
-            if (sender is ListBox)
-                OptionListBox_SelectionChanged(sender as ListBox);
-            else if (sender is RadioButton)
-                OptionRadio_SelectionChanged(sender as RadioButton);
+            RadioButton radio = sender as RadioButton;
 
+            if (radio == null)
+            {
+                MessageBox.Show("Option is not radio button.");
+                return;
+            }
+
+            int questIdx = int.Parse(radio.Name.Substring(1,
+                radio.Name.IndexOf('_', 1) - 1));
+            int x = radio.Name.IndexOf("__", 0) + 2;
+            int optionIdx = int.Parse(radio.Name.Substring(x,
+                radio.Name.IndexOf("___", 0) - x));
+
+            int BOA_idx = GetBytesOfAnswerIdxByQuesIdx(questIdx, optionIdx);
+
+            if(radio.Name.EndsWith("True") && radio.IsChecked == true)
+            {
+                thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx] = QuestionAnswer.TRUE;
+            }
+            else if(radio.Name.EndsWith("False") && radio.IsChecked == true)
+            {
+                thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx] = QuestionAnswer.FALSE;
+            }
+            else
+            {
+                /*MessageBox.Show("Unhandled radio name: " + radio.Name +
+                    ". Event: " + radio.IsChecked);*/
+            }
+        }
+
+        private void ListBoxOption_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            thisExaminee.AnswerSheet.bChanged = true;
+
+            ListBox options = sender as ListBox;
+
+            if (options == null)
+            {
+                MessageBox.Show("Option is not list box.");
+                return;
+            }
+
+            if (options.SelectedItem == null)
+            {
+                MessageBox.Show("Option list box has no selected item.");
+                return;
+            }
+
+            int questIdx = Convert.ToInt32(options.Name.Substring(1));
+            int BOA_idx = GetBytesOfAnswerIdxByQuesIdx(questIdx, 0);
+            int i = 0;
+            foreach (ListBoxItem li in options.Items)
+            {
+                if (li.IsSelected)
+                {
+                    thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx + i] = QuestionAnswer.TRUE;
+                    OptionView v = li as OptionView;
+                    if (v != null)
+                        SelectedLabels[questIdx + 1].Content = v.Idx_Label;
+                }
+                else
+                    thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx + i] = QuestionAnswer.FALSE;
+
+                ++i;
+            }
         }
 
         public void Submit()

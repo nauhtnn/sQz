@@ -42,6 +42,7 @@ namespace sQzLib
         public ListBox CreateOptionsView_SingleAnswer(string[] options, byte[] optionStatusArray, int questionIdx_start0)
         {
             ListBox optionsView = new ListBox();
+            optionsView.Name = "_" + questionIdx_start0;
             optionsView.Width = StemWidth;
             optionsView.BorderBrush = Theme.s._[(int)BrushId.Ans_TopLine];
             optionsView.BorderThickness = new Thickness(0, 4, 0, 0);
@@ -61,27 +62,29 @@ namespace sQzLib
         {
             StackPanel optionsView = new StackPanel();
             optionsView.Width = StemWidth;
-            int answerIdx = -1;
-            int choiceCodeIdx = questionIdx_start0 * OptionSelectAnswer.OPTION_COUNT - 1;
+            int answerIdx = 0;
+            int choiceCodeIdx = questionIdx_start0 * OptionSelectAnswer.OPTION_COUNT;
+            char optionLabel = 'a';
             foreach (string text in options)
             {
-                answerIdx++;
-                choiceCodeIdx++;
-
                 TextBlock option = new TextBlock();
-                option.Text = text;
+                option.Width = StemWidth;
+                option.TextWrapping = TextWrapping.Wrap;
+                option.Text = optionLabel.ToString() + ") " + text;
                 optionsView.Children.Add(option);
-                
+
+                string groupName = "_" + questionIdx_start0.ToString() + "_Group__" + answerIdx;
+
                 RadioButton trueButton = new RadioButton();
-                trueButton.GroupName = questionIdx_start0.ToString() + "_" + answerIdx + "_TrueFalse";
+                trueButton.GroupName = groupName;
                 trueButton.Content = "Đúng";
-                trueButton.Name = "True";
+                trueButton.Name = groupName + "___True";
                 optionsView.Children.Add(trueButton);
                 
                 RadioButton falseButton = new RadioButton();
-                falseButton.GroupName = questionIdx_start0.ToString() + "_" + answerIdx + "_TrueFalse";
+                falseButton.GroupName = groupName;
                 falseButton.Content = "Sai";
-                falseButton.Name = "False";
+                falseButton.Name = groupName + "___False";
                 optionsView.Children.Add(falseButton);
 
                 if(choiceCodes != null)
@@ -91,6 +94,10 @@ namespace sQzLib
                     else if (choiceCodes[choiceCodeIdx] == QuestionAnswer.FALSE)
                         falseButton.IsChecked = true;
                 }
+
+                ++answerIdx;
+                ++choiceCodeIdx;
+                ++optionLabel;
             }
             return optionsView;
         }

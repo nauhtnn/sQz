@@ -155,7 +155,10 @@ namespace sQzLib
                 bytes_length = question_count * OptionSelectAnswer.OPTION_COUNT;
             }
             else
+            {
                 bytes_length = 0;
+                System.Windows.MessageBox.Show("Extracting key has error. Byte length = 0.");
+            }
             answerSheet.BytesOfAnswer_Length = bytes_length;
             answerSheet.BytesOfAnswer = new byte[bytes_length];
             int i = -1;
@@ -163,6 +166,21 @@ namespace sQzLib
                 foreach (Question q in section.Questions)
                     foreach (char x in q.Answer)
                         answerSheet.BytesOfAnswer[++i] = Convert.ToByte(x);
+
+            answerSheet.QuestionTypes = GetQuestionTypes();
+        }
+
+        AnswerType[] GetQuestionTypes()
+        {
+            List<AnswerType> questionTypes = new List<AnswerType>();
+
+            foreach (QSheetSection section in Sections)
+                foreach (Question quest in section.Questions)
+                    questionTypes.Add(quest.QuestionType);
+
+            if (questionTypes.Count == 0)
+                return null;
+            return questionTypes.ToArray();
         }
 
         private Question ReadBytesOfQuestion(byte[] buf, ref int offs)

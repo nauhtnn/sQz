@@ -13,6 +13,7 @@ namespace sQzLib
         public int BytesOfAnswer_Length;
         public int Subject;
         public int QuestSheetID;
+        public AnswerType[] QuestionTypes;
         public bool bChanged;
         public byte[] BytesOfAnswer;
         public string tAns
@@ -31,11 +32,13 @@ namespace sQzLib
             bChanged = false;
             BytesOfAnswer = null;
             QuestSheetID = ExamineeA.LV_CAP;
+            QuestionTypes = null;
         }
 
         public void Init(QuestSheet qsheet)
         {
             QuestSheetID = qsheet.ID;
+            QuestionTypes = null;
             BytesOfAnswer_Length = qsheet.CountAllQuestions() * OptionSelectAnswer.OPTION_COUNT;
             if (BytesOfAnswer == null)
             {
@@ -47,16 +50,17 @@ namespace sQzLib
 
         public byte[] GetBytes_S0SendingToS1()
         {
-            byte[] buf = new byte[8 + BytesOfAnswer_Length];
-            int offs = 0;
-            Buffer.BlockCopy(BitConverter.GetBytes(QuestSheetID),
-                        0, buf, offs, 4);
-            offs += 4;
-            Buffer.BlockCopy(BitConverter.GetBytes(BytesOfAnswer_Length),
-                        0, buf, offs, 4);
-            offs += 4;
-            Buffer.BlockCopy(BytesOfAnswer, 0, buf, offs, BytesOfAnswer_Length);
-            return buf;
+            List<byte[]> bytes = new List<byte[]>();
+            bytes.Add(BitConverter.GetBytes(QuestSheetID));
+            bytes.Add(BitConverter.GetBytes(QuestionTypes.Length));
+            foreach (AnswerType type in QuestionTypes)
+                bytes.Add(BitConverter.GetBytes((int)type));
+
+            bytes.Add(BitConverter.GetBytes(BytesOfAnswer_Length));
+
+            bytes.Add(BytesOfAnswer);
+
+            return Utils.ToArray_FromListOfBytes(bytes);
         }
 
         public bool ReadBytes_S1ReceivingFromS0(byte[] buf, ref int offs)
@@ -67,6 +71,26 @@ namespace sQzLib
             QuestSheetID = BitConverter.ToInt32(buf, offs);
             offs += 4;
             l -= 4;
+
+            if (l < 4)
+                return true;
+            int questCount = BitConverter.ToInt32(buf, offs);
+            offs += 4;
+            l -= 4;
+
+            if (l < sizeof(int) * questCount)
+                return true;
+            QuestionTypes = new AnswerType[questCount];
+            for(int i = 0; i < questCount; ++i)
+            {
+                int type;
+                if (!Enum.IsDefined(typeof(AnswerType), type = BitConverter.ToInt32(buf, offs)))
+                    return true;
+                QuestionTypes[i] = (AnswerType)type;
+
+                offs += 4;
+                l -= 4;
+            }
 
             if (l < 4)
                 return true;
@@ -92,17 +116,22 @@ namespace sQzLib
                 return 103;
             double grade = 0;
             int offs = 0;
-            int part1QuestionCount = 22;
+            var typeItor = QuestionTypes.GetEnumerator();
+
+            if (typeItor == null)
+                return 999;
+
             while(offs < BytesOfAnswer.Length)
             {
+                typeItor.MoveNext();
+
                 int offs4 = offs + 4;
-                if (part1QuestionCount > 0)
-                {
-                    grade += SingleAnswer.S().Grade(ans, BytesOfAnswer, offs);
-                    part1QuestionCount--;
-                }
-                else
+
+                if ((AnswerType)typeItor.Current == AnswerType.MultipleTrueFalse)
                     grade += MTFAnswer.S().Grade(ans, BytesOfAnswer, offs);
+                else
+                    grade += SingleAnswer.S().Grade(ans, BytesOfAnswer, offs);
+
                 offs = offs4;
             }
             return grade;
