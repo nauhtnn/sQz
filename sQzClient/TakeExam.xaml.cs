@@ -142,7 +142,8 @@ namespace sQzClient
         void AnswerSheet_NewCellAtBottomRow(string answerIdx, int column, Brush border, bool isLastRow)
         {
             Label cell = new Label();
-            Grid.SetRow(cell, gAnsSh.RowDefinitions.Count - 1);
+            int bottomRow = gAnsSh.RowDefinitions.Count - 1;
+            Grid.SetRow(cell, bottomRow);
             Grid.SetColumn(cell, column);
             cell.BorderBrush = border;
             cell.HorizontalContentAlignment = HorizontalAlignment.Center;
@@ -159,14 +160,14 @@ namespace sQzClient
             else
             {
                 char labelFromSaveFile;
-                if (LabelFromSaveFile(gAnsSh.RowDefinitions.Count - 1, out labelFromSaveFile))
+                if (LabelFromSaveFile(bottomRow, out labelFromSaveFile))
                     cell.Content = labelFromSaveFile;
                 if(isLastRow)
                     cell.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
                 else
                     cell.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
 
-                SelectedLabels.Add(gAnsSh.RowDefinitions.Count, cell);
+                SelectedLabels.Add(bottomRow, cell);
             }
 
             gAnsSh.Children.Add(cell);
@@ -198,7 +199,7 @@ namespace sQzClient
 
         void AnswerSheetView_AddAtBottomRow(int questionIdx, Brush border, bool isLastRow)
         {
-            Question question = this.QuestionSheet.ElementAt(questionIdx);
+            Question question = QuestionSheet.ElementAt(questionIdx);
             if (question == null)
                 return;
 
@@ -216,66 +217,19 @@ namespace sQzClient
             //left panel
             spLp.HorizontalAlignment = HorizontalAlignment.Left;
             spLp.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
-            //title
+
             gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
             int n = QuestionSheet.CountAllQuestions();
             SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
+
             //next lines
             SelectedLabels = new Dictionary<int, Label>();
             
-            for (int j = 0; j < n; ++j)
-            {
+            for (int j = 0; j < n - 1; ++j)
                 AnswerSheetView_AddAtBottomRow(j, brBK, false);
-                /*l = new Label();
-                l.Content = j;
-                l.BorderBrush = brBK;
-                l.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
-                l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                l.FontWeight = FontWeights.Bold;
-                Grid.SetRow(l, j - 1);
-                Grid.SetColumn(l, 0);
-                gAnsSh.Children.Add(l);
-                l = new Label();
-                l.BorderBrush = brBK;
-                l.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
-                l.HorizontalContentAlignment = HorizontalAlignment.Center;
-                l.FontWeight = FontWeights.Bold;
-                Grid.SetRow(l, j - 1);
-                Grid.SetColumn(l, 1);
-                gAnsSh.Children.Add(l);
-                SelectedLabels.Add(j, l);
 
-                char labelFromSaveFile;
-                if (LabelFromSaveFile(j - 1, out labelFromSaveFile))
-                    l.Content = labelFromSaveFile;*/
-            }
             //bottom lines
             AnswerSheetView_AddAtBottomRow(n -1, brBK, true);
-            /*l = new Label();
-            l.Content = j;
-            l.BorderBrush = brBK;
-            l.BorderThickness = Theme.s.l[(int)ThicknessId.LB];
-            l.HorizontalContentAlignment = HorizontalAlignment.Center;
-            l.FontWeight = FontWeights.Bold;
-            Grid.SetRow(l, j - 1);
-            Grid.SetColumn(l, 0);
-            gAnsSh.Children.Add(l);
-            l = new Label();
-            l.BorderBrush = brBK;
-            l.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
-            l.HorizontalContentAlignment = HorizontalAlignment.Center;
-            l.FontWeight = FontWeights.Bold;
-            Grid.SetRow(l, j - 1);
-            Grid.SetColumn(l, 1);
-            gAnsSh.Children.Add(l);
-            SelectedLabels.Add(j, l);
-
-            char lastLabelFromSaveFile;
-            if (LabelFromSaveFile(j - 1, out lastLabelFromSaveFile))
-                l.Content = lastLabelFromSaveFile;*/
-
-            //for (j = Question.svQuest[0].Count; -1 < j; --j)
-            //    gAnsSh.RowDefinitions[j].Height = new GridLength(32, GridUnitType.Pixel);
         }
 
         private bool LabelFromSaveFile(int questionIdx, out char label)
@@ -414,10 +368,14 @@ namespace sQzClient
             if(radio.Name.EndsWith("True") && radio.IsChecked == true)
             {
                 thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx] = QuestionAnswer.TRUE;
+
+                GetAnswerLabelByQuestIdx(questIdx, optionIdx).Content = 'Đ';
             }
             else if(radio.Name.EndsWith("False") && radio.IsChecked == true)
             {
                 thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx] = QuestionAnswer.FALSE;
+
+                GetAnswerLabelByQuestIdx(questIdx, optionIdx).Content = 'S';
             }
             else
             {
@@ -454,13 +412,36 @@ namespace sQzClient
                     thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx + i] = QuestionAnswer.TRUE;
                     OptionView v = li as OptionView;
                     if (v != null)
-                        SelectedLabels[questIdx + 1].Content = v.Idx_Label;
+                        GetAnswerLabelByQuestIdx(questIdx, 0).Content = v.Idx_Label;
                 }
                 else
                     thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx + i] = QuestionAnswer.FALSE;
 
                 ++i;
             }
+        }
+
+        Label GetAnswerLabelByQuestIdx(int questIdx, int option)
+        {
+            int labelIdx = 0;
+            foreach(QSheetSection section in QuestionSheet.Sections)
+                foreach(Question quest in section.Questions)
+                {
+                    if(questIdx <= 0)
+                    {
+                        labelIdx += option;
+                        break;
+                    }
+
+                    if (quest.QuestionType == AnswerType.MultipleTrueFalse)
+                        labelIdx += 4;
+                    else
+                        ++labelIdx;
+                    
+                    --questIdx;
+                }
+
+            return SelectedLabels[labelIdx];
         }
 
         public void Submit()
