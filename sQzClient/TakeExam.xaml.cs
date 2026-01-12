@@ -22,7 +22,7 @@ namespace sQzClient
         UICbMsg mCbMsg;
         System.Timers.Timer mTimer;
 
-        Dictionary<int, Label> SelectedLabels;
+        List<Label> SelectedLabels;
 
         const int SMT_OK_M = 20;
         const int SMT_OK_S = 60;
@@ -139,46 +139,59 @@ namespace sQzClient
             dtLastLog = kDtStart = DateTime.Now;
         }
 
-        void AnswerSheet_NewCellAtBottomRow(string answerIdx, int column, Brush border, bool isLastRow)
+        void AnswerSheet_NewCellAtBottomRow(string constLabel, int column, Brush border, Grid answerPart)
         {
             Label cell = new Label();
-            int bottomRow = gAnsSh.RowDefinitions.Count - 1;
+            int bottomRow = answerPart.RowDefinitions.Count - 1;
             Grid.SetRow(cell, bottomRow);
             Grid.SetColumn(cell, column);
             cell.BorderBrush = border;
             cell.HorizontalContentAlignment = HorizontalAlignment.Center;
             cell.FontWeight = FontWeights.Bold;
+            cell.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
 
-            if(column == 0)
+            if (constLabel.Length > 0)
             {
-                cell.Content = answerIdx;
-                if(isLastRow)
-                    cell.BorderThickness = Theme.s.l[(int)ThicknessId.LB];
-                else
-                    cell.BorderThickness = Theme.s.l[(int)ThicknessId.MT];
+                cell.Content = constLabel;
             }
             else
             {
-                char labelFromSaveFile;
+                /*char labelFromSaveFile;
                 if (LabelFromSaveFile(bottomRow, out labelFromSaveFile))
-                    cell.Content = labelFromSaveFile;
-                if(isLastRow)
-                    cell.BorderThickness = Theme.s.l[(int)ThicknessId.RB];
-                else
-                    cell.BorderThickness = Theme.s.l[(int)ThicknessId.RT];
+                    cell.Content = labelFromSaveFile;*/
 
-                SelectedLabels.Add(bottomRow, cell);
+                SelectedLabels.Add(cell);
             }
 
-            gAnsSh.Children.Add(cell);
+            answerPart.Children.Add(cell);
+        }
+
+        void AnswerSheetView_AddSingleAnswerHeader(Brush border)
+        {
+            AnswerSheetP1.RowDefinitions.Add(new RowDefinition());
+
+            AnswerSheet_NewCellAtBottomRow("A", 1, border, AnswerSheetP1);
+            AnswerSheet_NewCellAtBottomRow("B", 2, border, AnswerSheetP1);
+            AnswerSheet_NewCellAtBottomRow("C", 3, border, AnswerSheetP1);
+            AnswerSheet_NewCellAtBottomRow("D", 4, border, AnswerSheetP1);
         }
 
         void AnswerSheetView_AddSingleAnswer(string questionIdx, Brush border, bool isLastRow)
         {
-            gAnsSh.RowDefinitions.Add(new RowDefinition());
+            AnswerSheetP1.RowDefinitions.Add(new RowDefinition());
 
-            AnswerSheet_NewCellAtBottomRow(questionIdx, 0, border, isLastRow);
-            AnswerSheet_NewCellAtBottomRow(questionIdx, 1, border, isLastRow);
+            AnswerSheet_NewCellAtBottomRow(questionIdx, 0, border, AnswerSheetP1);
+            AnswerSheet_NewCellAtBottomRow("", 1, border, AnswerSheetP1);
+            AnswerSheet_NewCellAtBottomRow("", 2, border, AnswerSheetP1);
+            AnswerSheet_NewCellAtBottomRow("", 3, border, AnswerSheetP1);
+            AnswerSheet_NewCellAtBottomRow("", 4, border, AnswerSheetP1);
+        }
+
+        void AnswerSheetView_AddMTFAnswerHeader(Brush border)
+        {
+            AnswerSheetP2.RowDefinitions.Add(new RowDefinition());
+            AnswerSheet_NewCellAtBottomRow("Đúng", 1, border, AnswerSheetP2);
+            AnswerSheet_NewCellAtBottomRow("Sai", 2, border, AnswerSheetP2);
         }
 
         void AnswerSheetView_AddMTFAnswer(string questionIdx1, Brush border, bool isLastRow)
@@ -187,10 +200,11 @@ namespace sQzClient
             int i = 0;
             while(i < OptionSelectAnswer.OPTION_COUNT)
             {
-                gAnsSh.RowDefinitions.Add(new RowDefinition());
+                AnswerSheetP2.RowDefinitions.Add(new RowDefinition());
 
-                AnswerSheet_NewCellAtBottomRow(questionIdx1 + '.' + option, 0, border, isLastRow);
-                AnswerSheet_NewCellAtBottomRow(questionIdx1 + '.' + option, 1, border, isLastRow);
+                AnswerSheet_NewCellAtBottomRow(questionIdx1 + '.' + option, 0, border, AnswerSheetP2);
+                AnswerSheet_NewCellAtBottomRow("", 1, border, AnswerSheetP2);
+                AnswerSheet_NewCellAtBottomRow("", 2, border, AnswerSheetP2);
 
                 ++option;
                 ++i;
@@ -218,18 +232,21 @@ namespace sQzClient
             spLp.HorizontalAlignment = HorizontalAlignment.Left;
             spLp.Background = Theme.s._[(int)BrushId.LeftPanel_BG];
 
-            gAnsSh.Background = Theme.s._[(int)BrushId.Sheet_BG];
+            AnswerSheetP1.Background = Theme.s._[(int)BrushId.Sheet_BG];
             int n = QuestionSheet.CountAllQuestions();
-            SolidColorBrush brBK = new SolidColorBrush(Colors.Black);
+            SolidColorBrush blackBrush = new SolidColorBrush(Colors.Black);
+
+            AnswerSheetView_AddMTFAnswerHeader(blackBrush);
+            AnswerSheetView_AddSingleAnswerHeader(blackBrush);
 
             //next lines
-            SelectedLabels = new Dictionary<int, Label>();
+            SelectedLabels = new List<Label>();
             
             for (int j = 0; j < n - 1; ++j)
-                AnswerSheetView_AddAtBottomRow(j, brBK, false);
+                AnswerSheetView_AddAtBottomRow(j, blackBrush, false);
 
             //bottom lines
-            AnswerSheetView_AddAtBottomRow(n -1, brBK, true);
+            AnswerSheetView_AddAtBottomRow(n -1, blackBrush, true);
         }
 
         private bool LabelFromSaveFile(int questionIdx, out char label)
@@ -364,18 +381,23 @@ namespace sQzClient
                 radio.Name.IndexOf("___", 0) - x));
 
             int BOA_idx = GetBytesOfAnswerIdxByQuesIdx(questIdx, optionIdx);
+            IEnumerator<Label> label = GetAnswerLabelIdx(questIdx, optionIdx);
 
             if(radio.Name.EndsWith("True") && radio.IsChecked == true)
             {
                 thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx] = QuestionAnswer.TRUE;
 
-                GetAnswerLabelByQuestIdx(questIdx, optionIdx).Content = 'Đ';
+                label.Current.Content = "X";
+                label.MoveNext();
+                label.Current.Content = "";
             }
             else if(radio.Name.EndsWith("False") && radio.IsChecked == true)
             {
                 thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx] = QuestionAnswer.FALSE;
 
-                GetAnswerLabelByQuestIdx(questIdx, optionIdx).Content = 'S';
+                label.Current.Content = "";
+                label.MoveNext();
+                label.Current.Content = "X";
             }
             else
             {
@@ -404,44 +426,61 @@ namespace sQzClient
 
             int questIdx = Convert.ToInt32(options.Name.Substring(1));
             int BOA_idx = GetBytesOfAnswerIdxByQuesIdx(questIdx, 0);
+            IEnumerator<Label> label = GetAnswerLabelIdx(questIdx, 0);
             int i = 0;
             foreach (ListBoxItem li in options.Items)
             {
                 if (li.IsSelected)
                 {
                     thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx + i] = QuestionAnswer.TRUE;
-                    OptionView v = li as OptionView;
-                    if (v != null)
-                        GetAnswerLabelByQuestIdx(questIdx, 0).Content = v.Idx_Label;
+                    label.Current.Content = "X";
                 }
                 else
+                {
                     thisExaminee.AnswerSheet.BytesOfAnswer[BOA_idx + i] = QuestionAnswer.FALSE;
+                    label.Current.Content = "";
+                }
 
                 ++i;
+                label.MoveNext();
             }
         }
 
-        Label GetAnswerLabelByQuestIdx(int questIdx, int option)
+        IEnumerator<Label> GetAnswerLabelIdx(int questIdx, int optionIdx)
         {
-            int labelIdx = 0;
-            foreach(QSheetSection section in QuestionSheet.Sections)
-                foreach(Question quest in section.Questions)
+            IEnumerator<Label> labelIdx = SelectedLabels.GetEnumerator();
+
+            foreach (QSheetSection section in QuestionSheet.Sections)
+            {
+                foreach (Question quest in section.Questions)
                 {
-                    if(questIdx <= 0)
+                    if (questIdx <= 0)
                     {
-                        labelIdx += option;
-                        break;
+                        labelIdx.MoveNext();
+
+                        if (quest.QuestionType == AnswerType.MultipleTrueFalse)
+                        {
+                            for (int i = optionIdx * 2; i > 0; --i)
+                                labelIdx.MoveNext();
+                        }
+                            
+                        return labelIdx;
                     }
 
-                    if (quest.QuestionType == AnswerType.MultipleTrueFalse)
-                        labelIdx += 4;
+                    int option_pass;
+                    if(quest.QuestionType == AnswerType.MultipleTrueFalse)
+                        option_pass = OptionSelectAnswer.OPTION_COUNT * 2;
                     else
-                        ++labelIdx;
-                    
+                        option_pass = OptionSelectAnswer.OPTION_COUNT;
+
+                    for (int i = option_pass; i > 0 ; --i)
+                        labelIdx.MoveNext();
+
                     --questIdx;
                 }
+            }
 
-            return SelectedLabels[labelIdx];
+            return labelIdx;
         }
 
         public void Submit()
