@@ -75,7 +75,7 @@
                 </Grid>
                 <StackPanel Orientation="Horizontal">
                     <Button Name="btnQGen" Content="Tạo đề" Click="btnQGen_Click" Width="120" Height="40" Background="#80cc28" Foreground="#fff" Margin="50,10,0,0"/>
-                    <Button Name="btnQSav" Content="Lưu đề" Click="btnQSav_Click" Width="120" Height="40" Background="#fbbc09" Foreground="#fff" Margin="60,10,0,0"/>
+                    <Button Name="btnQSav" Content="Lưu đề" IsEnabled="False" Click="btnQSav_Click" Width="120" Height="40" Background="#fbbc09" Foreground="#fff" Margin="60,10,0,0"/>
                 </StackPanel>
             </StackPanel>
             <TabControl Name="tbcSl" Width="876" SelectionChanged="tbcSl_SelectionChanged"/>

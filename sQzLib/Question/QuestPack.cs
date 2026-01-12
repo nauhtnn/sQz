@@ -222,9 +222,9 @@ namespace sQzLib
                 vSheet.Add(qs.ID, qs);
                 sheets.Add(qs);
             }
-            //if (DBInsertQSheets(mDt, sheets) == null)
+            if (DBInsertQSheets(mDt, sheets) == null)
                 return sheets;
-            //return new List<QuestSheet>();
+            return new List<QuestSheet>();
         }
 
         public static string DBInsertQSheets(DateTime dt, List<QuestSheet> l)

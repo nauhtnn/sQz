@@ -304,15 +304,15 @@ namespace sQzServer0
 
         void DisableQS_Gen()
         {
-            //rem in developing. MUST unrem in production. btnQGen.IsEnabled = false;
+            btnQGen.IsEnabled = false;
             //btnQGen.Foreground = Theme.s._[(int)BrushId.FG_Gray];
             //btnQGen.Background = Theme.s._[(int)BrushId.BG_Gray];
         }
 
-        //void EnableQSGen()
-        //{
-        //    btnQGen.IsEnabled = true;
-        //}
+        void EnableQS_Gen()
+        {
+            btnQGen.IsEnabled = true;
+        }
 
         void DisableQS_Save()
         {
@@ -349,12 +349,14 @@ namespace sQzServer0
             tbi.ShowExaminee();
             tbi.ShowQSHeader();
             tbcSl.Items.Add(tbi);
-            //QuestSheet.GetMaxID_inDB(Slot.Dt);
-            //if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
-            //        tbi.mSl.eStt == ExamStt.Prep)
-            //    btnQGen.IsEnabled = true; //EnableQSGen();
-            //else
-            //    btnQGen.IsEnabled = false; //DisableQSGen();
+
+            tbi.IsSelected = true;
+            QuestSheet.GetMaxID_inDB(Slot.Dt);
+            if ((tbi = tbcSl.SelectedItem as Op0SlotView) != null &&
+                    tbi.mSl.eStt == ExamStt.Prep)
+                EnableQS_Gen();
+            else
+                DisableQS_Gen();
         }
 
         private void btnQGen_Click(object sender, RoutedEventArgs e)
@@ -388,7 +390,7 @@ namespace sQzServer0
             Op0SlotView vw;
             if ((vw = tbcSl.SelectedItem as Op0SlotView) != null &&
                     vw.mSl.eStt == ExamStt.Prep)// && vw.mSl.MaxNumberOfExaminees_PerSubject() > 0)
-                btnQGen.IsEnabled = true; //EnableQSGen();
+                EnableQS_Gen();
             else
                 DisableQS_Gen();
         }
