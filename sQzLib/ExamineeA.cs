@@ -53,7 +53,7 @@ namespace sQzLib
         public string Grade {
             get
             {
-                return Grade2Decimal.ToString();
+                return Grade2Decimal.ToString("F2", System.Globalization.CultureInfo.InvariantCulture);
             }
         }
     }

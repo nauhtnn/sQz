@@ -103,7 +103,7 @@ namespace sQzServer0
                     t = new TextBlock();
                     t.Background = bg;
                     vGrade.Add(e.ID, t);
-                    if (e.Grade2Decimal != ExamineeA.LV_CAP)
+                    if (Math.Abs(e.Grade2Decimal - ExamineeA.LV_CAP) > 0.001)
                         t.Text = e.Grade;
                     Grid.SetRow(t, rid);
                     Grid.SetColumn(t, 5);
@@ -150,7 +150,7 @@ namespace sQzServer0
                 {
                     e.bToVw = false;
                     TextBlock t;
-                    if (e.Grade2Decimal != ExamineeA.LV_CAP && vGrade.TryGetValue(e.ID, out t))
+                    if (Math.Abs(e.Grade2Decimal - ExamineeA.LV_CAP) > 0.001 && vGrade.TryGetValue(e.ID, out t))
                         t.Text = e.Grade;
                     if (e.dtTim1.Hour != DT.INV && vDt1.TryGetValue(e.ID, out t))
                         t.Text = e.dtTim1.ToString(DT.hh);

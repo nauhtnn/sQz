@@ -127,7 +127,7 @@ namespace sQzServer1
                     grdNee.Children.Add(t);
                     t = new TextBlock();
                     t.HorizontalAlignment = HorizontalAlignment.Center;
-                    if (e.Grade2Decimal != ExamineeA.LV_CAP)
+                    if (Math.Abs(e.Grade2Decimal - ExamineeA.LV_CAP) > 0.001)
                     {
                         t.Text = e.Grade;
                         cbx.IsEnabled = false;

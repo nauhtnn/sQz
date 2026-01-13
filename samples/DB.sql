@@ -34,7 +34,7 @@ FOREIGN KEY(`subj_id`) REFERENCES `sqz_subject`(`id`));
 
 CREATE TABLE IF NOT EXISTS `sqz_nee_qsheet`(`dt` DATETIME,
 `neeid` VARCHAR(8) CHARACTER SET `utf8mb4`, `qsid` INT,
-`t1` TIME, `t2` TIME, `grade` INT,
+`t1` TIME, `t2` TIME, `grade` DOUBLE,
 `comp` VARCHAR(32),
 `ans` TEXT,
 FOREIGN KEY(`dt`, `neeid`) REFERENCES `sqz_examinee`(`dt`, `id`),

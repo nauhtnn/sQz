@@ -269,10 +269,12 @@ namespace sQzServer0
                         nee.Grade2Decimal.ToString("F2",
                             System.Globalization.CultureInfo.InvariantCulture) + ',' +
                         nee.dtTim1 + ',' +
-                        nee.dtTim2);
+                        nee.dtTim2 + ',' +
+                        nee.ComputerName);
                 }
             System.IO.File.WriteAllText("Result.csv", resultCsv.ToString(),
-                System.Text.Encoding.UTF8);
+                Encoding.UTF8);
+            MessageBox.Show("Đã xuất kết quả ra file: Result.csv");
         }
 
         private void lbxNee_Selected(object sender, RoutedEventArgs e)
