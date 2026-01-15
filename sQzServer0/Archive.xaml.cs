@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.Win32;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -272,9 +273,34 @@ namespace sQzServer0
                         nee.dtTim2 + ',' +
                         nee.ComputerName);
                 }
-            System.IO.File.WriteAllText("Result.csv", resultCsv.ToString(),
-                Encoding.UTF8);
-            MessageBox.Show("Đã xuất kết quả ra file: Result.csv");
+
+            string filePath = SaveFileDialog("comma delimited |*.csv");
+
+            if(filePath.Length > 0)
+            {
+                System.IO.File.WriteAllText(filePath, resultCsv.ToString(),
+                    Encoding.UTF8);
+                MessageBox.Show("Đã xuất kết quả ra file: " + filePath);
+            }
+        }
+
+        private string SaveFileDialog(string filter)
+        {
+            SaveFileDialog dlg = new SaveFileDialog();
+
+            // set filter for file extension and default file extension 
+            dlg.DefaultExt = ".csv";
+            if (filter.Length > 0)
+                dlg.Filter = filter;
+            bool? result = dlg.ShowDialog();
+
+            string fpath;
+            if (result == true)
+                fpath = dlg.FileName;
+            else
+                fpath = string.Empty;
+
+            return fpath;
         }
 
         private void lbxNee_Selected(object sender, RoutedEventArgs e)

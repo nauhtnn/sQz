@@ -114,7 +114,7 @@ namespace sQzServer0
 
             // set filter for file extension and default file extension 
             dlg.DefaultExt = ".docx";
-            dlg.Filter = "text documents (.docx;.txt)|*.docx;*.txt";
+            dlg.Filter = "text document |*.docx;*.txt";
             bool? result = dlg.ShowDialog();
 
             string fpath = null;
