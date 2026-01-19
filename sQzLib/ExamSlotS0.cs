@@ -42,11 +42,12 @@ namespace sQzLib
                 return null;
             }
             string qry;
+            string cond;
             if (arch)
-                qry = "status=" + (int)ExamStt.Arch;
+                cond = "status=" + (int)ExamStt.Arch;
             else
-                qry = "status!=" + (int)ExamStt.Arch;
-            qry = DBConnect.mkQrySelect("sqz_slot", "dt", qry);
+                cond = null;// "status!=" + (int)ExamStt.Arch;
+            qry = DBConnect.mkQrySelect("sqz_slot", "dt", cond);
             MySqlDataReader reader = DBConnect.exeQrySelect(conn, qry, out eMsg);
             if (reader == null)
             {
