@@ -209,7 +209,15 @@ namespace sQzServer0
 
         private void PrintAllExaminees()
         {
-            if(!QSheetExamineePrinter.ForceCreateDocx("exported_examinees.docx"))
+            string filePath = SaveFileDialog("Word document |*.docx");
+
+            if (filePath.Length <= 0)
+            {
+                MessageBox.Show("Chưa chọn file. Dừng lệnh xuất.");
+                return;
+            }
+
+            if (!QSheetExamineePrinter.ForceCreateDocx(filePath))
             {
                 MessageBox.Show("PrintAllExaminees CreateDocx error");
                 return;
@@ -255,6 +263,8 @@ namespace sQzServer0
                     printer.WritePageBreak();
                 }
             QSheetExamineePrinter.CloseDocx();
+
+            MessageBox.Show("Đã xuất bài làm ra file: " + filePath);
         }
 
         private void ExportExamineeCsv()
@@ -280,7 +290,7 @@ namespace sQzServer0
             {
                 System.IO.File.WriteAllText(filePath, resultCsv.ToString(),
                     Encoding.UTF8);
-                MessageBox.Show("Đã xuất kết quả ra file: " + filePath);
+                MessageBox.Show("Đã xuất DS điểm ra file: " + filePath);
             }
         }
 
@@ -429,13 +439,14 @@ namespace sQzServer0
 
         private void btnExportSheets_Click(object sender, RoutedEventArgs e)
         {
-            PrintQSheets();
+            //PrintQSheets();
+            PrintAllExaminees();
         }
 
         private void btnExportExaminees_Click(object sender, RoutedEventArgs e)
         {
-            ExportExamineeCsv();
             //PrintAllExaminees();
+            ExportExamineeCsv();
         }
     }
 }

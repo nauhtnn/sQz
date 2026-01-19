@@ -26,30 +26,66 @@ namespace sQzLib
 
         private void WriteSeletedLabel(Question question, int questionIdx, byte[] optionStatusArray, char[] answerKeys)
         {
-            char selectedLabel = 'A';
+            char currentUserLabel = 'A';
+            StringBuilder userSelectedLabels = new StringBuilder();
             int entireAnswerSheet_optionIdx = questionIdx * OptionSelectAnswer.OPTION_COUNT;
             bool noSelection = true;
-            char correctLabel = 'A';
+            char currentKeyLabel = 'A';
+            StringBuilder keyLabels = new StringBuilder();
             bool notFoundCorrect = true;
 
             for(int optionIdx = 0; optionIdx < OptionSelectAnswer.OPTION_COUNT;
                 ++optionIdx, ++entireAnswerSheet_optionIdx)
             {
-                if (noSelection)
+                if(question.QuestionType == AnswerType.SingleAnswer)
                 {
-                    if (optionStatusArray[entireAnswerSheet_optionIdx] == 0)
-                        ++selectedLabel;
-                    else
-                        noSelection = false;
+                    if (noSelection)
+                    {
+                        if (optionStatusArray[entireAnswerSheet_optionIdx] != QuestionAnswer.TRUE)
+                            ++currentUserLabel;
+                        else
+                        {
+                            noSelection = false;
+                            userSelectedLabels.Append(currentUserLabel + " ");
+                        }   
+                    }
+                    if (notFoundCorrect)
+                    {
+                        if (answerKeys[entireAnswerSheet_optionIdx] != QuestionAnswer.TRUE)
+                            ++currentKeyLabel;
+                        else
+                        {
+                            notFoundCorrect = false;
+                            keyLabels.Append(currentKeyLabel + " ");
+                        }
+                    }
                 }
-                if(notFoundCorrect)
+                else
                 {
-                    if (answerKeys[entireAnswerSheet_optionIdx] == '0')
-                        ++correctLabel;
+                    if (optionStatusArray[entireAnswerSheet_optionIdx] == QuestionAnswer.FALSE)
+                    {
+                        noSelection = false;
+                        userSelectedLabels.Append("S ");
+                    }
+                    else if (optionStatusArray[entireAnswerSheet_optionIdx] == QuestionAnswer.TRUE)
+                    {
+                        noSelection = false;
+                        userSelectedLabels.Append("Đ ");
+                    }
                     else
-                        notFoundCorrect = false;
+                        userSelectedLabels.Append("_ ");
+
+                    if (answerKeys[entireAnswerSheet_optionIdx] != QuestionAnswer.TRUE)
+                        keyLabels.Append("S ");
+                    else
+                        keyLabels.Append("Đ ");
                 }
             }
+
+            if (userSelectedLabels.Length > 1)
+                userSelectedLabels.Remove(userSelectedLabels.Length - 1, 1);
+            if (keyLabels.Length > 1)
+                keyLabels.Remove(keyLabels.Length - 1, 1);
 
             StringBuilder selection = new StringBuilder();
             selection.Append((questionIdx + 1).ToString() + ") ");
@@ -57,8 +93,8 @@ namespace sQzLib
             if (noSelection)
                 selection.Append(Txt.s._((int)TxI.PRINT_NO_SELECTED));
             else
-                selection.Append(Txt.s._((int)TxI.PRINT_SELECTED) + selectedLabel + ". ");
-            selection.Append(Txt.s._((int)TxI.PRINT_CORRECT_LABEL) + correctLabel + ".");
+                selection.Append(Txt.s._((int)TxI.PRINT_SELECTED) + userSelectedLabels.ToString() + ". ");
+            selection.Append(Txt.s._((int)TxI.PRINT_CORRECT_LABEL) + keyLabels.ToString() + ".");
 
             mDocxBody.AppendChild(new Paragraph(new Run(new Text(selection.ToString()))));
         }
